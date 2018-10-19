@@ -3,7 +3,6 @@ package io.improbable.keanu.model.regression;
 import io.improbable.keanu.model.MAPModelFitter;
 import io.improbable.keanu.model.MaximumLikelihoodModelFitter;
 import io.improbable.keanu.model.ModelFitter;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -28,9 +27,9 @@ public class RegressionModelBuilder<OUTPUT> {
     private Double priorOnInterceptMean;
     private DoubleTensor inputTrainingData;
     private OUTPUT outputTrainingData;
-    private Function<DoubleVertex, RegressionGraph.OutputVertices<OUTPUT>> outputTransform;
+    private Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
 
-    public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, RegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
+    public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
         this.inputTrainingData = inputTrainingData;
         this.outputTrainingData = outputTrainingData;
         this.outputTransform = outputTransform;
@@ -100,7 +99,7 @@ public class RegressionModelBuilder<OUTPUT> {
     public RegressionModel<OUTPUT> build() {
         checkVariablesAreCorrectlyInitialised();
 
-        RegressionGraph<OUTPUT> regressionGraph = new RegressionGraph<>(
+        LinearRegressionGraph<OUTPUT> regressionGraph = new LinearRegressionGraph<>(
                 this.inputTrainingData.getShape(),
                 outputTransform,
                 getInterceptVertex(),
@@ -153,7 +152,7 @@ public class RegressionModelBuilder<OUTPUT> {
         }
     }
 
-    private void performDataFitting(RegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
+    private void performDataFitting(LinearRegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
         ModelFitter<DoubleTensor, OUTPUT> fitter;
         switch (this.regularization) {
             case NONE:

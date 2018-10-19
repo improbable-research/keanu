@@ -21,10 +21,10 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
  * </pre>
  */
 public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
-    private final RegressionGraph<OUTPUT> modelGraph;
+    private final LinearRegressionGraph<OUTPUT> modelGraph;
     private static double defaultObservationSigma = 2.0;
 
-    RegressionModel(RegressionGraph<OUTPUT> modelGraph) {
+    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph) {
         this.modelGraph = modelGraph;
     }
 
@@ -36,14 +36,14 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
         return new RegressionModelBuilder<>(inputTrainingData, outputTrainingData, RegressionModel.logisticOutputTransform());
     }
 
-    static Function<DoubleVertex, RegressionGraph.OutputVertices<DoubleTensor>> gaussianOutputTransform(double measurementSigma) {
-        return yVertex -> new RegressionGraph.OutputVertices<>(yVertex, new GaussianVertex(yVertex, measurementSigma));
+    static Function<DoubleVertex, LinearRegressionGraph.OutputVertices<DoubleTensor>> gaussianOutputTransform(double measurementSigma) {
+        return yVertex -> new LinearRegressionGraph.OutputVertices<>(yVertex, new GaussianVertex(yVertex, measurementSigma));
     }
 
-    static Function<DoubleVertex, RegressionGraph.OutputVertices<BooleanTensor>> logisticOutputTransform() {
+    static Function<DoubleVertex, LinearRegressionGraph.OutputVertices<BooleanTensor>> logisticOutputTransform() {
         return probabilities -> {
             DoubleVertex sigmoid = probabilities.sigmoid();
-            return new RegressionGraph.OutputVertices<>(sigmoid.greaterThan(ConstantVertex.of(0.5)), new BernoulliVertex(sigmoid));
+            return new LinearRegressionGraph.OutputVertices<>(sigmoid.greaterThan(ConstantVertex.of(0.5)), new BernoulliVertex(sigmoid));
         };
     }
 

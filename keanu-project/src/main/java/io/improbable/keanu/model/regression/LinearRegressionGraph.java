@@ -13,7 +13,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import lombok.Getter;
 import lombok.Value;
 
-public class RegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, OUTPUT> {
+public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, OUTPUT> {
     private final DoubleVertex xVertex;
     private final Vertex<OUTPUT> yVertex;
     private final Vertex<OUTPUT> yObservationVertex;
@@ -22,7 +22,7 @@ public class RegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, OUTPUT>
     @Getter
     private final BayesianNetwork net;
 
-    public RegressionGraph(long[] featureShape, Function<DoubleVertex, OutputVertices<OUTPUT>> outputTransform, DoubleVertex interceptVertex, DoubleVertex weightsVertex) {
+    public LinearRegressionGraph(long[] featureShape, Function<DoubleVertex, OutputVertices<OUTPUT>> outputTransform, DoubleVertex interceptVertex, DoubleVertex weightsVertex) {
         long featureCount = featureShape[0];
         TensorShapeValidation.checkShapesMatch(weightsVertex.getShape(), new long[]{1, featureCount});
         TensorShapeValidation.checkShapesMatch(interceptVertex.getShape(), new long[]{1, 1});
