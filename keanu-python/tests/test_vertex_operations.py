@@ -77,3 +77,17 @@ def test_can_do_division(lhs, rhs, expected_result):
     result = lhs / rhs
     assert type(result) == kn.Vertex
     assert tensors_equal(result.getValue(), expected_result)    
+
+def test_can_do_compound_operations():
+    v1 = kn.Const(np.array([
+        [2., 3.], 
+        [5., 7.]
+        ]))
+    v2 = np.array([
+        [11., 13.], 
+        [17., 19.]]
+        )
+    v3 = 23.
+
+    result = v1 * v2 - v2 / v1 + v3 * v2
+    assert tensors_equal(result.getValue(), np.array([[269.5, 333.6666666666667], [472.6, 567.2857142857142]]))
