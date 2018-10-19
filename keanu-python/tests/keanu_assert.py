@@ -38,6 +38,6 @@ def __get_length(t):
 
 def __as_list(t):
     try:
-        return [i for i in t.asFlatArray()]
+        return (i for i in t.asFlatArray())
     except:
-        return [i for i in t]
+        return (i for i in t)
