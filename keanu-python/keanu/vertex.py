@@ -22,7 +22,9 @@ class VertexOps:
             "multiply" : VertexOps.__rmul__,
             "true_divide" : VertexOps.__rtruediv__,
             "greater" : VertexOps.__lt__,
+            "greater_equal" : VertexOps.__le__,
             "less" : VertexOps.__gt__,
+            "less_equal" : VertexOps.__ge__,
         }
         if method == "__call__":
             try:
@@ -60,9 +62,14 @@ class VertexOps:
     def __gt__(self, other):
         return kn.generated.vertex.GreaterThan(self, other)
 
+    def __ge__(self, other):
+        return kn.generated.vertex.GreaterThanOrEqual(self, other)
+
     def __lt__(self, other):
         return kn.generated.vertex.LessThan(self, other)
 
+    def __le__(self, other):
+        return kn.generated.vertex.LessThanOrEqual(self, other)
 
 class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, ctor, *args):

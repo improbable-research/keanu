@@ -29,6 +29,29 @@ def test_can_do_less_than(lhs, rhs, expected_result):
     assert type(result) == kn.Vertex
     assert tensors_equal(result.getValue(), expected_result)
 
+@pytest.mark.parametrize("lhs, rhs, expected_result", [
+    (kn.Const(np.array([10., 15., 20.])), kn.Const(np.array([15., 15., 15.])), np.array([[False], [True], [True]])),
+    (kn.Const(np.array([10., 15., 20.])),          np.array([15., 15., 15.]) , np.array([[False], [True], [True]])),
+    (         np.array([10., 15., 20.]) , kn.Const(np.array([15., 15., 15.])), np.array([[False], [True], [True]])),
+    (kn.Const(np.array([10., 15., 20.])),                              15.   , np.array([[False], [True], [True]])),
+    (                   10.             , kn.Const(np.array([15., 10.,  5.])), np.array([[False], [True], [True]])),
+])
+def test_can_do_greater_than_or_equal_to(lhs, rhs, expected_result):
+    result = lhs >= rhs
+    assert type(result) == kn.Vertex
+    assert tensors_equal(result.getValue(), expected_result)
+
+@pytest.mark.parametrize("lhs, rhs, expected_result", [
+    (kn.Const(np.array([10., 15., 20.])), kn.Const(np.array([15., 15., 15.])), np.array([[True], [True], [False]])),
+    (kn.Const(np.array([10., 15., 20.])),          np.array([15., 15., 15.]) , np.array([[True], [True], [False]])),
+    (         np.array([10., 15., 20.]) , kn.Const(np.array([15., 15., 15.])), np.array([[True], [True], [False]])),
+    (kn.Const(np.array([10., 15., 20.])),                              15.   , np.array([[True], [True], [False]])),
+    (                   10.             , kn.Const(np.array([15., 10.,  5.])), np.array([[True], [True], [False]])),
+])
+def test_can_do_less_than_or_equal_to(lhs, rhs, expected_result):
+    result = lhs <= rhs
+    assert type(result) == kn.Vertex
+    assert tensors_equal(result.getValue(), expected_result)
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([10., 20.])), kn.Const(np.array([1., 2.])), np.array([[11], [22]])),
