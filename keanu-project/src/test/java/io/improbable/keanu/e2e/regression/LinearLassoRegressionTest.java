@@ -1,8 +1,8 @@
 package io.improbable.keanu.e2e.regression;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertEquals;
 
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertWeightsAndInterceptMatchTestData;
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.generateThreeFeatureDataWithOneUncorrelatedFeature;
@@ -92,7 +92,7 @@ public class LinearLassoRegressionTest {
             .withRegularization(RegressionRegularization.LASSO)
             .build();
 
-        assertEquals(0., linearRegressionModel.getWeight(2), 1e-3);
+        assertThat(linearRegressionModel.getWeight(2), closeTo(0., 1e-3));
     }
 
 }

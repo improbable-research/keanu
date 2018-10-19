@@ -1,10 +1,9 @@
 package io.improbable.keanu.e2e.regression;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
-import static junit.framework.TestCase.assertTrue;
+import static io.improbable.keanu.tensor.TensorMatchers.lessThanOrEqualTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 
 import java.util.function.Function;
 
@@ -16,6 +15,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import lombok.Value;
 import lombok.experimental.UtilityClass;
+import static org.hamcrest.Matchers.is;
 
 @UtilityClass
 class LinearRegressionTestUtils {
@@ -100,12 +100,12 @@ class LinearRegressionTestUtils {
     }
 
     static void assertWeightsAndInterceptMatchTestData(DoubleTensor weights, double intercept, TestData testData) {
-        assertEquals("Intercept", testData.intercept, intercept, 0.5);
+        assertThat("Intercept", testData.intercept, closeTo(intercept, 0.5));
         assertThat("Weights", weights, allCloseTo(new Double(0.05), testData.weights));
     }
 
     private void assertRegularizedWeightsAreSmaller(DoubleVertex unregularizedWeights, DoubleVertex regularizedWeights) {
-        assertTrue(regularizedWeights.getValue().abs().lessThanOrEqual(unregularizedWeights.getValue().abs()).allTrue());
+        assertThat(regularizedWeights.getValue().abs(), lessThanOrEqualTo(unregularizedWeights.getValue().abs()));
     }
 
     @Value

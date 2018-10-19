@@ -1,9 +1,9 @@
 package io.improbable.keanu.e2e.regression;
 
+import static io.improbable.keanu.tensor.TensorMatchers.lessThanOrEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
-import static junit.framework.TestCase.assertTrue;
 
 import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.model.regression.RegressionModel;
@@ -76,6 +76,6 @@ public class LogisticRegressionTest {
     }
 
     private void assertRegularizedWeightsAreSmaller(DoubleVertex unregularizedWeights, DoubleVertex regularizedWeights) {
-        assertTrue(regularizedWeights.getValue().abs().lessThanOrEqual(unregularizedWeights.getValue().abs()).allTrue());
+        assertThat(regularizedWeights.getValue().abs(), lessThanOrEqualTo(unregularizedWeights.getValue().abs()));
     }
 }

@@ -1,8 +1,8 @@
 package io.improbable.keanu.e2e.regression;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -46,8 +46,8 @@ public class DiabetesLinearRegression {
         GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
         optimizer.maxLikelihood();
 
-        assertEquals(938.2378, weight.getValue().scalar(), 0.01);
-        assertEquals(152.9189, b.getValue().scalar(), 0.01);
+        assertThat(weight.getValue().scalar(), closeTo(938.2378, 0.01));
+        assertThat(b.getValue().scalar(),closeTo(152.9189, 0.01));
     }
 
     @Test
@@ -58,8 +58,8 @@ public class DiabetesLinearRegression {
             .withRegularization(RegressionRegularization.RIDGE)
             .withPriorOnWeightsAndIntercept(0, 100)
             .build();
-        assertEquals(938.2378, linearRegressionModel.getWeight(0), 0.5);
-        assertEquals(152.9189, linearRegressionModel.getIntercept(), 0.5);
+        assertThat(linearRegressionModel.getWeight(0), closeTo(938.2378, 0.5));
+        assertThat(linearRegressionModel.getIntercept(), closeTo(152.9189,0.5));
     }
 
     @Test

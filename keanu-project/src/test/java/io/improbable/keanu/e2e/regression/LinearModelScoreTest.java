@@ -1,9 +1,9 @@
 package io.improbable.keanu.e2e.regression;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertEquals;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class LinearModelScoreTest {
     public void coefficientOfDeterminationIs1ForSameData() {
         DoubleVertex generator = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
         DoubleTensor sample = generator.sample();
-        assertEquals(1, ModelScoring.coefficientOfDetermination(sample, sample), 1e-8);
+        assertThat( ModelScoring.coefficientOfDetermination(sample, sample), closeTo(1, 1e-8));
     }
 
     @Test
