@@ -21,6 +21,7 @@ class Optimizer:
     def max_likelihood(self):
         return self.optimizer.maxLikelihood()
 
+
 def build_bayes_net(builder, net):
     if isinstance(net, BayesNet):
         return builder.bayesianNetwork(net.unwrap()), net
@@ -29,6 +30,7 @@ def build_bayes_net(builder, net):
         return builder.bayesianNetwork(net.unwrap()), net
     else:
         raise ValueError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))
+
 
 class GradientOptimizer(Optimizer):
     def __init__(self, net, max_evaluations=None, relative_threshold=None, absolute_threshold=None):
