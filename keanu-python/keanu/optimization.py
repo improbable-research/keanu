@@ -22,7 +22,7 @@ class Optimizer:
         return self.optimizer.maxLikelihood()
 
     @staticmethod
-    def build_bayes_net(builder, net):
+    def _build_bayes_net(builder, net):
         if isinstance(net, BayesNet):
             return builder.bayesianNetwork(net.unwrap()), net
         elif isinstance(net, Vertex):
@@ -35,7 +35,7 @@ class Optimizer:
 class GradientOptimizer(Optimizer):
     def __init__(self, net, max_evaluations=None, relative_threshold=None, absolute_threshold=None):
         builder = k.GradientOptimizer.builder()
-        builder, net = Optimizer.build_bayes_net(builder, net)
+        builder, net = Optimizer._build_bayes_net(builder, net)
         if max_evaluations is not None:
             builder.maxEvaluations(max_evaluations)
         if relative_threshold is not None:
@@ -49,7 +49,7 @@ class GradientOptimizer(Optimizer):
 class NonGradientOptimizer(Optimizer):
     def __init__(self, net, max_evaluations=None, bounds_range=None, initial_trust_region_radius=None, stopping_trust_region_radius=None):
         builder = k.NonGradientOptimizer.builder()
-        builder, net = Optimizer.build_bayes_net(builder, net)
+        builder, net = Optimizer._build_bayes_net(builder, net)
         if max_evaluations is not None:
             builder.maxEvaluations(max_evaluations)
         if bounds_range is not None:
