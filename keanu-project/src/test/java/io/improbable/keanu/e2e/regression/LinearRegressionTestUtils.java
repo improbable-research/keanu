@@ -15,7 +15,6 @@ import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import lombok.Value;
 import lombok.experimental.UtilityClass;
-import static org.hamcrest.Matchers.is;
 
 @UtilityClass
 class LinearRegressionTestUtils {

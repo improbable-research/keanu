@@ -1,7 +1,5 @@
 package io.improbable.keanu.model.regression;
 
-import io.improbable.keanu.model.MAPModelFitter;
-import io.improbable.keanu.model.MaximumLikelihoodModelFitter;
 import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
