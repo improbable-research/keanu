@@ -32,13 +32,6 @@ public class RegressionModelBuilder<OUTPUT> {
         this.outputTransform = outputTransform;
     }
 
-    /**
-     * Sets the regularization to be used by the model.
-     * This can be any of the types from {@link io.improbable.keanu.model.regression.RegressionRegularization RegressionRegularization}
-     *
-     * @param regularization the type of regularization to be used by the resulting model
-     * @return An updated version of this builder
-     */
     public RegressionModelBuilder withRegularization(RegressionRegularization regularization) {
         this.regularization = regularization;
         return this;
@@ -50,7 +43,7 @@ public class RegressionModelBuilder<OUTPUT> {
      * @param means An array of means of the distribution describing the prior belief about the regression weights
      * @param scaleParameters An array of scale parameters of the distribution describing the prior belief about the regression weights.
      *                        This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
-     * @return An updated version of this builder
+     * @return this
      */
     public RegressionModelBuilder withPriorOnWeights(double[] means, double[] scaleParameters) {
         RegressionWeights.checkArrayHasCorrectNumberOfFeatures(means, getFeatureCount());
@@ -68,7 +61,7 @@ public class RegressionModelBuilder<OUTPUT> {
      * @param mean The mean of the distribution describing the prior belief about the regression intercept
      * @param scaleParameter The scale parameter of the distribution describing the prior belief about the regression intercept.
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
-     * @return An updated version of this builder
+     * @return this
      */
     public RegressionModelBuilder withPriorOnIntercept(double mean, double scaleParameter) {
         this.priorOnInterceptMean = mean;
@@ -82,7 +75,7 @@ public class RegressionModelBuilder<OUTPUT> {
      * @param mean The mean of the distribution describing the prior belief about both the regression intercept and weights
      * @param scaleParameter The scale parameter of the distribution describing the prior belief about both regression intercept and weights.
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
-     * @return An updated version of this builder
+     * @return this
      */
     public RegressionModelBuilder withPriorOnWeightsAndIntercept(double mean, double scaleParameter) {
         withPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), mean), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), scaleParameter));
