@@ -92,6 +92,9 @@ class VertexOps:
     def __le__(self, other):
         return kn.generated.vertex.LessThanOrEqual(self, other)
 
+    def __abs__(self):
+        return kn.generated.vertex.Abs(self)
+
 class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, ctor, *args):
         super(Vertex, self).__init__(ctor, *(Vertex.__parse_args(*args)))

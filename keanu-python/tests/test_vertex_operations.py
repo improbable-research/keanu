@@ -158,3 +158,20 @@ def test_can_do_compound_operations():
 
     result = v1 * v2 - v2 / v1 + v3 * v2
     assert tensors_equal(result.getValue(), np.array([[269.5, 333.6666666666667], [472.6, 567.2857142857142]]))
+
+
+### Unary
+
+def test_can_do_abs():
+    v = kn.Const(np.array([
+        [ 2., -3.], 
+        [-5.,  7.]
+        ]))
+
+    expected = np.array([
+        [ 2.,  3.], 
+        [ 5.,  7.]
+        ])
+
+    result = abs(v)
+    assert tensors_equal(result.getValue(), expected)
