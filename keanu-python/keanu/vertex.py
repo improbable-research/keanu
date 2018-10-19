@@ -95,6 +95,10 @@ class VertexOps:
     def __abs__(self):
         return kn.generated.vertex.Abs(self)
 
+    def __round__(self):
+        return kn.generated.vertex.Round(self)        
+
+
 class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, ctor, *args):
         super(Vertex, self).__init__(ctor, *(Vertex.__parse_args(*args)))

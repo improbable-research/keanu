@@ -174,4 +174,21 @@ def test_can_do_abs():
         ])
 
     result = abs(v)
+    assert type(result) == kn.Vertex
+    assert tensors_equal(result.getValue(), expected)
+
+
+def test_can_do_round():
+    v = kn.Const(np.array([
+        [ 4.4, 4.5,   5.5,  6.6], 
+        [-4.4, -4.5, -5.5, -6.6]
+        ]))
+
+    expected = np.array([
+        [ 4.,  5.,  6.,  7.], 
+        [-4., -5., -6., -7.]
+        ])
+
+    result = round(v)
+    assert type(result) == kn.Vertex
     assert tensors_equal(result.getValue(), expected)
