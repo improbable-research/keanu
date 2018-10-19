@@ -40,7 +40,7 @@ def __as_iterator(t):
     try:
         return (i for i in t.asFlatArray())
     except:
-        return (i for i in t)
+        return (i for i in t.flatten())
 
 def __as_list(t):
     return list(__as_iterator(t))
