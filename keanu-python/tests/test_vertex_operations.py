@@ -7,6 +7,34 @@ from tests.keanu_assert import tensors_equal
 ### Comparisons
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
+    (kn.Const(np.array([1., 2.])), kn.Const(np.array([1., -1.])), np.array([[True], [False]])),
+    (kn.Const(np.array([1., 2.])),          np.array([1., -1.]) , np.array([[True], [False]])),
+    (         np.array([1., 2.]) , kn.Const(np.array([1., -1.])), np.array([[True], [False]])),
+    (kn.Const(np.array([1.    ])),                    1.        , np.array([[True]         ])),
+    (kn.Const(np.array([    2.])),                    1.        , np.array([        [False]])),
+    (                   1.       , kn.Const(np.array([1.     ])), np.array([[True]         ])),
+    (                   1.       , kn.Const(np.array([    -1.])), np.array([        [False]])),
+])
+def test_can_do_equal_to(lhs, rhs, expected_result):
+    result = lhs == rhs
+    assert type(result) == kn.Vertex
+    assert tensors_equal(result.getValue(), expected_result)
+
+@pytest.mark.parametrize("lhs, rhs, expected_result", [
+    (kn.Const(np.array([1., 2.])), kn.Const(np.array([1., -1.])), np.array([[False], [True]])),
+    (kn.Const(np.array([1., 2.])),          np.array([1., -1.]) , np.array([[False], [True]])),
+    (         np.array([1., 2.]) , kn.Const(np.array([1., -1.])), np.array([[False], [True]])),
+    (kn.Const(np.array([1.    ])),                    1.        , np.array([[False]        ])),
+    (kn.Const(np.array([    2.])),                    1.        , np.array([         [True]])),
+    (                   1.       , kn.Const(np.array([1.     ])), np.array([[False]        ])),
+    (                   1.       , kn.Const(np.array([    -1.])), np.array([         [True]])),    
+])
+def test_can_do_not_equal_to(lhs, rhs, expected_result):
+    result = lhs != rhs
+    assert type(result) == kn.Vertex
+    assert tensors_equal(result.getValue(), expected_result)
+
+@pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([10., 20.])), kn.Const(np.array([15., 15.])), np.array([[False], [True]])),
     (kn.Const(np.array([10., 20.])),          np.array([15., 15.]) , np.array([[False], [True]])),
     (         np.array([10., 20.]) , kn.Const(np.array([15., 15.])), np.array([[False], [True]])),

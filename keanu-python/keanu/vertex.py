@@ -17,6 +17,8 @@ class VertexOps:
     """
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         methods = {
+            "equal" : VertexOps.__eq__,
+            "not_equal" : VertexOps.__ne__,
             "add" : VertexOps.__radd__,
             "subtract" : VertexOps.__rsub__,
             "multiply" : VertexOps.__rmul__,
@@ -65,6 +67,18 @@ class VertexOps:
 
     def __rtruediv__(self, other):
         return kn.generated.vertex.Division(other, self)
+
+    def __eq__(self, other):
+        return kn.generated.vertex.Equals(self, other)
+        
+    def __req__(self, other):
+        return kn.generated.vertex.Equals(self, other)
+
+    def __ne__(self, other):
+        return kn.generated.vertex.NotEquals(self, other)
+        
+    def __rne__(self, other):
+        return kn.generated.vertex.NotEquals(self, other)
 
     def __gt__(self, other):
         return kn.generated.vertex.GreaterThan(self, other)
