@@ -4,7 +4,6 @@ They might be Keanu tensors or Numpy arrays
 """
 def tensors_equal(t1, t2):
     if not shapes_equal(__get_shape(t1), __get_shape(t2)):
-        return False
         print("Shapes don't match", __get_shape(t1), __get_shape(t2))
         return False
     it1 = __as_list(t1)
