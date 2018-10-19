@@ -55,8 +55,8 @@ public class DiabetesLinearRegression {
         Data data = csvDataResource.getData();
 
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.bmi, data.y)
-            .setRegularization(RegressionRegularization.RIDGE)
-            .setPriorOnWeightsAndIntercept(0, 100)
+            .withRegularization(RegressionRegularization.RIDGE)
+            .withPriorOnWeightsAndIntercept(0, 100)
             .build();
         assertEquals(938.2378, linearRegressionModel.getWeight(0), 0.5);
         assertEquals(152.9189, linearRegressionModel.getIntercept(), 0.5);

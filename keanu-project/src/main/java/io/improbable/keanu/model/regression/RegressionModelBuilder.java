@@ -4,10 +4,7 @@ import io.improbable.keanu.model.MAPModelFitter;
 import io.improbable.keanu.model.MaximumLikelihoodModelFitter;
 import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 
 import java.util.function.Function;
 
@@ -42,7 +39,7 @@ public class RegressionModelBuilder<OUTPUT> {
      * @param regularization the type of regularization to be used by the resulting model
      * @return An updated version of this builder
      */
-    public RegressionModelBuilder setRegularization(RegressionRegularization regularization) {
+    public RegressionModelBuilder withRegularization(RegressionRegularization regularization) {
         this.regularization = regularization;
         return this;
     }
@@ -55,7 +52,7 @@ public class RegressionModelBuilder<OUTPUT> {
      *                        This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return An updated version of this builder
      */
-    public RegressionModelBuilder setPriorOnWeights(double[] means, double[] scaleParameters) {
+    public RegressionModelBuilder withPriorOnWeights(double[] means, double[] scaleParameters) {
         RegressionWeights.checkArrayHasCorrectNumberOfFeatures(means, getFeatureCount());
         RegressionWeights.checkArrayHasCorrectNumberOfFeatures(scaleParameters, getFeatureCount());
 
@@ -73,7 +70,7 @@ public class RegressionModelBuilder<OUTPUT> {
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return An updated version of this builder
      */
-    public RegressionModelBuilder setPriorOnIntercept(double mean, double scaleParameter) {
+    public RegressionModelBuilder withPriorOnIntercept(double mean, double scaleParameter) {
         this.priorOnInterceptMean = mean;
         this.priorOnInterceptScaleParameter = scaleParameter;
         return this;
@@ -87,9 +84,9 @@ public class RegressionModelBuilder<OUTPUT> {
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return An updated version of this builder
      */
-    public RegressionModelBuilder setPriorOnWeightsAndIntercept(double mean, double scaleParameter) {
-        setPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), mean), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), scaleParameter));
-        setPriorOnIntercept(mean, scaleParameter);
+    public RegressionModelBuilder withPriorOnWeightsAndIntercept(double mean, double scaleParameter) {
+        withPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), mean), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), scaleParameter));
+        withPriorOnIntercept(mean, scaleParameter);
         return this;
     }
 
@@ -118,10 +115,10 @@ public class RegressionModelBuilder<OUTPUT> {
             throw new IllegalArgumentException("You have not provided output training data");
         }
         if (priorOnWeightsMeans == null || priorOnWeightsScaleParameters == null) {
-            setPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), DEFAULT_MU), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), DEFAULT_SCALE_PARAMETER));
+            withPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), DEFAULT_MU), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), DEFAULT_SCALE_PARAMETER));
         }
         if (priorOnInterceptMean == null || priorOnInterceptScaleParameter == null) {
-            setPriorOnIntercept(DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
+            withPriorOnIntercept(DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
         }
     }
 
