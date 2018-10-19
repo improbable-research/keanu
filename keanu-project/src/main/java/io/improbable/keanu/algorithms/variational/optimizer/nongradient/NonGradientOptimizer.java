@@ -29,17 +29,37 @@ import lombok.Getter;
  */
 @Builder
 public class NonGradientOptimizer implements Optimizer {
-
+    /**
+     * Creates a BOBYQA {@link NonGradientOptimizer} which optimizes against the unobserved (latent) variables of the Bayesian network.
+     *
+     * @param bayesNet The Bayesian network containing the unobserved variables to be optimized against,
+     *                 and the observed variables to optimize the probability of.
+     * @return a {@link NonGradientOptimizer}
+     */
     public static NonGradientOptimizer of(BayesianNetwork bayesNet) {
         return NonGradientOptimizer.builder()
             .bayesianNetwork(bayesNet)
             .build();
     }
 
+    /**
+     * Creates a Bayesian network from the given vertices and uses this to
+     * create a BOBYQA {@link NonGradientOptimizer} which optimizes against the unobserved (latent) variables.
+     *
+     * @param vertices The vertices to create a Bayesian network from.
+     * @return a {@link NonGradientOptimizer}
+     */
     public static NonGradientOptimizer of(Collection<? extends Vertex> vertices) {
         return of(new BayesianNetwork(vertices));
     }
 
+    /**
+     * Retrieves the connected graph from the given vertex and uses this to
+     * create a BOBYQA {@link NonGradientOptimizer} which optimizes against the unobserved (latent) variables.
+     *
+     * @param vertexFromNetwork The vertices to create a Bayesian network from.
+     * @return a {@link NonGradientOptimizer}
+     */
     public static NonGradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
         return of(vertexFromNetwork.getConnectedGraph());
     }
@@ -96,6 +116,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
     }
 
+
     private double optimize(List<Vertex> outputVertices) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
@@ -146,6 +167,10 @@ public class NonGradientOptimizer implements Optimizer {
     }
 
     /**
+     * This methods detects the vertices in the Bayesian Network that have been observed, and will use MAP estimation to
+     * optimize the observation probability of these vertices.
+     * This method will modify in place the Bayesian network that was used to create this object.
+     *
      * @return the natural logarithm of the Maximum a posteriori (MAP)
      */
     @Override
@@ -154,6 +179,10 @@ public class NonGradientOptimizer implements Optimizer {
     }
 
     /**
+     * This methods detects the vertices in the Bayesian Network that have been observed, and will use Maximum Likelihood
+     * estimation to optimize the observation probability of these vertices.
+     * This method will modify in place the Bayesian network that was used to create this object.
+     *
      * @return the natural logarithm of the maximum likelihood (MLE)
      */
     @Override

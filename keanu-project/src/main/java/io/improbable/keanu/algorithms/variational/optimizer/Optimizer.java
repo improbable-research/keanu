@@ -16,9 +16,19 @@ import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 
 public interface Optimizer {
-
+    /**
+     * Adds a callback to be called whenever the optimizer evaluates the fitness of a point.
+     * @param fitnessCalculationHandler a function to be called whenever the optimizer evaluates the fitness of a point.
+     *                                  The double[] argument to the handler represents the point being evaluated.
+     *                                  The Double argument to the handler represents the fitness of that point.
+     */
     void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
 
+    /**
+     * This attempts to remove a callback function that previously would have been called whenever the optimizer
+     * evaluated the fitness of a point. If the callback is not registered then this function will do nothing.
+     * @param fitnessCalculationHandler the function to be removed from the list of fitness evaluation callbacks
+     */
     void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
 
     double maxAPosteriori();
