@@ -54,12 +54,10 @@ public class DiabetesLinearRegression {
     public void doesLinearRegressionOnBMIAsModel() {
         Data data = csvDataResource.getData();
 
-        RegressionModel linearRegressionModel = RegressionModel.builder()
+        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.bmi, data.y)
             .setRegularization(RegressionRegularization.RIDGE)
-            .setInputTrainingData(data.bmi)
-            .setOutputTrainingData(data.y)
             .setPriorOnWeightsAndIntercept(0, 100)
-            .buildLinearRegressionModel();
+            .build();
         assertEquals(938.2378, linearRegressionModel.getWeight(0), 0.5);
         assertEquals(152.9189, linearRegressionModel.getIntercept(), 0.5);
     }
@@ -78,10 +76,8 @@ public class DiabetesLinearRegression {
         DoubleTensor yTrainingData = splitYData.get(0);
         DoubleTensor yTestData = splitYData.get(1);
 
-        RegressionModel<DoubleTensor> linearRegressionModel = RegressionModel.builder()
-            .setInputTrainingData(xTrainingData)
-            .setOutputTrainingData(yTrainingData)
-            .buildLinearRegressionModel();
+        RegressionModel<DoubleTensor> linearRegressionModel = RegressionModel.withTrainingData(xTrainingData, yTrainingData)
+            .build();
 
         double accuracyOnTestData = ModelScoring.coefficientOfDetermination(linearRegressionModel.predict(xTestData), yTestData);
         assertThat(accuracyOnTestData, greaterThan(0.3));

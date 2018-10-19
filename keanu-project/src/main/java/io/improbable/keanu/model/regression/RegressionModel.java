@@ -22,13 +22,18 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
  */
 public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
     private final RegressionGraph<OUTPUT> modelGraph;
+    private static double defaultObservationSigma = 2.0;
 
     RegressionModel(RegressionGraph<OUTPUT> modelGraph) {
         this.modelGraph = modelGraph;
     }
 
-    public static RegressionModelBuilder builder() {
-        return new RegressionModelBuilder();
+    public static RegressionModelBuilder<DoubleTensor> withTrainingData(DoubleTensor inputTrainingData, DoubleTensor outputTrainingData) {
+        return new RegressionModelBuilder<>(inputTrainingData, outputTrainingData, RegressionModel.gaussianOutputTransform(defaultObservationSigma));
+    }
+
+    public static RegressionModelBuilder<BooleanTensor> withTrainingData(DoubleTensor inputTrainingData, BooleanTensor outputTrainingData) {
+        return new RegressionModelBuilder<>(inputTrainingData, outputTrainingData, RegressionModel.logisticOutputTransform());
     }
 
     static Function<DoubleVertex, RegressionGraph.OutputVertices<DoubleTensor>> gaussianOutputTransform(double measurementSigma) {

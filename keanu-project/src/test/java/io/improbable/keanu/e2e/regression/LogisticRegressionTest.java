@@ -49,10 +49,8 @@ public class LogisticRegressionTest {
 
     @Test
     public void testLogisticRegression() {
-        RegressionModel<BooleanTensor> model = RegressionModel.builder()
-            .setInputTrainingData(xTrain)
-            .setOutputTrainingData(yTrain)
-            .buildLogisticRegressionModel();
+        RegressionModel<BooleanTensor> model = RegressionModel.withTrainingData(xTrain, yTrain)
+            .build();
 
         double accuracy = ModelScoring.accuracy(model.predict(xTest), yTest);
         Assert.assertTrue(accuracy > 0.75);

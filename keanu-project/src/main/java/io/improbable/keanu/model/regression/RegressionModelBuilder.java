@@ -10,57 +10,30 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 
+import java.util.function.Function;
+
 /**
  * Builder class for doing linear regression without regularisation.
  *
  * @see RegressionModel
  */
-public class RegressionModelBuilder {
+public class RegressionModelBuilder<OUTPUT> {
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SCALE_PARAMETER = 2.0;
 
     private RegressionRegularization regularization = RegressionRegularization.NONE;
-    private double observationSigma = DEFAULT_SCALE_PARAMETER;
     private double[] priorOnWeightsScaleParameters;
     private double[] priorOnWeightsMeans;
     private Double priorOnInterceptScaleParameter;
     private Double priorOnInterceptMean;
     private DoubleTensor inputTrainingData;
-    private DoubleTensor outputLinearTrainingData;
-    private BooleanTensor outputLogisticTrainingData;
+    private OUTPUT outputTrainingData;
+    private Function<DoubleVertex, RegressionGraph.OutputVertices<OUTPUT>> outputTransform;
 
-    public RegressionModelBuilder setObservationSigma(double sigma) {
-        this.observationSigma = sigma;
-        return this;
-    }
-
-    public RegressionModelBuilder setInputTrainingData(DoubleTensor inputTrainingData) {
+    public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, RegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
         this.inputTrainingData = inputTrainingData;
-        return this;
-    }
-
-    /**
-     * Sets the output training data for the model. Specifically the case where we are performing linear regression.
-     *
-     * @param outputTrainingData The output training data for the model.
-     *                           This is specifically for the case where we are performing linear regression
-     * @return An updated version of this builder
-     */
-    public RegressionModelBuilder setOutputTrainingData(DoubleTensor outputTrainingData) {
-        this.outputLinearTrainingData = outputTrainingData;
-        return this;
-    }
-
-    /**
-     * Sets the output training data for the model. Specifically the case where we are performing logistic regression.
-     *
-     * @param outputTrainingData The output training data for the model.
-     *                           This is specifically for the case where we are performing logistic regression
-     * @return An updated version of this builder
-     */
-    public RegressionModelBuilder setOutputTrainingData(BooleanTensor outputTrainingData) {
-        this.outputLogisticTrainingData = outputTrainingData;
-        return this;
+        this.outputTrainingData = outputTrainingData;
+        this.outputTransform = outputTransform;
     }
 
     /**
@@ -122,49 +95,32 @@ public class RegressionModelBuilder {
     }
 
     /**
-     * Builds and fits LinearRegressionModel using the data passed to the builder.
      * @return A linear regression model from the data passed to the builder
      */
-    public RegressionModel<DoubleTensor> buildLinearRegressionModel() {
+    public RegressionModel<OUTPUT> build() {
         checkVariablesAreCorrectlyInitialised();
 
-        RegressionGraph<DoubleTensor> regressionGraph = new RegressionGraph<>(
-            this.inputTrainingData.getShape(),
-            RegressionModel.gaussianOutputTransform(observationSigma),
-            getInterceptVertex(),
-            getWeightsVertex()
-        );
-
-        performDataFitting(regressionGraph, outputLinearTrainingData);
-        return new RegressionModel<>(regressionGraph);
-    }
-
-    /**
-     * Builds and fits LogisticRegressionModel using the data passed to the builder.
-     * @return A linear regression model from the data passed to the builder
-     */
-    public RegressionModel<BooleanTensor> buildLogisticRegressionModel() {
-        checkVariablesAreCorrectlyInitialised();
-
-        RegressionGraph<BooleanTensor> regressionGraph = new RegressionGraph<>(
+        RegressionGraph<OUTPUT> regressionGraph = new RegressionGraph<>(
                 this.inputTrainingData.getShape(),
-                RegressionModel.logisticOutputTransform(),
+                outputTransform,
                 getInterceptVertex(),
                 getWeightsVertex()
         );
 
-        performDataFitting(regressionGraph, outputLogisticTrainingData);
+        performDataFitting(regressionGraph, outputTrainingData);
         return new RegressionModel<>(regressionGraph);
     }
 
     private void checkVariablesAreCorrectlyInitialised() {
-        if (inputTrainingData == null || (outputLogisticTrainingData == null && outputLinearTrainingData == null)) {
-            throw new IllegalArgumentException("You have not provided both the input and output variables");
+        if (inputTrainingData == null) {
+            throw new IllegalArgumentException("You have not provided input training data");
+        }
+        if (outputTrainingData == null) {
+            throw new IllegalArgumentException("You have not provided output training data");
         }
         if (priorOnWeightsMeans == null || priorOnWeightsScaleParameters == null) {
             setPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), DEFAULT_MU), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), DEFAULT_SCALE_PARAMETER));
         }
-
         if (priorOnInterceptMean == null || priorOnInterceptScaleParameter == null) {
             setPriorOnIntercept(DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
         }
@@ -197,7 +153,7 @@ public class RegressionModelBuilder {
         }
     }
 
-    private <OUTPUT> void performDataFitting(RegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
+    private void performDataFitting(RegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
         ModelFitter<DoubleTensor, OUTPUT> fitter;
         switch (this.regularization) {
             case NONE:

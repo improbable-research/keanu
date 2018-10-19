@@ -44,10 +44,8 @@ public class LinearRegressionTest {
     public void modelFindsParamsForOneWeight() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData();
 
-        RegressionModel linearRegressionModel = RegressionModel.builder()
-            .setInputTrainingData(data.xTrain)
-            .setOutputTrainingData(data.yTrain)
-            .buildLinearRegressionModel();
+        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
+            .build();
 
         assertWeightsAndInterceptMatchTestData(
             linearRegressionModel.getWeights(),
@@ -83,10 +81,8 @@ public class LinearRegressionTest {
     @Test
     public void modelFindsParamsForTwoWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
-        RegressionModel linearRegressionModel = RegressionModel.builder()
-            .setInputTrainingData(data.xTrain)
-            .setOutputTrainingData(data.yTrain)
-            .buildLinearRegressionModel();
+        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
+            .build();
 
         assertWeightsAndInterceptMatchTestData(
             linearRegressionModel.getWeights(),
@@ -120,10 +116,8 @@ public class LinearRegressionTest {
     public void modelFindsParamsForManyWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataUniformWeights(20);
 
-        RegressionModel linearRegressionModel = RegressionModel.builder()
-            .setInputTrainingData(data.xTrain)
-            .setOutputTrainingData(data.yTrain)
-            .buildLinearRegressionModel();
+        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
+            .build();
 
         assertWeightsAndInterceptMatchTestData(
             linearRegressionModel.getWeights(),
