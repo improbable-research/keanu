@@ -24,7 +24,6 @@ public class LogisticModelScoreTest {
 
     @Test
     public void accuracyOfHalfIsHalf() {
-        BooleanTensor test = BooleanTensor.create(true, false, true, false);
         assertThat(ModelScoring.accuracy(BooleanTensor.create(true, true, true, true), BooleanTensor.create(true, false, true, false)), closeTo(0.5, 1e-10));
     }
 }
