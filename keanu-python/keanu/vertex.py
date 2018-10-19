@@ -109,7 +109,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
         super(Vertex, self).__init__(ctor, *(Vertex.__parse_args(*args)))
 
     def observe(self, v):
-        from keanu.const import Tensor
+        from keanu.tensor import Tensor
         self.unwrap().observe(Tensor(v).unwrap())
 
     @staticmethod
