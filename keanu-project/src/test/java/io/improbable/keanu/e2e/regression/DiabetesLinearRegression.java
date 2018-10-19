@@ -39,7 +39,7 @@ public class DiabetesLinearRegression {
             .load(true);
 
         // Linear Regression
-        DoubleVertex weight = new GaussianVertex(0.0, 100.0);
+        DoubleVertex weight = new GaussianVertex(0.0, 2.0);
         DoubleVertex b = new GaussianVertex(0.0, 2.0);
         DoubleVertex x = ConstantVertex.of(data.bmi);
         DoubleVertex yMu = x.multiply(weight);
@@ -48,8 +48,8 @@ public class DiabetesLinearRegression {
         y.observe(data.y);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = GradientOptimizer.builder().absoluteThreshold(1000000000).bayesianNetwork(bayesNet).build();
-        optimizer.maxAPosteriori();
+        GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
+        optimizer.maxLikelihood();
 
         assertEquals(938.2378, weight.getValue().scalar(), 0.01);
         assertEquals(152.9189, b.getValue().scalar(), 0.01);

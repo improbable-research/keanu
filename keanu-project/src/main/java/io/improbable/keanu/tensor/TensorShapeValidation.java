@@ -75,7 +75,7 @@ public class TensorShapeValidation {
         } else if (nonScalarShapes.size() == 1) {
             return nonScalarShapes.iterator().next().getShape();
         } else {
-             throw new IllegalArgumentException("Shapes must match or be scalar");
+            throw new IllegalArgumentException("Shapes must match or be scalar");
         }
     }
 
