@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -16,6 +17,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
      * @param base  the base vertex
      * @param exponent the exponent vertex
      */
+    @ExportVertexToPythonBindings
     public PowerVertex(DoubleVertex base, DoubleVertex exponent) {
         super(base, exponent);
     }

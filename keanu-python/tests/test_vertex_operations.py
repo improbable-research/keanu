@@ -4,6 +4,8 @@ import pytest
 from tests.keanu_assert import tensors_equal
 
 
+### Comparisons
+
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([10., 20.])), kn.Const(np.array([15., 15.])), np.array([[False], [True]])),
     (kn.Const(np.array([10., 20.])),          np.array([15., 15.]) , np.array([[False], [True]])),
@@ -53,6 +55,8 @@ def test_can_do_less_than_or_equal_to(lhs, rhs, expected_result):
     assert type(result) == kn.Vertex
     assert tensors_equal(result.getValue(), expected_result)
 
+### Arithmetic
+
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([10., 20.])), kn.Const(np.array([1., 2.])), np.array([[11], [22]])),
     (kn.Const(np.array([10., 20.])),          np.array([1., 2.]) , np.array([[11], [22]])),
@@ -100,6 +104,18 @@ def test_can_do_division(lhs, rhs, expected_result):
     result = lhs / rhs
     assert type(result) == kn.Vertex
     assert tensors_equal(result.getValue(), expected_result)    
+
+@pytest.mark.parametrize("lhs, rhs, expected_result", [
+    (kn.Const(np.array([3., 2.])), kn.Const(np.array([2., 0.5])), np.array([[9], [1.4142135623730951]])),
+    (kn.Const(np.array([3., 2.])),          np.array([2., 0.5]) , np.array([[9], [1.4142135623730951]])),
+    (         np.array([3., 2.]) , kn.Const(np.array([2., 0.5])), np.array([[9], [1.4142135623730951]])),
+    (kn.Const(np.array([3., 2.])),                    2.        , np.array([[9], [4                 ]])),
+    (                   3.,        kn.Const(np.array([2., 0.5])), np.array([[9], [1.7320508075688772]])),
+])
+def test_can_do_pow(lhs, rhs, expected_result):
+    result = lhs ** rhs
+    assert type(result) == kn.Vertex
+    assert tensors_equal(result.getValue(), expected_result)
 
 def test_can_do_compound_operations():
     v1 = kn.Const(np.array([

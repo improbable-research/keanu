@@ -20,6 +20,7 @@ class VertexOps:
             "add" : VertexOps.__radd__,
             "subtract" : VertexOps.__rsub__,
             "multiply" : VertexOps.__rmul__,
+            "power" : VertexOps.__rpow__,
             "true_divide" : VertexOps.__rtruediv__,
             "greater" : VertexOps.__lt__,
             "greater_equal" : VertexOps.__le__,
@@ -53,6 +54,12 @@ class VertexOps:
     def __rmul__(self, other):
         return kn.generated.vertex.Multiplication(other, self)
 
+    def __pow__(self, other):
+        return kn.generated.vertex.Power(self, other)
+
+    def __rpow__(self, other):
+        return kn.generated.vertex.Power(other, self)
+        
     def __truediv__(self, other):
         return kn.generated.vertex.Division(self, other)
 
