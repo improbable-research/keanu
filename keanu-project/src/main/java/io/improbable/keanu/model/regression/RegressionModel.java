@@ -14,10 +14,10 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
  * A general linear regression model that can be fitted to input and output training data.
  * You can construct a regression model as follows:
  * <pre>
- * LinearRegressionModel model = LinearRegressionModel.builder()
- *     .setInputTrainingData(inputTrainingData)
- *     .setOutputTrainingData(outputTrainingData)
- *     .build();
+ * RegressionModel model = RegressionModel
+ *      .withTrainingData(inputTrainingData, outputTrainingData)
+ *      .withRegularization(RegressionRegularization.RIDGE)
+ *      .build();
  * </pre>
  */
 public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
