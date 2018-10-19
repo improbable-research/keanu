@@ -8,9 +8,9 @@ def tensors_equal(t1, t2):
         return False
     it1 = __as_list(t1)
     it2 = __as_list(t2)
-    for i in range(len(it1)):
-        if it1[i] != it2[i]:
-            print("Mismatch at position %d: %s != %s" % (i, it1[i], it2[i]))
+    for idx, value in enumerate(zip(it1, it2)):
+        if value[0] != value[1]:
+            print("Mismatch at position %d: %s != %s" % (idx, value[0], value[1]))
             return False
     return True
 
