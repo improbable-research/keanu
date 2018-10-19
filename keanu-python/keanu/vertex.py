@@ -98,6 +98,11 @@ class VertexOps:
     def __round__(self):
         return kn.generated.vertex.Round(self)        
 
+    def __floor__(self):
+        return kn.generated.vertex.Floor(self)    
+
+    def __ceil__(self):
+        return kn.generated.vertex.Ceil(self)    
 
 class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, ctor, *args):

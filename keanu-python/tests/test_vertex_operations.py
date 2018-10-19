@@ -1,6 +1,7 @@
 import keanu as kn
 import numpy as np
 import pytest
+import math
 from tests.keanu_assert import tensors_equal
 
 
@@ -192,3 +193,35 @@ def test_can_do_round():
     result = round(v)
     assert type(result) == kn.Vertex
     assert tensors_equal(result.getValue(), expected)
+
+
+def test_can_do_floor():
+    v = kn.Const(np.array([
+        [ 4.4, 4.5,   5.5,  6.6], 
+        [-4.4, -4.5, -5.5, -6.6]
+        ]))
+
+    expected = np.array([
+        [ 4.,  4.,  5.,  6.], 
+        [-5., -5., -6., -7.]
+        ])
+
+    result = math.floor(v)
+    assert type(result) == kn.Vertex
+    assert tensors_equal(result.getValue(), expected)
+
+
+def test_can_do_ceil():
+    v = kn.Const(np.array([
+        [ 4.4, 4.5,   5.5,  6.6], 
+        [-4.4, -4.5, -5.5, -6.6]
+        ]))
+
+    expected = np.array([
+        [ 5.,  5.,  6.,  7.], 
+        [-4., -4., -5., -6.]
+        ])
+
+    result = math.ceil(v)
+    assert type(result) == kn.Vertex
+    assert tensors_equal(result.getValue(), expected)        

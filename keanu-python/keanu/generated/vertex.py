@@ -23,6 +23,8 @@ java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.bina
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex")
@@ -94,6 +96,14 @@ def Power(*args) -> k.PowerVertex:
 
 def Abs(*args) -> k.AbsVertex:
     return Vertex(k.AbsVertex, args)
+
+
+def Ceil(*args) -> k.CeilVertex:
+    return Vertex(k.CeilVertex, args)
+
+
+def Floor(*args) -> k.FloorVertex:
+    return Vertex(k.FloorVertex, args)
 
 
 def Round(*args) -> k.RoundVertex:
