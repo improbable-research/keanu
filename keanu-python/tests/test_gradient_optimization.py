@@ -22,7 +22,7 @@ def test_gradient_op_bayes_net(model):
 
 def test_gradient_op_vertex(model):
     gradient_optimizer = kn.GradientOptimizer(model.temperature)
-    assert len(gradient_optimizer.net.vertices) == 7
+    assert len(gradient_optimizer.net.getLatentVertices()) == 1
 
 
 def test_gradient_op_throws_with_invalid_net_param():

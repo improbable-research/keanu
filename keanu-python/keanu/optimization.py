@@ -21,21 +21,21 @@ class Optimizer:
     def max_likelihood(self):
         return self.optimizer.maxLikelihood()
 
-
-def build_bayes_net(builder, net):
-    if isinstance(net, BayesNet):
-        return builder.bayesianNetwork(net.unwrap()), net
-    elif isinstance(net, Vertex):
-        net = BayesNet(net.unwrap().getConnectedGraph())
-        return builder.bayesianNetwork(net.unwrap()), net
-    else:
-        raise ValueError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))
+    @staticmethod
+    def build_bayes_net(builder, net):
+        if isinstance(net, BayesNet):
+            return builder.bayesianNetwork(net.unwrap()), net
+        elif isinstance(net, Vertex):
+            net = BayesNet(net.getConnectedGraph())
+            return builder.bayesianNetwork(net.unwrap()), net
+        else:
+            raise ValueError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))
 
 
 class GradientOptimizer(Optimizer):
     def __init__(self, net, max_evaluations=None, relative_threshold=None, absolute_threshold=None):
         builder = k.GradientOptimizer.builder()
-        builder, net = build_bayes_net(builder, net)
+        builder, net = Optimizer.build_bayes_net(builder, net)
         if max_evaluations is not None:
             builder.maxEvaluations(max_evaluations)
         if relative_threshold is not None:
@@ -49,7 +49,7 @@ class GradientOptimizer(Optimizer):
 class NonGradientOptimizer(Optimizer):
     def __init__(self, net, max_evaluations=None, bounds_range=None, initial_trust_region_radius=None, stopping_trust_region_radius=None):
         builder = k.NonGradientOptimizer.builder()
-        builder, net = build_bayes_net(builder, net)
+        builder, net = Optimizer.build_bayes_net(builder, net)
         if max_evaluations is not None:
             builder.maxEvaluations(max_evaluations)
         if bounds_range is not None:
