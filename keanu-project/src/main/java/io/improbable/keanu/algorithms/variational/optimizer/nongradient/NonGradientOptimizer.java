@@ -22,6 +22,11 @@ import io.improbable.keanu.vertices.Vertex;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * This class can be used to construct a BOBYQA non-gradient optimizer.
+ * This will use a quadratic approximation of the gradient to perform optimization without derivatives.
+ * @see <a href="http://www.damtp.cam.ac.uk/user/na/NA_papers/NA2009_06.pdf">BOBYQA Optimizer</a>
+ */
 @Builder
 public class NonGradientOptimizer implements Optimizer {
 
