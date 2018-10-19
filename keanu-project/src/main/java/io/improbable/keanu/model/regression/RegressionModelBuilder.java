@@ -126,30 +126,11 @@ public class RegressionModelBuilder<OUTPUT> {
     }
 
     private DoubleVertex getInterceptVertex() {
-        switch (this.regularization) {
-            case NONE:
-                return new GaussianVertex(DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
-            case LASSO:
-                return new LaplaceVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
-            case RIDGE:
-                return new GaussianVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
-            default:
-                return new GaussianVertex(DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
-
-        }
+        return this.regularization.getInterceptVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
     }
 
     private DoubleVertex getWeightsVertex() {
-        switch (this.regularization) {
-            case NONE:
-                return new GaussianVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(DEFAULT_MU), ConstantVertex.of(DEFAULT_SCALE_PARAMETER));
-            case LASSO:
-                return new LaplaceVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnInterceptScaleParameter));
-            case RIDGE:
-                return new GaussianVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnInterceptScaleParameter));
-            default:
-                return new GaussianVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(DEFAULT_MU), ConstantVertex.of(DEFAULT_SCALE_PARAMETER));
-        }
+        return this.regularization.getWeightsVertex(getFeatureCount(), priorOnWeightsMeans, priorOnWeightsScaleParameters);
     }
 
     private void performDataFitting(LinearRegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
