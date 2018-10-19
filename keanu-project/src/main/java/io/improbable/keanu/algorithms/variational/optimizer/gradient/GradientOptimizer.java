@@ -100,16 +100,31 @@ public class GradientOptimizer implements Optimizer {
     @Builder.Default
     private double absoluteThreshold = 1e-8;
 
+    /**
+     * Specifies what formula to use to update the Beta parameter of the Nonlinear conjugate gradient method optimizer.
+     */
     @Builder.Default
     private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
 
     private final List<BiConsumer<double[], double[]>> onGradientCalculations = new ArrayList<>();
     private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
 
+    /**
+     * Adds a callback to be called whenever the optimizer evaluates the gradient at a point.
+     * @param gradientCalculationHandler a function to be called whenever the optimizer evaluates the gradient at a point.
+     *                                  The double[] argument to the handler represents the point being evaluated.
+     *                                  The double[] argument to the handler represents the gradient of that point.
+     */
     public void addGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
         this.onGradientCalculations.add(gradientCalculationHandler);
     }
 
+    /**
+     * This attempts to remove a callback function that previously would have been called whenever the optimizer
+     * evaluated the gradient at a point. If the callback is not registered then this function will do nothing.
+     *
+     * @param gradientCalculationHandler the function to be removed from the list of gradient evaluation callbacks
+     */
     public void removeGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
         this.onGradientCalculations.remove(gradientCalculationHandler);
     }
