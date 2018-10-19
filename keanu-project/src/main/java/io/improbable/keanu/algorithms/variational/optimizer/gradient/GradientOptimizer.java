@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -40,7 +41,13 @@ public class GradientOptimizer implements Optimizer {
             this.apacheMapping = apacheMapping;
         }
     }
-
+    /**
+     * Creates a {@link GradientOptimizer} which optimizes against the unobserved (latent) variables of the Bayesian network.
+     *
+     * @param bayesNet The Bayesian network containing the unobserved variables to be optimized against,
+     *                 and the observed variables to optimize the probability of.
+     * @return a {@link GradientOptimizer}
+     */
     public static GradientOptimizer of(BayesianNetwork bayesNet) {
         List<Vertex> discreteLatentVertices = bayesNet.getDiscreteLatentVertices();
         boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
@@ -55,10 +62,24 @@ public class GradientOptimizer implements Optimizer {
             .build();
     }
 
+    /**
+     * Creates a Bayesian network from the given vertices and uses this to
+     * create a {@link GradientOptimizer} which optimizes against the unobserved (latent) variables.
+     *
+     * @param vertices The vertices to create a Bayesian network from.
+     * @return a {@link GradientOptimizer}
+     */
     public static GradientOptimizer of(Collection<? extends Vertex> vertices) {
         return of(new BayesianNetwork(vertices));
     }
 
+    /**
+     * Retrieves the connected graph from the given vertex and uses this to
+     * create a {@link GradientOptimizer} which optimizes against the unobserved (latent) variables.
+     *
+     * @param vertexFromNetwork The vertices to create a Bayesian network from.
+     * @return a {@link GradientOptimizer}
+     */
     public static GradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
         return of(vertexFromNetwork.getConnectedGraph());
     }

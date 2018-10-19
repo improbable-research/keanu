@@ -31,12 +31,33 @@ public interface Optimizer {
      */
     void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
 
+    /**
+     * This methods detects the vertices in the Bayesian Network that have been observed, and will use MAP estimation to
+     * optimize the observation probability of these vertices.
+     * This method will modify in place the Bayesian network that was used to create this object.
+     *
+     * @return the natural logarithm of the Maximum a posteriori (MAP)
+     */
     double maxAPosteriori();
 
+    /**
+     * This methods detects the vertices in the Bayesian Network that have been observed, and will use Maximum Likelihood
+     * estimation to optimize the observation probability of these vertices.
+     * This method will modify in place the Bayesian network that was used to create this object.
+     *
+     * @return the natural logarithm of the maximum likelihood (MLE)
+     */
     double maxLikelihood();
 
     BayesianNetwork getBayesianNetwork();
 
+    /**
+     * Creates an {@link Optimizer} which optimizes against the unobserved (latent) variables of the Bayesian network.
+     *
+     * @param network The Bayesian network containing the unobserved variables to be optimized against,
+     *                 and the observed variables to optimize the probability of.
+     * @return an {@link Optimizer}
+     */
     static Optimizer of(BayesianNetwork network) {
         if (network.getDiscreteLatentVertices().isEmpty()) {
             return GradientOptimizer.of(network);
@@ -45,10 +66,24 @@ public interface Optimizer {
         }
     }
 
+    /**
+     * Creates a Bayesian network from the given vertices and uses this to
+     * create an {@link Optimizer} which optimizes against the unobserved (latent) variables.
+     *
+     * @param vertices The vertices to create a Bayesian network from.
+     * @return an {@link Optimizer}
+     */
     static Optimizer of(Collection<? extends Vertex> vertices) {
         return of(new BayesianNetwork(vertices));
     }
 
+    /**
+     * Retrieves the connected graph from the given vertex and uses this to
+     * create an {@link Optimizer} which optimizes against the unobserved (latent) variables.
+     *
+     * @param vertexFromNetwork The vertices to create a Bayesian network from.
+     * @return an {@link Optimizer}
+     */
     static Optimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
         return of(vertexFromNetwork.getConnectedGraph());
     }

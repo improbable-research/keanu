@@ -166,25 +166,11 @@ public class NonGradientOptimizer implements Optimizer {
         return (int) (2 * Optimizer.totalNumberOfLatentDimensions(latentVertices) + 1);
     }
 
-    /**
-     * This methods detects the vertices in the Bayesian Network that have been observed, and will use MAP estimation to
-     * optimize the observation probability of these vertices.
-     * This method will modify in place the Bayesian network that was used to create this object.
-     *
-     * @return the natural logarithm of the Maximum a posteriori (MAP)
-     */
     @Override
     public double maxAPosteriori() {
         return optimize(bayesianNetwork.getLatentOrObservedVertices());
     }
 
-    /**
-     * This methods detects the vertices in the Bayesian Network that have been observed, and will use Maximum Likelihood
-     * estimation to optimize the observation probability of these vertices.
-     * This method will modify in place the Bayesian network that was used to create this object.
-     *
-     * @return the natural logarithm of the maximum likelihood (MLE)
-     */
     @Override
     public double maxLikelihood() {
         return optimize(bayesianNetwork.getObservedVertices());
