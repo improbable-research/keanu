@@ -23,13 +23,11 @@ class Optimizer:
 
     @staticmethod
     def _build_bayes_net(builder, net):
-        if isinstance(net, BayesNet):
-            return builder.bayesianNetwork(net.unwrap()), net
+        if not (isinstance(net, BayesNet) or isinstance(net, Vertex)):
+            raise ValueError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))
         elif isinstance(net, Vertex):
             net = BayesNet(net.getConnectedGraph())
-            return builder.bayesianNetwork(net.unwrap()), net
-        else:
-            raise ValueError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))
+        return builder.bayesianNetwork(net.unwrap()), net
 
 
 class GradientOptimizer(Optimizer):
