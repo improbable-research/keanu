@@ -1,7 +1,6 @@
 import keanu as kn
 import numpy as np
 import pytest
-from tests.keanu_assert import tensors_equal
 
 
 @pytest.fixture

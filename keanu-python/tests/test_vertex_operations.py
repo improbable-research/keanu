@@ -1,7 +1,6 @@
 import keanu as kn
 import numpy as np
 import pytest
-from tests.keanu_assert import tensors_equal
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
@@ -14,7 +13,7 @@ from tests.keanu_assert import tensors_equal
 def test_can_do_greater_than(lhs, rhs, expected_result):
     result = lhs > rhs
     assert type(result) == kn.Vertex
-    assert tensors_equal(result.getValue(), expected_result)
+    assert (result.getValue() == expected_result).all()
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
@@ -27,7 +26,7 @@ def test_can_do_greater_than(lhs, rhs, expected_result):
 def test_can_do_less_than(lhs, rhs, expected_result):
     result = lhs < rhs
     assert type(result) == kn.Vertex
-    assert tensors_equal(result.getValue(), expected_result)
+    assert (result.getValue() == expected_result).all()
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
@@ -40,7 +39,7 @@ def test_can_do_less_than(lhs, rhs, expected_result):
 def test_can_do_addition(lhs, rhs, expected_result):
     result = lhs + rhs
     assert type(result) == kn.Vertex
-    assert tensors_equal(result.getValue(), expected_result)
+    assert (result.getValue() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([10., 20.])), kn.Const(np.array([1., 2.])), np.array([[9], [18]])),
@@ -52,7 +51,7 @@ def test_can_do_addition(lhs, rhs, expected_result):
 def test_can_do_subtraction(lhs, rhs, expected_result):
     result = lhs - rhs
     assert type(result) == kn.Vertex
-    assert tensors_equal(result.getValue(), expected_result)
+    assert (result.getValue() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([3., 2.])), kn.Const(np.array([5., 7.])), np.array([[15], [14]])),
@@ -64,7 +63,7 @@ def test_can_do_subtraction(lhs, rhs, expected_result):
 def test_can_do_multiplication(lhs, rhs, expected_result):
     result = lhs * rhs
     assert type(result) == kn.Vertex
-    assert tensors_equal(result.getValue(), expected_result)
+    assert (result.getValue() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([15., 10.])), kn.Const(np.array([2., 4.])), np.array([[7.5], [2.5 ]])),
@@ -76,4 +75,4 @@ def test_can_do_multiplication(lhs, rhs, expected_result):
 def test_can_do_division(lhs, rhs, expected_result):
     result = lhs / rhs
     assert type(result) == kn.Vertex
-    assert tensors_equal(result.getValue(), expected_result)    
+    assert (result.getValue() == expected_result).all()    
