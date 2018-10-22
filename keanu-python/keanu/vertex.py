@@ -81,9 +81,14 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def setAndCascade(self, v):
         self.unwrap().setAndCascade(kn.Tensor(v).unwrap())
 
+    def sample(self):
+        return self.__to_np_array(self.unwrap().sample())
+
     def getValue(self):
-        value = u = self.unwrap().getValue()
-        np_array = np.array(list(u.asFlatArray()))
+        return self.__to_np_array(self.unwrap().getValue())
+
+    def __to_np_array(self, value):
+        np_array = np.array(list(value.asFlatArray()))
         return np_array.reshape(self.getShape())
 
     @staticmethod

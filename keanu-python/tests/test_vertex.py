@@ -15,17 +15,14 @@ def test_can_pass_scalar_to_vertex(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
     sample = gaussian.sample()
 
-    assert sample.isScalar()
+    assert sample.shape == (1, 1)
 
 
 def test_can_pass_ndarray_to_vertex(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (np.array([[0.1, 0.4]]), np.array([[0.4, 0.5]])))
     sample = gaussian.sample()
 
-    shape = sample.getShape()
-    assert sample.getRank() == 2
-    assert shape[0] == 1
-    assert shape[1] == 2
+    assert sample.shape == (1, 2)
 
 
 def test_can_pass_vertex_to_vertex(jvm_view):
@@ -33,17 +30,14 @@ def test_can_pass_vertex_to_vertex(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (mu, 1.))
     sample = gaussian.sample()
 
-    assert sample.isScalar()
+    assert sample.shape == (1, 1)
 
 
 def test_can_pass_array_to_vertex(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, ([3, 3], 0., 1.))
     sample = gaussian.sample()
 
-    shape = sample.getShape()
-    assert sample.getRank() == 2
-    assert shape[0] == 3
-    assert shape[1] == 3
+    assert sample.shape == (3, 3)
 
 
 def test_cannot_pass_generic_to_vertex(jvm_view):
@@ -80,3 +74,13 @@ def test_vertex_value_is_a_numpy_array():
     value = vertex.getValue()
     assert type(value) == np.ndarray
     assert (value == ndarray).all()
+
+
+def test_vertex_sample_is_a_numpy_array():
+    mu = np.array([[1., 2.], [3., 4.]])
+    sigma = np.array([[.1, .2], [.3, .4]])
+    vertex = kn.Gaussian(mu, sigma)
+    value = vertex.sample()
+    print(value)
+    assert type(value) == np.ndarray
+    assert value.shape == (2, 2)    
