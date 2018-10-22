@@ -68,13 +68,39 @@ def test_vertex_can_observe_ndarray(jvm_view):
     assert (gaussian.getValue() == ndarray).all()
 
 
-def test_vertex_value_is_a_numpy_array():
+def test_int_vertex_value_is_a_numpy_array():
     ndarray = np.array([[1, 2], [3, 4]])
     vertex = kn.Const(ndarray)
     value = vertex.getValue()
     assert type(value) == np.ndarray
+    assert value.dtype == np.int64
     assert (value == ndarray).all()
 
+def test_float_vertex_value_is_a_numpy_array():
+    ndarray = np.array([[1., 2.], [3., 4.]])
+    vertex = kn.Const(ndarray)
+    value = vertex.getValue()
+    assert type(value) == np.ndarray
+    assert value.dtype == np.float64
+    assert (value == ndarray).all()
+
+def test_boolean_vertex_value_is_a_numpy_array():
+    ndarray = np.array([[True, True], [False, True]])
+    vertex = kn.Const(ndarray)
+    value = vertex.getValue()
+    assert type(value) == np.ndarray
+    assert value.dtype == np.bool
+    assert (value == ndarray).all()    
+
+def test_scalar_vertex_value_is_a_numpy_array():
+    scalar = 1.
+    vertex = kn.Const(scalar)
+    value = vertex.getValue()
+    assert type(value) == np.ndarray
+    assert value.dtype == np.float64
+    assert value.shape == (1, 1)
+    assert value == scalar
+    assert (value == scalar).all()
 
 def test_vertex_sample_is_a_numpy_array():
     mu = np.array([[1., 2.], [3., 4.]])
@@ -83,4 +109,5 @@ def test_vertex_sample_is_a_numpy_array():
     value = vertex.sample()
     print(value)
     assert type(value) == np.ndarray
+    assert value.dtype == np.float64
     assert value.shape == (2, 2)    
