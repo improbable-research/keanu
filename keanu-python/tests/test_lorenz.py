@@ -42,11 +42,11 @@ def test_lorenz():
         actualAtPostT = observed[postT]
         
         error = math.sqrt(
-                    (actualAtPostT.x - posterior[0].scalar()) ** 2 +
-                    (actualAtPostT.y - posterior[1].scalar()) ** 2 +
-                    (actualAtPostT.z - posterior[2].scalar()) ** 2
+                    (actualAtPostT.x - posterior[0]) ** 2 +
+                    (actualAtPostT.y - posterior[1]) ** 2 +
+                    (actualAtPostT.z - posterior[2]) ** 2
                 )
-        priorMu = (posterior[0].scalar(), posterior[1].scalar(), posterior[2].scalar())
+        priorMu = (posterior[0], posterior[1], posterior[2])
         window += 1
         
     assert error <= convergedError

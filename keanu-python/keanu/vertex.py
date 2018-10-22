@@ -73,8 +73,18 @@ class Vertex(JavaObjectWrapper, VertexOps):
         super(Vertex, self).__init__(ctor, *(Vertex.__parse_args(*args)))
 
     def observe(self, v):
-        from keanu.const import Tensor
-        self.unwrap().observe(Tensor(v).unwrap())
+        self.unwrap().observe(kn.Tensor(v).unwrap())
+
+    def setValue(self, v):
+        self.unwrap().setValue(kn.Tensor(v).unwrap())
+
+    def setAndCascade(self, v):
+        self.unwrap().setAndCascade(kn.Tensor(v).unwrap())
+
+    def getValue(self):
+        value = u = self.unwrap().getValue()
+        np_array = np.array(list(u.asFlatArray()))
+        return np_array.reshape(self.getShape())
 
     @staticmethod
     def __parse_args(args):

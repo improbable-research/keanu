@@ -47,7 +47,7 @@ def test_non_gradient_can_set_bounds_range_builder_properties(model):
 
     logProb = non_gradient_optimizer.max_a_posteriori()
 
-    sum_ab = model.a.getValue().scalar() + model.b.getValue().scalar()
+    sum_ab = model.a.getValue() + model.b.getValue()
     assert not (19.9 < sum_ab < 20.1)
 
 
@@ -56,7 +56,7 @@ def test_map_non_gradient(model):
     logProb = non_gradient_optimizer.max_a_posteriori()
     assert logProb < 0.
 
-    sum_ab = model.a.getValue().scalar() + model.b.getValue().scalar()
+    sum_ab = model.a.getValue() + model.b.getValue()
     assert 19.9 < sum_ab < 20.1
 
 
@@ -65,5 +65,5 @@ def test_max_likelihood_non_gradient(model):
     logProb = non_gradient_optimizer.max_likelihood()
     assert logProb < 0.
 
-    sum_ab = model.a.getValue().scalar() + model.b.getValue().scalar()
+    sum_ab = model.a.getValue() + model.b.getValue()
     assert 19.9 < sum_ab < 20.1

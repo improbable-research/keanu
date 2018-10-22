@@ -59,22 +59,14 @@ def test_const_takes_ndarray_of_rank_one():
     ndarray = np.array([1 ,2])
     v = kn.Const(ndarray)
 
-    assert_vertex_value_equal_ndarray(v, ndarray)
-    assert v.getValue().getRank() == 2
+    assert_vertex_value_equal_ndarray(v, np.array([[1] ,[2]]))
 
 
 def assert_vertex_value_equal_ndarray(v, ndarray):
-    nd4j_flat = v.getValue().asFlatArray()
-    np_flat = ndarray.flatten().tolist()
-
-    assert len(nd4j_flat) == len(np_flat)
-
-    for i in range(len(ndarray)):
-        assert nd4j_flat[i] == np_flat[i]
-
+    assert (v.getValue() == ndarray).all()
 
 def assert_vertex_value_equals_scalar(v, scalar):
-    assert v.getValue().scalar() == scalar
+    assert v.getValue() == scalar
 
 
 def assert_java_class(java_object_wrapper, java_class_str):

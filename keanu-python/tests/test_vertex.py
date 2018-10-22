@@ -61,7 +61,8 @@ def test_vertex_can_observe_scalar(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
     gaussian.observe(4.)
 
-    assert gaussian.getValue().scalar() == 4.
+    assert type(gaussian.getValue()) == np.ndarray
+    assert gaussian.getValue() == 4.
 
 
 def test_vertex_can_observe_ndarray(jvm_view):
@@ -70,7 +71,13 @@ def test_vertex_can_observe_ndarray(jvm_view):
     ndarray = np.array([[1.,2.]])
     gaussian.observe(ndarray)
 
-    nd4j_tensor_flat = gaussian.getValue().asFlatArray()
-    assert nd4j_tensor_flat[0] == 1.
-    assert nd4j_tensor_flat[1] == 2.
-    
+    assert type(gaussian.getValue()) == np.ndarray
+    assert (gaussian.getValue() == ndarray).all()
+
+
+def test_vertex_value_is_a_numpy_array():
+    ndarray = np.array([[1, 2], [3, 4]])
+    vertex = kn.Const(ndarray)
+    value = vertex.getValue()
+    assert type(value) == np.ndarray
+    assert (value == ndarray).all()
