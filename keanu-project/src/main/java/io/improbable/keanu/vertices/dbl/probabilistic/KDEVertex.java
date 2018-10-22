@@ -1,18 +1,18 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.distributions.continuous.Uniform;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Samplable;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.improbable.keanu.distributions.continuous.Uniform;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-public class KDEVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class KDEVertex extends DoubleVertex implements ProbabilisticDouble, Samplable<DoubleTensor> {
 
     private final double bandwidth;
     private DoubleTensor samples;
@@ -104,7 +104,7 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble, Samp
     }
 
     @Override
-    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public DoubleTensor sample(KeanuRandom random) {
         return sample(1, random);
     }
 
@@ -115,4 +115,5 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble, Samp
     public long[] getSampleShape() {
         return samples.getShape();
     }
+
 }

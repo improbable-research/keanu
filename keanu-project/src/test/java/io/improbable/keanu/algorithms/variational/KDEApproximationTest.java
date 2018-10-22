@@ -1,14 +1,5 @@
 package io.improbable.keanu.algorithms.variational;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
@@ -21,6 +12,16 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.KDEVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract;
+import org.junit.Rule;
+import org.junit.Test;
+
+import java.util.Collections;
+import java.util.List;
+
+import static io.improbable.keanu.tensor.TensorMatchers.hasShape;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class KDEApproximationTest {
 
@@ -128,6 +129,19 @@ public class KDEApproximationTest {
         ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod(
             KDE, from, to, bucketSize, 1e-2, KeanuRandom.getDefaultRandom(), 1000
         );
+    }
+
+    @Test
+    public void youCanSampleAScalarMultipleTimes() {
+        double mu = 10.;
+        double sigma = .5;
+        DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 2);
+
+        KDEVertex KDE = GaussianKDE.approximate(samples);
+
+        int numSamples = 100;
+        DoubleTensor sample = KDE.sample(numSamples, KeanuRandom.getDefaultRandom());
+        assertThat(sample, hasShape(1, 100));
     }
 
     @Test
