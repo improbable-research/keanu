@@ -60,11 +60,11 @@ public class TensorShapeValidation {
         }
     }
 
-    public static void checkTensorsAreScalar(long[] ...shapes) {
+    public static void checkTensorsAreScalar(long[]... shapes) {
         checkTensorsAreScalar("Expected shapes to be scalar");
     }
 
-    public static void checkTensorsAreScalar(String message, long[] ...shapes) {
+    public static void checkTensorsAreScalar(String message, long[]... shapes) {
         Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
 
         if (!nonScalarShapes.isEmpty()) {
