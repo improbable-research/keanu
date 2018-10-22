@@ -15,7 +15,7 @@ beta = 2.66667
 rho = 28.
 time_step = 0.01
 
-def _test_lorenz():
+def test_lorenz():
     error = math.inf
     window = 0
     priorMu = (3.,3.,3.)
@@ -34,9 +34,8 @@ def _test_lorenz():
         zt0.setAndCascade(priorMu[2])
         applyObservations(graphTimeSteps, window, observed)
         
-        net = kn.BayesNet(xt0.getConnectedGraph())
-        # optimizer = kn.GradientOptimizer.of(net)
-        # optimizer.maxAPosteriori()
+        optimizer = kn.GradientOptimizer(xt0)
+        optimizer.max_a_posteriori()
         posterior = getTimeSliceValues(graphTimeSteps, windowSize - 1)
         
         postT = (window + 1) * (windowSize - 1)
