@@ -13,9 +13,10 @@ class LorenzModel:
 
     def runModel(self, numTimeSteps):
         position = Coordinates(2., 5., 4.)
+        yield position
         for _ in range(numTimeSteps):
-            yield position
             position = self.__getNextPosition(position)
+            yield position
         
     def __getNextPosition(self, current : Coordinates) -> Coordinates :
         nextX = current.x + self.time_step * (self.sigma * (current.y - current.x))

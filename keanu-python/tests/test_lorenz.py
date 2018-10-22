@@ -15,6 +15,7 @@ beta = 2.66667
 rho = 28.
 time_step = 0.01
 
+
 def test_lorenz():
     error = math.inf
     window = 0
@@ -22,7 +23,6 @@ def test_lorenz():
 
     model = LorenzModel(sigma, beta, rho, time_step)
     observed = list(model.runModel(windowSize * maxWindows))
-
 
     while error > convergedError and window < maxWindows:
         xt0 = kn.Gaussian(priorMu[0], 1.0)
@@ -62,14 +62,14 @@ def add_time(current):
 
 def buildGraph(initial):
     (x, y, z) = initial
+    yield (x, y, z)
     for _ in range(windowSize):
-        yield (x, y, z)
         (x, y, z) = add_time((x, y, z))
+        yield (x, y, z)
     
 def applyObservations(graphTimeSteps, window, observed):
-    for i in range(len(graphTimeSteps)):
-        t = window * (windowSize - 1) + i
-        timeSlice = graphTimeSteps[i]
+    for (idx, timeSlice) in enumerate(graphTimeSteps):
+        t = window * (windowSize - 1) + idx
         xt = timeSlice[0]
         observedXt = kn.Gaussian(xt, 1.0)
         observedXt.observe(observed[t].x)
