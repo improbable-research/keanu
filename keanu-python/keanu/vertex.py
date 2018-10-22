@@ -63,6 +63,10 @@ class VertexOps:
     def __lt__(self, other):
         return kn.generated.vertex.LessThan(self, other)
 
+    def __add__(self, other):
+        from keanu.generated.vertex import Addition
+        return Addition(self, other)
+
 
 class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, ctor, *args):

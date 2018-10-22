@@ -1,11 +1,8 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 
 import org.junit.Test;
 
