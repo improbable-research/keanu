@@ -78,7 +78,7 @@ We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle
 
 #### Python Code Generation
 
-[Custom annotations](keanu-project/src/main/java/io/improbable/keanu/annotation) are used for python code generation. Currently, there is only support for Python 3.6 and it must be installed by default in your dev environment. Simply run `./gradlew codeGen` to generate the code and commit the changes.
+[Custom annotations](keanu-project/src/main/java/io/improbable/keanu/annotation) are used for python code generation. The minimum version requirement is Python 3.6. Simply run `./gradlew codeGen` to generate the code and commit the changes.
 
 
 ## Hiring
