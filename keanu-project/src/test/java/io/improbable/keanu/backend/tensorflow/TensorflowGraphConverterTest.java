@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bytedeco.javacpp.tensorflow;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -21,7 +20,6 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
@@ -49,7 +47,7 @@ public class TensorflowGraphConverterTest {
         inputs.put(A.getLabel().toString(), A.getValue());
         inputs.put(B.getLabel().toString(), B.getValue());
 
-        DoubleTensor result = graph.eval(inputs, outputName);
+        DoubleTensor result = graph.compute(inputs, outputName);
 
         assertEquals(C.getValue(), result);
     }
@@ -76,7 +74,7 @@ public class TensorflowGraphConverterTest {
         inputs.put(A.getLabel().toString(), A.getValue());
         inputs.put(B.getLabel().toString(), B.getValue());
 
-        DoubleTensor result = graph.eval(inputs, outputName);
+        DoubleTensor result = graph.compute(inputs, outputName);
 
         assertEquals(C.getValue(), result);
     }
@@ -103,7 +101,7 @@ public class TensorflowGraphConverterTest {
         inputs.put(A.getLabel().toString(), A.getValue());
         inputs.put(B.getLabel().toString(), B.getValue());
 
-        IntegerTensor result = graph.eval(inputs, outputName);
+        IntegerTensor result = graph.compute(inputs, outputName);
 
         assertEquals(C.getValue(), result);
     }
@@ -130,7 +128,7 @@ public class TensorflowGraphConverterTest {
         inputs.put(A.getLabel().toString(), A.getValue());
         inputs.put(B.getLabel().toString(), B.getValue());
 
-        BooleanTensor result = graph.eval(inputs, outputName);
+        BooleanTensor result = graph.compute(inputs, outputName);
 
         assertEquals(C.getValue(), result);
     }
@@ -157,7 +155,7 @@ public class TensorflowGraphConverterTest {
         inputs.put(A.getLabel().toString(), A.getValue());
         inputs.put(B.getLabel().toString(), B.getValue());
 
-        DoubleTensor result = graph.eval(inputs, outputName);
+        DoubleTensor result = graph.compute(inputs, outputName);
 
         assertEquals(C.getValue(), result);
     }
@@ -238,7 +236,7 @@ public class TensorflowGraphConverterTest {
         inputs.put(A.getLabel().toString(), A.getValue());
         inputs.put(B.getLabel().toString(), B.getValue());
 
-        DoubleTensor result = graph.eval(inputs, outputName);
+        DoubleTensor result = graph.compute(inputs, outputName);
 
         assertEquals(out.getValue(), result);
     }

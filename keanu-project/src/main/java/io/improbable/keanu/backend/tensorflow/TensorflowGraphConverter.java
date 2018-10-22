@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.math3.analysis.function.Sigmoid;
-import org.bytedeco.javacpp.Loader;
 import org.tensorflow.Graph;
 import org.tensorflow.Output;
 import org.tensorflow.Session;
@@ -80,7 +79,6 @@ public class TensorflowGraphConverter {
     private static Map<Class<?>, OpMapper> opMappers;
 
     static {
-        Loader.load(org.bytedeco.javacpp.tensorflow.class);
         opMappers = new HashMap<>();
 
         //double binary ops
@@ -218,6 +216,21 @@ public class TensorflowGraphConverter {
         throw new IllegalArgumentException("Cannot convert " + value.getClass());
     }
 
+    private static Output<?> createVariable(Vertex<?> vertex, GraphBuilder graphBuilder) {
+
+        Object value = vertex.getValue();
+
+        if (value instanceof DoubleTensor) {
+            return graphBuilder.variable(getTensorflowOpName(vertex), toShape(vertex.getShape()), Double.class);
+        } else if (value instanceof IntegerTensor) {
+            return graphBuilder.variable(getTensorflowOpName(vertex), toShape(vertex.getShape()), Integer.class);
+        } else if (value instanceof BooleanTensor) {
+            return graphBuilder.variable(getTensorflowOpName(vertex), toShape(vertex.getShape()), Boolean.class);
+        }
+
+        throw new IllegalArgumentException("Cannot create variable for " + value.getClass());
+    }
+
     private static Output<?> createPlaceholder(Vertex<?> vertex, GraphBuilder graphBuilder) {
 
         Object value = vertex.getValue();
@@ -230,7 +243,7 @@ public class TensorflowGraphConverter {
             return graphBuilder.placeholder(getTensorflowOpName(vertex), toShape(vertex.getShape()), Boolean.class);
         }
 
-        throw new IllegalArgumentException("Cannot convert " + value.getClass());
+        throw new IllegalArgumentException("Cannot create placeholder for " + value.getClass());
     }
 
     private static Shape toShape(long[] shape) {
@@ -264,7 +277,7 @@ public class TensorflowGraphConverter {
                 if (visiting.isObserved()) {
                     lookup.put(visiting, createConstant(visiting, lookup, graphBuilder));
                 } else {
-                    Output<?> tfVisiting = createPlaceholder(visiting, graphBuilder);
+                    Output<?> tfVisiting = createVariable(visiting, graphBuilder);
                     lookup.put(visiting, tfVisiting);
                 }
             } else {

@@ -4,6 +4,7 @@ import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.ADD;
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONCAT_V2;
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONSTANT;
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.PLACE_HOLDER;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.VARIABLE_V2;
 
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
@@ -65,12 +66,13 @@ public class GraphBuilder {
         CONCAT_V2("ConcatV2"),
         CONSTANT("Const"),
         PLACE_HOLDER("Placeholder"),
+        VARIABLE_V2("VariableV2"),
         NO_OP("NoOp");
 
-        public final String opName;
+        public final String tfOpName;
 
-        OpType(String opName) {
-            this.opName = opName;
+        OpType(String tfOpName) {
+            this.tfOpName = tfOpName;
         }
     }
 
@@ -88,7 +90,7 @@ public class GraphBuilder {
 
 
     <T> Output<T> add(Output<T> left, Output<T> right) {
-        return binaryOp(ADD, scope.makeOpName("Add"), left, right);
+        return binaryOp(ADD, scope.makeOpName(ADD.tfOpName), left, right);
     }
 
     <T> Output<T> add(Output<T> left, Output<T> right, String name) {
@@ -98,7 +100,7 @@ public class GraphBuilder {
     <T> Output<T> concat(Output<T>[] inputs, int dimension, String name) {
         Output<Integer> dim = constant(dimension, name + "_dim");
 
-        OperationBuilder opBuilder = scope.graph().opBuilder(CONCAT_V2.opName, name);
+        OperationBuilder opBuilder = scope.graph().opBuilder(CONCAT_V2.tfOpName, name);
         opBuilder.addInputList(inputs);
         opBuilder.addInput(dim.asOutput());
 
@@ -114,7 +116,7 @@ public class GraphBuilder {
     }
 
     Output<Double> constant(double value) {
-        return constant(value, scope.makeOpName("Constant"));
+        return constant(value, scope.makeOpName(CONSTANT.tfOpName));
     }
 
     Output<Double> constant(double value, String name) {
@@ -124,7 +126,7 @@ public class GraphBuilder {
     }
 
     Output<Double> constant(double[] value, long[] shape) {
-        return constant(value, shape, scope.makeOpName("Constant"));
+        return constant(value, shape, scope.makeOpName(CONSTANT.tfOpName));
     }
 
     Output<Double> constant(double[] value, long[] shape, String name) {
@@ -134,7 +136,7 @@ public class GraphBuilder {
     }
 
     Output<Boolean> constant(Boolean[] value, long[] shape) {
-        return constant(value, shape, scope.makeOpName("Constant"));
+        return constant(value, shape, scope.makeOpName(CONSTANT.tfOpName));
     }
 
     Output<Boolean> constant(Boolean[] value, long[] shape, String name) {
@@ -144,7 +146,7 @@ public class GraphBuilder {
     }
 
     Output<Integer> constant(int[] value, long[] shape) {
-        return constant(value, shape, scope.makeOpName("Constant"));
+        return constant(value, shape, scope.makeOpName(CONSTANT.tfOpName));
     }
 
     Output<Integer> constant(int[] value, long[] shape, String name) {
@@ -154,7 +156,7 @@ public class GraphBuilder {
     }
 
     Output<Long> constant(long[] value, long[] shape) {
-        return constant(value, shape, scope.makeOpName("Constant"));
+        return constant(value, shape, scope.makeOpName(CONSTANT.tfOpName));
     }
 
     Output<Long> constant(long[] value, long[] shape, String name) {
@@ -164,7 +166,7 @@ public class GraphBuilder {
     }
 
     Output<Integer> constant(int value) {
-        return constant(value, scope.makeOpName("Constant"));
+        return constant(value, scope.makeOpName(CONSTANT.tfOpName));
     }
 
     Output<Integer> constant(int value, String name) {
@@ -174,15 +176,22 @@ public class GraphBuilder {
     }
 
     private <T> Output<T> constant(String name, Tensor<T> tensor, Class<T> type) {
-        return scope.graph().opBuilder(CONSTANT.opName, name)
+        return scope.graph().opBuilder(CONSTANT.tfOpName, name)
             .setAttr(AttrName.DTYPE.attrName, DataType.fromClass(type))
             .setAttr(AttrName.VALUE.attrName, tensor)
             .build()
             .output(0);
     }
 
+    public <T> Output<T> variable(String name, Shape shape, Class<T> type) {
+        OperationBuilder opBuilder = scope.graph().opBuilder(VARIABLE_V2.tfOpName, name);
+        opBuilder.setAttr(AttrName.SHAPE.attrName, shape);
+        opBuilder.setAttr(AttrName.DTYPE.attrName, DataType.fromClass(type));
+        return opBuilder.build().output(0);
+    }
+
     public <T> Output<T> placeholder(String name, Shape shape, Class<T> type) {
-        return scope.graph().opBuilder(PLACE_HOLDER.opName, name)
+        return scope.graph().opBuilder(PLACE_HOLDER.tfOpName, name)
             .setAttr(AttrName.DTYPE.attrName, DataType.fromClass(type))
             .setAttr(AttrName.SHAPE.attrName, shape)
             .build()
@@ -190,14 +199,14 @@ public class GraphBuilder {
     }
 
     public <T, L, R> Output<T> binaryOp(OpType type, String name, Output<L> in1, Output<R> in2) {
-        return scope.graph().opBuilder(type.opName, name)
+        return scope.graph().opBuilder(type.tfOpName, name)
             .addInput(in1)
             .addInput(in2).build()
             .output(0);
     }
 
     public <T> Output<T> unaryOp(OpType type, String name, Output<T> in1) {
-        return scope.graph().opBuilder(type.opName, name)
+        return scope.graph().opBuilder(type.tfOpName, name)
             .addInput(in1).build()
             .output(0);
     }

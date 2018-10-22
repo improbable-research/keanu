@@ -1,9 +1,6 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
@@ -26,7 +23,7 @@ public class TensorflowProbabilisticWithGradientGraph extends TensorflowProbabil
     @Override
     public Map<String, DoubleTensor> logProbGradients(Map<String, ?> inputs) {
 
-        Map<String, ?> results = computableGraph.eval(inputs, gradientOutputNameToInputName.keySet());
+        Map<String, ?> results = computableGraph.compute(inputs, gradientOutputNameToInputName.keySet());
 
         Map<String, DoubleTensor> gradientsByInputName = new HashMap<>();
         for (Map.Entry<String, ?> result : results.entrySet()) {

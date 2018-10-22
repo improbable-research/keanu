@@ -40,27 +40,33 @@ public class TensorflowComputableGraph implements ComputableGraph {
     }
 
     @Override
-    public Map<String, ?> eval(Map<String, ?> inputs, Collection<String> outputs) {
+    public Map<String, ?> compute(Map<String, ?> inputs, Collection<String> outputs) {
 
         Session.Runner runner = feedInputs(inputs);
         List<Tensor<?>> tfResults = fetchOutputs(runner, outputs).run();
-
-        Map<String, ?> results = new HashMap<>();
-        Iterator<Tensor<?>> resultIterator = tfResults.iterator();
-        for (String output: outputs) {
-            results.put(output, convertToKeanuTensor(resultIterator.next()));
-        }
-
-        return results;
+        return convertToKeanuTensors(outputs, tfResults);
     }
 
-    public <T> T eval(Map<String, ?> inputs, String output) {
+    @Override
+    public <T> T compute(Map<String, ?> inputs, String output) {
+
         Session.Runner runner = feedInputs(inputs);
         List<Tensor<?>> tfResults = fetchOutputs(runner, singletonList(output)).run();
         return convertToKeanuTensor(tfResults.get(0));
     }
 
+    private Map<String, ?> convertToKeanuTensors(Collection<String> outputs, List<Tensor<?>> tfResults) {
+
+        Map<String, ?> results = new HashMap<>();
+        Iterator<Tensor<?>> resultIterator = tfResults.iterator();
+        for (String output : outputs) {
+            results.put(output, convertToKeanuTensor(resultIterator.next()));
+        }
+        return results;
+    }
+
     private <T> T convertToKeanuTensor(Tensor<?> tensor) {
+
         try (Tensor<?> tfResult = tensor) {
             switch (tfResult.dataType()) {
                 case DOUBLE:
@@ -76,6 +82,7 @@ public class TensorflowComputableGraph implements ComputableGraph {
     }
 
     private Session.Runner feedInputs(Map<String, ?> inputs) {
+
         Session.Runner runner = session.runner();
         for (Map.Entry<String, ?> inputEntry : inputs.entrySet()) {
 

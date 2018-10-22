@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 
-import org.tensorflow.DataType;
 import org.tensorflow.Tensor;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -45,12 +44,6 @@ public class TensorflowData {
         }
     }
 
-    /**
-     * Converts a {@code byte[]} to a {@code boolean[]}.
-     *
-     * <p>Suitable for reading tensors of type {@link DataType#BOOL} using {@link
-     * java.nio.ByteBuffer}.
-     */
     private static boolean[] byte2bool(byte[] array) {
         boolean[] out = new boolean[array.length];
         for (int i = 0; i < array.length; i++) {
@@ -109,12 +102,6 @@ public class TensorflowData {
         );
     }
 
-    /**
-     * Converts a {@code boolean[]} to a {@code byte[]}.
-     *
-     * <p>Suitable for creating tensors of type {@link DataType#BOOL} using {@link
-     * java.nio.ByteBuffer}.
-     */
     public static byte[] bool2byte(Boolean[] array) {
         byte[] out = new byte[array.length];
         for (int i = 0; i < array.length; i++) {
