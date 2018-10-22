@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
