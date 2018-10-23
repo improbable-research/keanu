@@ -1,3 +1,9 @@
+import re
+import warnings
+
+first_cap_re = re.compile('(.)([A-Z][a-z]+)')
+all_cap_re = re.compile('([a-z0-9])([A-Z])')
+
 class JavaObjectWrapper:
     def __init__(self, val):
         self._val = val
@@ -7,26 +13,25 @@ class JavaObjectWrapper:
         return "[{0} => {1}]".format(self._class, type(self))
 
     def __getattr__(self, k):
-        py_method = JavaObjectWrapper.__get_py_name(k)
+        py_method = JavaObjectWrapper.__get_python_name(k)
         if py_method in self.__dict__:
             return self.__dict__[py_method]
+
+        warnings.warn("A python wrapper for {} does not exist, and it may return a Java Object".format(k))
         return self.unwrap().__getattr__(JavaObjectWrapper.__get_java_name(k))
 
     def unwrap(self):
         return self._val
 
     @staticmethod
-    def __get_java_name(column):
-       first, *rest = column.split('_')
+    def __get_java_name(python_name):
+       first, *rest = python_name.split('_')
        return first + ''.join(word.capitalize() for word in rest)
 
     @staticmethod
-    def __get_py_name(s):
-        import re
-        _underscorer1 = re.compile(r'(.)([A-Z][a-z]+)')
-        _underscorer2 = re.compile('([a-z0-9])([A-Z])')
-        subbed = _underscorer1.sub(r'\1_\2', s)
-        return _underscorer2.sub(r'\1_\2', subbed).lower()
+    def __get_python_name(java_name):
+        s1 = first_cap_re.sub(r'\1_\2', java_name)
+        return all_cap_re.sub(r'\1_\2', s1).lower()
 
 
 class JavaCtor(JavaObjectWrapper):
@@ -67,4 +72,3 @@ class UnaryLambda:
 
     class Java:
         implements = ["java.util.function.Function"]
-
