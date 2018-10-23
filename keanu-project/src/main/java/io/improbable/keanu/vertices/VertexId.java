@@ -1,11 +1,10 @@
 package io.improbable.keanu.vertices;
 
+import com.google.common.primitives.Ints;
+import lombok.EqualsAndHashCode;
+
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
-
-import com.google.common.primitives.Ints;
-
-import lombok.EqualsAndHashCode;
 
 /**
  * An object representing the ID value of a vertex.  IDs are assigned in such a way that a Lexicographic ordering of

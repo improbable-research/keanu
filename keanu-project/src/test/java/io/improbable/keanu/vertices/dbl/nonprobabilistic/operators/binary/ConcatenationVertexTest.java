@@ -1,20 +1,21 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableList;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Arrays;
+
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static org.junit.Assert.assertEquals;
 
 public class ConcatenationVertexTest {
 
@@ -167,6 +168,23 @@ public class ConcatenationVertexTest {
 
         assertEquals(concatPartialForward.withRespectTo(a), concatPartialReverse.withRespectTo(a));
         assertEquals(concatPartialForward.withRespectTo(b), concatPartialReverse.withRespectTo(b));
+    }
+
+    @Test
+    public void canConcatenateHighRankAutoDiff() {
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.arange(0, 12).reshape(2, 2, 3));
+
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+
+        DoubleVertex c = a.times(ConstantVertex.of(DoubleTensor.linspace(0, 1, 12).reshape(2, 2, 3)));
+        DoubleVertex d = b.plus(ConstantVertex.of(DoubleTensor.linspace(1, 2, 8).reshape(2, 2, 2)));
+
+        DoubleVertex concat = new ConcatenationVertex(2, c, d);
+        DoubleVertex sum = concat.sum(1);
+
+        finiteDifferenceMatchesForwardAndReverseModeGradient(Arrays.asList(a,b), sum, 10.0, 1e-10);
     }
 
     @Test

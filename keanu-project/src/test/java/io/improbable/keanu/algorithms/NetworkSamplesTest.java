@@ -1,16 +1,15 @@
 package io.improbable.keanu.algorithms;
 
-import static org.junit.Assert.assertTrue;
+import io.improbable.keanu.vertices.VertexId;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import io.improbable.keanu.vertices.VertexId;
+import static org.junit.Assert.assertTrue;
 
 public class NetworkSamplesTest {
 

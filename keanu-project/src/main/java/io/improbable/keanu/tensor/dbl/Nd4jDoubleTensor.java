@@ -1,16 +1,16 @@
 package io.improbable.keanu.tensor.dbl;
 
-import static java.util.Arrays.copyOf;
-
-import static com.google.common.primitives.Ints.checkedCast;
-
-import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-
+import io.improbable.keanu.tensor.INDArrayExtensions;
+import io.improbable.keanu.tensor.INDArrayShim;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
+import io.improbable.keanu.tensor.TypedINDArrayFactory;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
@@ -31,17 +31,14 @@ import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-import io.improbable.keanu.tensor.INDArrayExtensions;
-import io.improbable.keanu.tensor.INDArrayShim;
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.TensorShapeValidation;
-import io.improbable.keanu.tensor.TypedINDArrayFactory;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
-import io.improbable.keanu.tensor.validate.TensorValidator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
+import static com.google.common.primitives.Ints.checkedCast;
+import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
+import static java.util.Arrays.copyOf;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -512,6 +509,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      * This is identical to log().times(y), except that it changes NaN results to 0.
      * This is important when calculating 0log0, which should return 0
      * See https://arcsecond.wordpress.com/2009/03/19/0log0-0-for-real/ for some mathematical justification
+     *
      * @param y The tensor value to multiply by
      * @return the log of this tensor multiplied by y
      */
@@ -918,6 +916,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public List<DoubleTensor> split(int dimension, long... splitAtIndices) {
 
         long[] shape = getShape();
+        if (dimension < 0) {
+            dimension += shape.length;
+        }
+
         if (dimension < 0 || dimension >= shape.length) {
             throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
         }

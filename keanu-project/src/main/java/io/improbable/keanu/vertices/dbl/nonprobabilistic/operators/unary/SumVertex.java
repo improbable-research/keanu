@@ -1,15 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static java.util.Collections.singletonMap;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.primitives.Longs;
-
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -17,12 +8,20 @@ import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.singletonMap;
+
 public class SumVertex extends DoubleUnaryOpVertex {
 
     private final int[] overDimensions;
 
     /**
-     * Performs a sum across specified dimensions
+     * Performs a sum across specified dimensions. Negative dimension indexing is not supported.
      *
      * @param inputVertex    the vertex to have its values summed
      * @param overDimensions dimensions to sum over

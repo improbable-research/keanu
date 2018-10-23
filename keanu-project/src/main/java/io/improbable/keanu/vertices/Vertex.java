@@ -1,16 +1,15 @@
 package io.improbable.keanu.vertices;
 
+import com.google.common.collect.ImmutableSet;
+import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.tensor.Tensor;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
-
-import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.tensor.Tensor;
 
 public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape {
 
@@ -34,6 +33,10 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     public <V extends Vertex<T>> V setLabel(VertexLabel label) {
         this.label = label;
         return (V) this;
+    }
+
+    public <V extends Vertex<T>> V setLabel(String label) {
+        return this.setLabel(new VertexLabel(label));
     }
 
     public VertexLabel getLabel() {

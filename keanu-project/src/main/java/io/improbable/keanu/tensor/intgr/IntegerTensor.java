@@ -1,15 +1,15 @@
 package io.improbable.keanu.tensor.intgr;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+
+import java.util.Arrays;
+import java.util.function.Function;
 
 public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
@@ -32,6 +32,14 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
             return new ScalarIntegerTensor(values[0]);
         } else {
             return Nd4jIntegerTensor.create(values, shape);
+        }
+    }
+
+    static IntegerTensor create(long[] values, long... shape) {
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
+            return new ScalarIntegerTensor(Ints.checkedCast(values[0]));
+        } else {
+            return Nd4jIntegerTensor.create(Arrays.stream(values).mapToInt(Ints::checkedCast).toArray(), shape);
         }
     }
 
@@ -117,6 +125,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     IntegerTensor minus(IntegerTensor that);
 
+    default IntegerTensor reverseMinus(int that) {
+        return this.unaryMinus().plus(that);
+    }
+
     IntegerTensor plus(IntegerTensor that);
 
     IntegerTensor times(IntegerTensor that);
@@ -126,6 +138,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight);
 
     IntegerTensor div(IntegerTensor that);
+
+    default IntegerTensor reverseDiv(int that) {
+        return IntegerTensor.scalar(that).div(this);
+    }
 
     IntegerTensor unaryMinus();
 

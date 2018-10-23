@@ -1,6 +1,6 @@
 package io.improbable.keanu.tensor;
 
-import static java.util.stream.Collectors.toSet;
+import com.google.common.base.Preconditions;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.google.common.base.Preconditions;
+import static java.util.stream.Collectors.toSet;
 
 public class TensorShapeValidation {
 
@@ -106,6 +106,12 @@ public class TensorShapeValidation {
             .map(TensorShape::new)
             .filter(shape -> !shape.isScalar())
             .collect(toSet());
+    }
+
+    public static void checkShapesMatch(long[] actual, long[] expected) {
+        if (!Arrays.equals(actual, expected)) {
+            throw new IllegalArgumentException(String.format("Expected shape %s but got %s", Arrays.toString(expected), Arrays.toString(actual)));
+        }
     }
 
     public static long[] checkAllShapesMatch(long[]... shapes) {

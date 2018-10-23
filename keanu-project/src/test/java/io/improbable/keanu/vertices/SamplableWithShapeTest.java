@@ -1,20 +1,16 @@
 package io.improbable.keanu.vertices;
 
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.junit.Test;
+
+import static io.improbable.keanu.tensor.TensorMatchers.hasShape;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import static io.improbable.keanu.tensor.TensorMatchers.hasShape;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class SamplableWithShapeTest {
 

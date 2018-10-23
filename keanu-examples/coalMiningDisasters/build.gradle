@@ -1,18 +1,8 @@
 plugins {
-    id 'java'
     id 'application'
 }
+
 mainClassName = "com.example.coal.Model"
-
-group = 'improbable'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
 
 dependencies {
     compile project(":keanu-project")

@@ -1,9 +1,9 @@
 package io.improbable.keanu.tensor.validate.check;
 
-import java.util.function.Function;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+
+import java.util.function.Function;
 
 public class CustomTensorValueChecker<TENSOR extends Tensor<?>> implements TensorValueChecker<TENSOR> {
     private final Function<TENSOR, BooleanTensor> checkFunction;

@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
+
+import java.util.Map;
+import java.util.Set;
 
 public interface ProbabilisticInteger extends Probabilistic<IntegerTensor> {
     default double logPmf(int value) {

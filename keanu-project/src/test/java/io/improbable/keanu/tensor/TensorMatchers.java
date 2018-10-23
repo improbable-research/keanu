@@ -1,16 +1,16 @@
 package io.improbable.keanu.tensor;
 
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.equalTo;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.equalTo;
 
 
 public class TensorMatchers {
@@ -91,8 +91,8 @@ public class TensorMatchers {
         };
     }
 
-    public static <T> Matcher<Tensor<T>> tensorEqualTo(Tensor<T> tensor) {
-        return both(TensorMatchers.elementwiseEqualTo(tensor)).and(hasShape(tensor.getShape()));
+    public static <T> Matcher<Tensor<T>> valuesAndShapesMatch(Tensor<T> tensor) {
+        return both(TensorMatchers.valuesMatch(tensor)).and(hasShape(tensor.getShape()));
     }
 
     public static <T> Matcher<Tensor<T>> allValues(Matcher<T> valueMatcher) {
@@ -122,7 +122,22 @@ public class TensorMatchers {
         };
     }
 
-    public static <T> Matcher<Tensor<T>> elementwiseEqualTo(Tensor<T> other) {
+    public static Matcher<NumberTensor> lessThanOrEqualTo(NumberTensor other) {
+        return new TypeSafeDiagnosingMatcher<NumberTensor>() {
+            @Override
+            protected boolean matchesSafely(NumberTensor item, Description mismatchDescription) {
+                mismatchDescription.appendText("Tensor ").appendValue(item);
+                return item.lessThanOrEqual(other).allTrue();
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Tensor ").appendValue(other);
+            }
+        };
+    }
+
+    public static <T> Matcher<Tensor<T>> valuesMatch(Tensor<T> other) {
         return hasValue(other.asFlatArray());
     }
 

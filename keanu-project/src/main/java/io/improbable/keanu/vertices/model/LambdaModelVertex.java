@@ -10,10 +10,8 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
