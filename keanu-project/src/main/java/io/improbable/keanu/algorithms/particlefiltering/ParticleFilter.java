@@ -34,6 +34,8 @@ public class ParticleFilter {
 
     /**
      * Creates a {@link ParticleFilterBuilder} by retrieving connected graph from the vertex
+     * @param vertex vertex to retrieve connected graph from
+     * @return this
      */
     public static ParticleFilterBuilder ofVertexInGraph(Vertex vertex) {
         return new ParticleFilterBuilder(vertex.getConnectedGraph());
