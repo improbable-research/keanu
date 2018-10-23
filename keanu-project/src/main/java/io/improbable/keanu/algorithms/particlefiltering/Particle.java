@@ -9,6 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents a Particle used in a Particle Filter.
+ * A Particle can be thought of as a particular instance of the network with state and an associated probability.
+ */
 public class Particle {
 
     private Map<Vertex, Object> latentVertices = new HashMap<>();
@@ -19,10 +23,16 @@ public class Particle {
         return latentVertices;
     }
 
+    /**
+     * @return log probability of the subgraph occuring in it's current state
+     */
     public double logProb() {
         return sumLogPOfSubgraph;
     }
 
+    /**
+     * @return probability of the subgraph occuring in it's current state
+     */
     public double prob() { return Math.exp(sumLogPOfSubgraph); }
 
     public double getScalarValueOfVertex(Vertex<DoubleTensor> vertex) {
