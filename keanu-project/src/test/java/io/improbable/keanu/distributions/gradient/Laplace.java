@@ -1,6 +1,5 @@
 package io.improbable.keanu.distributions.gradient;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
  * Computer Generation of Statistical Distributions

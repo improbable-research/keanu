@@ -71,11 +71,11 @@ public class ModelCompositionTest {
     private BayesianNetwork createInnerNet() {
         location = new DoubleProxyVertex(new VertexLabel("Location"));
         size = new UniformVertex(0.1, 20);
-        size.setLabel(new VertexLabel("Size"));
+        size.setLabel("Size");
         gaussian = new GaussianVertex(location, size);
-        gaussian.setLabel(new VertexLabel("Output1"));
+        gaussian.setLabel("Output1");
         pareto = new ParetoVertex(location, size);
-        pareto.setLabel(new VertexLabel("Output2"));
+        pareto.setLabel("Output2");
 
         return new BayesianNetwork(gaussian.getConnectedGraph());
     }
@@ -143,9 +143,9 @@ public class ModelCompositionTest {
                                             String plusLabel) {
         DoubleVertex inputVertex = new DoubleProxyVertex(new VertexLabel(inputLabel));
         DoubleVertex plusValue = new ConstantDoubleVertex(1.0);
-        plusValue.setLabel(new VertexLabel(plusLabel));
+        plusValue.setLabel(plusLabel);
         DoubleVertex outputVertex = inputVertex.plus(plusValue);
-        outputVertex.setLabel(new VertexLabel(outputLabel));
+        outputVertex.setLabel(outputLabel);
         BayesianNetwork bayesNet = new BayesianNetwork(outputVertex.getConnectedGraph());
         DoubleVertex outerInput = new GaussianVertex(0.0, 1.0);
 
@@ -181,7 +181,7 @@ public class ModelCompositionTest {
     public void willRejectProxyWithParent() {
         DoubleProxyVertex proxy = new DoubleProxyVertex(new VertexLabel("Input1"));
         DoubleVertex output = new GaussianVertex(proxy, 1.0);
-        output.setLabel(new VertexLabel("Output1"));
+        output.setLabel("Output1");
         DoubleVertex outerInput = new UniformVertex(-1.0, 1.0);
         DoubleVertex invalidParent = new ConstantDoubleVertex(0.0);
         proxy.setParent(invalidParent);

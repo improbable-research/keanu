@@ -122,6 +122,21 @@ public class TensorMatchers {
         };
     }
 
+    public static Matcher<NumberTensor> lessThanOrEqualTo(NumberTensor other) {
+        return new TypeSafeDiagnosingMatcher<NumberTensor>() {
+            @Override
+            protected boolean matchesSafely(NumberTensor item, Description mismatchDescription) {
+                mismatchDescription.appendText("Tensor ").appendValue(item);
+                return item.lessThanOrEqual(other).allTrue();
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Tensor ").appendValue(other);
+            }
+        };
+    }
+
     public static <T> Matcher<Tensor<T>> valuesMatch(Tensor<T> other) {
         return hasValue(other.asFlatArray());
     }
