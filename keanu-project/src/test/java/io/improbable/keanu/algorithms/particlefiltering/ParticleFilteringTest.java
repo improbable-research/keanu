@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 import static org.junit.Assert.assertTrue;
 
 public class ParticleFilteringTest {
@@ -49,10 +51,10 @@ public class ParticleFilteringTest {
                 .withResamplingProportion(resamplingProportion)
                 .build();
 
-        List<Particle> particles = filter.getSortedMostProbableParticles();
-        Particle mostProbableParticle = filter.getMostProbableParticle();
+        List<Particle> particles = particleFilter.getSortedMostProbableParticles();
+        Particle mostProbableParticle = particleFilter.getMostProbableParticle();
 
-        double estimatedTemp = mostProbableParticle.getScalarValueOfVertex.scalar();
+        double estimatedTemp = mostProbableParticle.getScalarValueOfVertex(temperature);
         double probability = mostProbableParticle.prob();
 
         log.info("Final temp estimate = " + estimatedTemp + ", probability = " + probability);

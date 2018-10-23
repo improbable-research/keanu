@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
@@ -18,19 +19,29 @@ public class Particle {
         return latentVertices;
     }
 
-    public double getSumLogPOfSubgraph() {
+    public double logProb() {
         return sumLogPOfSubgraph;
     }
 
-    public <T> void addLatentVertex(Vertex<T> vertex, T value) {
+    public double prob() { return Math.exp(sumLogPOfSubgraph); }
+
+    public double getScalarValueOfVertex(Vertex<DoubleTensor> vertex) {
+        return ((DoubleTensor) latentVertices.get(vertex)).scalar();
+    }
+
+    public <T> T getValueOfVertex(Vertex<T> vertex){
+        return (T) latentVertices.get(vertex);
+    }
+
+    <T> void addLatentVertex(Vertex<T> vertex, T value) {
         latentVertices.put(vertex, value);
     }
 
-    public <T> void addObservedVertex(Vertex<T> vertex) {
+    <T> void addObservedVertex(Vertex<T> vertex) {
         observedVertices.add(vertex);
     }
 
-    public double updateSumLogPOfSubgraph() {
+    double updateSumLogPOfSubgraph() {
         applyLatentVertexValues();
         double sumLogPOfLatents = ProbabilityCalculator.calculateLogProbFor(latentVertices.keySet());
         double sumLogPOfObservables = ProbabilityCalculator.calculateLogProbFor(observedVertices);
@@ -38,15 +49,15 @@ public class Particle {
         return sumLogPOfSubgraph;
     }
 
-    public Particle shallowCopy() {
+    Particle shallowCopy() {
         Particle clone = new Particle();
         clone.latentVertices = new HashMap<>(this.latentVertices);
         clone.observedVertices = new ArrayList<>(this.observedVertices);
         return clone;
     }
 
-    public static int sortDescending(Particle a, Particle b) {
-        return Double.compare(b.getSumLogPOfSubgraph(), a.getSumLogPOfSubgraph());
+    static int sortDescending(Particle a, Particle b) {
+        return Double.compare(b.logProb(), a.logProb());
     }
 
     private void applyLatentVertexValues() {
