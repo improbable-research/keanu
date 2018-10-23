@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -32,23 +33,17 @@ public class ParticleFilter {
     private KeanuRandom random;
     private List<Particle> particles;
 
+    /**
+     * Creates a {@link ParticleFilterBuilder} by retrieving connected graph from the vertex
+     */
     public static ParticleFilterBuilder ofVertexInGraph(Vertex vertex) {
         return new ParticleFilterBuilder(vertex.getConnectedGraph());
     }
 
-    /**
-     * Creates a Particle Filter and runs the algorithm
-     *
-     * @param vertices the vertices of a Bayesian network to find probable values for
-     * @param numParticles the number of particles to generate (a larger number will yield better results but is more
-     *  computationally expensive)
-     * @param resamplingCycles the number of times low probability particles are culled and high probability particles
-     *                         are replicated each time the subgraph under consideration is expanded
-     * @param resamplingProportion the proportion of particles to cull (e.g. the 25% of least probably particles could
-     *                             be culled)
-     * @param random a random number generator
-     * @return a list of particles representing the most probable found values of latent variables
-     */
+    public static ParticleFilterBuilder ofGraph(Collection<? extends Vertex> vertices) {
+        return new ParticleFilterBuilder(vertices);
+    };
+
     public ParticleFilter(Collection<? extends Vertex> vertices,
                           int numParticles,
                           int resamplingCycles,
