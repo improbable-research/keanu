@@ -1,5 +1,8 @@
 package io.improbable.keanu.network;
 
+import io.improbable.keanu.vertices.Vertex;
+import lombok.Value;
+
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
@@ -8,9 +11,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import io.improbable.keanu.vertices.Vertex;
-import lombok.Value;
 
 /**
  * A Lambda Section is defined as a given vertex and all the vertices that it affects (downstream) OR

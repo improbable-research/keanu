@@ -1,8 +1,8 @@
 package io.improbable.keanu.model.regression;
 
-import java.util.Arrays;
-
 import lombok.experimental.UtilityClass;
+
+import java.util.Arrays;
 
 @UtilityClass
 class RegressionWeights {

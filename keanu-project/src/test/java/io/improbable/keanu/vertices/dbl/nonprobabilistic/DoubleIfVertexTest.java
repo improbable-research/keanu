@@ -1,8 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -15,6 +12,8 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class DoubleIfVertexTest {
 

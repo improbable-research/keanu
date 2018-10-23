@@ -1,10 +1,10 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Test;
 
 import java.util.Arrays;

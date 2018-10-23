@@ -1,13 +1,12 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import static org.junit.Assert.assertTrue;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Test;
-
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import static org.junit.Assert.assertTrue;
 
 public class GradientOptimizerTest {
 

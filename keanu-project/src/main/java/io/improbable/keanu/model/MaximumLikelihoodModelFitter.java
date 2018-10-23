@@ -26,4 +26,3 @@ public class MaximumLikelihoodModelFitter<INPUT, OUTPUT> implements ModelFitter<
         GradientOptimizer.of(modelGraph.getNet()).maxLikelihood();
     }
 }
-

@@ -1,19 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static org.hamcrest.Matchers.closeTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
-import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
-import static io.improbable.keanu.vertices.VertexMatchers.hasValue;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesReverseModeGradient;
-
-import org.apache.commons.math3.linear.SingularMatrixException;
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableList;
-
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -23,6 +10,16 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.apache.commons.math3.linear.SingularMatrixException;
+import org.junit.Assert;
+import org.junit.Test;
+
+import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
+import static io.improbable.keanu.vertices.VertexMatchers.hasValue;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesReverseModeGradient;
+import static org.hamcrest.Matchers.closeTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class MatrixDeterminantVertexTest {
     @Test

@@ -1,18 +1,8 @@
 package io.improbable.keanu.e2e.regression;
 
-import static io.improbable.keanu.tensor.TensorMatchers.lessThanOrEqualTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
-
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.model.regression.RegressionModel;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
-import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -21,6 +11,14 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
+import static io.improbable.keanu.tensor.TensorMatchers.lessThanOrEqualTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LogisticRegressionTest {
 

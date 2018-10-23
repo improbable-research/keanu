@@ -1,14 +1,14 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.continuous.Gaussian.LN_SQRT_2PI;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import static io.improbable.keanu.distributions.continuous.Gaussian.LN_SQRT_2PI;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
 public class LogNormal implements ContinuousDistribution {
 

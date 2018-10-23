@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.tensor.generic.GenericTensor;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -1,7 +1,5 @@
 package io.improbable.keanu.model.regression;
 
-import java.util.function.Function;
-
 import io.improbable.keanu.model.Model;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -9,6 +7,8 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+
+import java.util.function.Function;
 
 /**
  * A general linear regression model that can be fitted to input and output training data.

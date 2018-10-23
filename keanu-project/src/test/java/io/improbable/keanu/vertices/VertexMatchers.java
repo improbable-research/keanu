@@ -1,19 +1,18 @@
 package io.improbable.keanu.vertices;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorMatchers;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
-
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorMatchers;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 
 public class VertexMatchers {
 

@@ -1,6 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMatch;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,13 +19,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMatch;
 
 public class ReduceVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 

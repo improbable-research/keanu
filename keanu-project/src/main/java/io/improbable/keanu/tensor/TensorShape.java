@@ -1,8 +1,8 @@
 package io.improbable.keanu.tensor;
 
-import java.util.Arrays;
-
 import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Arrays;
 
 public class TensorShape {
 
@@ -210,4 +210,3 @@ public class TensorShape {
     }
 
 }
-

@@ -1,16 +1,15 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class AutoDiffTest {
 
