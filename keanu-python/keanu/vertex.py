@@ -2,9 +2,8 @@ import numpy as np
 import numbers
 
 from keanu.context import KeanuContext
-from keanu.base import JavaObjectWrapper
+from keanu.base import JavaObjectWrapper, JavaCtor, JavaSet
 from keanu.const import Const
-
 
 context = KeanuContext()
 
@@ -15,13 +14,16 @@ class VertexOps:
         return GreaterThan(self, other)
 
 
-class Vertex(JavaObjectWrapper, VertexOps):
+class Vertex(JavaCtor, VertexOps):
     def __init__(self, ctor, *args):
         super(Vertex, self).__init__(ctor, *(Vertex.__parse_args(*args)))
 
     def observe(self, v):
         from keanu.const import Tensor
         self.unwrap().observe(Tensor(v).unwrap())
+
+    def get_connected_graph(self):
+        return JavaSet(self.unwrap().getConnectedGraph())
 
     @staticmethod
     def __parse_args(args):

@@ -1,4 +1,4 @@
-from keanu.base import JavaObjectWrapper
+from keanu.base import JavaCtor
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 
@@ -14,7 +14,7 @@ java_import(k, "io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolV
 java_import(k, "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
 
 
-class Const(JavaObjectWrapper):
+class Const(JavaCtor):
     def __init__(self, t):
         if isinstance(t, np.ndarray):
             ctor = Const.__infer_const_from_ndarray(t)

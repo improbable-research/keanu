@@ -86,3 +86,10 @@ def test_vertex_can_overload_gt(jvm_view):
 
     flat_arr = sample.asFlatArray()
     assert all(isinstance(x, bool) for x in flat_arr)
+
+
+def test_vertex_can_get_connected_graph(jvm_view):
+    gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
+    connected_graph = gaussian.get_connected_graph()
+
+    assert connected_graph.size() == 3

@@ -1,4 +1,4 @@
-from keanu.base import JavaObjectWrapper
+from keanu.base import JavaCtor
 from keanu.context import KeanuContext
 
 import numpy as np
@@ -12,7 +12,7 @@ java_import(k, "io.improbable.keanu.tensor.dbl.DoubleTensor")
 java_import(k, "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k, "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
-class Tensor(JavaObjectWrapper):
+class Tensor(JavaCtor):
     def __init__(self, t):
         if isinstance(t, np.ndarray):
             normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(t)
