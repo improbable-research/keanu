@@ -1,12 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.VertexId;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,17 +14,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-@Accessors(fluent = true)
 public class NetworkSamplesGenerator {
 
     private final SamplingAlgorithm algorithm;
 
-    @Getter
-    @Setter
     private int dropCount = 0;
-
-    @Getter
-    @Setter
     private int downSampleInterval = 1;
 
     private Supplier<ProgressBar> progressBarSupplier;
@@ -36,7 +28,39 @@ public class NetworkSamplesGenerator {
         this.progressBarSupplier = progressBarSupplier;
     }
 
+    public int dropCount() {
+        return dropCount;
+    }
+
+    public NetworkSamplesGenerator dropCount(int dropCount) {
+        Preconditions.checkArgument(dropCount >= 0,
+            "Drop count of %s is invalid. Cannot drop negative samples.",
+            dropCount
+        );
+        this.dropCount = dropCount;
+        return this;
+    }
+
+    public int downSampleInterval() {
+        return downSampleInterval;
+    }
+
+    public NetworkSamplesGenerator downSampleInterval(int downSampleInterval) {
+        Preconditions.checkArgument(downSampleInterval > 0,
+            "Down-sample interval of %s is invalid. The down-sample interval means take every Nth sample." +
+                " A down-sample interval of 1 would be no down-sampling.",
+            downSampleInterval
+        );
+
+        this.downSampleInterval = downSampleInterval;
+        return this;
+    }
+
     public NetworkSamples generate(final int totalSampleCount) {
+        Preconditions.checkArgument(dropCount < totalSampleCount,
+            "Cannot drop more samples than requested or all of the samples. Samples requested %s and dropping %s",
+            totalSampleCount, dropCount
+        );
 
         ProgressBar progressBar = progressBarSupplier.get();
 
@@ -82,7 +106,7 @@ public class NetworkSamplesGenerator {
             progressBar.progress(String.format("Sample #%,d completed", sampleNumber.get()));
             return sample;
 
-        }).onClose(() -> progressBar.finish());
+        }).onClose(progressBar::finish);
     }
 
     private void dropSamples(int dropCount, ProgressBar progressBar) {

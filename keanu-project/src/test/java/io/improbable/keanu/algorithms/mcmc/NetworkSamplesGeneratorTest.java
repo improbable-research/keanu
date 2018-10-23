@@ -123,6 +123,27 @@ public class NetworkSamplesGeneratorTest {
         Mockito.verify(progressBar).finish();
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void doesNotAllowZeroDownSample() {
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(new AtomicInteger(0), new AtomicInteger(0));
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, ProgressBar::new);
+        unitUnderTest.downSampleInterval(0).stream();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesNotAllowNegativeDropCount() {
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(new AtomicInteger(0), new AtomicInteger(0));
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, ProgressBar::new);
+        unitUnderTest.dropCount(-10).generate(100);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesNotAllowDroppingMoreThanRequesting() {
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(new AtomicInteger(0), new AtomicInteger(0));
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, ProgressBar::new);
+        unitUnderTest.dropCount(200).generate(100);
+    }
+
     @Value
     public static class TestSamplingAlgorithm implements SamplingAlgorithm {
 

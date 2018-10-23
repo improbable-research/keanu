@@ -55,7 +55,7 @@ public class LinearLassoRegressionTest {
 
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .withRegularization(RegressionRegularization.LASSO)
-            .withPriorOnIntercept(0, 40)
+            .withPriorOnIntercept(0, 20)
             .build();
 
         assertWeightsAndInterceptMatchTestData(
