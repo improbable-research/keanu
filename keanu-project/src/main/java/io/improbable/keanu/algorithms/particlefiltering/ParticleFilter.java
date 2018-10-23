@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 

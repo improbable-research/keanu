@@ -4,7 +4,6 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.algorithms.particlefiltering.Particle;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
