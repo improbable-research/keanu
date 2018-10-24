@@ -1,19 +1,18 @@
 package io.improbable.keanu.network;
 
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import org.junit.Before;
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 
 public class BayesianNetworkTest {
 
@@ -86,8 +85,8 @@ public class BayesianNetworkTest {
         BoolVertex b = new BernoulliVertex(0.5);
         BoolVertex ored = a.or(b);
 
-        a.setLabel(new VertexLabel(LABEL_A));
-        b.setLabel(new VertexLabel(LABEL_A));
+        a.setLabel(LABEL_A);
+        b.setLabel(LABEL_A);
 
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
     }

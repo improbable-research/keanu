@@ -1,11 +1,11 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
 /**
  * The Smooth Uniform distribution is the usual Uniform distribution with the edges

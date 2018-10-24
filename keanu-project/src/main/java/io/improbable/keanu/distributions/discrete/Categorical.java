@@ -1,14 +1,14 @@
 package io.improbable.keanu.distributions.discrete;
 
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import java.util.Map;
+import java.util.Set;
 
 public class Categorical<T> implements Distribution<Tensor<T>> {
 

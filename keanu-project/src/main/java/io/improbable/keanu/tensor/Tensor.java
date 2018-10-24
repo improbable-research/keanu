@@ -1,11 +1,11 @@
 package io.improbable.keanu.tensor;
 
 
-import java.util.Arrays;
-import java.util.List;
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
+
+import java.util.Arrays;
+import java.util.List;
 
 public interface Tensor<T> {
 

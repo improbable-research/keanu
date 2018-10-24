@@ -1,15 +1,14 @@
 package io.improbable.keanu.tensor;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.util.function.Function;
-
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
+import org.junit.Test;
+
+import java.util.function.Function;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class TensorValidationTest {
     @Test

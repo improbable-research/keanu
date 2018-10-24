@@ -1,7 +1,5 @@
 package io.improbable.keanu.tensor.validate;
 
-import java.util.function.Function;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -10,6 +8,8 @@ import io.improbable.keanu.tensor.validate.check.CustomTensorValueChecker;
 import io.improbable.keanu.tensor.validate.check.TensorValueChecker;
 import io.improbable.keanu.tensor.validate.check.TensorValueNotEqualsCheck;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+
+import java.util.function.Function;
 
 public interface TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> extends TensorValueChecker<TENSOR> {
 

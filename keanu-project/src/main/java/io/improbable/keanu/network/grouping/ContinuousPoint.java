@@ -1,8 +1,8 @@
 package io.improbable.keanu.network.grouping;
 
-import java.util.Arrays;
-
 import org.apache.commons.math3.ml.clustering.Clusterable;
+
+import java.util.Arrays;
 
 public class ContinuousPoint implements Clusterable {
 

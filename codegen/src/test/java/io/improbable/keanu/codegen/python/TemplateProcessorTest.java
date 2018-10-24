@@ -1,10 +1,7 @@
 package io.improbable.keanu.codegen.python;
 
 import freemarker.template.Template;
-import static junit.framework.TestCase.assertTrue;
 import lombok.Getter;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -20,6 +17,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
 
 public class TemplateProcessorTest {
 

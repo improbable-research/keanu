@@ -1,13 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.util.ProgressBar;
@@ -15,6 +7,14 @@ import io.improbable.keanu.vertices.VertexId;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Accessors(fluent = true)
 public class NetworkSamplesGenerator {

@@ -1,11 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static java.lang.Math.pow;
-
-import static junit.framework.TestCase.assertEquals;
-
-import java.util.List;
-
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Assert;
@@ -14,7 +9,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import java.util.List;
+
+import static java.lang.Math.pow;
+import static junit.framework.TestCase.assertEquals;
 
 public class StudentTVertexTest {
     private static final double DELTA = 0.0001;

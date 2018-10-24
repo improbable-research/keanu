@@ -10,9 +10,12 @@ k = KeanuContext().jvm_view()
 java_import(k, "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex")
 java_import(k, "io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex")
 java_import(k, "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 
@@ -29,6 +32,10 @@ def DoubleIf(*args) -> k.DoubleIfVertex:
     return Vertex(k.DoubleIfVertex, args)
 
 
+def Addition(*args) -> k.AdditionVertex:
+    return Vertex(k.AdditionVertex, args)
+
+
 def Cauchy(*args) -> k.CauchyVertex:
     return Vertex(k.CauchyVertex, args)
 
@@ -39,6 +46,14 @@ def Exponential(*args) -> k.ExponentialVertex:
 
 def Gamma(*args) -> k.GammaVertex:
     return Vertex(k.GammaVertex, args)
+
+
+def Gaussian(*args) -> k.GaussianVertex:
+    return Vertex(k.GaussianVertex, args)
+
+
+def Uniform(*args) -> k.UniformVertex:
+    return Vertex(k.UniformVertex, args)
 
 
 def Poisson(*args) -> k.PoissonVertex:
