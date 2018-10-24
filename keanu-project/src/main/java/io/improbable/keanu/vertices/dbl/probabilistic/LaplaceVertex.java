@@ -42,6 +42,18 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
+    public LaplaceVertex(long[] shape, DoubleVertex mu, double beta) {
+        this(shape, mu, new ConstantDoubleVertex(beta));
+    }
+
+    public LaplaceVertex(long[] shape, double mu, DoubleVertex beta) {
+        this(shape, new ConstantDoubleVertex(mu), beta);
+    }
+
+    public LaplaceVertex(long[] shape, double mu, double beta) {
+        this(shape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta));
+    }
+
     /**
      * One to one constructor for mapping some shape of mu and sigma to
      * a matching shaped Laplace.

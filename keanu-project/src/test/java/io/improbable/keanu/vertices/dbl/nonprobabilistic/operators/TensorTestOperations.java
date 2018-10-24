@@ -38,7 +38,7 @@ public class TensorTestOperations {
     private static void runGradientTestOnSingleInput(DoubleVertex inputVertex,
                                                      DoubleVertex outputVertex,
                                                      double incrementAmount,
-                                                     Double delta,
+                                                     double delta,
                                                      boolean isForwardMode) {
         DoubleTensor initialInput = inputVertex.getValue();
 
