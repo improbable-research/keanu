@@ -58,7 +58,7 @@ public class NonGradientOptimizer implements Optimizer {
      * Creates a Bayesian network from the graph connected to the given vertex and uses this to
      * create a BOBYQA {@link NonGradientOptimizer} which optimizes the values of latent variables to maximise overall probability.
      *
-     * @param vertexFromNetwork The vertices to create a Bayesian network from.
+     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
      * @return a {@link NonGradientOptimizer}
      */
     public static NonGradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {

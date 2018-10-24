@@ -78,7 +78,7 @@ public class GradientOptimizer implements Optimizer {
      * create a {@link GradientOptimizer} which optimizes the values of latent variables
      * to maximise overall probability.
      *
-     * @param vertexFromNetwork The vertices to create a Bayesian network from.
+     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
      * @return a {@link GradientOptimizer}
      */
     public static GradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {

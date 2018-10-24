@@ -32,7 +32,7 @@ public interface Optimizer {
     void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
 
     /**
-     * This and will use MAP estimation to optimize the values of latent vertices such that the
+     * This will use MAP estimation to optimize the values of latent vertices such that the
      * probability of the whole Bayesian network is maximised.
      * This method will modify in place the Bayesian network that was used to create this object.
      *
@@ -42,7 +42,7 @@ public interface Optimizer {
 
     /**
      * This method will use Maximum Likelihood estimation to optimize the values of latent vertices such that
-     * the probability of the whole Bayesian network is maximised.
+     * the probability of the observed vertices is maximised.
      * This method will modify in place the Bayesian network that was used to create this object.
      *
      * @return the natural logarithm of the maximum likelihood (MLE)
