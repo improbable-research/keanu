@@ -73,7 +73,7 @@ def test_int_vertex_value_is_a_numpy_array():
     vertex = kn.Const(ndarray)
     value = vertex.getValue()
     assert type(value) == np.ndarray
-    assert value.dtype == np.int64
+    assert value.dtype == np.int64 or value.dtype == np.int32
     assert (value == ndarray).all()
 
 def test_float_vertex_value_is_a_numpy_array():
