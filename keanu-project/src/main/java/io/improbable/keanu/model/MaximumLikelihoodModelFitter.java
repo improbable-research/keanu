@@ -15,14 +15,13 @@ public class MaximumLikelihoodModelFitter<INPUT, OUTPUT> implements ModelFitter<
      * This will mutate the graph which can then be used to construct a graph-backed model like, for instance a
      * {@link io.improbable.keanu.model.regression.RegressionModel RegressionModel}.
      *
-     * @param input The input data to your model graph
+     * @param input  The input data to your model graph
      * @param output The output data to your model graph
-     *
      * @see <a href=https://en.wikipedia.org/wiki/Maximum_likelihood_estimation>Maximum Likelihood estimation</a>
      */
     @Override
     public void fit(INPUT input, OUTPUT output) {
         modelGraph.observeValues(input, output);
-        GradientOptimizer.of(modelGraph.getNet()).maxLikelihood();
+        GradientOptimizer.of(modelGraph.getBayesianNetwork()).maxLikelihood();
     }
 }

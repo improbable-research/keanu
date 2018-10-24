@@ -17,14 +17,13 @@ public class LinearLassoRegressionTest {
     @Rule
     public DeterministicRule deterministicRule = new DeterministicRule();
 
-
     @Test
     public void findsExpectedParamsForOneWeight() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData();
 
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .withRegularization(RegressionRegularization.LASSO)
-            .withPriorOnIntercept(0, 40)
+            .withPriorOnIntercept(0, 20)
             .build();
 
         assertWeightsAndInterceptMatchTestData(
@@ -39,7 +38,7 @@ public class LinearLassoRegressionTest {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .withRegularization(RegressionRegularization.LASSO)
-            .withPriorOnIntercept(0, 40)
+            .withPriorOnIntercept(0, 20)
             .build();
 
         assertWeightsAndInterceptMatchTestData(

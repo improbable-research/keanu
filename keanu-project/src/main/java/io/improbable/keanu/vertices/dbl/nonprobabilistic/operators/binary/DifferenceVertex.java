@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -17,6 +18,7 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
      * @param left  the vertex that will be subtracted from
      * @param right the vertex to subtract
      */
+    @ExportVertexToPythonBindings
     public DifferenceVertex(DoubleVertex left, DoubleVertex right) {
         super(left, right);
     }

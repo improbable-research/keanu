@@ -13,7 +13,7 @@ import java.util.function.Function;
  */
 public class RegressionModelBuilder<OUTPUT> {
     private static final double DEFAULT_MU = 0.0;
-    private static final double DEFAULT_SCALE_PARAMETER = 2.0;
+    private static final double DEFAULT_SCALE_PARAMETER = 1.0;
 
     private RegressionRegularization regularization = RegressionRegularization.NONE;
     private double[] priorOnWeightsScaleParameters;
