@@ -22,7 +22,7 @@ def shapes_equal(s1, s2):
         if s1[i] != s2[i]:
             print("Mismatch in dimension %d: %d != %d" % (i, s1[i], s2[i]))
             return False
-        return True
+    return True
 
 def __get_shape(t):
     try:
