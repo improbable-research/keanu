@@ -6,9 +6,6 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -24,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class LambdaModelVertexTest {

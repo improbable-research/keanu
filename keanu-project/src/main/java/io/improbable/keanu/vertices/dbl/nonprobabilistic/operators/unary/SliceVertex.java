@@ -1,16 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
 public class SliceVertex extends DoubleUnaryOpVertex {
 

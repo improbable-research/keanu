@@ -1,17 +1,15 @@
 package io.improbable.keanu.tensor.intgr;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-
 import com.google.common.primitives.Ints;
-
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+
+import java.util.Arrays;
+import java.util.function.Function;
 
 public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 

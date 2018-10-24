@@ -1,8 +1,8 @@
 package io.improbable.keanu.tensor;
 
-import static org.junit.Assert.assertArrayEquals;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertArrayEquals;
 
 public class TensorShapeValidationTest {
 

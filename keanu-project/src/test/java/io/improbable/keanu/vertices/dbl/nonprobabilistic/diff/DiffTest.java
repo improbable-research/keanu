@@ -1,17 +1,15 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
-import static org.junit.Assert.assertTrue;
-
-import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
-
-import java.util.NoSuchElementException;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import io.improbable.keanu.distributions.hyperparam.Diff;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.NoSuchElementException;
+
+import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
+import static org.junit.Assert.assertTrue;
 
 public class DiffTest {
     Diffs diffs;

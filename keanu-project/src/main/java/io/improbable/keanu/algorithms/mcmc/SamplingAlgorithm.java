@@ -1,10 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import java.util.List;
-import java.util.Map;
-
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.VertexId;
+
+import java.util.List;
+import java.util.Map;
 
 public interface SamplingAlgorithm {
 

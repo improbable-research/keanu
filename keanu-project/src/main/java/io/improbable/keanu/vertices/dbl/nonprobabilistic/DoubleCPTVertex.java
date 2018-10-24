@@ -1,8 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import java.util.List;
-import java.util.Map;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -12,6 +9,9 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.CPTCondition;
+
+import java.util.List;
+import java.util.Map;
 
 public class DoubleCPTVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 

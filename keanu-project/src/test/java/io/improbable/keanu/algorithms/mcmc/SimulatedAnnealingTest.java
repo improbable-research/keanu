@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
@@ -12,7 +11,6 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;

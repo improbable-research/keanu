@@ -19,4 +19,3 @@ public abstract class BoolBinaryOpLambda<A extends Tensor, B extends Tensor> ext
         return boolOp.apply(a, b);
     }
 }
-

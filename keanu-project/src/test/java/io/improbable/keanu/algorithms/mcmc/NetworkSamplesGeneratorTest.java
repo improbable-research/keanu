@@ -1,10 +1,13 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.vertices.VertexId;
+import lombok.Value;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,15 +16,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
-import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.VertexId;
-import lombok.Value;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 public class NetworkSamplesGeneratorTest {
 

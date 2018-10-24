@@ -1,6 +1,8 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
-import static java.lang.Math.exp;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static java.lang.Math.exp;
 
 public class ParticleFilter {
 

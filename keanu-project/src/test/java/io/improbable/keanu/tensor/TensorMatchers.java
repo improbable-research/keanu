@@ -1,16 +1,16 @@
 package io.improbable.keanu.tensor;
 
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.equalTo;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.equalTo;
 
 
 public class TensorMatchers {
@@ -118,6 +118,21 @@ public class TensorMatchers {
             @Override
             public void describeTo(Description description) {
                 description.appendText("Tensor with all values ").appendValue(valueMatcher);
+            }
+        };
+    }
+
+    public static Matcher<NumberTensor> lessThanOrEqualTo(NumberTensor other) {
+        return new TypeSafeDiagnosingMatcher<NumberTensor>() {
+            @Override
+            protected boolean matchesSafely(NumberTensor item, Description mismatchDescription) {
+                mismatchDescription.appendText("Tensor ").appendValue(item);
+                return item.lessThanOrEqual(other).allTrue();
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Tensor ").appendValue(other);
             }
         };
     }

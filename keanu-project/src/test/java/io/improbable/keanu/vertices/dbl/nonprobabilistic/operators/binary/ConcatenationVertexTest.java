@@ -1,16 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static org.junit.Assert.assertEquals;
-
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
-
-import java.util.Arrays;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableList;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
@@ -19,6 +9,13 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Arrays;
+
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static org.junit.Assert.assertEquals;
 
 public class ConcatenationVertexTest {
 
