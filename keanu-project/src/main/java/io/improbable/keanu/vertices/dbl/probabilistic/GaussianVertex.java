@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -43,6 +44,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
+    @ExportVertexToPythonBindings
     public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
     }
