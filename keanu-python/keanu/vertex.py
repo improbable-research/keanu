@@ -41,13 +41,3 @@ class Vertex(JavaCtor, VertexOps):
             return context.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
-
-
-class JavaVertexId(JavaObjectWrapper):
-    def __init__(self, java_vertex_id):
-        super(JavaVertexId, self).__init__(java_vertex_id)
-
-
-class JavaVertex(JavaObjectWrapper):
-    def __init__(self, java_vertex):
-        super(JavaVertex, self).__init__(java_vertex)

@@ -28,32 +28,20 @@ class BayesNet(JavaCtor):
     def get_latent_or_observed_vertices(self):
         return JavaList(self.unwrap().getLatentOrObservedVertices())
 
-    def get_top_level_latent_or_observed_vertices(self):
-        return JavaList(self.unwrap().getLatentOrObservedVertices())
-
     def get_latent_vertices(self):
         return JavaList(self.unwrap().getLatentVertices())
-
-    def get_top_level_latent_vertices(self):
-        return JavaList(self.unwrap().getTopLevelLatentVertices())
 
     def get_observed_vertices(self):
         return JavaList(self.unwrap().getObservedVertices())
 
-    def get_top_level_observed_vertices(self):
-        return JavaList(self.unwrap().getTopLevelObservedVertices())
-
-    def probe_for_non_zero_probability(self, attempts, random):
-        self.unwrap().probForNonZeroProbability(attempts, random.unwrap())
-
     def get_continuous_latent_vertices(self):
-        return JavaList(self.unwrap().get_continuous_latent_vertices())
+        return JavaList(self.unwrap().getContinuousLatentVertices())
 
     def get_discrete_latent_vertices(self):
-        return JavaList(self.unwrap().get_discrete_latent_vertices())
+        return JavaList(self.unwrap().getDiscreteLatentVertices())
 
-    def get_vertex_by_label(self, vertex_label):
-        return JavaVertex(self.unwrap().getVertexByLabel(vertex_label.unwrap()))
+    def probe_for_non_zero_probability(self, attempts, random):
+        self.unwrap().probeForNonZeroProbability(attempts, random.unwrap())
 
 
 class JavaVertexSamples(JavaObjectWrapper):
@@ -80,29 +68,18 @@ class JavaVertexSamples(JavaObjectWrapper):
         return np_array.reshape(value.getShape())
 
 
-class JavaNetworkState(JavaObjectWrapper):
-    def __init__(self, java_network_state):
-        super(JavaNetworkState, self).__init__(java_network_state)
-
-    def get(self, vertex_or_vertex_id):
-        self.unwrap().get(vertex_or_vertex_id.unwrap())
-
-    def get_vertex_ids(self):
-        return JavaSet(self.unwrap().getVertexIds())
-
-
 class JavaNetworkSamples(JavaObjectWrapper):
     def __init__(self, java_network_samples):
         super(JavaNetworkSamples, self).__init__(java_network_samples)
+
+    def get(self, vertex):
+        return JavaVertexSamples(self.unwrap().get(vertex.unwrap()))
 
     def get_double_tensor_samples(self, vertex):
         return JavaVertexSamples(self.unwrap().getDoubleTensorSamples(vertex.unwrap()))
 
     def get_integer_tensor_samples(self, vertex):
         return JavaVertexSamples(self.unwrap().getIntegerTensorSamples(vertex.unwrap()))
-
-    def get(self, vertex_or_vertex_id):
-        return JavaVertexSamples(self.unwrap().get(vertex_or_vertex_id.unwrap()))
 
     def drop(self, drop_count):
         return JavaNetworkSamples(self.unwrap().drop(drop_count))
@@ -112,9 +89,6 @@ class JavaNetworkSamples(JavaObjectWrapper):
 
     def probability(self, fn):
         return self.unwrap().probability(UnaryLambda(fn))
-
-    def get_network_state(self, sample):
-        return JavaNetworkState(self.unwrap().getNetworkState(sample))
 
 
 class InferenceAlgorithm:
