@@ -7,13 +7,13 @@ def test_construct_bayes_net_with_java_list_of_vertices():
     uniform = kn.UniformInt(0, 1)
     java_list = uniform.get_connected_graph()
 
-    assert java_list.contains(uniform)
+    assert java_list.contains(uniform.unwrap())
     assert java_list.size() == 3
 
     net = kn.BayesNet(java_list)
     vertices = net.get_latent_vertices()
 
-    assert vertices.contains(uniform)
+    assert vertices.contains(uniform.unwrap())
     assert vertices.size() == 1
 
 def test_construct_bayes_net_with_python_list_of_vertices():
@@ -23,7 +23,7 @@ def test_construct_bayes_net_with_python_list_of_vertices():
     net = kn.BayesNet(python_list)
     vertices = net.get_latent_vertices()
 
-    assert vertices.contains(uniform)
+    assert vertices.contains(uniform.unwrap())
     assert vertices.size() == 1
 
 def test_cant_construct_bayes_net_if_not_java_or_python_list():
@@ -61,11 +61,11 @@ def test_can_get_vertices_from_bayes_net(get_method, latent, observed, continuou
     vertices = getattr(net, get_method)()
 
     if observed and continuous:
-        assert vertices.contains(gamma)
+        assert vertices.contains(gamma.unwrap())
     if latent and discrete:
-        assert vertices.contains(poisson)
+        assert vertices.contains(poisson.unwrap())
     if latent and continuous:
-        assert vertices.contains(cauchy)
+        assert vertices.contains(cauchy.unwrap())
 
     assert vertices.size() == (observed and continuous) + (latent and discrete) + (latent and continuous)
 
