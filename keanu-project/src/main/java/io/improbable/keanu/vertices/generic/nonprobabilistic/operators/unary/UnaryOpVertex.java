@@ -26,4 +26,3 @@ public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> implements NonP
 
     protected abstract OUT op(IN a);
 }
-

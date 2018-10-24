@@ -4,5 +4,6 @@ spotless {
 
         indentWithSpaces(4)
         removeUnusedImports()
+        importOrder '', 'javax', 'java', 'static '
     }
 }

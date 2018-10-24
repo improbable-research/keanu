@@ -61,7 +61,7 @@ class VertexOps:
 
     def __rpow__(self, other):
         return kn.generated.vertex.Power(other, self)
-        
+
     def __truediv__(self, other):
         return kn.generated.vertex.Division(self, other)
 
@@ -70,13 +70,13 @@ class VertexOps:
 
     def __eq__(self, other):
         return kn.generated.vertex.Equals(self, other)
-        
+
     def __req__(self, other):
         return kn.generated.vertex.Equals(self, other)
 
     def __ne__(self, other):
         return kn.generated.vertex.NotEquals(self, other)
-        
+
     def __rne__(self, other):
         return kn.generated.vertex.NotEquals(self, other)
 
@@ -96,13 +96,13 @@ class VertexOps:
         return kn.generated.vertex.Abs(self)
 
     def __round__(self):
-        return kn.generated.vertex.Round(self)        
+        return kn.generated.vertex.Round(self)
 
     def __floor__(self):
-        return kn.generated.vertex.Floor(self)    
+        return kn.generated.vertex.Floor(self)
 
     def __ceil__(self):
-        return kn.generated.vertex.Ceil(self)    
+        return kn.generated.vertex.Ceil(self)
 
 class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, ctor, *args):

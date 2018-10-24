@@ -1,15 +1,14 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators;
 
-import static org.junit.Assert.assertThat;
-
-import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
-
-import java.util.List;
-
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+
+import java.util.List;
+
+import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
+import static org.junit.Assert.assertThat;
 
 public class TensorTestOperations {
     public static void finiteDifferenceMatchesForwardAndReverseModeGradient(List<DoubleVertex> inputVertices,

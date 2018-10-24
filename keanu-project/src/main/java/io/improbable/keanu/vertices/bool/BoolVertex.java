@@ -1,10 +1,6 @@
 package io.improbable.keanu.vertices.bool;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.google.common.collect.ImmutableList;
-
 import io.improbable.keanu.kotlin.BooleanOperators;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -21,6 +17,9 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolRe
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
+
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class BoolVertex extends Vertex<BooleanTensor> implements BooleanOperators<BoolVertex> {
 

@@ -1,9 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -12,6 +8,9 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class DoubleCPTVertexTest {
 
