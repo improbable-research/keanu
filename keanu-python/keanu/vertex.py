@@ -118,10 +118,8 @@ class Vertex(JavaObjectWrapper, VertexOps):
 
     @staticmethod
     def __parse_arg(arg):
-        if isinstance(arg, np.ndarray):
+        if isinstance(arg, np.ndarray) or isinstance(arg, numbers.Number):
             return kn.Const(arg).unwrap()
-        elif isinstance(arg, numbers.Number):
-            return Vertex.__parse_arg(np.array([[arg]]))
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()
         elif isinstance(arg, list) and all(isinstance(x, numbers.Number) for x in arg):
