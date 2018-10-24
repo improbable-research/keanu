@@ -13,12 +13,13 @@ class JavaObjectWrapper:
         return "[{0} => {1}]".format(self._class, type(self))
 
     def __getattr__(self, k):
-        py_method = JavaObjectWrapper.__get_python_name(k)
-        if py_method in self.__dict__:
-            return self.__dict__[py_method]
+        python_name = JavaObjectWrapper.__get_python_name(k)
+        if python_name in self.__dict__:
+            return self.__dict__[python_name]
 
-        warnings.warn("A python wrapper for {} does not exist so it may return a Java Object".format(k))
-        return self.unwrap().__getattr__(JavaObjectWrapper.__get_java_name(k))
+        java_name = JavaObjectWrapper.__get_java_name(k)
+        warnings.warn("A python wrapper for {} does not exist so it may return a Java Object".format(java_name))
+        return self.unwrap().__getattr__(java_name)
 
     def unwrap(self):
         return self._val
