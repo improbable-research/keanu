@@ -1,18 +1,18 @@
 package io.improbable.keanu.network.grouping;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.network.grouping.continuouspointgroupers.ContinuousPointGrouper;
+import io.improbable.keanu.vertices.VertexId;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
-import io.improbable.keanu.network.grouping.continuouspointgroupers.ContinuousPointGrouper;
-import io.improbable.keanu.vertices.VertexId;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * This class has the ability to group NetworkStates that are similar. Which NetworkStates

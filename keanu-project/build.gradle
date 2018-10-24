@@ -84,9 +84,9 @@ uploadArchives {
 
                 developers {
                     developer {
-                        id 'caleb'
-                        name 'Caleb Walker'
-                        email 'caleb@improbable.io'
+                        id 'keanu-engineering'
+                        name 'Keanu Improbable'
+                        email 'keanu-engineering@improbable.io'
                     }
                 }
             }

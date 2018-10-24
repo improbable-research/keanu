@@ -6,9 +6,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.model.ModelVertex;
 import io.improbable.keanu.vertices.model.ModelResult;
 import io.improbable.keanu.vertices.model.ModelResultProvider;
+import io.improbable.keanu.vertices.model.ModelVertex;
 
 /**
  * A non-probabilistic boolean vertex whose value is extracted from an upstream model vertex.

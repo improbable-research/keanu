@@ -1,11 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import java.util.Map;
-
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import java.util.Map;
 
 public class CeilVertex extends DoubleUnaryOpVertex {
 
@@ -15,6 +16,7 @@ public class CeilVertex extends DoubleUnaryOpVertex {
      *
      * @param inputVertex the vertex to be ceil'd
      */
+    @ExportVertexToPythonBindings
     public CeilVertex(DoubleVertex inputVertex) {
         super(inputVertex);
     }

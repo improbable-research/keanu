@@ -1,20 +1,17 @@
 package io.improbable.keanu.tensor.generic;
 
-import static java.util.Arrays.copyOf;
-
-import static com.google.common.primitives.Ints.checkedCast;
-
-import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.nd4j.linalg.util.ArrayUtil;
-
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
+import static com.google.common.primitives.Ints.checkedCast;
+import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
+import static java.util.Arrays.copyOf;
 
 public class GenericTensor<T> implements Tensor<T> {
 

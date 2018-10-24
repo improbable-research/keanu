@@ -1,21 +1,19 @@
 package io.improbable.keanu.vertices;
 
-import static org.junit.Assert.assertEquals;
-
-import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+
+import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
+import static org.junit.Assert.assertEquals;
 
 public class EvalPropagationTest {
 

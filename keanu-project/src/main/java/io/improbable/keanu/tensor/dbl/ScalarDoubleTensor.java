@@ -1,20 +1,19 @@
 package io.improbable.keanu.tensor.dbl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.special.Gamma;
-import org.apache.commons.math3.util.FastMath;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.special.Gamma;
+import org.apache.commons.math3.util.FastMath;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 

@@ -1,6 +1,10 @@
 package io.improbable.keanu.network;
 
-import static org.junit.Assert.assertTrue;
+import io.improbable.keanu.network.grouping.NetworkStateGrouper;
+import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,12 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-
-import io.improbable.keanu.network.grouping.NetworkStateGrouper;
-import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static org.junit.Assert.assertTrue;
 
 public class NetworkStateGrouperTest {
 
