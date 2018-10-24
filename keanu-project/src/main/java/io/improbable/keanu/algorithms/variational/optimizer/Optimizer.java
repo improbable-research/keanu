@@ -17,7 +17,7 @@ import io.improbable.keanu.vertices.Vertex;
 
 public interface Optimizer {
     /**
-     * Adds a callback to be called whenever the optimizer evaluates the fitness of a point.
+     * Adds a callback to be called whenever the optimizer evaluates the fitness of a point. E.g. for logging.
      * @param fitnessCalculationHandler a function to be called whenever the optimizer evaluates the fitness of a point.
      *                                  The double[] argument to the handler represents the point being evaluated.
      *                                  The Double argument to the handler represents the fitness of that point.
@@ -25,15 +25,15 @@ public interface Optimizer {
     void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
 
     /**
-     * This attempts to remove a callback function that previously would have been called whenever the optimizer
+     * Removes a callback function that previously would have been called whenever the optimizer
      * evaluated the fitness of a point. If the callback is not registered then this function will do nothing.
      * @param fitnessCalculationHandler the function to be removed from the list of fitness evaluation callbacks
      */
     void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
 
     /**
-     * This methods detects the vertices in the Bayesian Network that have been observed, and will use MAP estimation to
-     * optimize the observation probability of these vertices.
+     * This and will use MAP estimation to optimize the values of latent vertices such that the
+     * probability of the whole Bayesian network is maximised.
      * This method will modify in place the Bayesian network that was used to create this object.
      *
      * @return the natural logarithm of the Maximum a posteriori (MAP)
@@ -41,8 +41,8 @@ public interface Optimizer {
     double maxAPosteriori();
 
     /**
-     * This methods detects the vertices in the Bayesian Network that have been observed, and will use Maximum Likelihood
-     * estimation to optimize the observation probability of these vertices.
+     * This method will use Maximum Likelihood estimation to optimize the values of latent vertices such that
+     * the probability of the whole Bayesian network is maximised.
      * This method will modify in place the Bayesian network that was used to create this object.
      *
      * @return the natural logarithm of the maximum likelihood (MLE)
@@ -52,10 +52,10 @@ public interface Optimizer {
     BayesianNetwork getBayesianNetwork();
 
     /**
-     * Creates an {@link Optimizer} which optimizes against the unobserved (latent) variables of the Bayesian network.
+     * Creates an {@link Optimizer} which optimizes the values of latent variables of the Bayesian network to maximise
+     * the overall probability.
      *
-     * @param network The Bayesian network containing the unobserved variables to be optimized against,
-     *                 and the observed variables to optimize the probability of.
+     * @param network The Bayesian network to run optimization on.
      * @return an {@link Optimizer}
      */
     static Optimizer of(BayesianNetwork network) {
@@ -68,7 +68,7 @@ public interface Optimizer {
 
     /**
      * Creates a Bayesian network from the given vertices and uses this to
-     * create an {@link Optimizer} which optimizes against the unobserved (latent) variables.
+     * create an {@link Optimizer} which optimizes the values of latent variables to maximise overall probability.
      *
      * @param vertices The vertices to create a Bayesian network from.
      * @return an {@link Optimizer}
@@ -78,10 +78,10 @@ public interface Optimizer {
     }
 
     /**
-     * Retrieves the connected graph from the given vertex and uses this to
-     * create an {@link Optimizer} which optimizes against the unobserved (latent) variables.
+     * Creates a Bayesian network from the graph connected to the given vertex and uses this to
+     * create an {@link Optimizer} which optimizes the values of latent variables to maximise overall probability.
      *
-     * @param vertexFromNetwork The vertices to create a Bayesian network from.
+     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
      * @return an {@link Optimizer}
      */
     static Optimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {

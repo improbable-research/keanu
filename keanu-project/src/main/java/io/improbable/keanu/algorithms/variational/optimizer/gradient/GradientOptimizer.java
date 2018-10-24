@@ -41,10 +41,10 @@ public class GradientOptimizer implements Optimizer {
         }
     }
     /**
-     * Creates a {@link GradientOptimizer} which optimizes against the unobserved (latent) variables of the Bayesian network.
+     * Creates a {@link GradientOptimizer} which optimizes the values of the latent variables to maximise
+     * the overall probability of the Bayesian network.
      *
-     * @param bayesNet The Bayesian network containing the unobserved variables to be optimized against,
-     *                 and the observed variables to optimize the probability of.
+     * @param bayesNet The Bayesian network to run optimization on.
      * @return a {@link GradientOptimizer}
      */
     public static GradientOptimizer of(BayesianNetwork bayesNet) {
@@ -63,7 +63,8 @@ public class GradientOptimizer implements Optimizer {
 
     /**
      * Creates a Bayesian network from the given vertices and uses this to
-     * create a {@link GradientOptimizer} which optimizes against the unobserved (latent) variables.
+     * create a {@link GradientOptimizer} which optimizes the values of latent variables
+     * to maximise overall probability.
      *
      * @param vertices The vertices to create a Bayesian network from.
      * @return a {@link GradientOptimizer}
@@ -73,8 +74,9 @@ public class GradientOptimizer implements Optimizer {
     }
 
     /**
-     * Retrieves the connected graph from the given vertex and uses this to
-     * create a {@link GradientOptimizer} which optimizes against the unobserved (latent) variables.
+     * Creates a Bayesian network from the graph connected to the given vertex and uses this to
+     * create a {@link GradientOptimizer} which optimizes the values of latent variables
+     * to maximise overall probability.
      *
      * @param vertexFromNetwork The vertices to create a Bayesian network from.
      * @return a {@link GradientOptimizer}
@@ -119,7 +121,7 @@ public class GradientOptimizer implements Optimizer {
     }
 
     /**
-     * This attempts to remove a callback function that previously would have been called whenever the optimizer
+     * Removes a callback function that previously would have been called whenever the optimizer
      * evaluated the gradient at a point. If the callback is not registered then this function will do nothing.
      *
      * @param gradientCalculationHandler the function to be removed from the list of gradient evaluation callbacks

@@ -30,10 +30,10 @@ import lombok.Getter;
 @Builder
 public class NonGradientOptimizer implements Optimizer {
     /**
-     * Creates a BOBYQA {@link NonGradientOptimizer} which optimizes against the unobserved (latent) variables of the Bayesian network.
+     * Creates a BOBYQA {@link NonGradientOptimizer} which optimizes the values of the latent variables of
+     * the Bayesian network to maximise overall probability.
      *
-     * @param bayesNet The Bayesian network containing the unobserved variables to be optimized against,
-     *                 and the observed variables to optimize the probability of.
+     * @param bayesNet The Bayesian network to run optimization on.
      * @return a {@link NonGradientOptimizer}
      */
     public static NonGradientOptimizer of(BayesianNetwork bayesNet) {
@@ -44,7 +44,8 @@ public class NonGradientOptimizer implements Optimizer {
 
     /**
      * Creates a Bayesian network from the given vertices and uses this to
-     * create a BOBYQA {@link NonGradientOptimizer} which optimizes against the unobserved (latent) variables.
+     * create a BOBYQA {@link NonGradientOptimizer} which optimizes the values of latent variables
+     * to maximise overall probability.
      *
      * @param vertices The vertices to create a Bayesian network from.
      * @return a {@link NonGradientOptimizer}
@@ -54,8 +55,8 @@ public class NonGradientOptimizer implements Optimizer {
     }
 
     /**
-     * Retrieves the connected graph from the given vertex and uses this to
-     * create a BOBYQA {@link NonGradientOptimizer} which optimizes against the unobserved (latent) variables.
+     * Creates a Bayesian network from the graph connected to the given vertex and uses this to
+     * create a BOBYQA {@link NonGradientOptimizer} which optimizes the values of latent variables to maximise overall probability.
      *
      * @param vertexFromNetwork The vertices to create a Bayesian network from.
      * @return a {@link NonGradientOptimizer}
