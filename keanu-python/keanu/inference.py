@@ -1,6 +1,5 @@
 from py4j.java_gateway import java_import
 from keanu.base import JavaObjectWrapper, JavaCtor, JavaList, JavaSet
-from keanu.vertex import JavaVertex
 from keanu.context import KeanuContext
 from keanu.impl import UnaryLambda
 import numpy as np
@@ -54,9 +53,6 @@ class JavaVertexSamples(JavaObjectWrapper):
     def get_averages(self):
         keanu_tensor = self.unwrap().getAverages()
         return JavaVertexSamples.__to_np_array(keanu_tensor)
-
-    def as_list(self):
-        return JavaList(self.unwrap().asList())
 
     def get_mode(self):
         keanu_tensor = self.unwrap().getMode()
