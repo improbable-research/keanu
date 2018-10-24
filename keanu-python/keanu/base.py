@@ -17,7 +17,7 @@ class JavaObjectWrapper:
         if py_method in self.__dict__:
             return self.__dict__[py_method]
 
-        warnings.warn("A python wrapper for {} does not exist, and it may return a Java Object".format(k))
+        warnings.warn("A python wrapper for {} does not exist so it may return a Java Object".format(k))
         return self.unwrap().__getattr__(JavaObjectWrapper.__get_java_name(k))
 
     def unwrap(self):
@@ -61,14 +61,3 @@ class JavaSet(JavaObjectWrapper):
 
     def contains(self, py_element):
         return self.unwrap().contains(py_element.unwrap())
-
-
-class UnaryLambda:
-    def __init__(self, fn):
-        self._fn = fn
-
-    def apply(self, val):
-        return self._fn(val)
-
-    class Java:
-        implements = ["java.util.function.Function"]

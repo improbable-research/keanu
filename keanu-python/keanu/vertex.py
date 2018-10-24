@@ -19,7 +19,7 @@ class Vertex(JavaCtor, VertexOps):
         super(Vertex, self).__init__(ctor, *(Vertex.__parse_args(*args)))
 
     def observe(self, v):
-        from keanu.const import Tensor
+        from keanu.tensor import Tensor
         self.unwrap().observe(Tensor(v).unwrap())
 
     def get_connected_graph(self):
@@ -41,3 +41,13 @@ class Vertex(JavaCtor, VertexOps):
             return context.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
+
+
+class JavaVertexId(JavaObjectWrapper):
+    def __init__(self, java_vertex_id):
+        super(JavaVertexId, self).__init__(java_vertex_id)
+
+
+class JavaVertex(JavaObjectWrapper):
+    def __init__(self, java_vertex):
+        super(JavaVertex, self).__init__(java_vertex)
