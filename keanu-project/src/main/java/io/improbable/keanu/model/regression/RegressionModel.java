@@ -21,15 +21,16 @@ import java.util.function.Function;
  * </pre>
  */
 public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
+    private static final double DEFAULT_OBSERVATION_SIGMA = 1.0;
+
     private final LinearRegressionGraph<OUTPUT> modelGraph;
-    private static double defaultObservationSigma = 2.0;
 
     RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph) {
         this.modelGraph = modelGraph;
     }
 
     public static RegressionModelBuilder<DoubleTensor> withTrainingData(DoubleTensor inputTrainingData, DoubleTensor outputTrainingData) {
-        return new RegressionModelBuilder<>(inputTrainingData, outputTrainingData, RegressionModel.gaussianOutputTransform(defaultObservationSigma));
+        return new RegressionModelBuilder<>(inputTrainingData, outputTrainingData, RegressionModel.gaussianOutputTransform(DEFAULT_OBSERVATION_SIGMA));
     }
 
     public static RegressionModelBuilder<BooleanTensor> withTrainingData(DoubleTensor inputTrainingData, BooleanTensor outputTrainingData) {

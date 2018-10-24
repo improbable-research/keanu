@@ -70,7 +70,7 @@ public class LogisticRegressionTest {
     }
 
     private void assertWeightsAreCalculated(DoubleTensor weights) {
-        assertThat(weights, allCloseTo(Double.valueOf(0.15), TRUE_WEIGHTS));
+        assertThat(weights, allCloseTo(0.15, TRUE_WEIGHTS));
     }
 
     private void assertRegularizedWeightsAreSmaller(DoubleVertex unregularizedWeights, DoubleVertex regularizedWeights) {

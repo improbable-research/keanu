@@ -14,8 +14,8 @@ import static org.hamcrest.Matchers.equalTo;
 
 
 public class TensorMatchers {
-    private TensorMatchers() {}
-
+    private TensorMatchers() {
+    }
 
     public static <T> Matcher<Tensor<T>> hasShape(long... shape) {
         return hasShape(equalTo(shape));
@@ -141,8 +141,7 @@ public class TensorMatchers {
         return hasValue(other.asFlatArray());
     }
 
-
-    public static <T extends Double> Matcher<Tensor<Double>> allCloseTo(T epsilon, Tensor<T> other) {
+    public static Matcher<Tensor<Double>> allCloseTo(double epsilon, Tensor<Double> other) {
         return hasValue(other.asFlatList().stream().map(v -> closeTo(v, epsilon)).collect(Collectors.toList()));
     }
 }
