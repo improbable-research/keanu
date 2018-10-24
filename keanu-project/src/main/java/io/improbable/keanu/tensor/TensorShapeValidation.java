@@ -1,6 +1,6 @@
 package io.improbable.keanu.tensor;
 
-import static java.util.stream.Collectors.toSet;
+import com.google.common.base.Preconditions;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.google.common.base.Preconditions;
+import static java.util.stream.Collectors.toSet;
 
 public class TensorShapeValidation {
 

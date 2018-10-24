@@ -5,3 +5,4 @@ from keanu.const import *
 from keanu.tensor import *
 from keanu.vertex import *
 from keanu.random import *
+from keanu.optimization import *

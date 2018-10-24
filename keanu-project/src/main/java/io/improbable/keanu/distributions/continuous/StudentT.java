@@ -1,15 +1,14 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.log;
-
-import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
+import static java.lang.Math.PI;
+import static java.lang.Math.log;
 
 /**
  * Student T Distribution

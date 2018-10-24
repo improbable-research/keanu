@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices;
 
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Test;
-
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import static org.junit.Assert.assertEquals;
 
 public class AutoDiffPropagationTest {
 

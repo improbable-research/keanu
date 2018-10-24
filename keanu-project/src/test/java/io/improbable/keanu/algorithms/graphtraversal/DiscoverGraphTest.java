@@ -1,9 +1,9 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Test;
 

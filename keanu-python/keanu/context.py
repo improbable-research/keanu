@@ -29,6 +29,8 @@ class KeanuContext(metaclass=Singleton):
 
         self.__get_random_port_for_callback_server()
 
+        self.__jvm_view = self._gateway.new_jvm_view()
+
     def __stderr_with_redirect_disabled_for_jupyter(self):
         try:
             sys.stderr.fileno()
@@ -43,7 +45,7 @@ class KeanuContext(metaclass=Singleton):
         jgws.resetCallbackClient(jgws.getCallbackClient().getAddress(), self._gateway.get_callback_server().get_listening_port())
 
     def jvm_view(self):
-        return self._gateway.new_jvm_view()
+        return self.__jvm_view
 
     def to_java_list(self, l):
         lst = self._gateway.jvm.java.util.ArrayList()

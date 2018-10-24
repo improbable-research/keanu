@@ -1,17 +1,16 @@
 package io.improbable.keanu.util.csv.pojo.bycolumn;
 
-import static org.apache.commons.lang3.ArrayUtils.toPrimitive;
-import static org.junit.Assert.assertArrayEquals;
-
-import java.util.Arrays;
-
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.util.csv.pojo.CsvProperty;
+import org.junit.Test;
+
+import java.util.Arrays;
+
+import static org.apache.commons.lang3.ArrayUtils.toPrimitive;
+import static org.junit.Assert.assertArrayEquals;
 
 public class CsvReaderByColumnTest {
 

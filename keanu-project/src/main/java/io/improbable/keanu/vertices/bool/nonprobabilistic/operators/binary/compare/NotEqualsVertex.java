@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -7,6 +8,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolB
 
 public class NotEqualsVertex<A extends Tensor, B extends Tensor> extends BoolBinaryOpVertex<A, B> {
 
+    @ExportVertexToPythonBindings
     public NotEqualsVertex(Vertex<A> a, Vertex<B> b) {
         super(a, b);
     }

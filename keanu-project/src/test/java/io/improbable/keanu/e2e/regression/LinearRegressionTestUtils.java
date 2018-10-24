@@ -1,20 +1,18 @@
 package io.improbable.keanu.e2e.regression;
 
-import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
-import static io.improbable.keanu.tensor.TensorMatchers.lessThanOrEqualTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
-
-import java.util.function.Function;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import lombok.Value;
 import lombok.experimental.UtilityClass;
+
+import java.util.function.Function;
+
+import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 
 @UtilityClass
 class LinearRegressionTestUtils {
@@ -78,9 +76,8 @@ class LinearRegressionTestUtils {
     }
 
     static TestData generateMultiFeatureDataLaplaceWeights(int featureCount) {
-        return generateMultiFeatureData(featureCount, shape -> new LaplaceVertex(shape, ConstantVertex.of(0.), ConstantVertex.of(5.)));
+        return generateMultiFeatureData(featureCount, shape -> new LaplaceVertex(shape, 0., 5.));
     }
-
 
     static TestData generateMultiFeatureData(int featureCount, Function<long[], DoubleVertex> weightVertexFromShape) {
         long N = 1000;
@@ -100,11 +97,7 @@ class LinearRegressionTestUtils {
 
     static void assertWeightsAndInterceptMatchTestData(DoubleTensor weights, double intercept, TestData testData) {
         assertThat("Intercept", testData.intercept, closeTo(intercept, 0.5));
-        assertThat("Weights", weights, allCloseTo(new Double(0.05), testData.weights));
-    }
-
-    private void assertRegularizedWeightsAreSmaller(DoubleVertex unregularizedWeights, DoubleVertex regularizedWeights) {
-        assertThat(regularizedWeights.getValue().abs(), lessThanOrEqualTo(unregularizedWeights.getValue().abs()));
+        assertThat("Weights", weights, allCloseTo(0.05, testData.weights));
     }
 
     @Value

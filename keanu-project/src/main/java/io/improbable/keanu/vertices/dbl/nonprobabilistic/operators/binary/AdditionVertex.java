@@ -1,12 +1,13 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AdditionVertex extends DoubleBinaryOpVertex {
 
@@ -16,6 +17,7 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
      * @param left  a vertex to add
      * @param right a vertex to add
      */
+    @ExportVertexToPythonBindings
     public AdditionVertex(DoubleVertex left, DoubleVertex right) {
         super(left, right);
     }

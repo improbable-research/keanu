@@ -1,6 +1,7 @@
 import keanu as kn
 import numpy as np
 import pytest
+from tests.keanu_assert import tensors_equal
 
 
 @pytest.fixture
@@ -72,20 +73,6 @@ def test_vertex_can_observe_ndarray(jvm_view):
     nd4j_tensor_flat = gaussian.getValue().asFlatArray()
     assert nd4j_tensor_flat[0] == 1.
     assert nd4j_tensor_flat[1] == 2.
-
-
-def test_vertex_can_overload_gt(jvm_view):
-    gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
-    sample = gaussian.sample()
-    assert sample.isScalar()
-
-    greaterThan = gaussian > np.array([[2., 2.]])
-
-    sample = greaterThan.sample()
-    assert not sample.isScalar()
-
-    flat_arr = sample.asFlatArray()
-    assert all(isinstance(x, bool) for x in flat_arr)
 
 
 def test_vertex_can_get_connected_graph(jvm_view):

@@ -1,17 +1,17 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
@@ -76,5 +76,3 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
         return reverseModeAutoDiffLambda.apply(derivativeOfOutputsWithRespectToSelf);
     }
 }
-
-

@@ -1,14 +1,6 @@
 package io.improbable.keanu.distributions.discrete;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.util.ArrayUtil;
-
 import com.google.common.base.Preconditions;
-
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -17,6 +9,12 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.DebugTensorValidator;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.apache.commons.lang3.ArrayUtils;
+import org.nd4j.linalg.util.ArrayUtil;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class Multinomial implements DiscreteDistribution {
