@@ -52,8 +52,8 @@ public interface Optimizer {
     BayesianNetwork getBayesianNetwork();
 
     /**
-     * Creates an {@link Optimizer} which optimizes the values of latent variables of the Bayesian network to maximise
-     * the overall probability.
+     * Creates an {@link Optimizer} which provides methods for optimizing the values of latent variables
+     * of the Bayesian network to maximise probability.
      *
      * @param network The Bayesian network to run optimization on.
      * @return an {@link Optimizer}
@@ -68,7 +68,8 @@ public interface Optimizer {
 
     /**
      * Creates a Bayesian network from the given vertices and uses this to
-     * create an {@link Optimizer} which optimizes the values of latent variables to maximise overall probability.
+     * create an {@link Optimizer}. This provides methods for optimizing the values of latent variables
+     * of the Bayesian network to maximise probability.
      *
      * @param vertices The vertices to create a Bayesian network from.
      * @return an {@link Optimizer}
@@ -79,7 +80,8 @@ public interface Optimizer {
 
     /**
      * Creates a Bayesian network from the graph connected to the given vertex and uses this to
-     * create an {@link Optimizer} which optimizes the values of latent variables to maximise overall probability.
+     * create an {@link Optimizer}. This provides methods for optimizing the values of latent variables
+     * of the Bayesian network to maximise probability.
      *
      * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
      * @return an {@link Optimizer}
