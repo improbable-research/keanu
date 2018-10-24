@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -15,6 +16,7 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
      * @param left  the vertex to be divided
      * @param right the vertex to divide
      */
+    @ExportVertexToPythonBindings
     public DivisionVertex(DoubleVertex left, DoubleVertex right) {
         super(left, right);
     }

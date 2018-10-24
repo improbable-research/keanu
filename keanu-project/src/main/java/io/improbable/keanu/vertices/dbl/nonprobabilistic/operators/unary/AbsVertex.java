@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -15,6 +16,7 @@ public class AbsVertex extends DoubleUnaryOpVertex {
      *
      * @param inputVertex the vertex
      */
+    @ExportVertexToPythonBindings
     public AbsVertex(DoubleVertex inputVertex) {
         super(inputVertex);
     }
