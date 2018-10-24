@@ -24,13 +24,13 @@ class JavaObjectWrapper:
         return self._val
 
     @staticmethod
-    def __get_java_name(python_name):
-       first, *rest = python_name.split('_')
+    def __get_java_name(name):
+       first, *rest = name.split('_')
        return first + ''.join(word.capitalize() for word in rest)
 
     @staticmethod
-    def __get_python_name(java_name):
-        s1 = first_cap_re.sub(r'\1_\2', java_name)
+    def __get_python_name(name):
+        s1 = first_cap_re.sub(r'\1_\2', name)
         return all_cap_re.sub(r'\1_\2', s1).lower()
 
 
