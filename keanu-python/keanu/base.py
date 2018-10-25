@@ -1,4 +1,5 @@
 import re
+import warnings
 
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')
 all_cap_re = re.compile('([a-z0-9])([A-Z])')
@@ -17,6 +18,7 @@ class JavaObjectWrapper:
             return getattr(self, python_name)
 
         java_name = JavaObjectWrapper.__get_java_name(k)
+        warnings.warn("\"{}\" is not implemented. A Java API was called directly so its return value may be a Java Object".format(k))
         return self.unwrap().__getattr__(java_name)
 
     def unwrap(self):
