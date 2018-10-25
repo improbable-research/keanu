@@ -190,7 +190,7 @@ def gamma_vertex_samples():
 def test_vertex_samples_get_averaes_returns_ndarray(gamma_vertex_samples):
     samples = gamma_vertex_samples.get_averages()
 
-    assert isinstance(samples, np.ndarray)
+    assert type(samples) == np.ndarray
 
 def test_vertex_samples_probability_is_greater_than_zero(gamma_vertex_samples):
     prob = gamma_vertex_samples.probability(lambda sample: sample.scalar() > 0)
@@ -200,5 +200,5 @@ def test_vertex_samples_probability_is_greater_than_zero(gamma_vertex_samples):
 def test_get_mode_returns_values_greater_than_zero(gamma_vertex_samples):
     mode = gamma_vertex_samples.get_mode()
 
-    assert isinstance(mode, np.ndarray)
-    assert mode[0] > 0
+    assert type(mode) == np.ndarray
+    assert (mode > 0).all()
