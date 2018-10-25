@@ -30,14 +30,13 @@ public class TriangularVertex extends DoubleVertex implements ProbabilisticDoubl
      * @param c           the center of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     public TriangularVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape(), c.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
         this.c = c;
         setParents(xMin, xMax, c);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public TriangularVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double c) {

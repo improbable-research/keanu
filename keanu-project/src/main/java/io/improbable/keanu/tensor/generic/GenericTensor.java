@@ -35,15 +35,6 @@ public class GenericTensor<T> implements Tensor<T> {
         this.stride = Tensor.SCALAR_STRIDE;
     }
 
-    /**
-     * @param shape placeholder shape
-     */
-    public GenericTensor(long[] shape) {
-        this.data = null;
-        this.shape = Arrays.copyOf(shape, shape.length);
-        this.stride = TensorShape.getRowFirstStride(shape);
-    }
-
     public GenericTensor(long[] shape, T value) {
         this(fillArray(shape, value), shape);
     }

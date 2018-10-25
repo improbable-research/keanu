@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -18,6 +19,7 @@ public class IntegerModelResultVertex extends IntegerVertex implements ModelResu
     private final ModelResult<IntegerTensor> delegate;
 
     public IntegerModelResultVertex(ModelVertex model, VertexLabel label) {
+        super(Tensor.SCALAR_SHAPE);
         this.delegate = new ModelResult<>(model, label);
         setParents((Vertex) model);
     }

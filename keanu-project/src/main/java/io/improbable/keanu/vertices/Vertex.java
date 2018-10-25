@@ -18,17 +18,25 @@ public abstract class Vertex<T> implements Observable<T> {
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
+    private long[] initialShape;
     private final Observable<T> observation;
     private VertexLabel label = null;
 
     public Vertex() {
+        this.initialShape = Tensor.SCALAR_SHAPE;
+        this.observation = Observable.observableTypeFor(this.getClass());
+    }
+
+    public Vertex(long[] initialShape) {
+        this.initialShape = initialShape;
         this.observation = Observable.observableTypeFor(this.getClass());
     }
 
     /**
      * Set a label for this vertex.  This allows easy retrieval of this vertex using nothing but a label name.
+     *
      * @param label The label to apply to this vertex.  Uniqueness is only enforced on instantiation of a Bayes Net
-     * @param <V> vertex type
+     * @param <V>   vertex type
      * @return this
      */
     public <V extends Vertex<T>> V setLabel(VertexLabel label) {
@@ -127,7 +135,7 @@ public abstract class Vertex<T> implements Observable<T> {
         if (value instanceof Tensor) {
             return ((Tensor) value).getShape();
         } else {
-            return Tensor.SCALAR_SHAPE;
+            return initialShape;
         }
     }
 

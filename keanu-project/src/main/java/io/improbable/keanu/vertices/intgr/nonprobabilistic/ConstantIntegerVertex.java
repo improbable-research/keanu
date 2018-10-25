@@ -11,6 +11,7 @@ public class ConstantIntegerVertex extends IntegerVertex implements NonProbabili
 
     @ExportVertexToPythonBindings
     public ConstantIntegerVertex(IntegerTensor constant) {
+        super(constant.getShape());
         setValue(constant);
     }
 

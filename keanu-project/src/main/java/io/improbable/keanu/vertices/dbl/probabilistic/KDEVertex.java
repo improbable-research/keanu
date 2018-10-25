@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Uniform;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -17,6 +18,7 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     private DoubleTensor samples;
 
     public KDEVertex(DoubleTensor samples, double bandwidth) {
+        super(Tensor.SCALAR_SHAPE);
         if (samples.getLength() == 0) {
             throw new IllegalStateException("The provided tensor of samples is empty!");
         }

@@ -16,6 +16,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
 
     @ExportVertexToPythonBindings
     public ConstantDoubleVertex(DoubleTensor constant) {
+        super(constant.getShape());
         setValue(constant);
     }
 

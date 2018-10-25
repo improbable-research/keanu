@@ -29,10 +29,10 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
      * @param probTrue the probability the bernoulli returns true
      */
     public BernoulliVertex(long[] shape, Vertex<DoubleTensor> probTrue) {
+        super(shape);
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;
         setParents(probTrue);
-        setValue(BooleanTensor.placeHolder(shape));
     }
 
     /**

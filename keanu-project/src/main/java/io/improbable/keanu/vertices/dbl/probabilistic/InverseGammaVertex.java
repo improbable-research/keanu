@@ -33,13 +33,12 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
      * @param beta        the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
     public InverseGammaVertex(long[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 
         this.alpha = alpha;
         this.beta = beta;
         setParents(alpha, beta);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**

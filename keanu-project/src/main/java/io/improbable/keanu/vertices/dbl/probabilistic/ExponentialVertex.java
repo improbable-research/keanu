@@ -34,12 +34,11 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
      *                    vertex or scalar.
      */
     public ExponentialVertex(long[] tensorShape, DoubleVertex lambda) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, lambda.getShape());
 
         this.lambda = lambda;
         setParents(lambda);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**
