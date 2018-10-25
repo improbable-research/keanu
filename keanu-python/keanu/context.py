@@ -2,6 +2,7 @@ import sys
 import io
 import os.path
 from py4j.java_gateway import JavaGateway, JavaObject, CallbackServerParameters
+import logging
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 CLASSPATH = os.path.join(PATH, "keanu-python-all.jar")
@@ -19,6 +20,8 @@ class Singleton(type):
 class KeanuContext(metaclass=Singleton):
     def __init__(self):
         stderr = self.__stderr_with_redirect_disabled_for_jupyter()
+
+        logging.debug("Initiating Py4J gateway with classpath %s" % CLASSPATH)
 
         self._gateway = JavaGateway.launch_gateway(
             classpath=CLASSPATH,
