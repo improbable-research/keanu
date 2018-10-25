@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -102,7 +101,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public DoubleTensor setDoubleIf(DoubleTensor trueValue, DoubleTensor falseValue) {
+    public DoubleTensor doubleWhere(DoubleTensor trueValue, DoubleTensor falseValue) {
         double[] trueValues = trueValue.asFlatDoubleArray();
         double[] falseValues = falseValue.asFlatDoubleArray();
 
@@ -123,7 +122,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public IntegerTensor setIntegerIf(IntegerTensor trueValue, IntegerTensor falseValue) {
+    public IntegerTensor integerWhere(IntegerTensor trueValue, IntegerTensor falseValue) {
         FlattenedView<Integer> trueValuesFlattened = trueValue.getFlattenedView();
         FlattenedView<Integer> falseValuesFlattened = falseValue.getFlattenedView();
 
@@ -136,7 +135,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor setBooleanIf(BooleanTensor trueValue, BooleanTensor falseValue) {
+    public BooleanTensor booleanWhere(BooleanTensor trueValue, BooleanTensor falseValue) {
         FlattenedView<Boolean> trueValuesFlattened = trueValue.getFlattenedView();
         FlattenedView<Boolean> falseValuesFlattened = falseValue.getFlattenedView();
 
@@ -149,16 +148,24 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public <T> Tensor<T> where(Tensor<T> trueValue, Tensor<T> falseValue) {
-        FlattenedView<T> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<T> falseValuesFlattened = falseValue.getFlattenedView();
+    public <T, TENSOR extends Tensor<T>> TENSOR where(TENSOR trueValue, TENSOR falseValue) {
+        if (trueValue instanceof DoubleTensor && falseValue instanceof DoubleTensor) {
+            return (TENSOR) doubleWhere((DoubleTensor) trueValue, (DoubleTensor) falseValue);
+        } else if (trueValue instanceof IntegerTensor && falseValue instanceof IntegerTensor) {
+            return (TENSOR) integerWhere((IntegerTensor) trueValue, (IntegerTensor) falseValue);
+        } else if (trueValue instanceof BooleanTensor && falseValue instanceof BooleanTensor) {
+            return (TENSOR) booleanWhere((BooleanTensor) trueValue, (BooleanTensor) falseValue);
+        } else {
+            FlattenedView<T> trueValuesFlattened = trueValue.getFlattenedView();
+            FlattenedView<T> falseValuesFlattened = falseValue.getFlattenedView();
 
-        T[] result = (T[]) (new Object[data.length]);
-        for (int i = 0; i < result.length; i++) {
-            result[i] = data[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            T[] result = (T[]) (new Object[data.length]);
+            for (int i = 0; i < result.length; i++) {
+                result[i] = data[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            }
+
+            return Tensor.create(result, copyOf(shape, shape.length));
         }
-
-        return new GenericTensor<>(result, copyOf(shape, shape.length));
     }
 
     @Override

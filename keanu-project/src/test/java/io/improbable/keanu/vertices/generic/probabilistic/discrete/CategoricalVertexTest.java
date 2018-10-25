@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -14,16 +15,14 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class CategoricalVertexTest {
     private static double epsilon = 0.01;
@@ -38,12 +37,12 @@ public class CategoricalVertexTest {
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        t1 = DoubleTensor.create(new double[] {0., 0.5, 0.8, 0.2}, 2, 2);
+        t1 = DoubleTensor.create(new double[]{0., 0.5, 0.8, 0.2}, 2, 2);
     }
 
     @Test
     public void cantCreateCategoricalVertexIfShapeIsNotSpecifiedAndNonScalarShapesDoNotMatch() {
-        DoubleTensor t2 = DoubleTensor.create(new double[] {0., 0.5, 0.8, 0.2}, 4, 1);
+        DoubleTensor t2 = DoubleTensor.create(new double[]{0., 0.5, 0.8, 0.2}, 4, 1);
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
         selectableValues.put(TestEnum.B, ConstantVertex.of(t2));
@@ -87,7 +86,7 @@ public class CategoricalVertexTest {
 
     @Test
     public void cantCreateCategoricalVertexIfShapeIsSpecifiedAndNonScalarShapeDoNotMatch() {
-        DoubleTensor t2 = DoubleTensor.create(0.5, new long[] {4, 4, 4});
+        DoubleTensor t2 = DoubleTensor.create(0.5, new long[]{4, 4, 4});
 
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
@@ -171,7 +170,7 @@ public class CategoricalVertexTest {
     public void ofDirichletVertexHasCorrectProportions() {
         final DoubleTensor concentration = DoubleTensor.create(1, 2, 3, 4);
         final DirichletVertex dirichletVertex = new DirichletVertex(new ConstantDoubleVertex(concentration));
-        final CategoricalVertex<TestEnum> categoricalVertex = CategoricalVertex.of(dirichletVertex, Arrays.asList(TestEnum.A, TestEnum.B, TestEnum.C, TestEnum.D));
+        final CategoricalVertex<TestEnum, GenericTensor<TestEnum>> categoricalVertex = CategoricalVertex.of(dirichletVertex, Arrays.asList(TestEnum.A, TestEnum.B, TestEnum.C, TestEnum.D));
         final DoubleTensor sample = dirichletVertex.getValue();
 
         final Map<TestEnum, DoubleVertex> expectedProportions = new LinkedHashMap<>();
@@ -188,7 +187,7 @@ public class CategoricalVertexTest {
     public void ofDirichletVertexUsesIntegerRangeByDefault() {
         final DoubleTensor concentration = DoubleTensor.create(1, 2, 3, 4, 5);
         final DirichletVertex dirichletVertex = new DirichletVertex(new ConstantDoubleVertex(concentration));
-        final CategoricalVertex<Integer> categoricalVertex = CategoricalVertex.of(dirichletVertex);
+        final CategoricalVertex<Integer, IntegerTensor> categoricalVertex = CategoricalVertex.of(dirichletVertex);
         final DoubleTensor sample = dirichletVertex.getValue();
 
         final Map<Integer, DoubleVertex> expectedProportions = new LinkedHashMap<>();
@@ -201,7 +200,6 @@ public class CategoricalVertexTest {
         final Map<Integer, Double> proportions = testScalarSampleFromVertex(categoricalVertex, random);
         assertProportionsWithinExpectedRanges(expectedProportions, proportions);
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void ofDirichletWrongAmountOfCategoriesFails() {
@@ -218,36 +216,18 @@ public class CategoricalVertexTest {
         selectableValues.put(TestEnum.A, ConstantVertex.of(probA));
         selectableValues.put(TestEnum.B, ConstantVertex.of(probB));
 
-        CategoricalVertex<TestEnum> select = new CategoricalVertex<>(selectableValues);
+        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select = new CategoricalVertex<>(selectableValues);
         select.sample(random);
     }
 
     @Test
-    public void canSampleEvenIfRandomReturnsAValueGreaterThanTotalCumulativeProbability() {
-
-        KeanuRandom alwaysReturnsGreaterThan1 = mock(KeanuRandom.class);
-        when(alwaysReturnsGreaterThan1.nextDouble()).thenReturn(2.);
-
-        Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertex.of(1.));
-
-        CategoricalVertex<TestEnum> categoricalVertex = new CategoricalVertex<>(selectableValues);
-        Tensor<TestEnum> sample = categoricalVertex.sample(alwaysReturnsGreaterThan1);
-
-        assertThat(sample.scalar(), equalTo(TestEnum.A));
-    }
-
-    @Test
     public void heterogeneousNonScalarTensorSelectableValuesCanProduceHeterogeneousNonScalarSample() {
-        KeanuRandom alwaysReturnsHalf = mock(KeanuRandom.class);
-        when(alwaysReturnsHalf.nextDouble()).thenReturn(0.5);
-
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, ConstantVertex.of(DoubleTensor.create(0., 1.)));
         selectableValues.put(TestEnum.B, ConstantVertex.of(DoubleTensor.create(1., 0.)));
 
-        CategoricalVertex<TestEnum> categoricalVertex = new CategoricalVertex<>(selectableValues);
-        Tensor<TestEnum> sample = categoricalVertex.sample(alwaysReturnsHalf);
+        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> categoricalVertex = new CategoricalVertex<>(selectableValues);
+        Tensor<TestEnum> sample = categoricalVertex.sample();
 
         assertThat(sample.getValue(0, 0), equalTo(TestEnum.B));
         assertThat(sample.getValue(0, 1), equalTo(TestEnum.A));
@@ -268,7 +248,7 @@ public class CategoricalVertexTest {
         selectableValues.put(TestEnum.C, ConstantVertex.of(1.25));
         selectableValues.put(TestEnum.D, ConstantVertex.of(1.75));
 
-        CategoricalVertex<TestEnum> select = new CategoricalVertex<>(selectableValues);
+        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select = new CategoricalVertex<>(selectableValues);
 
         assertEquals(Math.log(probA / total), select.logProb(GenericTensor.scalar(TestEnum.A)), 1e-6);
         assertEquals(Math.log(probB / total), select.logProb(GenericTensor.scalar(TestEnum.B)), 1e-6);
@@ -285,7 +265,7 @@ public class CategoricalVertexTest {
         selectableValues.put(TestEnum.A, ConstantVertex.of(probA));
         selectableValues.put(TestEnum.B, ConstantVertex.of(probB));
 
-        CategoricalVertex<TestEnum> select = new CategoricalVertex<>(selectableValues);
+        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select = new CategoricalVertex<>(selectableValues);
         select.logProb(new GenericTensor<>(TestEnum.A));
     }
 
@@ -299,9 +279,9 @@ public class CategoricalVertexTest {
         selectableValues.put(TestEnum.A, ConstantVertex.of(DoubleTensor.create(aProbs, 2, 2)));
         selectableValues.put(TestEnum.B, ConstantVertex.of(bProb));
 
-        CategoricalVertex<TestEnum> categoricalVertex = new CategoricalVertex<>(selectableValues);
+        CategoricalVertex<TestEnum, GenericTensor<TestEnum>> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
-        GenericTensor<TestEnum> value = GenericTensor.create(TestEnum.A, new long[] {2, 2});
+        GenericTensor<TestEnum> value = GenericTensor.createFilled(TestEnum.A, new long[]{2, 2});
         double logProbA = categoricalVertex.logProb(value);
         double expectedLogProb = Arrays.stream(aProbs).map(v -> Math.log(v / (v + bProb))).sum();
 
@@ -313,12 +293,12 @@ public class CategoricalVertexTest {
         return testScalarSampleFromVertex(new CategoricalVertex<>(selectableValues), random);
     }
 
-    private <T> Map<T, Double> testScalarSampleFromVertex(CategoricalVertex<T> vertex, KeanuRandom random) {
-        Map<T, Integer> sampleFrequencies = vertex.getSelectableValues().keySet().stream().collect(Collectors.toMap(key -> key, key -> 0));
+    private <T, TENSOR extends Tensor<T>> Map<T, Double> testScalarSampleFromVertex(CategoricalVertex<T, TENSOR> vertex, KeanuRandom random) {
+        Map<T, Integer> sampleFrequencies = new HashMap<>();
 
         for (int i = 0; i < N; i++) {
             T s = vertex.sample(random).scalar();
-            sampleFrequencies.put(s, sampleFrequencies.get(s) + 1);
+            sampleFrequencies.put(s, sampleFrequencies.getOrDefault(s, 0) + 1);
         }
 
         return calculateProportions(sampleFrequencies, N);

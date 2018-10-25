@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -22,7 +23,7 @@ public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
         super(inputVertex);
         this.dimension = dimension;
         this.index = index;
-        setValue(Tensor.placeHolder(shapeSlice(dimension, inputVertex.getShape())));
+        setValue(GenericTensor.placeHolder(shapeSlice(dimension, inputVertex.getShape())));
     }
 
     @Override
