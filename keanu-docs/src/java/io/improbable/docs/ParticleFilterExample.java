@@ -23,11 +23,11 @@ thermometerA.observe(21.0);
 thermometerB.observe(19.5);
 
 //Create a particle filter with default settings
-ParticleFilter filter = ParticleFilter.ofVertex(temperature)
+ParticleFilter filter = ParticleFilter.ofVertexInGraph(temperature)
         .build();
 
 //Get a sorted list of the most probable particles in order of descending probability
-List<Particle> particles = filter.getSortedProbableParticles();
+List<Particle> particles = filter.getSortedMostProbableParticles();
 
 //Get the most probable particle
 Particle mostProbableParticle = filter.getMostProbableParticle();
@@ -36,7 +36,7 @@ Particle mostProbableParticle = filter.getMostProbableParticle();
 double estimation = mostProbableParticle.getScalarValueOfVertex(temperature);
 
 //Get the probability of this particle state
-double prob = mostProbableParticle.prob();
+double logProb = mostProbableParticle.logProb();
 //%%SNIPPET_END%% ParticleFilterExample
     }
 }
