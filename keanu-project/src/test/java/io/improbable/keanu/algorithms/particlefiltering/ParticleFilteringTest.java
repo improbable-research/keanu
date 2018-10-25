@@ -50,7 +50,6 @@ public class ParticleFilteringTest {
                 .withResamplingProportion(resamplingProportion)
                 .build();
 
-        List<Particle> particles = particleFilter.getSortedMostProbableParticles();
         Particle mostProbableParticle = particleFilter.getMostProbableParticle();
 
         double estimatedTemp = mostProbableParticle.getScalarValueOfVertex(temperature);

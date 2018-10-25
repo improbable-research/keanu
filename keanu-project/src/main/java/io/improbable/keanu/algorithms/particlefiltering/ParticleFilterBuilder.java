@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import java.util.Collection;
 
 public class ParticleFilterBuilder {
+
     private Collection<? extends Vertex> vertices;
     private int numParticles = 1000;
     private int resamplingCycles = 3;
@@ -53,7 +54,7 @@ public class ParticleFilterBuilder {
      * @param random A {@link KeanuRandom KeanuRandom} used for stochastic parts of algorithm
      * @return this
      */
-    public ParticleFilterBuilder withRandomness(KeanuRandom random) {
+    public ParticleFilterBuilder withRandom(KeanuRandom random) {
         this.random = random;
         return this;
     }
