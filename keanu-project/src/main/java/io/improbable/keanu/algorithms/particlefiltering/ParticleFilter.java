@@ -145,7 +145,7 @@ public class ParticleFilter {
 
     private List<Particle> sampleAndCopy(List<Particle> particles, int numToSample) {
 
-        double sumWeights = particles.stream().mapToDouble(Particle::prob).sum();
+        double sumWeights = particles.stream().mapToDouble(p -> Math.exp(p.logProb())).sum();
         List<Particle> sampledParticles = new ArrayList<>();
         for (int i = 0; i < numToSample; i++) {
             Particle sampledParticle = weightedRandomParticle(particles, sumWeights);
@@ -161,7 +161,7 @@ public class ParticleFilter {
         Particle p = particles.get(0);
         for (int i = 0; i < particles.size(); i++) {
             p = particles.get(i);
-            cumulativeWeight += p.prob();
+            cumulativeWeight += Math.exp(p.logProb());
             if (cumulativeWeight > r) {
                 break;
             }

@@ -54,9 +54,9 @@ public class ParticleFilteringTest {
         Particle mostProbableParticle = particleFilter.getMostProbableParticle();
 
         double estimatedTemp = mostProbableParticle.getScalarValueOfVertex(temperature);
-        double probability = mostProbableParticle.prob();
+        double probability = mostProbableParticle.logProb();
 
-        log.info("Final temp estimate = " + estimatedTemp + ", probability = " + probability);
+        log.info("Final temp estimate = " + estimatedTemp + ", log probability = " + probability);
 
         assertTrue(estimatedTemp > 18.0);
         assertTrue(estimatedTemp < 22.0);

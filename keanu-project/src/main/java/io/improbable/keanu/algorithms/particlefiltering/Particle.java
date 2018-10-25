@@ -30,11 +30,6 @@ public class Particle {
         return sumLogPOfSubgraph;
     }
 
-    /**
-     * @return probability of the subgraph occuring in it's current state
-     */
-    public double prob() { return Math.exp(sumLogPOfSubgraph); }
-
     public double getScalarValueOfVertex(Vertex<DoubleTensor> vertex) {
         return ((DoubleTensor) latentVertices.get(vertex)).scalar();
     }
