@@ -39,7 +39,13 @@ public class GradientOptimizer implements Optimizer {
             this.apacheMapping = apacheMapping;
         }
     }
-
+    /**
+     * Creates a {@link GradientOptimizer} which provides methods for optimizing the values of latent variables
+     * of the Bayesian network to maximise probability.
+     *
+     * @param bayesNet The Bayesian network to run optimization on.
+     * @return a {@link GradientOptimizer}
+     */
     public static GradientOptimizer of(BayesianNetwork bayesNet) {
         List<Vertex> discreteLatentVertices = bayesNet.getDiscreteLatentVertices();
         boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
@@ -54,10 +60,26 @@ public class GradientOptimizer implements Optimizer {
             .build();
     }
 
+    /**
+     * Creates a Bayesian network from the given vertices and uses this to
+     * create a {@link GradientOptimizer}. This provides methods for optimizing the values of latent variables
+     * of the Bayesian network to maximise probability.
+     *
+     * @param vertices The vertices to create a Bayesian network from.
+     * @return a {@link GradientOptimizer}
+     */
     public static GradientOptimizer of(Collection<? extends Vertex> vertices) {
         return of(new BayesianNetwork(vertices));
     }
 
+    /**
+     * Creates a Bayesian network from the graph connected to the given vertex and uses this to
+     * create a {@link GradientOptimizer}. This provides methods for optimizing the values of latent variables
+     * of the Bayesian network to maximise probability.
+     *
+     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
+     * @return a {@link GradientOptimizer}
+     */
     public static GradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
         return of(vertexFromNetwork.getConnectedGraph());
     }
@@ -78,16 +100,31 @@ public class GradientOptimizer implements Optimizer {
     @Builder.Default
     private double absoluteThreshold = 1e-8;
 
+    /**
+     * Specifies what formula to use to update the Beta parameter of the Nonlinear conjugate gradient method optimizer.
+     */
     @Builder.Default
     private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
 
     private final List<BiConsumer<double[], double[]>> onGradientCalculations = new ArrayList<>();
     private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
 
+    /**
+     * Adds a callback to be called whenever the optimizer evaluates the gradient at a point.
+     * @param gradientCalculationHandler a function to be called whenever the optimizer evaluates the gradient at a point.
+     *                                  The double[] argument to the handler represents the point being evaluated.
+     *                                  The double[] argument to the handler represents the gradient of that point.
+     */
     public void addGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
         this.onGradientCalculations.add(gradientCalculationHandler);
     }
 
+    /**
+     * Removes a callback function that previously would have been called whenever the optimizer
+     * evaluated the gradient at a point. If the callback is not registered then this function will do nothing.
+     *
+     * @param gradientCalculationHandler the function to be removed from the list of gradient evaluation callbacks
+     */
     public void removeGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
         this.onGradientCalculations.remove(gradientCalculationHandler);
     }
