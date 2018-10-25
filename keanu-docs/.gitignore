@@ -1,0 +1,12 @@
+.idea
+.gradle
+target
+nbproject
+*.DS_Store
+*.iml
+build
+/out
+_site
+.sass-cache
+.jekyll-metadata
+/docs/

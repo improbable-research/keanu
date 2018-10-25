@@ -1,0 +1,26 @@
+# Theme settings
+doks:
+    baseurl:
+    color_theme: # Available themes: blue (default), green, purple, red and yellow
+    header:
+        logo:
+            text: 
+            image: true
+        nav:
+            - item_name: JavaDoc
+              item_url: 'https://static.javadoc.io/io.improbable/keanu/0.0.14/overview-summary.html'
+            - item_name: Contributing
+              item_url: '/contributing'
+            - item_name: License
+              item_url: 'https://github.com/improbable-research/keanu/blob/master/LICENSE'
+
+# SASS settings
+sass:
+    sass_dir: ./doks-theme/_sass
+    style: :compressed
+
+# Jekyll settings
+layouts_dir: ./doks-theme/_layouts
+includes_dir: ./doks-theme/_includes
+exclude: [ 'README.md', 'CHANGELOG.md', 'src/markdown/']
+permalink: /:title/
