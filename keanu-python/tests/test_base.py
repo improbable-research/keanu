@@ -16,10 +16,16 @@ def java_list_wrapper():
 
     return JavaListWrapper([1, 2, 3])
 
-def test_java_object_wrapper_attr_python_name_to_java_name(java_list_wrapper):
+def test_java_object_wrapper_can_call_java_api_with_no_python_impl(java_list_wrapper):
+    assert not java_list_wrapper.isEmpty()
+
+def test_java_object_wrapper_convert_python_name_to_java_name(java_list_wrapper):
     assert not java_list_wrapper.is_empty()
 
-def test_java_object_wrapper_attr_java_name_to_python_name(java_list_wrapper):
+def test_java_object_wrapper_can_call_python_api(java_list_wrapper):
+    assert java_list_wrapper.index_of(1) == 100
+
+def test_java_object_wrapper_convert_java_name_to_python_name(java_list_wrapper):
     assert java_list_wrapper.indexOf(1) == 100
 
 def test_java_object_wrapper_attr_override(java_list_wrapper):
