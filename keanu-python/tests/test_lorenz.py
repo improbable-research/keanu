@@ -19,7 +19,7 @@ time_step = 0.01
 def test_lorenz():
     error = math.inf
     window = 0
-    prior_mu = (3.,3.,3.)
+    prior_mu = (3. ,3. ,3.)
 
     model = LorenzModel(sigma, beta, rho, time_step)
     observed = list(model.runModel(window_size * max_windows))
