@@ -1,4 +1,3 @@
-from keanu.base import JavaCtor
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex import Vertex

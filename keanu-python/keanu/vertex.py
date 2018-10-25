@@ -3,7 +3,7 @@ import numbers
 
 import keanu as kn
 from keanu.context import KeanuContext
-from keanu.base import JavaObjectWrapper, JavaCtor, JavaSet
+from keanu.base import JavaObjectWrapper
 
 context = KeanuContext()
 
@@ -103,16 +103,25 @@ class VertexOps:
     def __ceil__(self):
         return kn.generated.vertex.Ceil(self)
 
-class Vertex(JavaCtor, VertexOps):
-    def __init__(self, ctor, *args):
-        super(Vertex, self).__init__(ctor, *(Vertex.__parse_args(*args)))
+class Vertex(JavaObjectWrapper, VertexOps):
+    def __init__(self, ctor=None, *args, java_vertex=None):
+        if java_vertex is None:
+            super(Vertex, self).__init__(ctor(*(Vertex.__parse_args(*args))))
+        else:
+            super(Vertex, self).__init__(java_vertex)
+
+    def __hash__(self):
+        return hash(self.get_id())
 
     def observe(self, v):
         from keanu.tensor import Tensor
         self.unwrap().observe(Tensor(v).unwrap())
 
     def get_connected_graph(self):
-        return JavaSet(self.unwrap().getConnectedGraph())
+        return Vertex.to_python_set(self.unwrap().getConnectedGraph())
+
+    def get_id(self):
+        return self.unwrap().getId().toString()
 
     @staticmethod
     def __parse_args(args):
@@ -128,3 +137,23 @@ class Vertex(JavaCtor, VertexOps):
             return context.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
+
+    @staticmethod
+    def to_python_list(java_list):
+        python_list = []
+
+        for i in range(java_list.size()):
+            python_list.append(Vertex(java_vertex=java_list.get(i)))
+
+        return python_list
+
+    @staticmethod
+    def to_python_set(java_set):
+        java_iterator = java_set.iterator()
+
+        python_set = set()
+        while java_iterator.hasNext():
+            java_vertex = java_iterator.next()
+            python_set.add(Vertex(java_vertex=java_vertex))
+
+        return python_set

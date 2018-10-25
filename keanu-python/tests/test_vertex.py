@@ -79,4 +79,4 @@ def test_vertex_can_get_connected_graph(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
     connected_graph = gaussian.get_connected_graph()
 
-    assert connected_graph.size() == 3
+    assert len(connected_graph) == 3

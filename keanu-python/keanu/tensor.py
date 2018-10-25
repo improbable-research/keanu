@@ -1,4 +1,4 @@
-from keanu.base import JavaCtor
+from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 
 import numpy as np
@@ -12,7 +12,7 @@ java_import(k, "io.improbable.keanu.tensor.dbl.DoubleTensor")
 java_import(k, "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k, "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
-class Tensor(JavaCtor):
+class Tensor(JavaObjectWrapper):
     def __init__(self, t):
         if isinstance(t, np.ndarray):
             normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(t)
@@ -21,9 +21,9 @@ class Tensor(JavaCtor):
             values = context.to_java_array(normalized_ndarray.flatten().tolist())
             shape = context.to_java_long_array(normalized_ndarray.shape)
 
-            super(Tensor, self).__init__(ctor, values, shape)
+            super(Tensor, self).__init__(ctor(values, shape))
         elif isinstance(t, numbers.Number):
-            super(Tensor, self).__init__(Tensor.__infer_tensor_from_scalar(t), t)
+            super(Tensor, self).__init__(Tensor.__infer_tensor_from_scalar(t)(t))
         else:
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(t)))
 

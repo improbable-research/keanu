@@ -20,22 +20,3 @@ class JavaObjectWrapper:
 
     def unwrap(self):
         return self._val
-
-
-class JavaCtor(JavaObjectWrapper):
-    def __init__(self, ctor, *args):
-        super(JavaCtor, self).__init__(ctor(*args))
-        self._args = args
-
-    def __repr__(self):
-        args = [str(arg) for arg in self._args]
-        return "[{0} => {1}: ({2})]".format(self._class, type(self), ",".join(args))
-
-
-class JavaList(JavaObjectWrapper):
-    def __init__(self, java_list):
-        super(JavaList, self).__init__(java_list)
-
-class JavaSet(JavaObjectWrapper):
-    def __init__(self, java_set):
-        super(JavaSet, self).__init__(java_set)
