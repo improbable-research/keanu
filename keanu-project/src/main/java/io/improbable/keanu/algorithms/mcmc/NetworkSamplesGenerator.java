@@ -36,6 +36,7 @@ public class NetworkSamplesGenerator {
      * @param dropCount the number of samples to drop before collecting anything. If this is zero
      *                  then no samples will be dropped before collecting.
      * @return this NetworkSamplesGenerator set to drop the specified number of samples
+     * @throws IllegalArgumentException when dropCount is less than zero
      */
     public NetworkSamplesGenerator dropCount(int dropCount) {
         Preconditions.checkArgument(dropCount >= 0,
@@ -51,9 +52,11 @@ public class NetworkSamplesGenerator {
     }
 
     /**
-     *
-     * @param downSampleInterval collect 1 sample for every downSampleInterval.
-     * @return
+     * @param downSampleInterval collect 1 sample for every downSampleInterval. If this is 1 then there will be no
+     *                           down-sampling. If this is 2 then every other sample will be taken. If this is 3 then
+     *                           2 samples will be dropped before one is taken.
+     * @return this NetworkSamplesGenerator set to down-sample at the specified downSampleInterval
+     * @throws IllegalArgumentException when downSampleInterval is less than or equal to zero
      */
     public NetworkSamplesGenerator downSampleInterval(int downSampleInterval) {
         Preconditions.checkArgument(downSampleInterval > 0,
@@ -66,6 +69,13 @@ public class NetworkSamplesGenerator {
         return this;
     }
 
+    /**
+     * @param totalSampleCount The total number of samples to generate. This is the total before any dropping
+     *                         or down-sampling is done. If you drop 10 and down sample 2 and request a totalSampleCount
+     *                         of 100 then you would take 100 samples, drop 10 and then take every other sample resulting
+     *                         in 45 samples returned.
+     * @return Samples after dropping and down-sampling.
+     */
     public NetworkSamples generate(final int totalSampleCount) {
         Preconditions.checkArgument(dropCount < totalSampleCount,
             "Cannot drop more samples than requested or all of the samples. Samples requested %s and dropping %s",
@@ -96,6 +106,10 @@ public class NetworkSamplesGenerator {
         return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, sampleCount);
     }
 
+    /**
+     * @return A stream of samples starting after dropping. Down-sampling is handled outside of the stream (i.e. the
+     * stream will be the final result after dropping and down-sampling)
+     */
     public Stream<NetworkState> stream() {
 
         ProgressBar progressBar = progressBarSupplier.get();
