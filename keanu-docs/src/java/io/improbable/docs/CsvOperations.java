@@ -6,7 +6,6 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.util.csv.WriteCsv;
-import io.improbable.keanu.util.csv.Writer;
 import io.improbable.keanu.util.csv.pojo.CsvProperty;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;

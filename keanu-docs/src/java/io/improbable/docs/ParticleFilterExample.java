@@ -1,7 +1,7 @@
 package io.improbable.docs;
 
-import io.improbable.keanu.algorithms.particlefiltering.ParticleFilter;
 import io.improbable.keanu.algorithms.particlefiltering.Particle;
+import io.improbable.keanu.algorithms.particlefiltering.ParticleFilter;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
