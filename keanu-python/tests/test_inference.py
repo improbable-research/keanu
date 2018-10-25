@@ -148,19 +148,19 @@ def test_network_samples_get_vertex_samples(double_samples):
     vertex, network_samples = double_samples
 
     vertex_samples = network_samples.get(vertex)
-    assert vertex_samples.unwrap().asList().size() == network_samples.size()
+    assert vertex_samples.as_list().size() == network_samples.size()
 
 def test_network_samples_get_double_tensor_samples(double_samples):
     vertex, network_samples = double_samples
 
     vertex_samples = network_samples.get_double_tensor_samples(vertex)
-    assert vertex_samples.unwrap().asList().size() == network_samples.size()
+    assert vertex_samples.as_list().size() == network_samples.size()
 
 def test_network_samples_get_integer_tensor_samples(integer_samples):
     vertex, network_samples = integer_samples
 
     vertex_samples = network_samples.get_integer_tensor_samples(vertex)
-    assert vertex_samples.unwrap().asList().size() == network_samples.size()
+    assert vertex_samples.as_list().size() == network_samples.size()
 
 def test_network_samples_can_drop_samples(double_samples):
     vertex, network_samples = double_samples
