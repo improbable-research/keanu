@@ -104,6 +104,7 @@ class VertexOps:
     def __ceil__(self):
         return kn.generated.vertex.Ceil(self)
 
+
 class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, ctor, *args):
         super(Vertex, self).__init__(ctor, *(Vertex.__parse_args(*args)))
@@ -124,8 +125,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
         return self.__to_np_array(self.unwrap().getValue())
 
     def __to_np_array(self, value):
-        np_array = np.array(list(value.asFlatArray()))
-        return np_array.reshape(self.getShape())
+        return np.array(list(value.asFlatArray())).reshape(self.getShape())
 
     @staticmethod
     def __parse_args(args):
