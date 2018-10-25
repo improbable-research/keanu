@@ -15,18 +15,18 @@ algorithms = {'metropolis': k.MetropolisHastings,
               'hamiltonian': k.Hamiltonian}
 
 def sample(net, sample_from, algo='metropolis', draws=500, drop=0, down_sample_interval=1):
-    vertices = context.to_java_list([vertex.unwrap() for vertex in sample_from])
+    vertices_unwrapped = context.to_java_list([vertex.unwrap() for vertex in sample_from])
 
-    network_samples = algorithms[algo].withDefaultConfig().getPosteriorSamples(net.unwrap(), vertices, draws).drop(drop).downSample(down_sample_interval)
+    network_samples = algorithms[algo].withDefaultConfig().getPosteriorSamples(net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
     vertex_samples = {vertex.get_id(): __to_np_arrays(network_samples.get(vertex.unwrap()).asList()) for vertex in sample_from}
 
     return vertex_samples
 
-def __to_np_arrays(values):
+def __to_np_arrays(keanu_tensors):
     np_arrays = []
-    for value in values:
-        np_array = np.array(list(value.asFlatArray()))
-        np_array.reshape(value.getShape())
+    for keanu_tensor in keanu_tensors:
+        np_array = np.array(list(keanu_tensor.asFlatArray()))
+        np_array.reshape(keanu_tensor.getShape())
 
         np_arrays.append(np_array)
     return np_arrays
