@@ -75,5 +75,5 @@ def apply_observations(graph_time_steps, window, observed):
         observed_xt.observe(observed[t].x)
 
 def get_time_slice_values(time_steps, time):
-    slice = time_steps[time]
-    return list(map(lambda v : v.getValue(), slice))
+    time_slice = time_steps[time]
+    return list(map(lambda v : v.getValue(), time_slice))
