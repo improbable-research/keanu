@@ -1,19 +1,5 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
-
-import org.apache.commons.math3.optim.InitialGuess;
-import org.apache.commons.math3.optim.MaxEval;
-import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.SimpleBounds;
-import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
-
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -21,20 +7,60 @@ import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.commons.math3.optim.InitialGuess;
+import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.PointValuePair;
+import org.apache.commons.math3.optim.SimpleBounds;
+import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiConsumer;
+
+import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
+
+/**
+ * This class can be used to construct a BOBYQA non-gradient optimizer.
+ * This will use a quadratic approximation of the gradient to perform optimization without derivatives.
+ * @see <a href="http://www.damtp.cam.ac.uk/user/na/NA_papers/NA2009_06.pdf">BOBYQA Optimizer</a>
+ */
 @Builder
 public class NonGradientOptimizer implements Optimizer {
-
+    /**
+     * Creates a BOBYQA {@link NonGradientOptimizer} which provides methods for optimizing the values of latent variables
+     * of the Bayesian network to maximise probability.
+     *
+     * @param bayesNet The Bayesian network to run optimization on.
+     * @return a {@link NonGradientOptimizer}
+     */
     public static NonGradientOptimizer of(BayesianNetwork bayesNet) {
         return NonGradientOptimizer.builder()
             .bayesianNetwork(bayesNet)
             .build();
     }
 
+    /**
+     * Creates a Bayesian network from the given vertices and uses this to
+     * create a BOBYQA {@link NonGradientOptimizer}. This provides methods for optimizing the
+     * values of latent variables of the Bayesian network to maximise probability.
+     *
+     * @param vertices The vertices to create a Bayesian network from.
+     * @return a {@link NonGradientOptimizer}
+     */
     public static NonGradientOptimizer of(Collection<? extends Vertex> vertices) {
         return of(new BayesianNetwork(vertices));
     }
 
+    /**
+     * Creates a Bayesian network from the graph connected to the given vertex and uses this to
+     * create a BOBYQA {@link NonGradientOptimizer}. This provides methods for optimizing the
+     * values of latent variables of the Bayesian network to maximise probability.
+     *
+     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
+     * @return a {@link NonGradientOptimizer}
+     */
     public static NonGradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
         return of(vertexFromNetwork.getConnectedGraph());
     }
@@ -91,6 +117,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
     }
 
+
     private double optimize(List<Vertex> outputVertices) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
@@ -140,17 +167,11 @@ public class NonGradientOptimizer implements Optimizer {
         return (int) (2 * Optimizer.totalNumberOfLatentDimensions(latentVertices) + 1);
     }
 
-    /**
-     * @return the natural logarithm of the Maximum a posteriori (MAP)
-     */
     @Override
     public double maxAPosteriori() {
         return optimize(bayesianNetwork.getLatentOrObservedVertices());
     }
 
-    /**
-     * @return the natural logarithm of the maximum likelihood (MLE)
-     */
     @Override
     public double maxLikelihood() {
         return optimize(bayesianNetwork.getObservedVertices());

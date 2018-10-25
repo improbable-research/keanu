@@ -1,15 +1,14 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.setAndCascadePoint;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
+import org.apache.commons.math3.analysis.MultivariateFunction;
 
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import org.apache.commons.math3.analysis.MultivariateFunction;
-
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.Vertex;
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.setAndCascadePoint;
 
 public class FitnessFunction {
 

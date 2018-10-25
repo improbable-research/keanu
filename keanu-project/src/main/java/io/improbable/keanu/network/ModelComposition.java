@@ -1,13 +1,13 @@
 package io.improbable.keanu.network;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class ModelComposition {
 

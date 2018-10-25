@@ -1,6 +1,12 @@
 package io.improbable.keanu.algorithms;
 
-import static java.util.stream.Collectors.toMap;
+import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
+import io.improbable.keanu.vertices.intgr.IntegerTensorVertexSamples;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,13 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
-import io.improbable.keanu.vertices.intgr.IntegerTensorVertexSamples;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * An immutable collection of network samples. A network sample is a collection

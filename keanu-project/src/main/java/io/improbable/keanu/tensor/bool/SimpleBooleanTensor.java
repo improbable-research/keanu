@@ -1,15 +1,5 @@
 package io.improbable.keanu.tensor.bool;
 
-import static java.util.Arrays.copyOf;
-
-import static com.google.common.primitives.Ints.checkedCast;
-
-import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-
-import java.util.Arrays;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -17,6 +7,13 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Arrays;
+
+import static com.google.common.primitives.Ints.checkedCast;
+import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
+import static java.util.Arrays.copyOf;
 
 public class SimpleBooleanTensor implements BooleanTensor {
 

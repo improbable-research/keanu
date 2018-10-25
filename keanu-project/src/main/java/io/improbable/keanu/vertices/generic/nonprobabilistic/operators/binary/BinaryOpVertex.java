@@ -27,4 +27,3 @@ public abstract class BinaryOpVertex<A, B, C> extends Vertex<C> implements NonPr
 
     protected abstract C op(A a, B b);
 }
-

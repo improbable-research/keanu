@@ -1,8 +1,5 @@
 package io.improbable.docs;
 
-import java.util.Arrays;
-import java.util.stream.Stream;
-
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
@@ -10,6 +7,9 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 public class WetGrass {
 

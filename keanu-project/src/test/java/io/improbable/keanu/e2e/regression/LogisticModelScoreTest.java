@@ -2,9 +2,8 @@ package io.improbable.keanu.e2e.regression;
 
 
 import io.improbable.keanu.model.ModelScoring;
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;

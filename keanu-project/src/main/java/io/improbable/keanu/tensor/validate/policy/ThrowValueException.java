@@ -1,7 +1,7 @@
 package io.improbable.keanu.tensor.validate.policy;
 
-import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 public class ThrowValueException<TENSOR extends Tensor<?>> implements TensorValidationPolicy<TENSOR> {

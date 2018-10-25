@@ -1,13 +1,13 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
 public class InverseGamma implements ContinuousDistribution {
 
