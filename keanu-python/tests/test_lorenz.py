@@ -3,7 +3,7 @@ import numpy as np
 import math
 import keanu as kn
 from keanu.const import Const
-from lorenz_model import LorenzModel
+from examples.lorenz_model import LorenzModel
 
 
 convergedError = 0.01
