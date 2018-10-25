@@ -10,7 +10,7 @@
 				{% if page.page_content.message %}
 					<p>{{ page.page_content.message }}</p>
 				{% endif %}
-				<a href="{% if jekyll.environment == 'production' %}{{ site.doks.baseurl }}{% endif %}/" class="btn btn--dark btn--rounded btn--w-icon btn--w-icon-left">
+				<a href="{{ site.baseurl }}/" class="btn btn--dark btn--rounded btn--w-icon btn--w-icon-left">
 					<i class="icon icon--home"></i>
 					Go back home
 				</a>

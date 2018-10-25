@@ -1,6 +1,5 @@
 # Theme settings
 doks:
-    baseurl:
     color_theme: # Available themes: blue (default), green, purple, red and yellow
     header:
         logo:
@@ -8,11 +7,15 @@ doks:
             image: true
         nav:
             - item_name: JavaDoc
+              external_url: true
               item_url: 'https://static.javadoc.io/io.improbable/keanu/0.0.14/overview-summary.html'
             - item_name: Contributing
               item_url: '/contributing'
             - item_name: License
+              external_url: true
               item_url: 'https://github.com/improbable-research/keanu/blob/master/LICENSE'
+
+baseurl: /keanu
 
 # SASS settings
 sass:

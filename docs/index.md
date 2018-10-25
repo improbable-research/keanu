@@ -13,6 +13,7 @@ featured-img: /doks-theme/assets/images/layout/logo.png
 buttons:
     - icon: github
       content: View on GitHub
+      external_url: true
       url: https://github.com/improbable-research/keanu
     - icon: arrow-right
       content: Get started

@@ -19,13 +19,13 @@
 								{% endif %}
 								{% if page.page_nav.prev.content or page.page_nav.next.content %}
 									{% if page.page_nav.prev.content and page.page_nav.prev.url %}
-										<a href="{% if jekyll.environment == 'production' %}{{ site.doks.baseurl }}{% endif %}{{ page.page_nav.prev.url }}" class="btn btn--dark btn--rounded btn--w-icon btn--w-icon-left">
+										<a href="{{ site.baseurl }}{{ page.page_nav.prev.url }}" class="btn btn--dark btn--rounded btn--w-icon btn--w-icon-left">
 											<i class="icon icon--arrow-left"></i>
 											{{ page.page_nav.prev.content }}
 										</a>
 									{% endif %}
 									{% if page.page_nav.next.content and page.page_nav.next.url %}
-										<a href="{% if jekyll.environment == 'production' %}{{ site.doks.baseurl }}{% endif %}{{ page.page_nav.next.url }}" class="btn btn--dark btn--rounded btn--w-icon">
+										<a href="{{ site.baseurl }}{{ page.page_nav.next.url }}" class="btn btn--dark btn--rounded btn--w-icon">
 											<i class="icon icon--arrow-right"></i>
 											{{ page.page_nav.next.content }}
 										</a>
@@ -56,7 +56,7 @@
 										{% for link in links %}
 											{% unless link.title == version %}
 												{% assign newlink = page.url | replace: currentPageDirectory, link.url %}
-												<li><a href={{ newlink }}>{{link.title}}</a></li>
+												<li><a href={{ site.baseurl }}{{ newlink }}>{{link.title}}</a></li>
 											{% endunless %}
 										{% endfor %}
 										</ul>
@@ -78,7 +78,7 @@
 												<i class="icon icon--arrow-right"></i>
 											</a>
 											{% else %}
-											<a href="{% if jekyll.environment == 'production' %}{{ site.doks.baseurl }}{% endif %}{{ page.author.title_url }}" class="btn btn--read-more">
+											<a href="{{ site.baseurl }}{{ page.author.title_url }}" class="btn btn--read-more">
 												{{ page.author.title }}
 												<i class="icon icon--arrow-right"></i>
 											</a>
@@ -127,13 +127,13 @@
 						<div class="row">
 							<div class="col-xs-12">
 								{% if page.page_nav.prev.content and page.page_nav.prev.url %}
-									<a href="{% if jekyll.environment == 'production' %}{{ site.doks.baseurl }}{% endif %}{{ page.page_nav.prev.url }}" class="page-nav__item page-nav__item--prev">
+									<a href="{{ site.baseurl }}{{ page.page_nav.prev.url }}" class="page-nav__item page-nav__item--prev">
 										<i class="icon icon--arrow-left"></i>
 										{{ page.page_nav.prev.content }}
 									</a><!-- /.page-nav__item -->
 								{% endif %}
 								{% if page.page_nav.next.content and page.page_nav.next.url %}
-									<a href="{% if jekyll.environment == 'production' %}{{ site.doks.baseurl }}{% endif %}{{ page.page_nav.next.url }}" class="page-nav__item page-nav__item--next">
+									<a href="{{ site.baseurl }}{{ page.page_nav.next.url }}" class="page-nav__item page-nav__item--next">
 										{{ page.page_nav.next.content }}
 										<i class="icon icon--arrow-right"></i>
 									</a><!-- /.page-nav__item -->
