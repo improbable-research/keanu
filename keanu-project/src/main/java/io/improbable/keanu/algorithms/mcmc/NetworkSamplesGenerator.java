@@ -28,10 +28,15 @@ public class NetworkSamplesGenerator {
         this.progressBarSupplier = progressBarSupplier;
     }
 
-    public int dropCount() {
+    public int getDropCount() {
         return dropCount;
     }
 
+    /**
+     * @param dropCount the number of samples to drop before collecting anything. If this is zero
+     *                  then no samples will be dropped before collecting.
+     * @return this NetworkSamplesGenerator set to drop the specified number of samples
+     */
     public NetworkSamplesGenerator dropCount(int dropCount) {
         Preconditions.checkArgument(dropCount >= 0,
             "Drop count of %s is invalid. Cannot drop negative samples.",
@@ -41,10 +46,15 @@ public class NetworkSamplesGenerator {
         return this;
     }
 
-    public int downSampleInterval() {
+    public int getDownSampleInterval() {
         return downSampleInterval;
     }
 
+    /**
+     *
+     * @param downSampleInterval collect 1 sample for every downSampleInterval.
+     * @return
+     */
     public NetworkSamplesGenerator downSampleInterval(int downSampleInterval) {
         Preconditions.checkArgument(downSampleInterval > 0,
             "Down-sample interval of %s is invalid. The down-sample interval means take every Nth sample." +
