@@ -34,7 +34,7 @@ def test_cant_construct_bayes_net_if_not_java_or_python_list():
     assert something is not list
     assert something is not kn.JavaList
 
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(TypeError) as excinfo:
         kn.BayesNet(something)
 
     assert str(excinfo.value) == "Expected a list. Was given {}".format(Something)
@@ -115,7 +115,7 @@ def test_can_pass_python_list_to_inference_algorithm(inference_algorithm, net):
 def test_cant_pass_non_list_to_inference_algorithm(inference_algorithm, net):
     class Something:
         pass
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(TypeError) as excinfo:
         inference_algorithm.get_posterior_samples(net, Something(), 3)
 
     assert str(excinfo.value) == "Expected a list. Was given {}".format(Something)

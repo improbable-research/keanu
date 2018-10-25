@@ -28,7 +28,7 @@ def test_non_gradient_op_vertex(model):
 
 
 def test_non_gradient_op_throws_with_invalid_net_param():
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(TypeError) as excinfo:
         kn.NonGradientOptimizer(500)
 
 

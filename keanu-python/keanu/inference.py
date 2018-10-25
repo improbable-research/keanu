@@ -20,7 +20,7 @@ class BayesNet(JavaCtor):
         elif isinstance(lst, list):
             vertices = context.to_java_list([vertex.unwrap() for vertex in lst])
         else:
-            raise ValueError("Expected a list. Was given {}".format(type(lst)))
+            raise TypeError("Expected a list. Was given {}".format(type(lst)))
 
         super(BayesNet, self).__init__(k.BayesianNetwork, vertices)
 
@@ -97,7 +97,7 @@ class InferenceAlgorithm:
         elif isinstance(lst, list):
             vertices = context.to_java_list([vertex.unwrap() for vertex in lst])
         else:
-            raise ValueError("Expected a list. Was given {}".format(type(lst)))
+            raise TypeError("Expected a list. Was given {}".format(type(lst)))
 
         network_samples = self.algorithm.withDefaultConfig().getPosteriorSamples(
             net.unwrap(),
