@@ -109,9 +109,7 @@ def test_java_list_to_python_list(jvm_view):
     python_list = kn.Vertex.to_python_list(java_list)
 
     assert type(python_list) == list
-    assert len(python_list) == 1
-    assert type(python_list[0]) == kn.Vertex
-    assert python_list[0].get_id() == gaussian.get_id()
+    assert all(type(element) == kn.Vertex for element in python_list)
 
 
 def test_java_set_to_python_set(jvm_view):
