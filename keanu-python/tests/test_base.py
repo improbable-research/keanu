@@ -8,9 +8,6 @@ def java_list_wrapper():
         def __init__(self, values):
             super(JavaListWrapper, self).__init__(kn.KeanuContext().to_java_list(values))
 
-        def get(self, index):
-            return 4
-
         def index_of(self, value):
             return 100
 
@@ -27,8 +24,8 @@ def test_java_object_wrapper_cant_call_java_api_with_python_impl_if_camel_case(j
 def test_java_object_wrapper_can_call_java_api_with_no_python_impl_if_snake_case(java_list_wrapper):
     assert not java_list_wrapper.is_empty()
 
+def test_java_object_wrapper_can_call_java_api_with_no_python_impl_if_both_camel_case_and_snake_case(java_list_wrapper):
+    assert java_list_wrapper.get(0) == 1
+
 def test_java_object_wrapper_can_call_python_api(java_list_wrapper):
     assert java_list_wrapper.index_of(1) == 100
-
-def test_java_object_wrapper_attr_override(java_list_wrapper):
-    assert java_list_wrapper.get(0) == 4
