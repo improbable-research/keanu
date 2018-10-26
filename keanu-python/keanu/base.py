@@ -10,18 +10,16 @@ class JavaObjectWrapper:
         return "[{0} => {1}]".format(self._class, type(self))
 
     def __getattr__(self, k):
-        java_name = get_java_name(k)
+        python_name = get_python_name(k)
 
-        if not k.islower() and k == java_name:
-            python_name = get_python_name(k)
-
+        if k != python_name:
             if python_name in self.__class__.__dict__:
                 raise AttributeError("{} has no attribute {}. Did you mean {}?".format(self.__class__, k, python_name))
 
             raise AttributeError("{} has no attribute {}".format(self.__class__, k))
 
         warnings.warn("\"{}\" is not implemented so Java API was called directly instead".format(k))
-        return self.unwrap().__getattr__(java_name)
+        return self.unwrap().__getattr__(get_java_name(k))
 
     def unwrap(self):
         return self._val
