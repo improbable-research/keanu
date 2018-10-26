@@ -10,13 +10,13 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
+import org.junit.Ignore;
 
 import static org.junit.Assert.assertArrayEquals;
 
 public class Tensors {
 
-    @Test
+    @Ignore
     public void doesSimpleTensorInferenceExample() {
 
 //%%SNIPPET_START%% TensorExample

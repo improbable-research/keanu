@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.Ignore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 //%%SNIPPET_START%% LorenzJavaFull
 public class LorenzTest {
 
-    @Test
+    @Ignore
     public void convergesOnLorenz() {
 
         double[] priorMu = new double[]{3, 3, 3};
