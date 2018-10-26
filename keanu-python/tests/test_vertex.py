@@ -75,8 +75,52 @@ def test_vertex_can_observe_ndarray(jvm_view):
     assert nd4j_tensor_flat[1] == 2.
 
 
-def test_vertex_can_get_connected_graph(jvm_view):
+def test_get_connected_graph(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
     connected_graph = gaussian.get_connected_graph()
 
     assert len(connected_graph) == 3
+
+
+def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view):
+    hyper_params = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
+    gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., hyper_params))
+
+    hyper_params_id = hyper_params.get_id()
+    gaussian_id = gaussian.get_id()
+
+    assert type(hyper_params_id) == str
+    assert type(gaussian_id) == str
+
+    assert hyper_params_id < gaussian_id
+
+
+def test_construct_vertex_with_java_vertex(jvm_view):
+    java_vertex = kn.Vertex(jvm_view.GaussianVertex, (0., 1.)).unwrap()
+    python_vertex = kn.Vertex(java_vertex=java_vertex)
+
+    assert java_vertex.getId().toString() == python_vertex.get_id()
+
+
+def test_java_list_to_python_list(jvm_view):
+    gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
+
+    java_list = kn.KeanuContext().to_java_list([gaussian.unwrap()])
+    python_list = kn.Vertex.to_python_list(java_list)
+
+    assert type(java_list) != list
+    assert type(python_list) == list
+    assert len(python_list) == 1
+    assert type(python_list[0]) == kn.Vertex
+    assert python_list[0].get_id() == gaussian.get_id()
+
+
+def test_java_set_to_python_set(jvm_view):
+    gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
+
+    java_set = gaussian.unwrap().getConnectedGraph()
+    python_set = kn.Vertex.to_python_set(java_set)
+
+    assert type(java_set) != set
+    assert type(python_set) == set
+    assert all(type(element) == kn.Vertex for element in python_set)
