@@ -7,7 +7,7 @@ permalink: /docs/installation/
 
 # Hero section
 title: Installation
-description: There is an example project that can quickly get your new modelling project off the ground.
+description: Learn how to get Keanu installed in your project.
 
 # Micro navigation
 micro_nav: true
