@@ -1,5 +1,5 @@
 include 'keanu-project',
         'codegen',
-        'ocs',
+        'docs',
         'keanu-python',
         'keanu-examples:coalMiningDisasters'
