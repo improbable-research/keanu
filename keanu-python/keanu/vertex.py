@@ -153,7 +153,6 @@ class Vertex(JavaObjectWrapper, VertexOps):
 
         python_set = set()
         while java_iterator.hasNext():
-            java_vertex = java_iterator.next()
-            python_set.add(Vertex(java_vertex=java_vertex))
+            python_set.add(Vertex(java_vertex=java_iterator.next()))
 
         return python_set
