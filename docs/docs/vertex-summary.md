@@ -102,4 +102,4 @@ Vertices also have a `shape`, which describes the tensor shape contained within 
 [2,2] represents a matrix of 2 by 2. A vertex of shape [1,3] represents a row vector of length 3. The shape
 can be of any amount of dimensions and length.
 
-Read more about tensors [here](/docs/tensors) 
+Read more about tensors [here]({{ site.baseurl }}/docs/tensors) 

@@ -251,7 +251,7 @@ The default header sets the column name to the index.
 
 Let's look at how you can write samples to CSV. 
 First, you'll need some samples, let's take some from a network using the NUTS algorithm. 
-To learn more about the parameters being used here, head over to the [NUTS documentation](/docs/inference-posterior-sampling#nuts).
+To learn more about the parameters being used here, head over to the [NUTS documentation]({{ site.baseurl }}/docs/inference-posterior-sampling#nuts).
 
 ```java
 NetworkSamples samples = NUTS.withDefaultConfig().getPosteriorSamples(

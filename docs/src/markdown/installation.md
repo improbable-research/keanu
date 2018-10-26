@@ -36,7 +36,7 @@ git clone --depth 1 https://github.com/improbable-research/keanu-starter.git
 
 This clones the Keanu starter repo.
 
-Now that you have the starter project, head over to [getting started](/docs/getting-started) to get started.
+Now that you have the starter project, head over to [getting started]({{ site.baseurl }}/docs/getting-started) to get started.
 
 ## Using Keanu in an existing model (JVM based)
 
@@ -65,4 +65,4 @@ In your project's `pom.xml`
 </dependency>
 ```
 
-Now that you have the dependency, head over to [getting started](/docs/getting-started) to get started.
+Now that you have the dependency, head over to [getting started]({{ site.baseurl }}/docs/getting-started) to get started.

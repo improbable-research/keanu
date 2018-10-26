@@ -102,7 +102,7 @@ To observe that C is true:
 {% snippet DescribeObserve %}
 ```
 
-Now you can infer that A and B are also both true by sampling from the posterior distribution. Note: we will be covering MCMC sampling in the [Posterior Sampling](/docs/inference-posterior-sampling/) section.
+Now you can infer that A and B are also both true by sampling from the posterior distribution. Note: we will be covering MCMC sampling in the [Posterior Sampling]({{ site.baseurl }}/docs/inference-posterior-sampling/) section.
 
 ```java
 {% snippet DescribeInfer %}
@@ -129,4 +129,4 @@ Alternatively, you can create a new Bayesian network and use this to probe some 
 ```
 Now you can run MCMC on the BayesNet as it will start off in the correct configuration.
 
-Instead of running MCMC you could also run one of our inference algorithms which you can find out more about in the [inference algorithms](/docs/inference-map) section.
+Instead of running MCMC you could also run one of our inference algorithms which you can find out more about in the [inference algorithms]({{ site.baseurl }}/docs/inference-map) section.
