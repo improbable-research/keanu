@@ -8,7 +8,6 @@ import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.util.csv.WriteCsv;
 import io.improbable.keanu.util.csv.pojo.CsvProperty;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.io.File;
 import java.util.List;
