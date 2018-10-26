@@ -105,7 +105,7 @@ def test_construct_vertex_with_java_vertex(jvm_view):
 def test_java_list_to_python_list(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
 
-    java_list = kn.KeanuContext().to_java_list([gaussian.unwrap()])
+    java_list = kn.KeanuContext().to_java_list([gaussian.unwrap(), gaussian.unwrap()])
     python_list = kn.Vertex.to_python_list(java_list)
 
     assert type(python_list) == list
