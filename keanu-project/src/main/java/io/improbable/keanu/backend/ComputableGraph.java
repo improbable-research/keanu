@@ -10,5 +10,6 @@ public interface ComputableGraph extends AutoCloseable {
     Map<String, ?> compute(Map<String, ?> inputs, Collection<String> outputs);
 
     @Override
-    void close();
+    default void close() {
+    }
 }

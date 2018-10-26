@@ -5,10 +5,13 @@ import java.util.Map;
 
 public interface ProbabilisticGraph extends AutoCloseable {
 
+    boolean USE_TENSOR_FLOW = true;
+
     double logProb(Map<String, ?> inputs);
 
     LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> outputs);
 
     @Override
-    void close();
+    default void close() {
+    }
 }

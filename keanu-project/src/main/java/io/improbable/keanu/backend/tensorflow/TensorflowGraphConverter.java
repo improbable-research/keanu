@@ -256,11 +256,11 @@ public class TensorflowGraphConverter {
         return name.replace("]", "").replace("[", "").replace(",", "_");
     }
 
-    public static TensorflowComputableGraph convert(Set<Vertex> queuedAlready) {
-        return convert(queuedAlready, new HashMap<>());
+    public static TensorflowComputableGraph convert(Set<Vertex> vertices) {
+        return convert(vertices, new HashMap<>());
     }
 
-    public static TensorflowComputableGraph convert(Collection<? extends Vertex> queuedAlready, Map<Vertex<?>, Output<?>> lookup) {
+    public static TensorflowComputableGraph convert(Collection<? extends Vertex> vertices, Map<Vertex<?>, Output<?>> lookup) {
 
         Graph graph = new Graph();
         Scope scope = new Scope(graph);
@@ -268,7 +268,7 @@ public class TensorflowGraphConverter {
         GraphBuilder graphBuilder = computableGraph.getGraphBuilder();
 
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
-        priorityQueue.addAll(queuedAlready);
+        priorityQueue.addAll(vertices);
 
         Vertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
