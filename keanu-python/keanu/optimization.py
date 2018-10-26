@@ -26,7 +26,7 @@ class Optimizer:
         if not (isinstance(net, BayesNet) or isinstance(net, Vertex)):
             raise TypeError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))
         elif isinstance(net, Vertex):
-            net = BayesNet(net.getConnectedGraph())
+            net = BayesNet(net.get_connected_graph())
         return builder.bayesianNetwork(net.unwrap()), net
 
 

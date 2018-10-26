@@ -13,12 +13,18 @@ def get_java_name(name):
     first, *rest = name.split('_')
     return first + ''.join(word.capitalize() for word in rest)
 
-def get_python_name(name):
+def is_python_name(name):
     """
-    >>> get_python_name("camelCaseName")
-    'camel_case_name'
-    >>> get_python_name("snake_case_name")
-    'snake_case_name'
+    >>> is_python_name("snake_case_name")
+    True
+    >>> is_python_name("snakecasename")
+    True
+    >>> is_python_name("camelCaseName")
+    False
+    >>> is_python_name("camelCaseNAME")
+    False
     """
     s1 = first_cap_re.sub(r'\1_\2', name)
-    return all_cap_re.sub(r'\1_\2', s1).lower()
+    python_name = all_cap_re.sub(r'\1_\2', s1).lower()
+
+    return python_name == name

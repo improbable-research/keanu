@@ -1,5 +1,5 @@
 import warnings
-from keanu.utils import get_java_name, get_python_name
+from keanu.utils import get_java_name, is_python_name
 
 class JavaObjectWrapper:
     def __init__(self, val):
@@ -10,9 +10,11 @@ class JavaObjectWrapper:
         return "[{0} => {1}]".format(self._class, type(self))
 
     def __getattr__(self, k):
-        python_name = get_python_name(k)
-        if python_name in self.__class__.__dict__:
-            return getattr(self, python_name)
+        if k in self.__class__.__dict__:
+            return getattr(self, k)
+
+        if not is_python_name(k):
+            raise AttributeError("{} has no attribute {}".format(self, k))
 
         java_name = get_java_name(k)
         warnings.warn("\"{}\" is not implemented so Java API was called directly instead".format(k))

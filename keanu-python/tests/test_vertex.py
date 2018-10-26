@@ -29,7 +29,7 @@ def test_can_pass_ndarray_to_vertex(jvm_view):
     assert shape[1] == 2
 
 
-def test_can_pass_vertex_to_vertex(jvm_view):
+def test_use_vertex_as_hyperparameter_of_another_vertex(jvm_view):
     mu = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (mu, 1.))
     sample = gaussian.sample()
@@ -61,7 +61,7 @@ def test_vertex_can_observe_scalar(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
     gaussian.observe(4.)
 
-    assert gaussian.getValue().scalar() == 4.
+    assert gaussian.get_value().scalar() == 4.
 
 
 def test_vertex_can_observe_ndarray(jvm_view):
@@ -70,7 +70,7 @@ def test_vertex_can_observe_ndarray(jvm_view):
     ndarray = np.array([[1.,2.]])
     gaussian.observe(ndarray)
 
-    nd4j_tensor_flat = gaussian.getValue().asFlatArray()
+    nd4j_tensor_flat = gaussian.get_value().asFlatArray()
     assert nd4j_tensor_flat[0] == 1.
     assert nd4j_tensor_flat[1] == 2.
 
