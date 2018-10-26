@@ -23,8 +23,8 @@ page_nav:
 ---
 
 ## Overview
-Particle filters can help you find probable states of your network which can be useful, for example, for using as starting states for MCMC sampling. 
-In this section, we will see how to use Keanu's Particle filter class.
+Particle filters can help you find probable states of your network which can be used as starting states for MCMC sampling. 
+Here is an example on how to use Keanu's Particle filter class:
 
 ```java
 //Create a dummy Bayesian Network

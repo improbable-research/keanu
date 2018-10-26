@@ -33,6 +33,8 @@ when the program is a model of some real world process. For example, if you were
 a person driving through traffic, then you would need a way to express the uncertainty about how closely they are following
 the car in front of them in the real world.
 
+Note: the following code snippets are probabilistic programming pseudocode, we'll introduce Keanu syntax afterwards. 
+
 For simplicity's sake, let's take a simple program with an input `x` and an output `y`.
 
 ```
@@ -45,8 +47,6 @@ Here we see that `x` is 1 and if we run the program we will find that `y` is 2.
 ### Propagating uncertainty forward
 
 However, what if we **don't know** what `x` is exactly but we **do know** that it's somewhere between 1 and 2?
-
-The following code snippets are probabilistic programming pseudocode, we'll introduce Keanu syntax afterwards. 
 
 With probabilistic programming we might be able to write:
 
@@ -116,6 +116,7 @@ BoolVertex sprinkler = new BernoulliVertex(
 
 //The grass being wet is dependent on whether or not it rained or
 //the sprinkler was on.
+// The following probabilities are the same as those used in Wikipedia article linked above.
 BoolVertex wetGrass = new BernoulliVertex(
         ConditionalProbabilityTable.of(sprinkler, rain)
                 .when(false, false).then(0.001)

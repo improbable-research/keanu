@@ -31,7 +31,7 @@ If we know the form of a posterior distribution, we gain valuable information ab
 Unfortunately, there's no easy way to perfectly determine the form of a posterior distribution, so we have
 to rely on approximation.
 
-Luckily, sampling algorithms exist that are designed to efficiently explore distributions and enable us
+Luckily, there are sampling algorithms that are designed to efficiently explore distributions and enable us
 to gain insight into their form. 
 MCMC stands for Markov Chain Monte Carlo, and describes a class of algorithms that help us do exactly that.
 In this section we will be exploring a few MCMC algorithms.
@@ -41,7 +41,7 @@ In this section we will be exploring a few MCMC algorithms.
 #### Algorithm
 
 [Metropolis Hastings](https://en.wikipedia.org/wiki/Metropolis%E2%80%93Hastings_algorithm) is the simplest
-of the sampling algorithms we have implemented in Keanu, which is a good place to start.
+of the sampling algorithms we have implemented in Keanu, and it is a good place to start.
 
 At each iteration of the algorithm, we do three things:
 
@@ -133,7 +133,7 @@ Hamiltonian physics introduces the idea of a position and a momentum for a sampl
 can understand if the distribution is steep or shallow at our current position. We can then use Hamiltonian physics to move 
 our samples around using this information.
 
-This is crucial to understand in order to tweak the parameters of HMC, it's very sensitive to two in particular:
+This is crucial to understand in order to tweak the parameters of HMC, it's very sensitive to two parameters in particular:
 
 * Leapfrog count
 * Step size
@@ -161,11 +161,11 @@ Therefore, you have covered a total distance of 2 before the likelihood is calcu
 If your problem domain is a simple Gaussian that has a sigma of 1, then this will obviously be a problem as
 we will be covering too large a distance and will never explore the Gaussian effectively.
 
-If you are not receiving accurate samples, try lowering your step size to explore the space more accurately
+If you are not receiving accurate samples, try lowering your step size to explore the space in finer detail.
 
 The parameters are:
 
-* The bayesian network to sample from
+* The Bayesian network to sample from
 * The vertices in the network to return samples for (latent vertices)
 * The number of samples to take
 
@@ -185,7 +185,7 @@ NUTS is built on top of HMC.
 As the sample moves through the distribution, there are features in place that stop it from performing 
 a U-turn and re-exploring locations. 
 Hence why it's called the 'No-U-Turn Sampler'. 
-It also attempts to calculate and auto-tune those difficult leapfrog and step size parameters we encountered in HMC for you.
+It also attempts to calculate and auto-tune those difficult leapfrog and step size parameters we encountered in HMC.
 
 ```java
 NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
@@ -198,7 +198,7 @@ NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
 Let's explain the auto-tuning and target acceptance probability parameters a bit further.
 
 Picking a step size in HMC is very challenging and can often result in you not exploring the distribution effectively.
-NUTS calculates a step size for you based on your bayesian network and then will continue to adapt it for a given
+NUTS calculates a step size for you based on your Bayesian network and then will continue to adapt it for a given
 number of samples. 
 It does this by using the target acceptance probability. 
 To find an effective starting value of step size, the algorithm chooses a starting point and then makes many jumps of differing sizes, recording the likelihood of the attempted position. 

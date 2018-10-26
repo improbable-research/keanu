@@ -33,7 +33,7 @@ Imagine you are watching the point below moving through space:
 ![Trajectory through phase space](https://upload.wikimedia.org/wikipedia/commons/1/13/A_Trajectory_Through_Phase_Space_in_a_Lorenz_Attractor.gif)
 
 You'd begin to notice it has an interesting repeated pattern of movement. If you had a really
-keen eye, you'd notice its movement that can be described by the
+keen eye, you'd notice that its movement can be described by the
 [Lorenz equations](https://en.wikipedia.org/wiki/Lorenz_system).
 
 The Lorenz equations are particuarly hard to model as they describe a chaotic system. Two initial
@@ -59,7 +59,7 @@ system and you know it follows movement described by the Lorenz equations:
 ![Lorenz equations](https://wikimedia.org/api/rest_v1/media/math/render/svg/5f993e17e16f1c3ea4ad7031353c61164a226bb8)
 
 Rather than performing a single timestep and then calculating the most likely value of the coordinates, 
-you'll to perform several timesteps at once and then calculate the most likely value. 
+you'll perform several timesteps at once and then calculate the most likely value. 
 
 Let's define 10 timesteps as a window, and calculate the probable values at the end of every window.
 
@@ -104,7 +104,7 @@ You then want to iterate through these timesteps until either:
 
 1. The calculation of the most probable values of X, Y and Z are within an acceptable tolerance
 of the actual coordinates.
-2. We reach our maximum timesteps.
+2. We reach our maximum timestep.
 
 Place all of the following code inside a loop that describes these conditons:
 
@@ -152,7 +152,7 @@ fun calculateLorenzTimesteps(graphTimeSteps: MutableList<List<DoubleVertex>>, wi
 You can now apply the observations of the X coordinate from the "Real World" system to each timestep
 in the window calculated above. 
 
-Let's define a function that can do this.
+Let's define a function that does this.
 
 ```kotlin
 fun applyObservations(graphTimeSteps: MutableList<List<DoubleVertex>>, windowSize: Int, window: Int, observed: List<LorenzModel.Coordinates>, random: DoubleVertexFactory) {

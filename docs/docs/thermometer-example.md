@@ -7,7 +7,7 @@ permalink: /docs/examples/thermometer/
 
 # Hero section
 title: Thermometer Example
-description: You have two thermometers
+description: You have two inaccurate thermometers and want to estimate the temperature of a room.
 
 # Micro navigation
 micro_nav: true

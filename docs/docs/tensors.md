@@ -25,7 +25,7 @@ page_nav:
 
 # Tensor rank and shape
 
-Tensors in most cases can be thought of as just a nested array of values that can have any number
+Tensors in most cases can be thought of as nested arrays of values that can have any number
 of dimensions. A tensor with one dimension can be thought of as a vector, a tensor
 with two dimensions as a matrix and a tensor with three dimensions can be thought of as a cube. 
 The number of dimensions a tensor has is called its `rank` and the length in each dimension 
@@ -57,9 +57,9 @@ Nearly everything in Keanu supports Tensors. But how do you create one?
 Let's create a vector of doubles, integers and booleans that share the same value.
 
 ```java
-DoubleTensor dTensor = DoubleTensor.create(5, new long[]{2, 2});     //[5, 5, 5, 5]
-IntegerTensor iTensor = IntegerTensor.create(1, new long[]{2, 2});    //[1, 1, 1, 1]
-BooleanTensor bTensor = BooleanTensor.create(true, new long[]{2, 2}); //[true, true, true, true]
+DoubleTensor dTensor = DoubleTensor.create(5, new long[]{1, 4});     //[5, 5, 5, 5]
+IntegerTensor iTensor = IntegerTensor.create(1, new long[]{1, 4});    //[1, 1, 1, 1]
+BooleanTensor bTensor = BooleanTensor.create(true, new long[]{1, 4}); //[true, true, true, true]
 ```
 
 
@@ -86,7 +86,7 @@ tensor.getShape();       //[1, 4]
 
 ## Tensor Operations
 
-What operations can I do on these tensors?
+What operations can I apply to tensors?
 
 Here's a small example of the power of tensors, all of these operations apply to each value in the tensor.
 

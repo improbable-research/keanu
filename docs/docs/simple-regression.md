@@ -27,7 +27,7 @@ Linear and logistic regression are two simple classes of a problem where we can 
 Linear regression describes the case where our output is a number, and logistic regression describes the case where our output is a discrete, two-valued variable.
 Keanu has the ability to help you quickly and easily create regression models with input data.
 Keanu also allows you to specify what form of regularization you would like (i.e. if you would like to use ridge regression or lasso regression).
-However, if that sounds scary to you, then you don't need to worry about it.
+By default, unregularised linear regression is used, but if you wish, you can specify Lasso or Ridge regression.
 
 # Building a simple linear regression model
 ```java
@@ -55,5 +55,5 @@ RegressionModel regressionModel = RegressionModel.withTrainingData(xData, yData)
     .withRegularization(RegressionRegularization.NONE)
     .build();
 
-//It is now possible to use regressionModel.predict(value) to use your model!
+//It is now possible to use regressionModel.predict(value) to get a prediction of the output given an input value.
 ```

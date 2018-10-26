@@ -47,7 +47,7 @@ CsvReader reader1 = ReadCsv.fromFile("~/my_filename.csv");
 ```
 
 If you place the CSV file in your src/main/resources folder, you can load it as a resource,
-which you would do in order to avoid having to provide a hardcoded file path.
+which allows you to avoid having to provide a hardcoded file path.
 
 ```java
 CsvReader reader2 = ReadCsv.fromResources("my_other_filename.csv");
@@ -62,12 +62,12 @@ for (List<String> csvLine : reader1.readLines()) {
 
 #### Large CSV files
 
-If you CSV is very large, you may not want to load the entire CSV file into memory before
+If your CSV file is very large, you may not want to load the entirety of it into memory before
 processing it. You can stream the lines in order to avoid holding the entire file in memory.
 
 Once you have a CsvReader, you can call streamLines() to start streaming each line. Make sure
 to close the stream as it is potentially connected to an open file. Closing the stream can be
-done by using try-with-resources, which is shown below.
+done by using try-with-resources, as shown below.
 
 ```java
 try (Stream<List<String>> lineStream = reader2.streamLines()) {
@@ -151,23 +151,23 @@ for a complete example of reading CSV data into a model in Keanu.
 
 ## Writing out data
 
-Keanu is packaged with a CSV writer that allows you to write to CSV. This is useful for writing the values stored in vertices
+Keanu is packaged with a CSV writer that allows you to write to a CSV file. This is useful for writing values stored in vertices
 or samples to a file.
 
 ### Creating a CsvWriter from vertices
 
 This section assumes knowledge of tensors, please look [here](https://nd4j.org/userguide#intro) to familiarise yourself with them first. 
-Only scalar or vector tensors are supported in the CSV writer at the moment.
+Only scalar and vector tensors are supported by the CSV writer at the moment.
 
-Let's look at the different ways we can write the values stored in vertices to CSV, but first we have to decide which format to write out in.
+Before looking at the different ways in which we can write values stored in vertices to CSV files, 
+we have to decide which output format we want to use. The options are
 
 * Column format: each vertex occupies a column in the CSV file, with each row denoting the index of the vector.
 * Row format:  each vertex occupies a row, with each column denoting the index of the vector.
 
-Let's look at an example of each.
-
-Say that we have ran inference on a model and would like to write the resulting values to CSV and 
-that the list of inferred variables contains the following three vertices.
+Let's look at an example of each format.
+Say, we have ran inference on a model and would like to write the resulting (most probable) values to a CSV file and 
+that the list of inferred variables contains the following three vertices:
 
 ```java
 List<DoubleVertex> inferredVariables = runMyModel();
@@ -180,7 +180,6 @@ inferredVariables.get(2); // [50.0, 100.0, 150.0]
 Let's write these as columns to a file called columnTest.csv in the root directory.
 
 ```java
-//Uncomment here once Perms for this function fixed
 File file = WriteCsv.asColumns(inferredVariables).toFile("columnTest.csv");
 ```
 
@@ -196,7 +195,6 @@ The CSV file columnTest.csv contains:
 Let's now write these as rows to a file called rowTest.csv in the root directory.
 
 ```java
-//Also uncomment here
 File file2 = WriteCsv.asRows(inferredVariables).toFile("rowTest.csv");
 ```
 
@@ -217,7 +215,6 @@ Let's re-run the above examples but using the default headers provided in the CS
 As columns.
 
 ```java
-//Chat to george on this one too
 File file3 = WriteCsv.asColumns(inferredVariables).withDefaultHeader().toFile("columnTest.csv");
 ```
 
@@ -234,7 +231,6 @@ The default header sets the column name to the vertex ID.
 As rows.
 
 ```java
-//Uncomment
 File file4 = WriteCsv.asRows(inferredVariables).withDefaultHeader().toFile("rowTest.csv");
 ```
 
@@ -255,8 +251,8 @@ To learn more about the parameters being used here, head over to the [NUTS docum
 
 ```java
 NetworkSamples samples = NUTS.withDefaultConfig().getPosteriorSamples(
+        new BayesianNetwork(aVertex.getConnectedGraph()),
         aVertex,
-        aVertex.getLatentVertices(),
         1000
 );
 ```

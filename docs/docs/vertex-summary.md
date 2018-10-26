@@ -69,7 +69,7 @@ The currently available boolean vertices are
 ### The Generic (everything else) family
 
 These are the vertices that can have any type as a value. For example, this type can be an Enum or any user defined object.
-Let's look at an example of this in Keanu with the `SelectVertex` which will return a value of the specified Enum `MyType`.
+Let's look at an example of this in Keanu with the `CategoricalVertex` which will return a value of the specified Enum `MyType`.
 
 ```java
 public enum MyType {
@@ -88,7 +88,7 @@ public CategoricalVertex<MyType> getSelectorForMyType() {
 }
 ```
 
-The getSelectorForMyType() method would return a probabilistic vertex that would contain an 
+The getSelectorForMyType() method returns a probabilistic vertex that would contain an 
 object of type MyType A, B, C or D, 25% of the time respectively.
 
 The currently available generic vertices are
@@ -99,7 +99,7 @@ The currently available generic vertices are
 ### Tensors
 
 Vertices also have a `shape`, which describes the tensor shape contained within them. A vertex with shape
-[2,2] represents a matrix of 2 by 2. A vertex of shape [1,3] represents a row vector of length 3. The shape
-can be of any amount of dimensions and length.
+[2,2] represents a 2 by 2 matrix. A vertex of shape [1,3] represents a row vector of length 3. The shape
+can have any number of dimensions and any length.
 
 Read more about tensors [here]({{ site.baseurl }}/docs/tensors) 
