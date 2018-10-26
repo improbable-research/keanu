@@ -2,7 +2,7 @@
 	<div class="offcanvas visible-xs">
 		<ul class="offcanvas__nav">
 			{% for item in site.doks.header.nav %}
-				<li><a href="{% unless item.external_url %}{{ site.baseurl }}/{% endunless %}{{ item.item_url }}">{{ item.external_url }}{{ item.item_name }}</a></li>
+				<li><a href="{% unless item.external_url %}{{ site.baseurl }}/{% endunless %}{{ item.item_url }}">{{ item.item_name }}</a></li>
 			{% endfor %}
 		</ul><!-- /.offcanvas__nav -->
 	</div><!-- /.offcanvas -->

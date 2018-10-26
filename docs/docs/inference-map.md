@@ -24,12 +24,12 @@ page_nav:
 
 ## Model Fitting
 
-Now that we've learnt to describe and build a model in [describing your model](/docs/describing-your-model.md), we want to put 
+Now that we've learnt to describe and build a model in [describing your model]({{ site.baseurl }}/docs/describing-your-model), we want to put 
 it to use! Keanu enables you to calculate the **most probable values** of components of your model given certain conditions
 or 'observations'. More formally, these are known as posterior estimates, and we are going to look at how we can obtain these
 through an optimization method called Maximum A Posteriori (MAP).
 
-Another technique for obtaining posterior estimates is through sampling, read more about that on [posterior-sampling](/docs/inference-posterior-sampling.md).
+Another technique for obtaining posterior estimates is through sampling, read more about that on [posterior-sampling]({{ site.baseurl }}/docs/inference-posterior-sampling).
 Sampling should be used when optimization techniques are not appropriate, e.g: you have discrete variables in your model.
 
 
@@ -56,7 +56,7 @@ your model and determine whether or not to use gradients for you. The next secti
 
 ### Optimizer
 
-Let's say you've described the [thermometer model](/docs/thermometer-example.md) and want to run MAP but you're not sure
+Let's say you've described the [thermometer model]({{ site.baseurl }}/docs/thermometer-example) and want to run MAP but you're not sure
 whether to use the Gradient or Non-Gradient Optimizer. You can use the following code to let Keanu decide which one to use.
 
 ```java

@@ -80,7 +80,7 @@ Another central concept to Bayesian networks is observations. The value of a ver
 effectively locks the value of the vertex. Observing a vertex raises a flag on the vertex that tells an
 inference algorithm to treat the vertex in a special way.
 
-Observing vertices that contain numbers is a special case and is described more in the docs on [Double vertices](/docs/vertex-summary.md).
+Observing vertices that contain numbers is a special case and is described more in the docs on [Double vertices]({{ site.baseurl }}/docs/vertex-summary).
 In the interest to keeping this simple, take for example where instead of multiplying A and B, we apply the logical AND operator to their values.
 
 ```
