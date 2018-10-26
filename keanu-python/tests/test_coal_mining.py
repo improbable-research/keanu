@@ -1,7 +1,7 @@
 import pandas as pd
 import keanu as kn
+import numpy as np
 from examples import CoalMining
-import statistics
 
 def test_coalmining():
     coal_mining = CoalMining()
@@ -12,5 +12,9 @@ def test_coalmining():
     net = kn.BayesNet(model.switchpoint.get_connected_graph())
     samples = kn.sample(net=net, sample_from=net.get_latent_vertices(), draws=50000, drop=10000, down_sample_interval=5)
 
-    switch_year = statistics.mode([sample[0] for sample in samples[model.switchpoint.get_id()]])
+    vertex_samples = samples[model.switchpoint.get_id()]
+    scalar_values = np.concatenate(vertex_samples, axis=0).flatten()
+
+    switch_year = np.argmax(np.bincount(scalar_values))
+
     assert switch_year == 1890

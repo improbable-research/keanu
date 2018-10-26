@@ -18,6 +18,6 @@ def sample(net, sample_from, algo='metropolis', draws=500, drop=0, down_sample_i
     vertices_unwrapped = context.to_java_list([vertex.unwrap() for vertex in sample_from])
 
     network_samples = algorithms[algo].withDefaultConfig().getPosteriorSamples(net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
-    vertex_samples = {vertex.get_id(): [Tensor._to_ndarray(java_tensor) for java_tensor in network_samples.get(vertex.unwrap()).asList()] for vertex in sample_from}
+    vertex_samples = {vertex.get_id(): list(map(Tensor._to_ndarray, network_samples.get(vertex.unwrap()).asList())) for vertex in sample_from}
 
     return vertex_samples
