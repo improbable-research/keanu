@@ -32,16 +32,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     @Override
     public double logProb(Map<String, ?> inputs) {
-
-        List<Vertex> updatedVertices = new ArrayList<>();
-        for (Map.Entry<String, ?> input : inputs.entrySet()) {
-            Vertex updatingVertex = vertexLookup.get(new VertexLabel(input.getKey()));
-            updatingVertex.setValue(input.getValue());
-            updatedVertices.add(updatingVertex);
-        }
-
-        VertexValuePropagation.cascadeUpdate(updatedVertices);
-
+        cascadeUpdate(inputs);
         return this.bayesianNetwork.getLogOfMasterP();
     }
 
@@ -55,6 +46,18 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
         ));
 
         return new LogProbWithSample(logProb, sample);
+    }
+
+    public void cascadeUpdate(Map<String, ?> inputs) {
+
+        List<Vertex> updatedVertices = new ArrayList<>();
+        for (Map.Entry<String, ?> input : inputs.entrySet()) {
+            Vertex updatingVertex = vertexLookup.get(new VertexLabel(input.getKey()));
+            updatingVertex.setValue(input.getValue());
+            updatedVertices.add(updatingVertex);
+        }
+
+        VertexValuePropagation.cascadeUpdate(updatedVertices);
     }
 
 }

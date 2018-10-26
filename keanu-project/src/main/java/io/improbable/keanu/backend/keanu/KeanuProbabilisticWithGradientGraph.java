@@ -30,6 +30,10 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
     @Override
     public Map<String, DoubleTensor> logProbGradients(Map<String, ?> inputs) {
 
+        if (inputs != null && !inputs.isEmpty()) {
+            cascadeUpdate(inputs);
+        }
+
         Map<VertexId, DoubleTensor> gradients = gradientCalculator.getJointLogProbGradientWrtLatents();
 
         return gradients.entrySet().stream()
