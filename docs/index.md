@@ -8,7 +8,7 @@ title:
 description: Keanu is a general-purpose probabilistic programming library. The main
              design goal is to build a Bayesian inference tool that scales to a point where
              we can model the world and therefore optimize it.
-featured-img: /doks-theme/assets/images/layout/logo.png
+featured-img: /doks-theme/assets/images/layout/logo.gif
              
 buttons:
     - icon: github
