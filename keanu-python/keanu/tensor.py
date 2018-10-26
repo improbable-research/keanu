@@ -59,3 +59,7 @@ class Tensor(JavaObjectWrapper):
         else:
             raise NotImplementedError("Generic types in a ndarray are not supported. Was given {}".format(type(scalar)))
 
+    @staticmethod
+    def _to_ndarray(java_tensor):
+        np_array = np.array(list(java_tensor.asFlatArray()))
+        return np_array.reshape(java_tensor.getShape())
