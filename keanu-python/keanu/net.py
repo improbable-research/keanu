@@ -9,10 +9,10 @@ k = context.jvm_view()
 java_import(k, "io.improbable.keanu.network.BayesianNetwork")
 
 class BayesNet(JavaObjectWrapper):
-    def __init__(self, lst):
-        vertices = context.to_java_list([vertex.unwrap() for vertex in lst])
+    def __init__(self, vertices):
+        java_vertices = context.to_java_list([vertex.unwrap() for vertex in vertices])
 
-        super(BayesNet, self).__init__(k.BayesianNetwork(vertices))
+        super(BayesNet, self).__init__(k.BayesianNetwork(java_vertices))
 
     def get_latent_or_observed_vertices(self):
         return Vertex.to_python_list(self.unwrap().getLatentOrObservedVertices())

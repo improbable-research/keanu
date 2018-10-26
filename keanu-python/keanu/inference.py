@@ -1,6 +1,5 @@
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
-from keanu.bayes_net import BayesNet
 import numpy as np
 
 context = KeanuContext()
