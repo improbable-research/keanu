@@ -139,17 +139,17 @@ class Vertex(JavaObjectWrapper, VertexOps):
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
-    def to_python_list(java_list):
+    def to_python_list(java_vertex_list):
         python_list = []
 
-        for i in range(java_list.size()):
-            python_list.append(Vertex(java_vertex=java_list.get(i)))
+        for i in range(java_vertex_list.size()):
+            python_list.append(Vertex(java_vertex=java_vertex_list.get(i)))
 
         return python_list
 
     @staticmethod
-    def to_python_set(java_set):
-        java_iterator = java_set.iterator()
+    def to_python_set(java_vertex_set):
+        java_iterator = java_vertex_set.iterator()
 
         python_set = set()
         while java_iterator.hasNext():
