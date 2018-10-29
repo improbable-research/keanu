@@ -37,10 +37,10 @@ class KeanuContext(metaclass=Singleton):
 
     def __build_classpath(self):
         keanu_path = os.path.join(PATH, "keanu-python-all.jar")
-        nd4j_path = os.environ.get(ND4J_CLASSPATH_ENVIRONMENT_VARIABLE) + "/*"
+        nd4j_path = os.environ.get(ND4J_CLASSPATH_ENVIRONMENT_VARIABLE)
         if nd4j_path is None:
             raise EnvironmentError("Please set the environment variable %s to point to the ND4J jar files" % ND4J_CLASSPATH_ENVIRONMENT_VARIABLE)
-        return ":".join([keanu_path, nd4j_path])
+        return ":".join([keanu_path, nd4j_path + "/*"])
 
     def __stderr_with_redirect_disabled_for_jupyter(self):
         try:
