@@ -3,7 +3,8 @@
 layout: default
 keywords: vertices
 comments: false
-permalink: /docs/vertex-summary/
+version: 0.0.15
+permalink: /docs/0_0_15/vertex-summary/
 
 # Hero section
 title: Vertices
@@ -17,10 +18,10 @@ micro_nav: true
 page_nav:
     prev:
         content: Previous page
-        url: '/docs/data-io/'
+        url: '/docs/0_0_15/data-io/'
     next:
         content: Next page
-        url: '/docs/tensors/'
+        url: '/docs/0_0_15/tensors/'
 ---
 
 ## Vertices
@@ -102,4 +103,4 @@ Vertices also have a `shape`, which describes the tensor shape contained within 
 [2,2] represents a 2 by 2 matrix. A vertex of shape [1,3] represents a row vector of length 3. The shape
 can have any number of dimensions and any length.
 
-Read more about tensors [here]({{ site.baseurl }}/docs/tensors) 
+Read more about tensors [here]({{ site.baseurl }}/docs/0_0_15/tensors) 
