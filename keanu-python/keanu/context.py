@@ -21,7 +21,7 @@ class KeanuContext(metaclass=Singleton):
     def __init__(self):
         stderr = self.__stderr_with_redirect_disabled_for_jupyter()
 
-        logging.debug("Initiating Py4J gateway with classpath %s" % CLASSPATH)
+        logging.getLogger("keanu").debug("Initiating Py4J gateway with classpath %s" % CLASSPATH)
 
         self._gateway = JavaGateway.launch_gateway(
             classpath=CLASSPATH,
