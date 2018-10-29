@@ -97,7 +97,7 @@ def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view):
 
 def test_construct_vertex_with_java_vertex(jvm_view):
     java_vertex = kn.Vertex(jvm_view.GaussianVertex, (0., 1.)).unwrap()
-    python_vertex = kn.Vertex(java_vertex=java_vertex)
+    python_vertex = kn.Vertex(java_vertex)
 
     assert tuple(java_vertex.getId().getValue()) == python_vertex.get_id()
 

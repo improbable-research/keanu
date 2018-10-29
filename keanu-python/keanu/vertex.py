@@ -104,11 +104,12 @@ class VertexOps:
         return kn.generated.vertex.Ceil(self)
 
 class Vertex(JavaObjectWrapper, VertexOps):
-    def __init__(self, ctor=None, *args, java_vertex=None):
-        if java_vertex is None:
-            super(Vertex, self).__init__(ctor(*(Vertex.__parse_args(*args))))
-        else:
-            super(Vertex, self).__init__(java_vertex)
+    def __init__(self, val, *args):
+        if args:
+            ctor = val
+            val = ctor(*(Vertex.__parse_args(*args)))
+
+        super(Vertex, self).__init__(val)
 
     def __hash__(self):
         return hash(self.get_id())
@@ -140,8 +141,8 @@ class Vertex(JavaObjectWrapper, VertexOps):
 
     @staticmethod
     def _to_python_list(java_vertex_list):
-        return [Vertex(java_vertex=java_vertex) for java_vertex in java_vertex_list]
+        return [Vertex(java_vertex) for java_vertex in java_vertex_list]
 
     @staticmethod
     def _to_python_set(java_vertex_set):
-        return set(Vertex(java_vertex=java_vertex) for java_vertex in java_vertex_set)
+        return set(Vertex(java_vertex) for java_vertex in java_vertex_set)
