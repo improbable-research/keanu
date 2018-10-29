@@ -1,14 +1,5 @@
 package io.improbable.keanu.e2e.rocket;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.stream.Stream;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
@@ -17,6 +8,14 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
+
+import static org.junit.Assert.assertEquals;
 
 public class RocketTest {
 

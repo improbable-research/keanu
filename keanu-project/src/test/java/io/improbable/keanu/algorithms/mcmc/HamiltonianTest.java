@@ -1,14 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import static junit.framework.TestCase.assertTrue;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -16,6 +7,13 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Rule;
+import org.junit.Test;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class HamiltonianTest {
 

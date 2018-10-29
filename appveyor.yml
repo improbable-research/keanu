@@ -5,5 +5,7 @@ environment:
   PIPENV_YES: 1
 install:
 - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+init:
+- git config --global core.autocrlf true
 build_script:
 - cmd: ./gradlew.bat clean build -i --stacktrace

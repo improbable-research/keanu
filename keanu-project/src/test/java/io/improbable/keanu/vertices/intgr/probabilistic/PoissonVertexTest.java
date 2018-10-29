@@ -1,18 +1,17 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
-import static org.junit.Assert.assertEquals;
-
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.PoissonDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
+import static org.junit.Assert.assertEquals;
 
 public class PoissonVertexTest {
     private final Logger log = LoggerFactory.getLogger(PoissonVertexTest.class);

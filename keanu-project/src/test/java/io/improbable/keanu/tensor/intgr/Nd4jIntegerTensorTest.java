@@ -1,25 +1,23 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-
-import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
-import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
-import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
-
-import java.util.Arrays;
-import java.util.stream.IntStream;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.validate.TensorValidator;
-import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class Nd4jIntegerTensorTest {
 

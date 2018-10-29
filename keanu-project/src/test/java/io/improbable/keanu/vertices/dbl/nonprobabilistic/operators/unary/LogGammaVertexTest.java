@@ -1,6 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static org.apache.commons.math3.special.Gamma.digamma;
+import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.apache.commons.math3.special.Gamma;
+import org.junit.Rule;
+import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
@@ -8,16 +14,7 @@ import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfScalar;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOn2x2MatrixVertexValues;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOnScalarVertexValue;
-
-import org.apache.commons.math3.special.Gamma;
-import org.junit.Rule;
-import org.junit.Test;
-
-import com.google.common.collect.ImmutableList;
-
-import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import static org.apache.commons.math3.special.Gamma.digamma;
 
 public class LogGammaVertexTest {
 

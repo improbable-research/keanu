@@ -26,4 +26,3 @@ public class CastBoolVertex extends BoolVertex implements NonProbabilistic<Boole
     }
 
 }
-

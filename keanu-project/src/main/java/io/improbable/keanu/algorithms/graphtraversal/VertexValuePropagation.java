@@ -1,5 +1,8 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
+
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,9 +12,6 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
-
-import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.Vertex;
 
 /**
  * This class enables efficient propagation of vertex updates.

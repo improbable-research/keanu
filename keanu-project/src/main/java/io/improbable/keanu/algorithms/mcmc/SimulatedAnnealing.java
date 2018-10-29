@@ -1,12 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -18,6 +11,13 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
 /**
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to

@@ -1,17 +1,6 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.testGradientAcrossMultipleHyperParameterValues;
-
-import java.util.Map;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableList;
-
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -22,6 +11,14 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.junit.Rule;
+import org.junit.Test;
+
+import java.util.Map;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.testGradientAcrossMultipleHyperParameterValues;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class BernoulliVertexTest {
 

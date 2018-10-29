@@ -1,28 +1,7 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
-import static io.improbable.keanu.tensor.TensorMatchers.allValues;
-import static io.improbable.keanu.tensor.TensorMatchers.hasShape;
-import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
-
-import java.util.Map;
-
-import org.junit.Test;
-import org.nd4j.linalg.exception.ND4JIllegalStateException;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.distributions.discrete.Multinomial;
@@ -36,6 +15,24 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.Conc
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import org.junit.Test;
+import org.nd4j.linalg.exception.ND4JIllegalStateException;
+
+import java.util.Map;
+
+import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
+import static io.improbable.keanu.tensor.TensorMatchers.allValues;
+import static io.improbable.keanu.tensor.TensorMatchers.hasShape;
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MultinomialVertexTest {
 
@@ -69,11 +66,11 @@ public class MultinomialVertexTest {
     public void itThrowsIfTheSampleShapeDoesntMatchTheShapeOfN() {
         IntegerTensor n = IntegerTensor.create(100, 200);
         DoubleTensor p = DoubleTensor.create(new double[]{
-            0.1, 0.25,
-            0.2, 0.25,
-            0.3, 0.25,
-            0.4, 0.25
-        },
+                0.1, 0.25,
+                0.2, 0.25,
+                0.3, 0.25,
+                0.4, 0.25
+            },
             4, 2);
         Multinomial multinomial = Multinomial.withParameters(n, p);
         multinomial.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
@@ -108,7 +105,7 @@ public class MultinomialVertexTest {
         IntegerTensor n = IntegerTensor.scalar(10);
         DoubleTensor p = DoubleTensor.create(0.2, 0.3, 0.5).transpose();
         DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
-        int[] state = new int[] {Integer.MAX_VALUE, Integer.MAX_VALUE, 12};
+        int[] state = new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE, 12};
         assertThat(state[0] + state[1] + state[2], equalTo(10));
         multinomial.logProb(IntegerTensor.create(state).transpose());
     }
@@ -127,8 +124,8 @@ public class MultinomialVertexTest {
     @Test
     public void itWorksWithTensors() {
         IntegerVertex n = ConstantVertex.of(IntegerTensor.create(new int[]{
-            1, 5, 8, 10,
-            100, 200, 500, 1000},
+                1, 5, 8, 10,
+                100, 200, 500, 1000},
             2, 4));
 
         DoubleVertex p = ConstantVertex.of(DoubleTensor.create(new double[]{
@@ -248,7 +245,7 @@ public class MultinomialVertexTest {
         for (int value : ImmutableList.of(1, 2, 9, 10)) {
             DoubleTensor binomialLogProbs = binomial.logProb(IntegerTensor.scalar(value));
             DoubleTensor multinomialLogProbs = multinomial.logProb(IntegerTensor.create(value, 10 - value).transpose()).transpose();
-            assertThat(multinomialLogProbs, allCloseTo(new Double(1e-6), binomialLogProbs));
+            assertThat(multinomialLogProbs, allCloseTo(1e-6, binomialLogProbs));
         }
     }
 

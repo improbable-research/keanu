@@ -1,9 +1,7 @@
 package io.improbable.keanu.distributions.gradient;
 
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static java.lang.Math.pow;
 import static org.apache.commons.math3.special.Gamma.*;
 
 /**

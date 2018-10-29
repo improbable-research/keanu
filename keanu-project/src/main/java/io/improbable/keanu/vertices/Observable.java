@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices;
 
-import java.util.Optional;
-
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+
+import java.util.Optional;
 
 public interface Observable<T> {
     void observe(T value);

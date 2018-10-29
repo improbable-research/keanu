@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
 public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
 

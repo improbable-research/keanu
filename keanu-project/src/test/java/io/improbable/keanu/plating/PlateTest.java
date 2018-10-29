@@ -1,13 +1,11 @@
 package io.improbable.keanu.plating;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.when;
-
-import java.util.Collection;
-
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,12 +14,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
+import java.util.Collection;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PlateTest {

@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static org.junit.Assert.assertArrayEquals;
-
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.junit.Test;
+
+import static org.junit.Assert.assertArrayEquals;
 
 public class DoubleUnaryOpLambdaTest {
 

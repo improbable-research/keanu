@@ -1,12 +1,11 @@
 package io.improbable.keanu.tensor.intgr;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
-
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class ScalarIntegerTensorTest {
 
