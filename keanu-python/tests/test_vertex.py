@@ -102,27 +102,25 @@ def test_construct_vertex_with_java_vertex(jvm_view):
     assert tuple(java_vertex.getId().getValue()) == python_vertex.get_id()
 
 
-def test_java_list_to_python_list(jvm_view):
+def test_java_list_to_generator(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
 
     java_list = kn.KeanuContext().to_java_list([gaussian.unwrap(), gaussian.unwrap()])
-    python_list = kn.Vertex._to_python_list(java_list)
+    python_list = list(kn.Vertex._to_generator(java_list))
 
     java_vertex_ids = [tuple(element.getId().getValue()) for element in java_list]
 
-    assert type(python_list) == list
     assert java_list.size() == len(python_list)
     assert all(type(element) == kn.Vertex and element.get_id() in java_vertex_ids for element in python_list)
 
 
-def test_java_set_to_python_set(jvm_view):
+def test_java_set_to_generator(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
 
     java_set = gaussian.unwrap().getConnectedGraph()
-    python_set = kn.Vertex._to_python_set(java_set)
+    python_set = set(kn.Vertex._to_generator(java_set))
 
     java_vertex_ids = [tuple(element.getId().getValue()) for element in java_set]
 
-    assert type(python_set) == set
     assert java_set.size() == len(python_set)
     assert all(type(element) == kn.Vertex and element.get_id() in java_vertex_ids for element in python_set)

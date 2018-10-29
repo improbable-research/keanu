@@ -15,19 +15,19 @@ class BayesNet(JavaObjectWrapper):
         super(BayesNet, self).__init__(k.BayesianNetwork(java_vertices))
 
     def get_latent_or_observed_vertices(self):
-        return Vertex._to_python_list(self.unwrap().getLatentOrObservedVertices())
+        return list(Vertex._to_generator(self.unwrap().getLatentOrObservedVertices()))
 
     def get_latent_vertices(self):
-        return Vertex._to_python_list(self.unwrap().getLatentVertices())
+        return list(Vertex._to_generator(self.unwrap().getLatentVertices()))
 
     def get_observed_vertices(self):
-        return Vertex._to_python_list(self.unwrap().getObservedVertices())
+        return list(Vertex._to_generator(self.unwrap().getObservedVertices()))
 
     def get_continuous_latent_vertices(self):
-        return Vertex._to_python_list(self.unwrap().getContinuousLatentVertices())
+        return list(Vertex._to_generator(self.unwrap().getContinuousLatentVertices()))
 
     def get_discrete_latent_vertices(self):
-        return Vertex._to_python_list(self.unwrap().getDiscreteLatentVertices())
+        return list(Vertex._to_generator(self.unwrap().getDiscreteLatentVertices()))
 
     def probe_for_non_zero_probability(self, attempts, random):
         self.unwrap().probeForNonZeroProbability(attempts, random.unwrap())
