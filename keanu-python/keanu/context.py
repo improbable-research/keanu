@@ -5,7 +5,7 @@ from py4j.java_gateway import JavaGateway, JavaObject, CallbackServerParameters
 import logging
 
 PATH = os.path.abspath(os.path.dirname(__file__))
-CLASSPATH = os.path.join(PATH, "keanu-python-all.jar")
+ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
 
 # python singleton implementation https://stackoverflow.com/a/6798042/741789
 class Singleton(type):
@@ -20,11 +20,12 @@ class Singleton(type):
 class KeanuContext(metaclass=Singleton):
     def __init__(self):
         stderr = self.__stderr_with_redirect_disabled_for_jupyter()
+        classpath = self.__build_classpath()
 
-        logging.getLogger("keanu").debug("Initiating Py4J gateway with classpath %s" % CLASSPATH)
+        logging.getLogger("keanu").debug("Initiating Py4J gateway with classpath %s" % classpath)
 
         self._gateway = JavaGateway.launch_gateway(
-            classpath=CLASSPATH,
+            classpath=classpath,
             die_on_exit=True,
             redirect_stdout=sys.stdout,
             redirect_stderr=stderr
@@ -33,6 +34,13 @@ class KeanuContext(metaclass=Singleton):
         self.__get_random_port_for_callback_server()
 
         self.__jvm_view = self._gateway.new_jvm_view()
+
+    def __build_classpath(self):
+        keanu_path = os.path.join(PATH, "keanu-python-all.jar")
+        nd4j_path = os.environ.get(ND4J_CLASSPATH_ENVIRONMENT_VARIABLE) + "/*"
+        if nd4j_path is None:
+            raise EnvironmentError("Please set the environment variable %s to point to the ND4J jar files" % ND4J_CLASSPATH_ENVIRONMENT_VARIABLE)
+        return ":".join([keanu_path, nd4j_path])
 
     def __stderr_with_redirect_disabled_for_jupyter(self):
         try:
