@@ -1,5 +1,5 @@
 import warnings
-from keanu.utils import _get_java_name, _get_python_name
+from keanu.case_conversion import _get_java_name, _get_python_name
 
 class JavaObjectWrapper:
     def __init__(self, val):
