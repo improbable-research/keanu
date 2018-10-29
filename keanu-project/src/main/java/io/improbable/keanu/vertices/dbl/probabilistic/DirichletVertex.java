@@ -1,12 +1,5 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.hyperparam.Diffs.C;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -14,6 +7,13 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static io.improbable.keanu.distributions.hyperparam.Diffs.C;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
 public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble {
 

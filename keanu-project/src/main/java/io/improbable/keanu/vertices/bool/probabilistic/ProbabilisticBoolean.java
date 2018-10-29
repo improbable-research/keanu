@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
+
+import java.util.Map;
+import java.util.Set;
 
 public interface ProbabilisticBoolean extends Probabilistic<BooleanTensor> {
 

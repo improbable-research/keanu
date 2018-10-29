@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
 
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertDivideInPlaceOperationEquals;
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertDivideOperationEquals;
@@ -10,10 +11,7 @@ import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertPlusInP
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertPlusOperationEquals;
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesInPlaceOperationEquals;
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesOperationEquals;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.junit.Assert.assertEquals;
 
 public class Nd4jBroadcastTensorTest {
 

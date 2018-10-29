@@ -1,16 +1,16 @@
 package io.improbable.keanu.algorithms;
 
-import static org.junit.Assert.assertTrue;
+import io.improbable.keanu.vertices.VertexId;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import io.improbable.keanu.vertices.VertexId;
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class NetworkSamplesTest {
 
@@ -46,6 +46,21 @@ public class NetworkSamplesTest {
         assertTrue(subsamples.size() == 2);
         assertTrue(subsamples.get(v1).asList().equals(Arrays.asList(1, 6)));
         assertTrue(subsamples.get(v2).asList().equals(Arrays.asList(9, 4)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesCatchInvalidDropCount() {
+        samples.drop(-1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesCatchInvalidDownSampleInterval() {
+        samples.downSample(0);
+    }
+
+    @Test
+    public void doesNothingOnDropZero() {
+        assertEquals(samples, samples.drop(0));
     }
 
     @Test

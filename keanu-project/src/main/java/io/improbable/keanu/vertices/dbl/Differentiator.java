@@ -1,6 +1,10 @@
 package io.improbable.keanu.vertices.dbl;
 
-import static java.util.Collections.singletonMap;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -13,11 +17,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import static java.util.Collections.singletonMap;
 
 public class Differentiator {
 

@@ -1,14 +1,13 @@
 package io.improbable.keanu.vertices;
 
+import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableList;
-
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 public interface Probabilistic<T> extends Observable<T> {
 

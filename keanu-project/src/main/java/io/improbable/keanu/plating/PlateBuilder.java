@@ -1,17 +1,16 @@
 package io.improbable.keanu.plating;
 
+import com.google.common.collect.ImmutableMap;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexDictionary;
+import io.improbable.keanu.vertices.VertexLabel;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import com.google.common.collect.ImmutableMap;
-
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexDictionary;
-import io.improbable.keanu.vertices.VertexLabel;
 
 /**
  * PlateBuilder allows plates to be constructed in steps

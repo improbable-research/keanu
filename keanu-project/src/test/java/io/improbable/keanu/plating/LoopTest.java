@@ -1,18 +1,6 @@
 package io.improbable.keanu.plating;
 
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
-
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.loop.Loop;
 import io.improbable.keanu.plating.loop.LoopConstructionException;
@@ -25,6 +13,17 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 
 public class LoopTest {
 
