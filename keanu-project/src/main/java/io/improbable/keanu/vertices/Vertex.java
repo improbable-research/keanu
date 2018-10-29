@@ -15,16 +15,16 @@ import java.util.Set;
 public abstract class Vertex<T> implements Observable<T> {
 
     private final VertexId id = new VertexId();
+    private final long[] initialShape;
+    private final Observable<T> observation;
+
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
-    private long[] initialShape;
-    private final Observable<T> observation;
     private VertexLabel label = null;
 
     public Vertex() {
-        this.initialShape = Tensor.SCALAR_SHAPE;
-        this.observation = Observable.observableTypeFor(this.getClass());
+        this(Tensor.SCALAR_SHAPE);
     }
 
     public Vertex(long[] initialShape) {
@@ -132,12 +132,10 @@ public abstract class Vertex<T> implements Observable<T> {
     }
 
     public long[] getShape() {
-        if (value == null) {
-            return initialShape;
-        } else if (value instanceof Tensor) {
+        if (value instanceof Tensor) {
             return ((Tensor) value).getShape();
         } else {
-            return Tensor.SCALAR_SHAPE;
+            return initialShape;
         }
     }
 

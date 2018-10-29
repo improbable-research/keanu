@@ -31,10 +31,6 @@ public class GenericTensor<T> implements Tensor<T> {
         return new GenericTensor<>(data);
     }
 
-    public static <T> GenericTensor<T> placeHolder(long[] shape) {
-        return new GenericTensor<>(shape);
-    }
-
     public GenericTensor(T[] data, long[] shape) {
         this.data = Arrays.copyOf(data, data.length);
         this.shape = Arrays.copyOf(shape, shape.length);

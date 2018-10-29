@@ -12,16 +12,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Categorical<CAT, TENSOR extends Tensor<CAT>> implements Distribution<TENSOR> {
+public class Categorical<CATEGORY, TENSOR extends Tensor<CATEGORY>> implements Distribution<TENSOR> {
 
-    private final Map<CAT, DoubleTensor> selectableValues;
-    private final List<CAT> categoryOrder;
+    private final Map<CATEGORY, DoubleTensor> selectableValues;
+    private final List<CATEGORY> categoryOrder;
 
     public static <CAT, TENSOR extends Tensor<CAT>> Categorical<CAT, TENSOR> withParameters(Map<CAT, DoubleTensor> selectableValues) {
         return new Categorical<>(selectableValues);
     }
 
-    private Categorical(Map<CAT, DoubleTensor> selectableValues) {
+    private Categorical(Map<CATEGORY, DoubleTensor> selectableValues) {
         this.selectableValues = new LinkedHashMap<>(selectableValues);
         this.categoryOrder = new ArrayList<>(this.selectableValues.keySet());
     }
@@ -33,11 +33,11 @@ public class Categorical<CAT, TENSOR extends Tensor<CAT>> implements Distributio
         DoubleTensor p = random.nextDouble(shape);
         DoubleTensor sum = DoubleTensor.zeros(shape);
 
-        CAT lastValue = categoryOrder.get(categoryOrder.size() - 1);
+        CATEGORY lastValue = categoryOrder.get(categoryOrder.size() - 1);
         TENSOR sample = Tensor.createFilled(lastValue, shape);
         BooleanTensor sampleValuesSetSoFar = BooleanTensor.falses(shape);
 
-        for (CAT category : categoryOrder) {
+        for (CATEGORY category : categoryOrder) {
             DoubleTensor probabilitiesForCategory = selectableValues.get(category);
 
             DoubleTensor normalizedProbabilities = probabilitiesForCategory.div(sumOfProbabilities);
@@ -61,7 +61,7 @@ public class Categorical<CAT, TENSOR extends Tensor<CAT>> implements Distributio
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(x.getShape());
 
         DoubleTensor logProb = DoubleTensor.zeros(x.getShape());
-        for (Map.Entry<CAT, DoubleTensor> entry : selectableValues.entrySet()) {
+        for (Map.Entry<CATEGORY, DoubleTensor> entry : selectableValues.entrySet()) {
 
             DoubleTensor xEqualToEntryKeyMask = x.elementwiseEquals(GenericTensor.createFilled(entry.getKey(), x.getShape())).toDoubleMask();
             logProb = logProb.plus(xEqualToEntryKeyMask.timesInPlace(entry.getValue().div(sumOfProbabilities).logInPlace()));

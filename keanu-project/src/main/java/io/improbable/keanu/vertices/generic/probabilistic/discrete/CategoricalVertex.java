@@ -14,7 +14,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVer
 import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,23 +25,24 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 import static java.util.stream.Collectors.toMap;
 
 
-public class CategoricalVertex<T, TENSOR extends Tensor<T>> extends Vertex<TENSOR> implements Probabilistic<TENSOR> {
+public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extends Vertex<TENSOR> implements Probabilistic<TENSOR> {
 
-    private final Map<T, DoubleVertex> selectableValues;
+    private final Map<CATEGORY, DoubleVertex> selectableValues;
 
-    public static <T, TENSOR extends Tensor<T>> CategoricalVertex<T, TENSOR> of(Map<T, Double> selectableValues) {
+    public static <CATEGORY, TENSOR extends Tensor<CATEGORY>> CategoricalVertex<CATEGORY, TENSOR> of(Map<CATEGORY, Double> selectableValues) {
         return new CategoricalVertex<>(toDoubleVertices(selectableValues));
     }
 
-    private static <T> Map<T, DoubleVertex> toDoubleVertices(Map<T, Double> selectableValues) {
-        Map<T, DoubleVertex> copy = new LinkedHashMap<>();
-        for (Map.Entry<T, Double> entry : selectableValues.entrySet()) {
-            copy.put(entry.getKey(), ConstantVertex.of(entry.getValue()));
-        }
-        return copy;
+    private static <CATEGORY> Map<CATEGORY, DoubleVertex> toDoubleVertices(Map<CATEGORY, Double> selectableValues) {
+        return selectableValues.entrySet().stream()
+            .collect(toMap(
+                Map.Entry::getKey,
+                e -> ConstantVertex.of(e.getValue())
+                )
+            );
     }
 
-    public static <T, TENSOR extends Tensor<T>> CategoricalVertex<T, TENSOR> of(DirichletVertex vertex, List<T> categories) {
+    public static <CATEGORY, TENSOR extends Tensor<CATEGORY>> CategoricalVertex<CATEGORY, TENSOR> of(DirichletVertex vertex, List<CATEGORY> categories) {
 
         final long length = TensorShape.getLength(vertex.getShape());
         if (length != categories.size()) {
@@ -51,7 +51,7 @@ public class CategoricalVertex<T, TENSOR extends Tensor<T>> extends Vertex<TENSO
 
         final int categoriesCount = categories.size();
         final IntStream categoriesIndices = IntStream.range(0, categoriesCount);
-        final Map<T, DoubleVertex> selectableValues = categoriesIndices.boxed()
+        final Map<CATEGORY, DoubleVertex> selectableValues = categoriesIndices.boxed()
             .collect(
                 toMap(
                     categories::get,
@@ -68,7 +68,7 @@ public class CategoricalVertex<T, TENSOR extends Tensor<T>> extends Vertex<TENSO
         return CategoricalVertex.of(vertex, categoriesList);
     }
 
-    public CategoricalVertex(long[] tensorShape, Map<T, DoubleVertex> selectableValues) {
+    public CategoricalVertex(long[] tensorShape, Map<CATEGORY, DoubleVertex> selectableValues) {
         super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, selectableValuesShapes(selectableValues));
 
@@ -77,24 +77,24 @@ public class CategoricalVertex<T, TENSOR extends Tensor<T>> extends Vertex<TENSO
         setParents(this.selectableValues.values());
     }
 
-    public CategoricalVertex(Map<T, DoubleVertex> selectableValues) {
+    public CategoricalVertex(Map<CATEGORY, DoubleVertex> selectableValues) {
         this(checkHasSingleNonScalarShapeOrAllScalar(selectableValuesShapes(selectableValues)), selectableValues);
     }
 
-    public Map<T, DoubleVertex> getSelectableValues() {
+    public Map<CATEGORY, DoubleVertex> getSelectableValues() {
         return selectableValues;
     }
 
     @Override
     public TENSOR sample(KeanuRandom random) {
-        Categorical<T, TENSOR> categorical =
+        Categorical<CATEGORY, TENSOR> categorical =
             Categorical.withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.sample(getShape(), random);
     }
 
     @Override
     public double logProb(TENSOR value) {
-        Categorical<T, TENSOR> categorical = Categorical.
+        Categorical<CATEGORY, TENSOR> categorical = Categorical.
             withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.logProb(value).sum();
     }
@@ -104,12 +104,17 @@ public class CategoricalVertex<T, TENSOR extends Tensor<T>> extends Vertex<TENSO
         return Collections.emptyMap();
     }
 
-    private Map<T, DoubleTensor> selectableValuesMappedToDoubleTensor() {
-        return selectableValues.entrySet().stream().collect(toMap(Map.Entry::getKey,
-            e -> e.getValue().getValue()));
+    private Map<CATEGORY, DoubleTensor> selectableValuesMappedToDoubleTensor() {
+        return selectableValues.entrySet().stream()
+            .collect(toMap(
+                Map.Entry::getKey,
+                e -> e.getValue().getValue())
+            );
     }
 
     private static long[][] selectableValuesShapes(Map<?, DoubleVertex> selectableValues) {
-        return selectableValues.values().stream().map(Vertex::getShape).toArray(long[][]::new);
+        return selectableValues.values().stream()
+            .map(Vertex::getShape)
+            .toArray(long[][]::new);
     }
 }

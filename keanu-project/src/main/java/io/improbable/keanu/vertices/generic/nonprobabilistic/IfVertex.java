@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -17,11 +16,11 @@ public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<T
                     Vertex<? extends BooleanTensor> predicate,
                     Vertex<? extends Tensor<T>> thn,
                     Vertex<? extends Tensor<T>> els) {
+        super(shape);
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
         setParents(predicate, thn, els);
-        setValue(GenericTensor.placeHolder(shape));
     }
 
     private Tensor<T> op(BooleanTensor predicate, Tensor<T> thn, Tensor<T> els) {
