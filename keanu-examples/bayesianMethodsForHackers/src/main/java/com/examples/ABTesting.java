@@ -1,7 +1,5 @@
 package com.examples;
 
-import java.util.Arrays;
-
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -11,6 +9,8 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+
+import java.util.Arrays;
 
 /**
  * Is treatment A significantly more likely to drive purchases than treatment B?

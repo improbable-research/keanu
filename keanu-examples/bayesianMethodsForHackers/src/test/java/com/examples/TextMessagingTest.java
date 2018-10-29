@@ -1,7 +1,6 @@
 package com.examples;
 
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 import org.junit.Before;
 import org.junit.Test;
 
