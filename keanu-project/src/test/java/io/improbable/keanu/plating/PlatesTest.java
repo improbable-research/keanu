@@ -1,10 +1,10 @@
 package io.improbable.keanu.plating;
 
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
-
-import org.junit.Test;
 
 public class PlatesTest {
     @Test

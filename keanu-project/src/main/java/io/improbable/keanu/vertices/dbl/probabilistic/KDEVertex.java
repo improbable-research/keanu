@@ -1,15 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.Uniform;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -17,6 +18,7 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     private DoubleTensor samples;
 
     public KDEVertex(DoubleTensor samples, double bandwidth) {
+        super(Tensor.SCALAR_SHAPE);
         if (samples.getLength() == 0) {
             throw new IllegalStateException("The provided tensor of samples is empty!");
         }

@@ -1,21 +1,19 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.HashSet;
-
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableList;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static org.junit.Assert.assertEquals;
 
 public class MatrixMultiplicationVertexTest {
 

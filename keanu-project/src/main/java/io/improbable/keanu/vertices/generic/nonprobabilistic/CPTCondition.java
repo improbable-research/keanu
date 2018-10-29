@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Value;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Value
 public class CPTCondition {

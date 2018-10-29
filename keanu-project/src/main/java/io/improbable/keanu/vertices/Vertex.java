@@ -1,40 +1,51 @@
 package io.improbable.keanu.vertices;
 
+import com.google.common.collect.ImmutableSet;
+import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
-
-import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 public abstract class Vertex<T> implements Observable<T> {
 
     private final VertexId id = new VertexId();
+    private final long[] initialShape;
+    private final Observable<T> observation;
+
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
-    private final Observable<T> observation;
     private VertexLabel label = null;
 
     public Vertex() {
+        this(Tensor.SCALAR_SHAPE);
+    }
+
+    public Vertex(long[] initialShape) {
+        this.initialShape = initialShape;
         this.observation = Observable.observableTypeFor(this.getClass());
     }
 
     /**
      * Set a label for this vertex.  This allows easy retrieval of this vertex using nothing but a label name.
+     *
      * @param label The label to apply to this vertex.  Uniqueness is only enforced on instantiation of a Bayes Net
-     * @param <V> vertex type
+     * @param <V>   vertex type
      * @return this
      */
     public <V extends Vertex<T>> V setLabel(VertexLabel label) {
         this.label = label;
         return (V) this;
+    }
+
+    public <V extends Vertex<T>> V setLabel(String label) {
+        return this.setLabel(new VertexLabel(label));
     }
 
     public VertexLabel getLabel() {
@@ -124,7 +135,7 @@ public abstract class Vertex<T> implements Observable<T> {
         if (value instanceof Tensor) {
             return ((Tensor) value).getShape();
         } else {
-            return Tensor.SCALAR_SHAPE;
+            return initialShape;
         }
     }
 

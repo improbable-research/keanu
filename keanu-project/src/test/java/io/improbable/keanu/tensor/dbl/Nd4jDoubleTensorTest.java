@@ -1,25 +1,5 @@
 package io.improbable.keanu.tensor.dbl;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
-import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
-import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
-import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
-import static junit.framework.TestCase.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorValueException;
@@ -27,6 +7,24 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
+import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class Nd4jDoubleTensorTest {
 

@@ -1,15 +1,5 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.LogNormal;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -17,6 +7,16 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -33,13 +33,12 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
      * @param sigma       the sigma of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
     public LogNormalVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 
         this.mu = mu;
         this.sigma = sigma;
         setParents(mu, sigma);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public LogNormalVertex(long[] tensorShape, DoubleVertex mu, double sigma) {

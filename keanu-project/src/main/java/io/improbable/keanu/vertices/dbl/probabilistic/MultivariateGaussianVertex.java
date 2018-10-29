@@ -1,14 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import java.util.Map;
+import java.util.Set;
 
 public class MultivariateGaussianVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -24,13 +24,12 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     public MultivariateGaussianVertex(long[] shape, DoubleVertex mu, DoubleVertex covariance) {
-
+        super(shape);
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
         this.mu = mu;
         this.covariance = covariance;
         setParents(mu, covariance);
-        setValue(DoubleTensor.placeHolder(shape));
     }
 
     /**

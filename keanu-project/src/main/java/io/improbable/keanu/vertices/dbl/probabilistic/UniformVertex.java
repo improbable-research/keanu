@@ -1,20 +1,20 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static java.util.Collections.singletonMap;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static java.util.Collections.singletonMap;
 
 public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -31,13 +31,12 @@ public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param xMax        the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
     public UniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
         setParents(xMin, xMax);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**
@@ -47,6 +46,7 @@ public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param xMin the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
      * @param xMax the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
+    @ExportVertexToPythonBindings
     public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
         this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }

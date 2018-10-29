@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices;
 
-import static org.hamcrest.Matchers.equalTo;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
+
+import static org.hamcrest.Matchers.equalTo;
 
 public class VertexLabelMatchers {
 

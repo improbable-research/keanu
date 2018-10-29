@@ -1,16 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-
-import java.util.Map;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import java.util.Map;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
@@ -37,10 +37,10 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
      * @param right a vertex
      */
     public DoubleBinaryOpVertex(long[] shape, DoubleVertex left, DoubleVertex right) {
+        super(shape);
         this.left = left;
         this.right = right;
         setParents(left, right);
-        setValue(DoubleTensor.placeHolder(shape));
     }
 
     @Override

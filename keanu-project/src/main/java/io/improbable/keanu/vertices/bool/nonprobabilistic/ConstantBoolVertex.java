@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -10,7 +11,9 @@ public class ConstantBoolVertex extends BoolVertex implements NonProbabilistic<B
     public static final BoolVertex TRUE = new ConstantBoolVertex(true);
     public static final BoolVertex FALSE = new ConstantBoolVertex(false);
 
+    @ExportVertexToPythonBindings
     public ConstantBoolVertex(BooleanTensor constant) {
+        super(constant.getShape());
         setValue(constant);
     }
 

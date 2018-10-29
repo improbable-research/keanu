@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 public abstract class IntegerBinaryOpVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
@@ -31,10 +31,10 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
      * @param b     second input vertex
      */
     public IntegerBinaryOpVertex(long[] shape, IntegerVertex a, IntegerVertex b) {
+        super(shape);
         this.a = a;
         this.b = b;
         setParents(a, b);
-        setValue(IntegerTensor.placeHolder(shape));
     }
 
     @Override

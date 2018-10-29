@@ -1,15 +1,5 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.hyperparam.Diffs.BETA;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -17,6 +7,16 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static io.improbable.keanu.distributions.hyperparam.Diffs.BETA;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -33,13 +33,24 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param beta        the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     public LaplaceVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex beta) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), beta.getShape());
 
         this.mu = mu;
         this.beta = beta;
         setParents(mu, beta);
-        setValue(DoubleTensor.placeHolder(tensorShape));
+    }
+
+    public LaplaceVertex(long[] shape, DoubleVertex mu, double beta) {
+        this(shape, mu, new ConstantDoubleVertex(beta));
+    }
+
+    public LaplaceVertex(long[] shape, double mu, DoubleVertex beta) {
+        this(shape, new ConstantDoubleVertex(mu), beta);
+    }
+
+    public LaplaceVertex(long[] shape, double mu, double beta) {
+        this(shape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta));
     }
 
     /**

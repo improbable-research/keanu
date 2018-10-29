@@ -11,7 +11,6 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
-
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
 import static org.junit.Assert.assertEquals;

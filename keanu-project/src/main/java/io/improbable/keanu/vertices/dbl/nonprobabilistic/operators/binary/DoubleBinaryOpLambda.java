@@ -1,17 +1,17 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
@@ -27,13 +27,13 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                 Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
+        super(shape);
         this.left = left;
         this.right = right;
         this.op = op;
         this.forwardModeAutoDiffLambda = forwardModeAutoDiffLambda;
         this.reverseModeAutoDiffLambda = reverseModeAutoDiffLambda;
         setParents(left, right);
-        setValue(DoubleTensor.placeHolder(shape));
     }
 
     public DoubleBinaryOpLambda(long[] shape, Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
@@ -76,5 +76,3 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
         return reverseModeAutoDiffLambda.apply(derivativeOfOutputsWithRespectToSelf);
     }
 }
-
-

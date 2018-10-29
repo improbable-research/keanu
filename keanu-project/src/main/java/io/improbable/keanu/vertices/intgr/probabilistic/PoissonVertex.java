@@ -1,12 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -18,6 +12,12 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger {
 
@@ -32,12 +32,11 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
      * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
      */
     public PoissonVertex(long[] shape, DoubleVertex mu) {
-
+        super(shape);
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
 
         this.mu = mu;
         setParents(mu);
-        setValue(IntegerTensor.placeHolder(shape));
     }
 
     public PoissonVertex(long[] shape, double mu) {

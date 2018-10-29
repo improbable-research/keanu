@@ -1,11 +1,10 @@
 package io.improbable.keanu.distributions.hyperparam;
 
 
-import java.util.Objects;
-
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.jetbrains.annotations.NotNull;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import java.util.Objects;
 
 /**
  * A Diff is identified only by its name

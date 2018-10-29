@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.ImmutableMap;
 
 public class SimpleVertexDictionary implements VertexDictionary {
 

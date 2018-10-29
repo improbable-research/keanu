@@ -1,9 +1,6 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
 import com.google.common.collect.Iterables;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -11,6 +8,8 @@ import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<IntegerVertex>, NonProbabilistic<IntegerTensor> {
 
@@ -25,7 +24,7 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
     }
 
     public IntegerProxyVertex(long[] shape, VertexLabel label) {
-        setValue(IntegerTensor.placeHolder(shape));
+        super(shape);
         setLabel(label);
     }
 

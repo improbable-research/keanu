@@ -1,16 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.Cauchy;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -18,6 +8,16 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -34,13 +34,12 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param scale       the scale of the Cauchy with either the same tensorShape as specified for this vertex or a scalar
      */
     public CauchyVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
 
         this.location = location;
         this.scale = scale;
         setParents(location, scale);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     @ExportVertexToPythonBindings

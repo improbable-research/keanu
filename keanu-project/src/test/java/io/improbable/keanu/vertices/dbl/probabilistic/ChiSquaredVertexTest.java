@@ -1,16 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
 
 public class ChiSquaredVertexTest {
 

@@ -1,16 +1,15 @@
 package io.improbable.keanu.tensor.dbl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
@@ -91,10 +90,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     static DoubleTensor scalar(double scalarValue) {
         return new ScalarDoubleTensor(scalarValue);
-    }
-
-    static DoubleTensor placeHolder(long[] shape) {
-        return new ScalarDoubleTensor(shape);
     }
 
     static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {

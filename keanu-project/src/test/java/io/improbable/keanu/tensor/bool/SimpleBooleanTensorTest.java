@@ -1,24 +1,22 @@
 package io.improbable.keanu.tensor.bool;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-
-import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
-import static junit.framework.TestCase.assertTrue;
-
-import java.util.Arrays;
-
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.generic.GenericTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import java.util.Arrays;
+
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
 
 public class SimpleBooleanTensorTest {
 
