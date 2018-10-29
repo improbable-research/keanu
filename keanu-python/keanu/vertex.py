@@ -140,19 +140,8 @@ class Vertex(JavaObjectWrapper, VertexOps):
 
     @staticmethod
     def to_python_list(java_vertex_list):
-        python_list = []
-
-        for i in range(java_vertex_list.size()):
-            python_list.append(Vertex(java_vertex=java_vertex_list.get(i)))
-
-        return python_list
+        return [Vertex(java_vertex=java_vertex) for java_vertex in java_vertex_list]
 
     @staticmethod
     def to_python_set(java_vertex_set):
-        java_iterator = java_vertex_set.iterator()
-
-        python_set = set()
-        while java_iterator.hasNext():
-            python_set.add(Vertex(java_vertex=java_iterator.next()))
-
-        return python_set
+        return set(Vertex(java_vertex=java_vertex) for java_vertex in java_vertex_set)

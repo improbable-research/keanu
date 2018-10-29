@@ -108,8 +108,11 @@ def test_java_list_to_python_list(jvm_view):
     java_list = kn.KeanuContext().to_java_list([gaussian.unwrap(), gaussian.unwrap()])
     python_list = kn.Vertex.to_python_list(java_list)
 
+    java_vertex_ids = [element.getId().toString() for element in java_list]
+
     assert type(python_list) == list
-    assert all(type(element) == kn.Vertex for element in python_list)
+    assert java_list.size() == len(python_list)
+    assert all(type(element) == kn.Vertex and element.get_id() in java_vertex_ids for element in python_list)
 
 
 def test_java_set_to_python_set(jvm_view):
@@ -118,5 +121,8 @@ def test_java_set_to_python_set(jvm_view):
     java_set = gaussian.unwrap().getConnectedGraph()
     python_set = kn.Vertex.to_python_set(java_set)
 
+    java_vertex_ids = [element.getId().toString() for element in java_set]
+
     assert type(python_set) == set
-    assert all(type(element) == kn.Vertex for element in python_set)
+    assert java_set.size() == len(python_set)
+    assert all(type(element) == kn.Vertex and element.get_id() in java_vertex_ids for element in python_set)
