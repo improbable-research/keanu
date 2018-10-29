@@ -7,12 +7,13 @@ def readme():
 setup(name='keanu',
       description='A probabilistic approach from an Improbabilistic company',
       long_description=readme(),
-      version='0.0.14.dev4',
+      version='0.0.14.dev8',
       author='Improbable Worlds',
       author_email='keanu-engineering@improbable.io',
       url='https://github.com/improbable-research/keanu',
       license='MIT',
       packages=find_packages(),
+      include_package_data=True,
       install_requires=[
           'py4j',
           'numpy'
