@@ -25,5 +25,5 @@ sass:
 # Jekyll settings
 layouts_dir: ./doks_theme/_layouts
 includes_dir: ./doks_theme/_includes
-exclude: [ 'README.md', 'CHANGELOG.md', 'docs_templates/']
+exclude: [ 'README.md', 'CHANGELOG.md', 'doc_templates/']
 permalink: /:title/
