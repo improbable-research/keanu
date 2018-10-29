@@ -36,6 +36,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     public LambdaModelVertex(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                              Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
                              Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
+        super(Tensor.SCALAR_SHAPE);
         this.inputs = inputs;
         this.outputs = Collections.emptyMap();
         this.executor = executor;

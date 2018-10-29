@@ -17,6 +17,7 @@ public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<D
 
     @ExportVertexToPythonBindings
     public CastDoubleVertex(Vertex<? extends NumberTensor> inputVertex) {
+        super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }

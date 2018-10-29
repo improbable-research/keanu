@@ -22,13 +22,12 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     private final IntegerVertex n;
 
     public BinomialVertex(long[] tensorShape, DoubleVertex p, IntegerVertex n) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, p.getShape(), n.getShape());
         this.p = p;
         this.n = n;
 
         setParents(p, n);
-        setValue(IntegerTensor.placeHolder(tensorShape));
     }
 
     public BinomialVertex(long[] tensorShape, double p, IntegerVertex n) {

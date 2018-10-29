@@ -33,13 +33,12 @@ public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble 
      * @param s           the s (scale) of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
     public LogisticVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex s) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), s.getShape());
 
         this.mu = mu;
         this.s = s;
         setParents(mu, s);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public LogisticVertex(DoubleVertex mu, DoubleVertex s) {

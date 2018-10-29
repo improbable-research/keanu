@@ -34,12 +34,12 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param scale       the scale value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
      */
     public ParetoVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
 
         this.scale = scale;
         this.location = location;
         setParents(location, scale);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public ParetoVertex(DoubleVertex location, DoubleVertex scale) {

@@ -36,13 +36,13 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
     public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
         this.edgeSharpness = edgeSharpness;
         setParents(xMin, xMax);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**

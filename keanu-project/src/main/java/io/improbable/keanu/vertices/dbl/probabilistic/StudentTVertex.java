@@ -30,10 +30,10 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble 
      * @param v           Degrees of Freedom
      */
     public StudentTVertex(long[] tensorShape, IntegerVertex v) {
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());
         this.v = v;
         setParents(v);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public StudentTVertex(long[] tensorShape, int v) {

@@ -31,13 +31,12 @@ public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param xMax        the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
     public UniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
         setParents(xMin, xMax);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**

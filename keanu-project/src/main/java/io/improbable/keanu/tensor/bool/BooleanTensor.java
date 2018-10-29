@@ -23,10 +23,6 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
         return new SimpleBooleanTensor(scalarValue);
     }
 
-    static BooleanTensor placeHolder(long[] shape) {
-        return new SimpleBooleanTensor(shape);
-    }
-
     static BooleanTensor trues(long... shape) {
         return new SimpleBooleanTensor(true, shape);
     }

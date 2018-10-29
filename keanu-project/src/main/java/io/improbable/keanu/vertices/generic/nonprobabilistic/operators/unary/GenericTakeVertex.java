@@ -6,7 +6,7 @@ import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>,Tensor<T>> {
+public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
 
     private final long[] index;
 
