@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import static java.util.Collections.singletonMap;
 
 public class SumVertex extends DoubleUnaryOpVertex {
 
+    @Getter
     private final int[] overDimensions;
 
     /**

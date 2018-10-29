@@ -1,25 +1,5 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.commons.math3.analysis.function.Sigmoid;
-import org.tensorflow.Graph;
-import org.tensorflow.Output;
-import org.tensorflow.Session;
-import org.tensorflow.Shape;
-import org.tensorflow.op.Operands;
-import org.tensorflow.op.Scope;
-
 import io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.TensorShape;
@@ -73,6 +53,25 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
+import org.apache.commons.math3.analysis.function.Sigmoid;
+import org.tensorflow.Graph;
+import org.tensorflow.Output;
+import org.tensorflow.Session;
+import org.tensorflow.Shape;
+import org.tensorflow.op.Operands;
+import org.tensorflow.op.Scope;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TensorflowGraphConverter {
 
@@ -192,10 +191,10 @@ public class TensorflowGraphConverter {
         Output<?> input = lookup.get(summationVertex.getInput());
         String name = getTensorflowOpName(vertex);
 
-        int dims = input.shape().numDimensions();
-        Output<Integer> dimRange = graphBuilder.constant(TensorShape.dimensionRange(0, dims), new long[]{dims});
+        int dims = summationVertex.getOverDimensions().length;
+        Output<Integer> overDimensions = graphBuilder.constant(summationVertex.getOverDimensions(), new long[]{dims});
 
-        return graphBuilder.binaryOp(OpType.SUM, name, input, dimRange);
+        return graphBuilder.binaryOp(OpType.SUM, name, input, overDimensions);
     }
 
     private static Output<?> createConstant(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
@@ -231,6 +230,17 @@ public class TensorflowGraphConverter {
         throw new IllegalArgumentException("Cannot create variable for " + value.getClass());
     }
 
+    private static <T> Output<T> createVariableInitializer(Output<T> variable, Output<T> assignment, GraphBuilder graphBuilder) {
+        return graphBuilder.assign(variable, assignment);
+    }
+
+    private static Output<Double> zeros(long[] variableShape, GraphBuilder graphBuilder) {
+        double[] zeros = new double[(int) TensorShape.getLength(variableShape)];
+        Arrays.fill(zeros, 0);
+
+        return graphBuilder.constant(zeros, variableShape);
+    }
+
     private static Output<?> createPlaceholder(Vertex<?> vertex, GraphBuilder graphBuilder) {
 
         Object value = vertex.getValue();
@@ -264,11 +274,12 @@ public class TensorflowGraphConverter {
 
         Graph graph = new Graph();
         Scope scope = new Scope(graph);
-        TensorflowComputableGraph computableGraph = new TensorflowComputableGraph(new Session(scope.graph()), scope);
-        GraphBuilder graphBuilder = computableGraph.getGraphBuilder();
+        GraphBuilder graphBuilder = new GraphBuilder(scope);
 
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.addAll(vertices);
+
+        List<Output<?>> variableInitializers = new ArrayList<>();
 
         Vertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
@@ -278,6 +289,18 @@ public class TensorflowGraphConverter {
                     lookup.put(visiting, createConstant(visiting, lookup, graphBuilder));
                 } else {
                     Output<?> tfVisiting = createVariable(visiting, graphBuilder);
+
+//                    if (visiting.getValue() instanceof DoubleTensor) {
+//
+//                        Output<Double> variableInitializer = createVariableInitializer(
+//                            (Output<Double>) tfVisiting,
+//                            (Output<Double>) tfVisiting,
+//                            graphBuilder
+//                        );
+//
+//                        variableInitializers.add(variableInitializer);
+//                    }
+
                     lookup.put(visiting, tfVisiting);
                 }
             } else {
@@ -291,7 +314,7 @@ public class TensorflowGraphConverter {
             }
         }
 
-        return computableGraph;
+        return new TensorflowComputableGraph(new Session(scope.graph()), scope);
     }
 
     public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
@@ -336,6 +359,7 @@ public class TensorflowGraphConverter {
                                                                       List<Vertex> latentOrObservedVertices) {
         List<String> latentVariables = new ArrayList<>();
         List<Output<Double>> logProbOps = new ArrayList<>();
+        GraphBuilder graphBuilder = new GraphBuilder(computableGraph.getScope());
 
         for (Vertex visiting : latentOrObservedVertices) {
 
@@ -345,7 +369,7 @@ public class TensorflowGraphConverter {
                 }
 
                 LogProbGraph logProbGraph = ((LogProbAsAGraphable) visiting).logProbGraph();
-                Output<Double> logProbFromVisiting = addLogProbFrom(logProbGraph, vertexLookup, computableGraph.getGraphBuilder());
+                Output<Double> logProbFromVisiting = addLogProbFrom(logProbGraph, vertexLookup, graphBuilder);
                 logProbOps.add(logProbFromVisiting);
 
             } else {
@@ -353,7 +377,7 @@ public class TensorflowGraphConverter {
             }
         }
 
-        Output<Double> logProbSumTotal = addLogProbSumTotal(logProbOps, computableGraph.getGraphBuilder());
+        Output<Double> logProbSumTotal = addLogProbSumTotal(logProbOps, graphBuilder);
 
         return new TensorflowProbabilisticGraph(computableGraph, logProbSumTotal.op().name());
     }

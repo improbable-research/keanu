@@ -5,7 +5,7 @@ import java.util.Map;
 
 public interface ProbabilisticGraph extends AutoCloseable {
 
-    boolean USE_TENSOR_FLOW = true;
+    boolean USE_TENSOR_FLOW = false;
 
     double logProb(Map<String, ?> inputs);
 

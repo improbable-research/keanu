@@ -1,11 +1,13 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import static java.util.Collections.singletonList;
-
-import static io.improbable.keanu.backend.tensorflow.TensorflowData.toBooleanTensor;
-import static io.improbable.keanu.backend.tensorflow.TensorflowData.toDoubleTensor;
-import static io.improbable.keanu.backend.tensorflow.TensorflowData.toIntegerTensor;
-import static io.improbable.keanu.backend.tensorflow.TensorflowData.toTensorFlow;
+import io.improbable.keanu.backend.ComputableGraph;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import lombok.Getter;
+import org.tensorflow.Session;
+import org.tensorflow.Tensor;
+import org.tensorflow.op.Scope;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,15 +15,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.tensorflow.Session;
-import org.tensorflow.Tensor;
-import org.tensorflow.op.Scope;
-
-import io.improbable.keanu.backend.ComputableGraph;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import lombok.Getter;
+import static io.improbable.keanu.backend.tensorflow.TensorflowData.toBooleanTensor;
+import static io.improbable.keanu.backend.tensorflow.TensorflowData.toDoubleTensor;
+import static io.improbable.keanu.backend.tensorflow.TensorflowData.toIntegerTensor;
+import static io.improbable.keanu.backend.tensorflow.TensorflowData.toTensorFlow;
+import static java.util.Collections.singletonList;
 
 public class TensorflowComputableGraph implements ComputableGraph {
 
@@ -30,19 +28,19 @@ public class TensorflowComputableGraph implements ComputableGraph {
     @Getter
     private final Scope scope;
 
-    @Getter
-    private final GraphBuilder graphBuilder;
+    private Map<String, Object> inputCache = new HashMap<>();
 
     public TensorflowComputableGraph(Session session, Scope scope) {
         this.session = session;
         this.scope = scope;
-        this.graphBuilder = new GraphBuilder(scope);
     }
 
     @Override
     public Map<String, ?> compute(Map<String, ?> inputs, Collection<String> outputs) {
 
-        Session.Runner runner = feedInputs(inputs);
+        cacheInputs(inputs);
+
+        Session.Runner runner = feedInputs(inputCache);
         List<Tensor<?>> tfResults = fetchOutputs(runner, outputs).run();
         return convertToKeanuTensors(outputs, tfResults);
     }
@@ -50,9 +48,15 @@ public class TensorflowComputableGraph implements ComputableGraph {
     @Override
     public <T> T compute(Map<String, ?> inputs, String output) {
 
-        Session.Runner runner = feedInputs(inputs);
+        cacheInputs(inputs);
+
+        Session.Runner runner = feedInputs(inputCache);
         List<Tensor<?>> tfResults = fetchOutputs(runner, singletonList(output)).run();
         return convertToKeanuTensor(tfResults.get(0));
+    }
+
+    private void cacheInputs(Map<String, ?> inputs) {
+        inputs.forEach((inputLabel, inputValue) -> inputCache.put(inputLabel, inputValue));
     }
 
     private Map<String, ?> convertToKeanuTensors(Collection<String> outputs, List<Tensor<?>> tfResults) {

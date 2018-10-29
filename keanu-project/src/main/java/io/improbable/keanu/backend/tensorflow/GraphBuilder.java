@@ -1,16 +1,7 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.ADD;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONCAT_V2;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONSTANT;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.PLACE_HOLDER;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.VARIABLE_V2;
-
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-
 import org.tensorflow.DataType;
+import org.tensorflow.Operand;
 import org.tensorflow.OperationBuilder;
 import org.tensorflow.Output;
 import org.tensorflow.Shape;
@@ -18,6 +9,16 @@ import org.tensorflow.Tensor;
 import org.tensorflow.op.Scope;
 import org.tensorflow.op.core.BroadcastTo;
 import org.tensorflow.op.core.Where3;
+
+import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.ADD;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONCAT_V2;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONSTANT;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.PLACE_HOLDER;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.VARIABLE_V2;
 
 public class GraphBuilder {
 
@@ -67,6 +68,7 @@ public class GraphBuilder {
         CONSTANT("Const"),
         PLACE_HOLDER("Placeholder"),
         VARIABLE_V2("VariableV2"),
+        ASSIGN("Assign"),
         NO_OP("NoOp");
 
         public final String tfOpName;
@@ -187,6 +189,13 @@ public class GraphBuilder {
         OperationBuilder opBuilder = scope.graph().opBuilder(VARIABLE_V2.tfOpName, name);
         opBuilder.setAttr(AttrName.SHAPE.attrName, shape);
         opBuilder.setAttr(AttrName.DTYPE.attrName, DataType.fromClass(type));
+        return opBuilder.build().output(0);
+    }
+
+    public <T> Output<T> assign(Operand<T> ref, Operand<T> value) {
+        OperationBuilder opBuilder = scope.graph().opBuilder("Assign", scope.makeOpName("Assign"));
+        opBuilder.addInput(ref.asOutput());
+        opBuilder.addInput(value.asOutput());
         return opBuilder.build().output(0);
     }
 

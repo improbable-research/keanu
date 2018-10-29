@@ -1,13 +1,5 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -15,7 +7,6 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -23,6 +14,14 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCal
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.google.common.collect.ImmutableMap.of;
+import static org.junit.Assert.assertEquals;
 
 public class TensorflowGraphConverterTest {
 
@@ -33,13 +32,13 @@ public class TensorflowGraphConverterTest {
         DoubleVertex B = new GaussianVertex(1, 1);
         B.setValue(3);
 
-        A.setLabel(new VertexLabel("A"));
-        B.setLabel(new VertexLabel("B"));
+        A.setLabel("A");
+        B.setLabel("B");
 
         DoubleVertex C = A.plus(B);
 
         String outputName = "someOutput";
-        C.setLabel(new VertexLabel(outputName));
+        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
@@ -60,13 +59,13 @@ public class TensorflowGraphConverterTest {
         DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
         B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        A.setLabel(new VertexLabel("A"));
-        B.setLabel(new VertexLabel("B"));
+        A.setLabel("A");
+        B.setLabel("B");
 
         DoubleVertex C = A.plus(B);
 
         String outputName = "someOutput";
-        C.setLabel(new VertexLabel(outputName));
+        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
@@ -80,6 +79,41 @@ public class TensorflowGraphConverterTest {
     }
 
     @Test
+    public void canMaintainStateInGraph() {
+        DoubleVertex A = new GaussianVertex(new long[]{2, 2}, 0, 1);
+        A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+
+        DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
+        B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
+
+        A.setLabel("A");
+        B.setLabel("B");
+
+        DoubleVertex C = A.plus(B);
+
+        String outputName = "someOutput";
+        C.setLabel(outputName);
+
+        ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
+
+        DoubleTensor result = graph.compute(of(
+            "A", A.getValue(),
+            "B", B.getValue()
+        ), outputName);
+
+        assertEquals(C.eval(), result);
+
+        DoubleTensor nextBValue = DoubleTensor.create(new double[]{0.1, 0.1, 0.1, 0.1}, 2, 2);
+        DoubleTensor resultAfterRun = graph.compute(of(
+            "B", nextBValue
+        ), outputName);
+
+        B.setValue(nextBValue);
+
+        assertEquals(C.eval(), resultAfterRun);
+    }
+
+    @Test
     public void canRunIntegerTensorAddition() {
         IntegerVertex A = new UniformIntVertex(new long[]{2, 2}, 0, 1);
         A.setValue(IntegerTensor.create(new int[]{1, 2, 3, 4}, 2, 2));
@@ -87,13 +121,13 @@ public class TensorflowGraphConverterTest {
         IntegerVertex B = new UniformIntVertex(new long[]{2, 2}, 1, 1);
         B.setValue(IntegerTensor.create(new int[]{5, 6, 7, 8}, 2, 2));
 
-        A.setLabel(new VertexLabel("A"));
-        B.setLabel(new VertexLabel("B"));
+        A.setLabel("A");
+        B.setLabel("B");
 
         IntegerVertex C = A.times(B).abs();
 
         String outputName = "someOutput";
-        C.setLabel(new VertexLabel(outputName));
+        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
@@ -114,13 +148,13 @@ public class TensorflowGraphConverterTest {
         BoolVertex B = new BernoulliVertex(new long[]{2, 2}, 0.75);
         B.setValue(BooleanTensor.create(new boolean[]{false, false, true, true}, 2, 2));
 
-        A.setLabel(new VertexLabel("A"));
-        B.setLabel(new VertexLabel("B"));
+        A.setLabel("A");
+        B.setLabel("B");
 
         BoolVertex C = A.and(B).not();
 
         String outputName = "someOutput";
-        C.setLabel(new VertexLabel(outputName));
+        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
@@ -141,13 +175,13 @@ public class TensorflowGraphConverterTest {
         DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
         B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        A.setLabel(new VertexLabel("A"));
-        B.setLabel(new VertexLabel("B"));
+        A.setLabel("A");
+        B.setLabel("B");
 
         DoubleVertex C = DoubleVertex.concat(0, A, B);
 
         String outputName = "someOutput";
-        C.setLabel(new VertexLabel(outputName));
+        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
@@ -168,19 +202,19 @@ public class TensorflowGraphConverterTest {
     public void canAutoDiffTensorConcat() {
         DoubleVertex A = new GaussianVertex(new long[]{2, 2}, 0, 1);
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
-        A.setLabel(new VertexLabel("A"));
+        A.setLabel("A");
 
         DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
         B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
-        B.setLabel(new VertexLabel("B"));
+        B.setLabel("B");
 
         DoubleVertex C = new GaussianVertex(new long[]{2, 2}, 1, 1);
         C.setValue(DoubleTensor.create(new double[]{-3, 2, -4, 9}, 2, 2));
-        C.setLabel(new VertexLabel("C"));
+        C.setLabel("C");
 
         DoubleVertex D = DoubleVertex.concat(0, A.times(C), B.times(C));
         DoubleVertex E = new GaussianVertex(new long[]{4, 2}, D, 1);
-        E.setLabel(new VertexLabel("E"));
+        E.setLabel("E");
         E.observe(DoubleTensor.create(new double[]{0, 0, 0, 0, 0, 0, 0, 0}, 4, 2));
 
         Map<String, DoubleTensor> inputs = new HashMap<>();
@@ -220,15 +254,15 @@ public class TensorflowGraphConverterTest {
         DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
         B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        A.setLabel(new VertexLabel("A"));
-        B.setLabel(new VertexLabel("B"));
+        A.setLabel("A");
+        B.setLabel("B");
 
         DoubleVertex C = A.plus(B);
         DoubleVertex D = C.times(B);
         DoubleVertex out = D.matrixMultiply(C);
 
         String outputName = "output";
-        out.setLabel(new VertexLabel(outputName));
+        out.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
@@ -256,8 +290,8 @@ public class TensorflowGraphConverterTest {
         A.setValue(initialA);
         B.setValue(initialB);
 
-        A.setLabel(new VertexLabel("A"));
-        B.setLabel(new VertexLabel("B"));
+        A.setLabel("A");
+        B.setLabel("B");
 
         DoubleVertex C = A.matrixMultiply(B).matrixMultiply(A).times(0.5).matrixMultiply(B);
 
