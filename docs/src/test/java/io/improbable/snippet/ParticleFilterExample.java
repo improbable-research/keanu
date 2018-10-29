@@ -1,4 +1,4 @@
-package io.improbable.docs;
+package io.improbable.snippet;
 
 import io.improbable.keanu.algorithms.particlefiltering.Particle;
 import io.improbable.keanu.algorithms.particlefiltering.ParticleFilter;

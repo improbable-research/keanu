@@ -37,13 +37,3 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
-sourceSets {
-    test {
-        java {
-            srcDirs = ['src/java']
-        }
-        kotlin {
-            srcDirs = ['src/java']
-        }
-    }
-}

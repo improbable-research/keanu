@@ -1,4 +1,4 @@
-package io.improbable.docs;
+package io.improbable.snippet;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVe
 
 import java.util.LinkedHashMap;
 
-import static io.improbable.docs.SelectVertexExample.MyType.*;
+import static io.improbable.snippet.SelectVertexExample.MyType.*;
 
 public class SelectVertexExample {
 

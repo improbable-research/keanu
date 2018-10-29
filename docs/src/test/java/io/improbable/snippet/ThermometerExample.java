@@ -1,4 +1,4 @@
-package io.improbable.docs;
+package io.improbable.snippet;
 
 //%%SNIPPET_START%% TempFull
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;

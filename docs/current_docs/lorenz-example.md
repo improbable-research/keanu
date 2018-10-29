@@ -355,7 +355,7 @@ Here is the same implementation, but done in Java.
 ```java
 public class LorenzTest {
 
-    @Test
+    @Ignore
     public void convergesOnLorenz() {
 
         double[] priorMu = new double[]{3, 3, 3};

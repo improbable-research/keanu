@@ -1,4 +1,4 @@
-package io.improbable.docs;
+package io.improbable.snippet;
 
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;

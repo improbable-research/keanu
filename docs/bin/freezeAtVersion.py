@@ -13,11 +13,11 @@ def updateFile(destination, version):
             print(line.replace("/docs", "/docs/" + version), end='')
 
 def performFreeze(version):
-    directory = "docs"
+    directory = "current_docs"
     version = version.replace(".", "_")
     for file in os.listdir(directory):
         if not os.path.isdir(file):
-            path = "docs/"
+            path = "current_docs/"
             legacy_path = "legacy_docs/"
             file_src = path + file
             dest_dir = legacy_path + version + "/"

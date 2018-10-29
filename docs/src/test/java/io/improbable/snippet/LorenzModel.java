@@ -1,4 +1,4 @@
-package io.improbable.docs;
+package io.improbable.snippet;
 
 import java.util.ArrayList;
 import java.util.List;

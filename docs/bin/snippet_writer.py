@@ -122,9 +122,9 @@ def main():
        writing out the new versions to the output location"""
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_dir", help="The Input file directory", default="src/markdown/")
-    parser.add_argument("--output_dir", help="Where to store the processed files", default="docs/")
-    parser.add_argument("--src_dir", help="Where snippet source files are located", default="src/java/io/improbable/docs/")
+    parser.add_argument("--input_dir", help="The Input file directory", default="doc_templates/")
+    parser.add_argument("--output_dir", help="Where to store the processed files", default="current_docs/")
+    parser.add_argument("--src_dir", help="Where snippet source files are located", default="src/test/java/io/improbable/snippet/")
     parser.add_argument("--debug", action='store_true', help="Turn on script debugging")
 
     args = parser.parse_args()
