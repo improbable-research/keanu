@@ -3,7 +3,7 @@
 layout: default
 keywords: linear regression example model
 comments: false
-permalink: /docs/regression
+permalink: /docs/regression/
 
 # Hero section
 title: Regression Example
