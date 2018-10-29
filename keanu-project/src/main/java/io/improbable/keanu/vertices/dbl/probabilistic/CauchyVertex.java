@@ -1,15 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Cauchy;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -17,6 +8,16 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -42,6 +43,7 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
+    @ExportVertexToPythonBindings
     public CauchyVertex(DoubleVertex location, DoubleVertex scale) {
         this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
     }

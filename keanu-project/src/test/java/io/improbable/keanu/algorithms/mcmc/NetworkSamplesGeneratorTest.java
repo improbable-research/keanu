@@ -1,10 +1,13 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.vertices.VertexId;
+import lombok.Value;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,15 +16,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
-import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.VertexId;
-import lombok.Value;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 public class NetworkSamplesGeneratorTest {
 
@@ -122,6 +121,27 @@ public class NetworkSamplesGeneratorTest {
 
         Mockito.verify(progressBar, times(10)).progress(anyString());
         Mockito.verify(progressBar).finish();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesNotAllowZeroDownSample() {
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(new AtomicInteger(0), new AtomicInteger(0));
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, ProgressBar::new);
+        unitUnderTest.downSampleInterval(0).stream();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesNotAllowNegativeDropCount() {
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(new AtomicInteger(0), new AtomicInteger(0));
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, ProgressBar::new);
+        unitUnderTest.dropCount(-10).generate(100);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesNotAllowDroppingMoreThanRequesting() {
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(new AtomicInteger(0), new AtomicInteger(0));
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, ProgressBar::new);
+        unitUnderTest.dropCount(200).generate(100);
     }
 
     @Value

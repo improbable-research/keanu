@@ -1,10 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.function.Function;
-
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -50,6 +46,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.function.Function;
 
 public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
@@ -106,6 +106,11 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     @Override
     public DoubleVertex minus(double that) {
         return minus(new ConstantDoubleVertex(that));
+    }
+
+    @Override
+    public DoubleVertex reverseMinus(double that) {
+        return new ConstantDoubleVertex(that).minus(this);
     }
 
     @Override
@@ -245,6 +250,11 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     @Override
     public DoubleVertex div(double that) {
         return divideBy(that);
+    }
+
+    @Override
+    public DoubleVertex reverseDiv(double that) {
+        return new ConstantDoubleVertex(that).div(this);
     }
 
     @Override

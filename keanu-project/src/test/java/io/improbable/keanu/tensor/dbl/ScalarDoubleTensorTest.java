@@ -1,25 +1,23 @@
 package io.improbable.keanu.tensor.dbl;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-
-import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
-import static io.improbable.keanu.tensor.TensorMatchers.tensorEqualTo;
-
-import java.util.function.Function;
-
+import io.improbable.keanu.tensor.TensorValueException;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import io.improbable.keanu.tensor.TensorValueException;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.validate.TensorValidator;
-import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+import java.util.function.Function;
+
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 
 public class ScalarDoubleTensorTest {
 
@@ -190,8 +188,8 @@ public class ScalarDoubleTensorTest {
         DoubleTensor tensor = DoubleTensor.scalar(1);
 
         assertEquals(0, tensor.argMax());
-        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.scalar(0)));
-        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.scalar(0)));
+        assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.scalar(0)));
+        assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.scalar(0)));
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -1,11 +1,18 @@
 package io.improbable.keanu.algorithms;
 
-import java.util.List;
-
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 
+import java.util.Collections;
+import java.util.List;
+
 public interface PosteriorSamplingAlgorithm {
+
+    default NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
+                                               Vertex vertexToSampleFrom,
+                                               int sampleCount) {
+        return getPosteriorSamples(bayesianNetwork, Collections.singletonList(vertexToSampleFrom), sampleCount);
+    }
 
     NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
                                        List<? extends Vertex> verticesToSampleFrom,

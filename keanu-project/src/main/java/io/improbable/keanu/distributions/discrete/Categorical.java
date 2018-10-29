@@ -1,10 +1,10 @@
 package io.improbable.keanu.distributions.discrete;
 
-import java.util.Map;
-
 import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import java.util.Map;
 
 public class Categorical<T> implements Distribution<T> {
 

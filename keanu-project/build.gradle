@@ -3,30 +3,22 @@ buildscript {
     repositories {
         mavenCentral()
     }
+
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.6'
     }
 }
 
 plugins {
     id 'io.franzbecker.gradle-lombok' version '1.14'
-    id 'java'
     id 'maven'
+    id 'jacoco'
 }
 
-apply plugin: 'java'
-apply plugin: 'jacoco'
+apply plugin: 'com.google.protobuf'
 
-group = 'io.improbable'
 archivesBaseName = "keanu"
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
 
 dependencies {
 
@@ -34,6 +26,7 @@ dependencies {
     compile 'org.nd4j:nd4j-native-platform:1.0.0-beta2'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.google.guava:guava:20.0'
+    compile 'com.google.protobuf:protobuf-java:3.6.1'
     compile group: 'com.opencsv', name: 'opencsv', version: '4.2'
     compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.10'
 
@@ -45,6 +38,13 @@ dependencies {
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'ca.umontreal.iro.simul:ssj:3.2.1'
 
+}
+
+protobuf {
+    protoc {
+        // The artifact spec for the Protobuf Compiler
+        artifact = 'com.google.protobuf:protoc:3.6.1'
+    }
 }
 
 test {
@@ -95,9 +95,9 @@ uploadArchives {
 
                 developers {
                     developer {
-                        id 'caleb'
-                        name 'Caleb Walker'
-                        email 'caleb@improbable.io'
+                        id 'keanu-engineering'
+                        name 'Keanu Improbable'
+                        email 'keanu-engineering@improbable.io'
                     }
                 }
             }

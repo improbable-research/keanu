@@ -1,9 +1,7 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
@@ -11,9 +9,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
-import static java.lang.Math.exp;
 import static org.junit.Assert.assertTrue;
 
 public class ParticleFilteringTest {
@@ -47,22 +42,18 @@ public class ParticleFilteringTest {
         int numParticles = 1000;
         int resamplingCycles = 3;
         double resamplingProportion = 0.5;
+        ParticleFilter particleFilter = ParticleFilter.ofVertexInGraph(temperature)
+                .withNumParticles(numParticles)
+                .withResamplingCycles(resamplingCycles)
+                .withResamplingProportion(resamplingProportion)
+                .build();
 
-        List<ParticleFilter.Particle> particles = ParticleFilter.getProbableValues(
-            temperature.getConnectedGraph(),
-            numParticles,
-            resamplingCycles,
-            resamplingProportion,
-            new KeanuRandom(1)
-        );
+        Particle mostProbableParticle = particleFilter.getMostProbableParticle();
 
-        particles.sort(ParticleFilter.Particle::sortDescending);
-        ParticleFilter.Particle p = particles.get(0);
+        double estimatedTemp = mostProbableParticle.getScalarValueOfVertex(temperature);
+        double probability = mostProbableParticle.logProb();
 
-        double estimatedTemp = ((DoubleTensor) p.getLatentVertices().get(temperature)).scalar();
-        double probability = exp(p.getSumLogPOfSubgraph());
-
-        log.info("Final temp estimate = " + estimatedTemp + ", probability = " + probability);
+        log.info("Final temp estimate = " + estimatedTemp + ", log probability = " + probability);
 
         assertTrue(estimatedTemp > 18.0);
         assertTrue(estimatedTemp < 22.0);

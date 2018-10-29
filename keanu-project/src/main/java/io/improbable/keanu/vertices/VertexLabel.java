@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class VertexLabel {
     private static final char NAMESPACE_SEPARATOR = '.';

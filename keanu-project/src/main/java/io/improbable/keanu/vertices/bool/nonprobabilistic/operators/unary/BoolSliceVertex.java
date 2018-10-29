@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
+
+import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
 public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
     private final int dimension;
