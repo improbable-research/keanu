@@ -106,7 +106,7 @@ def test_java_list_to_python_list(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
 
     java_list = kn.KeanuContext().to_java_list([gaussian.unwrap(), gaussian.unwrap()])
-    python_list = kn.Vertex.to_python_list(java_list)
+    python_list = kn.Vertex._to_python_list(java_list)
 
     java_vertex_ids = [element.getId().toString() for element in java_list]
 
@@ -119,7 +119,7 @@ def test_java_set_to_python_set(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
 
     java_set = gaussian.unwrap().getConnectedGraph()
-    python_set = kn.Vertex.to_python_set(java_set)
+    python_set = kn.Vertex._to_python_set(java_set)
 
     java_vertex_ids = [element.getId().toString() for element in java_set]
 

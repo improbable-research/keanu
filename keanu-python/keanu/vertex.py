@@ -118,7 +118,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
         self.unwrap().observe(Tensor(v).unwrap())
 
     def get_connected_graph(self):
-        return Vertex.to_python_set(self.unwrap().getConnectedGraph())
+        return Vertex._to_python_set(self.unwrap().getConnectedGraph())
 
     def get_id(self):
         return self.unwrap().getId().toString()
@@ -139,9 +139,9 @@ class Vertex(JavaObjectWrapper, VertexOps):
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
-    def to_python_list(java_vertex_list):
+    def _to_python_list(java_vertex_list):
         return [Vertex(java_vertex=java_vertex) for java_vertex in java_vertex_list]
 
     @staticmethod
-    def to_python_set(java_vertex_set):
+    def _to_python_set(java_vertex_set):
         return set(Vertex(java_vertex=java_vertex) for java_vertex in java_vertex_set)
