@@ -89,8 +89,8 @@ def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view):
     hyper_params_id = hyper_params.get_id()
     gaussian_id = gaussian.get_id()
 
-    assert type(hyper_params_id) == str
-    assert type(gaussian_id) == str
+    assert type(hyper_params_id) == tuple
+    assert type(gaussian_id) == tuple
 
     assert hyper_params_id < gaussian_id
 
@@ -99,7 +99,7 @@ def test_construct_vertex_with_java_vertex(jvm_view):
     java_vertex = kn.Vertex(jvm_view.GaussianVertex, (0., 1.)).unwrap()
     python_vertex = kn.Vertex(java_vertex=java_vertex)
 
-    assert java_vertex.getId().toString() == python_vertex.get_id()
+    assert tuple(java_vertex.getId().getValue()) == python_vertex.get_id()
 
 
 def test_java_list_to_python_list(jvm_view):
@@ -108,7 +108,7 @@ def test_java_list_to_python_list(jvm_view):
     java_list = kn.KeanuContext().to_java_list([gaussian.unwrap(), gaussian.unwrap()])
     python_list = kn.Vertex._to_python_list(java_list)
 
-    java_vertex_ids = [element.getId().toString() for element in java_list]
+    java_vertex_ids = [tuple(element.getId().getValue()) for element in java_list]
 
     assert type(python_list) == list
     assert java_list.size() == len(python_list)
@@ -121,7 +121,7 @@ def test_java_set_to_python_set(jvm_view):
     java_set = gaussian.unwrap().getConnectedGraph()
     python_set = kn.Vertex._to_python_set(java_set)
 
-    java_vertex_ids = [element.getId().toString() for element in java_set]
+    java_vertex_ids = [tuple(element.getId().getValue()) for element in java_set]
 
     assert type(python_set) == set
     assert java_set.size() == len(python_set)
