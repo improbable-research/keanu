@@ -16,13 +16,11 @@ public class ChallengerDisasterTest {
 
     @Test
     public void testWhenChallengerDisasterIsRunThenBetaIsSmallAndPositive() {
-        // act
         ChallengerDisaster.ChallengerPosteriors posteriors = ChallengerDisaster.run();
 
         System.out.println("mapAlpha " + posteriors.mapAlpha);
         System.out.println("mapBeta " + posteriors.mapBeta);
 
-        // assert
         assertThat(posteriors.mapBeta).isCloseTo(0.25, within(0.15));
         assertThat(posteriors.mapAlpha).isCloseTo(-15d, within(5d));
     }

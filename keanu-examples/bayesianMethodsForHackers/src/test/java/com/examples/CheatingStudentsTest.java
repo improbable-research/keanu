@@ -18,7 +18,7 @@ public class CheatingStudentsTest {
 
     @Test
     public void doesWorkWithHigherDimensionDescription() {
-        double approximateProbabilityOfCheating = CheatingStudents.runWithFlips(numberOfStudents, numberOfYesAnswers);
+        double approximateProbabilityOfCheating = CheatingStudents.runWithBernoulli(numberOfStudents, numberOfYesAnswers);
         assertEquals(0.2, approximateProbabilityOfCheating, 0.05);
     }
 

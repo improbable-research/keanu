@@ -2,6 +2,7 @@ package com.examples;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -9,15 +10,14 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 
-import java.util.Collections;
+import static java.util.Collections.singletonList;
 
 public class CheatingStudents {
 
 
-    public static double runWithFlips(int numberOfStudents, int numberOfYesAnswers) {
+    public static double runWithBernoulli(int numberOfStudents, int numberOfYesAnswers) {
 
         int numberOfSamples = 10000;
         UniformVertex probabilityOfCheating = new UniformVertex(0.0, 1.0);
@@ -41,11 +41,13 @@ public class CheatingStudents {
 
         BayesianNetwork network = new BayesianNetwork(answerTotal.getConnectedGraph());
 
-        NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            network,
-            Collections.singletonList(probabilityOfCheating),
-            numberOfSamples
-        ).drop(numberOfSamples / 10).downSample(network.getLatentVertices().size());
+        NetworkSamplesGenerator samplesGenerator = MetropolisHastings.withDefaultConfig()
+            .generatePosteriorSamples(network, singletonList(probabilityOfCheating));
+
+        NetworkSamples networkSamples = samplesGenerator
+            .dropCount(numberOfSamples / 10)
+            .downSampleInterval(network.getLatentVertices().size())
+            .generate(numberOfSamples);
 
         double approximateProbabilityOfCheating = networkSamples
             .getDoubleTensorSamples(probabilityOfCheating)
@@ -60,16 +62,17 @@ public class CheatingStudents {
 
         UniformVertex probabilityOfCheating = new UniformVertex(0.0, 1.0);
         DoubleVertex pYesAnswer = probabilityOfCheating.times(0.5).plus(0.25);
-        IntegerVertex answerTotal = new BinomialVertex(pYesAnswer, numberOfStudents);
+        BinomialVertex answerTotal = new BinomialVertex(pYesAnswer, numberOfStudents);
         answerTotal.observe(numberOfYesAnswers);
 
         BayesianNetwork network = new BayesianNetwork(answerTotal.getConnectedGraph());
 
-        NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            network,
-            Collections.singletonList(probabilityOfCheating),
-            numberOfSamples
-        ).drop(numberOfSamples / 10).downSample(network.getLatentVertices().size());
+        NetworkSamplesGenerator samplesGenerator = MetropolisHastings.withDefaultConfig()
+            .generatePosteriorSamples(network, singletonList(probabilityOfCheating));
+
+        NetworkSamples networkSamples = samplesGenerator.dropCount(numberOfSamples / 10)
+            .downSampleInterval(network.getLatentVertices().size())
+            .generate(numberOfSamples);
 
         double approximateProbabilityOfCheating = networkSamples
             .getDoubleTensorSamples(probabilityOfCheating)

@@ -28,11 +28,11 @@ public class TextMessaging {
             .load();
 
         final int numberOfDays = (int) data.numberOfMessages.getLength();
+
         // These hyperparameters differ from the alpha used in the example book
         // This is because the sampling algorithm of choice uses the prior distribution
         // as its proposal distribution. The suggested parameters were too wide, resulting
         // in bad proposals and by extension bad samples.
-        // When it is easier to decouple the prior from the proposal distribution, we should revisit this
         final double alpha = 10;
 
         ExponentialVertex earlyRate = new ExponentialVertex(alpha);
@@ -52,9 +52,10 @@ public class TextMessaging {
 
         final int numSamples = 50000;
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig()
-            .getPosteriorSamples(net, net.getLatentVertices(), numSamples)
-            .drop(numSamples / 10)
-            .downSample(net.getLatentVertices().size());
+            .generatePosteriorSamples(net, net.getLatentVertices())
+            .dropCount(numSamples / 10)
+            .downSampleInterval(net.getLatentVertices().size())
+            .generate(numSamples);
 
         return new TextMessagingResults(
             posteriorSamples.getIntegerTensorSamples(switchPoint).getScalarMode(),

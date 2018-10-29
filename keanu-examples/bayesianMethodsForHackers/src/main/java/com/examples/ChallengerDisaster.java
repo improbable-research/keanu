@@ -42,10 +42,12 @@ public class ChallengerDisaster {
         BayesianNetwork net = new BayesianNetwork(defect.getConnectedGraph());
         net.probeForNonZeroProbability(1000);
 
-        final int sampleCount = 120000;
+        final int sampleCount = 12000;
         NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig()
-            .getPosteriorSamples(net, net.getLatentVertices(), sampleCount)
-            .drop(sampleCount / 10).downSample(net.getLatentVertices().size());
+            .generatePosteriorSamples(net, net.getLatentVertices())
+            .dropCount(sampleCount / 10)
+            .downSampleInterval(net.getLatentVertices().size())
+            .generate(sampleCount);
 
         ChallengerPosteriors cp = new ChallengerPosteriors();
         cp.mapAlpha = networkSamples.getDoubleTensorSamples(alpha).getAverages().scalar();
