@@ -18,7 +18,7 @@ class JavaObjectWrapper:
 
             raise AttributeError("{} has no attribute {}".format(self.__class__, k))
 
-        java_name =_to_camel_case_name(k)
+        java_name = _to_camel_case_name(k)
         warnings.warn("\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
         return self.unwrap().__getattr__(java_name)
 
