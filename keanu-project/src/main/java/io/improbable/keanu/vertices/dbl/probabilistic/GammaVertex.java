@@ -34,13 +34,12 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param k           the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     public GammaVertex(long[] tensorShape, DoubleVertex theta, DoubleVertex k) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, theta.getShape(), k.getShape());
 
         this.theta = theta;
         this.k = k;
         setParents(theta, k);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**

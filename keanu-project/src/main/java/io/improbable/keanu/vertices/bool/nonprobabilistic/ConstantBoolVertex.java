@@ -13,6 +13,7 @@ public class ConstantBoolVertex extends BoolVertex implements NonProbabilistic<B
 
     @ExportVertexToPythonBindings
     public ConstantBoolVertex(BooleanTensor constant) {
+        super(constant.getShape());
         setValue(constant);
     }
 

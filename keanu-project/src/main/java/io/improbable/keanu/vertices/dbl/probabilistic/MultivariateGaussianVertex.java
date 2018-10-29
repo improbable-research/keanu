@@ -24,13 +24,12 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     public MultivariateGaussianVertex(long[] shape, DoubleVertex mu, DoubleVertex covariance) {
-
+        super(shape);
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
         this.mu = mu;
         this.covariance = covariance;
         setParents(mu, covariance);
-        setValue(DoubleTensor.placeHolder(shape));
     }
 
     /**

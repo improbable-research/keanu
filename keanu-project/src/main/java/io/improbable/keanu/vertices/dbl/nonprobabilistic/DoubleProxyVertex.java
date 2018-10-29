@@ -29,7 +29,7 @@ public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<Doubl
     }
 
     public DoubleProxyVertex(long[] shape, VertexLabel label) {
-        this.setValue(DoubleTensor.placeHolder(shape));
+        super(shape);
         this.setLabel(label);
     }
 

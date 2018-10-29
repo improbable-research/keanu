@@ -33,13 +33,12 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param beta        the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     public LaplaceVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex beta) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), beta.getShape());
 
         this.mu = mu;
         this.beta = beta;
         setParents(mu, beta);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public LaplaceVertex(long[] shape, DoubleVertex mu, double beta) {

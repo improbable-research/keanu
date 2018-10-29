@@ -34,13 +34,12 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     public BetaVertex(long[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 
         this.alpha = alpha;
         this.beta = beta;
         setParents(alpha, beta);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     ContinuousDistribution distribution() {

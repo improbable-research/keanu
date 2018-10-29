@@ -34,13 +34,12 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param scale       the scale of the Cauchy with either the same tensorShape as specified for this vertex or a scalar
      */
     public CauchyVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
 
         this.location = location;
         this.scale = scale;
         setParents(location, scale);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     @ExportVertexToPythonBindings

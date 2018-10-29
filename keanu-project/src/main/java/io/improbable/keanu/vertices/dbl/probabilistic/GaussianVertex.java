@@ -35,13 +35,12 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
     public GaussianVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 
         this.mu = mu;
         this.sigma = sigma;
         setParents(mu, sigma);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     @ExportVertexToPythonBindings
