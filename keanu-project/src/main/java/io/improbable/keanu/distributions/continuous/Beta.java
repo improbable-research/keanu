@@ -1,9 +1,5 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
-import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -14,6 +10,10 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.PlaceHolderDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
 public class Beta implements ContinuousDistribution {
 
@@ -77,10 +77,12 @@ public class Beta implements ContinuousDistribution {
 
         final DoubleVertex logProbOutput = alphaMinusOneTimesLnX.plus(betaMinusOneTimesOneMinusXLn).minus(betaFunction).sum();
 
-        return new LogProbGraph(logProbOutput)
-            .addInput(x, xInput)
-            .addInput(alpha, alphaInput)
-            .addInput(beta, betaInput);
+        return LogProbGraph.builder()
+            .input(x, xInput)
+            .input(alpha, alphaInput)
+            .input(beta, betaInput)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
