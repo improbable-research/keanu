@@ -7,10 +7,14 @@ from py4j.protocol import Py4JJavaError
 
 @pytest.fixture
 def model():
+    keanu_random = kn.KeanuRandom(1)
     with kn.Model() as m:
         m.a = kn.Gaussian(0., 50.)
         m.b = kn.Gaussian(0., 50.)
+        m.a.set_value(m.a.sample(keanu_random.unwrap()))
+        m.b.set_value(m.b.sample(keanu_random.unwrap()))
         m.c = m.a + m.b
+        m.c.set_value(m.c.sample(keanu_random.unwrap()))
         m.d = kn.Gaussian(m.c, 1.)
         m.d.observe(20.0)
     return m
@@ -61,6 +65,7 @@ def test_map_non_gradient(model):
 
 
 def test_max_likelihood_non_gradient(model):
+    keanu_random = kn.KeanuRandom(1)
     non_gradient_optimizer = kn.NonGradientOptimizer(model.a)
     logProb = non_gradient_optimizer.max_likelihood()
     assert logProb < 0.
