@@ -47,6 +47,14 @@ class KeanuContext(metaclass=Singleton):
     def jvm_view(self):
         return self.__jvm_view
 
+    def to_java_object_list(self, l):
+        lst = self._gateway.jvm.java.util.ArrayList()
+
+        for o in l:
+            lst.add(o.unwrap())
+
+        return lst
+
     def to_java_array(self, l, klass=None):
         if klass is None:
             klass = self.__infer_class_from_array(l)

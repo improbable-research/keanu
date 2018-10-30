@@ -79,4 +79,8 @@ public class VertexId implements Comparable<VertexId> {
     public int getIndentation() {
         return idValues.length;
     }
+
+    public long[] getValue() {
+        return Arrays.copyOf(idValues, idValues.length);
+    }
 }
