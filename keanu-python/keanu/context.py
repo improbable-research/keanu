@@ -5,7 +5,7 @@ from py4j.java_gateway import JavaGateway, JavaObject, CallbackServerParameters
 import logging
 
 PATH = os.path.abspath(os.path.dirname(__file__))
-ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
+CLASSPATH = os.path.join(PATH, "keanu-python-all.jar")
 
 # python singleton implementation https://stackoverflow.com/a/6798042/741789
 class Singleton(type):
@@ -20,12 +20,10 @@ class Singleton(type):
 class KeanuContext(metaclass=Singleton):
     def __init__(self):
         stderr = self.__stderr_with_redirect_disabled_for_jupyter()
-        classpath = os.path.join(PATH, "keanu-python-all.jar")
-
-        logging.getLogger("keanu").debug("Initiating Py4J gateway with classpath %s" % classpath)
+        logging.getLogger("keanu").debug("Initiating Py4J gateway with classpath %s" % CLASSPATH)
 
         self._gateway = JavaGateway.launch_gateway(
-            classpath=classpath,
+            classpath=CLASSPATH,
             die_on_exit=True,
             redirect_stdout=sys.stdout,
             redirect_stderr=stderr
