@@ -487,11 +487,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof IntegerTensor) {
-            IntegerTensor integerThat = (IntegerTensor) that;
+            IntegerTensor thatAsInteger = (IntegerTensor) that;
             if (that.isScalar()) {
-                return BooleanTensor.scalar(value.equals(integerThat.scalar()));
+                return BooleanTensor.scalar(value.equals(thatAsInteger.scalar()));
             } else {
-                return integerThat.elementwiseEquals(value);
+                return thatAsInteger.elementwiseEquals(value);
             }
         } else {
             return Tensor.elementwiseEquals(this, that);
