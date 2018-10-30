@@ -88,10 +88,10 @@ Here's a small example of the power of tensors, all of these operations apply to
 ```
 
 A complete list of tensor operations is available here:
-- [Double Tensor](https://static.javadoc.io/io.improbable/keanu/0.0.14/io/improbable/keanu/tensor/dbl/DoubleTensor.html)
-- [Integer Tensor](https://static.javadoc.io/io.improbable/keanu/0.0.14/io/improbable/keanu/tensor/intgr/IntegerTensor.html)
-- [Boolean Tensor](https://static.javadoc.io/io.improbable/keanu/0.0.14/io/improbable/keanu/tensor/bool/package-frame.html)
-- [Generic Tensor](https://static.javadoc.io/io.improbable/keanu/0.0.14/io/improbable/keanu/tensor/generic/package-frame.html)
+- [Double Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/dbl/DoubleTensor.html)
+- [Integer Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/intgr/IntegerTensor.html)
+- [Boolean Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/bool/package-frame.html)
+- [Generic Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/generic/package-frame.html)
 
 
 ## Creating Vertices with Tensors

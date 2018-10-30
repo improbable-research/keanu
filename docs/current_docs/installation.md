@@ -50,7 +50,7 @@ in your gradle or maven build file.
 In your project's `build.gradle`
 
 ```
-compile group: 'io.improbable', name: 'keanu', version: '0.0.15'
+compile group: 'io.improbable', name: 'keanu', version: '{{ site.current_version }}'
 ```
 
 #### Maven
@@ -61,7 +61,7 @@ In your project's `pom.xml`
 <dependency>
     <groupId>io.improbable</groupId>
     <artifactId>keanu</artifactId>
-    <version>0.0.15</version>
+    <version>{{ site.current_version }}</version>
 </dependency>
 ```
 

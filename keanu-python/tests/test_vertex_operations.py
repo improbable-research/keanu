@@ -134,6 +134,19 @@ def test_can_do_division(lhs, rhs, expected_result):
     assert (result.get_value() == expected_result).all()    
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
+    (kn.Const(np.array([15, 10])), kn.Const(np.array([2, 4])), np.array([[7], [2]])),
+    (kn.Const(np.array([15, 10])),          np.array([2, 4]) , np.array([[7], [2]])),
+    (         np.array([15, 10]) , kn.Const(np.array([2, 4])), np.array([[7], [2]])),
+    (kn.Const(np.array([15, 10])),                    2      , np.array([[7], [5]])),
+    (                   15,        kn.Const(np.array([2, 4])), np.array([[7], [3]])),
+])
+def test_can_do_integer_division(lhs, rhs, expected_result):
+    result = lhs // rhs
+    assert type(result) == kn.Vertex
+    assert (result.get_value() == expected_result).all()    
+
+
+@pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([3., 2.])), kn.Const(np.array([2., 0.5])), np.array([[9], [1.4142135623730951]])),
     (kn.Const(np.array([3., 2.])),          np.array([2., 0.5]) , np.array([[9], [1.4142135623730951]])),
     (         np.array([3., 2.]) , kn.Const(np.array([2., 0.5])), np.array([[9], [1.4142135623730951]])),
