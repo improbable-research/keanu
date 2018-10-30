@@ -47,24 +47,24 @@ A DoubleVertex can be used by most arithmetic operators. They can be used to des
 that can be solved using gradient ascent optimization and their value is a double.
 
 The currently available double vertices are
-- [Probabilistic](https://static.javadoc.io/io.improbable/keanu/0.0.15/io/improbable/keanu/vertices/dbl/probabilistic/package-summary.html)
-- [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/0.0.15/io/improbable/keanu/vertices/dbl/nonprobabilistic/package-summary.html)
+- [Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/dbl/probabilistic/package-summary.html)
+- [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/dbl/nonprobabilistic/package-summary.html)
 
 ### The Integer Family
 
 An IntegerVertex is similar to the DoubleVertex except its value is an integer.
 
 The currently available integer vertices are
-- [Probabilistic](https://static.javadoc.io/io.improbable/keanu/0.0.15/io/improbable/keanu/vertices/intgr/probabilistic/package-summary.html)
-- [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/0.0.15/io/improbable/keanu/vertices/intgr/nonprobabilistic/package-summary.html)
+- [Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/intgr/probabilistic/package-summary.html)
+- [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/intgr/nonprobabilistic/package-summary.html)
 
 ### The Boolean (true/false) Family
 
 A BoolVertex can be used by most boolean operators. These can be observed directly and used in MCMC.
 
 The currently available boolean vertices are
-- [Probabilistic](https://static.javadoc.io/io.improbable/keanu/0.0.15/io/improbable/keanu/vertices/bool/probabilistic/package-summary.html)
-- [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/0.0.15/io/improbable/keanu/vertices/bool/nonprobabilistic/package-summary.html)
+- [Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/bool/probabilistic/package-summary.html)
+- [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/bool/nonprobabilistic/package-summary.html)
 
 ### The Generic (everything else) family
 
@@ -92,8 +92,8 @@ The getSelectorForMyType() method returns a probabilistic vertex that would cont
 object of type MyType A, B, C or D, 25% of the time respectively.
 
 The currently available generic vertices are
-- [Probabilistic](https://static.javadoc.io/io.improbable/keanu/0.0.15/io/improbable/keanu/vertices/generic/probabilistic/package-summary.html)
-- [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/0.0.15/io/improbable/keanu/vertices/generic/nonprobabilistic/package-frame.html)
+- [Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/generic/probabilistic/package-summary.html)
+- [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/generic/nonprobabilistic/package-frame.html)
 
 
 ### Tensors
