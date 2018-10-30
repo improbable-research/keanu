@@ -5,7 +5,6 @@ import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexLabel;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -21,13 +20,13 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     private final BayesianNetwork bayesianNetwork;
 
     @Getter
-    private final Map<VertexLabel, Vertex> vertexLookup;
+    private final Map<String, Vertex> vertexLookup;
 
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
         this.bayesianNetwork = bayesianNetwork;
         this.vertexLookup = bayesianNetwork.getVertices().stream()
             .filter(v -> v.getLabel() != null)
-            .collect(toMap(Vertex::getLabel, v -> v));
+            .collect(toMap(Vertex::getUniqueStringReference, v -> v));
     }
 
     @Override
@@ -40,19 +39,27 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     public LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> outputs) {
 
         double logProb = logProb(inputs);
-        Map<String, ?> sample = outputs.stream().collect(Collectors.toMap(
-            output -> output,
-            output -> vertexLookup.get(new VertexLabel(output)).getValue()
-        ));
+        Map<String, Object> sample = outputs.stream()
+            .collect(toMap(
+                output -> output,
+                output -> vertexLookup.get(output).getValue()
+            ));
 
         return new LogProbWithSample(logProb, sample);
+    }
+
+    @Override
+    public List<String> getLatentVariables() {
+        return bayesianNetwork.getLatentVertices().stream()
+            .map(Vertex::getUniqueStringReference)
+            .collect(Collectors.toList());
     }
 
     public void cascadeUpdate(Map<String, ?> inputs) {
 
         List<Vertex> updatedVertices = new ArrayList<>();
         for (Map.Entry<String, ?> input : inputs.entrySet()) {
-            Vertex updatingVertex = vertexLookup.get(new VertexLabel(input.getKey()));
+            Vertex updatingVertex = vertexLookup.get(input.getKey());
             updatingVertex.setValue(input.getValue());
             updatedVertices.add(updatingVertex);
         }

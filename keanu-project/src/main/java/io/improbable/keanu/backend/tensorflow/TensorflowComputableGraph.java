@@ -52,6 +52,11 @@ public class TensorflowComputableGraph implements ComputableGraph {
     }
 
     @Override
+    public <T> T getInput(String input) {
+        return (T) inputCache.get(input);
+    }
+
+    @Override
     public <T> T compute(Map<String, ?> inputs, String output) {
 
         cacheInputs(inputs);

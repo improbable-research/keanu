@@ -197,7 +197,7 @@ public class TensorflowGraphConverter {
         return graphBuilder.binaryOp(OpType.SUM, name, input, overDimensions);
     }
 
-    private static Output<?> createConstant(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+    public static Output<?> createConstant(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
 
         Object value = vertex.getValue();
 
@@ -261,9 +261,7 @@ public class TensorflowGraphConverter {
     }
 
     private static String getTensorflowOpName(Vertex vertex) {
-
-        String name = vertex.getLabel() != null ? vertex.getLabel().toString() : vertex.getId().toString();
-        return name.replace("]", "").replace("[", "").replace(",", "_");
+        return vertex.getUniqueStringReference();
     }
 
     public static TensorflowComputableGraph convert(Set<Vertex> vertices) {
@@ -314,40 +312,24 @@ public class TensorflowGraphConverter {
 
         TensorflowComputableGraph computableGraph = convert(network.getVertices(), vertexLookup);
 
-        return addLogProbCalculation(
-            computableGraph,
+        String logProbSumTotalOpName = addLogProbCalculation(
+            computableGraph.getScope(),
             vertexLookup,
             network.getLatentOrObservedVertices()
         );
-    }
 
-    public static TensorflowProbabilisticWithGradientGraph convertWithGradient(BayesianNetwork bayesianNetwork) {
-
-        Map<Vertex<?>, Output<?>> vertexLookup = new HashMap<>();
-        TensorflowProbabilisticGraph tensorflowProbabilisticGraph = convert(bayesianNetwork, vertexLookup);
-
-        List<String> latentVariables = bayesianNetwork.getContinuousLatentVertices().stream()
-            .map(latent -> vertexLookup.get(latent).op().name())
+        List<String> latentVariables = network.getLatentVertices().stream()
+            .map(Vertex::getUniqueStringReference)
             .collect(Collectors.toList());
 
-        Map<String, String> gradientOutputNameToInputName = addGradients(
-            tensorflowProbabilisticGraph.getComputableGraph().getScope().graph(),
-            tensorflowProbabilisticGraph.getLogProbSumTotalOpName(),
-            latentVariables
-        );
-
-        return new TensorflowProbabilisticWithGradientGraph(
-            tensorflowProbabilisticGraph.getComputableGraph(),
-            tensorflowProbabilisticGraph.getLogProbSumTotalOpName(),
-            gradientOutputNameToInputName
-        );
+        return new TensorflowProbabilisticGraph(computableGraph, latentVariables, logProbSumTotalOpName);
     }
 
-    private static TensorflowProbabilisticGraph addLogProbCalculation(TensorflowComputableGraph computableGraph,
-                                                                      Map<Vertex<?>, Output<?>> vertexLookup,
-                                                                      List<Vertex> latentOrObservedVertices) {
+    private static String addLogProbCalculation(Scope scope,
+                                                Map<Vertex<?>, Output<?>> vertexLookup,
+                                                List<Vertex> latentOrObservedVertices) {
         List<Output<Double>> logProbOps = new ArrayList<>();
-        GraphBuilder graphBuilder = new GraphBuilder(computableGraph.getScope());
+        GraphBuilder graphBuilder = new GraphBuilder(scope);
 
         for (Vertex visiting : latentOrObservedVertices) {
 
@@ -363,7 +345,7 @@ public class TensorflowGraphConverter {
 
         Output<Double> logProbSumTotal = addLogProbSumTotal(logProbOps, graphBuilder);
 
-        return new TensorflowProbabilisticGraph(computableGraph, logProbSumTotal.op().name());
+        return logProbSumTotal.op().name();
     }
 
     private static Output<Double> addLogProbFrom(LogProbGraph logProbGraph, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
@@ -408,6 +390,29 @@ public class TensorflowGraphConverter {
 
         Output<Double> lastLogProbContrib = logProbOps.get(logProbOps.size() - 1);
         return graphBuilder.add(totalLogProb, lastLogProbContrib);
+    }
+
+    public static TensorflowProbabilisticWithGradientGraph convertWithGradient(BayesianNetwork bayesianNetwork) {
+
+        Map<Vertex<?>, Output<?>> vertexLookup = new HashMap<>();
+        TensorflowProbabilisticGraph tensorflowProbabilisticGraph = convert(bayesianNetwork, vertexLookup);
+
+        List<String> latentVariables = bayesianNetwork.getContinuousLatentVertices().stream()
+            .map(latent -> vertexLookup.get(latent).op().name())
+            .collect(Collectors.toList());
+
+        Map<String, String> gradientOutputNameToInputName = addGradients(
+            tensorflowProbabilisticGraph.getComputableGraph().getScope().graph(),
+            tensorflowProbabilisticGraph.getLogProbSumTotalOpName(),
+            latentVariables
+        );
+
+        return new TensorflowProbabilisticWithGradientGraph(
+            tensorflowProbabilisticGraph.getComputableGraph(),
+            latentVariables,
+            tensorflowProbabilisticGraph.getLogProbSumTotalOpName(),
+            gradientOutputNameToInputName
+        );
     }
 
     /**

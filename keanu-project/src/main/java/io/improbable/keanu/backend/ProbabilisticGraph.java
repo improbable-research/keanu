@@ -14,6 +14,8 @@ public interface ProbabilisticGraph extends AutoCloseable {
 
     LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> outputs);
 
+    List<String> getLatentVariables();
+
     @Override
     default void close() {
     }

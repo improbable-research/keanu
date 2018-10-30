@@ -3,6 +3,10 @@ package io.improbable.keanu.algorithms.mcmc;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.backend.LogProbWithSample;
+import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.backend.keanu.KeanuGraphConverter;
+import io.improbable.keanu.backend.tensorflow.TensorflowGraphConverter;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
@@ -15,9 +19,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
@@ -64,6 +70,9 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     @Builder.Default
     private double targetAcceptanceProb = DEFAULT_TARGET_ACCEPTANCE_PROB;
 
+
+    public static boolean USE_TENSORFLOW = false;
+
     /**
      * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
      *
@@ -77,17 +86,28 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                                               final List<? extends Vertex> sampleFromVertices,
                                               final int sampleCount) {
 
-        bayesNet.cascadeObservations();
+        ProbabilisticWithGradientGraph gradientGraph;
+        if (USE_TENSORFLOW) {
+            gradientGraph = TensorflowGraphConverter.convertWithGradient(bayesNet);
+        } else {
+            bayesNet.cascadeObservations();
+            gradientGraph = KeanuGraphConverter.convertWithGradient(bayesNet);
+        }
 
-        final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesNet.getLatentOrObservedVertices(), latentVertices);
-        List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(bayesNet.getLatentOrObservedVertices());
+        final List<String> latentVertices = gradientGraph.getLatentVariables();
+        final List<String> sampleFrom = sampleFromVertices.stream()
+            .map(Vertex::getUniqueStringReference)
+            .collect(Collectors.toList());
 
-        final Map<VertexId, List<?>> samples = new HashMap<>();
-        addSampleFromCache(samples, takeSample(sampleFromVertices));
+        LogProbWithSample logProbWithSample = gradientGraph.logProbWithSample(Collections.emptyMap(), sampleFrom);
 
-        Map<VertexId, DoubleTensor> position = new HashMap<>();
+        final Map<String, List<?>> samples = new HashMap<>();
+        addSampleFromCache(samples, logProbWithSample.getSample());
+
+        Map<String, DoubleTensor> position = new HashMap<>();
         cachePosition(latentVertices, position);
+
+        Map<String, DoubleTensor> gradients = gradientGraph.logProbGradients(Collections.emptyMap());
 
         Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
@@ -445,9 +465,9 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         return (forward >= 0.0) && (backward >= 0.0);
     }
 
-    private static void cachePosition(List<Vertex<DoubleTensor>> latentVertices, Map<VertexId, DoubleTensor> position) {
-        for (Vertex<DoubleTensor> vertex : latentVertices) {
-            position.put(vertex.getId(), vertex.getValue());
+    private static void cachePosition(Map<String, DoubleTensor> latentVertices, Map<String, DoubleTensor> position) {
+        for (Map.Entry<String, DoubleTensor> latent : latentVertices.entrySet()) {
+            position.put(latent.getKey(), latent.getValue());
         }
     }
 
@@ -539,13 +559,13 @@ public class NUTS implements PosteriorSamplingAlgorithm {
      * @param samples      samples taken already
      * @param cachedSample a cached sample from before leapfrog
      */
-    private static void addSampleFromCache(Map<VertexId, List<?>> samples, Map<VertexId, ?> cachedSample) {
-        for (Map.Entry<VertexId, ?> sampleEntry : cachedSample.entrySet()) {
+    private static void addSampleFromCache(Map<String, List<?>> samples, Map<String, ?> cachedSample) {
+        for (Map.Entry<String, ?> sampleEntry : cachedSample.entrySet()) {
             addSampleForVertex(sampleEntry.getKey(), sampleEntry.getValue(), samples);
         }
     }
 
-    private static <T> void addSampleForVertex(VertexId id, T value, Map<VertexId, List<?>> samples) {
+    private static <T> void addSampleForVertex(String id, T value, Map<String, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(id, v -> new ArrayList<T>());
         samplesForVertex.add(value);
     }

@@ -19,6 +19,9 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
     private final TensorflowComputableGraph computableGraph;
 
     @Getter
+    private final List<String> latentVariables;
+
+    @Getter
     private final String logProbSumTotalOpName;
 
     @Override
