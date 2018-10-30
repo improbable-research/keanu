@@ -15,4 +15,4 @@ class KeanuRandom(JavaObjectWrapper):
             super(KeanuRandom, self).__init__(k.jvm_view().KeanuRandom(seed))
 
     def set_default_random_seed(self, seed):
-    	self.unwrap().setDefaultRandomSeed(seed)
+    	k.jvm_view().KeanuRandom.setDefaultRandomSeed(seed)
