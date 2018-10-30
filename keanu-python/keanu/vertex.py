@@ -119,7 +119,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
         self.unwrap().observe(Tensor(v).unwrap())
 
     def get_connected_graph(self):
-        return set(Vertex._to_generator(self.unwrap().getConnectedGraph()))
+        return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
     def get_id(self):
         return tuple(self.unwrap().getId().getValue())

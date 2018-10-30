@@ -18,7 +18,7 @@ def net():
 ])
 def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo, net):
     draws = 5
-    sample_from = net.get_latent_vertices()
+    sample_from = list(net.get_latent_vertices())
     vertex_ids = [vertex.get_id() for vertex in sample_from]
 
     samples = kn.sample(net=net, sample_from=sample_from, algo=algo, draws=draws)

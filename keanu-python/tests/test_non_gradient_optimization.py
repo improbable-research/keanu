@@ -24,7 +24,7 @@ def test_non_gradient_op_bayes_net(model):
 
 def test_non_gradient_op_vertex(model):
     non_gradient_optimizer = kn.NonGradientOptimizer(model.a)
-    assert len(non_gradient_optimizer.net.get_latent_vertices()) == 2
+    assert len(list(non_gradient_optimizer.net.get_latent_vertices())) == 2
 
 
 def test_non_gradient_op_throws_with_invalid_net_param():

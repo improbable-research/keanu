@@ -5,8 +5,12 @@ from py4j.java_gateway import java_import
 @pytest.fixture
 def java_list_wrapper():
     class JavaListWrapper(kn.JavaObjectWrapper):
-        def __init__(self, values):
-            super(JavaListWrapper, self).__init__(kn.KeanuContext().to_java_list(values))
+        def __init__(self, numbers):
+            lst = kn.KeanuContext()._gateway.jvm.java.util.ArrayList()
+            for number in numbers:
+                lst.add(number)
+
+            super(JavaListWrapper, self).__init__(lst)
 
         def index_of(self, value):
             return 100

@@ -77,7 +77,7 @@ def test_vertex_can_observe_ndarray(jvm_view):
 
 def test_get_connected_graph(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
-    connected_graph = gaussian.get_connected_graph()
+    connected_graph = set(gaussian.get_connected_graph())
 
     assert len(connected_graph) == 3
 
@@ -105,7 +105,7 @@ def test_construct_vertex_with_java_vertex(jvm_view):
 def test_java_list_to_generator(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
 
-    java_list = kn.KeanuContext().to_java_list([gaussian.unwrap(), gaussian.unwrap()])
+    java_list = kn.KeanuContext().to_java_object_list([gaussian, gaussian])
     python_list = list(kn.Vertex._to_generator(java_list))
 
     java_vertex_ids = [tuple(element.getId().getValue()) for element in java_list]

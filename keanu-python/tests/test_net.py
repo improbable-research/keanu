@@ -3,7 +3,7 @@ import pytest
 
 def test_construct_bayes_net():
     uniform = kn.UniformInt(0, 1)
-    graph = uniform.get_connected_graph()
+    graph = set(uniform.get_connected_graph())
     vertex_ids = [vertex.get_id() for vertex in graph]
 
     assert len(vertex_ids) == 3
