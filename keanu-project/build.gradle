@@ -15,8 +15,6 @@ plugins {
     id 'jacoco'
 }
 
-apply plugin: 'com.github.johnrengelman.plugin-shadow'
-
 archivesBaseName = "keanu"
 
 dependencies {
