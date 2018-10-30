@@ -10,7 +10,7 @@ import java.util.List;
 public interface Tensor<T> {
 
     static BooleanTensor elementwiseEquals(Tensor a, Tensor b) {
-        if (!a.hasSameShapeAs(b) && (!a.isScalar() && !b.isScalar())) {
+        if (!a.hasSameShapeAs(b)) {
             throw new IllegalArgumentException(
                 String.format("Cannot compare tensors of different shapes %s and %s",
                     Arrays.toString(a.getShape()), Arrays.toString(b.getShape()))
@@ -28,18 +28,6 @@ public interface Tensor<T> {
 
         long[] shape = a.getShape();
         return BooleanTensor.create(equality, Arrays.copyOf(shape, shape.length));
-    }
-
-    static BooleanTensor elementwiseEqualsBroadcast(Tensor a, Tensor b) {
-        Object scalar;
-        Object tensor;
-        if (a.isScalar()) {
-            scalar = a.scalar();
-            tensor = b.asFlatArray();
-        } else {
-            scalar = b.scalar();
-            tensor = a.asFlatArray();
-        }
     }
 
     static <T> Tensor<T> scalar(T value) {

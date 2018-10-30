@@ -841,7 +841,7 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
-    public void comparesIntegerTensorWithScalar() {
+    public void comparesDoubleTensorWithScalar() {
         DoubleTensor value = DoubleTensor.create(1., 2., 3.);
         DoubleTensor differentValue = DoubleTensor.create(1.);
         BoolVertex result = new EqualsVertex<>(ConstantVertex.of(value), ConstantVertex.of(differentValue));
@@ -849,7 +849,7 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
-    public void comparesScalarWithIntegerTensor() {
+    public void comparesScalarWithDoubleTensor() {
         DoubleTensor value = DoubleTensor.create(1.);
         DoubleTensor differentValue = DoubleTensor.create(1., 2., 3.);
         BoolVertex result = new EqualsVertex<>(ConstantVertex.of(value), ConstantVertex.of(differentValue));
