@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.intgr;
 
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
