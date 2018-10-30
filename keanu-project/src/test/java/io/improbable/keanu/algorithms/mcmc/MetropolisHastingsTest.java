@@ -294,7 +294,7 @@ public class MetropolisHastingsTest {
 
         int sampleCount = 1000;
         int dropCount = 100;
-        int downSampleInterval = 0;
+        int downSampleInterval = 1;
         GaussianVertex A = new GaussianVertex(0, 1);
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 

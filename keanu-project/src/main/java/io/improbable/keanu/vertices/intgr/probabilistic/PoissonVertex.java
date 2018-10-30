@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -19,7 +20,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger {
+public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
     private final DoubleVertex mu;
 
@@ -32,12 +33,11 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
      * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
      */
     public PoissonVertex(long[] shape, DoubleVertex mu) {
-
+        super(shape);
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
 
         this.mu = mu;
         setParents(mu);
-        setValue(IntegerTensor.placeHolder(shape));
     }
 
     public PoissonVertex(long[] shape, double mu) {
@@ -78,7 +78,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return Poisson.withParameters(mu.getValue()).sample(getShape(), random);
+    public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Poisson.withParameters(mu.getValue()).sample(shape, random);
     }
 }

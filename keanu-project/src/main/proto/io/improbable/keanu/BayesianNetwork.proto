@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package keanu;
+
+option java_package = "io.improbable.keanu";
+option java_outer_classname = "KeanuSavedBayesNet";
+
+message BayesianNetwork {
+    repeated Vertex vertices = 1;
+    repeated VertexValue defaultState = 2;
+}
+
+message Vertex {
+    repeated int64 id = 1;
+    string label = 2;
+    string vertexType = 3;
+    repeated NamedParent parents = 5;
+}
+
+message VertexValue {
+    oneof valueType {
+        double doubleVal = 1;
+        int32 intVal = 2;
+        bool boolVal = 3;
+        string stringVal = 4;
+        bytes genericVal = 5;
+    }
+
+    string vertexLabel = 6;
+    repeated int64 id = 7;
+}
+
+message NamedParent {
+    string name = 1;
+    int64 parentID = 2;
+}
