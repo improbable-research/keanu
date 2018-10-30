@@ -807,6 +807,20 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public BooleanTensor elementwiseEquals(Tensor that) {
+        if (that instanceof DoubleTensor) {
+            DoubleTensor doubleThat = (DoubleTensor) that;
+            if (that.isScalar()) {
+                return BooleanTensor.scalar(value.equals(doubleThat.scalar()));
+            } else {
+                return doubleThat.elementwiseEquals(value);
+            }
+        } else {
+            return Tensor.elementwiseEquals(this, that);
+        }
+    }
+
+    @Override
     public BooleanTensor elementwiseEquals(Double value) {
         return BooleanTensor.create(this.scalar().equals(value));
     }

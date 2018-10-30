@@ -7,6 +7,10 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -834,5 +838,21 @@ public class Nd4jDoubleTensorTest {
         TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(x -> x > 0., TensorValidationPolicy.changeValueTo(1e-8));
         containsZero = validator.validate(containsZero);
         assertThat(containsZero, equalTo(expectedResult));
+    }
+
+    @Test
+    public void comparesIntegerTensorWithScalar() {
+        DoubleTensor value = DoubleTensor.create(1., 2., 3.);
+        DoubleTensor differentValue = DoubleTensor.create(1.);
+        BoolVertex result = new EqualsVertex<>(ConstantVertex.of(value), ConstantVertex.of(differentValue));
+        assertThat(result.getValue(), hasValue(true, false, false));
+    }
+
+    @Test
+    public void comparesScalarWithIntegerTensor() {
+        DoubleTensor value = DoubleTensor.create(1.);
+        DoubleTensor differentValue = DoubleTensor.create(1., 2., 3.);
+        BoolVertex result = new EqualsVertex<>(ConstantVertex.of(value), ConstantVertex.of(differentValue));
+        assertThat(result.getValue(), hasValue(true, false, false));
     }
 }
