@@ -18,6 +18,6 @@ def sample(net, sample_from, algo='metropolis', draws=500, drop=0, down_sample_i
     vertices_unwrapped = k.to_java_object_list(sample_from)
 
     network_samples = algorithms[algo].withDefaultConfig().getPosteriorSamples(net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
-    vertex_samples = {Vertex._to_python_id(vertex_unwrapped.getId()): list(map(Tensor._to_ndarray, network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped}
+    vertex_samples = {Vertex._get_python_id(vertex_unwrapped): list(map(Tensor._to_ndarray, network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped}
 
     return vertex_samples
