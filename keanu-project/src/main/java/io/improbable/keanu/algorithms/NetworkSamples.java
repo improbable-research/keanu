@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -62,6 +63,10 @@ public class NetworkSamples {
     }
 
     public NetworkSamples drop(int dropCount) {
+        Preconditions.checkArgument(dropCount >= 0, "Cannot drop %s samples. Drop count must be positive.", dropCount);
+        if (dropCount == 0) {
+            return this;
+        }
 
         final Map<VertexId, List<?>> withSamplesDropped = samplesByVertex.entrySet().parallelStream()
             .collect(toMap(
@@ -74,6 +79,7 @@ public class NetworkSamples {
     }
 
     public NetworkSamples downSample(final int downSampleInterval) {
+        Preconditions.checkArgument(downSampleInterval > 0, "Down sample interval of %s is invalid. Sample interval must be positive.", downSampleInterval);
 
         final Map<VertexId, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
             .collect(toMap(

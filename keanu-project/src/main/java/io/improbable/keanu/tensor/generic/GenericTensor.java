@@ -19,8 +19,12 @@ public class GenericTensor<T> implements Tensor<T> {
     private long[] shape;
     private long[] stride;
 
-    public static <T> GenericTensor<T> create(T data, long[] shape) {
+    public static <T> GenericTensor<T> createFilled(T data, long[] shape) {
         return new GenericTensor<>(shape, data);
+    }
+
+    public static <T> GenericTensor<T> create(T[] data, long[] shape) {
+        return new GenericTensor<>(data, shape);
     }
 
     public static <T> GenericTensor<T> scalar(T data) {
@@ -41,15 +45,6 @@ public class GenericTensor<T> implements Tensor<T> {
         this.data = (T[]) (new Object[]{scalar});
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
-    }
-
-    /**
-     * @param shape placeholder shape
-     */
-    public GenericTensor(long[] shape) {
-        this.data = null;
-        this.shape = Arrays.copyOf(shape, shape.length);
-        this.stride = TensorShape.getRowFirstStride(shape);
     }
 
     public GenericTensor(long[] shape, T value) {

@@ -23,11 +23,11 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
                           Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
+        super(shape);
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
         setParents(predicate, thn, els);
-        setValue(DoubleTensor.placeHolder(shape));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     }
 
     private DoubleTensor op(BooleanTensor predicate, DoubleTensor thn, DoubleTensor els) {
-        return predicate.setDoubleIf(thn, els);
+        return predicate.doubleWhere(thn, els);
     }
 
     @Override

@@ -250,7 +250,7 @@ public class MultinomialVertexTest {
         }
     }
 
-    enum Colours {
+    enum Color {
         RED, GREEN, BLUE
     }
 
@@ -260,17 +260,17 @@ public class MultinomialVertexTest {
         DoubleTensor p = DoubleTensor.create(0.2, .3, 0.5).transpose();
         DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
 
-        Map<Colours, DoubleVertex> selectableValues = ImmutableMap.of(
-            Colours.RED, ConstantVertex.of(p.getValue(0)),
-            Colours.GREEN, ConstantVertex.of(p.getValue(1)),
-            Colours.BLUE, ConstantVertex.of(p.getValue(2)));
-        CategoricalVertex<Colours> categoricalVertex = new CategoricalVertex<>(selectableValues);
+        Map<Color, DoubleVertex> selectableValues = ImmutableMap.of(
+            Color.RED, ConstantVertex.of(p.getValue(0)),
+            Color.GREEN, ConstantVertex.of(p.getValue(1)),
+            Color.BLUE, ConstantVertex.of(p.getValue(2)));
+        CategoricalVertex<Color, GenericTensor<Color>> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
-        double pRed = categoricalVertex.logProb(GenericTensor.scalar(Colours.RED));
+        double pRed = categoricalVertex.logProb(GenericTensor.scalar(Color.RED));
         assertThat(multinomial.logProb(IntegerTensor.create(1, 0, 0).transpose()).scalar(), closeTo(pRed, 1e-7));
-        double pGreen = categoricalVertex.logProb(GenericTensor.scalar(Colours.GREEN));
+        double pGreen = categoricalVertex.logProb(GenericTensor.scalar(Color.GREEN));
         assertThat(multinomial.logProb(IntegerTensor.create(0, 1, 0).transpose()).scalar(), closeTo(pGreen, 1e-7));
-        double pBlue = categoricalVertex.logProb(GenericTensor.scalar(Colours.BLUE));
+        double pBlue = categoricalVertex.logProb(GenericTensor.scalar(Color.BLUE));
         assertThat(multinomial.logProb(IntegerTensor.create(0, 0, 1).transpose()).scalar(), closeTo(pBlue, 1e-7));
     }
 
