@@ -25,7 +25,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
         this.bayesianNetwork = bayesianNetwork;
-        this.vertexLookup = bayesianNetwork.getLatentVertices().stream()
+        this.vertexLookup = bayesianNetwork.getVertices().stream()
             .filter(v -> v.getLabel() != null)
             .collect(toMap(Vertex::getLabel, v -> v));
     }

@@ -13,15 +13,16 @@ import static junit.framework.TestCase.assertEquals;
 
 public class KeanuProbabilisticWithGradientGraphTest {
 
-    UniformVertex A;
-    UniformVertex B;
+    private UniformVertex A;
+    private UniformVertex B;
+
+    private static final String A_LABEL = "A";
+    private static final String B_LABEL = "B";
 
     @Before
     public void setup() {
-        A = new UniformVertex(0.0, 1.0);
-        A.setLabel("A");
-        B = new UniformVertex(0.0, 1.0);
-        B.setLabel("B");
+        A = new UniformVertex(0.0, 1.0).setLabel(A_LABEL);
+        B = new UniformVertex(0.0, 1.0).setLabel(B_LABEL);
     }
 
     @Test
@@ -37,8 +38,8 @@ public class KeanuProbabilisticWithGradientGraphTest {
 
         Map<String, DoubleTensor> gradients = graph.logProbGradients(null);
 
-        DoubleTensor dLogProbWrtA = gradients.get("A");
-        DoubleTensor dLogProbWrtB = gradients.get("B");
+        DoubleTensor dLogProbWrtA = gradients.get(A_LABEL);
+        DoubleTensor dLogProbWrtB = gradients.get(B_LABEL);
 
         //logProb = log(A*B)
         //dLogProb w.r.t A = B * 1/(A*B) = 1/A
