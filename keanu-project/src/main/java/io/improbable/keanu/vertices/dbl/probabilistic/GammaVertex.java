@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -19,7 +20,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
+public class GammaVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex theta;
     private final DoubleVertex k;
@@ -34,13 +35,12 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param k           the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     public GammaVertex(long[] tensorShape, DoubleVertex theta, DoubleVertex k) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, theta.getShape(), k.getShape());
 
         this.theta = theta;
         this.k = k;
         setParents(theta, k);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**
@@ -97,8 +97,8 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Gamma.withParameters(theta.getValue(), k.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Gamma.withParameters(theta.getValue(), k.getValue()).sample(shape, random);
     }
 
 }

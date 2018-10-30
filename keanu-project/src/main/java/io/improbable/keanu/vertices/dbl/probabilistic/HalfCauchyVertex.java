@@ -42,8 +42,8 @@ public class HalfCauchyVertex extends CauchyVertex {
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return super.sample(random).absInPlace();
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return super.sampleWithShape(shape, random).absInPlace();
     }
 
 }

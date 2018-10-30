@@ -34,10 +34,6 @@ public interface Tensor<T> {
         return new GenericTensor<>(value);
     }
 
-    static <T> Tensor<T> placeHolder(long[] shape) {
-        return new GenericTensor<>(shape);
-    }
-
     long[] SCALAR_SHAPE = new long[]{1, 1};
     long[] SCALAR_STRIDE = new long[]{1};
 

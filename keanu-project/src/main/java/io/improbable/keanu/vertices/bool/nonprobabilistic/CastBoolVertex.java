@@ -11,6 +11,7 @@ public class CastBoolVertex extends BoolVertex implements NonProbabilistic<Boole
     private final Vertex<? extends BooleanTensor> inputVertex;
 
     public CastBoolVertex(Vertex<? extends BooleanTensor> inputVertex) {
+        super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }

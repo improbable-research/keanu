@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -10,7 +11,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import java.util.Map;
 import java.util.Set;
 
-public class MultivariateGaussianVertex extends DoubleVertex implements ProbabilisticDouble {
+public class MultivariateGaussianVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;
@@ -24,13 +25,12 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     public MultivariateGaussianVertex(long[] shape, DoubleVertex mu, DoubleVertex covariance) {
-
+        super(shape);
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
         this.mu = mu;
         this.covariance = covariance;
         setParents(mu, covariance);
-        setValue(DoubleTensor.placeHolder(shape));
     }
 
     /**
@@ -74,8 +74,8 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return MultivariateGaussian.withParameters(mu.getValue(), covariance.getValue()).sample(mu.getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return MultivariateGaussian.withParameters(mu.getValue(), covariance.getValue()).sample(shape, random);
     }
 
     private static long[] checkValidMultivariateShape(long[] muShape, long[] covarianceShape) {

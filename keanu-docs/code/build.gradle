@@ -1,9 +1,0 @@
-dependencies {
-    compile project(":keanu-project")
-
-    //testing:
-    // these use the "compile" configuration rather than "testCompile"
-    // so that we can include assertions in the doc code, which are in src/main/java
-    compile 'junit:junit:4.12'
-    compile 'org.hamcrest:hamcrest-library:1.3'
-}
