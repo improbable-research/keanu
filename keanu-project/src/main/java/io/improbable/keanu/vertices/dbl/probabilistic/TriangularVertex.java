@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -13,7 +14,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class TriangularVertex extends DoubleVertex implements ProbabilisticDouble {
+public class TriangularVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
@@ -114,7 +115,7 @@ public class TriangularVertex extends DoubleVertex implements ProbabilisticDoubl
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Triangular.withParameters(xMin.getValue(), xMax.getValue(), c.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Triangular.withParameters(xMin.getValue(), xMax.getValue(), c.getValue()).sample(shape, random);
     }
 }

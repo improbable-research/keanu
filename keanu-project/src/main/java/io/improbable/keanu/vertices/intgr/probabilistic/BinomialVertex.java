@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -16,7 +17,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class BinomialVertex extends IntegerVertex implements ProbabilisticInteger {
+public class BinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
@@ -69,7 +70,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return Binomial.withParameters(p.getValue(), n.getValue()).sample(getShape(), random);
+    public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Binomial.withParameters(p.getValue(), n.getValue()).sample(shape, random);
     }
 }

@@ -60,6 +60,18 @@ public class TensorShapeValidation {
         }
     }
 
+    public static void checkTensorsAreScalar(long[]... shapes) {
+        checkTensorsAreScalar("Expected shapes to be scalar");
+    }
+
+    public static void checkTensorsAreScalar(String message, long[]... shapes) {
+        Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
+
+        if (!nonScalarShapes.isEmpty()) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
     /**
      * This ensures there is at most a single non-scalar shape.
      *

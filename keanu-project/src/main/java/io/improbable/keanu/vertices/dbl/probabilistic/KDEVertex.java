@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Samplable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
+public class KDEVertex extends DoubleVertex implements ProbabilisticDouble, Samplable<DoubleTensor> {
 
     private final double bandwidth;
     private DoubleTensor samples;
@@ -116,4 +117,5 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     public long[] getSampleShape() {
         return samples.getShape();
     }
+
 }

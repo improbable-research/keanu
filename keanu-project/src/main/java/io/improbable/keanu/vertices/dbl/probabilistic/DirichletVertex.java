@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -15,7 +16,7 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.C;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
-public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble {
+public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex concentration;
 
@@ -87,7 +88,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Dirichlet.withParameters(concentration.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Dirichlet.withParameters(concentration.getValue()).sample(shape, random);
     }
 }

@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -16,7 +17,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean {
+public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor> {
 
     private final Vertex<DoubleTensor> probTrue;
 
@@ -78,7 +79,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return Bernoulli.withParameters(probTrue.getValue()).sample(this.getShape(), random);
+    public BooleanTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Bernoulli.withParameters(probTrue.getValue()).sample(shape, random);
     }
 }
