@@ -279,7 +279,7 @@ public class TensorflowGraphConverter {
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.addAll(vertices);
 
-        List<Output<?>> variableInitializers = new ArrayList<>();
+        Map<String, Object> latentVariables = new HashMap<>();
 
         Vertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
@@ -289,32 +289,21 @@ public class TensorflowGraphConverter {
                     lookup.put(visiting, createConstant(visiting, lookup, graphBuilder));
                 } else {
                     Output<?> tfVisiting = createVariable(visiting, graphBuilder);
-
-//                    if (visiting.getValue() instanceof DoubleTensor) {
-//
-//                        Output<Double> variableInitializer = createVariableInitializer(
-//                            (Output<Double>) tfVisiting,
-//                            (Output<Double>) tfVisiting,
-//                            graphBuilder
-//                        );
-//
-//                        variableInitializers.add(variableInitializer);
-//                    }
-
+                    latentVariables.put(tfVisiting.op().name(), visiting.getValue());
                     lookup.put(visiting, tfVisiting);
                 }
             } else {
                 OpMapper vertexMapper = opMappers.get(visiting.getClass());
 
                 if (vertexMapper == null) {
-                    throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported");
+                    throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported for Tensorflow conversion");
                 }
 
                 lookup.put(visiting, vertexMapper.apply(visiting, lookup, graphBuilder));
             }
         }
 
-        return new TensorflowComputableGraph(new Session(scope.graph()), scope);
+        return new TensorflowComputableGraph(new Session(scope.graph()), scope, latentVariables);
     }
 
     public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
@@ -357,17 +346,12 @@ public class TensorflowGraphConverter {
     private static TensorflowProbabilisticGraph addLogProbCalculation(TensorflowComputableGraph computableGraph,
                                                                       Map<Vertex<?>, Output<?>> vertexLookup,
                                                                       List<Vertex> latentOrObservedVertices) {
-        List<String> latentVariables = new ArrayList<>();
         List<Output<Double>> logProbOps = new ArrayList<>();
         GraphBuilder graphBuilder = new GraphBuilder(computableGraph.getScope());
 
         for (Vertex visiting : latentOrObservedVertices) {
 
             if (visiting instanceof LogProbAsAGraphable) {
-                if (!visiting.isObserved()) {
-                    latentVariables.add(vertexLookup.get(visiting).op().name());
-                }
-
                 LogProbGraph logProbGraph = ((LogProbAsAGraphable) visiting).logProbGraph();
                 Output<Double> logProbFromVisiting = addLogProbFrom(logProbGraph, vertexLookup, graphBuilder);
                 logProbOps.add(logProbFromVisiting);

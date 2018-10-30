@@ -2,8 +2,6 @@ package io.improbable.keanu.backend;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import io.improbable.keanu.backend.LogProbWithSample;
-import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.backend.keanu.KeanuGraphConverter;
 import io.improbable.keanu.backend.tensorflow.TensorflowGraphConverter;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -25,6 +23,10 @@ public class ProbabilisticGraphTest {
     private DoubleVertex C;
     private DoubleVertex D;
 
+    private DoubleTensor initialA = DoubleTensor.scalar(2.0);
+    private DoubleTensor initialB = DoubleTensor.scalar(3.0);
+    private DoubleTensor observationD = DoubleTensor.scalar(6.0);
+
     private static final String A_LABEL = "A";
     private static final String B_LABEL = "B";
     private static final String C_LABEL = "C";
@@ -33,10 +35,12 @@ public class ProbabilisticGraphTest {
     @Before
     public void setup() {
         A = new GaussianVertex(0.0, 1.0).setLabel(A_LABEL);
+        A.setValue(initialA);
         B = new GaussianVertex(0.0, 1.0).setLabel(B_LABEL);
+        B.setValue(initialB);
         C = A.plus(B).setLabel(C_LABEL);
         D = new GaussianVertex(C, 1.0).setLabel(D_LABEL);
-        D.observe(6.0);
+        D.observe(observationD);
     }
 
     @Test
@@ -63,46 +67,48 @@ public class ProbabilisticGraphTest {
         canConvertSimpleNetworkAndTakeSample(probabilisticGraph);
     }
 
-    private double expectedLogProb(double a, double b) {
+    private double expectedLogProb(double a, double b, double d) {
         NormalDistribution latents = new NormalDistribution(0.0, 1.0);
         NormalDistribution observation = new NormalDistribution(a + b, 1.0);
-        return latents.logDensity(a) + latents.logDensity(b) + observation.logDensity(6.0);
+        return latents.logDensity(a) + latents.logDensity(b) + observation.logDensity(d);
     }
 
     public void canCalculateLogProb(ProbabilisticGraph probabilisticGraph) {
 
-        double a = 2;
-        double b = 3;
+        double defaultLogProb = probabilisticGraph.logProb();
 
         double logProb = probabilisticGraph.logProb(ImmutableMap.of(
-            A_LABEL, DoubleTensor.scalar(a),
-            B_LABEL, DoubleTensor.scalar(b)
+            A_LABEL, initialA,
+            B_LABEL, initialB
         ));
 
-        assertEquals(expectedLogProb(a, b), logProb, 1e-5);
+        assertEquals(defaultLogProb, logProb);
 
-        double logProb2 = probabilisticGraph.logProb(ImmutableMap.of(
+        double expectedInitialLogProb = expectedLogProb(initialA.scalar(), initialB.scalar(), observationD.scalar());
+        assertEquals(expectedInitialLogProb, logProb, 1e-5);
+
+        double postUpdateLogProb = probabilisticGraph.logProb(ImmutableMap.of(
             A_LABEL, DoubleTensor.scalar(3)
         ));
 
-        assertEquals(expectedLogProb(3, b), logProb2, 1e-5);
+        double expectedPostUpdateLogProb = expectedLogProb(3, initialB.scalar(), observationD.scalar());
+
+        assertEquals(expectedPostUpdateLogProb, postUpdateLogProb, 1e-5);
     }
 
     public void canConvertSimpleNetworkAndTakeSample(ProbabilisticGraph probabilisticGraph) {
 
-        double a = 2;
-        double b = 3;
-
         LogProbWithSample logProbWithSample = probabilisticGraph.logProbWithSample(ImmutableMap.of(
-            A_LABEL, DoubleTensor.scalar(a),
-            B_LABEL, DoubleTensor.scalar(b)
+            A_LABEL, initialA,
+            B_LABEL, initialB
         ), ImmutableList.of(A_LABEL, B_LABEL, C_LABEL));
 
-        assertEquals(expectedLogProb(a, b), logProbWithSample.getLogProb(), 1e-5);
+        double expectedLogProb = expectedLogProb(initialA.scalar(), initialB.scalar(), observationD.scalar());
+        assertEquals(expectedLogProb, logProbWithSample.getLogProb(), 1e-5);
 
         Map<String, ?> sample = logProbWithSample.getSample();
-        assertEquals(a, ((DoubleTensor) sample.get(A_LABEL)).scalar());
-        assertEquals(b, ((DoubleTensor) sample.get(B_LABEL)).scalar());
-        assertEquals(a + b, ((DoubleTensor) sample.get(C_LABEL)).scalar());
+        assertEquals(initialA.scalar(), ((DoubleTensor) sample.get(A_LABEL)).scalar());
+        assertEquals(initialB.scalar(), ((DoubleTensor) sample.get(B_LABEL)).scalar());
+        assertEquals(initialA.plus(initialB).scalar(), ((DoubleTensor) sample.get(C_LABEL)).scalar());
     }
 }

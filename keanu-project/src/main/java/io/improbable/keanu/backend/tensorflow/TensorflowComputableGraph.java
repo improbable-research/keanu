@@ -10,6 +10,7 @@ import org.tensorflow.Tensor;
 import org.tensorflow.op.Scope;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,9 +31,14 @@ public class TensorflowComputableGraph implements ComputableGraph {
 
     private Map<String, Object> inputCache = new HashMap<>();
 
-    public TensorflowComputableGraph(Session session, Scope scope) {
+    public TensorflowComputableGraph(Session session, Scope scope, Map<String, Object> defaultInputs) {
         this.session = session;
         this.scope = scope;
+        this.inputCache.putAll(defaultInputs);
+    }
+
+    public TensorflowComputableGraph(Session session, Scope scope) {
+        this(session, scope, Collections.emptyMap());
     }
 
     @Override
