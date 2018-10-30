@@ -5,10 +5,10 @@ matrix:
       addons:
         sonarcloud:
           organization: "improbable-keanu"
-      stage: build java
-      script: deployment/buildAndDeploy.sh
-      stage: sonar
-      script: deployment/sonar.sh
+      - stage: build java
+        script: deployment/buildAndDeploy.sh
+      - stage: sonar
+        script: deployment/sonar.sh
       before_install:
       - openssl aes-256-cbc -K $encrypted_eec04b57ffc0_key -iv $encrypted_eec04b57ffc0_iv
         -in deployment/secret-keys-keanu.gpg.enc -out deployment/secret-keys-keanu.gpg -d
