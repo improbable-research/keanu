@@ -122,7 +122,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
     def get_id(self):
-        return tuple(self.unwrap().getId().getValue())
+        return Vertex._to_python_id(self.unwrap().getId())
 
     @staticmethod
     def __parse_args(args):
@@ -142,3 +142,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
     @staticmethod
     def _to_generator(java_vertices):
         return (Vertex(java_vertex) for java_vertex in java_vertices)
+
+    @staticmethod
+    def _to_python_id(java_id):
+        return tuple(java_id.getValue())
