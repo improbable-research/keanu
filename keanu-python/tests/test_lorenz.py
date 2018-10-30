@@ -6,7 +6,7 @@ from keanu.const import Const
 from examples.lorenz_model import LorenzModel
 
 
-convergedError = 0.01
+converged_error = 0.01
 window_size = 8
 max_windows = 100
 
@@ -22,13 +22,13 @@ def test_lorenz():
     prior_mu = (3. ,3. ,3.)
 
     model = LorenzModel(sigma, beta, rho, time_step)
-    observed = list(model.runModel(window_size * max_windows))
+    observed = list(model.run_model(window_size * max_windows))
 
-    while error > convergedError and window < max_windows:
+    while error > converged_error and window < max_windows:
         xt0 = kn.Gaussian(prior_mu[0], 1.0)
         yt0 = kn.Gaussian(prior_mu[1], 1.0)
         zt0 = kn.Gaussian(prior_mu[2], 1.0)
-        graph_time_steps = list(buildGraph((xt0, yt0, zt0)))
+        graph_time_steps = list(build_graph((xt0, yt0, zt0)))
         xt0.setAndCascade(prior_mu[0])
         yt0.setAndCascade(prior_mu[1])
         zt0.setAndCascade(prior_mu[2])
@@ -49,7 +49,7 @@ def test_lorenz():
         prior_mu = (posterior[0], posterior[1], posterior[2])
         window += 1
         
-    assert error <= convergedError
+    assert error <= converged_error
 
 def add_time(current):
     rho_v = Const(rho)
@@ -60,7 +60,7 @@ def add_time(current):
     z_tplus1 = zt * Const(1. - time_step * beta) + (xt * yt * Const(time_step))
     return (x_tplus1, y_tplus1, z_tplus1) 
 
-def buildGraph(initial):
+def build_graph(initial):
     (x, y, z) = initial
     yield (x, y, z)
     for _ in range(window_size):

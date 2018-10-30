@@ -11,14 +11,14 @@ class LorenzModel:
         self.rho = rho
         self.time_step = time_step
 
-    def runModel(self, numTimeSteps):
+    def run_model(self, num_time_steps):
         position = Coordinates(2., 5., 4.)
         yield position
-        for _ in range(numTimeSteps):
-            position = self.__getNextPosition(position)
+        for _ in range(num_time_steps):
+            position = self.__get_next_position(position)
             yield position
         
-    def __getNextPosition(self, current : Coordinates) -> Coordinates :
+    def __get_next_position(self, current : Coordinates) -> Coordinates :
         nextX = current.x + self.time_step * (self.sigma * (current.y - current.x))
         nextY = current.y + self.time_step * (current.x * (self.rho - current.z) - current.y)
         nextZ = current.z + self.time_step * (current.x * current.y - self.beta * current.z)
