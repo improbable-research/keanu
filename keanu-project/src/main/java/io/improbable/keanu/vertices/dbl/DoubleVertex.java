@@ -53,6 +53,10 @@ import java.util.function.Function;
 
 public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
+    public DoubleVertex(long[] initialShape) {
+        super(initialShape);
+    }
+
     /**
      * @param dimension dimension to concat along. Negative dimension indexing is not supported.
      * @param toConcat  array of things to concat. Must match in all dimensions except for the provided

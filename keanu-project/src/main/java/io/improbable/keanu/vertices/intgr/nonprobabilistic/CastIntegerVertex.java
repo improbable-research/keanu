@@ -11,6 +11,7 @@ public class CastIntegerVertex extends IntegerVertex implements NonProbabilistic
     private final Vertex<IntegerTensor> inputVertex;
 
     public CastIntegerVertex(Vertex<IntegerTensor> inputVertex) {
+        super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }

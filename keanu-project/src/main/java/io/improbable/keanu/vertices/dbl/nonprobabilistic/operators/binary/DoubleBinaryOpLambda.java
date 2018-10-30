@@ -27,13 +27,13 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                 Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
+        super(shape);
         this.left = left;
         this.right = right;
         this.op = op;
         this.forwardModeAutoDiffLambda = forwardModeAutoDiffLambda;
         this.reverseModeAutoDiffLambda = reverseModeAutoDiffLambda;
         setParents(left, right);
-        setValue(DoubleTensor.placeHolder(shape));
     }
 
     public DoubleBinaryOpLambda(long[] shape, Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {

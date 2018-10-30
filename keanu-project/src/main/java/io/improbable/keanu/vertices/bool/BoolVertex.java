@@ -23,6 +23,10 @@ import java.util.List;
 
 public abstract class BoolVertex extends Vertex<BooleanTensor> implements BooleanOperators<BoolVertex> {
 
+    public BoolVertex(long[] initialShape) {
+        super(initialShape);
+    }
+
     @SafeVarargs
     public final BoolVertex or(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;

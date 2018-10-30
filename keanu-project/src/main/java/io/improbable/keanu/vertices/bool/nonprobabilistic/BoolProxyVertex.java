@@ -24,7 +24,7 @@ public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVerte
     }
 
     public BoolProxyVertex(long[] shape, VertexLabel label) {
-        this.setValue(BooleanTensor.placeHolder(shape));
+        super(shape);
         this.setLabel(label);
     }
 

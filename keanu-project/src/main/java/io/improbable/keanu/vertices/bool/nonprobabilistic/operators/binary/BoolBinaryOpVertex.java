@@ -19,10 +19,10 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
     }
 
     public BoolBinaryOpVertex(long[] shape, Vertex<A> a, Vertex<B> b) {
+        super(shape);
         this.a = a;
         this.b = b;
         setParents(a, b);
-        setValue(BooleanTensor.placeHolder(shape));
     }
 
     @Override

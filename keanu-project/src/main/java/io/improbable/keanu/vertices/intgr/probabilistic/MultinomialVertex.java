@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.discrete.Multinomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -15,13 +16,13 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger {
+public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
 
     public MultinomialVertex(long[] tensorShape, IntegerVertex n, DoubleVertex p) {
-
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, n.getShape());
         long[] pShapeExcludingFirstDimension = ArrayUtils.remove(p.getShape(), 0);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, pShapeExcludingFirstDimension);
@@ -31,7 +32,6 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
         setParents(p);
         addParent(n);
-        setValue(IntegerTensor.placeHolder(tensorShape));
     }
 
     public MultinomialVertex(IntegerVertex n, DoubleVertex p) {
@@ -53,7 +53,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return Multinomial.withParameters(n.getValue(), p.getValue()).sample(getShape(), random);
+    public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Multinomial.withParameters(n.getValue(), p.getValue()).sample(shape, random);
     }
 }
