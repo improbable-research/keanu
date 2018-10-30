@@ -1,14 +1,9 @@
-from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex import Vertex
 from keanu.generated import ConstantBool, ConstantDouble, ConstantInteger
 
 import numpy as np
 import numbers
-from py4j.java_gateway import java_import
-
-context = KeanuContext()
-k = context.jvm_view()
 
 def Const(t) -> Vertex:
     if isinstance(t, np.ndarray):

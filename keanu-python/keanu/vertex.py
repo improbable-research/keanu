@@ -5,7 +5,7 @@ import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 
-context = KeanuContext()
+k = KeanuContext()
 
 
 class VertexOps:
@@ -135,7 +135,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()
         elif isinstance(arg, list) and all(isinstance(x, numbers.Number) for x in arg):
-            return context.to_java_long_array(arg)
+            return k.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 

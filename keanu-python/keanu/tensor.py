@@ -5,12 +5,11 @@ import numpy as np
 import numbers
 from py4j.java_gateway import java_import
 
-context = KeanuContext()
-k = context.jvm_view()
+k = KeanuContext()
 
-java_import(k, "io.improbable.keanu.tensor.dbl.DoubleTensor")
-java_import(k, "io.improbable.keanu.tensor.bool.BooleanTensor")
-java_import(k, "io.improbable.keanu.tensor.intgr.IntegerTensor")
+java_import(k.jvm_view(), "io.improbable.keanu.tensor.dbl.DoubleTensor")
+java_import(k.jvm_view(), "io.improbable.keanu.tensor.bool.BooleanTensor")
+java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
 class Tensor(JavaObjectWrapper):
     def __init__(self, t):
@@ -18,8 +17,8 @@ class Tensor(JavaObjectWrapper):
             normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(t)
 
             ctor = Tensor.__infer_tensor_from_ndarray(normalized_ndarray)
-            values = context.to_java_array(normalized_ndarray.flatten().tolist())
-            shape = context.to_java_long_array(normalized_ndarray.shape)
+            values = k.to_java_array(normalized_ndarray.flatten().tolist())
+            shape = k.to_java_long_array(normalized_ndarray.shape)
 
             super(Tensor, self).__init__(ctor(values, shape))
         elif isinstance(t, numbers.Number):
@@ -40,22 +39,22 @@ class Tensor(JavaObjectWrapper):
             raise ValueError("Cannot infer type because the ndarray is empty")
 
         if isinstance(ndarray.item(0), bool):
-            return k.BooleanTensor.create
+            return k.jvm_view().BooleanTensor.create
         elif isinstance(ndarray.item(0), int):
-            return k.IntegerTensor.create
+            return k.jvm_view().IntegerTensor.create
         elif isinstance(ndarray.item(0), float):
-            return k.DoubleTensor.create
+            return k.jvm_view().DoubleTensor.create
         else:
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(ndarray.item(0))))
 
     @staticmethod
     def __infer_tensor_from_scalar(scalar):
         if isinstance(scalar, bool):
-            return k.BooleanTensor.scalar
+            return k.jvm_view().BooleanTensor.scalar
         elif isinstance(scalar, int):
-            return k.IntegerTensor.scalar
+            return k.jvm_view().IntegerTensor.scalar
         elif isinstance(scalar, float):
-            return k.DoubleTensor.scalar
+            return k.jvm_view().DoubleTensor.scalar
         else:
             raise NotImplementedError("Generic types in a ndarray are not supported. Was given {}".format(type(scalar)))
 
