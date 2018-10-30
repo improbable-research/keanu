@@ -32,6 +32,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.GammaV
 java_import(k.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex")
 java_import(k.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex")
 java_import(k.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
+java_import(k.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex")
 java_import(k.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex")
 java_import(k.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 
@@ -134,6 +135,10 @@ def Uniform(*args) -> k.jvm_view().UniformVertex:
 
 def ConstantInteger(*args) -> k.jvm_view().ConstantIntegerVertex:
     return Vertex(k.jvm_view().ConstantIntegerVertex, args)
+
+
+def IntegerDivision(*args) -> k.jvm_view().IntegerDivisionVertex:
+    return Vertex(k.jvm_view().IntegerDivisionVertex, args)
 
 
 def Poisson(*args) -> k.jvm_view().PoissonVertex:
