@@ -31,7 +31,9 @@ dependencies {
         exclude module: "commons-compress"  // 0.5MB
         exclude module: "commons-lang3"     // 0.5MB
         exclude module: "commons-math3"     //   2MB
+        exclude module: "openblas-platform"
     }
+    compile 'org.bytedeco.javacpp-presets:openblas:0.3.0-1.4.2:macosx-x86_64'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.google.guava:guava:20.0'
     compile group: 'com.opencsv', name: 'opencsv', version: '4.2'
