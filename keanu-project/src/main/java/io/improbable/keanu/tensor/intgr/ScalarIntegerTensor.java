@@ -10,6 +10,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import java.util.Arrays;
 import java.util.function.Function;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
+
 public class ScalarIntegerTensor implements IntegerTensor {
 
     private Integer value;
@@ -480,6 +482,20 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public FlattenedView<Integer> getFlattenedView() {
         return new SimpleIntegerFlattenedView(value);
+    }
+
+    @Override
+    public BooleanTensor elementwiseEquals(Tensor that) {
+        if (that instanceof IntegerTensor) {
+            IntegerTensor integerThat = (IntegerTensor) that;
+            if (that.isScalar()) {
+                return BooleanTensor.scalar(value.equals(integerThat.scalar()));
+            } else {
+                return integerThat.elementwiseEquals(value);
+            }
+        } else {
+            return Tensor.elementwiseEquals(this, that);
+        }
     }
 
     @Override

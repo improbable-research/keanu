@@ -590,9 +590,14 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public BooleanTensor elementwiseEquals(Tensor that) {
-
-        if (that instanceof Nd4jIntegerTensor) {
-            INDArray eq = tensor.eq(unsafeGetNd4J((Nd4jIntegerTensor) that));
+        INDArray eq;
+        if (that instanceof IntegerTensor) {
+            IntegerTensor integerThat = (IntegerTensor) that;
+            if (that.isScalar()) {
+                eq = tensor.eq(integerThat.scalar());
+            } else {
+                eq = tensor.eq(unsafeGetNd4J((Nd4jIntegerTensor) that));
+            }
             return fromMask(eq, getShape());
         } else {
             return Tensor.elementwiseEquals(this, that);
