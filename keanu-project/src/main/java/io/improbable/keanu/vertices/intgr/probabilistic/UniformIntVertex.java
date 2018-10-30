@@ -5,6 +5,7 @@ import io.improbable.keanu.distributions.discrete.UniformInt;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -16,7 +17,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger {
+public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
     private IntegerVertex min;
     private IntegerVertex max;
@@ -27,13 +28,12 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
      * @param max   The exclusive upper bound.
      */
     public UniformIntVertex(long[] shape, IntegerVertex min, IntegerVertex max) {
-
+        super(shape);
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, min.getShape(), max.getShape());
 
         this.min = min;
         this.max = max;
         setParents(min, max);
-        setValue(IntegerTensor.placeHolder(shape));
     }
 
     public UniformIntVertex(long[] shape, int min, int max) {
@@ -88,7 +88,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return UniformInt.withParameters(min.getValue(), max.getValue()).sample(getShape(), random);
+    public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return UniformInt.withParameters(min.getValue(), max.getValue()).sample(shape, random);
     }
 }

@@ -47,19 +47,19 @@ Please create a Github Issue if you encounter any bugs or have a feature request
  
 ## Getting Started
 
-Want to see an example and run it yourself? Head over to [Getting Started](keanu-docs/getting-started.md).
+Want to see an example and run it yourself? Head over to [Getting Started](https://improbable-research.github.io/keanu/docs/getting-started).
 
 ## Documentation
 
-Want to learn more? Head over to the [Documentation](keanu-docs/toc.md).
+Want to learn more? Head over to the [Documentation](https://improbable-research.github.io/keanu/).
 
 ## Future
 
-What does the future entail for Keanu? Find out at [Future](keanu-docs/future.md).
+What does the future entail for Keanu? Find out at [Future](https://improbable-research.github.io/keanu/docs/future).
 
 ## Examples
 
-Interested in more technical examples? Explore [Examples](keanu-docs/examples.md).
+Interested in more technical examples? Explore the examples repo at `/keanu-examples`.
 
 ## Development
 

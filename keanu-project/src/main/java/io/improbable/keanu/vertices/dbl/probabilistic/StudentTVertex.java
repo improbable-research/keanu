@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -17,7 +18,7 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble {
+public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final IntegerVertex v;
 
@@ -30,10 +31,10 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble 
      * @param v           Degrees of Freedom
      */
     public StudentTVertex(long[] tensorShape, IntegerVertex v) {
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());
         this.v = v;
         setParents(v);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public StudentTVertex(long[] tensorShape, int v) {
@@ -70,7 +71,7 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return StudentT.withParameters(v.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return StudentT.withParameters(v.getValue()).sample(shape, random);
     }
 }

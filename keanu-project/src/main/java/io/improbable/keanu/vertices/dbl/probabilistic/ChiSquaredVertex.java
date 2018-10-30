@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -14,7 +15,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDouble {
+public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private IntegerVertex k;
 
@@ -27,11 +28,11 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
      * @param k           the number of degrees of freedom
      */
     public ChiSquaredVertex(long[] tensorShape, IntegerVertex k) {
+        super(tensorShape);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
 
         this.k = k;
         setParents(k);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public ChiSquaredVertex(long[] tensorShape, int k) {
@@ -53,8 +54,8 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return ChiSquared.withParameters(k.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return ChiSquared.withParameters(k.getValue()).sample(shape, random);
     }
 
     @Override

@@ -21,11 +21,11 @@ public class IntegerBinaryOpLambda<A, B> extends IntegerVertex implements NonPro
                                  Vertex<A> left,
                                  Vertex<B> right,
                                  BiFunction<A, B, IntegerTensor> op) {
+        super(shape);
         this.left = left;
         this.right = right;
         this.op = op;
         setParents(left, right);
-        setValue(IntegerTensor.placeHolder(shape));
     }
 
     public IntegerBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, IntegerTensor> op) {
