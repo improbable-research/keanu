@@ -23,6 +23,7 @@ class VertexOps:
             "multiply" : VertexOps.__rmul__,
             "power" : VertexOps.__rpow__,
             "true_divide" : VertexOps.__rtruediv__,
+            "floor_divide" : VertexOps.__rfloordiv__,
             "greater" : VertexOps.__lt__,
             "greater_equal" : VertexOps.__le__,
             "less" : VertexOps.__gt__,
@@ -66,6 +67,12 @@ class VertexOps:
 
     def __rtruediv__(self, other):
         return kn.generated.vertex.Division(other, self)
+
+    def __floordiv__(self, other):
+        return kn.generated.vertex.IntegerDivision(self, other)
+
+    def __rfloordiv__(self, other):
+        return kn.generated.vertex.IntegerDivision(other, self)
 
     def __eq__(self, other):
         return kn.generated.vertex.Equals(self, other)
