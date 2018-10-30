@@ -35,14 +35,6 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         }
     }
 
-    static IntegerTensor create(long[] values, long... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
-            return new ScalarIntegerTensor(Ints.checkedCast(values[0]));
-        } else {
-            return Nd4jIntegerTensor.create(Arrays.stream(values).mapToInt(Ints::checkedCast).toArray(), shape);
-        }
-    }
-
     static IntegerTensor create(int... values) {
         return create(values, 1, values.length);
     }
