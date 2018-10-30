@@ -118,10 +118,10 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def observe(self, v):
         self.unwrap().observe(kn.Tensor(v).unwrap())
 
-    def setValue(self, v):
+    def set_value(self, v):
         self.unwrap().setValue(kn.Tensor(v).unwrap())
 
-    def setAndCascade(self, v):
+    def set_and_cascade(self, v):
         self.unwrap().setAndCascade(kn.Tensor(v).unwrap())
 
     def sample(self):

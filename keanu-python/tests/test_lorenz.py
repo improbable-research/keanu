@@ -29,9 +29,9 @@ def test_lorenz():
         yt0 = kn.Gaussian(prior_mu[1], 1.0)
         zt0 = kn.Gaussian(prior_mu[2], 1.0)
         graph_time_steps = list(build_graph((xt0, yt0, zt0)))
-        xt0.setAndCascade(prior_mu[0])
-        yt0.setAndCascade(prior_mu[1])
-        zt0.setAndCascade(prior_mu[2])
+        xt0.set_and_cascade(prior_mu[0])
+        yt0.set_and_cascade(prior_mu[1])
+        zt0.set_and_cascade(prior_mu[2])
         apply_observations(graph_time_steps, window, observed)
         
         optimizer = kn.GradientOptimizer(xt0)

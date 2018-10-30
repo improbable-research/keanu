@@ -50,6 +50,21 @@ def test_cannot_pass_generic_to_vertex(jvm_view):
     assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(GenericExampleClass)
 
 
+def test_you_can_set_and_get_a_value(jvm_view):
+    gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
+    gaussian.set_value(4.)
+    assert gaussian.get_value() == 4.
+
+
+def test_you_can_cascade_a_value(jvm_view):
+    gaussian1 = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
+    gaussian2 = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
+    sum_of_gaussians = gaussian1 + gaussian2
+    gaussian1.set_value(4.)
+    gaussian2.set_and_cascade(3.)
+    assert sum_of_gaussians.get_value() == 7.
+
+
 def test_vertex_can_observe_scalar(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
     gaussian.observe(4.)
