@@ -22,6 +22,7 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable, Non
     public DoubleCPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
                            Map<CPTCondition, DoubleVertex> conditions,
                            DoubleVertex defaultResult) {
+        super(defaultResult.getShape());
         this.inputs = inputs;
         this.conditions = conditions;
         this.defaultResult = defaultResult;

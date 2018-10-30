@@ -37,10 +37,10 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
      * @param right a vertex
      */
     public DoubleBinaryOpVertex(long[] shape, DoubleVertex left, DoubleVertex right) {
+        super(shape);
         this.left = left;
         this.right = right;
         setParents(left, right);
-        setValue(DoubleTensor.placeHolder(shape));
     }
 
     @Override

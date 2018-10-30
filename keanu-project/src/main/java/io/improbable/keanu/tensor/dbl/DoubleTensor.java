@@ -92,10 +92,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new ScalarDoubleTensor(scalarValue);
     }
 
-    static DoubleTensor placeHolder(long[] shape) {
-        return new ScalarDoubleTensor(shape);
-    }
-
     static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {

@@ -47,11 +47,11 @@ class KeanuContext(metaclass=Singleton):
     def jvm_view(self):
         return self.__jvm_view
 
-    def to_java_list(self, l):
+    def to_java_object_list(self, l):
         lst = self._gateway.jvm.java.util.ArrayList()
 
         for o in l:
-            lst.add(o)
+            lst.add(o.unwrap())
 
         return lst
 

@@ -5,7 +5,7 @@ import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 
-context = KeanuContext()
+k = KeanuContext()
 
 
 class VertexOps:
@@ -104,11 +104,12 @@ class VertexOps:
         return kn.generated.vertex.Ceil(self)
 
 class Vertex(JavaObjectWrapper, VertexOps):
-    def __init__(self, ctor=None, *args, java_vertex=None):
-        if java_vertex is None:
-            super(Vertex, self).__init__(ctor(*(Vertex.__parse_args(*args))))
-        else:
-            super(Vertex, self).__init__(java_vertex)
+    def __init__(self, val, *args):
+        if args:
+            ctor = val
+            val = ctor(*(Vertex.__parse_args(*args)))
+
+        super(Vertex, self).__init__(val)
 
     def __hash__(self):
         return hash(self.get_id())
@@ -118,10 +119,10 @@ class Vertex(JavaObjectWrapper, VertexOps):
         self.unwrap().observe(Tensor(v).unwrap())
 
     def get_connected_graph(self):
-        return Vertex._to_python_set(self.unwrap().getConnectedGraph())
+        return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
     def get_id(self):
-        return self.unwrap().getId().toString()
+        return Vertex._get_python_id(self.unwrap())
 
     @staticmethod
     def __parse_args(args):
@@ -134,14 +135,14 @@ class Vertex(JavaObjectWrapper, VertexOps):
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()
         elif isinstance(arg, list) and all(isinstance(x, numbers.Number) for x in arg):
-            return context.to_java_long_array(arg)
+            return k.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
-    def _to_python_list(java_vertex_list):
-        return [Vertex(java_vertex=java_vertex) for java_vertex in java_vertex_list]
+    def _to_generator(java_vertices):
+        return (Vertex(java_vertex) for java_vertex in java_vertices)
 
     @staticmethod
-    def _to_python_set(java_vertex_set):
-        return set(Vertex(java_vertex=java_vertex) for java_vertex in java_vertex_set)
+    def _get_python_id(java_vertex):
+        return tuple(java_vertex.getId().getValue())
