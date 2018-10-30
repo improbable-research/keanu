@@ -17,9 +17,9 @@ public abstract class BoolUnaryOpVertex<T extends Tensor> extends BoolVertex imp
     }
 
     public BoolUnaryOpVertex(long[] shape, Vertex<T> a) {
+        super(shape);
         this.a = a;
         setParents(a);
-        setValue(BooleanTensor.placeHolder(shape));
     }
 
     public Vertex<T> getInput() {

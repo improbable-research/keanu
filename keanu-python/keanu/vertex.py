@@ -5,8 +5,7 @@ import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 
-
-context = KeanuContext()
+k = KeanuContext()
 
 
 class VertexOps:
@@ -24,6 +23,7 @@ class VertexOps:
             "multiply" : VertexOps.__rmul__,
             "power" : VertexOps.__rpow__,
             "true_divide" : VertexOps.__rtruediv__,
+            "floor_divide" : VertexOps.__rfloordiv__,
             "greater" : VertexOps.__lt__,
             "greater_equal" : VertexOps.__le__,
             "less" : VertexOps.__gt__,
@@ -68,6 +68,12 @@ class VertexOps:
     def __rtruediv__(self, other):
         return kn.generated.vertex.Division(other, self)
 
+    def __floordiv__(self, other):
+        return kn.generated.vertex.IntegerDivision(self, other)
+
+    def __rfloordiv__(self, other):
+        return kn.generated.vertex.IntegerDivision(other, self)
+
     def __eq__(self, other):
         return kn.generated.vertex.Equals(self, other)
 
@@ -105,12 +111,25 @@ class VertexOps:
         return kn.generated.vertex.Ceil(self)
 
 class Vertex(JavaObjectWrapper, VertexOps):
-    def __init__(self, ctor, *args):
-        super(Vertex, self).__init__(ctor, *(Vertex.__parse_args(*args)))
+    def __init__(self, val, *args):
+        if args:
+            ctor = val
+            val = ctor(*(Vertex.__parse_args(*args)))
+
+        super(Vertex, self).__init__(val)
+
+    def __hash__(self):
+        return hash(self.get_id())
 
     def observe(self, v):
         from keanu.tensor import Tensor
         self.unwrap().observe(Tensor(v).unwrap())
+
+    def get_connected_graph(self):
+        return Vertex._to_generator(self.unwrap().getConnectedGraph())
+
+    def get_id(self):
+        return Vertex._get_python_id(self.unwrap())
 
     @staticmethod
     def __parse_args(args):
@@ -123,6 +142,14 @@ class Vertex(JavaObjectWrapper, VertexOps):
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()
         elif isinstance(arg, list) and all(isinstance(x, numbers.Number) for x in arg):
-            return context.to_java_long_array(arg)
+            return k.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
+
+    @staticmethod
+    def _to_generator(java_vertices):
+        return (Vertex(java_vertex) for java_vertex in java_vertices)
+
+    @staticmethod
+    def _get_python_id(java_vertex):
+        return tuple(java_vertex.getId().getValue())

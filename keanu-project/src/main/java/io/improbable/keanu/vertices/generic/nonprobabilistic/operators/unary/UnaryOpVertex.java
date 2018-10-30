@@ -9,7 +9,8 @@ public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> implements NonP
 
     protected final Vertex<IN> inputVertex;
 
-    public UnaryOpVertex(Vertex<IN> inputVertex) {
+    public UnaryOpVertex(long[] shape, Vertex<IN> inputVertex) {
+        super(shape);
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }

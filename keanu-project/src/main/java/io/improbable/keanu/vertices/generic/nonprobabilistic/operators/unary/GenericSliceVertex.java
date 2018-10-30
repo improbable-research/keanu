@@ -19,10 +19,9 @@ public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
      * @param index       the index of extraction
      */
     public GenericSliceVertex(Vertex<Tensor<T>> inputVertex, int dimension, int index) {
-        super(inputVertex);
+        super(shapeSlice(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
-        setValue(Tensor.placeHolder(shapeSlice(dimension, inputVertex.getShape())));
     }
 
     @Override

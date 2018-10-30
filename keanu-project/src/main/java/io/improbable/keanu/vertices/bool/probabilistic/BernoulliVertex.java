@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbAsAGraphable;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
@@ -22,7 +23,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean, LogProbAsAGraphable {
+public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor>, LogProbAsAGraphable {
 
     private final Vertex<DoubleTensor> probTrue;
 
@@ -35,10 +36,10 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
      * @param probTrue the probability the bernoulli returns true
      */
     public BernoulliVertex(long[] shape, Vertex<DoubleTensor> probTrue) {
+        super(shape);
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;
         setParents(probTrue);
-        setValue(BooleanTensor.placeHolder(shape));
     }
 
     /**
@@ -98,7 +99,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return Bernoulli.withParameters(probTrue.getValue()).sample(this.getShape(), random);
+    public BooleanTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Bernoulli.withParameters(probTrue.getValue()).sample(shape, random);
     }
 }

@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -18,6 +19,7 @@ public class BoolModelResultVertex extends BoolVertex implements ModelResultProv
     private final ModelResult<BooleanTensor> delegate;
 
     public BoolModelResultVertex(ModelVertex model, VertexLabel label) {
+        super(Tensor.SCALAR_SHAPE);
         delegate = new ModelResult<>(model, label);
         setParents((Vertex) model);
     }

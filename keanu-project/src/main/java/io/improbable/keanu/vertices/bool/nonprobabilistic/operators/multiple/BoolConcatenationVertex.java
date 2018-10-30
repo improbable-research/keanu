@@ -23,28 +23,27 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
      * @param input     the input vertices to concatenate
      */
     public BoolConcatenationVertex(int dimension, BoolVertex... input) {
+        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, input)));
         this.dimension = dimension;
         this.input = input;
         setParents(input);
-        long[][] shapes = extractFromInputs(long[].class, Vertex::getShape);
-        setValue(BooleanTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 
     @Override
     public BooleanTensor calculate() {
-        return op(extractFromInputs(BooleanTensor.class, Vertex::getValue));
+        return op(extractFromInputs(BooleanTensor.class, Vertex::getValue, input));
     }
 
     @Override
     public BooleanTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(BooleanTensor.class, Vertex::sample));
+        return op(extractFromInputs(BooleanTensor.class, Vertex::sample, input));
     }
 
     protected BooleanTensor op(BooleanTensor... inputs) {
         return BooleanTensor.concat(dimension, inputs);
     }
 
-    private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<BooleanTensor>, T> func) {
+    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<BooleanTensor>, T> func, BoolVertex[] input) {
         T[] extract = (T[]) Array.newInstance(clazz, input.length);
         for (int i = 0; i < input.length; i++) {
             extract[i] = func.apply(input[i]);

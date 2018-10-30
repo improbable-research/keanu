@@ -32,10 +32,10 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
      * @param right second input vertex
      */
     public IntegerBinaryOpVertex(long[] shape, IntegerVertex left, IntegerVertex right) {
+        super(shape);
         this.left = left;
         this.right = right;
         setParents(left, right);
-        setValue(IntegerTensor.placeHolder(shape));
     }
 
     @Override

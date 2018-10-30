@@ -14,10 +14,10 @@ public class IntegerUnaryOpLambda<IN> extends IntegerVertex implements NonProbab
     protected final Function<IN, IntegerTensor> op;
 
     public IntegerUnaryOpLambda(long[] shape, Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
+        super(shape);
         this.inputVertex = inputVertex;
         this.op = op;
         setParents(inputVertex);
-        setValue(IntegerTensor.placeHolder(shape));
     }
 
     public IntegerUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
