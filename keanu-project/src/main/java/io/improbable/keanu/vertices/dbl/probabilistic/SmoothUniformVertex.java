@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -17,7 +18,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import static java.util.Collections.singletonMap;
 
-public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDouble {
+public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private static final double DEFAULT_EDGE_SHARPNESS = 0.01;
 
@@ -139,7 +140,7 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return SmoothUniform.withParameters(xMin.getValue(), xMax.getValue(), this.edgeSharpness).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return SmoothUniform.withParameters(xMin.getValue(), xMax.getValue(), this.edgeSharpness).sample(shape, random);
     }
 }
