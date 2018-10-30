@@ -5,7 +5,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 public class MAPModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OUTPUT> {
 
     private final ModelGraph<INPUT, OUTPUT> modelGraph;
-
+asdasd
     public MAPModelFitter(ModelGraph<INPUT, OUTPUT> modelGraph) {
         this.modelGraph = modelGraph;
     }
