@@ -59,7 +59,7 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     }
 
     private DoubleTensor op(BooleanTensor predicate, DoubleTensor thn, DoubleTensor els) {
-        return predicate.setDoubleIf(thn, els);
+        return predicate.doubleWhere(thn, els);
     }
 
     @Override

@@ -35,7 +35,7 @@ public class BinaryOpVertexTest {
         BinaryOpLambda<BooleanTensor, DoubleTensor, DoubleTensor> custom = new BinaryOpLambda<>(
             bernoulliVertex, gaussianVertex,
             (BooleanTensor f, DoubleTensor g) ->
-                f.setDoubleIf(g, DoubleTensor.scalar(0.0))
+                f.doubleWhere(g, DoubleTensor.scalar(0.0))
         );
 
         int N = 1000000;

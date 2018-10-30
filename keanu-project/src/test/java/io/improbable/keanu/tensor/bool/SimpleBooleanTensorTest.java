@@ -90,7 +90,7 @@ public class SimpleBooleanTensorTest {
         DoubleTensor trueCase = DoubleTensor.create(new double[]{1.5, 2.0, 3.3, 4.65}, new long[]{2, 2});
         DoubleTensor falseCase = DoubleTensor.create(new double[]{5.1, 7.2, 11.4, 23.22}, new long[]{2, 2});
 
-        DoubleTensor result = matrixA.setDoubleIf(trueCase, falseCase);
+        DoubleTensor result = matrixA.doubleWhere(trueCase, falseCase);
         assertArrayEquals(new double[]{1.5, 7.2, 3.3, 23.22}, result.asFlatDoubleArray(), 0.0);
     }
 
@@ -99,13 +99,13 @@ public class SimpleBooleanTensorTest {
         IntegerTensor trueCase = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor falseCase = IntegerTensor.create(new int[]{5, 7, 11, 23}, new long[]{2, 2});
 
-        IntegerTensor result = matrixA.setIntegerIf(trueCase, falseCase);
+        IntegerTensor result = matrixA.integerWhere(trueCase, falseCase);
         assertArrayEquals(new int[]{1, 7, 3, 23}, result.asFlatIntegerArray());
     }
 
     @Test
     public void doesSetBooleanIf() {
-        BooleanTensor result = matrixA.setBooleanIf(matrixB, matrixC);
+        BooleanTensor result = matrixA.booleanWhere(matrixB, matrixC);
         assertArrayEquals(new Boolean[]{false, true, true, false}, result.asFlatArray());
     }
 
@@ -114,7 +114,7 @@ public class SimpleBooleanTensorTest {
     }
 
     @Test
-    public void doesSetGenericIf() {
+    public void doesWhereWithNonScalarTensors() {
 
         Tensor<Something> trueCase = new GenericTensor<>(
             new Something[]{Something.A, Something.B, Something.C, Something.D},
@@ -126,9 +126,22 @@ public class SimpleBooleanTensorTest {
             new long[]{2, 2}
         );
 
-        Tensor<Something> result = matrixA.setIf(trueCase, falseCase);
+        Tensor<Something> result = matrixA.where(trueCase, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.C, Something.A},
+            result.asFlatArray()
+        );
+    }
+
+    @Test
+    public void doesWhereWithScalarTensors() {
+
+        Tensor<Something> trueCase = GenericTensor.scalar(Something.A);
+        Tensor<Something> falseCase = GenericTensor.scalar(Something.C);
+
+        Tensor<Something> result = matrixA.where(trueCase, falseCase);
+        assertArrayEquals(
+            new Something[] {Something.A, Something.C, Something.A, Something.C},
             result.asFlatArray()
         );
     }
