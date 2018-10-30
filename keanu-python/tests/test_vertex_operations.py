@@ -18,7 +18,7 @@ import math
 def test_can_do_equal_to(lhs, rhs, expected_result):
     result = lhs == rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()
+    assert (result.get_value() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([1., 2.])), kn.Const(np.array([1., -1.])), np.array([[False], [True]])),
@@ -32,7 +32,7 @@ def test_can_do_equal_to(lhs, rhs, expected_result):
 def test_can_do_not_equal_to(lhs, rhs, expected_result):
     result = lhs != rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()
+    assert (result.get_value() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([10., 20.])), kn.Const(np.array([15., 15.])), np.array([[False], [True]])),
@@ -44,7 +44,7 @@ def test_can_do_not_equal_to(lhs, rhs, expected_result):
 def test_can_do_greater_than(lhs, rhs, expected_result):
     result = lhs > rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()
+    assert (result.get_value() == expected_result).all()
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
@@ -57,7 +57,7 @@ def test_can_do_greater_than(lhs, rhs, expected_result):
 def test_can_do_less_than(lhs, rhs, expected_result):
     result = lhs < rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()
+    assert (result.get_value() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([10., 15., 20.])), kn.Const(np.array([15., 15., 15.])), np.array([[False], [True], [True]])),
@@ -69,7 +69,7 @@ def test_can_do_less_than(lhs, rhs, expected_result):
 def test_can_do_greater_than_or_equal_to(lhs, rhs, expected_result):
     result = lhs >= rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()
+    assert (result.get_value() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([10., 15., 20.])), kn.Const(np.array([15., 15., 15.])), np.array([[True], [True], [False]])),
@@ -81,7 +81,7 @@ def test_can_do_greater_than_or_equal_to(lhs, rhs, expected_result):
 def test_can_do_less_than_or_equal_to(lhs, rhs, expected_result):
     result = lhs <= rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()
+    assert (result.get_value() == expected_result).all()
 
 ### Arithmetic
 
@@ -95,7 +95,7 @@ def test_can_do_less_than_or_equal_to(lhs, rhs, expected_result):
 def test_can_do_addition(lhs, rhs, expected_result):
     result = lhs + rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()
+    assert (result.get_value() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([10., 20.])), kn.Const(np.array([1., 2.])), np.array([[9], [18]])),
@@ -107,7 +107,7 @@ def test_can_do_addition(lhs, rhs, expected_result):
 def test_can_do_subtraction(lhs, rhs, expected_result):
     result = lhs - rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()
+    assert (result.get_value() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([3., 2.])), kn.Const(np.array([5., 7.])), np.array([[15], [14]])),
@@ -119,7 +119,7 @@ def test_can_do_subtraction(lhs, rhs, expected_result):
 def test_can_do_multiplication(lhs, rhs, expected_result):
     result = lhs * rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()
+    assert (result.get_value() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([15., 10.])), kn.Const(np.array([2., 4.])), np.array([[7.5], [2.5 ]])),
@@ -131,7 +131,7 @@ def test_can_do_multiplication(lhs, rhs, expected_result):
 def test_can_do_division(lhs, rhs, expected_result):
     result = lhs / rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()    
+    assert (result.get_value() == expected_result).all()    
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
     (kn.Const(np.array([3., 2.])), kn.Const(np.array([2., 0.5])), np.array([[9], [1.4142135623730951]])),
@@ -143,7 +143,7 @@ def test_can_do_division(lhs, rhs, expected_result):
 def test_can_do_pow(lhs, rhs, expected_result):
     result = lhs ** rhs
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected_result).all()
+    assert (result.get_value() == expected_result).all()
 
 def test_can_do_compound_operations():
     v1 = kn.Const(np.array([
@@ -157,7 +157,7 @@ def test_can_do_compound_operations():
     v3 = 23.
 
     result = v1 * v2 - v2 / v1 + v3 * v2
-    assert (result.getValue() == np.array([[269.5, 333.6666666666667], [472.6, 567.2857142857142]])).all()
+    assert (result.get_value() == np.array([[269.5, 333.6666666666667], [472.6, 567.2857142857142]])).all()
 
 
 ### Unary
@@ -175,7 +175,7 @@ def test_can_do_abs():
 
     result = abs(v)
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected).all()
+    assert (result.get_value() == expected).all()
 
 
 def test_can_do_round():
@@ -191,7 +191,7 @@ def test_can_do_round():
 
     result = round(v)
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected).all()
+    assert (result.get_value() == expected).all()
 
 
 def test_can_do_floor():
@@ -207,7 +207,7 @@ def test_can_do_floor():
 
     result = math.floor(v)
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected).all()
+    assert (result.get_value() == expected).all()
 
 
 def test_can_do_ceil():
@@ -223,4 +223,4 @@ def test_can_do_ceil():
 
     result = math.ceil(v)
     assert type(result) == kn.Vertex
-    assert (result.getValue() == expected).all()        
+    assert (result.get_value() == expected).all()        

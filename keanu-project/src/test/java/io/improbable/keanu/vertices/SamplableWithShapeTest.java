@@ -26,7 +26,7 @@ public class SamplableWithShapeTest {
         when(samplable.sampleWithShape(any(long[].class), any(KeanuRandom.class)))
             .thenAnswer(invocation -> {
                 long[] newShape = invocation.getArgument(0);
-                return BooleanTensor.placeHolder(newShape);
+                return BooleanTensor.create(true, newShape);
             });
         return samplable;
     }

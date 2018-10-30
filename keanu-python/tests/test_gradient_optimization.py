@@ -15,23 +15,23 @@ def model():
 
 
 def test_gradient_op_bayes_net(model):
-    net = kn.BayesNet(model.temperature.getConnectedGraph())
+    net = kn.BayesNet(model.temperature.get_connected_graph())
     gradient_optimizer = kn.GradientOptimizer(net)
     assert gradient_optimizer.net is net
 
 
 def test_gradient_op_vertex(model):
     gradient_optimizer = kn.GradientOptimizer(model.temperature)
-    assert len(gradient_optimizer.net.getLatentVertices()) == 1
+    assert len(list(gradient_optimizer.net.get_latent_vertices())) == 1
 
 
 def test_gradient_op_throws_with_invalid_net_param():
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(TypeError) as excinfo:
         kn.GradientOptimizer(500)
 
 
 def test_gradient_can_set_max_eval_builder_properties(model):
-    net = kn.BayesNet(model.temperature.getConnectedGraph())
+    net = kn.BayesNet(model.temperature.get_connected_graph())
     gradient_optimizer = kn.GradientOptimizer(model.temperature, max_evaluations=5)
 
     with pytest.raises(Py4JJavaError) as excinfo:
@@ -40,20 +40,20 @@ def test_gradient_can_set_max_eval_builder_properties(model):
 
 
 def test_thermometers_map_gradient(model):
-    net = kn.BayesNet(model.temperature.getConnectedGraph())
+    net = kn.BayesNet(model.temperature.get_connected_graph())
     gradient_optimizer = kn.GradientOptimizer(net)
     logProb = gradient_optimizer.max_a_posteriori()
     assert logProb < 0.
 
-    temperature = model.temperature.getValue()
+    temperature = model.temperature.get_value()
     assert 20.995 < temperature <  21.005
 
 
 def test_thermometers_max_likelihood_gradient(model):
-    net = kn.BayesNet(model.temperature.getConnectedGraph())
+    net = kn.BayesNet(model.temperature.get_connected_graph())
     gradient_optimizer = kn.GradientOptimizer(net)
     logProb = gradient_optimizer.max_likelihood()
     assert logProb < 0.
 
-    temperature = model.temperature.getValue()
+    temperature = model.temperature.get_value()
     assert 20.995 < temperature <  21.005
