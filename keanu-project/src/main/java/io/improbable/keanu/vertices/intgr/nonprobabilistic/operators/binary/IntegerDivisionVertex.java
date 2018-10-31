@@ -2,9 +2,10 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.util.dot.WriteDot;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-
+@WriteDot.DotAnnotation(displayName = "/")
 public class IntegerDivisionVertex extends IntegerBinaryOpVertex {
 
     /**
