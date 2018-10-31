@@ -4,6 +4,8 @@ import numbers
 import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
+from keanu.tensor import Tensor
+
 
 k = KeanuContext()
 
@@ -132,13 +134,10 @@ class Vertex(JavaObjectWrapper, VertexOps):
         self.unwrap().setAndCascade(kn.Tensor(v).unwrap())
 
     def sample(self):
-        return self.__to_np_array(self.unwrap().sample())
+        return Tensor._to_ndarray(self.unwrap().sample())
 
     def get_value(self):
-        return self.__to_np_array(self.unwrap().getValue())
-
-    def __to_np_array(self, value):
-        return np.array(list(value.asFlatArray())).reshape(self.unwrap().getShape())
+        return Tensor._to_ndarray(self.unwrap().getValue())
 
     def get_connected_graph(self):
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
