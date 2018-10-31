@@ -27,7 +27,7 @@ page_nav:
 
 Tensors in most cases can be thought of as nested arrays of values that can have any number
 of dimensions. A tensor with one dimension can be thought of as a vector, a tensor
-with two dimensions as a matrix and a tensor with three dimensions can be thought of as a cube. 
+with two dimensions as a matrix and a tensor with three dimensions can be thought of as a cuboid. 
 The number of dimensions a tensor has is called its `rank` and the length in each dimension 
 describes its `shape`. 
 
@@ -54,7 +54,7 @@ and much cleaner to describe this using tensors.
 
 Nearly everything in Keanu supports Tensors. But how do you create one?
 
-Let's create a vector of doubles, integers and booleans that share the same value.
+Let's create vectors of doubles, integers and booleans that share the same value.
 
 ```java
 DoubleTensor dTensor = DoubleTensor.create(5, new long[]{1, 4});     //[5, 5, 5, 5]
@@ -63,7 +63,7 @@ BooleanTensor bTensor = BooleanTensor.create(true, new long[]{1, 4}); //[true, t
 ```
 
 
-Let's make a 2x2 matrix of doubles, integers and booleans.
+Let's make some 2x2 matrices of doubles, integers and booleans.
 
 ```java
 DoubleTensor dTensor = DoubleTensor.create(new double[]{0.5, 1.5, 2.5, 3.5}, new long[]{2, 2});
@@ -72,7 +72,7 @@ BooleanTensor bTensor = BooleanTensor.create(new boolean[]{true, true, false, fa
 ```
 
 Want to change the shape of your tensor on the fly? You have to make sure the proposed shape is the same 
-length as the original. For example, you can change a 2x2 tensor to a 1x4 tensor. But you can't change a 2x2 tensor
+length as the original. For example, you can change a 2x2 tensor to a 1x4 tensor, but you can't change a 2x2 tensor
 to a 2x3 tensor.
 
 Here's how to do that in Keanu:
@@ -88,7 +88,7 @@ tensor.getShape();       //[1, 4]
 
 What operations can I apply to tensors?
 
-Here's a small example of the power of tensors, all of these operations apply to each value in the tensor.
+Here's a small example of the power of tensors. All of these operations apply to each value in the tensor.
 
 ```java
 DoubleTensor tensor = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
@@ -102,13 +102,13 @@ double sum = tensor.sum();  // -0.86602...
 A complete list of tensor operations is available here:
 - [Double Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/dbl/DoubleTensor.html)
 - [Integer Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/intgr/IntegerTensor.html)
-- [Boolean Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/bool/package-frame.html)
-- [Generic Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/generic/package-frame.html)
+- [Boolean Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/bool/SimpleBooleanTensor.html)
+- [Generic Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/generic/GenericTensor.html)
 
 
 ## Creating Vertices with Tensors
 
-Let's say I want to create a vector of 100 Gaussian's all with a mu of 0 and a sigma of 1.
+Let's say I want to create a vector of 100 Gaussians all with a mu of 0 and a sigma of 1.
 This is how you do that in Keanu:
 
 ```java
