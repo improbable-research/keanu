@@ -46,7 +46,7 @@ def test_thermometers_map_gradient(model):
     logProb = gradient_optimizer.max_a_posteriori()
     assert logProb < 0.
 
-    temperature = model.temperature.get_value().scalar()
+    temperature = model.temperature.get_value()
     assert 20.995 < temperature <  21.005
 
 
@@ -56,5 +56,5 @@ def test_thermometers_max_likelihood_gradient(model):
     logProb = gradient_optimizer.max_likelihood()
     assert logProb < 0.
 
-    temperature = model.temperature.get_value().scalar()
+    temperature = model.temperature.get_value()
     assert 20.995 < temperature <  21.005

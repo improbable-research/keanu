@@ -60,7 +60,7 @@ def test_const_takes_ndarray_of_rank_one():
     v = kn.Const(ndarray)
 
     assert_vertex_value_equal_ndarray(v, ndarray)
-    assert v.get_value().getRank() == 2
+    assert v.get_value().shape == (2, 1)
 
 
 def assert_vertex_value_equal_ndarray(v, ndarray):
@@ -74,7 +74,7 @@ def assert_vertex_value_equal_ndarray(v, ndarray):
 
 
 def assert_vertex_value_equals_scalar(v, scalar):
-    assert v.get_value().scalar() == scalar
+    assert v.get_value() == scalar
 
 
 def assert_java_class(java_object_wrapper, java_class_str):
