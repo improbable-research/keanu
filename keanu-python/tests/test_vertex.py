@@ -1,7 +1,6 @@
 import keanu as kn
 import numpy as np
 import pytest
-from tests.keanu_assert import tensors_equal
 
 
 @pytest.fixture
@@ -16,17 +15,14 @@ def test_can_pass_scalar_to_vertex(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, 0., 1.)
     sample = gaussian.sample()
 
-    assert sample.isScalar()
+    assert sample.shape == (1, 1)
 
 
 def test_can_pass_ndarray_to_vertex(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, np.array([[0.1, 0.4]]), np.array([[0.4, 0.5]]))
     sample = gaussian.sample()
 
-    shape = sample.getShape()
-    assert sample.getRank() == 2
-    assert shape[0] == 1
-    assert shape[1] == 2
+    assert sample.shape == (1, 2)
 
 
 def test_use_vertex_as_hyperparameter_of_another_vertex(jvm_view):
@@ -34,17 +30,14 @@ def test_use_vertex_as_hyperparameter_of_another_vertex(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, mu, 1.)
     sample = gaussian.sample()
 
-    assert sample.isScalar()
+    assert sample.shape == (1, 1)
 
 
 def test_can_pass_array_to_vertex(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, [3, 3], 0., 1.)
     sample = gaussian.sample()
 
-    shape = sample.getShape()
-    assert sample.getRank() == 2
-    assert shape[0] == 3
-    assert shape[1] == 3
+    assert sample.shape == (3, 3)
 
 
 def test_cannot_pass_generic_to_vertex(jvm_view):
@@ -57,11 +50,27 @@ def test_cannot_pass_generic_to_vertex(jvm_view):
     assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(GenericExampleClass)
 
 
+def test_you_can_set_and_get_a_value(jvm_view):
+    gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
+    gaussian.set_value(4.)
+    assert gaussian.get_value() == 4.
+
+
+def test_you_can_cascade_a_value(jvm_view):
+    gaussian1 = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
+    gaussian2 = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
+    sum_of_gaussians = gaussian1 + gaussian2
+    gaussian1.set_value(4.)
+    gaussian2.set_and_cascade(3.)
+    assert sum_of_gaussians.get_value() == 7.
+
+
 def test_vertex_can_observe_scalar(jvm_view):
     gaussian = kn.Vertex(jvm_view.GaussianVertex, 0., 1.)
     gaussian.observe(4.)
 
-    assert gaussian.get_value().scalar() == 4.
+    assert type(gaussian.get_value()) == np.ndarray
+    assert gaussian.get_value() == 4.
 
 
 def test_vertex_can_observe_ndarray(jvm_view):
@@ -70,9 +79,53 @@ def test_vertex_can_observe_ndarray(jvm_view):
     ndarray = np.array([[1.,2.]])
     gaussian.observe(ndarray)
 
-    nd4j_tensor_flat = gaussian.get_value().asFlatArray()
-    assert nd4j_tensor_flat[0] == 1.
-    assert nd4j_tensor_flat[1] == 2.
+    assert type(gaussian.get_value()) == np.ndarray
+    assert (gaussian.get_value() == ndarray).all()
+
+
+def test_int_vertex_value_is_a_numpy_array():
+    ndarray = np.array([[1, 2], [3, 4]])
+    vertex = kn.Const(ndarray)
+    value = vertex.get_value()
+    assert type(value) == np.ndarray
+    assert value.dtype == np.int64 or value.dtype == np.int32
+    assert (value == ndarray).all()
+
+def test_float_vertex_value_is_a_numpy_array():
+    ndarray = np.array([[1., 2.], [3., 4.]])
+    vertex = kn.Const(ndarray)
+    value = vertex.get_value()
+    assert type(value) == np.ndarray
+    assert value.dtype == np.float64
+    assert (value == ndarray).all()
+
+def test_boolean_vertex_value_is_a_numpy_array():
+    ndarray = np.array([[True, True], [False, True]])
+    vertex = kn.Const(ndarray)
+    value = vertex.get_value()
+    assert type(value) == np.ndarray
+    assert value.dtype == np.bool
+    assert (value == ndarray).all()
+
+def test_scalar_vertex_value_is_a_numpy_array():
+    scalar = 1.
+    vertex = kn.Const(scalar)
+    value = vertex.get_value()
+    assert type(value) == np.ndarray
+    assert value.dtype == np.float64
+    assert value.shape == (1, 1)
+    assert value == scalar
+    assert (value == scalar).all()
+
+def test_vertex_sample_is_a_numpy_array():
+    mu = np.array([[1., 2.], [3., 4.]])
+    sigma = np.array([[.1, .2], [.3, .4]])
+    vertex = kn.Gaussian(mu, sigma)
+    value = vertex.sample()
+    print(value)
+    assert type(value) == np.ndarray
+    assert value.dtype == np.float64
+    assert value.shape == (2, 2)
 
 
 def test_get_connected_graph(jvm_view):

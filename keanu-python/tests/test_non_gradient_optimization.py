@@ -45,7 +45,7 @@ def test_non_gradient_can_set_bounds_range_builder_properties(model):
     non_gradient_optimizer = kn.NonGradientOptimizer(model.a, bounds_range=0.1)
     logProb = non_gradient_optimizer.max_a_posteriori()
 
-    sum_ab = model.a.get_value().scalar() + model.b.get_value().scalar()
+    sum_ab = model.a.get_value() + model.b.get_value()
     assert not (19.9 < sum_ab < 20.1)
 
 
@@ -54,7 +54,7 @@ def test_map_non_gradient(model):
     logProb = non_gradient_optimizer.max_a_posteriori()
     assert logProb < 0.
 
-    sum_ab = model.a.get_value().scalar() + model.b.get_value().scalar()
+    sum_ab = model.a.get_value() + model.b.get_value()
     assert 19.9 < sum_ab < 20.1
 
 
@@ -63,5 +63,5 @@ def test_max_likelihood_non_gradient(model):
     logProb = non_gradient_optimizer.max_likelihood()
     assert logProb < 0.
 
-    sum_ab = model.a.get_value().scalar() + model.b.get_value().scalar()
+    sum_ab = model.a.get_value() + model.b.get_value()
     assert 19.9 < sum_ab < 20.1
