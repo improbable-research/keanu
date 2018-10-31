@@ -40,10 +40,6 @@ dependencies {
 
 }
 
-compileJava {
-    options.compilerArgs += ['-parameters']
-}
-
 protobuf {
     protoc {
         // The artifact spec for the Protobuf Compiler

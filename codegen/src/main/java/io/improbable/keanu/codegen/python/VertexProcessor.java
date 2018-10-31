@@ -6,6 +6,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import lombok.Getter;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.MethodParameterNamesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
@@ -33,7 +34,11 @@ class VertexProcessor {
     }
 
     private static Map<String, Object> buildDataModel() {
-        List<Constructor> constructors = getSortedListOfAnnotatedVertexConstructors();
+        Reflections reflections = new Reflections(new ConfigurationBuilder()
+            .setUrls(ClasspathHelper.forPackage("io.improbable.keanu.vertices"))
+            .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner(), new MethodParameterNamesScanner()));
+
+        List<Constructor> constructors = getSortedListOfAnnotatedVertexConstructors(reflections);
 
         Map<String, Object> root = new HashMap<>();
         List<Import> imports = new ArrayList<>();
@@ -44,9 +49,8 @@ class VertexProcessor {
 
         for (Constructor constructor : constructors) {
             String javaClass = constructor.getDeclaringClass().getSimpleName();
-
-            String[] pythonParameters = Arrays.stream(constructor.getParameters()).map(
-                parameter -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, parameter.getName())).toArray(String[]::new);
+            String[] pythonParameters = reflections.getConstructorParamNames(constructor).stream().map(
+                parameter -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, parameter)).toArray(String[]::new);
 
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
             pythonConstructors.add(new PythonConstructor(javaClass, toPythonClass(javaClass), String.join(", ", pythonParameters)));
@@ -55,11 +59,7 @@ class VertexProcessor {
         return root;
     }
 
-    private static List<Constructor> getSortedListOfAnnotatedVertexConstructors() {
-         Reflections reflections = new Reflections(new ConfigurationBuilder()
-            .setUrls(ClasspathHelper.forPackage("io.improbable.keanu.vertices"))
-            .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner()));
-
+    private static List<Constructor> getSortedListOfAnnotatedVertexConstructors(Reflections reflections) {
         List<Constructor> constructors = new ArrayList<>(reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class));
         constructors.sort(Comparator.comparing(Constructor::getName));
 
