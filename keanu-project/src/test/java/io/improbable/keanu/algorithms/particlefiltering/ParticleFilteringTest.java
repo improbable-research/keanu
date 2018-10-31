@@ -1,11 +1,13 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ public class ParticleFilteringTest {
 
     private final Logger log = LoggerFactory.getLogger(ParticleFilteringTest.class);
 
+    @Category(Slow.class)
     @Test
     public void findsCorrectTemp() {
 

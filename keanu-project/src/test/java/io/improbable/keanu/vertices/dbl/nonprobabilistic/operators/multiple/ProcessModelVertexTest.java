@@ -6,6 +6,7 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -19,6 +20,7 @@ import io.improbable.keanu.vertices.model.ModelVertex;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.io.IOException;
 import java.util.Map;
@@ -106,6 +108,7 @@ public class ProcessModelVertexTest {
         Assert.assertEquals(isSunny.getValue().scalar(), false);
     }
 
+    @Category(Slow.class)
     @Test
     public void modelInsideVertexIsRecalculatedOnEachParentSample() {
         int numSamples = 50;
@@ -127,6 +130,7 @@ public class ProcessModelVertexTest {
         }
     }
 
+    @Category(Slow.class)
     @Test
     public void modelWorksAsPartOfGradientOptimisation() {
         DoubleVertex inputToModelOne = new GaussianVertex(14.0, 5);
@@ -151,6 +155,7 @@ public class ProcessModelVertexTest {
         Assert.assertEquals(30.0, inputToModel.getValue().scalar(), 0.1);
     }
 
+    @Category(Slow.class)
     @Test
     public void modelWorksAsPartOfSampling() {
         inputToModel = new GaussianVertex(25, 5);

@@ -52,6 +52,12 @@ test {
     systemProperty "dtype", 'double'
 }
 
+task testFastOnes(type: Test) {
+    useJUnit {
+        excludeCategories 'io.improbable.keanu.testcategory.Slow'
+    }
+}
+
 // Add default user/pass so it's not needed if only building and not publishing to Nexus
 if (!hasProperty('nexusUser')) {
     ext.nexusUser = ''

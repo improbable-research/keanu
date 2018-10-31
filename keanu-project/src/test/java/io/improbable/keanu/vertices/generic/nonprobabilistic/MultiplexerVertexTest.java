@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.generic.GenericTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -8,6 +9,7 @@ import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVe
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,7 @@ public class MultiplexerVertexTest {
     private int N = 100000;
     private double epsilon = 0.01;
 
+    @Category(Slow.class)
     @Test
     public void multiplexerGivesReasonableDistributionOfSamples() {
         KeanuRandom random = new KeanuRandom(1);

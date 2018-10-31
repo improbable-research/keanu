@@ -4,11 +4,13 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -20,6 +22,7 @@ public class HamiltonianTest {
     @Rule
     public DeterministicRule deterministicRule = new DeterministicRule();
 
+    @Category(Slow.class)
     @Test
     public void samplesGaussian() {
         double mu = 0.0;
@@ -64,6 +67,7 @@ public class HamiltonianTest {
         MCMCTestDistributions.samplesMatchesSumOfGaussians(44.0, posteriorSamples.get(A).asList(), posteriorSamples.get(B).asList());
     }
 
+    @Category(Slow.class)
     @Test
     public void samplesFromDonut() {
 
