@@ -10,7 +10,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import org.nd4j.linalg.api.ndarray.INDArray;
 
 public class ScalarIntegerTensor implements IntegerTensor {
 
