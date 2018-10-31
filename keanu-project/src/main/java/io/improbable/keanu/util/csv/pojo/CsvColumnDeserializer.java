@@ -44,7 +44,7 @@ class CsvColumnDeserializer {
         if (fieldType == boolean[].class) {
             return convertToBooleans(s);
         }
-        
+
         if (fieldType == Boolean[].class) {
             return toObject(convertToBooleans(s));
         }
@@ -58,7 +58,8 @@ class CsvColumnDeserializer {
 
     private static int[] convertToIntegers(List<String> data) {
         return data.stream()
-            .mapToInt(Integer::parseInt)
+            .mapToDouble(Double::parseDouble)
+            .mapToInt(v -> (int) v)
             .toArray();
     }
 
