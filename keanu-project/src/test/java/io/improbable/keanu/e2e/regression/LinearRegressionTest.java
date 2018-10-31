@@ -1,6 +1,9 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.regression.RegressionModel;
@@ -116,6 +119,43 @@ public class LinearRegressionTest {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataUniformWeights(20);
 
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
+            .build();
+
+        assertWeightsAndInterceptMatchTestData(
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
+            data
+        );
+    }
+
+    @Test
+    public void youCanChooseSamplingInsteadOfGradientOptimization() {
+        LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataUniformWeights(20);
+
+        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
+            .withSampling(1000)
+            .build();
+
+        assertWeightsAndInterceptMatchTestData(
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
+            data
+        );
+    }
+
+
+    @Test
+    public void youCanSpecifyACustomSamplingMethodInsteadOfGradientOptimization() {
+        LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataUniformWeights(20);
+
+        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
+
+        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
+            .withSampling(
+                MetropolisHastings.builder()
+                    .proposalDistribution(proposalDistribution)
+                    .build(),
+                1000)
             .build();
 
         assertWeightsAndInterceptMatchTestData(
