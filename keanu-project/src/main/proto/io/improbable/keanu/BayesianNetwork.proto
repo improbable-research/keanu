@@ -10,8 +10,12 @@ message BayesianNetwork {
     repeated VertexValue defaultState = 2;
 }
 
+message VertexID {
+    repeated int64 idValues = 1;
+}
+
 message Vertex {
-    repeated int64 id = 1;
+    VertexID id = 1;
     string label = 2;
     string vertexType = 3;
     repeated NamedParent parents = 5;
@@ -27,10 +31,10 @@ message VertexValue {
     }
 
     string vertexLabel = 6;
-    repeated int64 id = 7;
+    VertexID id = 7;
 }
 
 message NamedParent {
     string name = 1;
-    int64 parentID = 2;
+    VertexID id = 2;
 }

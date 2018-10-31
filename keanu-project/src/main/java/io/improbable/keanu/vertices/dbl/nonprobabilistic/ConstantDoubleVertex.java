@@ -1,5 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -8,9 +14,6 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.Collections;
-import java.util.Map;
 
 public class ConstantDoubleVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
@@ -28,6 +31,10 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
         this(DoubleTensor.create(vector));
     }
 
+    public ConstantDoubleVertex(Map<String, Vertex> parentMap) {
+        this(0.0);
+    }
+
     @Override
     public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         return PartialDerivatives.OF_CONSTANT;
@@ -41,6 +48,11 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return getValue();
+    }
+
+    @Override
+    public List<KeanuSavedBayesNet.NamedParent> getNamedParents() {
+        return new ArrayList<>();
     }
 
     @Override

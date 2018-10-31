@@ -1,18 +1,26 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class BayesianNetworkTest {
 
@@ -89,5 +97,17 @@ public class BayesianNetworkTest {
         b.setLabel(LABEL_A);
 
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
+    }
+
+    @Test
+    public void youCanSaveAndLoadANetworkWithValues() throws IOException {
+        DoubleVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
+        BayesianNetwork net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        net.saveNetwork(output, true);
+        assertThat(output.size(), greaterThan(0));
+        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+        net = BayesianNetwork.loadNetwork(input);
     }
 }

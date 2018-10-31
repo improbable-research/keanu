@@ -1,16 +1,22 @@
 package io.improbable.keanu.vertices;
 
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import com.google.common.collect.ImmutableSet;
+
+import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
 
 public abstract class Vertex<T> implements Observable<T> {
 
@@ -22,6 +28,51 @@ public abstract class Vertex<T> implements Observable<T> {
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
     private VertexLabel label = null;
+
+    public static <T> Vertex<T> fromProtoBuf(KeanuSavedBayesNet.Vertex vertex,
+                                             Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+        Class vertexClass;
+        try {
+            vertexClass = Class.forName(vertex.getVertexType());
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("Unknown Vertex Type Specified: " + vertex.getVertexType(), e);
+        }
+
+        Constructor vertexConstructor;
+        try {
+            vertexConstructor = vertexClass.getConstructor(Map.class);
+        } catch (NoSuchMethodException e) {
+            throw new
+                IllegalArgumentException("Vertex Type doesn't support loading from Proto: " + vertex.getVertexType(), e);
+        }
+
+        Vertex<T> newVertex;
+        Map<String, Vertex> parentsMap = getParentsMap(vertex, existingVertices);
+
+        try {
+            newVertex = (Vertex<T>)vertexConstructor.newInstance(parentsMap);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to create Vertex of Type: " + vertex.getVertexType(), e);
+        }
+
+        return newVertex;
+    }
+
+    private static Map<String, Vertex> getParentsMap(KeanuSavedBayesNet.Vertex vertex,
+                                                     Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+        Map<String, Vertex> parentsMap = new HashMap<>();
+
+        for (KeanuSavedBayesNet.NamedParent namedParent : vertex.getParentsList()) {
+            Vertex existingParent = existingVertices.get(namedParent.getId());
+            if (existingParent == null) {
+                throw new IllegalArgumentException("Invalid Parent Specified: " + namedParent);
+            }
+
+            parentsMap.put(namedParent.getName(), existingParent);
+        }
+
+        return parentsMap;
+    }
 
     public Vertex() {
         this(Tensor.SCALAR_SHAPE);
@@ -113,6 +164,11 @@ public abstract class Vertex<T> implements Observable<T> {
         if (!observation.isObserved()) {
             this.value = value;
         }
+    }
+
+    public void setValue(KeanuSavedBayesNet.VertexValue value) {
+        throw new UnsupportedOperationException("This Vertex Type doesn't support loading from GPB");
+        //TODO - make abstract?
     }
 
     public T getValue() {
@@ -245,7 +301,6 @@ public abstract class Vertex<T> implements Observable<T> {
         return DiscoverGraph.getEntireGraph(this);
     }
 
-
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -259,5 +314,29 @@ public abstract class Vertex<T> implements Observable<T> {
             stringBuilder.append("(" + getValue() + ")");
         }
         return stringBuilder.toString();
+    }
+
+    public final KeanuSavedBayesNet.Vertex toProtoBuf() {
+        KeanuSavedBayesNet.Vertex.Builder vertexBuilder = KeanuSavedBayesNet.Vertex.newBuilder();
+
+        if (label != null) {
+            vertexBuilder = vertexBuilder.setLabel(label.toString());
+        }
+
+        vertexBuilder = vertexBuilder.setId(id.toProtoBuf());
+        vertexBuilder = vertexBuilder.setVertexType(this.getClass().getCanonicalName());
+        vertexBuilder = vertexBuilder.addAllParents(getNamedParents());
+
+        return vertexBuilder.build();
+    }
+
+    public List<KeanuSavedBayesNet.NamedParent> getNamedParents() {
+        //TODO - Make this abstract once everyone implements
+        throw new UnsupportedOperationException("Parent Save Not Implemented");
+    }
+
+    public KeanuSavedBayesNet.VertexValue getValueAsProtoBuf() {
+        //TODO - make abstract once implemented everywhere
+        throw new UnsupportedOperationException("This Vertex Doesn't Support Value Save");
     }
 }

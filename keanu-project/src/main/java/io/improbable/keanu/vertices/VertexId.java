@@ -1,10 +1,14 @@
 package io.improbable.keanu.vertices;
 
-import com.google.common.primitives.Ints;
-import lombok.EqualsAndHashCode;
-
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+
+import io.improbable.keanu.KeanuSavedBayesNet;
+import lombok.EqualsAndHashCode;
 
 /**
  * An object representing the ID value of a vertex.  IDs are assigned in such a way that a Lexicographic ordering of
@@ -23,6 +27,10 @@ public class VertexId implements Comparable<VertexId> {
 
     public VertexId() {
         idValues[0] = ID_GENERATOR.getAndIncrement();
+    }
+
+    public VertexId(List<Long> ids) {
+        idValues = Longs.toArray(ids);
     }
 
     public void addPrefix(VertexId prefix) {
@@ -78,5 +86,11 @@ public class VertexId implements Comparable<VertexId> {
 
     public int getIndentation() {
         return idValues.length;
+    }
+
+    public KeanuSavedBayesNet.VertexID toProtoBuf() {
+        return KeanuSavedBayesNet.VertexID.newBuilder()
+            .addAllIdValues(Longs.asList(idValues))
+            .build();
     }
 }
