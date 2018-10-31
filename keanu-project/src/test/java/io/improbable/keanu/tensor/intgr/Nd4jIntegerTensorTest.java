@@ -3,9 +3,6 @@ package io.improbable.keanu.tensor.intgr;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -21,6 +18,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+
 
 public class Nd4jIntegerTensorTest {
 
@@ -646,15 +644,9 @@ public class Nd4jIntegerTensorTest {
     public void comparesIntegerTensorWithScalar() {
         IntegerTensor value = IntegerTensor.create(1, 2, 3);
         IntegerTensor differentValue = IntegerTensor.create(1);
-        BoolVertex result = new EqualsVertex<>(ConstantVertex.of(value), ConstantVertex.of(differentValue));
-        assertThat(result.getValue(), hasValue(true, false, false));
+        BooleanTensor result = value.elementwiseEquals(differentValue);
+        assertThat(result, hasValue(true, false, false));
     }
 
-    @Test
-    public void comparesScalarWithIntegerTensor() {
-        IntegerTensor value = IntegerTensor.create(1);
-        IntegerTensor differentValue = IntegerTensor.create(1, 2, 3);
-        BoolVertex result = new EqualsVertex<>(ConstantVertex.of(value), ConstantVertex.of(differentValue));
-        assertThat(result.getValue(), hasValue(true, false, false));
-    }
+
 }
