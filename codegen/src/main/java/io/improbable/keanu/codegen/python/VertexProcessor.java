@@ -38,6 +38,7 @@ class VertexProcessor {
         Map<String, Object> root = new HashMap<>();
         List<Import> imports = new ArrayList<>();
         List<PythonConstructor> pythonConstructors = new ArrayList<>();
+
         root.put("imports", imports);
         root.put("constructors", pythonConstructors);
 
