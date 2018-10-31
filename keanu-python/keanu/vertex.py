@@ -4,6 +4,8 @@ import numbers
 import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
+from keanu.tensor import Tensor
+
 
 k = KeanuContext()
 
@@ -110,6 +112,7 @@ class VertexOps:
     def __ceil__(self):
         return kn.generated.vertex.Ceil(self)
 
+
 class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, val, *args):
         if args:
@@ -122,8 +125,19 @@ class Vertex(JavaObjectWrapper, VertexOps):
         return hash(self.get_id())
 
     def observe(self, v):
-        from keanu.tensor import Tensor
-        self.unwrap().observe(Tensor(v).unwrap())
+        self.unwrap().observe(kn.Tensor(v).unwrap())
+
+    def set_value(self, v):
+        self.unwrap().setValue(kn.Tensor(v).unwrap())
+
+    def set_and_cascade(self, v):
+        self.unwrap().setAndCascade(kn.Tensor(v).unwrap())
+
+    def sample(self):
+        return Tensor._to_ndarray(self.unwrap().sample())
+
+    def get_value(self):
+        return Tensor._to_ndarray(self.unwrap().getValue())
 
     def get_connected_graph(self):
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
