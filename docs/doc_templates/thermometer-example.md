@@ -29,11 +29,10 @@ Here's a simple example to demonstrate Keanu's syntax and how to solve a basic p
 
 ## The problem?
 
-You are sat inside a room. Feeling rather hot you decide to measure the temperature
-of the room. You have two thermometers at your disposal. Unfortunately, these thermometers deteriorate with age and
-one is a year old and the other is five years old.
-
-As a result, the newer one provides quite accurate results whereas the older one provides less accurate results. 
+You are sitting in a room. Feeling rather hot you decide to measure the temperature
+of the room. You have two thermometers at your disposal. Unfortunately, these thermometers deteriorate with age:
+one is a year old and the other is five years old. As a result, the newer one provides quite accurate results whereas 
+the older one provides less accurate results. 
 
 Let's calculate the temperature of the room given these two measurements.
 
@@ -67,8 +66,8 @@ we define the temperature as a Uniform Distribution between 20° and 30°.
 Let's now define our two thermometers. Looking at the graph we made earlier, we can see that each thermometer
 is comprised of the room temperature and its given inaccuracy. 
 
-Let's represent each thermometer as a Gaussian distribution with a Mu of the room temperature and a Sigma of it's inaccuracy.
-As the first thermometer is more accurate, it's Sigma will be smaller.
+Let's represent each thermometer as a Gaussian distribution with a mu of the room temperature and a sigma of its inaccuracy.
+As the first thermometer is more accurate, its sigma will be smaller.
 
 ```java
 {% snippet TempThermModel %}
@@ -106,7 +105,7 @@ Running this code gives a value of:
 
 Here is the completed code if you'd like to run it yourself.
 
-Experiment with the size of the Sigma in each thermometer (the inaccuracy) and see how it affects the 
+Experiment with the size of the sigma in each thermometer (the inaccuracy) and see how it affects the 
 estimated temperature.
 
 ```java

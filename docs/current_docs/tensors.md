@@ -67,7 +67,7 @@ Let's make a 2x2 matrix of doubles, integers and booleans.
 
 ```java
 DoubleTensor dTensor = DoubleTensor.create(new double[]{0.5, 1.5, 2.5, 3.5}, new long[]{2, 2});
-IntegerTensor iTensor = IntegerTensor.create(new long[]{1, 2, 3, 4}, new long[]{2, 2});
+IntegerTensor iTensor = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
 BooleanTensor bTensor = BooleanTensor.create(new boolean[]{true, true, false, false}, new long[]{2, 2});
 ```
 

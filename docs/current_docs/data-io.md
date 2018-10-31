@@ -33,7 +33,7 @@ This page tells you how to:
 
 ### Reading CSV data
 
-Keanu is packaged with a CSV reader that allows you to load simple CSV files with or without
+Keanu is packaged with a CSV reader that allows you to load simples CSV files with or without
 a header. You can read from a specified file, predefined string or a file on the class path.
 
 We will go through the steps on how to read from a file using a CsvReader and then how to

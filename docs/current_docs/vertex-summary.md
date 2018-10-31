@@ -76,7 +76,7 @@ public enum MyType {
     A, B, C, D
 }
 
-public CategoricalVertex<MyType> getSelectorForMyType() {
+public CategoricalVertex<MyType, GenericTensor<MyType>> getSelectorForMyType() {
 
     LinkedHashMap<MyType, DoubleVertex> frequency = new LinkedHashMap<>();
     frequency.put(A, new ConstantDoubleVertex(0.25));

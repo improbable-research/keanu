@@ -8,18 +8,9 @@ buildscript {
     }
 }
 
-group 'io.improbable'
-version '1.0-SNAPSHOT'
+version gitVersion()
 
-apply plugin: 'java'
 apply plugin: 'kotlin'
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
 
 dependencies {
     compile project(':keanu-project')

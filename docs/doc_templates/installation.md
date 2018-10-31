@@ -65,4 +65,4 @@ In your project's `pom.xml`
 </dependency>
 ```
 
-Now that you have the dependency, head over to [getting started]({{ site.baseurl }}/docs/getting-started) to get started.
+Now that you have the dependency, head over to [getting started]({{ site.baseurl }}/docs/getting-started).
