@@ -5,7 +5,3 @@ if [[ $TRAVIS_BRANCH == 'master' ]]; then
 else
   ./gradlew clean build -x :keanu-python:build --info --stacktrace
 fi
-
-if [[ ! -z $SONAR_TOKEN ]]; then
-  sonar-scanner
-fi

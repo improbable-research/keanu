@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.intgr;
 
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -32,14 +31,6 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
             return new ScalarIntegerTensor(values[0]);
         } else {
             return Nd4jIntegerTensor.create(values, shape);
-        }
-    }
-
-    static IntegerTensor create(long[] values, long... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
-            return new ScalarIntegerTensor(Ints.checkedCast(values[0]));
-        } else {
-            return Nd4jIntegerTensor.create(Arrays.stream(values).mapToInt(Ints::checkedCast).toArray(), shape);
         }
     }
 
