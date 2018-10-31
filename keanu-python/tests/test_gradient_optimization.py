@@ -8,6 +8,7 @@ from py4j.protocol import Py4JJavaError
 
 @pytest.fixture
 def model():
+    kn.KeanuRandom().set_default_random_seed(1)
     model = thermometers.model()
     model.thermometer_one.observe(22.0)
     model.thermometer_two.observe(20.0)

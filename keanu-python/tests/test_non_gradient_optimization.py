@@ -7,6 +7,7 @@ from py4j.protocol import Py4JJavaError
 
 @pytest.fixture
 def model():
+    kn.KeanuRandom().set_default_random_seed(1)
     with kn.Model() as m:
         m.a = kn.Gaussian(0., 50.)
         m.b = kn.Gaussian(0., 50.)
@@ -33,7 +34,6 @@ def test_non_gradient_op_throws_with_invalid_net_param():
 
 
 def test_non_gradient_can_set_max_eval_builder_properties(model):
-    net = kn.BayesNet(model.a.get_connected_graph())
     non_gradient_optimizer = kn.NonGradientOptimizer(model.a, max_evaluations=5)
 
     with pytest.raises(Py4JJavaError) as excinfo:
@@ -42,9 +42,7 @@ def test_non_gradient_can_set_max_eval_builder_properties(model):
 
 
 def test_non_gradient_can_set_bounds_range_builder_properties(model):
-    net = kn.BayesNet(model.a.get_connected_graph())
     non_gradient_optimizer = kn.NonGradientOptimizer(model.a, bounds_range=0.1)
-
     logProb = non_gradient_optimizer.max_a_posteriori()
 
     sum_ab = model.a.get_value().scalar() + model.b.get_value().scalar()
