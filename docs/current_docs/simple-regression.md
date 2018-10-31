@@ -22,14 +22,14 @@ page_nav:
         url: /docs/particle-filter/
 ---
 
-# Introduction
+## Introduction
 Linear and logistic regression are two simple classes of a problem where we can model a system output as the result of linear combinations of input variables and weights.
 Linear regression describes the case where our output is a number, and logistic regression describes the case where our output is a discrete, two-valued variable.
 Keanu has the ability to help you quickly and easily create regression models with input data.
 Keanu also allows you to specify what form of regularization you would like.
 By default, unregularised linear regression is used, but if you wish, you can specify Lasso or Ridge regression.
 
-# Building a simple linear regression model
+## Building a simple linear regression model
 ```java
 //Define Model Parameters
 double weight = 2.0;

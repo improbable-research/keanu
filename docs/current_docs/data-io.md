@@ -53,7 +53,7 @@ which allows you to avoid having to provide a hardcoded file path.
 CsvReader reader2 = ReadCsv.fromResources("my_other_filename.csv");
 ```
 
-Once you have a `CsvReader`, you can call readLines() to start reading each line.
+Once you have a `CsvReader`, you can call `readLines()` to start reading each line.
 ```java
 for (List<String> csvLine : reader1.readLines()) {
     //do something with your csv line

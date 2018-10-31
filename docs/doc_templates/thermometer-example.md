@@ -37,7 +37,7 @@ the older one provides less accurate results.
 Let's calculate the temperature of the room given these two measurements.
 
 
-## Defining the problem as a graph?
+### Defining the problem as a graph
 
 How can we define this problem as a graph? 
 
@@ -54,7 +54,7 @@ that we mentioned earlier.
      (Inaccuracy) ---- + -> (Second Thermometer) -> (Observation) 
 ```
 
-## Implementation
+### Implementation
 
 Let's assume we're on a distant planet and have no prior knowledge about what the temperature of the room may be, so 
 we define the temperature as a Uniform Distribution between 20° and 30°.
@@ -88,7 +88,7 @@ room temperature.
 
 Given our graph and observed values, this will attempt to calculate the most likely value for each vertex.
 
-## Results
+### Results
 
 Can you have a guess at what you think the result will be before you run the code?
 
@@ -101,7 +101,7 @@ Running this code gives a value of:
 26.01°
 ```
 
-## Code
+### Code
 
 Here is the completed code if you'd like to run it yourself.
 

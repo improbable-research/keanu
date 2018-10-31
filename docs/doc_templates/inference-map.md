@@ -47,7 +47,7 @@ on your bayesian network using [Automatic-Differentiation](http://www.columbia.e
 Automatic Differentiation may sound technical and scary, but don't worry, Keanu handles all the calculations for you! All
 you have to focus on is describing your model.
 
-"Which one do I use then?" I hear you ask. "How do I know if my model can make use of gradients"?
+"Which one do I use then?" I hear you ask. "How do I know if my model can make use of gradients?"
 
 Well it depends on whether your latent variables (the ones we're going to find the most probable value of) are continuous
 or discrete. Keanu does not support gradient optimisation on discrete latents. Still not sure? Don't worry, Keanu can analyse

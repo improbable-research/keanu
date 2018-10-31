@@ -130,4 +130,4 @@ Alternatively, you can create a new Bayesian network and use this to probe some 
 ```
 Now you can run MCMC on the BayesNet as it will start off in the correct configuration.
 
-Instead of running MCMC you could also run one of our [inference algorithms]({{ site.baseurl }}/docs/inference-map) section.
+Instead of running MCMC you could also run one of our [inference algorithms]({{ site.baseurl }}/docs/inference-map).

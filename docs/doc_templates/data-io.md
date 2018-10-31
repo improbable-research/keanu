@@ -53,7 +53,7 @@ which allows you to avoid having to provide a hardcoded file path.
 {% snippet ReadFromResource %}
 ```
 
-Once you have a `CsvReader`, you can call readLines() to start reading each line.
+Once you have a `CsvReader`, you can call `readLines()` to start reading each line.
 ```java
 {% snippet ReadLines %}
 ```
