@@ -29,7 +29,6 @@ public class BayesianNetwork {
         this.vertexLabels = buildLabelMap(vertices);
     }
 
-    // TODO Ieva switch this back to non-public
     public BayesianNetwork(Collection<? extends Vertex> vertices) {
         this(new HashSet<>(vertices));
     }
@@ -54,7 +53,7 @@ public class BayesianNetwork {
         return labelMap;
     }
 
-    public List<? extends Vertex> getVertices() {
+    List<? extends Vertex> getVertices() {
         return vertices;
     }
 
