@@ -1,10 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.function.Function;
-
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
@@ -51,6 +47,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.function.Function;
 
 public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 

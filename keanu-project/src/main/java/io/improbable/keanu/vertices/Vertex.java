@@ -1,5 +1,12 @@
 package io.improbable.keanu.vertices;
 
+import com.google.common.collect.ImmutableSet;
+import io.improbable.keanu.KeanuSavedBayesNet;
+import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,14 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
-
-import io.improbable.keanu.KeanuSavedBayesNet;
-import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public abstract class Vertex<T> implements Observable<T> {
 
