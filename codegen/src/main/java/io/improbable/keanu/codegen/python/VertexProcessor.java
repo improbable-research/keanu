@@ -1,5 +1,6 @@
 package io.improbable.keanu.codegen.python;
 
+import com.google.common.base.CaseFormat;
 import freemarker.template.Template;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import lombok.Getter;
@@ -11,7 +12,9 @@ import org.reflections.util.ConfigurationBuilder;
 
 import java.io.Writer;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -42,8 +45,11 @@ class VertexProcessor {
         for (Constructor constructor : constructors) {
             String javaClass = constructor.getDeclaringClass().getSimpleName();
 
+            String[] pythonParameters = Arrays.stream(constructor.getParameters()).map(
+                parameter -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, parameter.getName())).toArray(String[]::new);
+
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
-            pythonConstructors.add(new PythonConstructor(javaClass, toPythonClass(javaClass)));
+            pythonConstructors.add(new PythonConstructor(javaClass, toPythonClass(javaClass), String.join(", ", pythonParameters)));
         }
 
         return root;
@@ -78,10 +84,14 @@ class VertexProcessor {
         private String javaClass;
         @Getter
         private String pythonClass;
+        @Getter
+        private String pythonParameters;
 
-        PythonConstructor(String javaClass, String pythonClass) {
+        PythonConstructor(String javaClass, String pythonClass, String pythonParameters) {
             this.javaClass = javaClass;
             this.pythonClass = pythonClass;
+            this.pythonParameters = pythonParameters;
         }
     }
+
 }

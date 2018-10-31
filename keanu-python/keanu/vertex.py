@@ -114,7 +114,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, val, *args):
         if args:
             ctor = val
-            val = ctor(*(Vertex.__parse_args(*args)))
+            val = ctor(*(Vertex.__parse_args(args)))
 
         super(Vertex, self).__init__(val)
 
