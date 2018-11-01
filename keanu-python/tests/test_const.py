@@ -1,5 +1,6 @@
 import keanu as kn
 import numpy as np
+import pandas as pd
 import pytest
 
 
@@ -17,7 +18,48 @@ def test_const_takes_ndarray(arr, expected_java_class):
     v = kn.Const(ndarray)
 
     assert_java_class(v, expected_java_class)
-    assert_vertex_value_equal_ndarray(v, ndarray)
+    assert np.array_equal(v.get_value(), ndarray)
+
+
+@pytest.mark.parametrize("data, expected_java_class", [
+    ([1, 2], "ConstantIntegerVertex"),
+    ([1., 2.], "ConstantDoubleVertex"),
+    ([True, False], "ConstantBoolVertex")
+])
+def test_const_takes_panda_series(data, expected_java_class):
+    series = pd.Series(data)
+    v = kn.Const(series)
+
+    assert_java_class(v, expected_java_class)
+
+    vertex_value = v.get_value()
+    series_value = series.values
+
+    assert len(vertex_value) == len(series_value)
+    assert vertex_value.shape == (2, 1)
+    assert series_value.shape == (2,  )
+
+    assert np.array_equal(vertex_value.flatten(), series_value.flatten())
+
+
+@pytest.mark.parametrize("data, expected_java_class", [
+    ([[1, 2], [3, 4]], "ConstantIntegerVertex"),
+    ([[1., 2.], [3., 4.]], "ConstantDoubleVertex"),
+    ([[True, False], [True, False]], "ConstantBoolVertex")
+])
+def test_const_takes_panda_dataframe(data, expected_java_class):
+    dataframe = pd.DataFrame(columns=['A', 'B'], data=data)
+    v = kn.Const(dataframe)
+
+    assert_java_class(v, expected_java_class)
+
+    vertex_value = v.get_value()
+    dataframe_value = dataframe.values
+
+    assert vertex_value.shape == (2, 2)
+    assert dataframe_value.shape == (2, 2)
+
+    assert np.array_equal(vertex_value, dataframe_value)
 
 
 @pytest.mark.parametrize("num, expected_java_class", [
@@ -29,7 +71,7 @@ def test_const_takes_num(num, expected_java_class):
     v = kn.Const(num)
 
     assert_java_class(v, expected_java_class)
-    assert_vertex_value_equals_scalar(v, num)
+    assert v.get_value() == num
 
 
 def test_const_does_not_take_generic_ndarray(generic):
@@ -56,25 +98,13 @@ def test_const_does_not_take_empty_ndarray():
 
 
 def test_const_takes_ndarray_of_rank_one():
-    ndarray = np.array([1 ,2])
+    ndarray = np.array([1, 2])
     v = kn.Const(ndarray)
 
-    assert_vertex_value_equal_ndarray(v, ndarray)
+    assert ndarray.shape == (2, )
     assert v.get_value().shape == (2, 1)
 
-
-def assert_vertex_value_equal_ndarray(v, ndarray):
-    nd4j_flat = v.unwrap().getValue().asFlatArray()
-    np_flat = ndarray.flatten().tolist()
-
-    assert len(nd4j_flat) == len(np_flat)
-
-    for i in range(len(ndarray)):
-        assert nd4j_flat[i] == np_flat[i]
-
-
-def assert_vertex_value_equals_scalar(v, scalar):
-    assert v.get_value() == scalar
+    assert np.array_equal(v.get_value().flatten(), ndarray.flatten())
 
 
 def assert_java_class(java_object_wrapper, java_class_str):

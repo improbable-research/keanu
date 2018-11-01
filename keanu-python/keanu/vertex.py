@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import numbers
 
 import keanu as kn
@@ -151,7 +152,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
 
     @staticmethod
     def __parse_arg(arg):
-        if isinstance(arg, np.ndarray) or isinstance(arg, numbers.Number):
+        if isinstance(arg, (np.ndarray, pd.Series, pd.DataFrame, numbers.Number)):
             return kn.Const(arg).unwrap()
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()

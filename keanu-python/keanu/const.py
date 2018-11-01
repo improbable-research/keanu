@@ -3,12 +3,16 @@ from keanu.vertex import Vertex
 from keanu.generated import ConstantBool, ConstantDouble, ConstantInteger
 
 import numpy as np
+import pandas as pd
 import numbers
 
 def Const(t) -> Vertex:
     if isinstance(t, np.ndarray):
         ctor = __infer_const_from_ndarray(t)
         val = t
+    elif isinstance(t, (pd.Series, pd.DataFrame)):
+        val = t.values
+        ctor = __infer_const_from_ndarray(val)
     elif isinstance(t, numbers.Number):
         ctor = __infer_const_from_scalar(t)
         val = np.array([[t]])
