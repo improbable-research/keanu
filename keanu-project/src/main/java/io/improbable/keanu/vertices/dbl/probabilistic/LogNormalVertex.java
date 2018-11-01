@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.continuous.LogNormal;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -18,7 +19,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble {
+public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -101,7 +102,7 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return LogNormal.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return LogNormal.withParameters(mu.getValue(), sigma.getValue()).sample(shape, random);
     }
 }

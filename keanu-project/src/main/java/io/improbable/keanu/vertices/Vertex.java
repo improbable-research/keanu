@@ -5,7 +5,6 @@ import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -17,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class Vertex<T> implements Observable<T> {
+public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
@@ -108,17 +107,6 @@ public abstract class Vertex<T> implements Observable<T> {
     }
 
     /**
-     * @param random source of randomness
-     * @return a sample from the vertex's distribution. For non-probabilistic vertices,
-     * this will always be the same value.
-     */
-    public abstract T sample(KeanuRandom random);
-
-    public T sample() {
-        return sample(KeanuRandom.getDefaultRandom());
-    }
-
-    /**
      * This is similar to eval() except it only propagates as far up the graph as required until
      * there are values present to operate on. On a graph that is completely uninitialized,
      * this would be the same as eval()
@@ -186,6 +174,7 @@ public abstract class Vertex<T> implements Observable<T> {
         }
     }
 
+    @Override
     public long[] getShape() {
         if (value instanceof Tensor) {
             return ((Tensor) value).getShape();
@@ -210,7 +199,7 @@ public abstract class Vertex<T> implements Observable<T> {
      * This marks the vertex's value as being observed and unchangeable.
      * <p>
      * Non-probabilistic vertices of continuous types (integer, double) are prohibited
-     * from being observed due to it's negative impact on inference algorithms. Non-probabilistic
+     * from being observed due to its negative impact on inference algorithms. Non-probabilistic
      * booleans are allowed to be observed as well as user defined types.
      *
      * @param value the value to be observed

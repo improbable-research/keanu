@@ -36,24 +36,24 @@ This page tells you how to:
 Keanu is packaged with a CSV reader that allows you to load simple CSV files with or without
 a header. You can read from a specified file, predefined string or a file on the class path.
 
-We will go through the steps on how to read from a file using a CsvReader and then how to
+We will go through the steps of how to read from a file using a CsvReader and then how to
 extract and parse the lines from the reader.
 
 #### Creating a CsvReader from your CSV data
-To read from a file from your current directory:
+To read from a file from your home directory:
 
 ```java
 {% snippet ReadFromCurrent %}
 ```
 
-If you place the CSV file in your src/main/resources folder, you can load it as a resource,
+If you place the CSV file on your classpath (e.g. in src/main/resources), you can load it as a resource,
 which allows you to avoid having to provide a hardcoded file path.
 
 ```java
 {% snippet ReadFromResource %}
 ```
 
-Once you have a CsvReader, you can call readLines() to start reading each line.
+Once you have a `CsvReader`, you can call `readLines()` to start reading each line.
 ```java
 {% snippet ReadLines %}
 ```
@@ -63,9 +63,9 @@ Once you have a CsvReader, you can call readLines() to start reading each line.
 If your CSV file is very large, you may not want to load the entirety of it into memory before
 processing it. You can stream the lines in order to avoid holding the entire file in memory.
 
-Once you have a CsvReader, you can call streamLines() to start streaming each line. Make sure
+Once you have a `CsvReader`, you can call `streamLines()` to start streaming each line. Make sure
 to close the stream as it is potentially connected to an open file. Closing the stream can be
-done by using try-with-resources, as shown below.
+done by using *try-with-resources*, as shown below.
 
 ```java
 {% snippet ReadStream %}
@@ -134,30 +134,30 @@ or samples to a file.
 
 ### Creating a CsvWriter from vertices
 
-This section assumes knowledge of tensors, please look [here](https://nd4j.org/userguide#intro) to familiarise yourself with them first. 
+This section assumes knowledge of tensors - please look [here](https://nd4j.org/userguide#intro) to familiarise yourself with them first. 
 Only scalar and vector tensors are supported by the CSV writer at the moment.
 
 Before looking at the different ways in which we can write values stored in vertices to CSV files, 
-we have to decide which output format we want to use. The options are
+we have to decide which output format we want to use. The options are:
 
 * Column format: each vertex occupies a column in the CSV file, with each row denoting the index of the vector.
 * Row format:  each vertex occupies a row, with each column denoting the index of the vector.
 
 Let's look at an example of each format.
-Say, we have ran inference on a model and would like to write the resulting (most probable) values to a CSV file and 
+Say, we have run inference on a model and would like to write the resulting (most probable) values to a CSV file and 
 that the list of inferred variables contains the following three vertices:
 
 ```java
 {% snippet WriteVars %}
 ```
 
-Let's write these as columns to a file called columnTest.csv in the root directory.
+Let's write these as columns to a file called `columnTest.csv` in the root directory.
 
 ```java
 {% snippet WriteColumnTest %}
 ```
 
-The CSV file columnTest.csv contains:
+The CSV file `columnTest.csv` contains:
 
 ```text
 0.5,5.0,50.0
@@ -166,7 +166,7 @@ The CSV file columnTest.csv contains:
 2.0,20.0,-
 ```
 
-Let's now write these as rows to a file called rowTest.csv in the root directory.
+Let's now write these as rows to a file called `rowTest.csv` in the root directory.
 
 ```java
 {% snippet WriteRowTest %}
@@ -220,7 +220,7 @@ The default header sets the column name to the index.
 ### Creating a CsvWriter from samples
 
 Let's look at how you can write samples to CSV. 
-First, you'll need some samples, let's take some from a network using the NUTS algorithm. 
+First, you'll need some samples - let's take some from a network using the NUTS algorithm. 
 To learn more about the parameters being used here, head over to the [NUTS documentation]({{ site.baseurl }}/docs/inference-posterior-sampling#nuts).
 
 ```java

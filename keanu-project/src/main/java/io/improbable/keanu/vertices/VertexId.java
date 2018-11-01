@@ -92,4 +92,8 @@ public class VertexId implements Comparable<VertexId> {
             .addAllIdValues(Longs.asList(idValues))
             .build();
     }
+    
+    public long[] getValue() {
+        return Arrays.copyOf(idValues, idValues.length);
+    }
 }

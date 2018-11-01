@@ -6,6 +6,7 @@ matrix:
         sonarcloud:
           organization: "improbable-keanu"
       script: deployment/buildAndDeploy.sh
+      after_success: deployment/sonar.sh
       before_install:
       - openssl aes-256-cbc -K $encrypted_eec04b57ffc0_key -iv $encrypted_eec04b57ffc0_iv
         -in deployment/secret-keys-keanu.gpg.enc -out deployment/secret-keys-keanu.gpg -d

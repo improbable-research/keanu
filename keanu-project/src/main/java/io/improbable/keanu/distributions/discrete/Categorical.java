@@ -1,62 +1,90 @@
 package io.improbable.keanu.distributions.discrete;
 
 import io.improbable.keanu.distributions.Distribution;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
-public class Categorical<T> implements Distribution<T> {
+public class Categorical<CATEGORY, TENSOR extends Tensor<CATEGORY>> implements Distribution<TENSOR> {
 
-    private final Map<T, DoubleTensor> selectableValues;
+    private final Map<CATEGORY, DoubleTensor> selectableValues;
+    private final List<CATEGORY> categoryOrder;
 
-    public static <T> Categorical<T> withParameters(Map<T, DoubleTensor> selectableValues) {
+    public static <CAT, TENSOR extends Tensor<CAT>> Categorical<CAT, TENSOR> withParameters(Map<CAT, DoubleTensor> selectableValues) {
         return new Categorical<>(selectableValues);
     }
 
-    private Categorical(Map<T, DoubleTensor> selectableValues) {
-        this.selectableValues = selectableValues;
+    private Categorical(Map<CATEGORY, DoubleTensor> selectableValues) {
+        this.selectableValues = new LinkedHashMap<>(selectableValues);
+        this.categoryOrder = new ArrayList<>(this.selectableValues.keySet());
     }
 
-    public T sample(long[] shape, KeanuRandom random) {
-        double sumOfProbabilities = getSumOfProbabilities();
-        double p = random.nextDouble();
-        double sum = 0;
+    public TENSOR sample(long[] shape, KeanuRandom random) {
 
-        if (sumOfProbabilities == 0.0) {
-            throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
-        }
+        DoubleTensor sumOfProbabilities = getSumOfProbabilities(shape);
 
-        T value = null;
-        for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
-            sum += entry.getValue().scalar() / sumOfProbabilities;
-            if (p < sum) {
-                value = entry.getKey();
+        DoubleTensor p = random.nextDouble(shape);
+        DoubleTensor sum = DoubleTensor.zeros(shape);
+
+        CATEGORY lastValue = categoryOrder.get(categoryOrder.size() - 1);
+        TENSOR sample = Tensor.createFilled(lastValue, shape);
+        BooleanTensor sampleValuesSetSoFar = BooleanTensor.falses(shape);
+
+        for (CATEGORY category : categoryOrder) {
+            DoubleTensor probabilitiesForCategory = selectableValues.get(category);
+
+            DoubleTensor normalizedProbabilities = probabilitiesForCategory.div(sumOfProbabilities);
+            sum = sum.plus(normalizedProbabilities);
+
+            BooleanTensor maskForUnassignedSampleValues = sampleValuesSetSoFar.xor(sum.greaterThan(p));
+            sample = maskForUnassignedSampleValues.where(Tensor.scalar(category), sample);
+
+            sampleValuesSetSoFar.orInPlace(maskForUnassignedSampleValues);
+
+            if (sampleValuesSetSoFar.allTrue()) {
                 break;
             }
         }
-        if (value == null) {
-            T[] values = (T[]) selectableValues.keySet().toArray();
-            value = values[values.length - 1];
-        }
 
-        return value;
+        return sample;
     }
 
-    public DoubleTensor logProb(T x) {
-        double sumOfProbabilities = getSumOfProbabilities();
-        if (sumOfProbabilities == 0.0) {
+    public DoubleTensor logProb(TENSOR x) {
+
+        DoubleTensor sumOfProbabilities = getSumOfProbabilities(x.getShape());
+
+        DoubleTensor logProb = DoubleTensor.zeros(x.getShape());
+        for (Map.Entry<CATEGORY, DoubleTensor> entry : selectableValues.entrySet()) {
+
+            DoubleTensor xEqualToEntryKeyMask = x.elementwiseEquals(GenericTensor.createFilled(entry.getKey(), x.getShape())).toDoubleMask();
+            logProb = logProb.plus(xEqualToEntryKeyMask.timesInPlace(entry.getValue().div(sumOfProbabilities).logInPlace()));
+        }
+
+        return logProb;
+    }
+
+    private boolean containsNonPositiveEntry(DoubleTensor sumOfProbabilities) {
+        return !sumOfProbabilities.lessThanOrEqual(0.).allFalse();
+    }
+
+    private DoubleTensor getSumOfProbabilities(long[] shape) {
+
+        DoubleTensor sumOfProbabilities = DoubleTensor.zeros(shape);
+        for (DoubleTensor p : selectableValues.values()) {
+            sumOfProbabilities = sumOfProbabilities.plus(p);
+        }
+
+        if (containsNonPositiveEntry(sumOfProbabilities)) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
         }
-        final double probability = selectableValues.get(x).scalar() / sumOfProbabilities;
-        return DoubleTensor.scalar(Math.log(probability));
-    }
 
-    private double getSumOfProbabilities() {
-        double sumP = 0.0;
-        for (DoubleTensor p : selectableValues.values()) {
-            sumP += p.scalar();
-        }
-        return sumP;
+        return sumOfProbabilities;
     }
 }

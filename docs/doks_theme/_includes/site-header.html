@@ -2,7 +2,11 @@
 	<div class="offcanvas visible-xs">
 		<ul class="offcanvas__nav">
 			{% for item in site.doks.header.nav %}
-				<li><a href="{% unless item.external_url %}{{ site.baseurl }}/{% endunless %}{{ item.item_url }}">{{ item.item_name }}</a></li>
+				{% if item.contains_version %}
+					<li><a href="{% unless item.external_url %}{{ site.baseurl }}/{% endunless %}{{ item.item_url_prefix }}{{ site.current_version }}{{ item.item_url_suffix }}">{{ item.item_name }}</a></li>
+				{% else %}
+					<li><a href="{% unless item.external_url %}{{ site.baseurl }}/{% endunless %}{{ item.item_url }}">{{ item.item_name }}</a></li>
+				{% endif %}
 			{% endfor %}
 		</ul><!-- /.offcanvas__nav -->
 	</div><!-- /.offcanvas -->
@@ -24,7 +28,11 @@
 						<ul class="site-header__nav hidden-xs">
 							{% for item in site.doks.header.nav %}
 								{% assign isExternal = item.external_url %}
-								<li><a href="{% unless isExternal %}{{ site.baseurl }}{% endunless %}{{ item.item_url }}">{{ item.item_name }}</a></li>
+								{% if item.contains_version %}
+									<li><a href="{% unless item.external_url %}{{ site.baseurl }}/{% endunless %}{{ item.item_url_prefix }}{{ site.current_version }}{{ item.item_url_suffix }}">{{ item.item_name }}</a></li>
+								{% else %}
+									<li><a href="{% unless item.external_url %}{{ site.baseurl }}/{% endunless %}{{ item.item_url }}">{{ item.item_name }}</a></li>
+								{% endif %}							
 							{% endfor %}
 						</ul><!-- /.site-header__nav -->
 						<button class="offcanvas-toggle visible-xs">

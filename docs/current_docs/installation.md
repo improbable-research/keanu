@@ -50,7 +50,7 @@ in your gradle or maven build file.
 In your project's `build.gradle`
 
 ```
-compile group: 'io.improbable', name: 'keanu', version: '0.0.14'
+compile group: 'io.improbable', name: 'keanu', version: '{{ site.current_version }}'
 ```
 
 #### Maven
@@ -61,8 +61,8 @@ In your project's `pom.xml`
 <dependency>
     <groupId>io.improbable</groupId>
     <artifactId>keanu</artifactId>
-    <version>0.0.14</version>
+    <version>{{ site.current_version }}</version>
 </dependency>
 ```
 
-Now that you have the dependency, head over to [getting started]({{ site.baseurl }}/docs/getting-started) to get started.
+Now that you have the dependency, head over to [getting started]({{ site.baseurl }}/docs/getting-started).

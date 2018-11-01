@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -18,7 +19,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
+public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex beta;
@@ -109,8 +110,8 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Laplace.withParameters(mu.getValue(), beta.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Laplace.withParameters(mu.getValue(), beta.getValue()).sample(shape, random);
     }
 
 }
