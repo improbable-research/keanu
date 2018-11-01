@@ -40,15 +40,14 @@ The Lorenz equations are particuarly hard to model as they describe a chaotic sy
 starting states, no matter how close, will diverge almost immediately. 
 
 In this example, you'll make observations on the point above and build a probabilistic model
-using Keanu that can accurately describe its chaotic motion. To make things harder, you are going to
-only observe the X coordinate, and to observe a noisy value of the X coordinate.
+using Keanu that can accurately describe its chaotic motion. To make things harder, you are going to only observe 
+the X coordinate, and those observations will be noisy.
 
 ### How to model the problem
 
 To start with, you'll need to build a simple program that can step through time and calculate
-coordinates using the Lorenz equations. This will serve as the "Real World" system that you
-can take observations of the X coordinate from, and compare the calculated coordinates of the
-probabilistic model against.
+coordinates using the Lorenz equations. This will serve as the “Real World” system from which you can take observations 
+of the X coordinate, and against which you can compare the calculated coordinates of the probabilistic model.
 
 Then you'll step through time, taking observations of the X coordinate from this "Real World" system, 
 and feeding this value into the probabilistic model.

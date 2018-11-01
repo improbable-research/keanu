@@ -33,7 +33,7 @@ to rely on approximation.
 
 Luckily, there are sampling algorithms that are designed to efficiently explore distributions and enable us
 to gain insight into their form. 
-MCMC stands for Markov Chain Monte Carlo, and describes a class of algorithms that help us do exactly that.
+[MCMC](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) stands for Markov Chain Monte Carlo, and describes a class of algorithms that help us do exactly that.
 In this section we will be exploring a few MCMC algorithms.
 
 ### Metropolis Hastings
@@ -151,7 +151,7 @@ move too large a distance each timestep and not gain any precise information abo
 
 The trick is to find the largest step size and the smallest leapfrog count that return an effective sampling of the distribution.
 
-But how does that look in practice? Well let's take an example, let's say you set the following parameters:
+But how does that look in practice? Well let's take an example - let's say you set the following parameters:
 
 * Leapfrog count: 20
 * Step size: 0.1
