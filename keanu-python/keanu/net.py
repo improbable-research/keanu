@@ -1,7 +1,7 @@
 from py4j.java_gateway import java_import
-from keanu.base import JavaObjectWrapper
-from keanu.context import KeanuContext
-from keanu.vertex import Vertex
+from .base import JavaObjectWrapper
+from .context import KeanuContext
+from .vertex.base import Vertex
 
 k = KeanuContext()
 

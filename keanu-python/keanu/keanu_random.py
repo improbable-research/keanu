@@ -1,6 +1,6 @@
 from py4j.java_gateway import java_import
-from keanu.context import KeanuContext
-from keanu.base import JavaObjectWrapper
+from .context import KeanuContext
+from .base import JavaObjectWrapper
 
 k = KeanuContext()
 

@@ -1,9 +1,7 @@
-import pandas as pd
-import numpy as np
 import math
-import keanu as kn
-from keanu.const import Const
-from examples.lorenz_model import LorenzModel
+from keanu.vertex import Const, Gaussian
+from keanu.algorithm import GradientOptimizer
+from examples import LorenzModel
 
 
 converged_error = 0.01
@@ -25,22 +23,22 @@ def test_lorenz():
     observed = list(model.run_model(window_size * max_windows))
 
     while error > converged_error and window < max_windows:
-        xt0 = kn.Gaussian(prior_mu[0], 1.0)
-        yt0 = kn.Gaussian(prior_mu[1], 1.0)
-        zt0 = kn.Gaussian(prior_mu[2], 1.0)
+        xt0 = Gaussian(prior_mu[0], 1.0)
+        yt0 = Gaussian(prior_mu[1], 1.0)
+        zt0 = Gaussian(prior_mu[2], 1.0)
         graph_time_steps = list(build_graph((xt0, yt0, zt0)))
         xt0.set_and_cascade(prior_mu[0])
         yt0.set_and_cascade(prior_mu[1])
         zt0.set_and_cascade(prior_mu[2])
         apply_observations(graph_time_steps, window, observed)
-        
-        optimizer = kn.GradientOptimizer(xt0)
+
+        optimizer = GradientOptimizer(xt0)
         optimizer.max_a_posteriori()
         posterior = get_time_slice_values(graph_time_steps, window_size - 1)
-        
+
         post_t = (window + 1) * (window_size - 1)
         actual_at_post_t = observed[post_t]
-        
+
         error = math.sqrt(
                     (actual_at_post_t.x - posterior[0]) ** 2 +
                     (actual_at_post_t.y - posterior[1]) ** 2 +
@@ -48,7 +46,7 @@ def test_lorenz():
                 )
         prior_mu = (posterior[0], posterior[1], posterior[2])
         window += 1
-        
+
     assert error <= converged_error
 
 def add_time(current):
@@ -71,7 +69,7 @@ def apply_observations(graph_time_steps, window, observed):
     for (idx, time_slice) in enumerate(graph_time_steps):
         t = window * (window_size - 1) + idx
         xt = time_slice[0]
-        observed_xt = kn.Gaussian(xt, 1.0)
+        observed_xt = Gaussian(xt, 1.0)
         observed_xt.observe(observed[t].x)
 
 def get_time_slice_values(time_steps, time):
