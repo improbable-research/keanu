@@ -19,6 +19,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+
 public class Nd4jIntegerTensorTest {
 
     @Rule
@@ -638,4 +639,14 @@ public class Nd4jIntegerTensorTest {
         containsMinusOne = validator.validate(containsMinusOne);
         assertThat(containsMinusOne, equalTo(expectedResult));
     }
+
+    @Test
+    public void comparesIntegerTensorWithScalar() {
+        IntegerTensor value = IntegerTensor.create(1, 2, 3);
+        IntegerTensor differentValue = IntegerTensor.create(1);
+        BooleanTensor result = value.elementwiseEquals(differentValue);
+        assertThat(result, hasValue(true, false, false));
+    }
+
+
 }

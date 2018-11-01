@@ -197,4 +197,12 @@ public class ScalarDoubleTensorTest {
         DoubleTensor tensor = DoubleTensor.scalar(1);
         tensor.argMax(2);
     }
+
+    @Test
+    public void comparesScalarWithDoubleTensor() {
+        DoubleTensor value = DoubleTensor.create(1.);
+        DoubleTensor differentValue = DoubleTensor.create(1., 2., 3.);
+        BooleanTensor result = value.elementwiseEquals(differentValue);
+        assertThat(result, hasValue(true, false, false));
+    }
 }
