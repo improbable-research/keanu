@@ -835,4 +835,13 @@ public class Nd4jDoubleTensorTest {
         containsZero = validator.validate(containsZero);
         assertThat(containsZero, equalTo(expectedResult));
     }
+
+    @Test
+    public void comparesDoubleTensorWithScalar() {
+        DoubleTensor value = DoubleTensor.create(1., 2., 3.);
+        DoubleTensor differentValue = DoubleTensor.create(1.);
+        BooleanTensor result = value.elementwiseEquals(differentValue);
+        assertThat(result, hasValue(true, false, false));
+    }
+
 }

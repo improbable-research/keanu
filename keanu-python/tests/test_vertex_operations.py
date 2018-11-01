@@ -14,6 +14,8 @@ from keanu.vertex.base import Vertex
     (Const(np.array([    2.])),                    1.        , np.array([        [False]])),
     (                    1.   ,    Const(np.array([1.     ])), np.array([[True]         ])),
     (                    1.   ,    Const(np.array([    -1.])), np.array([        [False]])),
+    (Const(np.array([1., 2.])),    Const(np.array([1.     ])), np.array([[True], [False]])),
+    (Const(np.array([1.    ])),    Const(np.array([1.,  2.])), np.array([[True], [False]])),
 ])
 def test_can_do_equal_to(lhs, rhs, expected_result):
     result = lhs == rhs
