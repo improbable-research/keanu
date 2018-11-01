@@ -435,14 +435,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         );
     }
 
-    private static void printLogProb(Map<String, ?> position, LogProbWithSample logProbWithSample){
-        String positionString = position.entrySet().stream()
-            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
-            .collect(Collectors.joining(","));
-
-        System.out.println("LogProb samples " + positionString + " -> " + logProbWithSample.getLogProb());
-    }
-
     private static void acceptOtherPositionWithProbability(double probability,
                                                            BuiltTree tree,
                                                            BuiltTree otherTree,
@@ -495,11 +487,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             momentums.put(vertex, random.nextGaussian(position.getShape()));
         }
 
-        String momentumString = momentums.entrySet().stream()
-            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
-            .collect(Collectors.joining(","));
-
-        System.out.println("Momentum -> " + momentumString);
+        printMomentum(momentums);
     }
 
     private static void cache(Map<String, DoubleTensor> from, Map<String, DoubleTensor> to) {
@@ -555,16 +543,32 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         return new LeapFrogged(nextPosition, nextMomentum, nextPositionGradient);
     }
 
-    private static void printGradient(Map<String, DoubleTensor> gradient, Map<String, ?> position){
-        String nextPostitionString = position.entrySet().stream()
-            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
-            .collect(Collectors.joining(","));
+    private static void printGradient(Map<String, DoubleTensor> gradient, Map<String, ?> position) {
+//        String nextPostitionString = position.entrySet().stream()
+//            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
+//            .collect(Collectors.joining(","));
+//
+//        String gradientString = gradient.entrySet().stream()
+//            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
+//            .collect(Collectors.joining(","));
+//
+//        System.out.println("Gradients " + nextPostitionString + " -> " + gradientString);
+    }
 
-        String gradientString = gradient.entrySet().stream()
-            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
-            .collect(Collectors.joining(","));
+    private static void printLogProb(Map<String, ?> position, LogProbWithSample logProbWithSample) {
+//        String positionString = position.entrySet().stream()
+//            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
+//            .collect(Collectors.joining(","));
+//
+//        System.out.println("LogProb samples " + positionString + " -> " + logProbWithSample.getLogProb());
+    }
 
-        System.out.println("Gradients " + nextPostitionString + " -> " + gradientString);
+    private static void printMomentum(Map<String, DoubleTensor> momentums) {
+//        String momentumString = momentums.entrySet().stream()
+//            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
+//            .collect(Collectors.joining(","));
+//
+//        System.out.println("Momentum -> " + momentumString);
     }
 
     private static double dotProduct(Map<String, DoubleTensor> momentums) {
@@ -700,6 +704,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         while (scalingFactor * likelihoodRatio > -scalingFactor * Math.log(2)) {
             stepsize = stepsize * Math.pow(2, scalingFactor);
+            //TODO: no need for gradient at next position
             LeapFrogged leapFrogged = leapfrog(latentVariables, probabilisticGraph, position, gradient, momentums, stepsize);
 
             likelihoodRatio = probabilisticGraph.logProb(leapFrogged.position) - logProbBeforeLeapfrog;

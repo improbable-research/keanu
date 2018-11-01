@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class NUTSTest {
 
     @Before
     public void setup() {
-        NUTS.USE_TENSORFLOW = true;
+        NUTS.USE_TENSORFLOW = false;
         random = new KeanuRandom(1);
     }
 
@@ -38,7 +39,7 @@ public class NUTSTest {
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
-            1000
+            1500
         );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);

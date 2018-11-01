@@ -383,6 +383,11 @@ public class TensorflowGraphConverter {
     private static Output<Double> addLogProbSumTotal(List<Output<Double>> logProbOps, GraphBuilder graphBuilder) {
 
         Output<Double> totalLogProb = logProbOps.get(0);
+
+        if (logProbOps.size() == 1) {
+            return totalLogProb;
+        }
+
         for (int i = 1; i < logProbOps.size() - 1; i++) {
             Output<Double> logProbContrib = logProbOps.get(i);
             totalLogProb = graphBuilder.add(totalLogProb, logProbContrib);
