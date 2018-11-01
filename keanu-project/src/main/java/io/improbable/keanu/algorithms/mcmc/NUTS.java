@@ -2,18 +2,15 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.backend.keanu.KeanuGraphConverter;
 import io.improbable.keanu.backend.tensorflow.TensorflowGraphConverter;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
@@ -94,34 +93,39 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             gradientGraph = KeanuGraphConverter.convertWithGradient(bayesNet);
         }
 
-        final List<String> latentVertices = gradientGraph.getLatentVariables();
+        final List<String> latentVariables = gradientGraph.getLatentVariables();
         final List<String> sampleFrom = sampleFromVertices.stream()
             .map(Vertex::getUniqueStringReference)
             .collect(Collectors.toList());
 
+        final Map<String, VertexId> vertexByLabel = sampleFromVertices.stream()
+            .collect(Collectors.toMap(Vertex::getUniqueStringReference, Vertex::getId));
+
         LogProbWithSample logProbWithSample = gradientGraph.logProbWithSample(Collections.emptyMap(), sampleFrom);
+
+        printLogProb(gradientGraph.getLatentVariablesValues(), logProbWithSample);
 
         final Map<String, List<?>> samples = new HashMap<>();
         addSampleFromCache(samples, logProbWithSample.getSample());
 
         Map<String, DoubleTensor> position = new HashMap<>();
-        cachePosition(latentVertices, position);
+        cachePosition((Map<String, DoubleTensor>) gradientGraph.getLatentVariablesValues(), position);
 
-        Map<String, DoubleTensor> gradients = gradientGraph.logProbGradients(Collections.emptyMap());
+        Map<String, DoubleTensor> gradient = gradientGraph.logProbGradients(Collections.emptyMap());
 
-        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+        printGradient(gradient, gradientGraph.getLatentVariablesValues());
 
-        Map<VertexId, DoubleTensor> momentum = new HashMap<>();
+        double initialLogProb = logProbWithSample.getLogProb();
 
-        double initialLogOfMasterP = getLogProb(probabilisticVertices);
-        final List<Double> logOfMasterPForEachSample = new ArrayList<>();
-        logOfMasterPForEachSample.add(initialLogOfMasterP);
+        final List<Double> logProbForEachSample = new ArrayList<>();
+        logProbForEachSample.add(initialLogProb);
 
-        double stepSize = findStartingStepSize(position,
+        double stepSize = findStartingStepSize(
+            position,
             gradient,
-            latentVertices,
-            probabilisticVertices,
-            logProbGradientCalculator,
+            latentVariables,
+            initialLogProb,
+            gradientGraph,
             random
         );
 
@@ -131,17 +135,20 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
+        Map<String, DoubleTensor> momentum = new HashMap<>();
         BuiltTree tree = new BuiltTree(
             position,
             gradient,
             momentum,
+            initialLogProb,
             position,
             gradient,
             momentum,
+            initialLogProb,
             position,
             gradient,
-            initialLogOfMasterP,
-            takeSample(sampleFromVertices),
+            initialLogProb,
+            logProbWithSample.getSample(),
             1,
             true,
             0,
@@ -150,7 +157,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         for (int sampleNum = 1; sampleNum < sampleCount; sampleNum++) {
 
-            initializeMomentumForEachVertex(latentVertices, tree.momentumForward, random);
+            initializeMomentumForEachVertex(latentVariables, tree.momentumForward, tree.positionForward, random);
             cache(tree.momentumForward, tree.momentumBackward);
 
             double u = random.nextDouble() * Math.exp(tree.logOfMasterPAtAcceptedPosition - 0.5 * dotProduct(tree.momentumForward));
@@ -166,10 +173,9 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
                 BuiltTree otherHalfTree = buildOtherHalfOfTree(
                     tree,
-                    latentVertices,
-                    probabilisticVertices,
-                    logProbGradientCalculator,
-                    sampleFromVertices,
+                    latentVariables,
+                    gradientGraph,
+                    sampleFrom,
                     u,
                     buildDirection,
                     treeHeight,
@@ -210,17 +216,24 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             tree.gradientBackward = tree.gradientAtAcceptedPosition;
 
             addSampleFromCache(samples, tree.sampleAtAcceptedPosition);
-            logOfMasterPForEachSample.add(tree.logOfMasterPAtAcceptedPosition);
+            logProbForEachSample.add(tree.logOfMasterPAtAcceptedPosition);
         }
 
-        return new NetworkSamples(samples, logOfMasterPForEachSample, sampleCount);
+        return new NetworkSamples(toVertexId(samples, vertexByLabel), logProbForEachSample, sampleCount);
+    }
+
+    private static Map<VertexId, ? extends List> toVertexId(Map<String, ? extends List> byLabel, Map<String, VertexId> lookup) {
+        return byLabel.entrySet().stream()
+            .collect(toMap(
+                v -> lookup.get(v.getKey()),
+                Map.Entry::getValue)
+            );
     }
 
     private static BuiltTree buildOtherHalfOfTree(BuiltTree currentTree,
-                                                  List<Vertex<DoubleTensor>> latentVertices,
-                                                  List<? extends Probabilistic> probabilisticVertices,
-                                                  LogProbGradientCalculator logProbGradientCalculator,
-                                                  final List<? extends Vertex> sampleFromVertices,
+                                                  List<String> latentVertices,
+                                                  ProbabilisticWithGradientGraph probabilisticWithGradientGraph,
+                                                  final List<String> sampleFrom,
                                                   double u,
                                                   int buildDirection,
                                                   int treeHeight,
@@ -229,16 +242,15 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         BuiltTree otherHalfTree;
 
-        final double logOfMasterPBeforeLeapfrog = getLogProb(probabilisticVertices);
-        final double logOfMasterPMinusMomentumBeforeLeapfrog = logOfMasterPBeforeLeapfrog - 0.5 * dotProduct(currentTree.momentumBackward);
-
         if (buildDirection == -1) {
+
+            final double logProbBeforeLeapfrog = currentTree.logProbBackward;
+            final double logProbMinusMomentumBeforeLeapfrog = logProbBeforeLeapfrog - 0.5 * dotProduct(currentTree.momentumBackward);
 
             otherHalfTree = buildTree(
                 latentVertices,
-                probabilisticVertices,
-                logProbGradientCalculator,
-                sampleFromVertices,
+                probabilisticWithGradientGraph,
+                sampleFrom,
                 currentTree.positionBackward,
                 currentTree.gradientBackward,
                 currentTree.momentumBackward,
@@ -246,21 +258,24 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                 buildDirection,
                 treeHeight,
                 epsilon,
-                logOfMasterPMinusMomentumBeforeLeapfrog,
+                logProbMinusMomentumBeforeLeapfrog,
                 random
             );
 
             currentTree.positionBackward = otherHalfTree.positionBackward;
             currentTree.momentumBackward = otherHalfTree.momentumBackward;
             currentTree.gradientBackward = otherHalfTree.gradientBackward;
+            currentTree.logProbBackward = otherHalfTree.logProbBackward;
 
         } else {
 
+            final double logProbBeforeLeapfrog = currentTree.logProbForward;
+            final double logProbMinusMomentumBeforeLeapfrog = logProbBeforeLeapfrog - 0.5 * dotProduct(currentTree.momentumForward);
+
             otherHalfTree = buildTree(
                 latentVertices,
-                probabilisticVertices,
-                logProbGradientCalculator,
-                sampleFromVertices,
+                probabilisticWithGradientGraph,
+                sampleFrom,
                 currentTree.positionForward,
                 currentTree.gradientForward,
                 currentTree.momentumForward,
@@ -268,38 +283,37 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                 buildDirection,
                 treeHeight,
                 epsilon,
-                logOfMasterPMinusMomentumBeforeLeapfrog,
+                logProbMinusMomentumBeforeLeapfrog,
                 random
             );
 
             currentTree.positionForward = otherHalfTree.positionForward;
             currentTree.momentumForward = otherHalfTree.momentumForward;
             currentTree.gradientForward = otherHalfTree.gradientForward;
+            currentTree.logProbForward = otherHalfTree.logProbForward;
         }
 
         return otherHalfTree;
     }
 
-    private static BuiltTree buildTree(List<Vertex<DoubleTensor>> latentVertices,
-                                       List<? extends Probabilistic> probabilisticVertices,
-                                       LogProbGradientCalculator logProbGradientCalculator,
-                                       final List<? extends Vertex> sampleFromVertices,
-                                       Map<VertexId, DoubleTensor> position,
-                                       Map<VertexId, DoubleTensor> gradient,
-                                       Map<VertexId, DoubleTensor> momentum,
+    private static BuiltTree buildTree(List<String> latentVertices,
+                                       ProbabilisticWithGradientGraph probabilisticWithGradientGraph,
+                                       final List<String> sampleFromVertices,
+                                       Map<String, DoubleTensor> position,
+                                       Map<String, DoubleTensor> gradient,
+                                       Map<String, DoubleTensor> momentum,
                                        double u,
                                        int buildDirection,
                                        int treeHeight,
                                        double epsilon,
-                                       double logOfMasterPMinusMomentumBeforeLeapfrog,
+                                       double logProbMinusMomentumBeforeLeapfrog,
                                        KeanuRandom random) {
         if (treeHeight == 0) {
 
             //Base case-take one leapfrog step in the build direction
 
             return builtTreeBaseCase(latentVertices,
-                probabilisticVertices,
-                logProbGradientCalculator,
+                probabilisticWithGradientGraph,
                 sampleFromVertices,
                 position,
                 gradient,
@@ -307,7 +321,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                 u,
                 buildDirection,
                 epsilon,
-                logOfMasterPMinusMomentumBeforeLeapfrog
+                logProbMinusMomentumBeforeLeapfrog
             );
 
         } else {
@@ -315,8 +329,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
             BuiltTree tree = buildTree(
                 latentVertices,
-                probabilisticVertices,
-                logProbGradientCalculator,
+                probabilisticWithGradientGraph,
                 sampleFromVertices,
                 position,
                 gradient,
@@ -325,7 +338,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                 buildDirection,
                 treeHeight - 1,
                 epsilon,
-                logOfMasterPMinusMomentumBeforeLeapfrog,
+                logProbMinusMomentumBeforeLeapfrog,
                 random
             );
 
@@ -335,8 +348,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                 BuiltTree otherHalfTree = buildOtherHalfOfTree(
                     tree,
                     latentVertices,
-                    probabilisticVertices,
-                    logProbGradientCalculator,
+                    probabilisticWithGradientGraph,
                     sampleFromVertices,
                     u,
                     buildDirection,
@@ -370,48 +382,51 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     }
 
-    private static BuiltTree builtTreeBaseCase(List<Vertex<DoubleTensor>> latentVertices,
-                                               List<? extends Probabilistic> probabilisticVertices,
-                                               LogProbGradientCalculator logProbGradientCalculator,
-                                               final List<? extends Vertex> sampleFromVertices,
-                                               Map<VertexId, DoubleTensor> position,
-                                               Map<VertexId, DoubleTensor> gradient,
-                                               Map<VertexId, DoubleTensor> momentum,
+    private static BuiltTree builtTreeBaseCase(List<String> latentVertices,
+                                               ProbabilisticWithGradientGraph probabilisticWithGradientGraph,
+                                               final List<String> sampleFromVertices,
+                                               Map<String, DoubleTensor> position,
+                                               Map<String, DoubleTensor> gradient,
+                                               Map<String, DoubleTensor> momentum,
                                                double u,
                                                int buildDirection,
                                                double epsilon,
-                                               double logOfMasterPMinusMomentumBeforeLeapfrog) {
+                                               double logProbMinusMomentumBeforeLeapfrog) {
 
         LeapFrogged leapfrog = leapfrog(
             latentVertices,
-            logProbGradientCalculator,
+            probabilisticWithGradientGraph,
             position,
             gradient,
             momentum,
             epsilon * buildDirection
         );
 
-        final double logOfMasterPAfterLeapfrog = getLogProb(probabilisticVertices);
+        final LogProbWithSample logProbWithSample = probabilisticWithGradientGraph.logProbWithSample(leapfrog.position, sampleFromVertices);
+        final double logProbAfterLeapfrog = logProbWithSample.getLogProb();
+        final Map<String, ?> sampleAtAcceptedPosition = logProbWithSample.getSample();
 
-        final double logOfMasterPMinusMomentum = logOfMasterPAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
-        final int acceptedLeapfrogCount = u <= Math.exp(logOfMasterPMinusMomentum) ? 1 : 0;
-        final boolean shouldContinueFlag = u < Math.exp(DELTA_MAX + logOfMasterPMinusMomentum);
+        printLogProb(leapfrog.position, logProbWithSample);
 
-        final Map<VertexId, ?> sampleAtAcceptedPosition = takeSample(sampleFromVertices);
+        final double logProbMinusMomentum = logProbAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
+        final int acceptedLeapfrogCount = u <= Math.exp(logProbMinusMomentum) ? 1 : 0;
+        final boolean shouldContinueFlag = u < Math.exp(DELTA_MAX + logProbMinusMomentum);
 
-        double deltaLikelihoodOfLeapfrog = Math.exp(logOfMasterPMinusMomentum - logOfMasterPMinusMomentumBeforeLeapfrog);
+        double deltaLikelihoodOfLeapfrog = Math.exp(logProbMinusMomentum - logProbMinusMomentumBeforeLeapfrog);
         deltaLikelihoodOfLeapfrog = deltaLikelihoodOfLeapfrog < 1 ? deltaLikelihoodOfLeapfrog : 1;
 
         return new BuiltTree(
             leapfrog.position,
             leapfrog.gradient,
             leapfrog.momentum,
+            logProbAfterLeapfrog,
             leapfrog.position,
             leapfrog.gradient,
             leapfrog.momentum,
+            logProbAfterLeapfrog,
             leapfrog.position,
             leapfrog.gradient,
-            logOfMasterPAfterLeapfrog,
+            logProbAfterLeapfrog,
             sampleAtAcceptedPosition,
             acceptedLeapfrogCount,
             shouldContinueFlag,
@@ -420,12 +435,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         );
     }
 
-    private static double getLogProb(List<? extends Probabilistic> probabilisticVertices) {
-        double sum = 0.0;
-        for (Probabilistic vertex : probabilisticVertices) {
-            sum += vertex.logProbAtValue();
-        }
-        return sum;
+    private static void printLogProb(Map<String, ?> position, LogProbWithSample logProbWithSample){
+        String positionString = position.entrySet().stream()
+            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
+            .collect(Collectors.joining(","));
+
+        System.out.println("LogProb samples " + positionString + " -> " + logProbWithSample.getLogProb());
     }
 
     private static void acceptOtherPositionWithProbability(double probability,
@@ -444,16 +459,16 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         return random.nextDouble() < probability;
     }
 
-    private static boolean isNotUTurning(Map<VertexId, DoubleTensor> positionForward,
-                                         Map<VertexId, DoubleTensor> positionBackward,
-                                         Map<VertexId, DoubleTensor> momentumForward,
-                                         Map<VertexId, DoubleTensor> momentumBackward) {
+    private static boolean isNotUTurning(Map<String, DoubleTensor> positionForward,
+                                         Map<String, DoubleTensor> positionBackward,
+                                         Map<String, DoubleTensor> momentumForward,
+                                         Map<String, DoubleTensor> momentumBackward) {
         double forward = 0.0;
         double backward = 0.0;
 
-        for (Map.Entry<VertexId, DoubleTensor> forwardPositionForLatent : positionForward.entrySet()) {
+        for (Map.Entry<String, DoubleTensor> forwardPositionForLatent : positionForward.entrySet()) {
 
-            final VertexId latentId = forwardPositionForLatent.getKey();
+            final String latentId = forwardPositionForLatent.getKey();
             final DoubleTensor forwardMinusBackward = forwardPositionForLatent.getValue().minus(
                 positionBackward.get(latentId)
             );
@@ -471,86 +486,93 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         }
     }
 
-    private static void initializeMomentumForEachVertex(List<Vertex<DoubleTensor>> vertices,
-                                                        Map<VertexId, DoubleTensor> momentums,
+    private static void initializeMomentumForEachVertex(List<String> vertices,
+                                                        Map<String, DoubleTensor> momentums,
+                                                        Map<String, DoubleTensor> positions,
                                                         KeanuRandom random) {
-        for (Vertex<DoubleTensor> vertex : vertices) {
-            momentums.put(vertex.getId(), random.nextGaussian(vertex.getShape()));
+        for (String vertex : vertices) {
+            DoubleTensor position = positions.get(vertex);
+            momentums.put(vertex, random.nextGaussian(position.getShape()));
         }
+
+        String momentumString = momentums.entrySet().stream()
+            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
+            .collect(Collectors.joining(","));
+
+        System.out.println("Momentum -> " + momentumString);
     }
 
-    private static void cache(Map<VertexId, DoubleTensor> from, Map<VertexId, DoubleTensor> to) {
-        for (Map.Entry<VertexId, DoubleTensor> entry : from.entrySet()) {
+    private static void cache(Map<String, DoubleTensor> from, Map<String, DoubleTensor> to) {
+        for (Map.Entry<String, DoubleTensor> entry : from.entrySet()) {
             to.put(entry.getKey(), entry.getValue());
         }
     }
 
-    private static LeapFrogged leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
-                                        final LogProbGradientCalculator logProbGradientCalculator,
-                                        final Map<VertexId, DoubleTensor> position,
-                                        final Map<VertexId, DoubleTensor> gradient,
-                                        final Map<VertexId, DoubleTensor> momentum,
+    private static LeapFrogged leapfrog(final List<String> latentVertices,
+                                        final ProbabilisticWithGradientGraph probabilisticWithGradientGraph,
+                                        final Map<String, DoubleTensor> position,
+                                        final Map<String, DoubleTensor> gradient,
+                                        final Map<String, DoubleTensor> momentum,
                                         final double epsilon) {
 
         final double halfTimeStep = epsilon / 2.0;
 
-        Map<VertexId, DoubleTensor> nextMomentum = new HashMap<>();
-        Map<VertexId, DoubleTensor> nextPosition = new HashMap<>();
+        Map<String, DoubleTensor> nextMomentum = new HashMap<>();
+        for (Map.Entry<String, DoubleTensor> momentumForLatent : momentum.entrySet()) {
 
-        for (Map.Entry<VertexId, DoubleTensor> rEntry : momentum.entrySet()) {
-            final DoubleTensor updatedMomentum = (gradient.get(rEntry.getKey()).times(halfTimeStep)).plusInPlace(rEntry.getValue());
-            nextMomentum.put(rEntry.getKey(), updatedMomentum);
+            final DoubleTensor updatedMomentum = gradient.get(momentumForLatent.getKey())
+                .times(halfTimeStep)
+                .plusInPlace(momentumForLatent.getValue());
+
+            nextMomentum.put(momentumForLatent.getKey(), updatedMomentum);
         }
 
-        for (Vertex<DoubleTensor> latent : latentVertices) {
-            final DoubleTensor nextPositionForLatent = nextMomentum.get(latent.getId()).
+        Map<String, DoubleTensor> nextPosition = new HashMap<>();
+        for (String latent : latentVertices) {
+
+            final DoubleTensor nextPositionForLatent = nextMomentum.get(latent).
                 times(halfTimeStep).
                 plusInPlace(
-                    position.get(latent.getId())
+                    position.get(latent)
                 );
-            nextPosition.put(latent.getId(), nextPositionForLatent);
-            latent.setValue(nextPositionForLatent);
+
+            nextPosition.put(latent, nextPositionForLatent);
         }
 
-        VertexValuePropagation.cascadeUpdate(latentVertices);
+        Map<String, DoubleTensor> nextPositionGradient = probabilisticWithGradientGraph.logProbGradients(nextPosition);
 
-        Map<VertexId, DoubleTensor> nextPositionGradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+        printGradient(nextPositionGradient, nextPosition);
 
-        for (Map.Entry<VertexId, DoubleTensor> nextMomentumForLatent : nextMomentum.entrySet()) {
+        for (Map.Entry<String, DoubleTensor> nextMomentumForLatent : nextMomentum.entrySet()) {
+
             final DoubleTensor nextNextMomentumForLatent = nextPositionGradient.get(nextMomentumForLatent.getKey()).
                 times(halfTimeStep).
-                plusInPlace(
-                    nextMomentumForLatent.getValue()
-                );
+                plusInPlace(nextMomentumForLatent.getValue());
+
             nextMomentum.put(nextMomentumForLatent.getKey(), nextNextMomentumForLatent);
         }
 
         return new LeapFrogged(nextPosition, nextMomentum, nextPositionGradient);
     }
 
-    private static double dotProduct(Map<VertexId, DoubleTensor> momentums) {
+    private static void printGradient(Map<String, DoubleTensor> gradient, Map<String, ?> position){
+        String nextPostitionString = position.entrySet().stream()
+            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
+            .collect(Collectors.joining(","));
+
+        String gradientString = gradient.entrySet().stream()
+            .map(e -> e.getKey() + " : " + e.getValue().toString().replaceAll("\n", " "))
+            .collect(Collectors.joining(","));
+
+        System.out.println("Gradients " + nextPostitionString + " -> " + gradientString);
+    }
+
+    private static double dotProduct(Map<String, DoubleTensor> momentums) {
         double dotProduct = 0.0;
         for (DoubleTensor momentum : momentums.values()) {
             dotProduct += momentum.pow(2).sum();
         }
         return dotProduct;
-    }
-
-    /**
-     * This is meant to be used for tracking a sample while building tree.
-     *
-     * @param sampleFromVertices take samples from these vertices
-     */
-    private static Map<VertexId, ?> takeSample(List<? extends Vertex> sampleFromVertices) {
-        Map<VertexId, ?> sample = new HashMap<>();
-        for (Vertex vertex : sampleFromVertices) {
-            putValue(vertex, sample);
-        }
-        return sample;
-    }
-
-    private static <T> void putValue(Vertex<T> vertex, Map<VertexId, ?> target) {
-        ((Map<VertexId, T>) target).put(vertex.getId(), vertex.getValue());
     }
 
     /**
@@ -571,13 +593,13 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     }
 
     private static class LeapFrogged {
-        final Map<VertexId, DoubleTensor> position;
-        final Map<VertexId, DoubleTensor> momentum;
-        final Map<VertexId, DoubleTensor> gradient;
+        final Map<String, DoubleTensor> position;
+        final Map<String, DoubleTensor> momentum;
+        final Map<String, DoubleTensor> gradient;
 
-        LeapFrogged(Map<VertexId, DoubleTensor> position,
-                    Map<VertexId, DoubleTensor> momentum,
-                    Map<VertexId, DoubleTensor> gradient) {
+        LeapFrogged(Map<String, DoubleTensor> position,
+                    Map<String, DoubleTensor> momentum,
+                    Map<String, DoubleTensor> gradient) {
             this.position = position;
             this.momentum = momentum;
             this.gradient = gradient;
@@ -586,31 +608,35 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static class BuiltTree {
 
-        Map<VertexId, DoubleTensor> positionBackward;
-        Map<VertexId, DoubleTensor> gradientBackward;
-        Map<VertexId, DoubleTensor> momentumBackward;
-        Map<VertexId, DoubleTensor> positionForward;
-        Map<VertexId, DoubleTensor> gradientForward;
-        Map<VertexId, DoubleTensor> momentumForward;
-        Map<VertexId, DoubleTensor> acceptedPosition;
-        Map<VertexId, DoubleTensor> gradientAtAcceptedPosition;
+        Map<String, DoubleTensor> positionBackward;
+        Map<String, DoubleTensor> gradientBackward;
+        Map<String, DoubleTensor> momentumBackward;
+        double logProbBackward;
+        Map<String, DoubleTensor> positionForward;
+        Map<String, DoubleTensor> gradientForward;
+        Map<String, DoubleTensor> momentumForward;
+        double logProbForward;
+        Map<String, DoubleTensor> acceptedPosition;
+        Map<String, DoubleTensor> gradientAtAcceptedPosition;
         double logOfMasterPAtAcceptedPosition;
-        Map<VertexId, ?> sampleAtAcceptedPosition;
+        Map<String, ?> sampleAtAcceptedPosition;
         int acceptedLeapfrogCount;
         boolean shouldContinueFlag;
         double deltaLikelihoodOfLeapfrog;
         double treeSize;
 
-        BuiltTree(Map<VertexId, DoubleTensor> positionBackward,
-                  Map<VertexId, DoubleTensor> gradientBackward,
-                  Map<VertexId, DoubleTensor> momentumBackward,
-                  Map<VertexId, DoubleTensor> positionForward,
-                  Map<VertexId, DoubleTensor> gradientForward,
-                  Map<VertexId, DoubleTensor> momentumForward,
-                  Map<VertexId, DoubleTensor> acceptedPosition,
-                  Map<VertexId, DoubleTensor> gradientAtAcceptedPosition,
-                  double logOfMasterPAtAcceptedPosition,
-                  Map<VertexId, ?> sampleAtAcceptedPosition,
+        BuiltTree(Map<String, DoubleTensor> positionBackward,
+                  Map<String, DoubleTensor> gradientBackward,
+                  Map<String, DoubleTensor> momentumBackward,
+                  double logProbBackward,
+                  Map<String, DoubleTensor> positionForward,
+                  Map<String, DoubleTensor> gradientForward,
+                  Map<String, DoubleTensor> momentumForward,
+                  double logProbForward,
+                  Map<String, DoubleTensor> acceptedPosition,
+                  Map<String, DoubleTensor> gradientAtAcceptedPosition,
+                  double logProbAtAcceptedPosition,
+                  Map<String, ?> sampleAtAcceptedPosition,
                   int acceptedLeapfrogCount,
                   boolean shouldContinueFlag,
                   double deltaLikelihoodOfLeapfrog,
@@ -619,12 +645,14 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             this.positionBackward = positionBackward;
             this.gradientBackward = gradientBackward;
             this.momentumBackward = momentumBackward;
+            this.logProbBackward = logProbBackward;
             this.positionForward = positionForward;
             this.gradientForward = gradientForward;
             this.momentumForward = momentumForward;
+            this.logProbForward = logProbForward;
             this.acceptedPosition = acceptedPosition;
             this.gradientAtAcceptedPosition = gradientAtAcceptedPosition;
-            this.logOfMasterPAtAcceptedPosition = logOfMasterPAtAcceptedPosition;
+            this.logOfMasterPAtAcceptedPosition = logProbAtAcceptedPosition;
             this.sampleAtAcceptedPosition = sampleAtAcceptedPosition;
             this.acceptedLeapfrogCount = acceptedLeapfrogCount;
             this.shouldContinueFlag = shouldContinueFlag;
@@ -654,25 +682,27 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         }
     }
 
-    private static double findStartingStepSize(Map<VertexId, DoubleTensor> position,
-                                               Map<VertexId, DoubleTensor> gradient,
-                                               List<Vertex<DoubleTensor>> vertices,
-                                               List<? extends Probabilistic> probabilisticVertices,
-                                               LogProbGradientCalculator logProbGradientCalculator,
+    private static double findStartingStepSize(Map<String, DoubleTensor> position,
+                                               Map<String, DoubleTensor> gradient,
+                                               List<String> latentVariables,
+                                               double logProbBeforeLeapfrog,
+                                               ProbabilisticWithGradientGraph probabilisticGraph,
                                                KeanuRandom random) {
         double stepsize = 1;
-        double probBeforeLeapfrog = getLogProb(probabilisticVertices);
-        Map<VertexId, DoubleTensor> momentums = new HashMap<>();
-        initializeMomentumForEachVertex(vertices, momentums, random);
-        leapfrog(vertices, logProbGradientCalculator, position, gradient, momentums, stepsize);
-        double probAfterLeapfrog = getLogProb(probabilisticVertices);
-        double likelihoodRatio = probAfterLeapfrog - probBeforeLeapfrog;
+        Map<String, DoubleTensor> momentums = new HashMap<>();
+        initializeMomentumForEachVertex(latentVariables, momentums, position, random);
+
+        LeapFrogged initialLeapFrog = leapfrog(latentVariables, probabilisticGraph, position, gradient, momentums, stepsize);
+
+        double probAfterLeapfrog = probabilisticGraph.logProb(initialLeapFrog.position);
+        double likelihoodRatio = probAfterLeapfrog - logProbBeforeLeapfrog;
         double scalingFactor = likelihoodRatio > Math.log(0.5) ? 1 : -1;
 
-        while (scalingFactor * (likelihoodRatio) > -scalingFactor * Math.log(2)) {
+        while (scalingFactor * likelihoodRatio > -scalingFactor * Math.log(2)) {
             stepsize = stepsize * Math.pow(2, scalingFactor);
-            leapfrog(vertices, logProbGradientCalculator, position, gradient, momentums, stepsize);
-            likelihoodRatio = getLogProb(probabilisticVertices) - probBeforeLeapfrog;
+            LeapFrogged leapFrogged = leapfrog(latentVariables, probabilisticGraph, position, gradient, momentums, stepsize);
+
+            likelihoodRatio = probabilisticGraph.logProb(leapFrogged.position) - logProbBeforeLeapfrog;
         }
 
         return stepsize;

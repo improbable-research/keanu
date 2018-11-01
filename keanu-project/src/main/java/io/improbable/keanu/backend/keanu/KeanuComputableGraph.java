@@ -40,8 +40,10 @@ public class KeanuComputableGraph implements ComputableGraph {
 
         VertexValuePropagation.eval(outputVertices);
 
-        return outputVertices.stream()
+        Map<String, ?> results = outputVertices.stream()
             .collect(toMap(v -> v.getLabel().toString(), v -> (Object) v.getValue()));
+
+        return results;
     }
 
     @Override

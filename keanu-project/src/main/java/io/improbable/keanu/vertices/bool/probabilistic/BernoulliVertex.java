@@ -10,11 +10,12 @@ import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.PlaceHolderBoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.PlaceHolderDoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Collections;
@@ -70,17 +71,19 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
     }
 
     public LogProbGraph logProbGraph() {
-        final ConstantBoolVertex xInput = new ConstantBoolVertex(BooleanTensor.placeHolder(this.getShape()));
-        final ConstantDoubleVertex probTrueInput = new ConstantDoubleVertex(DoubleTensor.placeHolder(probTrue.getShape()));
+        final PlaceHolderBoolVertex xInput = new PlaceHolderBoolVertex(this.getShape());
+        final PlaceHolderDoubleVertex probTrueInput = new PlaceHolderDoubleVertex(probTrue.getShape());
 
         final DoubleVertex logProb = If.isTrue(xInput)
             .then(probTrueInput)
             .orElse(ConstantVertex.of(1.0).minus(probTrueInput))
             .sum();
 
-        return new LogProbGraph(logProb)
-            .addInput(this, xInput)
-            .addInput(probTrue, probTrueInput);
+        return LogProbGraph.builder()
+            .input(this, xInput)
+            .input(probTrue, probTrueInput)
+            .logProbOutput(logProb)
+            .build();
     }
 
     @Override

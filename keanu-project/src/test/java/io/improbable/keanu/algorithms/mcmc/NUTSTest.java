@@ -20,6 +20,7 @@ public class NUTSTest {
 
     @Before
     public void setup() {
+        NUTS.USE_TENSORFLOW = true;
         random = new KeanuRandom(1);
     }
 

@@ -357,13 +357,13 @@ public class TensorflowGraphConverter {
             lookup.put(input.getValue(), lookup.get(input.getKey()));
         }
 
-        List<Vertex<?>> topoSortedVertices = ((Set<Vertex<?>>) logProbGraph.getLogProbOutput().getConnectedGraph()).stream()
+        List<Vertex> topoSortedVertices = (logProbGraph.getLogProbOutput().getConnectedGraph()).stream()
             .sorted(Comparator.comparing(Vertex::getId))
             .collect(Collectors.toList());
 
         HashSet<Vertex<?>> logProbInputs = new HashSet<>(inputs.values());
 
-        for (Vertex<?> visiting : topoSortedVertices) {
+        for (Vertex visiting : topoSortedVertices) {
 
             if (!logProbInputs.contains(visiting)) {
 

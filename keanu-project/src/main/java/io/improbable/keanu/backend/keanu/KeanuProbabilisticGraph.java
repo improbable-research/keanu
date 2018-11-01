@@ -8,8 +8,11 @@ import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
@@ -25,7 +28,6 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
         this.bayesianNetwork = bayesianNetwork;
         this.vertexLookup = bayesianNetwork.getVertices().stream()
-            .filter(v -> v.getLabel() != null)
             .collect(toMap(Vertex::getUniqueStringReference, v -> v));
     }
 
@@ -53,6 +55,15 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
         return bayesianNetwork.getLatentVertices().stream()
             .map(Vertex::getUniqueStringReference)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, ?> getLatentVariablesValues() {
+        return bayesianNetwork.getLatentVertices().stream()
+            .collect(toMap(
+                Vertex::getUniqueStringReference,
+                Vertex::getValue)
+            );
     }
 
     public void cascadeUpdate(Map<String, ?> inputs) {

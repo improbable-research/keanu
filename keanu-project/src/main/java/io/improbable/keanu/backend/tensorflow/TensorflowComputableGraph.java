@@ -15,12 +15,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toBooleanTensor;
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toDoubleTensor;
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toIntegerTensor;
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toTensorFlow;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 public class TensorflowComputableGraph implements ComputableGraph {
 
@@ -42,13 +45,38 @@ public class TensorflowComputableGraph implements ComputableGraph {
     }
 
     @Override
-    public Map<String, ?> compute(Map<String, ?> inputs, Collection<String> outputs) {
+    public <T> T compute(Map<String, ?> inputs, String output) {
+        return (T) compute(inputs, singletonList(output)).get(output);
+    }
+
+    @Override
+    public Map<String, Object> compute(Map<String, ?> inputs, Collection<String> outputs) {
 
         cacheInputs(inputs);
 
+        List<String> outputsNotFed = filterInputs(inputCache, outputs);
         Session.Runner runner = feedInputs(inputCache);
-        List<Tensor<?>> tfResults = fetchOutputs(runner, outputs).run();
-        return convertToKeanuTensors(outputs, tfResults);
+        List<Tensor<?>> tfResults = fetchOutputs(runner, outputsNotFed).run();
+
+        Map<String, Object> resultsAsKeanu = convertToKeanuTensors(outputsNotFed, tfResults);
+
+        Map<String, Object> inputsFromOutputs = getOutputValuesThatAreInputs(inputCache, outputs);
+
+        resultsAsKeanu.putAll(inputsFromOutputs);
+
+        return resultsAsKeanu;
+    }
+
+    private Map<String, Object> getOutputValuesThatAreInputs(Map<String, ?> inputs, Collection<String> outputs) {
+        return outputs.stream()
+            .filter(inputs::containsKey)
+            .collect(toMap(output -> output, inputs::get));
+    }
+
+    private List<String> filterInputs(Map<String, ?> inputs, Collection<String> outputs) {
+        return outputs.stream()
+            .filter(v -> !inputs.containsKey(v))
+            .collect(toList());
     }
 
     @Override
@@ -56,23 +84,13 @@ public class TensorflowComputableGraph implements ComputableGraph {
         return (T) inputCache.get(input);
     }
 
-    @Override
-    public <T> T compute(Map<String, ?> inputs, String output) {
-
-        cacheInputs(inputs);
-
-        Session.Runner runner = feedInputs(inputCache);
-        List<Tensor<?>> tfResults = fetchOutputs(runner, singletonList(output)).run();
-        return convertToKeanuTensor(tfResults.get(0));
-    }
-
     private void cacheInputs(Map<String, ?> inputs) {
         inputs.forEach((inputLabel, inputValue) -> inputCache.put(inputLabel, inputValue));
     }
 
-    private Map<String, ?> convertToKeanuTensors(Collection<String> outputs, List<Tensor<?>> tfResults) {
+    private Map<String, Object> convertToKeanuTensors(Collection<String> outputs, List<Tensor<?>> tfResults) {
 
-        Map<String, ?> results = new HashMap<>();
+        Map<String, Object> results = new HashMap<>();
         Iterator<Tensor<?>> resultIterator = tfResults.iterator();
         for (String output : outputs) {
             results.put(output, convertToKeanuTensor(resultIterator.next()));

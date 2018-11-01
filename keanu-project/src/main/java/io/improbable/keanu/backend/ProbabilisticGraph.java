@@ -16,6 +16,8 @@ public interface ProbabilisticGraph extends AutoCloseable {
 
     List<String> getLatentVariables();
 
+    Map<String, ?> getLatentVariablesValues();
+
     @Override
     default void close() {
     }

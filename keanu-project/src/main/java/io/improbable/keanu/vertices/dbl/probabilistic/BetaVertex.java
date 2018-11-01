@@ -1,9 +1,10 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -25,6 +26,8 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble, Sam
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
 
+    private final Beta distribution;
+
     /**
      * One alpha or beta or both that match a proposed tensor shape of Beta.
      * <p>
@@ -40,11 +43,8 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble, Sam
 
         this.alpha = alpha;
         this.beta = beta;
+        this.distribution = Beta.withParameters(this, alpha, beta, ConstantVertex.of(0.0), ConstantVertex.of(1.0));
         setParents(alpha, beta);
-    }
-
-    ContinuousDistribution distribution() {
-        return Beta.withParameters(alpha.getValue(), beta.getValue(), DoubleTensor.scalar(0.), DoubleTensor.scalar(1.));
     }
 
     /**
@@ -84,13 +84,16 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble, Sam
 
     @Override
     public double logProb(DoubleTensor value) {
-        DoubleTensor logPdfs = distribution().logProb(value);
-        return logPdfs.sum();
+        return distribution.logProb(value).sum();
+    }
+
+    public LogProbGraph logProbGraph() {
+        return distribution.logProbGraph();
     }
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Diffs dlnP = distribution().dLogProb(value);
+        Diffs dlnP = distribution.dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
@@ -111,7 +114,7 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble, Sam
 
     @Override
     public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
-        return distribution().sample(shape, random);
+        return distribution.sample(shape, random);
     }
 
 }

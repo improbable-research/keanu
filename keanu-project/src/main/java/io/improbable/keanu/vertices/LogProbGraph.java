@@ -1,28 +1,24 @@
 package io.improbable.keanu.vertices;
 
-import java.util.HashMap;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Singular;
+
 import java.util.Map;
 
+@Builder
 public class LogProbGraph {
 
+    @Getter
+    @Singular
     private final Map<Vertex<?>, Vertex<?>> inputs;
-    private final Vertex logProbOutput;
 
-    public LogProbGraph(Vertex logProbOutput) {
-        this.inputs = new HashMap<>();
-        this.logProbOutput = logProbOutput;
+    @Getter
+    private final DoubleVertex logProbOutput;
+
+    public <T> Vertex<T> getInput(Vertex<T> input) {
+        return (Vertex<T>) inputs.get(input);
     }
 
-    public LogProbGraph addInput(Vertex from, Vertex to) {
-        inputs.put(from, to);
-        return this;
-    }
-
-    public Map<Vertex<?>, Vertex<?>> getInputs() {
-        return inputs;
-    }
-
-    public Vertex getLogProbOutput() {
-        return logProbOutput;
-    }
 }

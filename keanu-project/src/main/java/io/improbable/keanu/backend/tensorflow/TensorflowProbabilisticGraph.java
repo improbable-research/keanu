@@ -6,6 +6,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,29 +35,25 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
     @Override
     public LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> sampleFrom) {
 
-        List<String> allOutputs = filterSampleFromForOutputs(inputs, sampleFrom);
+        List<String> allOutputs = new ArrayList<>(sampleFrom);
         allOutputs.add(logProbSumTotalOpName);
-        Map<String, Object> sample = takeSampleFromInputs(inputs, sampleFrom);
 
         Map<String, ?> results = computableGraph.compute(inputs, allOutputs);
         double logProb = ((DoubleTensor) results.get(logProbSumTotalOpName)).scalar();
         results.remove(logProbSumTotalOpName);
 
-        sample.putAll(results);
-
-        return new LogProbWithSample(logProb, sample);
+        return new LogProbWithSample(logProb, results);
     }
 
-    private Map<String, Object> takeSampleFromInputs(Map<String, ?> inputs, List<String> sampleFrom) {
-        return sampleFrom.stream()
-            .filter(inputs::containsKey)
-            .collect(toMap(output -> output, inputs::get));
-    }
+    @Override
+    public Map<String, ?> getLatentVariablesValues() {
 
-    private List<String> filterSampleFromForOutputs(Map<String, ?> inputs, List<String> sampleFrom) {
-        return sampleFrom.stream()
-            .filter(v -> !inputs.containsKey(v))
-            .collect(toList());
+        Map<String, ?> values = new HashMap<>();
+        for (String latent : latentVariables) {
+            values.put(latent, computableGraph.getInput(latent));
+        }
+
+        return values;
     }
 
     @Override

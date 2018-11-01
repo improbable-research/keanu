@@ -11,6 +11,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.PlaceHolderDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.HashMap;
@@ -97,9 +98,9 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
     @Override
     public LogProbGraph logProbGraph() {
 
-        final ConstantDoubleVertex xInput = new ConstantDoubleVertex(0);
-        final ConstantDoubleVertex muInput = new ConstantDoubleVertex(0);
-        final ConstantDoubleVertex sigmaInput = new ConstantDoubleVertex(0);
+        final PlaceHolderDoubleVertex xInput = new PlaceHolderDoubleVertex(this.getShape());
+        final PlaceHolderDoubleVertex muInput = new PlaceHolderDoubleVertex(mu.getShape());
+        final PlaceHolderDoubleVertex sigmaInput = new PlaceHolderDoubleVertex(sigma.getShape());
 
         final DoubleVertex lnSigma = sigmaInput.log();
         final DoubleVertex xMinusMuSquared = xInput.minus(muInput).pow(2);
@@ -107,10 +108,12 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
 
         final DoubleVertex logProbOutput = xMinusMuSquaredOver2Variance.plus(lnSigma).plus(Gaussian.LN_SQRT_2PI).unaryMinus().sum();
 
-        return new LogProbGraph(logProbOutput)
-            .addInput(this, xInput)
-            .addInput(mu, muInput)
-            .addInput(sigma, sigmaInput);
+        return LogProbGraph.builder()
+            .input(this, xInput)
+            .input(mu, muInput)
+            .input(sigma, sigmaInput)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
