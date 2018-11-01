@@ -8,8 +8,10 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -83,7 +85,9 @@ public class WriteDot {
             idsToLabelStrings = new HashMap<>();
             verticeIdsToConnectionInfo = new HashMap<>();
 
-            writer = new BufferedWriter(new FileWriter(fileName));
+            File outputFile = getOutputFile(fileName);
+
+            writer = new BufferedWriter(new FileWriter(outputFile));
             writer.write("digraph " + graphName + " {\n");
 
             // Iterate over vertices and obtain the necessary label and conneciton info.
@@ -100,6 +104,30 @@ public class WriteDot {
             System.out.println("Encountered an issue writing to the specified file (" + fileName + "):");
             e.printStackTrace();
         }
+    }
+
+
+    // Make sure the output directory exists and that no files are being overwritten.
+    private static File getOutputFile(String fileName) {
+
+        File outputFile = new File(fileName);
+
+        // Make sure the output directory exists.
+        if (!outputFile.getParentFile().exists()){
+            outputFile.getParentFile().mkdirs();
+        }
+
+        // Add an index to the filename if a file with the specified name already exists.
+        if (outputFile.exists()) {
+            String baseName = FilenameUtils.getBaseName(fileName);
+            String extension = FilenameUtils.getExtension(fileName);
+            int counter = 1;
+            while(outputFile.exists())
+            {
+                outputFile = new File(outputFile.getParent(), baseName + "_" + (counter++) + "." + extension);
+            }
+        }
+        return outputFile;
     }
 
 
@@ -284,7 +312,7 @@ public class WriteDot {
 
         BayesianNetwork myNet = new BayesianNetwork(v4.getConnectedGraph());
 
-        outputDot("TestFile.txt", myNet);
+        outputDot("testdir/somemore/TestFile.txt", myNet);
 
 //        outputDot("TestFile.txt", "VerticeConnections", v1, 2);
 
