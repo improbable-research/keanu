@@ -16,7 +16,7 @@ from tests.keanu_assert import tensors_equal
     (                   1.       , kn.Const(np.array([1.     ])), np.array([[True]         ])),
     (                   1.       , kn.Const(np.array([    -1.])), np.array([        [False]])),
     (kn.Const(np.array([1., 2.])),      kn.Const(np.array([1.])), np.array([[True], [False]])),
-    (    kn.Const(np.array([1.])),  kn.Const(np.array([1., 2.])), np.array([[True], [False]])),
+    (kn.Const(np.array([    1.])), kn.Const(np.array([1.,  2.])), np.array([[True], [False]])),
 ])
 def test_can_do_equal_to(lhs, rhs, expected_result):
     result = lhs == rhs
