@@ -1,5 +1,6 @@
 import keanu as kn
 import numpy as np
+import pandas as pd
 import pytest
 
 
@@ -13,13 +14,54 @@ def generic():
     (1.3, "ScalarDoubleTensor"),
     (np.array([1.3])[0], "ScalarDoubleTensor"),
     (True, "SimpleBooleanTensor"),
-#    (np.array([True])[0], "SimpleBooleanTensor")
+    (np.array([True])[0], "SimpleBooleanTensor")
 ])
 def test_num_passed_to_Tensor_creates_scalar_tensor(num, expected_java_class):
     t = kn.Tensor(num)
     assert_java_class(t, expected_java_class)
     assert t.is_scalar()
     assert t.scalar() == num
+
+
+@pytest.mark.parametrize("data, expected_java_class", [
+    ([[1, 2], [3, 4]], "Nd4jIntegerTensor"),
+    ([[1., 2.], [3., 4.]], "Nd4jDoubleTensor"),
+    ([[True, False], [True, False]], "SimpleBooleanTensor")
+])
+def test_dataframe_passed_to_Tensor_creates_tensor(data, expected_java_class):
+    dataframe = pd.DataFrame(columns=['A', 'B'], data=data)
+    t = kn.Tensor(dataframe)
+
+    assert_java_class(t, expected_java_class)
+
+    tensor_value = kn.Tensor._to_ndarray(t.unwrap())
+    dataframe_value = dataframe.values
+
+    assert np.array_equal(tensor_value, dataframe_value)
+
+
+@pytest.mark.parametrize("data, expected_java_class", [
+    ([1, 2], "Nd4jIntegerTensor"),
+    ([1], "ScalarIntegerTensor"),
+    ([1., 2.], "Nd4jDoubleTensor"),
+    ([1.], "ScalarDoubleTensor"),
+    ([True, False], "SimpleBooleanTensor"),
+    ([True], "SimpleBooleanTensor")
+])
+def test_series_passed_to_Tensor_creates_tensor(data, expected_java_class):
+    series = pd.Series(data)
+    t = kn.Tensor(series)
+
+    assert_java_class(t, expected_java_class)
+
+    tensor_value = kn.Tensor._to_ndarray(t.unwrap())
+    series_value = series.values
+
+    assert len(tensor_value) == len(series_value)
+    assert tensor_value.shape == (len(series_value), 1)
+    assert series_value.shape == (len(series_value),  )
+
+    assert np.array_equal(tensor_value.flatten(), series_value.flatten())
 
 
 def test_cannot_pass_generic_to_Tensor(generic):

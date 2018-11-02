@@ -3,13 +3,13 @@ from keanu.vertex import Vertex
 from keanu.generated import ConstantBool, ConstantDouble, ConstantInteger
 
 import numpy as np
-from keanu.vartypes import int_types, float_types, bool_types, primitive_types, panda_types
+from keanu.vartypes import int_types, float_types, bool_types, primitive_types, pandas_types
 
 def Const(t) -> Vertex:
     if isinstance(t, np.ndarray):
         ctor = __infer_const_ctor_from_ndarray(t)
         val = t
-    elif isinstance(t, panda_types):
+    elif isinstance(t, pandas_types):
         val = t.values
         ctor = __infer_const_ctor_from_ndarray(val)
     elif isinstance(t, primitive_types):

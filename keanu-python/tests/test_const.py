@@ -56,9 +56,6 @@ def test_const_takes_panda_dataframe(data, expected_java_class):
     vertex_value = v.get_value()
     dataframe_value = dataframe.values
 
-    assert vertex_value.shape == (2, 2)
-    assert dataframe_value.shape == (2, 2)
-
     assert np.array_equal(vertex_value, dataframe_value)
 
 

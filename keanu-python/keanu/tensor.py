@@ -2,7 +2,7 @@ from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 
 import numpy as np
-from .vartypes import int_types, float_types, bool_types, primitive_types
+from .vartypes import int_types, float_types, bool_types, primitive_types, pandas_types
 from py4j.java_gateway import java_import
 
 k = KeanuContext()
@@ -13,6 +13,9 @@ java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
 class Tensor(JavaObjectWrapper):
     def __init__(self, t):
+        if isinstance(t, pandas_types):
+            t = t.values
+
         if isinstance(t, np.ndarray):
             normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(t)
 
