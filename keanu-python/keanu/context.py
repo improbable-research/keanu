@@ -36,7 +36,7 @@ class KeanuContext(metaclass=Singleton):
         self.__jvm_view = self._gateway.new_jvm_view()
 
     def __build_classpath(self):
-        keanu_path = os.path.join(PATH, "keanu-python-all.jar")
+        keanu_path = os.path.join(PATH, "classpath", "*")
         nd4j_path = os.environ.get(ND4J_CLASSPATH_ENVIRONMENT_VARIABLE)
         if nd4j_path is None:
             return keanu_path

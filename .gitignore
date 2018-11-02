@@ -8,3 +8,4 @@ build
 /out
 **/*.gpg
 keanu-python/dist/
+keanu-python/keanu/classpath

@@ -26,7 +26,3 @@ dependencies {
     compile project(":keanu-project")
 }
 
-shadowJar {
-    destinationDir = file("$rootDir/keanu-python/keanu")
-    archiveName = "keanu-python-all.jar"
-}

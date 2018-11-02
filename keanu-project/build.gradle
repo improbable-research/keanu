@@ -17,32 +17,15 @@ plugins {
 }
 
 apply plugin: 'com.google.protobuf'
+apply plugin: 'com.github.johnrengelman.plugin-shadow'
 
 archivesBaseName = "keanu"
 
 dependencies {
 
     compile 'org.apache.commons:commons-math3:3.6.1'
-    compile('org.nd4j:nd4j-native-platform:1.0.0-beta2') {
-        exclude module: "mkl"               //   9MB
-        exclude module: "mkl-dnn"           // 110MB
-        exclude module: "guava"             //   2MB
-        exclude module: "jackson"           //   2MB
-        exclude module: "commons-codec"     // 0.3MB
-        exclude module: "commons-compress"  // 0.5MB
-        exclude module: "commons-lang3"     // 0.5MB
-        exclude module: "commons-math3"     //   2MB
-        exclude module: "openblas-platform"
-        exclude module: "nd4j-native"
+    shadow('org.nd4j:nd4j-native-platform:1.0.0-beta2') {
     }
-
-    ["linux-x86_64", "windows-x86_64", "macosx-x86_64", ""].each { platform ->
-        compile "org.bytedeco.javacpp-presets:openblas:0.3.0-1.4.2:$platform"
-        compile "org.nd4j:nd4j-native:1.0.0-beta2:$platform"
-    }
-    compile 'org.nd4j:nd4j-api:1.0.0-beta2'
-    compile 'org.nd4j:nd4j-native-api:1.0.0-beta2'
-    compile 'org.nd4j:nd4j-context:1.0.0-beta2'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.google.guava:guava:20.0'
@@ -156,6 +139,19 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
+
+
+task copyShadowLibs(type: Copy) {
+    into "$rootDir/keanu-python/keanu/classpath/"
+    from configurations.shadow - configurations.compile
+}
+
+
+shadowJar {
+    destinationDir = file("$rootDir/keanu-python/keanu/classpath/")
+    archiveName = "keanu-python-all.jar"
+}
+shadowJar.dependsOn(copyShadowLibs)
 
 //Break build on javadoc warnings
 tasks.withType(Javadoc) {
