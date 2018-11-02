@@ -5,23 +5,31 @@ import java.util.Map;
 class DocString {
     private String comment;
     private Map<String, String> params;
-    private String methodName;
 
-    DocString(String comment, Map<String, String> params, String methodName) {
+    DocString(String comment, Map<String, String> params) {
         this.comment = comment;
         this.params = params;
-        this.methodName = methodName;
     }
 
-    String getComment() {
-        return comment;
+    private boolean isEmpty() {
+        return comment.isEmpty() && params.size() == 0;
     }
 
-    Map<String, String> getParams() {
-        return params;
-    }
-
-    String getMethodName() {
-        return methodName;
+    String getAsString() {
+        if (isEmpty()) {
+            return "";
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\"\"\"\n    ");
+        stringBuilder.append(comment.replaceAll("\n ", "\n    "));
+        for (String param : params.keySet()) {
+            stringBuilder.append("\n    ");
+            stringBuilder.append(":param ");
+            stringBuilder.append(param);
+            stringBuilder.append(": ");
+            stringBuilder.append(params.get(param));
+        }
+        stringBuilder.append("\n    \"\"\"\n    ");
+        return stringBuilder.toString();
     }
 }
