@@ -41,7 +41,7 @@ class KeanuContext(metaclass=Singleton):
         if nd4j_path is None:
             return keanu_path
         else:
-            return ":".join([keanu_path, nd4j_path + "/*"])
+            return ":".join([keanu_path, os.path.join(PATH, "nd4j_path", "*")])
 
     def __stderr_with_redirect_disabled_for_jupyter(self):
         try:
