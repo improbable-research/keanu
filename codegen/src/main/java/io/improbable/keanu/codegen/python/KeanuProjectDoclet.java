@@ -22,7 +22,7 @@ public class KeanuProjectDoclet extends Standard {
                 if (constructorDoc.annotations().length != 0) {
                     if (isConstructorAnnotated(constructorDoc)) {
                         Map<String, String> params = ParamStringProcessor.getNameToCommentMapping(constructorDoc);
-                        DocString docString = new DocString(constructorDoc.commentText(), params, constructorDoc.qualifiedName());
+                        DocString docString = new DocString(constructorDoc.commentText(), params);
                         docStrings.put(constructorDoc.qualifiedName(), docString);
                     }
                 }
@@ -54,7 +54,7 @@ public class KeanuProjectDoclet extends Standard {
         }
     }
 
-    public static Map<String, DocString> getDocStringsFromFile() {
+    static Map<String, DocString> getDocStringsFromFile() {
         try {
             Type listType = new TypeToken<Map<String, DocString>>(){}.getType();
             Gson gson = new Gson();

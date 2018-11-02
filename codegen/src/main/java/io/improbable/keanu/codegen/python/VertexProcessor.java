@@ -45,14 +45,17 @@ class VertexProcessor {
 
         root.put("imports", imports);
         root.put("constructors", pythonConstructors);
-
+        Map<String, DocString> nameToDocStringMap = KeanuProjectDoclet.getDocStringsFromFile();
         for (Constructor constructor : constructors) {
             String javaClass = constructor.getDeclaringClass().getSimpleName();
+            String qualifiedName = constructor.getName();
+            DocString docString = nameToDocStringMap.get(qualifiedName);
+
             String[] pythonParameters = reflections.getConstructorParamNames(constructor).stream().map(
                 parameter -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, parameter)).toArray(String[]::new);
 
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
-            pythonConstructors.add(new PythonConstructor(javaClass, toPythonClass(javaClass), String.join(", ", pythonParameters)));
+            pythonConstructors.add(new PythonConstructor(javaClass, toPythonClass(javaClass), String.join(", ", pythonParameters), docString.getAsString()));
         }
 
         return root;
@@ -85,11 +88,14 @@ class VertexProcessor {
         private String pythonClass;
         @Getter
         private String pythonParameters;
+        @Getter
+        private String docString;
 
-        PythonConstructor(String javaClass, String pythonClass, String pythonParameters) {
+        PythonConstructor(String javaClass, String pythonClass, String pythonParameters, String docString) {
             this.javaClass = javaClass;
             this.pythonClass = pythonClass;
             this.pythonParameters = pythonParameters;
+            this.docString = docString;
         }
     }
 

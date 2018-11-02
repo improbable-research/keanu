@@ -48,6 +48,5 @@ task myJavadocs(type: Javadoc) {
     options.setDoclet("io.improbable.keanu.codegen.python.KeanuProjectDoclet")
 
     def mainClasspath = keanuProject.layout.projectDirectory.asFileTree.files.toList()
-    println mainClasspath
     options.setClasspath(mainClasspath)
 }
