@@ -1,6 +1,6 @@
 from keanu.tensor import Tensor
-from keanu.vertex import Vertex
-from keanu.generated import ConstantBool, ConstantDouble, ConstantInteger
+from .generated import ConstantBool, ConstantInteger, ConstantDouble
+from .base import Vertex
 
 import numpy as np
 import numbers

@@ -1,2 +1,3 @@
-from examples.coal_mining import *
-from examples.thermometers import *
+from .coal_mining import CoalMining
+from .lorenz_model import LorenzModel
+from .thermometers import Thermometer
