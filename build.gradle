@@ -35,12 +35,11 @@ shadowJar {
 task saveJavadocStringsToFile(type: Javadoc) {
     def keanuProject = rootProject.subprojects.find { subproject -> subproject.name == "keanu-project" }
     def codegenProject = rootProject.subprojects.find { subproject -> subproject.name == "codegen" }
+    dependsOn codegenProject.tasks.getByName("compileJava")
 
     source = keanuProject.layout.getProjectDirectory().asFileTree.matching({ filter -> filter.include("**/*.java") })
 
-    File classFile = codegenProject.layout.getProjectDirectory().getAsFileTree().files
-        .find( { File file -> file.name.contains("KeanuProjectDoclet.class") })
-        .parentFile.parentFile.parentFile.parentFile.parentFile.parentFile
+    File classFile = new File(codegenProject.layout.projectDirectory.get().path + "/build/classes/java/main")
 
     def docletClasspath = compileJava.classpath.files.toList()
     docletClasspath.add(classFile)
