@@ -54,8 +54,12 @@ def test_down_sample_interval(net):
     assert all(len(vertex_samples) == expected_num_samples for vertex_id, vertex_samples in samples.items())
 
 
-def test_streaming_samples(net):
+@pytest.mark.parametrize("algo", [
+    ("metropolis"),
+    ("hamiltonian")
+])
+def test_streaming_samples(algo, net):
     draws = 10
-    samples_stream = kn.samples_iter(net=net, sample_from=net.get_latent_vertices(), draws=draws, down_sample_interval=1)
+    samples_stream = kn.samples_iter(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws, down_sample_interval=1)
     assert sum(1 for i in samples_stream) == 10
 

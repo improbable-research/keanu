@@ -181,7 +181,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
             initializeMomentumForEachVertex(latentVertices, momentum, random);
             cache(momentum, momentumBeforeLeapfrog);
 
-            takeSample(sampleBeforeLeapfrog, fromVertices);
+            putSample(sampleBeforeLeapfrog, fromVertices);
 
             for (int leapFrogNum = 0; leapFrogNum < leapFrogCount; leapFrogNum++) {
                 gradient = leapfrog(
@@ -236,6 +236,14 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
                 logOfMasterPBeforeLeapfrog = logOfMasterPAfterLeapfrog;
             }
             return samples;
+        }
+
+        private static Map<VertexId, ?> takeSample(List<? extends Vertex> fromVertices) {
+            Map<VertexId, Object> sample = new HashMap<>();
+            for (Vertex v : fromVertices) {
+                sample.put(v.getId(), v.getValue());
+            }
+            return sample;
         }
     }
 
@@ -340,14 +348,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         return dotProduct;
     }
 
-    /**
-     * This is meant to be used for caching a pre-leapfrog sample. This sample
-     * will be used if the leapfrog is rejected.
-     *
-     * @param sample
-     * @param fromVertices
-     */
-    private static void takeSample(Map<VertexId, ?> sample, List<? extends Vertex> fromVertices) {
+    private static void putSample(Map<VertexId, ?> sample, List<? extends Vertex> fromVertices) {
         for (Vertex<?> vertex : fromVertices) {
             putValue(vertex, sample);
         }
@@ -388,11 +389,4 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         samplesForVertex.add(value);
     }
 
-    private static Map<VertexId, ?> takeSample(List<? extends Vertex> fromVertices) {
-        Map<VertexId, Object> sample = new HashMap<>();
-        for (Vertex v : fromVertices) {
-            sample.put(v.getId(), v.getValue());
-        }
-        return sample;
-    }
 }
