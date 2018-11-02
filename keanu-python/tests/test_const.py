@@ -64,8 +64,11 @@ def test_const_takes_panda_dataframe(data, expected_java_class):
 
 @pytest.mark.parametrize("num, expected_java_class", [
     (3, "ConstantIntegerVertex"),
+    (np.array([3])[0], "ConstantIntegerVertex"),
     (3.4, "ConstantDoubleVertex"),
-    (True, "ConstantBoolVertex")
+    (np.array([3.4])[0], "ConstantDoubleVertex"),
+    (True, "ConstantBoolVertex"),
+    (np.array([True])[0], "ConstantBoolVertex")
 ])
 def test_const_takes_num(num, expected_java_class):
     v = kn.Const(num)

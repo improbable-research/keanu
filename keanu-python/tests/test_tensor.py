@@ -9,8 +9,11 @@ def generic():
 
 @pytest.mark.parametrize("num, expected_java_class", [
     (1, "ScalarIntegerTensor"),
+    (np.array([1])[0], "ScalarIntegerTensor"),
     (1.3, "ScalarDoubleTensor"),
-    (True, "SimpleBooleanTensor")
+    (np.array([1.3])[0], "ScalarDoubleTensor"),
+    (True, "SimpleBooleanTensor"),
+#    (np.array([True])[0], "SimpleBooleanTensor")
 ])
 def test_num_passed_to_Tensor_creates_scalar_tensor(num, expected_java_class):
     t = kn.Tensor(num)

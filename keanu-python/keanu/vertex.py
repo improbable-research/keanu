@@ -1,12 +1,8 @@
-import numpy as np
-import pandas as pd
-import numbers
-
 import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
-
+from keanu.vartypes import primitive_types, const_arg_types
 
 k = KeanuContext()
 
@@ -152,11 +148,11 @@ class Vertex(JavaObjectWrapper, VertexOps):
 
     @staticmethod
     def __parse_arg(arg):
-        if isinstance(arg, (np.ndarray, pd.Series, pd.DataFrame, numbers.Number)):
+        if isinstance(arg, const_arg_types):
             return kn.Const(arg).unwrap()
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()
-        elif isinstance(arg, list) and all(isinstance(x, numbers.Number) for x in arg):
+        elif isinstance(arg, list) and all(isinstance(x, primitive_types) for x in arg):
             return k.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))

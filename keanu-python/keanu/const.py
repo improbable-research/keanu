@@ -3,36 +3,35 @@ from keanu.vertex import Vertex
 from keanu.generated import ConstantBool, ConstantDouble, ConstantInteger
 
 import numpy as np
-import pandas as pd
-import numbers
+from keanu.vartypes import int_types, float_types, bool_types, primitive_types, panda_types
 
 def Const(t) -> Vertex:
     if isinstance(t, np.ndarray):
-        ctor = __infer_const_from_ndarray(t)
+        ctor = __infer_const_ctor_from_ndarray(t)
         val = t
-    elif isinstance(t, (pd.Series, pd.DataFrame)):
+    elif isinstance(t, panda_types):
         val = t.values
-        ctor = __infer_const_from_ndarray(val)
-    elif isinstance(t, numbers.Number):
-        ctor = __infer_const_from_scalar(t)
+        ctor = __infer_const_ctor_from_ndarray(val)
+    elif isinstance(t, primitive_types):
+        ctor = __infer_const_ctor_from_scalar(t)
         val = np.array([[t]])
     else:
         raise NotImplementedError("Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(type(t)))
 
     return ctor(Tensor(val))
 
-def __infer_const_from_ndarray(ndarray):
+def __infer_const_ctor_from_ndarray(ndarray):
     if len(ndarray) == 0:
         raise ValueError("Cannot infer type because the ndarray is empty")
 
-    return __infer_const_from_scalar(ndarray.item(0))
+    return __infer_const_ctor_from_scalar(ndarray.item(0))
 
-def __infer_const_from_scalar(scalar):
-    if isinstance(scalar, bool):
+def __infer_const_ctor_from_scalar(scalar):
+    if isinstance(scalar, bool_types):
         return ConstantBool
-    elif isinstance(scalar, int):
+    elif isinstance(scalar, int_types):
         return ConstantInteger
-    elif isinstance(scalar, float):
+    elif isinstance(scalar, float_types):
         return ConstantDouble
     else:
         raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(scalar)))
