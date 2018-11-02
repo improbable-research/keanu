@@ -11,8 +11,9 @@ import java.util.*;
 
 public class KeanuProjectDoclet extends Standard {
 
-    private static final String JAVADOC_STRING_FILE_NAME = "javadocstrings.json";
-    private static final String PATH_TO_OUT = "/codegen/out";
+    private static final String DESTINATION_FILE_NAME = "javadocstrings.json";
+    private static final String READ_DESTINATION = "./out/";
+    private static final String WRITE_DESTINATION = "./codegen/out/";
 
     public static boolean start(RootDoc root) {
 
@@ -46,10 +47,10 @@ public class KeanuProjectDoclet extends Standard {
         try {
             Gson gson = new Gson();
             String json = gson.toJson(docString);
-            OutputStream outputStream = new FileOutputStream("./" + JAVADOC_STRING_FILE_NAME);
-            System.out.println("Writing docstrings to " + System.getProperty("user.dir") + PATH_TO_OUT + "/" + JAVADOC_STRING_FILE_NAME);
+            OutputStream outputStream = new FileOutputStream(WRITE_DESTINATION + DESTINATION_FILE_NAME);
+        System.out.println("Writing docstrings to " + System.getProperty("user.dir") + WRITE_DESTINATION + DESTINATION_FILE_NAME);
             outputStream.write(json.getBytes());
-            System.out.println("Finished writing docstrings to " + System.getProperty("user.dir") + PATH_TO_OUT + "/" + JAVADOC_STRING_FILE_NAME);
+            System.out.println("Finished writing docstrings");
         } catch (IOException e) {
             System.out.println("Could not write to file while processing JavaDoc strings");
         }
@@ -59,10 +60,10 @@ public class KeanuProjectDoclet extends Standard {
         try {
             Type listType = new TypeToken<Map<String, DocString>>(){}.getType();
             Gson gson = new Gson();
-            Reader reader = new FileReader("./" + JAVADOC_STRING_FILE_NAME);
+            Reader reader = new FileReader(READ_DESTINATION + DESTINATION_FILE_NAME);
             return gson.fromJson(reader, listType);
         } catch (IOException e) {
-            System.out.println("Could not read JavaDoc strings from file");
+            System.out.println("Could not read JavaDoc strings from file at " + System.getProperty("user.dir") + READ_DESTINATION + DESTINATION_FILE_NAME);
             return new HashMap<>();
         }
     }
