@@ -26,7 +26,7 @@ dependencies {
     compile project(":keanu-project")
 }
 
-task myJavadocs(type: Javadoc) {
+task saveJavadocStringsToFile(type: Javadoc) {
     def keanuProject = rootProject.subprojects.find { subproject -> subproject.name == "keanu-project" }
     def codegenProject = rootProject.subprojects.find { subproject -> subproject.name == "codegen" }
 
