@@ -22,8 +22,12 @@ import java.util.HashSet;
 import java.util.stream.Stream;
 
 /**
- * Utility class for outputting a network to a DOT file.
+ * Utility class for outputting a network to a DOT file that can then be used by a range of graph visualisers.
  * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
+ *
+ * Usage:
+ * To output network to a DOT file: WriteDot.outputDot(fileName, network)
+ * To output vertex and it's connections up to degree n: WriteDot.outputDot(fileName, vertex, n)
  */
 public class WriteDot {
 
@@ -44,28 +48,17 @@ public class WriteDot {
 
     /**
      * Outputs the given graph to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
+     * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
      * @param fileName name of the output file.
      * @param net network to be written out to DOT format.
      */
     public static void outputDot(String fileName, BayesianNetwork net) {
-        outputDot(fileName, "BayesianNetwork" ,net);
-    }
-
-
-    /**
-     * Outputs the given graph to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
-     * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
-     *
-     * @param fileName name of the output file.
-     * @param graphName mame of the graph (default - BayesianNetwork).
-     * @param net network to be written out to DOT format.
-     */
-    public static void outputDot(String fileName, String graphName, BayesianNetwork net) {
 
         // Get any vertex in the network and set the degree to infinity to print out the entire network.
-        Vertex someVertex = net.getTopLevelLatentOrObservedVertices().get(0);
-        outputDot(fileName, graphName, someVertex, Integer.MAX_VALUE);
+        if (net.getAllVertices().size() == 0) return;
+        Vertex someVertex = net.getAllVertices().get(0);
+        outputDot(fileName, someVertex, Integer.MAX_VALUE);
     }
 
 
@@ -74,12 +67,11 @@ public class WriteDot {
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
      * @param fileName name of the output file
-     * @param graphName mame of the graph (default - BayesianNetwork)
      * @param vertex vertex around which the graph will be visualised
      * @param degree degree of connections to be visualised; for instance, if the degree is 1,
      *               only connections between the vertex amd it's parents and children will be written out to the DOT file.
      */
-    public static void outputDot(String fileName, String graphName, Vertex vertex, int degree) {
+    public static void outputDot(String fileName, Vertex vertex, int degree) {
         try {
             // Reset variables
             idsToLabelStrings = new HashMap<>();
@@ -88,7 +80,7 @@ public class WriteDot {
             File outputFile = getOutputFile(fileName);
 
             writer = new BufferedWriter(new FileWriter(outputFile));
-            writer.write("digraph " + graphName + " {\n");
+            writer.write("digraph BayesianNetwork {\n");
 
             // Iterate over vertices and obtain the necessary label and conneciton info.
             obtainGraphInfo(vertex, degree);
@@ -113,7 +105,7 @@ public class WriteDot {
         File outputFile = new File(fileName);
 
         // Make sure the output directory exists.
-        if (!outputFile.getParentFile().exists()){
+        if (outputFile.getParentFile() != null && !outputFile.getParentFile().exists()){
             outputFile.getParentFile().mkdirs();
         }
 
@@ -283,38 +275,5 @@ public class WriteDot {
         for (String labelString: idsToLabelStrings.values()) {
             writer.write(labelString + "\n");
         }
-    }
-
-
-    public static void main(String[] args) {
-        writerTest();
-    }
-
-    public static void writerTest() {
-        Collection<? extends Vertex> vertices;
-
-        double mu = 0;
-        double sigma = 1;
-//        GaussianVertex v1 = new GaussianVertex(mu, sigma);
-//        ConstantIntegerVertex v1 = new ConstantIntegerVertex(4);
-//        ConstantIntegerVertex v2 = new ConstantIntegerVertex(5);
-//        ConstantBoolVertex v1 = new ConstantBoolVertex(true);
-//        ConstantBoolVertex v2 = new ConstantBoolVertex(false);
-//
-//        IntegerVertex v4 = v1.multiply(v2);
-//
-//        BayesianNetwork myNet = new BayesianNetwork(v4.getConnectedGraph());
-
-        GaussianVertex v1 = new GaussianVertex(mu, sigma);
-        ConstantDoubleVertex v2 = new ConstantDoubleVertex(5);
-
-        DoubleVertex v4 = v2.multiply(v1);
-
-        BayesianNetwork myNet = new BayesianNetwork(v4.getConnectedGraph());
-
-        outputDot("testdir/somemore/TestFile.txt", myNet);
-
-//        outputDot("TestFile.txt", "VerticeConnections", v1, 2);
-
     }
 }
