@@ -12,8 +12,8 @@ import java.util.*;
 public class KeanuProjectDoclet extends Standard {
 
     private static final String DESTINATION_FILE_NAME = "javadocstrings.json";
-    private static final String READ_DESTINATION = "./out/";
-    private static final String WRITE_DESTINATION = "./codegen/out/";
+    private static final String READ_DESTINATION = "./build/resources/";
+    private static final String WRITE_DESTINATION = "./codegen/build/resources/";
 
     public static boolean start(RootDoc root) {
 
@@ -47,11 +47,15 @@ public class KeanuProjectDoclet extends Standard {
         try {
             Gson gson = new Gson();
             String json = gson.toJson(docString);
-            OutputStream outputStream = new FileOutputStream(WRITE_DESTINATION + DESTINATION_FILE_NAME);
-        System.out.println("Writing docstrings to " + System.getProperty("user.dir") + WRITE_DESTINATION + DESTINATION_FILE_NAME);
+            File outputFile = new File(WRITE_DESTINATION + DESTINATION_FILE_NAME);
+            outputFile.getParentFile().mkdirs();
+            outputFile.createNewFile(); // if file already exists will do nothing
+            OutputStream outputStream = new FileOutputStream(WRITE_DESTINATION + DESTINATION_FILE_NAME, false);
+        System.out.println("Writing docstrings");
             outputStream.write(json.getBytes());
             System.out.println("Finished writing docstrings");
         } catch (IOException e) {
+            e.printStackTrace();
             System.out.println("Could not write to file while processing JavaDoc strings");
         }
     }
