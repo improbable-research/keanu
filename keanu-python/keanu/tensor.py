@@ -1,5 +1,6 @@
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
+from keanu.functional import Function
 
 import numpy as np
 from .vartypes import int_types, float_types, bool_types, primitive_types, pandas_types
@@ -21,6 +22,9 @@ class Tensor(JavaObjectWrapper):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_scalar(t))
         else:
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(t)))
+
+    def apply(self, lambda_function):
+        return self.unwrap().apply(Function(lambda_function))
 
     @staticmethod
     def __get_tensor_from_ndarray(ndarray):

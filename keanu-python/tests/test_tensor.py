@@ -110,3 +110,15 @@ def test_convert_java_tensor_to_ndarray(value):
 
 def assert_java_class(java_object_wrapper, java_class_str):
     assert java_object_wrapper.get_class().getSimpleName() == java_class_str
+
+@pytest.mark.parametrize("value, expected_result", [
+    (1., 11.),
+    (1, 11),
+    (np.array([[1., 2.], [3., 4.]]), np.array([[11., 12.], [13., 14.]])),
+    (np.array([[1, 2], [3, 4]]), np.array([[11, 12], [13, 14]]))
+])
+def test_you_can_apply_a_function_to_a_tensor(value, expected_result):
+    t = kn.Tensor(value)
+    result = t.apply(lambda x : x + 10)
+    ndarray = kn.Tensor._to_ndarray(result)
+    assert (ndarray == expected_result).all()
