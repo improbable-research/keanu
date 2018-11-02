@@ -17,6 +17,7 @@ dependencies {
 }
 
 task codeGen (type: JavaExec) {
+    dependsOn rootProject.getTasks().getByName("saveJavadocStringsToFile")
     classpath sourceSets.main.runtimeClasspath
     main = mainClassName
     args += project.rootDir.toString() + '/keanu-python/keanu/vertex/'
