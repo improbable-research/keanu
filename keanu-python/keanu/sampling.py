@@ -21,3 +21,17 @@ def sample(net, sample_from, algo='metropolis', draws=500, drop=0, down_sample_i
     vertex_samples = {Vertex._get_python_id(vertex_unwrapped): list(map(Tensor._to_ndarray, network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped}
 
     return vertex_samples
+
+def samples_iter(net, sample_from, algo='metropolis', draws=500, drop=0, down_sample_interval=1):
+	vertices_unwrapped = k.to_java_object_list(sample_from)
+
+	network_samples = algorithms[algo].withDefaultConfig().generatePosteriorSamples(net.unwrap(), vertices_unwrapped).dropCount(drop).downSampleInterval(down_sample_interval).stream().iterator()
+	
+	return samples_gen(network_samples, draws, vertices_unwrapped)
+
+
+def samples_gen(network_samples, draws, vertices_unwrapped):
+	for i in range(draws):
+		network_sample = network_samples.next()
+		sample = {Vertex._get_python_id(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped)) for vertex_unwrapped in vertices_unwrapped}
+		yield sample
