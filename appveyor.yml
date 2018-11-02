@@ -3,7 +3,7 @@ environment:
   PYTHON: "C:\\Python36-x64"
   PIPENV_IGNORE_VIRTUALENVS: 1
   PIPENV_YES: 1
-  KEANU_ND4J_CLASSPATH: %HOMEPATH%
+  KEANU_ND4J_CLASSPATH: "%HOMEPATH%"
 install:
 - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 - appveyor DownloadFile "http://central.maven.org/maven2/org/bytedeco/javacpp-presets/mkl-dnn/0.15-1.4.2/mkl-dnn-0.15-1.4.2-windows-x86_64.jar" -FileName %KEANU_ND4J_CLASSPATH%
