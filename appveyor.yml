@@ -3,10 +3,11 @@ environment:
   PYTHON: "C:\\Python36-x64"
   PIPENV_IGNORE_VIRTUALENVS: 1
   PIPENV_YES: 1
-  KEANU_ND4J_CLASSPATH: "%APPVEYOR_BUILD_FOLDER%"
+  KEANU_ND4J_CLASSPATH: "%APPVEYOR_BUILD_FOLDER%\\Classpath"
 
 install:
 - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+- mkdir %KEANU_ND4J_CLASSPATH%
 - appveyor DownloadFile "http://central.maven.org/maven2/org/bytedeco/javacpp-presets/mkl-dnn/0.15-1.4.2/mkl-dnn-0.15-1.4.2-windows-x86_64.jar" -FileName %KEANU_ND4J_CLASSPATH%
 init:
 - git config --global core.autocrlf true
