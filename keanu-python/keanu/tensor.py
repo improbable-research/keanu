@@ -18,16 +18,9 @@ class Tensor(JavaObjectWrapper):
         elif isinstance(t, pandas_types):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t.values))
         elif isinstance(t, primitive_types):
-            super(Tensor, self).__init__(Tensor.__infer_tensor_from_scalar(t))
+            super(Tensor, self).__init__(Tensor.__get_tensor_from_scalar(t))
         else:
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(t)))
-
-    @staticmethod
-    def __ensure_rank_is_atleast_two(ndarray):
-        if len(ndarray.shape) == 1:
-            return ndarray[..., None]
-        else:
-            return ndarray
 
     @staticmethod
     def __get_tensor_from_ndarray(ndarray):
@@ -38,6 +31,13 @@ class Tensor(JavaObjectWrapper):
         shape = k.to_java_long_array(normalized_ndarray.shape)
 
         return ctor(values, shape)
+
+    @staticmethod
+    def __ensure_rank_is_atleast_two(ndarray):
+        if len(ndarray.shape) == 1:
+            return ndarray[..., None]
+        else:
+            return ndarray
 
     @staticmethod
     def __infer_tensor_ctor_from_ndarray(ndarray):
@@ -54,7 +54,7 @@ class Tensor(JavaObjectWrapper):
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(ndarray.item(0))))
 
     @staticmethod
-    def __infer_tensor_from_scalar(scalar):
+    def __get_tensor_from_scalar(scalar):
         if isinstance(scalar, bool_types):
             return k.jvm_view().BooleanTensor.scalar(bool(scalar))
         elif isinstance(scalar, int_types):
