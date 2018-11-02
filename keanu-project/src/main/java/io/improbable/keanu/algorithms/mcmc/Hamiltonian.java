@@ -205,10 +205,11 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         @Override
         public NetworkState sample() {
             step();
-            return new SimpleNetworkState(sampleLogic(new HashMap<>()));
+            sampleLogic(new HashMap<>());
+            return new SimpleNetworkState(takeSample(fromVertices));
         }
 
-        private Map<VertexId, ?> sampleLogic(Map<VertexId, List<?>> samples) {
+        private Map<VertexId, List<?>> sampleLogic(Map<VertexId, List<?>> samples) {
             final double logOfMasterPAfterLeapfrog = bayesNet.getLogOfMasterP();
 
             final double likelihoodOfLeapfrog = getLikelihoodOfLeapfrog(
@@ -385,5 +386,13 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
     private static <T> void addSampleForVertex(VertexId id, T value, Map<VertexId, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(id, v -> new ArrayList<T>());
         samplesForVertex.add(value);
+    }
+
+    private static Map<VertexId, ?> takeSample(List<? extends Vertex> fromVertices) {
+        Map<VertexId, Object> sample = new HashMap<>();
+        for (Vertex v : fromVertices) {
+            sample.put(v.getId(), v.getValue());
+        }
+        return sample;
     }
 }

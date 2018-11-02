@@ -11,6 +11,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -111,5 +113,27 @@ public class HamiltonianTest {
         assertNull(hmc.getRandom());
 
         assertFalse(posteriorSamples.get(A).asList().isEmpty());
+    }
+
+    @Test
+    public void canStreamSamples() {
+
+        Hamiltonian algo = Hamiltonian.withDefaultConfig();
+
+        int sampleCount = 1000;
+        int dropCount = 100;
+        int downSampleInterval = 1;
+        GaussianVertex A = new GaussianVertex(0, 1);
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+
+        double averageA = algo.generatePosteriorSamples(network, network.getLatentVertices())
+            .dropCount(dropCount)
+            .downSampleInterval(downSampleInterval)
+            .stream()
+            .limit(sampleCount)
+            .mapToDouble(networkState -> networkState.get(A).scalar())
+            .average().getAsDouble();
+
+        assertEquals(0.0, averageA, 0.1);
     }
 }
