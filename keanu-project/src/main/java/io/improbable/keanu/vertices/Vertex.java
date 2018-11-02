@@ -40,7 +40,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
 
         Constructor vertexConstructor;
         try {
-            vertexConstructor = vertexClass.getConstructor(Map.class);
+            vertexConstructor = vertexClass.getConstructor(Map.class, KeanuSavedBayesNet.VertexValue.class);
         } catch (NoSuchMethodException e) {
             throw new
                 IllegalArgumentException("Vertex Type doesn't support loading from Proto: " + vertex.getVertexType(), e);
@@ -50,7 +50,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         Map<String, Vertex> parentsMap = getParentsMap(vertex, existingVertices);
 
         try {
-            newVertex = (Vertex<T>)vertexConstructor.newInstance(parentsMap);
+            newVertex = (Vertex<T>)vertexConstructor.newInstance(parentsMap, vertex.getConstantValue());
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to create Vertex of Type: " + vertex.getVertexType(), e);
         }

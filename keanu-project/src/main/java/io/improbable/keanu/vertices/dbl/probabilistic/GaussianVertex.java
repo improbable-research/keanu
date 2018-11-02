@@ -76,7 +76,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
         this(tensorShape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
 
-    public GaussianVertex(Map<String, Vertex> parentsMap) {
+    public GaussianVertex(Map<String, Vertex> parentsMap, KeanuSavedBayesNet.VertexValue initialValue) {
         this((DoubleVertex)parentsMap.get("mu"), (DoubleVertex)parentsMap.get("sigma"));
     }
 

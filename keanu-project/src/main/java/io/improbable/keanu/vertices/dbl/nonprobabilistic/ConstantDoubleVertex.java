@@ -31,8 +31,16 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
         this(DoubleTensor.create(vector));
     }
 
-    public ConstantDoubleVertex(Map<String, Vertex> parentMap) {
-        this(0.0);
+    public ConstantDoubleVertex(Map<String, Vertex> parentMap, KeanuSavedBayesNet.VertexValue initialValue) {
+        this(parseValue(initialValue));
+    }
+
+    private static double parseValue(KeanuSavedBayesNet.VertexValue value) {
+        if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
+            throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
+        } else {
+            return value.getDoubleVal();
+        }
     }
 
     @Override
