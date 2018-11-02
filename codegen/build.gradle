@@ -9,6 +9,7 @@ dependencies {
     compile 'org.reflections:reflections:0.9.11'
     compile 'org.freemarker:freemarker:2.3.28'
     compile project(':keanu-project')
+    compile files("${System.getProperty('java.home')}/../lib/tools.jar")
 
     //testing
     testCompile 'junit:junit:4.12'
