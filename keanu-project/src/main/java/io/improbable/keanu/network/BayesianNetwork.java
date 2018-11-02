@@ -225,7 +225,7 @@ public class BayesianNetwork {
         bayesNetBuilder.build().writeTo(output);
     }
 
-    private List<KeanuSavedBayesNet.VertexValue> getVertexValues() {
+    private List<KeanuSavedBayesNet.StoredValue> getVertexValues() {
         return vertices.stream()
             .filter(Vertex::hasValue)
             .map(Vertex::getValueAsProtoBuf)
@@ -260,7 +260,7 @@ public class BayesianNetwork {
     private static void loadDefaultValues(KeanuSavedBayesNet.BayesianNetwork parsedNet,
                                           Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices,
                                           BayesianNetwork bayesNet) {
-        for (KeanuSavedBayesNet.VertexValue value : parsedNet.getDefaultStateList()) {
+        for (KeanuSavedBayesNet.StoredValue value : parsedNet.getDefaultStateList()) {
             Vertex targetVertex = null;
 
             if (value.hasId()) {
@@ -281,7 +281,7 @@ public class BayesianNetwork {
                 throw new IllegalArgumentException("Value specified for unknown Vertex");
             }
 
-            targetVertex.setValue(value);
+            targetVertex.setValue(value.getValue());
         }
     }
 }

@@ -74,4 +74,11 @@ public class ConstantVertex {
     public static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {
         return new ConstantGenericVertex<>(tensor);
     }
+
+    public static boolean isConstantVertex(Vertex v) {
+        return v instanceof ConstantDoubleVertex ||
+            v instanceof ConstantIntegerVertex ||
+            v instanceof ConstantBoolVertex ||
+            v instanceof ConstantGenericVertex;
+    }
 }

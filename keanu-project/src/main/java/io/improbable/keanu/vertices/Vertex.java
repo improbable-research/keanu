@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static io.improbable.keanu.vertices.ConstantVertex.isConstantVertex;
+
 public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape {
 
     private final VertexId id = new VertexId();
@@ -311,6 +313,10 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
             vertexBuilder = vertexBuilder.setLabel(label.toString());
         }
 
+        if (isConstantVertex(this)) {
+            vertexBuilder.setConstantValue(getValueAsProtoBuf().getValue());
+        }
+
         vertexBuilder = vertexBuilder.setId(id.toProtoBuf());
         vertexBuilder = vertexBuilder.setVertexType(this.getClass().getCanonicalName());
         vertexBuilder = vertexBuilder.addAllParents(getNamedParents());
@@ -323,7 +329,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         throw new UnsupportedOperationException("Parent Save Not Implemented");
     }
 
-    public KeanuSavedBayesNet.VertexValue getValueAsProtoBuf() {
+    public KeanuSavedBayesNet.StoredValue getValueAsProtoBuf() {
         //TODO - make abstract once implemented everywhere
         throw new UnsupportedOperationException("This Vertex Doesn't Support Value Save");
     }

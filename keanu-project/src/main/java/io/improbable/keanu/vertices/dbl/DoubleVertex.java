@@ -346,11 +346,15 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public KeanuSavedBayesNet.VertexValue getValueAsProtoBuf() {
-        return KeanuSavedBayesNet.VertexValue.newBuilder()
+    public KeanuSavedBayesNet.StoredValue getValueAsProtoBuf() {
+        KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
             .setDoubleVal(getValue(0)) //TODO - Need to deal with tensors - oneofs don't interact well with repeated
                                                //also - how will this interact with the shape layer?
-            .setId(getId().toProtoBuf())
+            .build();
+
+         return KeanuSavedBayesNet.StoredValue.newBuilder()
+             .setId(getId().toProtoBuf())
+             .setValue(value)
             .build();
     }
 
