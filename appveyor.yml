@@ -8,6 +8,7 @@ environment:
 install:
 - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 - mkdir %KEANU_ND4J_CLASSPATH%
+- icacls %KEANU_ND4J_CLASSPATH%
 - appveyor DownloadFile "http://central.maven.org/maven2/org/bytedeco/javacpp-presets/mkl-dnn/0.15-1.4.2/mkl-dnn-0.15-1.4.2-windows-x86_64.jar" -FileName %KEANU_ND4J_CLASSPATH%
 init:
 - git config --global core.autocrlf true
