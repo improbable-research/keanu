@@ -4,7 +4,7 @@ import os.path
 from py4j.java_gateway import JavaGateway, JavaObject, CallbackServerParameters
 
 PATH = os.path.abspath(os.path.dirname(__file__))
-CLASSPATH = os.path.join(PATH, "keanu-python-all.jar")
+CLASSPATH = os.path.join(PATH, "classpath", "*")
 
 print("classpath=", CLASSPATH)
 
