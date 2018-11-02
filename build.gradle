@@ -23,10 +23,31 @@ allprojects {
 }
 
 dependencies {
+    compile 'com.google.code.gson:gson:2.7'
     compile project(":keanu-project")
 }
 
 shadowJar {
     destinationDir = file("$rootDir/keanu-python/keanu")
     archiveName = "keanu-python-all.jar"
+}
+
+task myJavadocs(type: Javadoc) {
+    def keanuProject = rootProject.subprojects.find { subproject -> subproject.name == "keanu-project" }
+    def codegenProject = rootProject.subprojects.find { subproject -> subproject.name == "codegen" }
+
+    source = keanuProject.layout.getProjectDirectory().asFileTree.matching({ filter -> filter.include("**/*.java") })
+
+    File classFile = codegenProject.layout.getProjectDirectory().getAsFileTree().files
+        .find( { File file -> file.name.contains("KeanuProjectDoclet.class") })
+        .parentFile.parentFile.parentFile.parentFile.parentFile.parentFile
+
+    def docletClasspath = compileJava.classpath.files.toList()
+    docletClasspath.add(classFile)
+    options.setDocletpath(docletClasspath)
+    options.setDoclet("io.improbable.keanu.codegen.python.KeanuProjectDoclet")
+
+    def mainClasspath = keanuProject.layout.projectDirectory.asFileTree.files.toList()
+    println mainClasspath
+    options.setClasspath(mainClasspath)
 }
