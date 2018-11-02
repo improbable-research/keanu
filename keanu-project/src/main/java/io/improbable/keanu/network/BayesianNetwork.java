@@ -212,7 +212,7 @@ public class BayesianNetwork {
 
     public void saveNetwork(OutputStream output, boolean saveValues) throws IOException {
         List<KeanuSavedBayesNet.Vertex> protoBufs = vertices.stream()
-            .map(v -> v.toProtoBuf())
+            .map(Vertex::toProtoBuf)
             .collect(Collectors.toList());
 
         KeanuSavedBayesNet.BayesianNetwork.Builder bayesNetBuilder = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
@@ -227,8 +227,8 @@ public class BayesianNetwork {
 
     private List<KeanuSavedBayesNet.VertexValue> getVertexValues() {
         return vertices.stream()
-            .filter(v -> v.hasValue())
-            .map(v -> v.getValueAsProtoBuf())
+            .filter(Vertex::hasValue)
+            .map(Vertex::getValueAsProtoBuf)
             .collect(Collectors.toList());
     }
 
