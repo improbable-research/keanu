@@ -13,17 +13,10 @@ java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
 class Tensor(JavaObjectWrapper):
     def __init__(self, t):
-        if isinstance(t, pandas_types):
-            t = t.values
-
         if isinstance(t, np.ndarray):
-            normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(t)
-
-            ctor = Tensor.__infer_tensor_ctor_from_ndarray(normalized_ndarray)
-            values = k.to_java_array(normalized_ndarray.flatten().tolist())
-            shape = k.to_java_long_array(normalized_ndarray.shape)
-
-            super(Tensor, self).__init__(ctor(values, shape))
+            super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t))
+        elif isinstance(t, pandas_types):
+            super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t.values))
         elif isinstance(t, primitive_types):
             super(Tensor, self).__init__(Tensor.__infer_tensor_from_scalar(t))
         else:
@@ -35,6 +28,16 @@ class Tensor(JavaObjectWrapper):
             return ndarray[..., None]
         else:
             return ndarray
+
+    @staticmethod
+    def __get_tensor_from_ndarray(ndarray):
+        normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(ndarray)
+
+        ctor = Tensor.__infer_tensor_ctor_from_ndarray(normalized_ndarray)
+        values = k.to_java_array(normalized_ndarray.flatten().tolist())
+        shape = k.to_java_long_array(normalized_ndarray.shape)
+
+        return ctor(values, shape)
 
     @staticmethod
     def __infer_tensor_ctor_from_ndarray(ndarray):
