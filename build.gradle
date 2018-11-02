@@ -32,7 +32,7 @@ shadowJar {
     archiveName = "keanu-python-all.jar"
 }
 
-task myJavadocs(type: Javadoc) {
+task saveJavadocStringsToFile(type: Javadoc) {
     def keanuProject = rootProject.subprojects.find { subproject -> subproject.name == "keanu-project" }
     def codegenProject = rootProject.subprojects.find { subproject -> subproject.name == "codegen" }
 
