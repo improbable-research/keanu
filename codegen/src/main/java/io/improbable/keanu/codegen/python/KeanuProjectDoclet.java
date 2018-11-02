@@ -5,8 +5,8 @@ import com.google.gson.reflect.TypeToken;
 import com.sun.javadoc.*;
 import com.sun.tools.doclets.standard.Standard;
 
-import java.lang.reflect.Type;
 import java.io.*;
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class KeanuProjectDoclet extends Standard {
@@ -67,4 +67,3 @@ public class KeanuProjectDoclet extends Standard {
         }
     }
 }
-
