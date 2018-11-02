@@ -9,12 +9,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BayesianNetwork {
@@ -55,6 +50,13 @@ public class BayesianNetwork {
 
     List<? extends Vertex> getVertices() {
         return vertices;
+    }
+
+    /**
+     * @return A list of all vertices in the network.
+     */
+    public List<Vertex> getAllVertices() {
+        return Collections.unmodifiableList(vertices);
     }
 
     private interface VertexFilter {
