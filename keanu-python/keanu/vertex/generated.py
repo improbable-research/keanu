@@ -125,7 +125,7 @@ def Power(base, exponent) -> context.jvm_view().PowerVertex:
 def Abs(input_vertex) -> context.jvm_view().AbsVertex:
     """
     Takes the absolute of a vertex
-    :param inputVertex: the vertex
+    :param input_vertex: the vertex
     """
     return Vertex(context.jvm_view().AbsVertex, input_vertex)
 
@@ -134,7 +134,7 @@ def Ceil(input_vertex) -> context.jvm_view().CeilVertex:
     """
     Applies the Ceiling operator to a vertex.
     This maps a vertex to the smallest integer greater than or equal to its value
-    :param inputVertex: the vertex to be ceil'd
+    :param input_vertex: the vertex to be ceil'd
     """
     return Vertex(context.jvm_view().CeilVertex, input_vertex)
 
@@ -143,7 +143,7 @@ def Floor(input_vertex) -> context.jvm_view().FloorVertex:
     """
     Applies the Floor operator to a vertex.
     This maps a vertex to the biggest integer less than or equal to its value
-    :param inputVertex: the vertex to be floor'd
+    :param input_vertex: the vertex to be floor'd
     """
     return Vertex(context.jvm_view().FloorVertex, input_vertex)
 
@@ -152,7 +152,7 @@ def Round(input_vertex) -> context.jvm_view().RoundVertex:
     """
     Applies the Rounding operator to a vertex.
     This maps a vertex to the nearest integer value
-    :param inputVertex: the vertex to be rounded
+    :param input_vertex: the vertex to be rounded
     """
     return Vertex(context.jvm_view().RoundVertex, input_vertex)
 
@@ -186,8 +186,8 @@ def Uniform(x_min, x_max) -> context.jvm_view().UniformVertex:
     """
     One to one constructor for mapping some shape of mu and sigma to
     a matching shaped Uniform Vertex
-    :param xMax: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
-    :param xMin: the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
+    :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
+    :param x_min: the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
     """
     return Vertex(context.jvm_view().UniformVertex, x_min, x_max)
 
