@@ -1,8 +1,7 @@
 from py4j.java_gateway import java_import
-from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.net import BayesNet
-from keanu.vertex import Vertex
+from keanu.vertex.base import Vertex
 
 k = KeanuContext()
 

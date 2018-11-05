@@ -1,12 +1,12 @@
-import keanu as kn
+from keanu.base import JavaObjectWrapper
+from keanu.context import KeanuContext
 import pytest
-from py4j.java_gateway import java_import
 
 @pytest.fixture
 def java_list_wrapper():
-    class JavaListWrapper(kn.JavaObjectWrapper):
+    class JavaListWrapper(JavaObjectWrapper):
         def __init__(self, numbers):
-            lst = kn.KeanuContext()._gateway.jvm.java.util.ArrayList()
+            lst = KeanuContext()._gateway.jvm.java.util.ArrayList()
             for number in numbers:
                 lst.add(number)
 

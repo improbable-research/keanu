@@ -1,8 +1,7 @@
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
-from keanu.vertex import Vertex
-import numpy as np
+from keanu.vertex.base import Vertex
 
 k = KeanuContext()
 
