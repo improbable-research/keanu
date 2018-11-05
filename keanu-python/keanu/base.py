@@ -1,5 +1,5 @@
 import logging
-from keanu.case_conversion import _to_camel_case_name, _to_snake_case_name
+from .case_conversion import _to_camel_case_name, _to_snake_case_name
 
 class JavaObjectWrapper:
     def __init__(self, val):

@@ -1,7 +1,7 @@
-import keanu as kn
 import numpy as np
 import pandas as pd
 import pytest
+from keanu.tensor import Tensor
 
 
 @pytest.fixture
@@ -17,7 +17,7 @@ def generic():
     (np.array([True])[0], "SimpleBooleanTensor")
 ])
 def test_num_passed_to_Tensor_creates_scalar_tensor(num, expected_java_class):
-    t = kn.Tensor(num)
+    t = Tensor(num)
     assert_java_class(t, expected_java_class)
     assert t.is_scalar()
     assert t.scalar() == num
@@ -30,11 +30,11 @@ def test_num_passed_to_Tensor_creates_scalar_tensor(num, expected_java_class):
 ])
 def test_dataframe_passed_to_Tensor_creates_tensor(data, expected_java_class):
     dataframe = pd.DataFrame(columns=['A', 'B'], data=data)
-    t = kn.Tensor(dataframe)
+    t = Tensor(dataframe)
 
     assert_java_class(t, expected_java_class)
 
-    tensor_value = kn.Tensor._to_ndarray(t.unwrap())
+    tensor_value = Tensor._to_ndarray(t.unwrap())
     dataframe_value = dataframe.values
 
     assert np.array_equal(tensor_value, dataframe_value)
@@ -50,11 +50,11 @@ def test_dataframe_passed_to_Tensor_creates_tensor(data, expected_java_class):
 ])
 def test_series_passed_to_Tensor_creates_tensor(data, expected_java_class):
     series = pd.Series(data)
-    t = kn.Tensor(series)
+    t = Tensor(series)
 
     assert_java_class(t, expected_java_class)
 
-    tensor_value = kn.Tensor._to_ndarray(t.unwrap())
+    tensor_value = Tensor._to_ndarray(t.unwrap())
     series_value = series.values
 
     assert len(tensor_value) == len(series_value)
@@ -66,7 +66,7 @@ def test_series_passed_to_Tensor_creates_tensor(data, expected_java_class):
 
 def test_cannot_pass_generic_to_Tensor(generic):
     with pytest.raises(NotImplementedError) as excinfo:
-        kn.Tensor(generic)
+        Tensor(generic)
 
     assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
 
@@ -78,21 +78,21 @@ def test_cannot_pass_generic_to_Tensor(generic):
 ])
 def test_ndarray_passed_to_Tensor_creates_nonscalar_tensor(arr, expected_java_class):
     ndarray = np.array(arr)
-    t = kn.Tensor(ndarray)
+    t = Tensor(ndarray)
     assert_java_class(t, expected_java_class)
     assert not t.is_scalar()
 
 
 def test_cannot_pass_generic_ndarray_to_Tensor(generic):
     with pytest.raises(NotImplementedError) as excinfo:
-        kn.Tensor(np.array([generic, generic]))
+        Tensor(np.array([generic, generic]))
 
     assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
 
 
 def test_cannot_pass_empty_ndarray_to_Tensor():
     with pytest.raises(ValueError) as excinfo:
-        kn.Tensor(np.array([]))
+        Tensor(np.array([]))
 
     assert str(excinfo.value) == "Cannot infer type because the ndarray is empty"
 
@@ -102,8 +102,8 @@ def test_cannot_pass_empty_ndarray_to_Tensor():
     (3)
 ])
 def test_convert_java_tensor_to_ndarray(value):
-    t = kn.Tensor(value)
-    ndarray = kn.Tensor._to_ndarray(t.unwrap())
+    t = Tensor(value)
+    ndarray = Tensor._to_ndarray(t.unwrap())
 
     assert type(ndarray) == np.ndarray
     assert (value == ndarray).all()
