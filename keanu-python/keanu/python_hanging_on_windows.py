@@ -4,7 +4,12 @@ import os.path
 from py4j.java_gateway import JavaGateway, JavaObject, CallbackServerParameters
 
 PATH = os.path.abspath(os.path.dirname(__file__))
+ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
+
 CLASSPATH = os.path.join(PATH, "classpath", "*")
+nd4j_path = os.environ.get(ND4J_CLASSPATH_ENVIRONMENT_VARIABLE)
+if nd4j_path is not None:
+    CLASSPATH = os.pathsep.join([CLASSPATH, os.path.join(nd4j_path, "*")])
 
 print("classpath=", CLASSPATH)
 
