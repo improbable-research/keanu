@@ -1,5 +1,6 @@
 include 'keanu-project',
-        'codegen',
-        'docs',
-        'keanu-python',
-        'keanu-examples:coalMiningDisasters'
+    'codegen',
+    'docs',
+    'keanu-python',
+    'keanu-examples:coalMiningDisasters',
+    'keanu-examples:bayesianMethodsForHackers'

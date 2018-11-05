@@ -7,9 +7,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -61,9 +63,9 @@ public class TemplateProcessorTest {
 
 
     @Test
-    public void canProcessTemplate() throws IOException {
-        Path generatedFilePath = Paths.get(testFolder.getRoot().toString(), TEST_GENERATED_FILE);
-        Path expectedContentFilePath = new File(ClassLoader.getSystemResource("result.txt").getFile()).toPath();
+    public void canProcessTemplate() throws IOException, URISyntaxException {
+        Path generatedFilePath =Paths.get(testFolder.getRoot().toString(), TEST_GENERATED_FILE);
+        Path expectedContentFilePath = getSystemResourceAsPath("result.txt");
 
         Writer writer = TemplateProcessor.createFileWriter(generatedFilePath.toAbsolutePath().toString());
         Template template = TemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
@@ -72,6 +74,14 @@ public class TemplateProcessorTest {
         TemplateProcessor.processDataModel(dataModel, template, writer);
 
         assertFilesContainSameContent(generatedFilePath, expectedContentFilePath);
+    }
+
+    private Path getSystemResourceAsPath(String fileName) throws URISyntaxException {
+        // This is necessary on Windows to remove the escape characters
+        // see https://stackoverflow.com/a/13470643
+        URL resultFileUrl = ClassLoader.getSystemResource(fileName);
+        URI resultFileUri = new URI(resultFileUrl.toString());
+        return Paths.get(resultFileUri);
     }
 
     private Map<String, Object> buildTestDataModel() {
