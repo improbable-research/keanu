@@ -1,7 +1,13 @@
+from .net import BayesNet
+from .vertex.base import Vertex
+
 class Model:
     def __init__(self, vertices={}):
         self.__dict__["_vertices"] = {}
         self.__dict__["_vertices"].update(vertices)
+
+    def to_bayes_net(self):
+        return BayesNet((filter(lambda vertex: isinstance(vertex, Vertex), self._vertices.values())))
 
     def __setattr__(self, k, v):
         if k in self.__dict__:
