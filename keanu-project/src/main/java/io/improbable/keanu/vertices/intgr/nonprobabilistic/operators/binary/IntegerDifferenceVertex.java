@@ -12,7 +12,7 @@ public class IntegerDifferenceVertex extends IntegerBinaryOpVertex {
      * @param a the vertex to be subtracted from
      * @param b the vertex to subtract
      */
-    @WriteDot.DotAnnotation(displayName = "-")
+    @WriteDot.Display(displayName = "-")
     public IntegerDifferenceVertex(IntegerVertex a, IntegerVertex b) {
         super(a, b);
     }

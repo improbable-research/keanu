@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.util.dot.WriteDot;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-@WriteDot.DotAnnotation(displayName = "/")
+@WriteDot.Display(displayName = "/")
 public class IntegerDivisionVertex extends IntegerBinaryOpVertex {
 
     /**

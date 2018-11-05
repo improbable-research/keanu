@@ -3,7 +3,6 @@ package io.improbable.keanu.util.dot;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -12,7 +11,6 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.apache.commons.io.FileUtils;
 import org.junit.*;
-import org.nd4j.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,7 +131,7 @@ public class WriteDotTest {
 
     @Test
     public void outputContainsAnnotations() {
-        String multiplyVertexAnnotation = MultiplicationVertex.class.getAnnotation(WriteDot.DotAnnotation.class).displayName();
+        String multiplyVertexAnnotation = MultiplicationVertex.class.getAnnotation(WriteDot.Display.class).displayName();
         assertTrue(gaussianDotOutput.contains(multiplyVertexAnnotation));
     }
 

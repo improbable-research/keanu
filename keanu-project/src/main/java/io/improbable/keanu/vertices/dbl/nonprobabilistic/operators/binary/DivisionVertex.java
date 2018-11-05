@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.HashMap;
 import java.util.Map;
 
-@WriteDot.DotAnnotation(displayName = "/")
+@WriteDot.Display(displayName = "/")
 public class DivisionVertex extends DoubleBinaryOpVertex {
     /**
      * Divides one vertex by another
