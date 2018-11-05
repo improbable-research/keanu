@@ -24,13 +24,18 @@ class VertexProcessor {
 
     final private static String TEMPLATE_FILE = "generated.py.ftl";
     final private static String GENERATED_FILE = "generated.py";
+    final private static String TEMPLATE_INIT_FILE = "__init__.py.ftl";
+    final private static String GENERATED_INIT_FILE = "__init__.py";
 
     static void process(String generatedDir) throws IOException {
         Map<String, Object> dataModel = buildDataModel();
         Template fileTemplate = TemplateProcessor.getFileTemplate(TEMPLATE_FILE);
         Writer fileWriter = TemplateProcessor.createFileWriter(generatedDir + GENERATED_FILE);
+        Template initFileTemplate = TemplateProcessor.getFileTemplate(TEMPLATE_INIT_FILE);
+        Writer initFileWriter = TemplateProcessor.createFileWriter(generatedDir + GENERATED_INIT_FILE);
 
         TemplateProcessor.processDataModel(dataModel, fileTemplate, fileWriter);
+        TemplateProcessor.processDataModel(dataModel, initFileTemplate, initFileWriter);
     }
 
     private static Map<String, Object> buildDataModel() throws IOException {
@@ -43,6 +48,7 @@ class VertexProcessor {
         Map<String, Object> root = new HashMap<>();
         List<Import> imports = new ArrayList<>();
         List<PythonConstructor> pythonConstructors = new ArrayList<>();
+        List<String> exportedMethodsList = new ArrayList<>();
 
         root.put("imports", imports);
         root.put("constructors", pythonConstructors);
@@ -56,8 +62,12 @@ class VertexProcessor {
                 parameter -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, parameter)).toArray(String[]::new);
 
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
-            pythonConstructors.add(new PythonConstructor(javaClass, toPythonClass(javaClass), String.join(", ", pythonParameters), docString.getAsString()));
+            PythonConstructor pythonConstructor = new PythonConstructor(javaClass, toPythonClass(javaClass), String.join(", ", pythonParameters), docString.getAsString());
+            pythonConstructors.add(pythonConstructor);
+            exportedMethodsList.add(pythonConstructor.pythonClass);
         }
+        String exportedMethodsString = "\"" + String.join("\", \"", exportedMethodsList) + "\"";
+        root.put("exportedMethods", exportedMethodsString);
 
         return root;
     }
