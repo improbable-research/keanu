@@ -59,7 +59,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     }
 
     @Override
-    public List<KeanuSavedBayesNet.NamedParent> getNamedParents() {
+    public List<KeanuSavedBayesNet.NamedParent> getParentsAsProto() {
         return new ArrayList<>();
     }
 

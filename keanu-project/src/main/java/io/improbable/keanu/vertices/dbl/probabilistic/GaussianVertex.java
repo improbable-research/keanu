@@ -135,7 +135,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
     }
 
     @Override
-    public List<KeanuSavedBayesNet.NamedParent> getNamedParents() {
+    public List<KeanuSavedBayesNet.NamedParent> getParentsAsProto() {
         KeanuSavedBayesNet.NamedParent parents[] = new KeanuSavedBayesNet.NamedParent[2];
         parents[0] = KeanuSavedBayesNet.NamedParent.newBuilder()
             .setName("mu")

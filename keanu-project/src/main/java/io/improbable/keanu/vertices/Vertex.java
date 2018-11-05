@@ -319,12 +319,12 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
 
         vertexBuilder = vertexBuilder.setId(id.toProtoBuf());
         vertexBuilder = vertexBuilder.setVertexType(this.getClass().getCanonicalName());
-        vertexBuilder = vertexBuilder.addAllParents(getNamedParents());
+        vertexBuilder = vertexBuilder.addAllParents(getParentsAsProto());
 
         return vertexBuilder.build();
     }
 
-    public List<KeanuSavedBayesNet.NamedParent> getNamedParents() {
+    public List<KeanuSavedBayesNet.NamedParent> getParentsAsProto() {
         //TODO - Make this abstract once everyone implements
         throw new UnsupportedOperationException("Parent Save Not Implemented");
     }
