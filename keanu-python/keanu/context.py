@@ -1,6 +1,6 @@
 import sys
 import io
-import os.path
+import os
 import logging
 from py4j.java_gateway import JavaGateway, JavaObject, CallbackServerParameters
 
@@ -41,7 +41,7 @@ class KeanuContext(metaclass=Singleton):
         if nd4j_path is None:
             return keanu_path
         else:
-            return ";".join([keanu_path, os.path.join(PATH, "nd4j_path", "*")])
+            return os.pathsep.join([keanu_path, os.path.join(PATH, "nd4j_path", "*")])
 
     def __stderr_with_redirect_disabled_for_jupyter(self):
         try:
