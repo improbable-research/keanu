@@ -4,7 +4,7 @@ from py4j.java_gateway import java_import
 from examples import Thermometer
 from keanu.vertex import Gamma, Exponential, Cauchy
 from keanu.algorithm import sample, iterate_samples
-from keanu import BayesNet
+from keanu import BayesNet, KeanuRandom
 
 @pytest.fixture
 def net():
@@ -64,7 +64,7 @@ def test_down_sample_interval(net):
 ])
 def test_iter_is_correct_size(algo, net):
     draws = 10
-    samples = kn.iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws, down_sample_interval=1)
+    samples = iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws, down_sample_interval=1)
     assert sum(1 for i in samples) == 10
 
 
@@ -75,15 +75,15 @@ def test_iter_is_correct_size(algo, net):
 def test_iter_returns_same_result_as_sample(algo):
     draws = 100
     model = Thermometer.model()
-    net = kn.BayesNet(model.temperature.get_connected_graph())
+    net = BayesNet(model.temperature.get_connected_graph())
     set_starting_state(model)
     samples = sample(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
     set_starting_state(model)
     iter_samples = iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
     iter_samples_dict = {}
 
-    for sample in iter_samples:
-        for vertex_id, vertex_sample in sample.items():
+    for next_sample in iter_samples:
+        for vertex_id, vertex_sample in next_sample.items():
             if vertex_id in iter_samples_dict:    
                 iter_samples_dict[vertex_id] += vertex_sample
             else:
@@ -94,7 +94,7 @@ def test_iter_returns_same_result_as_sample(algo):
         np.testing.assert_almost_equal(average, np.average(samples[vertex_id]))
 
 def set_starting_state(model):
-    kn.KeanuRandom().set_default_random_seed(1)
+    KeanuRandom().set_default_random_seed(1)
     model.temperature.set_value(model.temperature.sample())
     model.thermometer_one.set_value(model.thermometer_one.sample())
     model.thermometer_two.set_value(model.thermometer_two.sample())
