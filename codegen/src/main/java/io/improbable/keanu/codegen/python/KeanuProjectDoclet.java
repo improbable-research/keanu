@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.javadoc.*;
 import com.sun.tools.doclets.standard.Standard;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -36,7 +37,8 @@ public class KeanuProjectDoclet extends Standard {
 
     private static boolean isConstructorAnnotated(ConstructorDoc constructorDoc) {
         for (AnnotationDesc an: constructorDoc.annotations()) {
-            if (an.toString().contains("ExportVertexToPythonBindings")) {
+            String exportVertexAnnotationName = "@" + ExportVertexToPythonBindings.class.getName();
+            if (an.toString().equals(exportVertexAnnotationName)) {
                 return true;
             }
         }
@@ -51,7 +53,7 @@ public class KeanuProjectDoclet extends Standard {
             outputFile.getParentFile().mkdirs();
             outputFile.createNewFile(); // if file already exists will do nothing
             OutputStream outputStream = new FileOutputStream(WRITE_DESTINATION + DESTINATION_FILE_NAME, false);
-        System.out.println("Writing docstrings");
+            System.out.println("Writing docstrings");
             outputStream.write(json.getBytes());
             System.out.println("Finished writing docstrings");
         } catch (IOException e) {
@@ -60,15 +62,14 @@ public class KeanuProjectDoclet extends Standard {
         }
     }
 
-    static Map<String, DocString> getDocStringsFromFile() {
+    static Map<String, DocString> getDocStringsFromFile() throws IOException {
         try {
             Type listType = new TypeToken<Map<String, DocString>>(){}.getType();
             Gson gson = new Gson();
             Reader reader = new FileReader(READ_DESTINATION + DESTINATION_FILE_NAME);
             return gson.fromJson(reader, listType);
         } catch (IOException e) {
-            System.out.println("Could not read JavaDoc strings from file at " + System.getProperty("user.dir") + READ_DESTINATION + DESTINATION_FILE_NAME);
-            return new HashMap<>();
+            throw new IOException("Could not read JavaDoc strings from file at " + System.getProperty("user.dir") + READ_DESTINATION + DESTINATION_FILE_NAME);
         }
     }
 }
