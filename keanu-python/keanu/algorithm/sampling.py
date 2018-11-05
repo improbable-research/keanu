@@ -28,7 +28,6 @@ def iterate_samples(net, sample_from, algo='metropolis', draws=500, drop=0, down
 	
 	return iterator_samples(network_samples, draws, vertices_unwrapped)
 
-
 def iterator_samples(network_samples, draws, vertices_unwrapped):
 	for i in range(draws):
 		network_sample = network_samples.next()
