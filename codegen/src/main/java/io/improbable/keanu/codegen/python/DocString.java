@@ -19,9 +19,13 @@ class DocString {
         if (isEmpty()) {
             return "";
         }
+        if (params.size() == 0) {
+            return "\"\"\"\n" + comment + "\n\"\"\"\n";
+        }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\"\"\"\n    ");
         stringBuilder.append(comment.replaceAll("\n ", "\n    "));
+        stringBuilder.append("\n");
         for (String param : params.keySet()) {
             stringBuilder.append("\n    ");
             stringBuilder.append(":param ");
