@@ -80,21 +80,20 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
     }
 
     public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
-                                              Vertex vertexToSampleFrom,
+                                              Vertex fromVertices,
                                               int sampleCount) {
-        return generatePosteriorSamples(bayesianNetwork, Collections.singletonList(vertexToSampleFrom))
+        return generatePosteriorSamples(bayesianNetwork, Collections.singletonList(fromVertices))
             .generate(sampleCount);
     }
 
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
-                                                            final List<? extends Vertex> verticesToSampleFrom) {
+                                                            final List<? extends Vertex> fromVertices) {
 
-        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom), ProgressBar::new);
+        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, fromVertices), ProgressBar::new);
     }
 
     private SamplingAlgorithm setupSampler(final BayesianNetwork bayesNet,
                                            final List<? extends Vertex> fromVertices) {
-
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
@@ -119,7 +118,10 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
 
         final Map<VertexId, ?> sampleBeforeLeapfrog = new HashMap<>();
 
-        return new Sampler(latentVertices, position, gradient, momentum, positionBeforeLeapfrog, gradientBeforeLeapfrog, momentumBeforeLeapfrog, random, fromVertices, leapFrogCount, stepSize, logProbGradientCalculator, sampleBeforeLeapfrog, bayesNet, logOfMasterPBeforeLeapfrog);
+        return new Sampler(latentVertices, position, gradient, momentum, positionBeforeLeapfrog,
+            gradientBeforeLeapfrog, momentumBeforeLeapfrog, random, fromVertices, leapFrogCount,
+            stepSize, logProbGradientCalculator, sampleBeforeLeapfrog, bayesNet, logOfMasterPBeforeLeapfrog
+        );
     }
 
     public static class Sampler implements SamplingAlgorithm {
@@ -159,7 +161,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
             this.latentVertices = latentVertices;
             this.position = position;
             this.gradient = gradient;
-            this.momentum= momentum;
+            this.momentum = momentum;
             this.positionBeforeLeapfrog = positionBeforeLeapfrog;
             this.momentumBeforeLeapfrog = momentumBeforeLeapfrog;
             this.gradientBeforeLeapfrog = gradientBeforeLeapfrog;
@@ -198,18 +200,17 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         @Override
         public void sample(Map<VertexId, List<?>> samples, List<Double> logOfMasterPForEachSample) {
             step();
-            sampleLogic(samples);
+            addSampleFromCache(samples, acceptOrReject());
             logOfMasterPForEachSample.add(logOfMasterPBeforeLeapfrog);
         }
 
         @Override
         public NetworkState sample() {
             step();
-            sampleLogic(new HashMap<>());
-            return new SimpleNetworkState(takeSample(fromVertices));
+            return new SimpleNetworkState(acceptOrReject());
         }
 
-        private Map<VertexId, List<?>> sampleLogic(Map<VertexId, List<?>> samples) {
+        private Map<VertexId, ?> acceptOrReject() {
             final double logOfMasterPAfterLeapfrog = bayesNet.getLogOfMasterP();
 
             final double likelihoodOfLeapfrog = getLikelihoodOfLeapfrog(
@@ -230,21 +231,15 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
                 gradient = gradientBeforeLeapfrog;
                 gradientBeforeLeapfrog = tempSwap;
 
-                addSampleFromCache(samples, sampleBeforeLeapfrog);
+                return sampleBeforeLeapfrog;
             } else {
-                addSampleFromVertices(samples, fromVertices);
                 logOfMasterPBeforeLeapfrog = logOfMasterPAfterLeapfrog;
+                Map<VertexId, ?> sample = new HashMap<>();
+                putSample(sample, fromVertices);
+                return sample;
             }
-            return samples;
         }
 
-        private static Map<VertexId, ?> takeSample(List<? extends Vertex> fromVertices) {
-            Map<VertexId, Object> sample = new HashMap<>();
-            for (Vertex v : fromVertices) {
-                sample.put(v.getId(), v.getValue());
-            }
-            return sample;
-        }
     }
 
     private static void cachePosition(List<Vertex<DoubleTensor>> latentVertices, Map<VertexId, DoubleTensor> position) {
@@ -348,6 +343,13 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         return dotProduct;
     }
 
+    /**
+     * This is meant to be used for caching a pre-leapfrog sample. This sample
+     * will be used if the leapfrog is rejected.
+     *
+     * @param sample
+     * @param fromVertices
+     */
     private static void putSample(Map<VertexId, ?> sample, List<? extends Vertex> fromVertices) {
         for (Vertex<?> vertex : fromVertices) {
             putValue(vertex, sample);
@@ -375,7 +377,6 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
      * This is used when a leapfrog is accepted. At that point the vertices are in a
      * post leapfrog state.
      *
-     * @param samples
      * @param fromVertices vertices from which to create and save new sample.
      */
     private static void addSampleFromVertices(Map<VertexId, List<?>> samples, List<? extends Vertex> fromVertices) {
