@@ -91,9 +91,14 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
+        printGradient(gradient, position);
+
         Map<VertexId, DoubleTensor> momentum = new HashMap<>();
 
         double initialLogOfMasterP = getLogProb(probabilisticVertices);
+
+        printLogProb(position, initialLogOfMasterP);
+
         final List<Double> logOfMasterPForEachSample = new ArrayList<>();
         logOfMasterPForEachSample.add(initialLogOfMasterP);
 
@@ -102,10 +107,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             latentVertices,
             probabilisticVertices,
             logProbGradientCalculator,
+            initialLogOfMasterP,
             random
         );
 
-        AutoTune autoTune = new AutoTune(stepSize,
+        AutoTune autoTune = new AutoTune(
+            stepSize,
             targetAcceptanceProb,
             Math.log(stepSize),
             adaptCount
@@ -115,9 +122,11 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             position,
             gradient,
             momentum,
+            initialLogOfMasterP,
             position,
             gradient,
             momentum,
+            initialLogOfMasterP,
             position,
             gradient,
             initialLogOfMasterP,
@@ -133,7 +142,13 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             initializeMomentumForEachVertex(latentVertices, tree.momentumForward, random);
             cache(tree.momentumForward, tree.momentumBackward);
 
-            double u = random.nextDouble() * Math.exp(tree.logOfMasterPAtAcceptedPosition - 0.5 * dotProduct(tree.momentumForward));
+            double logOfMasterPMinusMomentumBeforeLeapfrog = tree.logOfMasterPAtAcceptedPosition - 0.5 * dotProduct(tree.momentumForward);
+
+            double u = random.nextDouble() * Math.exp(logOfMasterPMinusMomentumBeforeLeapfrog);
+
+            if (u <= 0) {
+                throw new IllegalStateException("U is zero!");
+            }
 
             int treeHeight = 0;
             tree.shouldContinueFlag = true;
@@ -154,6 +169,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                     buildDirection,
                     treeHeight,
                     stepSize,
+                    logOfMasterPMinusMomentumBeforeLeapfrog,
                     random
                 );
 
@@ -205,12 +221,10 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                                                   int buildDirection,
                                                   int treeHeight,
                                                   double epsilon,
+                                                  double logOfMasterPMinusMomentumBeforeLeapfrog,
                                                   KeanuRandom random) {
 
         BuiltTree otherHalfTree;
-
-        final double logOfMasterPBeforeLeapfrog = getLogProb(probabilisticVertices);
-        final double logOfMasterPMinusMomentumBeforeLeapfrog = logOfMasterPBeforeLeapfrog - 0.5 * dotProduct(currentTree.momentumBackward);
 
         if (buildDirection == -1) {
 
@@ -233,6 +247,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             currentTree.positionBackward = otherHalfTree.positionBackward;
             currentTree.momentumBackward = otherHalfTree.momentumBackward;
             currentTree.gradientBackward = otherHalfTree.gradientBackward;
+            currentTree.logProbBackward = otherHalfTree.logProbBackward;
 
         } else {
 
@@ -255,6 +270,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             currentTree.positionForward = otherHalfTree.positionForward;
             currentTree.momentumForward = otherHalfTree.momentumForward;
             currentTree.gradientForward = otherHalfTree.gradientForward;
+            currentTree.logProbForward = otherHalfTree.logProbForward;
         }
 
         return otherHalfTree;
@@ -322,6 +338,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                     buildDirection,
                     treeHeight - 1,
                     epsilon,
+                    logOfMasterPMinusMomentumBeforeLeapfrog,
                     random
                 );
 
@@ -373,6 +390,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         final double logOfMasterPAfterLeapfrog = getLogProb(probabilisticVertices);
 
+        printLogProb(leapfrog.position, logOfMasterPAfterLeapfrog);
+
         final double logOfMasterPMinusMomentum = logOfMasterPAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
         final int acceptedLeapfrogCount = u <= Math.exp(logOfMasterPMinusMomentum) ? 1 : 0;
         final boolean shouldContinueFlag = u < Math.exp(DELTA_MAX + logOfMasterPMinusMomentum);
@@ -386,9 +405,11 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             leapfrog.position,
             leapfrog.gradient,
             leapfrog.momentum,
+            logOfMasterPAfterLeapfrog,
             leapfrog.position,
             leapfrog.gradient,
             leapfrog.momentum,
+            logOfMasterPAfterLeapfrog,
             leapfrog.position,
             leapfrog.gradient,
             logOfMasterPAfterLeapfrog,
@@ -457,6 +478,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         for (Vertex<DoubleTensor> vertex : vertices) {
             momentums.put(vertex.getId(), random.nextGaussian(vertex.getShape()));
         }
+        printMomentum(momentums);
     }
 
     private static void cache(Map<VertexId, DoubleTensor> from, Map<VertexId, DoubleTensor> to) {
@@ -496,6 +518,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         Map<VertexId, DoubleTensor> nextPositionGradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
+        printGradient(nextPositionGradient, nextPosition);
+
         for (Map.Entry<VertexId, DoubleTensor> nextMomentumForLatent : nextMomentum.entrySet()) {
             final DoubleTensor nextNextMomentumForLatent = nextPositionGradient.get(nextMomentumForLatent.getKey()).
                 times(halfTimeStep).
@@ -505,7 +529,37 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             nextMomentum.put(nextMomentumForLatent.getKey(), nextNextMomentumForLatent);
         }
 
+        printMomentum(nextMomentum);
+
         return new LeapFrogged(nextPosition, nextMomentum, nextPositionGradient);
+    }
+
+    private static void printGradient(Map<VertexId, DoubleTensor> gradient, Map<VertexId, DoubleTensor> position) {
+//        String nextPostitionString = position.entrySet().stream()
+//            .map(e -> e.getKey() + " : " + Arrays.toString(e.getValue().asFlatDoubleArray()))
+//            .collect(Collectors.joining(","));
+//
+//        String gradientString = gradient.entrySet().stream()
+//            .map(e -> e.getKey() + " : " + Arrays.toString(e.getValue().asFlatDoubleArray()))
+//            .collect(Collectors.joining(","));
+//
+//        System.out.println("Gradients " + nextPostitionString + " -> " + gradientString);
+    }
+
+    private static void printLogProb(Map<VertexId, DoubleTensor> position, double logProb) {
+//        String positionString = position.entrySet().stream()
+//            .map(e -> e.getKey() + " : " + Arrays.toString(e.getValue().asFlatDoubleArray()))
+//            .collect(Collectors.joining(","));
+//
+//        System.out.println("LogProb " + positionString + " -> " + logProb);
+    }
+
+    private static void printMomentum(Map<VertexId, DoubleTensor> momentums) {
+//        String momentumString = momentums.entrySet().stream()
+//            .map(e -> e.getKey() + " : " + Arrays.toString(e.getValue().asFlatDoubleArray()))
+//            .collect(Collectors.joining(","));
+//
+//        System.out.println("Momentum -> " + momentumString);
     }
 
     private static double dotProduct(Map<VertexId, DoubleTensor> momentums) {
@@ -569,9 +623,11 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         Map<VertexId, DoubleTensor> positionBackward;
         Map<VertexId, DoubleTensor> gradientBackward;
         Map<VertexId, DoubleTensor> momentumBackward;
+        double logProbBackward;
         Map<VertexId, DoubleTensor> positionForward;
         Map<VertexId, DoubleTensor> gradientForward;
         Map<VertexId, DoubleTensor> momentumForward;
+        double logProbForward;
         Map<VertexId, DoubleTensor> acceptedPosition;
         Map<VertexId, DoubleTensor> gradientAtAcceptedPosition;
         double logOfMasterPAtAcceptedPosition;
@@ -584,12 +640,14 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         BuiltTree(Map<VertexId, DoubleTensor> positionBackward,
                   Map<VertexId, DoubleTensor> gradientBackward,
                   Map<VertexId, DoubleTensor> momentumBackward,
+                  double logProbBackward,
                   Map<VertexId, DoubleTensor> positionForward,
                   Map<VertexId, DoubleTensor> gradientForward,
                   Map<VertexId, DoubleTensor> momentumForward,
+                  double logProbForward,
                   Map<VertexId, DoubleTensor> acceptedPosition,
                   Map<VertexId, DoubleTensor> gradientAtAcceptedPosition,
-                  double logOfMasterPAtAcceptedPosition,
+                  double logProbAtAcceptedPosition,
                   Map<VertexId, ?> sampleAtAcceptedPosition,
                   int acceptedLeapfrogCount,
                   boolean shouldContinueFlag,
@@ -599,12 +657,14 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             this.positionBackward = positionBackward;
             this.gradientBackward = gradientBackward;
             this.momentumBackward = momentumBackward;
+            this.logProbBackward = logProbBackward;
             this.positionForward = positionForward;
             this.gradientForward = gradientForward;
             this.momentumForward = momentumForward;
+            this.logProbForward = logProbForward;
             this.acceptedPosition = acceptedPosition;
             this.gradientAtAcceptedPosition = gradientAtAcceptedPosition;
-            this.logOfMasterPAtAcceptedPosition = logOfMasterPAtAcceptedPosition;
+            this.logOfMasterPAtAcceptedPosition = logProbAtAcceptedPosition;
             this.sampleAtAcceptedPosition = sampleAtAcceptedPosition;
             this.acceptedLeapfrogCount = acceptedLeapfrogCount;
             this.shouldContinueFlag = shouldContinueFlag;
@@ -639,42 +699,77 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                                                List<Vertex<DoubleTensor>> vertices,
                                                List<? extends Probabilistic> probabilisticVertices,
                                                LogProbGradientCalculator logProbGradientCalculator,
+                                               double initialLogOfMasterP,
                                                KeanuRandom random) {
         double stepsize = 1;
-        double probBeforeLeapfrog = getLogProb(probabilisticVertices);
         Map<VertexId, DoubleTensor> momentums = new HashMap<>();
         initializeMomentumForEachVertex(vertices, momentums, random);
-        leapfrog(vertices, logProbGradientCalculator, position, gradient, momentums, stepsize);
-        double probAfterLeapfrog = getLogProb(probabilisticVertices);
-        double likelihoodRatio = probAfterLeapfrog - probBeforeLeapfrog;
-        double scalingFactor = likelihoodRatio > Math.log(0.5) ? 1 : -1;
 
-        while (scalingFactor * (likelihoodRatio) > -scalingFactor * Math.log(2)) {
+        double pThetaR = initialLogOfMasterP - 0.5 * dotProduct(momentums);
+
+        LeapFrogged initialLeapFrog = leapfrog(vertices, logProbGradientCalculator, position, gradient, momentums, stepsize);
+
+        double probAfterLeapfrog = getLogProb(probabilisticVertices);
+        double pThetaRAfterLeapFrog = probAfterLeapfrog - 0.5 * dotProduct(initialLeapFrog.momentum);
+
+        double logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
+        double scalingFactor = logLikelihoodRatio > Math.log(0.5) ? 1 : -1;
+
+        while (scalingFactor * logLikelihoodRatio > -scalingFactor * Math.log(2)) {
             stepsize = stepsize * Math.pow(2, scalingFactor);
-            leapfrog(vertices, logProbGradientCalculator, position, gradient, momentums, stepsize);
-            likelihoodRatio = getLogProb(probabilisticVertices) - probBeforeLeapfrog;
+
+            LeapFrogged leapfrog = leapfrog(vertices, logProbGradientCalculator, position, gradient, momentums, stepsize);
+            probAfterLeapfrog = getLogProb(probabilisticVertices);
+            pThetaRAfterLeapFrog = probAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
+
+            logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
         }
 
+        System.out.println(stepsize);
         return stepsize;
     }
 
     private static double adaptStepSize(AutoTune autoTune, BuiltTree tree, int sampleNum) {
+
         if (sampleNum <= autoTune.adaptCount) {
+
+            //1/(m+t0)
             double percentageLeftToTune = (1 / (sampleNum + STABILISER));
-            double acceptanceProb = (autoTune.targetAcceptanceProb - (tree.deltaLikelihoodOfLeapfrog / tree.treeSize));
+
+            //(1 - 1/(m+t0)) * Hm-1
             double proportionalAcceptanceProb = (1 - percentageLeftToTune) * autoTune.averageAcceptanceProb;
+
+            //delta - alpha/nu
+            double acceptanceProb = (autoTune.targetAcceptanceProb - (tree.deltaLikelihoodOfLeapfrog / tree.treeSize));
+
+            //Hm = (1-1/(m+t0)) * Hm-1 + (1/(m+t0)) * (delta - (alpha/nu))
             autoTune.averageAcceptanceProb = proportionalAcceptanceProb + (percentageLeftToTune * acceptanceProb);
 
+            //sqrt(mu)/gamma
             double shrunkSampleCount = Math.sqrt(sampleNum) / SHRINKAGE_FACTOR;
+
+            //log(epsilon_m) = mu - (sqrt(m)/gamma) * Hm
             autoTune.logStepSize = autoTune.shrinkageTarget - (shrunkSampleCount * autoTune.averageAcceptanceProb);
 
+            //m^-k
             double tendToZero = Math.pow(sampleNum, -TEND_TO_ZERO_EXPONENT);
+
+            //m^-k * log(epsilon_m)
             double reducedStepSize = tendToZero * autoTune.logStepSize;
+
+            //
             double increasedStepSizeFrozen = (1 - tendToZero) * autoTune.logStepSizeFrozen;
+
             autoTune.logStepSizeFrozen = reducedStepSize + increasedStepSizeFrozen;
 
-            return Math.exp(autoTune.logStepSize);
+            double stepSize = Math.exp(autoTune.logStepSize);
+
+            System.out.println(stepSize);
+
+            return stepSize;
         } else {
+
+            System.out.println(Math.exp(autoTune.logStepSizeFrozen));
             return Math.exp(autoTune.logStepSizeFrozen);
         }
     }
