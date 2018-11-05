@@ -211,7 +211,7 @@ public class BayesianNetwork {
     }
 
     public void save(ProtobufWriter protobufWriter) throws IOException {
-        for (Vertex vertex : vertices) {
+        for (Vertex vertex : TopologicalSort.sort(vertices)) {
             vertex.saveTo(protobufWriter);
         }
     }
