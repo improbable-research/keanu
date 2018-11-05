@@ -140,11 +140,28 @@ task sourcesJar(type: Jar) {
 }
 
 task copyJarsIntoPythonClasspath(type: Copy) {
+    dependsOn(build)
     into "$rootDir/keanu-python/keanu/classpath/"
     from jar
     from configurations.compile
 }
 
+task deleteUnneededJarsFromPythonClasspath(type: Delete) {
+    mustRunAfter(copyJarsIntoPythonClasspath)
+    delete fileTree("../keanu-python/keanu/classpath/") {
+        include "*-android-*"
+        include "*-ios-*"
+        include "mkl-*"
+        include "*-x86.jar"
+        include "*-ppc64le.jar"
+        include "*-armhf.jar"
+    }
+}
+
+task preparePythonClasspath {
+    dependsOn deleteUnneededJarsFromPythonClasspath
+    dependsOn copyJarsIntoPythonClasspath
+}
 //Break build on javadoc warnings
 tasks.withType(Javadoc) {
     options.addStringOption('Xwerror', '-quiet')

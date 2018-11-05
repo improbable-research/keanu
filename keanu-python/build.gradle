@@ -1,4 +1,4 @@
-test.dependsOn(":keanu-project:copyJarsIntoPythonClasspath")
+test.dependsOn(":keanu-project:preparePythonClasspath")
 test.dependsOn(":codegen:codeGen")
 
 task installPipenv {
