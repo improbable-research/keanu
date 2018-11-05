@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 from py4j.java_gateway import java_import
-from examples import thermometers
+from examples import Thermometer
 from keanu.vertex import Gamma, Exponential, Cauchy
-from keanu.algorithm import sample
+from keanu.algorithm import sample, iterate_samples
 from keanu import BayesNet
 
 @pytest.fixture
@@ -74,12 +74,12 @@ def test_iter_is_correct_size(algo, net):
 ])
 def test_iter_returns_same_result_as_sample(algo):
     draws = 100
-    model = thermometers.model()
+    model = Thermometer.model()
     net = kn.BayesNet(model.temperature.get_connected_graph())
     set_starting_state(model)
-    samples = kn.sample(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
     set_starting_state(model)
-    iter_samples = kn.iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
+    iter_samples = iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
     iter_samples_dict = {}
 
     for sample in iter_samples:
