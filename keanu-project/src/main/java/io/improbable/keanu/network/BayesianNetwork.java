@@ -13,7 +13,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -62,6 +61,7 @@ public class BayesianNetwork {
     List<? extends Vertex> getVertices() {
         return vertices;
     }
+
 
     private interface VertexFilter {
         boolean filter(boolean isProbabilistic, boolean isObserved, int indentation);
@@ -210,26 +210,16 @@ public class BayesianNetwork {
         indentation++;
     }
 
-    public void saveNetwork(OutputStream output, boolean saveValues) throws IOException {
-        List<KeanuSavedBayesNet.Vertex> protoBufs = vertices.stream()
-            .map(Vertex::toProtoBuf)
-            .collect(Collectors.toList());
-
-        KeanuSavedBayesNet.BayesianNetwork.Builder bayesNetBuilder = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
-            .addAllVertices(protoBufs);
-
-        if (saveValues) {
-            bayesNetBuilder.addAllDefaultState(getVertexValues());
+    public void save(ProtobufWriter protobufWriter) throws IOException {
+        for (Vertex vertex : vertices) {
+            vertex.saveTo(protobufWriter);
         }
-
-        bayesNetBuilder.build().writeTo(output);
     }
 
-    private List<KeanuSavedBayesNet.StoredValue> getVertexValues() {
-        return vertices.stream()
-            .filter(Vertex::hasValue)
-            .map(Vertex::getValueAsProtoBuf)
-            .collect(Collectors.toList());
+    public void saveValues(ProtobufWriter protobufWriter) throws IOException {
+        for (Vertex vertex : vertices) {
+            vertex.saveValueTo(protobufWriter);
+        }
     }
 
     public static BayesianNetwork loadNetwork(InputStream input) throws IOException {

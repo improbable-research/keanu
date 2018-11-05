@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.network.ProtobufWriter;
 import io.improbable.keanu.tensor.Tensor;
 
 import java.lang.reflect.Constructor;
@@ -11,12 +12,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import static io.improbable.keanu.vertices.ConstantVertex.isConstantVertex;
 
 public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape {
 
@@ -306,31 +304,11 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         return stringBuilder.toString();
     }
 
-    public final KeanuSavedBayesNet.Vertex toProtoBuf() {
-        KeanuSavedBayesNet.Vertex.Builder vertexBuilder = KeanuSavedBayesNet.Vertex.newBuilder();
-
-        if (label != null) {
-            vertexBuilder = vertexBuilder.setLabel(label.toString());
-        }
-
-        if (isConstantVertex(this)) {
-            vertexBuilder.setConstantValue(getValueAsProtoBuf().getValue());
-        }
-
-        vertexBuilder = vertexBuilder.setId(id.toProtoBuf());
-        vertexBuilder = vertexBuilder.setVertexType(this.getClass().getCanonicalName());
-        vertexBuilder = vertexBuilder.addAllParents(getNamedParents());
-
-        return vertexBuilder.build();
+    public void saveTo(ProtobufWriter protobufWriter) {
+        protobufWriter.save(this);
     }
 
-    public List<KeanuSavedBayesNet.NamedParent> getNamedParents() {
-        //TODO - Make this abstract once everyone implements
-        throw new UnsupportedOperationException("Parent Save Not Implemented");
-    }
-
-    public KeanuSavedBayesNet.StoredValue getValueAsProtoBuf() {
-        //TODO - make abstract once implemented everywhere
-        throw new UnsupportedOperationException("This Vertex Doesn't Support Value Save");
+    public void saveValueTo(ProtobufWriter protobufWriter) {
+        protobufWriter.saveValue(this);
     }
 }

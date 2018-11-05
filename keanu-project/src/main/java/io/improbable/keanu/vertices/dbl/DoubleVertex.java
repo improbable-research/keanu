@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.network.ProtobufWriter;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -346,23 +347,15 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public KeanuSavedBayesNet.StoredValue getValueAsProtoBuf() {
-        KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
-            .setDoubleVal(getValue(0)) //TODO - Need to deal with tensors - oneofs don't interact well with repeated
-                                               //also - how will this interact with the shape layer?
-            .build();
-
-         return KeanuSavedBayesNet.StoredValue.newBuilder()
-             .setId(getId().toProtoBuf())
-             .setValue(value)
-            .build();
-    }
-
-    @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         return Collections.singletonMap(
             this,
             PartialDerivatives.withRespectToSelf(this.getId(), this.getShape())
         );
+    }
+
+    @Override
+    public void saveValueTo(ProtobufWriter protobufWriter) {
+        protobufWriter.saveValue(this);
     }
 }
