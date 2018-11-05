@@ -11,6 +11,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
+import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ class VertexProcessor {
     final private static String TEMPLATE_FILE = "generated.py.ftl";
     final private static String GENERATED_FILE = "generated.py";
 
-    static void process(String generatedDir) {
+    static void process(String generatedDir) throws IOException {
         Map<String, Object> dataModel = buildDataModel();
         Template fileTemplate = TemplateProcessor.getFileTemplate(TEMPLATE_FILE);
         Writer fileWriter = TemplateProcessor.createFileWriter(generatedDir + GENERATED_FILE);
@@ -32,7 +33,7 @@ class VertexProcessor {
         TemplateProcessor.processDataModel(dataModel, fileTemplate, fileWriter);
     }
 
-    private static Map<String, Object> buildDataModel() {
+    private static Map<String, Object> buildDataModel() throws IOException {
         Reflections reflections = new Reflections(new ConfigurationBuilder()
             .setUrls(ClasspathHelper.forPackage("io.improbable.keanu.vertices"))
             .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner(), new MethodParameterNamesScanner()));
