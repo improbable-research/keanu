@@ -1,5 +1,6 @@
 package io.improbable.keanu.util.dot;
 
+import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -14,6 +15,8 @@ import org.junit.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,52 +24,50 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayWithSize;
 
 public class WriteDotTest {
 
     private static BayesianNetwork gaussianNet;
     private static BayesianNetwork booleanNet;
-    private static String testFileDir = "dottestdir";
+    private static final String testFileDir = "dottestdir";
     private static String gaussianDotOutput;
     private static String boolDotOutput;
     private static String vertexDegree1DotOutput;
     private static String vertexDegree2DotOutput;
-    private static String boolVertexLabel = "/BoolResult";
+    private static final String boolVertexLabel = "/BoolResult";
     private static GaussianVertex gaussianV;
-    private static DoubleVertex doubleV;
+    private static DoubleVertex constantDoubleV;
 
     @BeforeClass
-    public static void setup() throws IOException {
-
-        String gaussianDotFileName = testFileDir + "/gaussianDot.dot";
-        String boolDotFileName = testFileDir + "/boolDot.dot";
-        String vertexDegree1DotFileName = testFileDir + "/VertexOutput1.dot";
-        String vertexDegree2DotFileName = testFileDir + "/VertexOutput2.dot";
+    public static void setup() {
 
         double mu = 0;
         double sigma = 1;
         gaussianV = new GaussianVertex(mu, sigma);
-        doubleV = new ConstantDoubleVertex(5.43);
-        DoubleVertex result = gaussianV.multiply(doubleV);
-        gaussianNet = new BayesianNetwork(result.getConnectedGraph());
-        WriteDot.outputDot(gaussianDotFileName, gaussianNet);
-        gaussianDotOutput = new String(Files.readAllBytes(Paths.get(gaussianDotFileName)), Charset.defaultCharset());
+        constantDoubleV = new ConstantDoubleVertex(5.43);
+        DoubleVertex guassianGraphResult = gaussianV.multiply(constantDoubleV);
+        gaussianNet = new BayesianNetwork(guassianGraphResult.getConnectedGraph());
 
+        Writer outputWriter = new StringWriter();
+        WriteDot.outputDot(outputWriter, gaussianNet);
+        gaussianDotOutput = outputWriter.toString();
 
-        ConstantBoolVertex boolV = new ConstantBoolVertex(true);
-        ConstantIntegerVertex intV = new ConstantIntegerVertex(5);
-        DoubleVertex doubleV2 = new ConstantDoubleVertex(5.43);
-        BoolVertex comparisonV = intV.greaterThan(doubleV2);
-        BoolVertex result2 = boolV.or(comparisonV);
-        result2.setLabel(boolVertexLabel);
-        booleanNet = new BayesianNetwork(result2.getConnectedGraph());
-        WriteDot.outputDot(boolDotFileName, booleanNet);
-        boolDotOutput = new String(Files.readAllBytes(Paths.get(boolDotFileName)), Charset.defaultCharset());
+        BoolVertex boolGraphResult = new ConstantBoolVertex(true).or(new ConstantIntegerVertex(5).greaterThan(new ConstantDoubleVertex(5.43)));
+        boolGraphResult.setLabel(boolVertexLabel);
+        booleanNet = new BayesianNetwork(boolGraphResult.getConnectedGraph());
+        outputWriter = new StringWriter();
+        WriteDot.outputDot(outputWriter, booleanNet);
+        boolDotOutput = outputWriter.toString();
 
-        WriteDot.outputDot(vertexDegree1DotFileName, gaussianV, 1);
-        vertexDegree1DotOutput = new String(Files.readAllBytes(Paths.get(vertexDegree1DotFileName)), Charset.defaultCharset());
-        WriteDot.outputDot(vertexDegree2DotFileName, gaussianV, 2);
-        vertexDegree2DotOutput = new String(Files.readAllBytes(Paths.get(vertexDegree2DotFileName)), Charset.defaultCharset());
+        outputWriter = new StringWriter();
+        WriteDot.outputDot(outputWriter, gaussianV, 1);
+        vertexDegree1DotOutput = outputWriter.toString();
+
+        outputWriter = new StringWriter();
+        WriteDot.outputDot(outputWriter, gaussianV, 2);
+        vertexDegree2DotOutput = outputWriter.toString();
     }
 
     @Test
@@ -79,7 +80,7 @@ public class WriteDotTest {
         assertTrue(outputFile.exists());
 
         WriteDot.outputDot(fileName, booleanNet);
-        assertTrue(outputFile.getParentFile().listFiles().length == 2);
+        assertThat(outputFile.getParentFile().listFiles(), arrayWithSize(2));
 
         FileUtils.deleteDirectory(outputFile.getParentFile());
     }
@@ -131,7 +132,7 @@ public class WriteDotTest {
 
     @Test
     public void outputContainsAnnotations() {
-        String multiplyVertexAnnotation = MultiplicationVertex.class.getAnnotation(WriteDot.Display.class).displayName();
+        String multiplyVertexAnnotation = MultiplicationVertex.class.getAnnotation(DisplayInformationForOutput.class).displayName();
         assertTrue(gaussianDotOutput.contains(multiplyVertexAnnotation));
     }
 
@@ -143,7 +144,7 @@ public class WriteDotTest {
     @Test
     public void outputVertexWithDegree1() {
         assertTrue(vertexDegree1DotOutput.contains(gaussianV.getId().hashCode() + ""));
-        assertFalse(vertexDegree1DotOutput.contains(doubleV.getId().hashCode() + ""));
+        assertFalse(vertexDegree1DotOutput.contains(constantDoubleV.getId().hashCode() + ""));
         // Vertices within 1 degree form the specified vertex cover less of a graph than vertices within two degrees.
         assertTrue(org.apache.commons.lang3.StringUtils.countMatches(vertexDegree1DotOutput, "->") < org.apache.commons.lang3.StringUtils.countMatches(vertexDegree2DotOutput, "->"));
     }

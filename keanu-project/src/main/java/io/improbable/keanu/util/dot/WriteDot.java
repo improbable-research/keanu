@@ -1,7 +1,9 @@
 package io.improbable.keanu.util.dot;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
@@ -10,10 +12,16 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.*;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -28,15 +36,6 @@ public class WriteDot {
 
     private static final String DOT_HEADER = "digraph BayesianNetwork {\n";
     private static final String DOT_ENDING = "}";
-
-    /**
-     * Annotation used for vertex classes to specify how they should be exported to a DOT file.
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface Display {
-        String displayName() default "";
-        boolean displayHyperparameterInfo() default false;
-    }
 
     /**
      * Outputs the given graph to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
@@ -100,17 +99,17 @@ public class WriteDot {
      */
     public static void outputDot(Writer outputWriter, Vertex vertex, int degree) {
         try {
-            Map<Integer, String> idsToLabelStrings = new HashMap<>();
+            Set<String> dotLabels = new HashSet<>();
             Map<String, String> verticeIdsToConnectionInfo = new HashMap<>();
 
             outputWriter.write(DOT_HEADER);
 
             // Iterate over vertices and obtain the necessary label and connection info.
-            obtainGraphInfo(vertex, degree, idsToLabelStrings, verticeIdsToConnectionInfo);
+            obtainGraphInfo(vertex, degree, dotLabels, verticeIdsToConnectionInfo);
 
             // Write out labels and connections.
-            outputConnections(verticeIdsToConnectionInfo.values(), outputWriter);
-            outputLabels(idsToLabelStrings, outputWriter);
+            outputInfo(verticeIdsToConnectionInfo.values(), outputWriter);
+            outputInfo(dotLabels, outputWriter);
 
             outputWriter.write(DOT_ENDING);
             outputWriter.close();
@@ -157,11 +156,12 @@ public class WriteDot {
      * @param degree degree of connections to be visualised; for instance, if the degree is 1,
      *               only connections between the vertex amd it's parents and children will be written out to the DOT file.
      */
-    private static void obtainGraphInfo(Vertex vertex, int degree, Map<Integer, String> idsToLabelStrings, Map<String, String> verticeIdsToConnectionInfo) {
+    private static void obtainGraphInfo(Vertex vertex, int degree, Set<String> dotLabels, Map<String, String> verticeIdsToConnectionInfo) {
 
         Set<VertexId> processedVertices = new HashSet<>();
         Set<Vertex> verticesToProcessNow = new HashSet<>();
         verticesToProcessNow.add(vertex);
+        setDotLabel(vertex, dotLabels);
 
         // Iterate over the graph till the specified degree or till there are no more unprocessed vertices left.
         int iterationIndex = 0;
@@ -173,7 +173,6 @@ public class WriteDot {
 
                 // Use hashed IDs as the unique identifier for each vertex and store the other information in labels.
                 VertexId vId = v.getId();
-                setDotLabel(v, idsToLabelStrings);
 
                 // Iterate over all vertices connected to this one.
                 Stream<Vertex> connectedVertices = Stream.concat(v.getParents().stream(), v.getChildren().stream());
@@ -182,11 +181,12 @@ public class WriteDot {
                     if (!processedVertices.contains(connectedVId)) {
                         verticeIdsToConnectionInfo.put(concatenateVertexIds(connectedVId, vId), getEdgeString(connectedVId, vId));
                         verticesToProcessNext.add(connectedVertex);
+                        setDotLabel(connectedVertex, dotLabels);
                     }
                 });
 
                 // If there is any hyperparameter information to be added to edges, add it now.
-                Display vertexAnnotation = v.getClass().getAnnotation(Display.class);
+                DisplayInformationForOutput vertexAnnotation = v.getClass().getAnnotation(DisplayInformationForOutput.class);
                 if (vertexAnnotation != null && vertexAnnotation.displayHyperparameterInfo()) {
                     applyHyperparameterInfo(v, verticeIdsToConnectionInfo);
                 }
@@ -198,10 +198,6 @@ public class WriteDot {
             iterationIndex++;
         }
 
-        // Set labels for vertices that have not yet been processed.
-        for (Vertex v : verticesToProcessNow) {
-            setDotLabel(v, idsToLabelStrings);
-        }
     }
 
     // Utility function for creating a unique identifier for a connection between two vertices.
@@ -229,14 +225,14 @@ public class WriteDot {
      *
      * @param v a vertex
      */
-    private static void setDotLabel(Vertex v, Map<Integer, String> idsToLabelStrings){
+    private static void setDotLabel(Vertex v, Set<String> dotLabels){
 
-        String vertexLabel;
+        String vertexLabel = getValueAsString(v);
 
         // If vertex is a constant vertex, display only it's value.
-        if ((vertexLabel = getValueAsString(v)).isEmpty()) {
+        if (vertexLabel.isEmpty()) {
             // Else use vertex label as DOT label for it.
-            Display vertexAnnotation = v.getClass().getAnnotation(Display.class);
+            DisplayInformationForOutput vertexAnnotation = v.getClass().getAnnotation(DisplayInformationForOutput.class);
             if (v.getLabel() != null) {
                 vertexLabel = v.getLabel().getUnqualifiedName();
             }
@@ -252,19 +248,13 @@ public class WriteDot {
 
         int uniqueHiddenID = v.getId().hashCode();
         String fullName = uniqueHiddenID + "[label=\"" + vertexLabel + "\"]";
-        idsToLabelStrings.put(uniqueHiddenID, fullName);
+        dotLabels.add(fullName);
     }
 
     // Get value of constant vertices that always have their value set.
     private static String getValueAsString(Vertex v) {
-        if (v instanceof ConstantDoubleVertex) {
-            return "" + ((ConstantDoubleVertex) v).getValue().scalar();
-        }
-        if (v instanceof ConstantIntegerVertex) {
-            return "" + ((ConstantIntegerVertex) v).getValue().scalar();
-        }
-        if (v instanceof ConstantBoolVertex) {
-            return "" + ((ConstantBoolVertex) v).getValue().scalar();
+        if ((v instanceof ConstantDoubleVertex || v instanceof ConstantBoolVertex || v instanceof ConstantIntegerVertex) && ((Vertex<Tensor>) v).getValue().isScalar()) {
+            return "" + ((Vertex<Tensor>) v).getValue().scalar();
         }
         return "";
     }
@@ -283,16 +273,9 @@ public class WriteDot {
     }
 
     // Output information about edges.
-    private static void outputConnections(Collection<String> connections, Writer outputWriter) throws IOException {
-        for (String connection: connections) {
-            outputWriter.write(connection + "\n");
-        }
-    }
-
-    // Output the stored labels.
-    private static void outputLabels(Map<Integer, String> idsToLabelStrings, Writer outputWriter) throws IOException {
-        for (String labelString: idsToLabelStrings.values()) {
-            outputWriter.write(labelString + "\n");
+    private static void outputInfo(Collection<String> infSet, Writer outputWriter) throws IOException {
+        for (String info: infSet) {
+            outputWriter.write(info + "\n");
         }
     }
 }
