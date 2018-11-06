@@ -51,13 +51,22 @@ public class KeanuProjectDoclet extends Standard {
     }
 
     private static void writeDocStringsToFile(Map<String, DocString> docString) {
-        try {
-            String json = (new Gson()).toJson(docString);
-            File outputFile = new File(WRITE_DESTINATION + DESTINATION_FILE_NAME);
-            outputFile.getParentFile().mkdirs();
-            outputFile.createNewFile(); // if file already exists will do nothing
-            OutputStream outputStream = new FileOutputStream(WRITE_DESTINATION + DESTINATION_FILE_NAME, false);
+        String json = (new Gson()).toJson(docString);
+        createFilesIfNecessary();
+        try (OutputStream outputStream =
+                 new FileOutputStream(WRITE_DESTINATION + DESTINATION_FILE_NAME, false)) {
             outputStream.write(json.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Could not write to file while processing JavaDoc strings");
+        }
+    }
+
+    private static void createFilesIfNecessary() {
+        File outputFile = new File(WRITE_DESTINATION + DESTINATION_FILE_NAME);
+        outputFile.getParentFile().mkdirs();
+        try {
+            outputFile.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Could not write to file while processing JavaDoc strings");
