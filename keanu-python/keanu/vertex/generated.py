@@ -183,8 +183,8 @@ def Gamma(theta, k) -> context.jvm_view().GammaVertex:
     """
     One to one constructor for mapping some shape of theta and k to matching shaped gamma.
 
-    :param k: the k (shape) of the Gamma with either the same shape as specified for this vertex
     :param theta: the theta (scale) of the Gamma with either the same shape as specified for this vertex
+    :param k: the k (shape) of the Gamma with either the same shape as specified for this vertex
     """
     return Vertex(context.jvm_view().GammaVertex, theta, k)
 
@@ -198,8 +198,8 @@ def Uniform(x_min, x_max) -> context.jvm_view().UniformVertex:
     One to one constructor for mapping some shape of mu and sigma to
     a matching shaped Uniform Vertex
 
-    :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
     :param x_min: the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
+    :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
     """
     return Vertex(context.jvm_view().UniformVertex, x_min, x_max)
 
