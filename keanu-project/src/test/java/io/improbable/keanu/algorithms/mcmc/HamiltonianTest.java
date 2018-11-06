@@ -45,7 +45,7 @@ public class HamiltonianTest {
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
 
-        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList());
+        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
     }
 
     @Test
@@ -130,21 +130,19 @@ public class HamiltonianTest {
             .stepSize(0.4)
             .build();
 
-        int sampleCount = 7500;
-        int downSampleInterval = 1;
         double mu = 0;
         double sigma = 1;
-        GaussianVertex A = new GaussianVertex(0, 1);
+        GaussianVertex A = new GaussianVertex(mu, sigma);
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
         List<DoubleTensor> samples = hmc.generatePosteriorSamples(network, network.getLatentVertices())
-            .downSampleInterval(downSampleInterval)
+            .downSampleInterval(1)
             .stream()
-            .limit(sampleCount)
+            .limit(500)
             .map(x -> x.get(A))
             .collect(Collectors.toList());
 
-        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, samples);
+        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, samples, 0.3);
     }
 
 }
