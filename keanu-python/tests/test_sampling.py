@@ -5,6 +5,7 @@ from examples import Thermometer
 from keanu.vertex import Gamma, Exponential, Cauchy
 from keanu.algorithm import sample, iterate_samples
 from keanu import BayesNet, KeanuRandom
+from collections import defaultdict
 
 @pytest.fixture
 def net():
@@ -80,21 +81,19 @@ def test_iter_returns_same_result_as_sample(algo):
     samples = sample(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
     set_starting_state(model)
     iter_samples = iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
-    iter_samples_dict = {}
+    iter_samples_dict = defaultdict(float)
 
     for next_sample in iter_samples:
         for vertex_id, vertex_sample in next_sample.items():
-            if vertex_id in iter_samples_dict:    
-                iter_samples_dict[vertex_id] += vertex_sample
-            else:
-                iter_samples_dict[vertex_id] = vertex_sample
+            iter_samples_dict[vertex_id] += vertex_sample
 
     for vertex_id, summed_vertex_sample in iter_samples_dict.items():
         average = summed_vertex_sample / draws
         np.testing.assert_almost_equal(average, np.average(samples[vertex_id]))
 
+
 def set_starting_state(model):
-    KeanuRandom().set_default_random_seed(1)
+    KeanuRandom.set_default_random_seed(1)
     model.temperature.set_value(model.temperature.sample())
     model.thermometer_one.set_value(model.thermometer_one.sample())
     model.thermometer_two.set_value(model.thermometer_two.sample())

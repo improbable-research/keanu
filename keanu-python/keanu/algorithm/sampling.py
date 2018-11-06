@@ -26,9 +26,9 @@ def iterate_samples(net, sample_from, algo='metropolis', draws=500, drop=0, down
 
 	sample_iterator = algorithms[algo].withDefaultConfig().generatePosteriorSamples(net.unwrap(), vertices_unwrapped).dropCount(drop).downSampleInterval(down_sample_interval).stream().iterator()
 	
-	return iterator_samples(sample_iterator, draws, vertices_unwrapped)
+	return _iterator_samples(sample_iterator, draws, vertices_unwrapped)
 
-def iterator_samples(sample_iterator, draws, vertices_unwrapped):
+def _iterator_samples(sample_iterator, draws, vertices_unwrapped):
 	for _ in range(draws):
 		network_sample = sample_iterator.next()
 		sample = {Vertex._get_python_id(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped)) for vertex_unwrapped in vertices_unwrapped}
