@@ -2,7 +2,6 @@ package io.improbable.keanu.codegen.python;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.ConstructorDoc;
 import com.sun.javadoc.RootDoc;
@@ -48,7 +47,7 @@ public class KeanuProjectDoclet extends Standard {
 
     private static boolean isConstructorAnnotated(ConstructorDoc constructorDoc) {
         return Arrays.stream(constructorDoc.annotations())
-            .anyMatch(an -> an.toString().equals(EXPORT_VERTEX_ANNOTATION_NAME))
+            .anyMatch(an -> an.toString().equals(EXPORT_VERTEX_ANNOTATION_NAME));
     }
 
     private static void writeDocStringsToFile(Map<String, DocString> docString) {
@@ -58,9 +57,7 @@ public class KeanuProjectDoclet extends Standard {
             outputFile.getParentFile().mkdirs();
             outputFile.createNewFile(); // if file already exists will do nothing
             OutputStream outputStream = new FileOutputStream(WRITE_DESTINATION + DESTINATION_FILE_NAME, false);
-            System.out.println("Writing docstrings");
             outputStream.write(json.getBytes());
-            System.out.println("Finished writing docstrings");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Could not write to file while processing JavaDoc strings");
@@ -74,7 +71,7 @@ public class KeanuProjectDoclet extends Standard {
             Reader reader = new FileReader(READ_DESTINATION + DESTINATION_FILE_NAME);
             return gson.fromJson(reader, listType);
         } catch (IOException e) {
-            throw new IOException("Could not read JavaDoc strings from file at " + System.getProperty("user.dir") + READ_DESTINATION + DESTINATION_FILE_NAME);
+            throw new IOException("Could not read JavaDoc strings from file at " + System.getProperty("user.dir") + READ_DESTINATION + DESTINATION_FILE_NAME, e);
         }
     }
 }
