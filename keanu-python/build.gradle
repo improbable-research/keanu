@@ -57,9 +57,32 @@ task pytest {
     }
 }
 
+task generatePythonDocumentation() {
+    exec {
+        workingDir("../docs/")
+        commandLine "rm", "-rf", "python/"
+    }
+    exec {
+        workingDir("docs/")
+        commandLine "make", "html"
+    }
+    exec {
+        workingDir("docs/")
+        commandLine 'python3', 'remove_underscores.py'
+    }
+    exec {
+        commandLine 'mv', 'docs/_build/html/', '../docs/python/'
+    }
+    exec {
+        workingDir("docs/")
+        commandLine 'rm', '-rf', '_build/'
+    }
+}
+
 test.dependsOn(pytest)
 pytest.dependsOn(installPipenv)
 pytest.dependsOn(pythonVersionInfo)
 pytest.dependsOn(installDependencies)
 pythonVersionInfo.mustRunAfter(installPipenv)
 installDependencies.mustRunAfter(pythonVersionInfo)
+generatePythonDocumentation.mustRunAfter(build)
