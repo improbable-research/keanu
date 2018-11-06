@@ -5,20 +5,19 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 public class ProtobufWriter {
-    private final ByteArrayOutputStream output;
+    private final OutputStream output;
     private final KeanuSavedBayesNet.BayesianNetwork.Builder bayesNetBuilder;
 
-    public ProtobufWriter(ByteArrayOutputStream output) {
+    public ProtobufWriter(OutputStream output) {
         this.output = output;
         bayesNetBuilder = KeanuSavedBayesNet.BayesianNetwork.newBuilder();
     }
 
-    public void save(BayesianNetwork net, OutputStream output, boolean saveValues) throws IOException {
+    public void save(BayesianNetwork net, boolean saveValues) throws IOException {
         net.save(this);
 
         if (saveValues) {

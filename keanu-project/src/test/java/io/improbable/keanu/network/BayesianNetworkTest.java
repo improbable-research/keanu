@@ -105,7 +105,7 @@ public class BayesianNetworkTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         ProtobufWriter protobufWriter = new ProtobufWriter(output);
-        protobufWriter.save(net, output, true);
+        protobufWriter.save(net, true);
         assertThat(output.size(), greaterThan(0));
         ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
         net = ProtobufReader.loadNetwork(input);
