@@ -2,13 +2,14 @@ import sys
 import io
 import os.path
 from py4j.java_gateway import JavaGateway, JavaObject, CallbackServerParameters
+from typing import Dict
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 CLASSPATH = os.path.join(PATH, "keanu-python-all.jar")
 
 # python singleton implementation https://stackoverflow.com/a/6798042/741789
 class Singleton(type):
-    _instances = {}
+    _instances = {} # type: Dict[KeanuContext, KeanuContext]
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
