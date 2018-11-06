@@ -2,3 +2,4 @@ keanu-python-all.jar
 *.egg-info/
 Pipfile.lock
 __pycache__/
+.mypy_cache/
