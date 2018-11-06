@@ -2,7 +2,10 @@ package io.improbable.keanu.codegen.python;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sun.javadoc.*;
+import com.sun.javadoc.RootDoc;
+import com.sun.javadoc.ClassDoc;
+import com.sun.javadoc.ConstructorDoc;
+import com.sun.javadoc.AnnotationDesc;
 import com.sun.tools.doclets.standard.Standard;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 
