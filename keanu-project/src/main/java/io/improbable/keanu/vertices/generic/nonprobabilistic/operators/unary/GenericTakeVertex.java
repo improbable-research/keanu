@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -27,7 +28,7 @@ public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
     }
 
     protected Tensor<T> op(Tensor<T> input) {
-        return Tensor.scalar(input.getValue(index));
+        return GenericTensor.scalar(input.getValue(index));
     }
 
 }

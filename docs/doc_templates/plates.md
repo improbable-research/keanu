@@ -26,7 +26,7 @@ page_nav:
 ## What is a plate?
 
 A plate is a group of vertices that is repeated multiple times in the network. They typically
-represent a concept larger than a vertex like an agent in an ABM or some observations that are
+represent a concept larger than a vertex like an agent in an ABM, a time series or some observations that are
 associated.
 
 ## How do you build them?

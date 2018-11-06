@@ -1,5 +1,5 @@
-import warnings
-from keanu.case_conversion import _to_camel_case_name, _to_snake_case_name
+import logging
+from .case_conversion import _to_camel_case_name, _to_snake_case_name
 
 class JavaObjectWrapper:
     def __init__(self, val):
@@ -19,7 +19,7 @@ class JavaObjectWrapper:
             raise AttributeError("{} has no attribute {}".format(self.__class__, k))
 
         java_name = _to_camel_case_name(k)
-        warnings.warn("\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
+        logging.warning("\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
         return self.unwrap().__getattr__(java_name)
 
     def unwrap(self):

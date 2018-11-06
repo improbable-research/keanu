@@ -23,7 +23,7 @@ page_nav:
 ---
 
 ## Overview
-Particle filters can help you find probable states of your network which can be used as starting states for MCMC sampling. 
+Particle filters can help you find probable states of your network which can be used as starting states for [MCMC]({{ site.baseurl }}/docs/inference-posterior-sampling/) sampling. 
 Here is an example on how to use Keanu's Particle filter class:
 
 ```java

@@ -25,12 +25,10 @@ page_nav:
 
 ## Vertices
 
-There are several families of vertices. Each family shares a common value type.
-
 ### Probabilistic
 
-Probabilistic vertices are vertices that do not depend completely on their parent vertices. An example
-of this is a GaussianVertex which is non-deterministic and has a probability distribution controlled by 
+Probabilistic vertices are vertices that are not a deterministic function of their parents. An example
+of this is a `GaussianVertex` which is non-deterministic and has a probability distribution controlled by 
 parameters that come from its parents.
 
 Changing the value of their parent vertices may change the probability density function but it 
@@ -41,28 +39,33 @@ will not directly cause a change of the value of the vertex.
 The value of these vertices are completely dependent on their parent vertices' values. For example,
 given `C = A * B` (for any vertices A and B), C is a non-probabilistic vertex. Even if A or B are probabilistic 
 vertices, C is still completely dependent on their values which means it is non-probabilistic.
+
+## Vertex Families
+
+There are several families of vertices. Each family shares a common value type.
+
 ### The Double Family
 
-A DoubleVertex can be used by most arithmetic operators. They can be used to describe a problem
-that can be solved using gradient ascent optimization and their value is a double.
+A `DoubleVertex` is one whose values are double-precision floating point numbers. It can be used by most arithmetic operators. 
+They can be used to describe a problem that can be solved using gradient ascent optimization.
 
-The currently available double vertices are
+The currently available double vertices are:
 - [Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/dbl/probabilistic/package-summary.html)
 - [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/dbl/nonprobabilistic/package-summary.html)
 
 ### The Integer Family
 
-An IntegerVertex is similar to the DoubleVertex except its value is an integer.
+An `IntegerVertex` is similar to the DoubleVertex except its value is an integer.
 
-The currently available integer vertices are
+The currently available integer vertices are:
 - [Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/intgr/probabilistic/package-summary.html)
 - [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/intgr/nonprobabilistic/package-summary.html)
 
 ### The Boolean (true/false) Family
 
-A BoolVertex can be used by most boolean operators. These can be observed directly and used in MCMC.
+A `BoolVertex` can be used by most boolean operators. These can be observed directly and used in [MCMC]({{ site.baseurl }}/docs/inference-posterior-sampling/).
 
-The currently available boolean vertices are
+The currently available boolean vertices are:
 - [Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/bool/probabilistic/package-summary.html)
 - [Non-Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/bool/nonprobabilistic/package-summary.html)
 
@@ -76,7 +79,7 @@ public enum MyType {
     A, B, C, D
 }
 
-public CategoricalVertex<MyType> getSelectorForMyType() {
+public CategoricalVertex<MyType, GenericTensor<MyType>> getSelectorForMyType() {
 
     LinkedHashMap<MyType, DoubleVertex> frequency = new LinkedHashMap<>();
     frequency.put(A, new ConstantDoubleVertex(0.25));

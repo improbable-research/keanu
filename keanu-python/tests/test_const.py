@@ -1,6 +1,6 @@
-import keanu as kn
 import numpy as np
 import pytest
+from keanu.vertex import Const
 
 
 @pytest.fixture
@@ -14,7 +14,7 @@ def generic():
 ])
 def test_const_takes_ndarray(arr, expected_java_class):
     ndarray = np.array(arr)
-    v = kn.Const(ndarray)
+    v = Const(ndarray)
 
     assert_java_class(v, expected_java_class)
     assert_vertex_value_equal_ndarray(v, ndarray)
@@ -26,7 +26,7 @@ def test_const_takes_ndarray(arr, expected_java_class):
     (True, "ConstantBoolVertex")
 ])
 def test_const_takes_num(num, expected_java_class):
-    v = kn.Const(num)
+    v = Const(num)
 
     assert_java_class(v, expected_java_class)
     assert_vertex_value_equals_scalar(v, num)
@@ -35,14 +35,14 @@ def test_const_takes_num(num, expected_java_class):
 def test_const_does_not_take_generic_ndarray(generic):
     ndarray = np.array([[generic]])
     with pytest.raises(NotImplementedError) as excinfo:
-        kn.Const(ndarray)
+        Const(ndarray)
 
     assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
 
 
 def test_const_does_not_take_generic(generic):
     with pytest.raises(NotImplementedError) as excinfo:
-        kn.Const(generic)
+        Const(generic)
 
     assert str(excinfo.value) == "Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(type(generic))
 
@@ -50,17 +50,17 @@ def test_const_does_not_take_generic(generic):
 def test_const_does_not_take_empty_ndarray():
     ndarray = np.array([])
     with pytest.raises(ValueError) as excinfo:
-        kn.Const(ndarray)
+        Const(ndarray)
 
     assert str(excinfo.value) == "Cannot infer type because the ndarray is empty"
 
 
 def test_const_takes_ndarray_of_rank_one():
     ndarray = np.array([1 ,2])
-    v = kn.Const(ndarray)
+    v = Const(ndarray)
 
     assert_vertex_value_equal_ndarray(v, ndarray)
-    assert v.get_value().getRank() == 2
+    assert v.get_value().shape == (2, 1)
 
 
 def assert_vertex_value_equal_ndarray(v, ndarray):
@@ -74,7 +74,7 @@ def assert_vertex_value_equal_ndarray(v, ndarray):
 
 
 def assert_vertex_value_equals_scalar(v, scalar):
-    assert v.get_value().scalar() == scalar
+    assert v.get_value() == scalar
 
 
 def assert_java_class(java_object_wrapper, java_class_str):
