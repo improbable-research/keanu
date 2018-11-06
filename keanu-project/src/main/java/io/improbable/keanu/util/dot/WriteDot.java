@@ -18,11 +18,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import static io.improbable.keanu.util.dot.DotWriterUtils.getOutputFile;
 
 /**
  * Utility class for outputting a network to a DOT file that can then be used by a range of graph visualisers.
@@ -100,16 +100,16 @@ public class WriteDot {
     public static void outputDot(Writer outputWriter, Vertex vertex, int degree) {
         try {
             Set<String> dotLabels = new HashSet<>();
-            Map<String, String> verticeIdsToConnectionInfo = new HashMap<>();
+            Set<GraphEdge> graphEdges = new HashSet<>();
 
             outputWriter.write(DOT_HEADER);
 
             // Iterate over vertices and obtain the necessary label and connection info.
-            obtainGraphInfo(vertex, degree, dotLabels, verticeIdsToConnectionInfo);
+            obtainGraphInfo(vertex, degree, dotLabels, graphEdges);
 
             // Write out labels and connections.
-            outputInfo(verticeIdsToConnectionInfo.values(), outputWriter);
-            outputInfo(dotLabels, outputWriter);
+            outputEdges(graphEdges, outputWriter);
+            outputLabels(dotLabels, outputWriter);
 
             outputWriter.write(DOT_ENDING);
             outputWriter.close();
@@ -120,43 +120,8 @@ public class WriteDot {
         }
     }
 
-    // Make sure the output directory exists and that no files are being overwritten.
-    private static File getOutputFile(String fileName) {
-
-        File outputFile = getFreshOutputFile(fileName);
-
-        // Make sure the output directory exists.
-        if (outputFile.getParentFile() != null && !outputFile.getParentFile().exists()){
-            outputFile.getParentFile().mkdirs();
-        }
-
-        return outputFile;
-    }
-
-    // Add an index to the filename if a file with the specified name already exists.
-    private static File getFreshOutputFile(String fileName) {
-        File outputFile = new File(fileName);
-
-        if (outputFile.exists()) {
-            String baseName = FilenameUtils.getBaseName(fileName);
-            String extension = FilenameUtils.getExtension(fileName);
-            int counter = 1;
-            while(outputFile.exists()) {
-                outputFile = new File(outputFile.getParent(), baseName + "_" + (counter++) + "." + extension);
-            }
-        }
-
-        return outputFile;
-    }
-
-    /**
-     * Iterates over the vertices of the graph, storing information about vertex labels to display and connections between vertices.
-     *
-     * @param vertex vertex around which the graph will be visualised
-     * @param degree degree of connections to be visualised; for instance, if the degree is 1,
-     *               only connections between the vertex amd it's parents and children will be written out to the DOT file.
-     */
-    private static void obtainGraphInfo(Vertex vertex, int degree, Set<String> dotLabels, Map<String, String> verticeIdsToConnectionInfo) {
+    // Iterates over the vertices of the graph, storing information about vertex labels to display and connections between vertices.
+    private static void obtainGraphInfo(Vertex vertex, int degree, Set<String> dotLabels, Set<GraphEdge> graphEdges) {
 
         Set<VertexId> processedVertices = new HashSet<>();
         Set<Vertex> verticesToProcessNow = new HashSet<>();
@@ -179,7 +144,7 @@ public class WriteDot {
                 connectedVertices.forEach(connectedVertex -> {
                     VertexId connectedVId = connectedVertex.getId();
                     if (!processedVertices.contains(connectedVId)) {
-                        verticeIdsToConnectionInfo.put(concatenateVertexIds(connectedVId, vId), getEdgeString(connectedVId, vId));
+                        graphEdges.add(new GraphEdge(v, connectedVertex));
                         verticesToProcessNext.add(connectedVertex);
                         setDotLabel(connectedVertex, dotLabels);
                     }
@@ -188,7 +153,7 @@ public class WriteDot {
                 // If there is any hyperparameter information to be added to edges, add it now.
                 DisplayInformationForOutput vertexAnnotation = v.getClass().getAnnotation(DisplayInformationForOutput.class);
                 if (vertexAnnotation != null && vertexAnnotation.displayHyperparameterInfo()) {
-                    applyHyperparameterInfo(v, verticeIdsToConnectionInfo);
+                    applyHyperparameterInfo(v, graphEdges);
                 }
 
                 processedVertices.add(vId);
@@ -198,25 +163,6 @@ public class WriteDot {
             iterationIndex++;
         }
 
-    }
-
-    // Utility function for creating a unique identifier for a connection between two vertices.
-    private static String concatenateVertexIds(VertexId v1, VertexId v2) {
-        if (v1.compareTo(v2) < 0) {
-            return v1.toString() + "_" + v2.toString();
-        } else {
-            return v2.toString() + "_" + v1.toString();
-        }
-    }
-
-
-    // Utility function for forming a DOT string to represent an edge.
-    private static String getEdgeString(VertexId v1, VertexId v2) {
-        if (v1.compareTo(v2) < 0) {
-            return  "<" + v1.hashCode() + "> -> <" + v2.hashCode() + ">";
-        } else {
-            return  "<" + v2.hashCode() + "> -> <" + v1.hashCode() + ">";
-        }
     }
 
     /**
@@ -261,21 +207,27 @@ public class WriteDot {
 
     // Apply hyperparameters as a label to connection edges.
     // Note - this is currently only done for Gaussian vertices. Can be extended for any others.
-    private static void applyHyperparameterInfo(Vertex v, Map<String, String> verticeIdsToConnectionInfo) {
-        VertexId vId = v.getId();
-
+    private static void applyHyperparameterInfo(Vertex v, Set<GraphEdge> graphEdges) {
         if (v instanceof GaussianVertex) {
-            VertexId meanVertexId = ((GaussianVertex) v).getMu().getId();
-            verticeIdsToConnectionInfo.computeIfPresent(concatenateVertexIds(vId, meanVertexId), (ids, previousValue) -> previousValue + " [label=mu]");
-            VertexId sigmaVertexId = ((GaussianVertex) v).getSigma().getId();
-            verticeIdsToConnectionInfo.computeIfPresent(concatenateVertexIds(vId, sigmaVertexId), (ids, previousValue) -> previousValue + " [label=sigma]");
+            GraphEdge newMuEdge = new GraphEdge(v, ((GaussianVertex) v).getMu());
+            graphEdges.stream().filter(newMuEdge::equals).findFirst().get().appendToDotLabel("mu");
+
+            GraphEdge newSigmaEdge = new GraphEdge(v, ((GaussianVertex) v).getSigma());
+            graphEdges.stream().filter(newSigmaEdge::equals).findFirst().get().appendToDotLabel("sigma");
+        }
+    }
+
+    // Output information about labels.
+    private static void outputLabels(Collection<String> infSet, Writer outputWriter) throws IOException {
+        for (String info: infSet) {
+            outputWriter.write(info + "\n");
         }
     }
 
     // Output information about edges.
-    private static void outputInfo(Collection<String> infSet, Writer outputWriter) throws IOException {
-        for (String info: infSet) {
-            outputWriter.write(info + "\n");
+    private static void outputEdges(Collection<GraphEdge> edges, Writer outputWriter) throws IOException {
+        for (GraphEdge edge : edges) {
+            outputWriter.write(edge.inDotFormat() + "\n");
         }
     }
 }
