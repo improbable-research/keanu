@@ -29,7 +29,7 @@ dependencies {
 task saveJavadocStringsToFile(type: Javadoc) {
     def keanuProject = rootProject.subprojects.find { subproject -> subproject.name == "keanu-project" }
     def codegenProject = rootProject.subprojects.find { subproject -> subproject.name == "codegen" }
-    dependsOn codegenProject.tasks.getByName("compileJava")
+    dependsOn "codegen:compileJava"
 
     source = keanuProject.layout.getProjectDirectory().asFileTree.matching({ filter -> filter.include("**/*.java") })
 
