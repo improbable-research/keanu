@@ -3,6 +3,9 @@ package io.improbable.keanu.codegen.python;
 import java.util.Map;
 
 class DocString {
+    private static final String THREE_QUOTES = "\"\"\"";
+    private static final String NEW_LINE_TAB = "\n    ";
+
     private String comment;
     private Map<String, String> params;
 
@@ -20,20 +23,23 @@ class DocString {
             return "";
         }
         if (params.size() == 0) {
-            return "\"\"\"\n" + comment + "\n\"\"\"\n";
+            return THREE_QUOTES + "\n" + comment + THREE_QUOTES + "\n\n";
         }
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\"\"\"\n    ");
-        stringBuilder.append(comment.replaceAll("\n ", "\n    "));
+        stringBuilder.append(THREE_QUOTES);
+        stringBuilder.append(NEW_LINE_TAB);
+        stringBuilder.append(comment.replaceAll("\n ", NEW_LINE_TAB));
         stringBuilder.append("\n");
         for (String param : params.keySet()) {
-            stringBuilder.append("\n    ");
+            stringBuilder.append(NEW_LINE_TAB);
             stringBuilder.append(":param ");
             stringBuilder.append(param);
             stringBuilder.append(": ");
             stringBuilder.append(params.get(param));
         }
-        stringBuilder.append("\n    \"\"\"\n    ");
+        stringBuilder.append(NEW_LINE_TAB);
+        stringBuilder.append(THREE_QUOTES);
+        stringBuilder.append(NEW_LINE_TAB);
         return stringBuilder.toString();
     }
 }
