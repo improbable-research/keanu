@@ -23,11 +23,11 @@ page_nav:
         url: '/docs/inference-map/'
 ---
 
-# Tensor rank and shape
+## Tensor rank and shape
 
 Tensors in most cases can be thought of as nested arrays of values that can have any number
 of dimensions. A tensor with one dimension can be thought of as a vector, a tensor
-with two dimensions as a matrix and a tensor with three dimensions can be thought of as a cube. 
+with two dimensions as a matrix and a tensor with three dimensions can be thought of as a cuboid. 
 The number of dimensions a tensor has is called its `rank` and the length in each dimension 
 describes its `shape`. 
 
@@ -42,7 +42,7 @@ has a `rank` of `2`, a `shape` of `[2, 3]` and a `length` of 6.
 
 If you are struggling to get your head around the notion of a tensor, [this article](https://www.kdnuggets.com/2018/05/wtf-tensor.html) attempts to provide some intuition on what tensors are and how you can use them.
 
-# Tensors in Keanu
+## Tensors in Keanu
 
 Tensors can be extremely powerful as a way to represent large data sets or a way to very efficiently do the same
 operation on many different pieces of data. This is because tensor operations can be done on the GPU.
@@ -50,25 +50,25 @@ operation on many different pieces of data. This is because tensor operations ca
 For example, if we have two lists of numbers and some observation on their product then it's much more efficient
 and much cleaner to describe this using tensors.
 
-## Creating Tensors
+### Creating Tensors
 
 Nearly everything in Keanu supports Tensors. But how do you create one?
 
-Let's create a vector of doubles, integers and booleans that share the same value.
+Let's create vectors of doubles, integers and booleans that share the same value.
 
 ```java
 {% snippet TensorSharedValue %}
 ```
 
 
-Let's make a 2x2 matrix of doubles, integers and booleans.
+Let's make some 2x2 matrices of doubles, integers and booleans.
 
 ```java
 {% snippet Tensor2by2 %}
 ```
 
 Want to change the shape of your tensor on the fly? You have to make sure the proposed shape is the same 
-length as the original. For example, you can change a 2x2 tensor to a 1x4 tensor. But you can't change a 2x2 tensor
+length as the original. For example, you can change a 2x2 tensor to a 1x4 tensor, but you can't change a 2x2 tensor
 to a 2x3 tensor.
 
 Here's how to do that in Keanu:
@@ -77,11 +77,11 @@ Here's how to do that in Keanu:
 {% snippet TensorReshape %}
 ```
 
-## Tensor Operations
+### Tensor Operations
 
 What operations can I apply to tensors?
 
-Here's a small example of the power of tensors, all of these operations apply to each value in the tensor.
+Here's a small example of the power of tensors. All of these operations apply to each value in the tensor.
 
 ```java
 {% snippet TensorOps %}
@@ -90,13 +90,13 @@ Here's a small example of the power of tensors, all of these operations apply to
 A complete list of tensor operations is available here:
 - [Double Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/dbl/DoubleTensor.html)
 - [Integer Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/intgr/IntegerTensor.html)
-- [Boolean Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/bool/package-frame.html)
-- [Generic Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/generic/package-frame.html)
+- [Boolean Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/bool/SimpleBooleanTensor.html)
+- [Generic Tensor](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/tensor/generic/GenericTensor.html)
 
 
-## Creating Vertices with Tensors
+### Creating Vertices with Tensors
 
-Let's say I want to create a vector of 100 Gaussian's all with a mu of 0 and a sigma of 1.
+Let's say I want to create a vector of 100 Gaussians all with a mu of 0 and a sigma of 1.
 This is how you do that in Keanu:
 
 ```java
@@ -121,7 +121,7 @@ In this case, you must make sure that the size of the mu and sigma vectors match
 ```  
 
 
-# Example of Tensors
+## Example of Tensors
 Tensors can provide us with a more succinct way of describing problems and can allow us to solve problems computationally efficiently on the GPU. 
 Without using tensors we have to iterate over the data and aggregate some results. 
 ```

@@ -1,7 +1,7 @@
-import pandas as pd
-import keanu as kn
 import numpy as np
 from examples import CoalMining
+from keanu import BayesNet
+from keanu.algorithm import sample
 
 def test_coalmining():
     coal_mining = CoalMining()
@@ -9,8 +9,8 @@ def test_coalmining():
 
     model.disasters.observe(coal_mining.training_data())
 
-    net = kn.BayesNet(model.switchpoint.get_connected_graph())
-    samples = kn.sample(net=net, sample_from=net.get_latent_vertices(), draws=50000, drop=10000, down_sample_interval=5)
+    net = BayesNet(model.switchpoint.get_connected_graph())
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=50000, drop=10000, down_sample_interval=5)
 
     vertex_samples = samples[model.switchpoint.get_id()]
     scalar_values = np.concatenate(vertex_samples, axis=0).flatten()

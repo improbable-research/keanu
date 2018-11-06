@@ -33,7 +33,7 @@ when the program is a model of some real world process. For example, if you were
 a person driving through traffic, then you would need a way to express the uncertainty about how closely they are following
 the car in front of them in the real world.
 
-Note: the following code snippets are probabilistic programming pseudocode, we'll introduce Keanu syntax afterwards. 
+Note: the following code snippets are probabilistic programming pseudocode; we'll introduce Keanu syntax afterwards. 
 
 For simplicity's sake, let's take a simple program with an input `x` and an output `y`.
 
@@ -59,7 +59,7 @@ Now that we've described the uncertainty around `x` we can make statements about
 of `x`. For example, we can calculate that `y` is somewhere between 2 and 4 given what we know about `x`. 
 
 Propagating this uncertainty forward can be incredibly useful, especially when the program is significantly more complex and it's 
-not immediately obvious how the uncertainty effects the program's output.
+not immediately obvious how the uncertainty affects the program's output.
 
 ### Propagating uncertainty backwards
 
@@ -87,7 +87,7 @@ observedY.observe(new double[]{4.0, 4.49});
 ```
 
 Here we observed `y` varies by 0.5 and can be as high as 4.5 and as low as 4.0. If we used one of the
-inference algorithms (e.g. MAP) in Keanu we would find `x` is ~2
+inference algorithms (e.g. [MAP](https://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation)) in Keanu we would find `x` is ~2
 
 ## A real-world example: rain, sprinklers and wet grass
 
@@ -158,16 +158,15 @@ Converting your problem to a dependency graph, which with prior beliefs makes th
 to your problem. Once you have described your problem as a Bayesian Network, there are several potentially valuable questions
 you can ask:
  
-1. ***What is the most probable network state given my observations? (Maximum a posteriori i.e. 
-[MAP](https://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation))***
+1. ***What is the most probable network state given my observations? (Maximum a posteriori)***
 
-    This finds the most probable unknown values given what ***is*** known. If your problem is differentiable,
+    This finds the most probable unknown values given what ***is*** known. If your probability distribution is differentiable,
     the gradient optimizer in Keanu will automatically calculate a gradient in order to efficiently find the 
     values for the unknowns that most closely match the observations. If your problem is not differentiable, 
     meaning it uses discrete events, has undefined areas or has especially not well behaved operations, then 
     you can either use a sampling algorithm or the non gradient based optimizer.  
 
-1. ***What is the probability of an event given some observations? (Posterior sampling)***
+1. ***What is the probability of an event given my observations? (Posterior sampling)***
 
-    This uses one of the many sampling algorithms to sample from a the posterior distribution, which
+    This uses one of the many sampling algorithms to sample from the posterior distribution, which
     is the distribution that describes probabilities given some observations.
