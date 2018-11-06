@@ -106,10 +106,10 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
         double logProbabilityBeforeStep = bayesianNetwork.getLogOfMasterP();
 
-        return new Sampler(latentVertices, verticesToSampleFrom, mhStep, variableSelector, logProbabilityBeforeStep);
+        return new MetropolisHastingSampler(latentVertices, verticesToSampleFrom, mhStep, variableSelector, logProbabilityBeforeStep);
     }
 
-    public static class Sampler implements SamplingAlgorithm {
+    public static class MetropolisHastingSampler implements SamplingAlgorithm {
 
         private final List<Vertex> latentVertices;
         private final List<? extends Vertex> verticesToSampleFrom;
@@ -119,7 +119,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         private double logProbabilityBeforeStep;
         private int sampleNum;
 
-        public Sampler(List<Vertex> latentVertices,
+        public MetropolisHastingSampler(List<Vertex> latentVertices,
                        List<? extends Vertex> verticesToSampleFrom,
                        MetropolisHastingsStep mhStep,
                        MHStepVariableSelector variableSelector,

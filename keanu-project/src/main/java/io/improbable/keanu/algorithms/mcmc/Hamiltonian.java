@@ -118,13 +118,13 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
 
         final Map<VertexId, ?> sampleBeforeLeapfrog = new HashMap<>();
 
-        return new Sampler(latentVertices, position, gradient, momentum, positionBeforeLeapfrog,
+        return new HamiltonianSampler(latentVertices, position, gradient, momentum, positionBeforeLeapfrog,
             gradientBeforeLeapfrog, momentumBeforeLeapfrog, random, fromVertices, leapFrogCount,
             stepSize, logProbGradientCalculator, sampleBeforeLeapfrog, bayesNet, logOfMasterPBeforeLeapfrog
         );
     }
 
-    public static class Sampler implements SamplingAlgorithm {
+    public static class HamiltonianSampler implements SamplingAlgorithm {
 
         private List<Vertex<DoubleTensor>> latentVertices;
         private Map<VertexId, DoubleTensor> position;
@@ -142,7 +142,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         private BayesianNetwork bayesNet;
         private double logOfMasterPBeforeLeapfrog;
 
-        public Sampler(List<Vertex<DoubleTensor>> latentVertices,
+        public HamiltonianSampler(List<Vertex<DoubleTensor>> latentVertices,
                        Map<VertexId, DoubleTensor> position,
                        Map<VertexId, DoubleTensor> gradient,
                        Map<VertexId, DoubleTensor> momentum,
