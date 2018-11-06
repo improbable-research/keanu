@@ -50,13 +50,18 @@ protobuf {
 test {
     systemProperty "io.improbable.keanu.defaultRandom.seed", '1'
     systemProperty "dtype", 'double'
-}
-
-task testFastOnes(type: Test) {
     useJUnit {
         excludeCategories 'io.improbable.keanu.testcategory.Slow'
     }
 }
+
+task testSlowOnes(type: Test) {
+    useJUnit {
+        includeCategories 'io.improbable.keanu.testcategory.Slow'
+    }
+}
+
+check.dependsOn(testSlowOnes)
 
 // Add default user/pass so it's not needed if only building and not publishing to Nexus
 if (!hasProperty('nexusUser')) {
