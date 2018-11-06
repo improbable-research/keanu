@@ -1,8 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import static io.improbable.keanu.algorithms.mcmc.HamiltonianSampler.addSampleFromVertices;
-import static io.improbable.keanu.algorithms.mcmc.HamiltonianSampler.cachePosition;
-
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -21,6 +18,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static io.improbable.keanu.algorithms.mcmc.HamiltonianSampler.addSampleFromVertices;
+import static io.improbable.keanu.algorithms.mcmc.HamiltonianSampler.cachePosition;
 
 /**
  * Hamiltonian Monte Carlo is a method for obtaining samples from a probability
