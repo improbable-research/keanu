@@ -59,7 +59,7 @@ public class ProtobufWriter {
     }
 
     public void saveValue(Vertex vertex) {
-        //TODO - refactor once implemented everywhere
+        //TODO - Remove once we have this everywhere
         throw new UnsupportedOperationException("This Vertex Doesn't Support Value Save");
     }
 

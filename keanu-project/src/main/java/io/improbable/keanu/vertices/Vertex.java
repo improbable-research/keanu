@@ -304,11 +304,12 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         return stringBuilder.toString();
     }
 
-    public void saveTo(ProtobufWriter protobufWriter) {
+    public void save(ProtobufWriter protobufWriter) {
         protobufWriter.save(this);
     }
 
-    public void saveValueTo(ProtobufWriter protobufWriter) {
+    public void saveValue(ProtobufWriter protobufWriter) {
+        //TODO - Make this abstract after we've implemented every type
         protobufWriter.saveValue(this);
     }
 }

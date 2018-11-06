@@ -208,13 +208,13 @@ public class BayesianNetwork {
 
     public void save(ProtobufWriter protobufWriter) throws IOException {
         for (Vertex vertex : TopologicalSort.sort(vertices)) {
-            vertex.saveTo(protobufWriter);
+            vertex.save(protobufWriter);
         }
     }
 
     public void saveValues(ProtobufWriter protobufWriter) throws IOException {
         for (Vertex vertex : vertices) {
-            vertex.saveValueTo(protobufWriter);
+            vertex.saveValue(protobufWriter);
         }
     }
 }

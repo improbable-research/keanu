@@ -355,7 +355,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public void saveValueTo(ProtobufWriter protobufWriter) {
+    public void saveValue(ProtobufWriter protobufWriter) {
         protobufWriter.saveValue(this);
     }
 }

@@ -64,7 +64,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
 
 
     @Override
-    public void saveTo(ProtobufWriter protobufWriter) {
+    public void save(ProtobufWriter protobufWriter) {
         protobufWriter.save(this);
     }
 }
