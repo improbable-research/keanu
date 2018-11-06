@@ -17,19 +17,14 @@ dependencies {
 }
 
 task saveJavadocStringsToFile(type: Javadoc) {
-    def keanuProject = rootProject.subprojects.find { subproject -> subproject.name == "keanu-project" }
-
-    source = keanuProject.layout.getProjectDirectory().asFileTree.matching({ filter -> filter.include("**/*.java") })
-
-    println layout.projectDirectory.get().path + "/build/classes/java/main"
-    File classFile = new File(layout.projectDirectory.get().path + "/build/classes/java/main")
+    source = fileTree(dir:'../keanu-project', includes:["**/*.java"])
 
     def docletClasspath = rootProject.compileJava.classpath.files.toList()
-    docletClasspath.add(classFile)
+    docletClasspath.add(new File(layout.projectDirectory.get().path + "/build/classes/java/main"))
     options.setDocletpath(docletClasspath)
     options.setDoclet("io.improbable.keanu.codegen.python.KeanuProjectDoclet")
 
-    def mainClasspath = keanuProject.layout.projectDirectory.asFileTree.files.toList()
+    def mainClasspath = fileTree(dir:'../keanu-project').files.toList()
     options.setClasspath(mainClasspath)
 }
 
