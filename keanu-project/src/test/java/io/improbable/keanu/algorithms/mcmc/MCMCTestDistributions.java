@@ -55,7 +55,7 @@ public class MCMCTestDistributions {
         A.setValue(mu);
         B.setAndCascade(mu);
 
-        return new BayesianNetwork(Arrays.asList(A, B, C));
+        return new BayesianNetwork(A.getConnectedGraph());
     }
 
     public static void samplesMatchesSumOfGaussians(double expected, List<DoubleTensor> sampleA, List<DoubleTensor> samplesB) {
@@ -81,7 +81,7 @@ public class MCMCTestDistributions {
         A.setValue(Math.sqrt(0.5));
         B.setAndCascade(0.0);
 
-        return new BayesianNetwork(Arrays.asList(A, B, D));
+        return new BayesianNetwork(A.getConnectedGraph());
     }
 
     public static void samplesMatch2DDonut(List<DoubleTensor> samplesA, List<DoubleTensor> samplesB) {
