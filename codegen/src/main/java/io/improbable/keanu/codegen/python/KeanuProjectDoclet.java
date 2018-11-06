@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,18 +47,13 @@ public class KeanuProjectDoclet extends Standard {
     }
 
     private static boolean isConstructorAnnotated(ConstructorDoc constructorDoc) {
-        for (AnnotationDesc an: constructorDoc.annotations()) {
-            if (an.toString().equals(EXPORT_VERTEX_ANNOTATION_NAME)) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(constructorDoc.annotations())
+            .anyMatch(an -> an.toString().equals(EXPORT_VERTEX_ANNOTATION_NAME))
     }
 
     private static void writeDocStringsToFile(Map<String, DocString> docString) {
         try {
-            Gson gson = new Gson();
-            String json = gson.toJson(docString);
+            String json = (new Gson()).toJson(docString);
             File outputFile = new File(WRITE_DESTINATION + DESTINATION_FILE_NAME);
             outputFile.getParentFile().mkdirs();
             outputFile.createNewFile(); // if file already exists will do nothing
