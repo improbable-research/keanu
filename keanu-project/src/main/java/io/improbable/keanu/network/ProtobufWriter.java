@@ -9,21 +9,24 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ProtobufWriter {
-    private final OutputStream output;
-    private final KeanuSavedBayesNet.BayesianNetwork.Builder bayesNetBuilder;
+    private final BayesianNetwork net;
+    private KeanuSavedBayesNet.BayesianNetwork.Builder bayesNetBuilder = null;
 
-    public ProtobufWriter(OutputStream output) {
-        this.output = output;
-        bayesNetBuilder = KeanuSavedBayesNet.BayesianNetwork.newBuilder();
+    public ProtobufWriter(BayesianNetwork net) {
+        this.net = net;
     }
 
-    public void save(BayesianNetwork net, boolean saveValues) throws IOException {
+    public void save(OutputStream output, boolean saveValues) throws IOException {
+        bayesNetBuilder = KeanuSavedBayesNet.BayesianNetwork.newBuilder();
+
         net.save(this);
 
         if (saveValues) {
             net.saveValues(this);
         }
+
         bayesNetBuilder.build().writeTo(output);
+        bayesNetBuilder = null;
     }
 
     public void save(Vertex vertex) {
@@ -52,7 +55,7 @@ public class ProtobufWriter {
     }
 
     public void saveValue(Vertex vertex) {
-        //TODO - Remove once we have this everywhere
+        //TODO - Remove once we have a version for all Vertex data types
         throw new UnsupportedOperationException("This Vertex Doesn't Support Value Save");
     }
 

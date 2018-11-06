@@ -104,8 +104,8 @@ public class BayesianNetworkTest {
         BayesianNetwork net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        ProtobufWriter protobufWriter = new ProtobufWriter(output);
-        protobufWriter.save(net, true);
+        ProtobufWriter protobufWriter = new ProtobufWriter(net);
+        protobufWriter.save(output, true);
         assertThat(output.size(), greaterThan(0));
         ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
         net = ProtobufReader.loadNetwork(input);
