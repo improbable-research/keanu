@@ -1,8 +1,8 @@
 package io.improbable.keanu.backend;
 
-import java.util.Map;
-
 import lombok.Value;
+
+import java.util.Map;
 
 @Value
 public class LogProbWithSample {

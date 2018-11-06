@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toBooleanTensor;
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toDoubleTensor;

@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,6 +50,9 @@ public class NUTSTest {
     public void samplesContinuousPrior() {
 
         BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.);
+
+        bayesNet.getContinuousLatentVertices().get(0).setValue(DoubleTensor.scalar(21.0));
+        bayesNet.getContinuousLatentVertices().get(1).setValue(DoubleTensor.scalar(23.0));
 
         NUTS nuts = NUTS.builder()
             .adaptCount(100)

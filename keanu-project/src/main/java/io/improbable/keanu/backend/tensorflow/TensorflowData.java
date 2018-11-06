@@ -1,14 +1,13 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.IntBuffer;
-
-import org.tensorflow.Tensor;
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import org.tensorflow.Tensor;
+
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
 
 public class TensorflowData {
 
