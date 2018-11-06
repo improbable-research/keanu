@@ -3,10 +3,10 @@ from .generated import ConstantBool, ConstantInteger, ConstantDouble
 from .base import Vertex
 
 import numpy as np
-from keanu.vartypes import int_types, float_types, bool_types, primitive_types, pandas_types
+from keanu.vartypes import int_types, float_types, bool_types, primitive_types, pandas_types, numpy_types
 
 def Const(t) -> Vertex:
-    if isinstance(t, np.ndarray):
+    if isinstance(t, numpy_types):
         ctor = __infer_const_ctor_from_ndarray(t)
         val = t
     elif isinstance(t, pandas_types):
