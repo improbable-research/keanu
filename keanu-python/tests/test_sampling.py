@@ -70,7 +70,7 @@ def test_can_iter_through_samples(algo, net):
     count = 0
     for sample in islice(samples, draws):
         count += 1
-    assert count == num_samples
+    assert count == draws
 
 
 @pytest.mark.parametrize("algo", [
