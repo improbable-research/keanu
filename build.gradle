@@ -32,20 +32,4 @@ shadowJar {
     archiveName = "keanu-python-all.jar"
 }
 
-task saveJavadocStringsToFile(type: Javadoc) {
-    def keanuProject = rootProject.subprojects.find { subproject -> subproject.name == "keanu-project" }
-    def codegenProject = rootProject.subprojects.find { subproject -> subproject.name == "codegen" }
-    dependsOn "codegen:compileJava"
 
-    source = keanuProject.layout.getProjectDirectory().asFileTree.matching({ filter -> filter.include("**/*.java") })
-
-    File classFile = new File(codegenProject.layout.projectDirectory.get().path + "/build/classes/java/main")
-
-    def docletClasspath = compileJava.classpath.files.toList()
-    docletClasspath.add(classFile)
-    options.setDocletpath(docletClasspath)
-    options.setDoclet("io.improbable.keanu.codegen.python.KeanuProjectDoclet")
-
-    def mainClasspath = keanuProject.layout.projectDirectory.asFileTree.files.toList()
-    options.setClasspath(mainClasspath)
-}

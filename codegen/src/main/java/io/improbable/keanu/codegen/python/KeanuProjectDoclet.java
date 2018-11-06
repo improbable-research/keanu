@@ -25,8 +25,7 @@ public class KeanuProjectDoclet extends Standard {
 
     private static final String EXPORT_VERTEX_ANNOTATION_NAME = "@" + ExportVertexToPythonBindings.class.getName();
     private static final String DESTINATION_FILE_NAME = "javadocstrings.json";
-    private static final String READ_DESTINATION = "./build/resources/";
-    private static final String WRITE_DESTINATION = "./codegen/build/resources/";
+    private static final String DESTINATION = "./build/resources/";
 
     public static boolean start(RootDoc root) {
 
@@ -56,7 +55,7 @@ public class KeanuProjectDoclet extends Standard {
         String json = (new Gson()).toJson(docString);
         createFilesIfNecessary();
         try (OutputStream outputStream =
-                 new FileOutputStream(WRITE_DESTINATION + DESTINATION_FILE_NAME, false)) {
+                 new FileOutputStream(DESTINATION + DESTINATION_FILE_NAME, false)) {
             outputStream.write(json.getBytes());
         } catch (IOException e) {
             Logger logger = LoggerFactory.getLogger(KeanuProjectDoclet.class);
@@ -65,7 +64,7 @@ public class KeanuProjectDoclet extends Standard {
     }
 
     private static void createFilesIfNecessary() {
-        File outputFile = new File(WRITE_DESTINATION + DESTINATION_FILE_NAME);
+        File outputFile = new File(DESTINATION + DESTINATION_FILE_NAME);
         outputFile.getParentFile().mkdirs();
         try {
             outputFile.createNewFile();
@@ -79,10 +78,10 @@ public class KeanuProjectDoclet extends Standard {
         try {
             Type listType = new TypeToken<Map<String, DocString>>(){}.getType();
             Gson gson = new Gson();
-            Reader reader = new FileReader(READ_DESTINATION + DESTINATION_FILE_NAME);
+            Reader reader = new FileReader(DESTINATION + DESTINATION_FILE_NAME);
             return gson.fromJson(reader, listType);
         } catch (IOException e) {
-            throw new IOException("Could not read JavaDoc strings from file at " + System.getProperty("user.dir") + READ_DESTINATION + DESTINATION_FILE_NAME, e);
+            throw new IOException("Could not read JavaDoc strings from file at " + System.getProperty("user.dir") + DESTINATION + DESTINATION_FILE_NAME, e);
         }
     }
 }
