@@ -15,7 +15,8 @@ setup(name='keanu',
       packages=['keanu'],
       install_requires=[
           'py4j',
-          'numpy'
+          'numpy',
+          'pandas'
       ],
       classifiers=[
           'Development Status :: 1 - Planning',
