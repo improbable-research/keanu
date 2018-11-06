@@ -28,13 +28,28 @@ message StoredValue {
     VertexID id = 3;
 }
 
+message DoubleTensor {
+    repeated double values = 1;
+}
+
+message IntegerTensor {
+    repeated int32 values = 1;
+}
+
+message BooleanTensor {
+    repeated bool values = 1;
+}
+
+message GenericTensor {
+    repeated bytes values = 1;
+}
+
 message VertexValue {
     oneof valueType {
-        double doubleVal = 1;
-        int32 intVal = 2;
-        bool boolVal = 3;
-        string stringVal = 4;
-        bytes genericVal = 5;
+        DoubleTensor doubleVal = 1;
+        IntegerTensor intVal = 2;
+        BooleanTensor boolVal = 3;
+        GenericTensor genericVal = 4;
     }
 }
 

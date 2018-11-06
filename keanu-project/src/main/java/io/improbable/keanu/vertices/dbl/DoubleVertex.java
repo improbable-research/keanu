@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl;
 
 
+import com.google.common.primitives.Doubles;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.network.ProtobufWriter;
@@ -342,7 +343,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         if (valueBuf.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
             throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
         } else {
-            setValue(valueBuf.getDoubleVal());
+            setValue(DoubleTensor.create(Doubles.toArray(valueBuf.getDoubleVal().getValuesList())));
         }
     }
 

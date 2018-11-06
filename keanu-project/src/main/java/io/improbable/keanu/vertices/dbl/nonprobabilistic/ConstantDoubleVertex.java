@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
+import com.google.common.primitives.Doubles;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.ProtobufWriter;
@@ -34,11 +35,11 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
         this(parseValue(initialValue));
     }
 
-    private static double parseValue(KeanuSavedBayesNet.VertexValue value) {
+    private static double[] parseValue(KeanuSavedBayesNet.VertexValue value) {
         if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
             throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
         } else {
-            return value.getDoubleVal();
+            return Doubles.toArray(value.getDoubleVal().getValuesList());
         }
     }
 

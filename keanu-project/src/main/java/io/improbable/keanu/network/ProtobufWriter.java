@@ -62,9 +62,12 @@ public class ProtobufWriter {
     }
 
     private KeanuSavedBayesNet.StoredValue getValue(DoubleVertex vertex) {
+        KeanuSavedBayesNet.DoubleTensor savedValue = KeanuSavedBayesNet.DoubleTensor.newBuilder()
+            .addAllValues(vertex.getValue().asFlatList())
+            .build();
+
         KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
-            .setDoubleVal(vertex.getValue(0)) //TODO - Need to deal with tensors - oneofs don't interact well with repeated
-            //also - how will this interact with the shape layer?
+            .setDoubleVal(savedValue)
             .build();
 
         return KeanuSavedBayesNet.StoredValue.newBuilder()
