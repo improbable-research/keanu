@@ -7,7 +7,7 @@ import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.CsvDataResource;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
@@ -35,7 +35,7 @@ public class DiabetesLinearRegression {
         // Linear Regression
         DoubleVertex weight = new GaussianVertex(0.0, 100);
         DoubleVertex b = new GaussianVertex(0.0, 100);
-        DoubleVertex x = ConstantVertex.of(data.bmi);
+        DoubleVertex x = ConstantVertexFactory.of(data.bmi);
         DoubleVertex yMu = x.multiply(weight);
 
         DoubleVertex y = new GaussianVertex(yMu.plus(b), 1.0);

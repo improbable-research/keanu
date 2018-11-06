@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -144,8 +144,8 @@ public class GaussianVertexTest {
         int sampleCount = 1000000;
         GaussianVertex vertex = new GaussianVertex(
             new long[]{sampleCount, 1},
-            ConstantVertex.of(0.0),
-            ConstantVertex.of(2.0)
+            ConstantVertexFactory.of(0.0),
+            ConstantVertexFactory.of(2.0)
         );
 
         double from = -4;
@@ -162,8 +162,8 @@ public class GaussianVertexTest {
         double trueSigma = 2.0;
 
         List<DoubleVertex> muSigma = new ArrayList<>();
-        muSigma.add(ConstantVertex.of(trueMu));
-        muSigma.add(ConstantVertex.of(trueSigma));
+        muSigma.add(ConstantVertexFactory.of(trueMu));
+        muSigma.add(ConstantVertexFactory.of(trueSigma));
 
         List<DoubleVertex> latentMuSigma = new ArrayList<>();
         UniformVertex latentMu = new UniformVertex(0.01, 10.0);

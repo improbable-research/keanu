@@ -6,7 +6,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
@@ -25,7 +25,7 @@ public class LinearRegressionTest {
 
         DoubleVertex weight = new GaussianVertex(0, 10.0);
         DoubleVertex intercept = new GaussianVertex(0, 10.0);
-        DoubleVertex x = ConstantVertex.of(data.xTrain);
+        DoubleVertex x = ConstantVertexFactory.of(data.xTrain);
         DoubleVertex y = new GaussianVertex(x.multiply(weight).plus(intercept), 5.0);
         y.observe(data.yTrain);
 
@@ -60,8 +60,8 @@ public class LinearRegressionTest {
         DoubleVertex w1 = new GaussianVertex(0.0, 10.0);
         DoubleVertex w2 = new GaussianVertex(0.0, 10.0);
         DoubleVertex b = new GaussianVertex(0.0, 10.0);
-        DoubleVertex x1 = ConstantVertex.of(data.xTrain.slice(0, 0));
-        DoubleVertex x2 = ConstantVertex.of(data.xTrain.slice(0, 1));
+        DoubleVertex x1 = ConstantVertexFactory.of(data.xTrain.slice(0, 0));
+        DoubleVertex x2 = ConstantVertexFactory.of(data.xTrain.slice(0, 1));
         DoubleVertex y = new GaussianVertex(x1.multiply(w1).plus(x2.multiply(w2)).plus(b), 5.0);
         y.observe(data.yTrain);
 
@@ -96,7 +96,7 @@ public class LinearRegressionTest {
 
         DoubleVertex weights = new GaussianVertex(new long[]{1, 40}, 0, 1);
         DoubleVertex intercept = new GaussianVertex(0, 1);
-        DoubleVertex x = ConstantVertex.of(data.xTrain);
+        DoubleVertex x = ConstantVertexFactory.of(data.xTrain);
         DoubleVertex y = new GaussianVertex(weights.matrixMultiply(x).plus(intercept), 1);
         y.observe(data.yTrain);
 

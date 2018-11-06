@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import org.junit.Test;
 
@@ -23,12 +23,12 @@ public class GreaterThanOrEqualVertexTest {
     }
 
     private void isGreaterThanOrEqual(int a, int b, boolean expected) {
-        BoolVertex vertex = ConstantVertex.of(a).greaterThanOrEqualTo(ConstantVertex.of(b));
+        BoolVertex vertex = ConstantVertexFactory.of(a).greaterThanOrEqualTo(ConstantVertexFactory.of(b));
         assertEquals(expected, vertex.eval().scalar());
     }
 
     private void isGreaterThanOrEqual(double a, double b, boolean expected) {
-        BoolVertex vertex = ConstantVertex.of(a).greaterThanOrEqualTo(ConstantVertex.of(b));
+        BoolVertex vertex = ConstantVertexFactory.of(a).greaterThanOrEqualTo(ConstantVertexFactory.of(b));
         assertEquals(expected, vertex.eval().scalar());
     }
 }

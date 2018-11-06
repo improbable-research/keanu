@@ -4,7 +4,6 @@ import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,11 +28,6 @@ public class ProtobufWriter {
     }
 
     public void save(Vertex vertex) {
-        KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
-        bayesNetBuilder.addVertices(vertexBuilder.build());
-    }
-
-    public void save(GaussianVertex vertex) {
         KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
         vertexBuilder.addAllParents(vertex.getNamedParents());
         bayesNetBuilder.addVertices(vertexBuilder.build());
