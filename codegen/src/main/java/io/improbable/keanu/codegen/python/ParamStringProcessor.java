@@ -5,6 +5,9 @@ import com.sun.javadoc.ConstructorDoc;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
+import static com.google.common.base.CaseFormat.UPPER_CAMEL;
+
 class ParamStringProcessor {
     static Map<String, String> getNameToCommentMapping(ConstructorDoc constructorDoc) {
         String rawComment = constructorDoc.getRawCommentText();
@@ -16,22 +19,10 @@ class ParamStringProcessor {
             }
             commentLine = commentLine.replaceFirst("[ ]{2,}", " ");
             String[] splitComment = commentLine.split(" ", 4);
-            String snakeCaseParamName = toSnakeCase(splitComment[2]);
+            String snakeCaseParamName = UPPER_CAMEL.to(LOWER_UNDERSCORE, splitComment[2]);
             String paramComment = splitComment[3];
             nameToCommentMapping.put(snakeCaseParamName, paramComment);
         }
         return nameToCommentMapping;
-    }
-
-    static String toSnakeCase(String camelCase) {
-        String[] camelCaseWords = camelCase.split("(?=\\p{Upper})");
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(camelCaseWords[0]);
-        for(int i=1; i<camelCaseWords.length; i++) {
-            stringBuilder.append("_");
-            stringBuilder.append(camelCaseWords[i].substring(0,1).toLowerCase());
-            stringBuilder.append(camelCaseWords[i].substring(1));
-        }
-        return stringBuilder.toString();
     }
 }
