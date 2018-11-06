@@ -16,8 +16,25 @@ dependencies {
     testCompile 'org.hamcrest:hamcrest-library:1.3'
 }
 
+task saveJavadocStringsToFile(type: Javadoc) {
+    def keanuProject = rootProject.subprojects.find { subproject -> subproject.name == "keanu-project" }
+
+    source = keanuProject.layout.getProjectDirectory().asFileTree.matching({ filter -> filter.include("**/*.java") })
+
+    println layout.projectDirectory.get().path + "/build/classes/java/main"
+    File classFile = new File(layout.projectDirectory.get().path + "/build/classes/java/main")
+
+    def docletClasspath = rootProject.compileJava.classpath.files.toList()
+    docletClasspath.add(classFile)
+    options.setDocletpath(docletClasspath)
+    options.setDoclet("io.improbable.keanu.codegen.python.KeanuProjectDoclet")
+
+    def mainClasspath = keanuProject.layout.projectDirectory.asFileTree.files.toList()
+    options.setClasspath(mainClasspath)
+}
+
 task codeGen (type: JavaExec) {
-    dependsOn rootProject.getTasks().getByName("saveJavadocStringsToFile")
+    dependsOn saveJavadocStringsToFile
     classpath sourceSets.main.runtimeClasspath
     main = mainClassName
     args += project.rootDir.toString() + '/keanu-python/keanu/vertex/'
