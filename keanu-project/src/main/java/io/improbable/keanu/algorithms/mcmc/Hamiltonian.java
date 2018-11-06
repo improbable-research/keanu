@@ -117,8 +117,8 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
 
         final Map<VertexId, ?> sampleBeforeLeapfrog = new HashMap<>();
 
-        HamiltonianSampler.VertexState x = new HamiltonianSampler.VertexState(position, gradient, momentum);
-        HamiltonianSampler.VertexState y = new HamiltonianSampler.VertexState(positionBeforeLeapfrog, gradientBeforeLeapfrog, momentumBeforeLeapfrog);
+        HamiltonianSampler.VertexState before = new HamiltonianSampler.VertexState(position, gradient, momentum);
+        HamiltonianSampler.VertexState after = new HamiltonianSampler.VertexState(positionBeforeLeapfrog, gradientBeforeLeapfrog, momentumBeforeLeapfrog);
 
         return new HamiltonianSampler(
             latentVertices,
@@ -127,8 +127,8 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
             leapFrogCount,
             stepSize,
             bayesNet,
-            x,
-            y,
+            before,
+            after,
             logProbGradientCalculator,
             sampleBeforeLeapfrog,
             logOfMasterPBeforeLeapfrog
