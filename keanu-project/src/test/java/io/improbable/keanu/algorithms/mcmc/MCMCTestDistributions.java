@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 public class MCMCTestDistributions {
 
     public static BayesianNetwork createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
-        GaussianVertex A = new GaussianVertex(mu, sigma);
+        GaussianVertex A = new GaussianVertex(new long[]{2, 1}, mu, sigma);
         A.setAndCascade(A.sample(random));
         return new BayesianNetwork(A.getConnectedGraph());
     }

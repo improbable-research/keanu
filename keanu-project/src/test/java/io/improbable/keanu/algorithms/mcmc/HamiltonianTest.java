@@ -40,7 +40,7 @@ public class HamiltonianTest {
         NetworkSamples posteriorSamples = hmc.getPosteriorSamples(
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
-            7500
+            1000
         );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
