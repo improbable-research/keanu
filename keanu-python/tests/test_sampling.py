@@ -6,6 +6,7 @@ from keanu.vertex import Gamma, Exponential, Cauchy
 from keanu.algorithm import sample, iterate_samples
 from keanu import BayesNet, KeanuRandom
 from collections import defaultdict
+from itertools import islice
 
 @pytest.fixture
 def net():
@@ -63,10 +64,13 @@ def test_down_sample_interval(net):
     ("metropolis"),
     ("hamiltonian")
 ])
-def test_iter_is_correct_size(algo, net):
+def test_can_iter_through_samples(algo, net):
     draws = 10
-    samples = iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws, down_sample_interval=1)
-    assert sum(1 for i in samples) == 10
+    samples = iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
+    count = 0
+    for sample in islice(samples, draws):
+        count += 1
+    assert count == num_samples
 
 
 @pytest.mark.parametrize("algo", [
@@ -80,10 +84,10 @@ def test_iter_returns_same_result_as_sample(algo):
     set_starting_state(model)
     samples = sample(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
     set_starting_state(model)
-    iter_samples = iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
+    iter_samples = iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo)
     iter_samples_dict = defaultdict(float)
 
-    for next_sample in iter_samples:
+    for next_sample in islice(iter_samples, draws):
         for vertex_id, vertex_sample in next_sample.items():
             iter_samples_dict[vertex_id] += vertex_sample
 
