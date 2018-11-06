@@ -7,6 +7,8 @@ import com.sun.javadoc.ConstructorDoc;
 import com.sun.javadoc.RootDoc;
 import com.sun.tools.doclets.standard.Standard;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,8 +59,8 @@ public class KeanuProjectDoclet extends Standard {
                  new FileOutputStream(WRITE_DESTINATION + DESTINATION_FILE_NAME, false)) {
             outputStream.write(json.getBytes());
         } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Could not write to file while processing JavaDoc strings");
+            Logger logger = LoggerFactory.getLogger(KeanuProjectDoclet.class);
+            logger.error("Could not write to file while processing JavaDoc strings", e);
         }
     }
 
@@ -68,8 +70,8 @@ public class KeanuProjectDoclet extends Standard {
         try {
             outputFile.createNewFile();
         } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Could not write to file while processing JavaDoc strings");
+            Logger logger = LoggerFactory.getLogger(KeanuProjectDoclet.class);
+            logger.error("Could not write to file while processing JavaDoc strings", e);
         }
     }
 
