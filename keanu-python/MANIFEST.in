@@ -1,1 +1,1 @@
-include keanu/keanu-python-all.jar
+include keanu/classpath/*.jar
