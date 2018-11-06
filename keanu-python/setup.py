@@ -13,7 +13,7 @@ setup(name='keanu',
       author_email='keanu-engineering@improbable.io',
       url='https://github.com/improbable-research/keanu',
       license='MIT',
-      packages=find_packages(),
+      packages=find_packages(exclude=["examples"]),
       include_package_data=True,
       install_requires=[
           'py4j',
