@@ -2,19 +2,26 @@ package io.improbable.keanu.codegen.python;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sun.javadoc.RootDoc;
+import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.ConstructorDoc;
-import com.sun.javadoc.AnnotationDesc;
+import com.sun.javadoc.RootDoc;
 import com.sun.tools.doclets.standard.Standard;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Reader;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class KeanuProjectDoclet extends Standard {
 
+    private static final String EXPORT_VERTEX_ANNOTATION_NAME = "@" + ExportVertexToPythonBindings.class.getName();
     private static final String DESTINATION_FILE_NAME = "javadocstrings.json";
     private static final String READ_DESTINATION = "./build/resources/";
     private static final String WRITE_DESTINATION = "./codegen/build/resources/";
@@ -40,8 +47,7 @@ public class KeanuProjectDoclet extends Standard {
 
     private static boolean isConstructorAnnotated(ConstructorDoc constructorDoc) {
         for (AnnotationDesc an: constructorDoc.annotations()) {
-            String exportVertexAnnotationName = "@" + ExportVertexToPythonBindings.class.getName();
-            if (an.toString().equals(exportVertexAnnotationName)) {
+            if (an.toString().equals(EXPORT_VERTEX_ANNOTATION_NAME)) {
                 return true;
             }
         }
