@@ -7,14 +7,11 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.ProtobufWriter;
 import io.improbable.keanu.tensor.Tensor;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,51 +25,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
     private VertexLabel label = null;
-
-    public static <T> Vertex<T> fromProtoBuf(KeanuSavedBayesNet.Vertex vertex,
-                                             Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
-        Class vertexClass;
-        try {
-            vertexClass = Class.forName(vertex.getVertexType());
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("Unknown Vertex Type Specified: " + vertex.getVertexType(), e);
-        }
-
-        Constructor vertexConstructor;
-        try {
-            vertexConstructor = vertexClass.getConstructor(Map.class, KeanuSavedBayesNet.VertexValue.class);
-        } catch (NoSuchMethodException e) {
-            throw new
-                IllegalArgumentException("Vertex Type doesn't support loading from Proto: " + vertex.getVertexType(), e);
-        }
-
-        Vertex<T> newVertex;
-        Map<String, Vertex> parentsMap = getParentsMap(vertex, existingVertices);
-
-        try {
-            newVertex = (Vertex<T>)vertexConstructor.newInstance(parentsMap, vertex.getConstantValue());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to create Vertex of Type: " + vertex.getVertexType(), e);
-        }
-
-        return newVertex;
-    }
-
-    private static Map<String, Vertex> getParentsMap(KeanuSavedBayesNet.Vertex vertex,
-                                                     Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
-        Map<String, Vertex> parentsMap = new HashMap<>();
-
-        for (KeanuSavedBayesNet.NamedParent namedParent : vertex.getParentsList()) {
-            Vertex existingParent = existingVertices.get(namedParent.getId());
-            if (existingParent == null) {
-                throw new IllegalArgumentException("Invalid Parent Specified: " + namedParent);
-            }
-
-            parentsMap.put(namedParent.getName(), existingParent);
-        }
-
-        return parentsMap;
-    }
 
     public Vertex() {
         this(Tensor.SCALAR_SHAPE);
