@@ -33,8 +33,12 @@ class LinearRegressionTestUtils {
     }
 
     static TestData generateTwoFeatureData() {
-        DoubleVertex x1Generator = new UniformVertex(new long[]{1, N}, 0, 10);
-        DoubleVertex x2Generator = new UniformVertex(new long[]{1, N}, 50, 100);
+        return generateTwoFeatureData(N);
+    }
+
+    static TestData generateTwoFeatureData(int numSamples) {
+        DoubleVertex x1Generator = new UniformVertex(new long[]{1, numSamples}, 0, 10);
+        DoubleVertex x2Generator = new UniformVertex(new long[]{1, numSamples}, 50, 100);
         DoubleVertex yGenerator = new GaussianVertex(
             x1Generator.multiply(EXPECTED_W1).plus(x2Generator.multiply(EXPECTED_W2)).plus(EXPECTED_B),
             1.0

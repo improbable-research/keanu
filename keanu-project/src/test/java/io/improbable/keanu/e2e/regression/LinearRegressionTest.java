@@ -146,7 +146,7 @@ public class LinearRegressionTest {
 
     @Test
     public void youCanSpecifyACustomSamplingMethodInsteadOfGradientOptimization() {
-        LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataUniformWeights(20);
+        LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData(1000);
 
         ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(20.));
 
