@@ -10,11 +10,13 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
     private final ModelGraph<INPUT, OUTPUT> modelGraph;
     private final PosteriorSamplingAlgorithm samplingAlgorithm;
     private final int sampleCount;
+    private final int dropCount;
 
-    public SamplingModelFitter(ModelGraph<INPUT, OUTPUT> modelGraph, PosteriorSamplingAlgorithm samplingAlgorithm, int sampleCount) {
+    public SamplingModelFitter(ModelGraph<INPUT, OUTPUT> modelGraph, PosteriorSamplingAlgorithm samplingAlgorithm, int sampleCount, int dropCount) {
         this.modelGraph = modelGraph;
         this.samplingAlgorithm = samplingAlgorithm;
         this.sampleCount = sampleCount;
+        this.dropCount = dropCount;
     }
 
     /**
@@ -28,7 +30,10 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
     @Override
     public void fit(INPUT input, OUTPUT output) {
         modelGraph.observeValues(input, output);
-        NetworkSamples posteriorSamples = samplingAlgorithm.getPosteriorSamples(modelGraph.getBayesianNetwork(), sampleCount);
+        NetworkSamples posteriorSamples = samplingAlgorithm
+            .getPosteriorSamples(modelGraph.getBayesianNetwork(), sampleCount)
+            .drop(dropCount)
+            .downSample(2);
         for (Vertex<DoubleTensor> vertex : modelGraph.getBayesianNetwork().getTopLevelLatentVertices()) {
             vertex.setValue(posteriorSamples.getDoubleTensorSamples(vertex).getAverages());
         }

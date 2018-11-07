@@ -28,6 +28,7 @@ public class RegressionModelBuilder<OUTPUT> {
     private Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
     private PosteriorSamplingAlgorithm samplingAlgorithm = null;
     private int samplingCount = 10000;
+    private int dropCount = 0;
 
     public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
         this.inputTrainingData = inputTrainingData;
@@ -86,16 +87,16 @@ public class RegressionModelBuilder<OUTPUT> {
         return this;
     }
 
-    public RegressionModelBuilder withSampling(int count) {
-        return withSampling(MetropolisHastings.withDefaultConfig(), count);
+    public RegressionModelBuilder withSampling(int sampleCount, int dropCount) {
+        return withSampling(MetropolisHastings.withDefaultConfig(), sampleCount, dropCount);
     }
 
-    public RegressionModelBuilder withSampling(PosteriorSamplingAlgorithm samplingAlgorithm, int count) {
+    public RegressionModelBuilder withSampling(PosteriorSamplingAlgorithm samplingAlgorithm, int sampleCount, int dropCount) {
         this.samplingAlgorithm = samplingAlgorithm;
-        this.samplingCount = count;
+        this.samplingCount = sampleCount;
+        this.dropCount = dropCount;
         return this;
     }
-
     /**
      * @return A linear regression model from the data passed to the builder
      */
@@ -139,7 +140,7 @@ public class RegressionModelBuilder<OUTPUT> {
     private void performDataFitting(LinearRegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
         ModelFitter<DoubleTensor, OUTPUT> fitter = samplingAlgorithm == null ?
             this.regularization.createFitterForGraph(regressionGraph) :
-            new SamplingModelFitter<>(regressionGraph, samplingAlgorithm, samplingCount);
+            new SamplingModelFitter<>(regressionGraph, samplingAlgorithm, samplingCount, dropCount);
 
         fitter.fit(inputTrainingData, outputTrainingData);
     }

@@ -130,22 +130,6 @@ public class LinearRegressionTest {
 
     @Test
     public void youCanChooseSamplingInsteadOfGradientOptimization() {
-        LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataUniformWeights(20);
-
-        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
-            .withSampling(1000)
-            .build();
-
-        assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
-            data
-        );
-    }
-
-
-    @Test
-    public void youCanSpecifyACustomSamplingMethodInsteadOfGradientOptimization() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData(1000);
 
         ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(0.1));
@@ -155,7 +139,8 @@ public class LinearRegressionTest {
                 MetropolisHastings.builder()
                     .proposalDistribution(proposalDistribution)
                     .build(),
-                1000)
+                2000,
+                1500)
             .build();
 
         assertWeightsAndInterceptMatchTestData(
