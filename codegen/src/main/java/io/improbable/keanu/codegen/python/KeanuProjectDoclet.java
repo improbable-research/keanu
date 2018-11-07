@@ -23,6 +23,8 @@ import java.util.Map;
 
 public class KeanuProjectDoclet extends Standard {
 
+    private static final Logger logger = LoggerFactory.getLogger(KeanuProjectDoclet.class);
+
     private static final String EXPORT_VERTEX_ANNOTATION_NAME = "@" + ExportVertexToPythonBindings.class.getName();
     private static final String DESTINATION_FILE_NAME = "javadocstrings.json";
     private static final String DESTINATION = "./build/resources/";
@@ -58,7 +60,6 @@ public class KeanuProjectDoclet extends Standard {
                  new FileOutputStream(DESTINATION + DESTINATION_FILE_NAME, false)) {
             outputStream.write(json.getBytes());
         } catch (IOException e) {
-            Logger logger = LoggerFactory.getLogger(KeanuProjectDoclet.class);
             logger.error("Could not write to file while processing JavaDoc strings", e);
         }
     }
@@ -69,7 +70,6 @@ public class KeanuProjectDoclet extends Standard {
         try {
             outputFile.createNewFile();
         } catch (IOException e) {
-            Logger logger = LoggerFactory.getLogger(KeanuProjectDoclet.class);
             logger.error("Could not write to file while processing JavaDoc strings", e);
         }
     }
@@ -77,9 +77,8 @@ public class KeanuProjectDoclet extends Standard {
     static Map<String, DocString> getDocStringsFromFile() throws IOException {
         try {
             Type listType = new TypeToken<Map<String, DocString>>(){}.getType();
-            Gson gson = new Gson();
             Reader reader = new FileReader(DESTINATION + DESTINATION_FILE_NAME);
-            return gson.fromJson(reader, listType);
+            return (new Gson()).fromJson(reader, listType);
         } catch (IOException e) {
             throw new IOException("Could not read JavaDoc strings from file at " + System.getProperty("user.dir") + DESTINATION + DESTINATION_FILE_NAME, e);
         }

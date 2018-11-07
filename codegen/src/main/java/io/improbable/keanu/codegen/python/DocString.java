@@ -29,7 +29,7 @@ class DocString {
         stringBuilder.append(THREE_QUOTES);
         stringBuilder.append(NEW_LINE_TAB);
         stringBuilder.append(comment.replaceAll("\n ", NEW_LINE_TAB));
-        stringBuilder.append("\n");
+        stringBuilder.append(NEW_LINE_TAB);
         for (String param : params.keySet()) {
             stringBuilder.append(NEW_LINE_TAB);
             stringBuilder.append(":param ");
@@ -39,7 +39,6 @@ class DocString {
         }
         stringBuilder.append(NEW_LINE_TAB);
         stringBuilder.append(THREE_QUOTES);
-        stringBuilder.append(NEW_LINE_TAB);
         return stringBuilder.toString();
     }
 }
