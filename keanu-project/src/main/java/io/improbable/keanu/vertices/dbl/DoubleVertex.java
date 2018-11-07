@@ -1,8 +1,10 @@
 package io.improbable.keanu.vertices.dbl;
 
 
+import com.google.common.primitives.Doubles;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -341,21 +343,8 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         if (valueBuf.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
             throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
         } else {
-            setValue(valueBuf.getDoubleVal());
+            setValue(DoubleTensor.create(Doubles.toArray(valueBuf.getDoubleVal().getValuesList())));
         }
-    }
-
-    @Override
-    public KeanuSavedBayesNet.StoredValue getValueAsProtoBuf() {
-        KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
-            .setDoubleVal(getValue(0)) //TODO - Need to deal with tensors - oneofs don't interact well with repeated
-                                               //also - how will this interact with the shape layer?
-            .build();
-
-         return KeanuSavedBayesNet.StoredValue.newBuilder()
-             .setId(getId().toProtoBuf())
-             .setValue(value)
-            .build();
     }
 
     @Override
@@ -364,5 +353,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
             this,
             PartialDerivatives.withRespectToSelf(this.getId(), this.getShape())
         );
+    }
+
+    @Override
+    public void saveValue(NetworkWriter protobufWriter) {
+        protobufWriter.saveValue(this);
     }
 }

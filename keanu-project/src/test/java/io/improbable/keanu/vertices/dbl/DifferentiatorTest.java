@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -133,7 +133,7 @@ public class DifferentiatorTest {
         DoubleVertex G = E.log();
         DoubleVertex F = D.plus(B);
 
-        BoolVertex predicate = ConstantVertex.of(BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2}));
+        BoolVertex predicate = ConstantVertexFactory.of(BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2}));
         DoubleVertex H = If.isTrue(predicate).then(G).orElse(F);
 
         PartialDerivatives dH = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));

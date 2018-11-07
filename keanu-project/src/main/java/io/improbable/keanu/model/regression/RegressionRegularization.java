@@ -4,7 +4,7 @@ import io.improbable.keanu.model.MAPModelFitter;
 import io.improbable.keanu.model.MaximumLikelihoodModelFitter;
 import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.model.ModelGraph;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 public enum RegressionRegularization {
     NONE {
         public DoubleVertex getWeightsVertex(long featureCount,  double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new GaussianVertex(new long[]{1, featureCount}, ConstantVertex.of(DEFAULT_MU), ConstantVertex.of(DEFAULT_SCALE_PARAMETER));
+            return new GaussianVertex(new long[]{1, featureCount}, ConstantVertexFactory.of(DEFAULT_MU), ConstantVertexFactory.of(DEFAULT_SCALE_PARAMETER));
         }
         public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
             return new GaussianVertex(DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
@@ -23,7 +23,7 @@ public enum RegressionRegularization {
     },
     LASSO {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new LaplaceVertex(new long[]{1, featureCount}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnInterceptScaleParameter));
+            return new LaplaceVertex(new long[]{1, featureCount}, ConstantVertexFactory.of(priorOnWeightsMeans), ConstantVertexFactory.of(priorOnInterceptScaleParameter));
         }
         public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
             return new LaplaceVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
@@ -34,7 +34,7 @@ public enum RegressionRegularization {
     },
     RIDGE {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new GaussianVertex(new long[]{1, featureCount}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnInterceptScaleParameter));
+            return new GaussianVertex(new long[]{1, featureCount}, ConstantVertexFactory.of(priorOnWeightsMeans), ConstantVertexFactory.of(priorOnInterceptScaleParameter));
         }
         public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
             return new GaussianVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);

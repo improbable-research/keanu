@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Before;
@@ -22,7 +22,7 @@ public class ReduceVertexTest {
     @Before
     public void prepare() {
         for (double i = minValue; i <= maxValue; i++) {
-            DoubleVertex v = ConstantVertex.of(i);
+            DoubleVertex v = ConstantVertexFactory.of(i);
             verts.add(v);
             total += i;
         }

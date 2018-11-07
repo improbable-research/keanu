@@ -3,7 +3,7 @@ package io.improbable.keanu.model.regression;
 import io.improbable.keanu.model.Model;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -44,7 +44,7 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
     static Function<DoubleVertex, LinearRegressionGraph.OutputVertices<BooleanTensor>> logisticOutputTransform() {
         return probabilities -> {
             DoubleVertex sigmoid = probabilities.sigmoid();
-            return new LinearRegressionGraph.OutputVertices<>(sigmoid.greaterThan(ConstantVertex.of(0.5)), new BernoulliVertex(sigmoid));
+            return new LinearRegressionGraph.OutputVertices<>(sigmoid.greaterThan(ConstantVertexFactory.of(0.5)), new BernoulliVertex(sigmoid));
         };
     }
 

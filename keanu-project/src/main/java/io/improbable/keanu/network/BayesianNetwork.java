@@ -1,20 +1,15 @@
 package io.improbable.keanu.network;
 
 import com.google.common.collect.ImmutableList;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +57,7 @@ public class BayesianNetwork {
     List<? extends Vertex> getVertices() {
         return vertices;
     }
+
 
     private interface VertexFilter {
         boolean filter(boolean isProbabilistic, boolean isObserved, int indentation);
@@ -210,78 +206,15 @@ public class BayesianNetwork {
         indentation++;
     }
 
-    public void saveNetwork(OutputStream output, boolean saveValues) throws IOException {
-        List<KeanuSavedBayesNet.Vertex> protoBufs = vertices.stream()
-            .map(Vertex::toProtoBuf)
-            .collect(Collectors.toList());
-
-        KeanuSavedBayesNet.BayesianNetwork.Builder bayesNetBuilder = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
-            .addAllVertices(protoBufs);
-
-        if (saveValues) {
-            bayesNetBuilder.addAllDefaultState(getVertexValues());
+    public void save(NetworkWriter protobufWriter) throws IOException {
+        for (Vertex vertex : TopologicalSort.sort(vertices)) {
+            vertex.save(protobufWriter);
         }
-
-        bayesNetBuilder.build().writeTo(output);
     }
 
-    private List<KeanuSavedBayesNet.StoredValue> getVertexValues() {
-        return vertices.stream()
-            .filter(Vertex::hasValue)
-            .map(Vertex::getValueAsProtoBuf)
-            .collect(Collectors.toList());
-    }
-
-    public static BayesianNetwork loadNetwork(InputStream input) throws IOException {
-        Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
-        KeanuSavedBayesNet.BayesianNetwork parsedNet = KeanuSavedBayesNet.BayesianNetwork.parseFrom(input);
-        List<KeanuSavedBayesNet.Vertex> sortedVertexList = new ArrayList<>(parsedNet.getVerticesList());
-        sortedVertexList.sort(BayesianNetwork::compareIDs);
-
-        for (KeanuSavedBayesNet.Vertex vertex : sortedVertexList) {
-            Vertex newVertex = Vertex.fromProtoBuf(vertex, instantiatedVertices);
-            instantiatedVertices.put(vertex.getId(), newVertex);
-        }
-
-        BayesianNetwork bayesNet = new BayesianNetwork(instantiatedVertices.values());
-
-        loadDefaultValues(parsedNet, instantiatedVertices, bayesNet);
-
-        return bayesNet;
-    }
-
-    private static int compareIDs(KeanuSavedBayesNet.Vertex v1, KeanuSavedBayesNet.Vertex v2) {
-        VertexId vID1 = new VertexId(v1.getId().getIdValuesList());
-        VertexId vID2 = new VertexId(v2.getId().getIdValuesList());
-
-        return vID1.compareTo(vID2);
-    }
-
-    private static void loadDefaultValues(KeanuSavedBayesNet.BayesianNetwork parsedNet,
-                                          Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices,
-                                          BayesianNetwork bayesNet) {
-        for (KeanuSavedBayesNet.StoredValue value : parsedNet.getDefaultStateList()) {
-            Vertex targetVertex = null;
-
-            if (value.hasId()) {
-                targetVertex = instantiatedVertices.get(value.getId());
-            }
-
-            if (value.getVertexLabel() != "") {
-                Vertex newTarget = bayesNet.getVertexByLabel(new VertexLabel(value.getVertexLabel()));
-
-                if (targetVertex != null && newTarget != targetVertex) {
-                    throw new IllegalArgumentException("Label and VertexID don't refer to same Vertex");
-                } else {
-                    targetVertex = newTarget;
-                }
-            }
-
-            if (targetVertex == null) {
-                throw new IllegalArgumentException("Value specified for unknown Vertex");
-            }
-
-            targetVertex.setValue(value.getValue());
+    public void saveValues(ProtobufWriter protobufWriter) throws IOException {
+        for (Vertex vertex : vertices) {
+            vertex.saveValue(protobufWriter);
         }
     }
 }

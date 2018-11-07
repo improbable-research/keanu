@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -142,8 +142,8 @@ public class GammaVertexTest {
         int sampleCount = 1000000;
         GammaVertex vertex = new GammaVertex(
             new long[]{sampleCount, 1},
-            ConstantVertex.of(2.0),
-            ConstantVertex.of(7.5)
+            ConstantVertexFactory.of(2.0),
+            ConstantVertexFactory.of(7.5)
         );
 
         double from = 1.5;
@@ -159,8 +159,8 @@ public class GammaVertexTest {
         double trueTheta = 2.0;
         double trueK = 3.0;
 
-        DoubleVertex constTheta = ConstantVertex.of(trueTheta);
-        DoubleVertex constK = ConstantVertex.of(trueK);
+        DoubleVertex constTheta = ConstantVertexFactory.of(trueTheta);
+        DoubleVertex constK = ConstantVertexFactory.of(trueK);
 
         List<DoubleVertex> thetaK = new ArrayList<>();
         thetaK.add(constTheta);

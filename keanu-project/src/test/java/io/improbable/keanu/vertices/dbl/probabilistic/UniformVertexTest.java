@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,7 +70,7 @@ public class UniformVertexTest {
 
     @Test
     public void uniformSampleMethodMatchesLogProbMethod() {
-        UniformVertex testUniformVertex = new UniformVertex(new long[] {1, N}, ConstantVertex.of(lowerBound), ConstantVertex.of(upperBound));
+        UniformVertex testUniformVertex = new UniformVertex(new long[] {1, N}, ConstantVertexFactory.of(lowerBound), ConstantVertexFactory.of(upperBound));
         ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(testUniformVertex, lowerBound, upperBound - 1, 0.5, 1e-2, random);
     }
 }
