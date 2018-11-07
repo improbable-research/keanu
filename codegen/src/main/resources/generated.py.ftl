@@ -14,5 +14,6 @@ java_import(context.jvm_view(), "${import.packageName}")
 
 
 def ${constructor.pythonClass}(${constructor.pythonParameters}) -> context.jvm_view().${constructor.javaClass}:
-    ${constructor.docString}return Vertex(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters})
+    ${constructor.docString}
+    return Vertex(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters})
 </#list>
