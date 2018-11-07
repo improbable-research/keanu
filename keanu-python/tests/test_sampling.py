@@ -3,7 +3,7 @@ import pytest
 from py4j.java_gateway import java_import
 from examples import Thermometer
 from keanu.vertex import Gamma, Exponential, Cauchy
-from keanu.algorithm import sample, iterate_samples
+from keanu.algorithm import sample, generate_samples
 from keanu import BayesNet, KeanuRandom
 from collections import defaultdict
 from itertools import islice
