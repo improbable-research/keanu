@@ -519,9 +519,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public String toString() {
-        return "ScalarIntegerTensor{" +
-            "value=" + value +
-            '}';
+        return String.format("[[%d]]", value);
     }
 
     private static class SimpleIntegerFlattenedView implements FlattenedView<Integer> {
