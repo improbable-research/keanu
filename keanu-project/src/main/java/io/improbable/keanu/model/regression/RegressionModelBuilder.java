@@ -27,8 +27,8 @@ public class RegressionModelBuilder<OUTPUT> {
     private OUTPUT outputTrainingData;
     private Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
     private PosteriorSamplingAlgorithm samplingAlgorithm = null;
-    private int samplingCount = 10000;
-    private int dropCount = 0;
+    private int samplingCount;
+    private int dropCount;
 
     public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
         this.inputTrainingData = inputTrainingData;
