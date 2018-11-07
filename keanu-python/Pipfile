@@ -8,10 +8,10 @@ name = "pypi"
 numpy = "*"
 keanu = {editable = true, path = "."}
 pandas = "*"
-sphinx = "*"
 
 [dev-packages]
 pytest = "*"
+sphinx = "*"
 
 [requires]
 python_version = "3.6"
