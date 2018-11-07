@@ -13,9 +13,8 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ConstantDoubleVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
@@ -65,8 +64,8 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     }
 
     @Override
-    public List<KeanuSavedBayesNet.NamedParent> getParentsAsProto() {
-        return new ArrayList<>();
+    public Map<String, Vertex> getParentsMap() {
+        return new HashMap<>();
     }
 
     public DoubleTensor calculate() {
@@ -74,7 +73,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     }
 
     @Override
-    public void save(NetworkWriter protobufWriter) {
-        protobufWriter.save(this);
+    public void save(NetworkWriter netWriter) {
+        netWriter.save(this);
     }
 }

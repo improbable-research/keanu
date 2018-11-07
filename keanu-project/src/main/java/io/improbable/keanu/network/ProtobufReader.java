@@ -11,6 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProtobufReader {
+
+    public ProtobufReader() {
+
+    }
+
     public static BayesianNetwork loadNetwork(InputStream input) throws IOException {
         Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
         KeanuSavedBayesNet.BayesianNetwork parsedNet = KeanuSavedBayesNet.BayesianNetwork.parseFrom(input);

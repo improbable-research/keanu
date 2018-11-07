@@ -7,11 +7,11 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -258,17 +258,17 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         return stringBuilder.toString();
     }
 
-    public void save(NetworkWriter protobufWriter) {
-        protobufWriter.save(this);
+    public void save(NetworkWriter netWriter) {
+        netWriter.save(this);
     }
 
-    public void saveValue(NetworkWriter protobufWriter) {
+    public void saveValue(NetworkWriter netWriter) {
         //TODO - Make this abstract after we've implemented every type
-        protobufWriter.saveValue(this);
+        netWriter.saveValue(this);
     }
 
-    public List<KeanuSavedBayesNet.NamedParent> getParentsAsProto() {
+    public Map<String, Vertex> getParentsMap() {
         //TODO - Make this abstract once all Vertices have this
-        return new ArrayList<>();
+        return new HashMap<>();
     }
 }

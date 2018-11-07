@@ -5,10 +5,10 @@ import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 public class ProtobufWriter implements NetworkWriter {
     private final BayesianNetwork net;
@@ -33,7 +33,6 @@ public class ProtobufWriter implements NetworkWriter {
 
     public void save(Vertex vertex) {
         KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
-        vertexBuilder.addAllParents(vertex.getParentsAsProto());
         bayesNetBuilder.addVertices(vertexBuilder.build());
     }
 
@@ -52,8 +51,24 @@ public class ProtobufWriter implements NetworkWriter {
 
         vertexBuilder = vertexBuilder.setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()));
         vertexBuilder = vertexBuilder.setVertexType(vertex.getClass().getCanonicalName());
+        saveParents(vertexBuilder, vertex);
 
         return vertexBuilder;
+    }
+
+    private void saveParents(KeanuSavedBayesNet.Vertex.Builder vertexBuilder,
+                             Vertex vertex) {
+        Map<String, Vertex> parentsMap = vertex.getParentsMap();
+
+        for (Map.Entry<String, Vertex> parent : parentsMap.entrySet()) {
+            vertexBuilder.addParents(
+                KeanuSavedBayesNet.NamedParent.newBuilder()
+                    .setName(parent.getKey())
+                    .setId(KeanuSavedBayesNet.VertexID.newBuilder()
+                        .setId(parent.getValue().getId().toString())
+                    )
+            );
+        }
     }
 
     public void saveValue(Vertex vertex) {

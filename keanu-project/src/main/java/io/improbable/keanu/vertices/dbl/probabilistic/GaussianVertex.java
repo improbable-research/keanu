@@ -5,7 +5,6 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.network.NetworkWriter;
-import io.improbable.keanu.network.ProtobufWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
@@ -14,9 +13,8 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -139,22 +137,16 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
     }
 
     @Override
-    public List<KeanuSavedBayesNet.NamedParent> getParentsAsProto() {
-        KeanuSavedBayesNet.NamedParent parents[] = new KeanuSavedBayesNet.NamedParent[2];
-        parents[0] = KeanuSavedBayesNet.NamedParent.newBuilder()
-            .setName(MU_NAME)
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(mu.getId().toString()))
-            .build();
-        parents[1] = KeanuSavedBayesNet.NamedParent.newBuilder()
-            .setName(SIGMA_NAME)
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(sigma.getId().toString()))
-            .build();
+    public Map<String, Vertex> getParentsMap() {
+        Map<String, Vertex> parentsMap = new LinkedHashMap<>();
+        parentsMap.put(MU_NAME, mu);
+        parentsMap.put(SIGMA_NAME, sigma);
 
-        return Arrays.asList(parents);
+        return parentsMap;
     }
 
     @Override
-    public void save(NetworkWriter protobufWriter) {
-        protobufWriter.save(this);
+    public void save(NetworkWriter netWriter) {
+        netWriter.save(this);
     }
 }
