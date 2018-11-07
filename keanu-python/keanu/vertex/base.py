@@ -6,7 +6,9 @@ import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
-from keanu.vartypes import primitive_types, const_arg_types
+from keanu.vartypes import primitive_types, const_arg_types, numpy_types
+from typing import Union, List
+from py4j.java_gateway import JavaObject
 
 k = KeanuContext()
 
@@ -115,7 +117,7 @@ class VertexOps:
 
 
 class Vertex(JavaObjectWrapper, VertexOps):
-    def __init__(self, val, *args):
+    def __init__(self, val, *args) -> None:
         if args:
             ctor = val
             val = ctor(*(Vertex.__parse_args(args)))
@@ -134,7 +136,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def set_and_cascade(self, v):
         self.unwrap().setAndCascade(Tensor(v).unwrap())
 
-    def sample(self):
+    def sample(self) -> Union[numpy_types]:
         return Tensor._to_ndarray(self.unwrap().sample())
 
     def get_value(self):
@@ -147,13 +149,13 @@ class Vertex(JavaObjectWrapper, VertexOps):
         return Vertex._get_python_id(self.unwrap())
 
     @staticmethod
-    def __parse_args(args):
+    def __parse_args(args) -> List[JavaObject]:
         return list(map(Vertex.__parse_arg, args))
 
     @staticmethod
-    def __parse_arg(arg):
+    def __parse_arg(arg) -> JavaObject:
         if isinstance(arg, const_arg_types):
-            return kn.vertex.const.Const(arg).unwrap()
+            return kn.vertex.const.Const(arg).unwrap() # type: ignore
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()
         elif isinstance(arg, collections.Iterable) and all(isinstance(x, primitive_types) for x in arg):

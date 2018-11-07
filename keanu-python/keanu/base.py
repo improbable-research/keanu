@@ -1,8 +1,9 @@
 import logging
 from .case_conversion import _to_camel_case_name, _to_snake_case_name
+from py4j.java_gateway import JavaObject
 
 class JavaObjectWrapper:
-    def __init__(self, val):
+    def __init__(self, val) -> None:
         self._val = val
         self._class = self.unwrap().getClass().getSimpleName()
 
@@ -22,5 +23,5 @@ class JavaObjectWrapper:
         logging.warning("\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
         return self.unwrap().__getattr__(java_name)
 
-    def unwrap(self):
+    def unwrap(self) -> JavaObject:
         return self._val
