@@ -80,9 +80,9 @@ class VertexProcessor {
 
     private static String toPythonParam(Class<?> parameterType) {
         if (Vertex.class.isAssignableFrom(parameterType) || Tensor.class.isAssignableFrom(parameterType)) {
-            return "const_arg_types";
+            return "mypy_vertex_arg_types";
         } else if (parameterType.isArray()) {
-            return "shape_types";
+            return "mypy_shape_types";
         } else {
             throw new NotImplementedException(String.format("Mapping from Java type %s is not defined.", parameterType.getName()));
         }

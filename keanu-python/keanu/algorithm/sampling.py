@@ -2,6 +2,7 @@ from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
+from typing import Any
 
 k = KeanuContext()
 
@@ -13,7 +14,7 @@ algorithms = {'metropolis': k.jvm_view().MetropolisHastings,
               'NUTS': k.jvm_view().NUTS,
               'hamiltonian': k.jvm_view().Hamiltonian}
 
-def sample(net, sample_from, algo='metropolis', draws=500, drop=0, down_sample_interval=1):
+def sample(net : Any, sample_from : Any, algo : Any='metropolis', draws : Any=500, drop : Any=0, down_sample_interval : Any=1) -> Any:
     vertices_unwrapped = k.to_java_object_list(sample_from)
 
     network_samples = algorithms[algo].withDefaultConfig().getPosteriorSamples(net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)

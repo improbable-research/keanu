@@ -3,9 +3,10 @@ import pytest
 from keanu.vertex import Gamma, Exponential, Cauchy
 from keanu.algorithm import sample
 from keanu import BayesNet
+from typing import Any
 
 @pytest.fixture
-def net():
+def net() -> Any:
     gamma = Gamma(1., 1.)
     exp = Exponential(1.)
     cauchy = Cauchy(gamma, exp)
@@ -17,7 +18,7 @@ def net():
     ("NUTS"),
     ("hamiltonian")
 ])
-def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo, net):
+def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo : Any, net : Any) -> Any:
     draws = 5
     sample_from = list(net.get_latent_vertices())
     vertex_ids = [vertex.get_id() for vertex in sample_from]
@@ -35,7 +36,7 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(a
         assert all(type(sample) == np.ndarray for sample in vertex_samples)
 
 
-def test_dropping_samples(net):
+def test_dropping_samples(net : Any) -> Any:
     draws = 10
     drop = 3
 
@@ -45,7 +46,7 @@ def test_dropping_samples(net):
     assert all(len(vertex_samples) == expected_num_samples for vertex_id, vertex_samples in samples.items())
 
 
-def test_down_sample_interval(net):
+def test_down_sample_interval(net : Any) -> Any:
     draws = 10
     down_sample_interval = 2
 

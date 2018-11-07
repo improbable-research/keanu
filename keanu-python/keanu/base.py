@@ -1,16 +1,17 @@
 import logging
 from .case_conversion import _to_camel_case_name, _to_snake_case_name
 from py4j.java_gateway import JavaObject
+from typing import Any
 
 class JavaObjectWrapper:
-    def __init__(self, val) -> None:
+    def __init__(self, val : Any) -> None:
         self._val = val
         self._class = self.unwrap().getClass().getSimpleName()
 
-    def __repr__(self):
+    def __repr__(self) -> Any:
         return "[{0} => {1}]".format(self._class, type(self))
 
-    def __getattr__(self, k):
+    def __getattr__(self, k : Any) -> Any:
         python_name = _to_snake_case_name(k)
 
         if k != python_name:

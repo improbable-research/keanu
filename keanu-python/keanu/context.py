@@ -12,7 +12,7 @@ ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
 class Singleton(type):
     _instances = {} # type: Dict[KeanuContext, KeanuContext]
 
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls : Any, *args : Any, **kwargs : Any) -> Any:
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
@@ -60,7 +60,7 @@ class KeanuContext(metaclass=Singleton):
     def jvm_view(self) -> JVMView:
         return self.__jvm_view
 
-    def to_java_object_list(self, l):
+    def to_java_object_list(self, l : Any) -> Any:
         lst = self._gateway.jvm.java.util.ArrayList()
 
         for o in l:
@@ -68,7 +68,7 @@ class KeanuContext(metaclass=Singleton):
 
         return lst
 
-    def to_java_array(self, l, klass=None) -> JavaObject:
+    def to_java_array(self, l : Any, klass : Any=None) -> JavaObject:
         if klass is None:
             klass = self.__infer_class_from_array(l)
         array = self._gateway.new_array(klass, len(l))
@@ -78,10 +78,10 @@ class KeanuContext(metaclass=Singleton):
 
         return array
 
-    def to_java_long_array(self, l) -> JavaObject:
+    def to_java_long_array(self, l : Any) -> JavaObject:
         return self.to_java_array(l, self._gateway.jvm.long)
 
-    def __infer_class_from_array(self, l) -> Any:
+    def __infer_class_from_array(self, l : Any) -> Any:
         if len(l) == 0:
             raise ValueError("Cannot infer type because array is empty")
 
