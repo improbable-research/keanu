@@ -26,11 +26,11 @@ public class NonGradientOptimizerTest {
     @Test
     public void canFindMAPGivenBounds() {
 
-        DoubleVertex A = new GaussianVertex(new long[]{1, 2}, ConstantVertex.of(new double[]{1, -3}), 1);
+        DoubleVertex A = new GaussianVertex(new long[]{2}, ConstantVertex.of(new double[]{1, -3}), 1);
         A.setValue(new double[]{0, 0});
 
         OptimizerBounds bounds = new OptimizerBounds();
-        bounds.addBound(A, DoubleTensor.create(new double[]{-1, -2}), 0.9);
+        bounds.addBound(A, DoubleTensor.create(-1, -2), 0.9);
 
         NonGradientOptimizer optimizer = NonGradientOptimizer.builder()
             .boundsRange(10)

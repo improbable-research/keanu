@@ -33,8 +33,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape desired shape of tensor
      */
     public SimpleBooleanTensor(boolean[] data, long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
-        this.data = new boolean[checkedCast(TensorShape.getLength(shape))];
+        this.data = new boolean[data.length];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -53,7 +52,6 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape shape to use as place holder
      */
     public SimpleBooleanTensor(long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -64,8 +62,8 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape    desired shape of tensor
      */
     public SimpleBooleanTensor(boolean constant, long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
-        this.data = new boolean[(int) TensorShape.getLength(shape)];
+        int dataLength = shape.length > 0 ? (int) TensorShape.getLength(shape) : 1;
+        this.data = new boolean[dataLength];
         Arrays.fill(this.data, constant);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);

@@ -31,7 +31,7 @@ class ApacheMathSimpleBoundsCalculator {
                 validateBoundsForVertex(vertex);
                 addBoundsForVertex(vertex, minBounds, maxBounds);
             } else {
-                int length = (int) TensorShape.getLength(vertex.getShape());
+                int length = Math.max(1, (int) TensorShape.getLength(vertex.getShape()));
                 int startIndex = minBounds.size();
                 for (int i = 0; i < length; i++) {
                     minBounds.add(startPoint[i + startIndex] - boundsRange);

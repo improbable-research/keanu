@@ -1,8 +1,10 @@
 package io.improbable.keanu.distributions.continuous;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.nd4j.linalg.util.ArrayUtil;
@@ -40,7 +42,7 @@ public class Gamma implements ContinuousDistribution {
         Tensor.FlattenedView<Double> thetaWrapped = theta.getFlattenedView();
         Tensor.FlattenedView<Double> kWrapped = k.getFlattenedView();
 
-        int length = ArrayUtil.prod(shape);
+        int length = Ints.checkedCast(TensorShape.getLength(shape));
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
             samples[i] = sample(thetaWrapped.getOrScalar(i), kWrapped.getOrScalar(i), random);

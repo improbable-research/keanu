@@ -69,8 +69,8 @@ public interface Tensor<T> {
         return BooleanTensor.create(equality, Arrays.copyOf(shape, shape.length));
     }
 
-    long[] SCALAR_SHAPE = new long[]{1, 1};
-    long[] SCALAR_STRIDE = new long[]{1};
+    long[] SCALAR_SHAPE = new long[]{};
+    long[] SCALAR_STRIDE = new long[]{};
 
     int getRank();
 

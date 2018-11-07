@@ -64,17 +64,17 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
-    public void youCannotCreateARankZeroTensor() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Tensors must have rank >=2 : []");
-        DoubleTensor.create(new double[]{}, new long[]{});
+    public void youCanCreateARankZeroTensor() {
+        DoubleTensor scalar = DoubleTensor.create(new double[]{2.0}, new long[]{});
+        DoubleTensor expected = DoubleTensor.scalar(2.0);
+        assertEquals(expected, scalar);
+        assertEquals(0, scalar.getShape().length);
     }
 
     @Test
-    public void youCannotCreateARankOneTensor() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Tensors must have rank >=2 : [5]");
-        DoubleTensor.create(new double[]{1, 2, 3, 4, 5}, new long[]{5});
+    public void youCanCreateARankOneTensor() {
+        DoubleTensor vector = DoubleTensor.create(new double[]{1, 2, 3, 4, 5}, new long[]{5});
+        assertArrayEquals(new long[]{5}, vector.getShape());
     }
 
     @Test
@@ -350,35 +350,38 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canLinSpace() {
         DoubleTensor actual = DoubleTensor.linspace(0, 10, 5);
-        DoubleTensor expected = DoubleTensor.create(new double[]{0, 2.5, 5.0, 7.5, 10.0});
+        DoubleTensor expected = DoubleTensor.create(0, 2.5, 5.0, 7.5, 10.0);
         assertEquals(expected, actual);
+        assertEquals(1, actual.getRank());
     }
 
     @Test
     public void canARange() {
         DoubleTensor actual = DoubleTensor.arange(0, 5);
-        DoubleTensor expected = DoubleTensor.create(new double[]{0, 1, 2, 3, 4});
+        DoubleTensor expected = DoubleTensor.create(0, 1, 2, 3, 4);
         assertEquals(expected, actual);
+        assertEquals(1, actual.getRank());
     }
 
     @Test
     public void canARangeWithStep() {
         DoubleTensor actual = DoubleTensor.arange(3, 7, 2);
-        DoubleTensor expected = DoubleTensor.create(new double[]{3, 5});
+        DoubleTensor expected = DoubleTensor.create(3, 5);
         assertEquals(expected, actual);
+        assertEquals(1, actual.getRank());
     }
 
     @Test
     public void canARangeWithFractionStep() {
         DoubleTensor actual = DoubleTensor.arange(3, 7, 0.5);
-        DoubleTensor expected = DoubleTensor.create(new double[]{3, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5});
+        DoubleTensor expected = DoubleTensor.create(3, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5);
         assertEquals(expected, actual);
     }
 
     @Test
     public void canARangeWithFractionStepThatIsNotEvenlyDivisible() {
         DoubleTensor actual = DoubleTensor.arange(3, 7, 1.5);
-        DoubleTensor expected = DoubleTensor.create(new double[]{3.0, 4.5, 6.0});
+        DoubleTensor expected = DoubleTensor.create(3.0, 4.5, 6.0);
         assertEquals(expected, actual);
     }
 
@@ -662,7 +665,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor tensorRow = DoubleTensor.create(1, 3, 4, 5, 2);
 
         assertEquals(3, tensorRow.argMax());
-        assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(1, 5)));
+        assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
         assertThat(tensorRow.argMax(1), isScalarWithValue(3));
     }
 
@@ -842,6 +845,33 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor differentValue = DoubleTensor.create(1.);
         BooleanTensor result = value.elementwiseEquals(differentValue);
         assertThat(result, hasValue(true, false, false));
+    }
+
+    @Test
+    public void canSumOverSpecifiedDimensionOfRank3() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
+        DoubleTensor summation = x.sum(2);
+        DoubleTensor expected = DoubleTensor.create(new double[]{3, 7, 11, 15}, new long[]{2, 2});
+        assertThat(summation, equalTo(expected));
+        assertThat(summation.getShape(), equalTo(expected.getShape()));
+    }
+
+    @Test
+    public void canSumOverSpecifiedDimensionOfMatrix() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor summationRow = x.sum(1);
+        DoubleTensor expected = DoubleTensor.create(3, 7);
+        assertThat(summationRow, equalTo(expected));
+        assertThat(summationRow.getShape(), equalTo(expected.getShape()));
+    }
+
+    @Test
+    public void canSumOverSpecifiedDimensionOfVector() {
+        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4);
+        DoubleTensor summation = x.sum(0);
+        DoubleTensor expected = DoubleTensor.scalar(10);
+        assertThat(summation, equalTo(expected));
+        assertThat(summation.getShape(), equalTo(expected.getShape()));
     }
 
 }

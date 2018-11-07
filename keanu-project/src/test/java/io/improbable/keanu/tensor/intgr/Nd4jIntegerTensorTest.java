@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.intgr;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+import junit.framework.TestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,16 +28,16 @@ public class Nd4jIntegerTensorTest {
 
     @Test
     public void youCannotCreateARankZeroTensor() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Tensors must have rank >=2 : []");
-        IntegerTensor.create(new int[] {}, new long[] {});
+        IntegerTensor scalar = IntegerTensor.create(new int[]{2}, new long[]{});
+        assertEquals(2, (int) scalar.scalar());
+        TestCase.assertEquals(0, scalar.getRank());
     }
 
     @Test
     public void youCannotCreateARankOneTensor() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Tensors must have rank >=2 : [5]");
-        IntegerTensor.create(new int[] {1, 2, 3, 4, 5}, new long[] {5});
+        IntegerTensor vector = IntegerTensor.create(new int[]{1, 2, 3, 4, 5}, new long[]{5});
+        assertEquals(4, (int) vector.getValue(3));
+        TestCase.assertEquals(1, vector.getRank());
     }
 
     @Test
@@ -388,7 +389,7 @@ public class Nd4jIntegerTensorTest {
     public void canElementwiseEqualsAScalarValue() {
         int value = 42;
         int otherValue = 43;
-        IntegerTensor allTheSame = IntegerTensor.create(value, new long[] {2, 3});
+        IntegerTensor allTheSame = IntegerTensor.create(value, new long[]{2, 3});
         IntegerTensor notAllTheSame = allTheSame.duplicate().setValue(otherValue, 1, 1);
 
         assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));

@@ -209,7 +209,7 @@ public class BoolVertexTest {
         BoolVertex flip = new BernoulliVertex(0.5);
         boolean[] values = new boolean[]{true, false, true};
         flip.setAndCascade(values);
-        assertEquals(true, flip.take(0, 0).getValue().scalar());
+        assertEquals(true, flip.take(0).getValue().scalar());
     }
 
     @Test

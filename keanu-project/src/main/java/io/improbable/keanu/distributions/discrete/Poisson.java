@@ -1,7 +1,9 @@
 package io.improbable.keanu.distributions.discrete;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -29,7 +31,7 @@ public class Poisson implements DiscreteDistribution {
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
 
-        int length = ArrayUtil.prod(shape);
+        int length = Ints.checkedCast(TensorShape.getLength(shape));
         int[] samples = new int[length];
         for (int i = 0; i < length; i++) {
             samples[i] = sample(muWrapped.getOrScalar(i), random);

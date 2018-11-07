@@ -25,7 +25,7 @@ public class MatrixInverseVertexTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsNonMatrix() {
-        DoubleTensor tensor = DoubleTensor.arange(1,9).reshape(2, 2, 2);
+        DoubleTensor tensor = DoubleTensor.arange(1, 9).reshape(2, 2, 2);
 
         shouldReject(tensor);
     }
@@ -37,7 +37,7 @@ public class MatrixInverseVertexTest {
 
     @Test
     public void canTakeInverseCorrectly() {
-        DoubleTensor matrix = DoubleTensor.arange(1,5).reshape(2, 2);
+        DoubleTensor matrix = DoubleTensor.arange(1, 5).reshape(2, 2);
         DoubleVertex inputVertex = new ConstantDoubleVertex(matrix);
         DoubleVertex inverseVertex = inputVertex.matrixInverse();
 
@@ -60,14 +60,14 @@ public class MatrixInverseVertexTest {
         DoubleTensor reverseInverseWrtMatrix = Differentiator.reverseModeAutoDiff(inverse, matrix).withRespectTo(matrix);
 
         DoubleTensor expectedInverseWrtMatrix = DoubleTensor.create(new double[]{
-            -4.0, 3.0,
-            2.0, -1.5,
-            2.0, -1.0,
-            -1.0, 0.5,
-            3.0, -2.25,
-            -1.0, 0.75,
-            -1.5, 0.75,
-            0.5, -0.25},
+                -4.0, 3.0,
+                2.0, -1.5,
+                2.0, -1.0,
+                -1.0, 0.5,
+                3.0, -2.25,
+                -1.0, 0.75,
+                -1.5, 0.75,
+                0.5, -0.25},
             new long[]{2, 2, 2, 2}
         );
 
@@ -98,7 +98,7 @@ public class MatrixInverseVertexTest {
 
     @Test
     public void scalarTensorsInvertCorrectly() {
-        DoubleTensor oneByOneMatrix = new ScalarDoubleTensor(2.0);
+        DoubleTensor oneByOneMatrix = new ScalarDoubleTensor(2.0).reshape(1, 1);
         DoubleVertex input = new ConstantDoubleVertex(oneByOneMatrix);
         DoubleVertex inverse = input.matrixInverse();
 

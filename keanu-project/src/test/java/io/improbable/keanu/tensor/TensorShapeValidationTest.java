@@ -27,7 +27,7 @@ public class TensorShapeValidationTest {
     @Test
     public void suggestScalar() {
         long[] shapeProposal = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(scalar1, scalar2);
-        assertArrayEquals(new long[]{1, 1}, shapeProposal);
+        assertArrayEquals(Tensor.SCALAR_SHAPE, shapeProposal);
     }
 
     @Test(expected = IllegalArgumentException.class)

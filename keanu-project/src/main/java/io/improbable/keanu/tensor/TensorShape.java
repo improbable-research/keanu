@@ -42,7 +42,7 @@ public class TensorShape {
      */
     public static long getLength(long[] shape) {
         if (shape.length == 0) {
-            return 0;
+            return 1;
         } else {
             long length = 1;
             for (long dim : shape) {
@@ -60,6 +60,11 @@ public class TensorShape {
      */
     public static long[] getRowFirstStride(long[] shape) {
         long[] stride = new long[shape.length];
+
+        if (shape.length == 0) {
+            return stride;
+        }
+
         stride[stride.length - 1] = 1;
 
         int buffer = 1;
@@ -114,7 +119,7 @@ public class TensorShape {
     }
 
     public static boolean isScalar(long[] shape) {
-        return getLength(shape) == 1;
+        return shape.length == 0 || getLength(shape) == 1;
     }
 
     public static long[] concat(long[] shape1, long[] shape2) {
@@ -156,7 +161,7 @@ public class TensorShape {
 
         return newShape;
     }
-    
+
     public static long[] shapeDesiredToRankByAppendingOnes(long[] lowRankTensorShape, int desiredRank) {
         return increaseRankByPaddingValue(lowRankTensorShape, desiredRank, true);
     }
@@ -198,13 +203,13 @@ public class TensorShape {
     public static long[] removeDimensionSafe(int dimension, long[] shape) {
         TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
 
-        if (shape.length == 1) {
-            return new long[]{1, shape[0]};
-        }
-
-        if (shape.length == 2) {
-            return new long[]{1, dimension == 1 ? shape[0] : shape[1]};
-        }
+//        if (shape.length == 1) {
+//            return new long[]{1, shape[0]};
+//        }
+//
+//        if (shape.length == 2) {
+//            return new long[]{1, dimension == 1 ? shape[0] : shape[1]};
+//        }
 
         return ArrayUtils.remove(shape, dimension);
     }

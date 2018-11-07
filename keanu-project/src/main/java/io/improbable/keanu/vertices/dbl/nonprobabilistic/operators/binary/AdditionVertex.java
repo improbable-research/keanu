@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -29,7 +30,11 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
 
     @Override
     protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
-        return dLeftWrtInputs.add(dRightWrtInputs, this.getShape());
+        return dLeftWrtInputs.add(dRightWrtInputs,
+            TensorShape.isScalar(left.getShape()),
+            TensorShape.isScalar(right.getShape()),
+            this.getShape()
+        );
     }
 
     @Override

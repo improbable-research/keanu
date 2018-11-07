@@ -34,11 +34,13 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     private INDArray tensor;
 
     public Nd4jIntegerTensor(int[] data, long[] shape) {
-        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
+        this(TypedINDArrayFactory.create(
+            Arrays.stream(data).asDoubleStream().toArray(),
+            shape, BUFFER_TYPE)
+        );
     }
 
     public Nd4jIntegerTensor(INDArray tensor) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(tensor.shape());
         this.tensor = tensor;
     }
 

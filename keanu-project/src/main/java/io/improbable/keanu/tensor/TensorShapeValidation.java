@@ -179,9 +179,4 @@ public class TensorShapeValidation {
 
         }
     }
-
-    public static void checkRankIsAtLeastTwo(long[] shape) {
-        Preconditions.checkArgument(shape.length > 1, "Tensors must have rank >=2 : " + Arrays.toString(shape));
-
-    }
 }

@@ -57,7 +57,7 @@ public class AutoDiffTensorTest {
 
         DoubleTensor wrtA = derivative.withRespectTo(A);
 
-        DoubleTensor expectedWrt = DoubleTensor.create(new double[]{4, 16, 36, 64}).reshape(1, 4, 1, 1);
+        DoubleTensor expectedWrt = DoubleTensor.create(4, 16, 36, 64);
 
         assertArrayEquals(expectedWrt.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 0.0);
         assertArrayEquals(expectedWrt.getShape(), wrtA.getShape());
@@ -77,7 +77,7 @@ public class AutoDiffTensorTest {
 
         //B = 1*(a00 + a01 + a10 + a11) + 2*(a00 + a01 + a10 + a11)+ 3*(a00 + a01 + a10 + a11)+ 4*(a00 + a01 + a10 + a11)
         //dBda00 = 1 + 2 + 3 + 4 = 10
-        DoubleTensor expectedWrt = DoubleTensor.create(new double[]{10, 10, 10, 10}).reshape(1, 1, 2, 2);
+        DoubleTensor expectedWrt = DoubleTensor.create(new double[]{10, 10, 10, 10}).reshape(2, 2);
 
         assertThat(wrtA, equalTo(expectedWrt));
     }

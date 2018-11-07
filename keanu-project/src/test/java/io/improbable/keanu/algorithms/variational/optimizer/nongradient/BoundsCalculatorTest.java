@@ -16,13 +16,13 @@ public class BoundsCalculatorTest {
     @Test
     public void calculatesBoundsWhenAllAreSpecified() {
 
-        DoubleVertex A = new UniformVertex(new long[]{1, 2}, -2, 1);
-        DoubleVertex B = new UniformVertex(new long[]{1, 2}, -2, 1);
+        DoubleVertex A = new UniformVertex(new long[]{2}, -2, 1);
+        DoubleVertex B = new UniformVertex(new long[]{2}, -2, 1);
         B.observe(2);
         DoubleVertex D = A.plus(B);
 
         OptimizerBounds bounds = new OptimizerBounds();
-        bounds.addBound(A, DoubleTensor.create(new double[]{-2, -1}), 1);
+        bounds.addBound(A, DoubleTensor.create(-2, -1), 1);
 
         ApacheMathSimpleBoundsCalculator boundsCalculator = new ApacheMathSimpleBoundsCalculator(Double.POSITIVE_INFINITY, bounds);
 
@@ -38,14 +38,14 @@ public class BoundsCalculatorTest {
 
         DoubleVertex A = new UniformVertex(new long[]{1, 2}, -2, 1);
         DoubleVertex B = new UniformVertex(new long[]{1, 2}, -2, 1);
-        B.observe(new double[]{2, 3});
+        B.observe(DoubleTensor.create(new double[]{2, 3}, 1, 2));
         DoubleVertex C = new GaussianVertex(new long[]{1, 2}, 0, 1);
         DoubleVertex D = A.plus(B);
         DoubleVertex E = C.plus(D);
         DoubleVertex F = new GaussianVertex(new long[]{2, 2}, new ConcatenationVertex(0, E, D), 1);
 
         OptimizerBounds bounds = new OptimizerBounds();
-        bounds.addBound(A, DoubleTensor.create(new double[]{-2, -1}), 1);
+        bounds.addBound(A, DoubleTensor.create(new double[]{-2, -1}, new long[]{1, 2}), 1);
         bounds.addBound(F,
             DoubleTensor.create(new double[]{-2, -1, -3, -4}, new long[]{2, 2}),
             DoubleTensor.create(new double[]{2, 1, 3, 4}, new long[]{2, 2})

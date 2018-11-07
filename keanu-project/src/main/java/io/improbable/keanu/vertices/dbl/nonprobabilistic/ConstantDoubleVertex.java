@@ -28,6 +28,10 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
         this(DoubleTensor.create(vector));
     }
 
+    public ConstantDoubleVertex(double[] data, long[] shape) {
+        this(DoubleTensor.create(data, shape));
+    }
+
     @Override
     public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         return PartialDerivatives.OF_CONSTANT;

@@ -1,8 +1,10 @@
 package io.improbable.keanu.distributions.discrete;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -10,7 +12,6 @@ import io.improbable.keanu.tensor.validate.DebugTensorValidator;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +56,7 @@ public class Multinomial implements DiscreteDistribution {
         Tensor.FlattenedView<Integer> nFlattened = n.getFlattenedView();
         List<DoubleTensor> sliced = p.sliceAlongDimension(0, 0, numCategories);
 
-        int length = ArrayUtil.prod(shape);
+        int length = Ints.checkedCast(TensorShape.getLength(shape));
         int[] samples = new int[0];
 
         for (int i = 0; i < length; i++) {
