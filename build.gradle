@@ -1,6 +1,5 @@
 plugins {
     id 'com.palantir.git-version' version '0.11.0'
-    id 'com.github.johnrengelman.shadow' version '2.0.2'
     id "com.diffplug.gradle.spotless" version "3.15.0"
 }
 
@@ -26,10 +25,3 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     compile project(":keanu-project")
 }
-
-shadowJar {
-    destinationDir = file("$rootDir/keanu-python/keanu")
-    archiveName = "keanu-python-all.jar"
-}
-
-
