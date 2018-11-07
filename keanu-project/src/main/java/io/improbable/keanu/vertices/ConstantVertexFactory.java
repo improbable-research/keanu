@@ -76,9 +76,6 @@ public class ConstantVertexFactory {
     }
 
     public static boolean isConstantVertex(Vertex v) {
-        return v instanceof ConstantDoubleVertex ||
-            v instanceof ConstantIntegerVertex ||
-            v instanceof ConstantBoolVertex ||
-            v instanceof ConstantGenericVertex;
+        return v instanceof ConstantVertex;
     }
 }
