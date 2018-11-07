@@ -59,6 +59,14 @@ class KeanuContext(metaclass=Singleton):
     def jvm_view(self):
         return self.__jvm_view
 
+    def to_java_map(self, python_map):
+        m = self._gateway.jvm.java.util.HashMap()
+
+        for (k, v) in python_map.items():
+            m.put(k, v.unwrap())
+            
+        return m
+
     def to_java_object_list(self, l):
         lst = self._gateway.jvm.java.util.ArrayList()
 
