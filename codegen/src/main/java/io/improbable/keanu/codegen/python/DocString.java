@@ -39,7 +39,7 @@ class DocString {
         }
         stringBuilder.append(NEW_LINE_TAB);
         stringBuilder.append(THREE_QUOTES);
-        stringBuilder.append(NEW_LINE_TAB);
+        stringBuilder.append("\n");
         return stringBuilder.toString();
     }
 }

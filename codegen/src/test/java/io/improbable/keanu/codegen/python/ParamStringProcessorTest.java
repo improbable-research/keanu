@@ -14,6 +14,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.codegen.python.ParamStringProcessor.getNameToCommentMapping;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -61,8 +62,8 @@ public class ParamStringProcessorTest {
         Map<String, String> nameToCommentMap = getNameToCommentMapping(constructorDoc);
         Set<String> keySet = nameToCommentMap.keySet();
         assertThat(keySet, hasItems(FIRST_PARAM_NAME_SNAKE_CASE, SECOND_PARAM_NAME_SNAKE_CASE));
-        assertThat(nameToCommentMap.get(FIRST_PARAM_NAME_SNAKE_CASE), equalTo(FIRST_PARAM_COMMENT));
-        assertThat(nameToCommentMap.get(SECOND_PARAM_NAME_SNAKE_CASE), equalTo(SECOND_PARAM_COMMENT));
+        assertThat(nameToCommentMap, hasEntry(equalTo(FIRST_PARAM_NAME_SNAKE_CASE), equalTo(FIRST_PARAM_COMMENT)));
+        assertThat(nameToCommentMap, hasEntry(equalTo(SECOND_PARAM_NAME_SNAKE_CASE), equalTo(SECOND_PARAM_COMMENT)));
         assertThat(keySet, hasSize(2));
     }
 }
