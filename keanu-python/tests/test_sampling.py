@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 from py4j.java_gateway import java_import
 from examples import Thermometer
@@ -85,15 +86,12 @@ def test_iter_returns_same_result_as_sample(algo):
     samples = sample(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
     set_starting_state(model)
     iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo)
-    iter_samples_dict = defaultdict(float)
 
-    for next_sample in islice(iter_samples, draws):
-        for vertex_id, vertex_sample in next_sample.items():
-            iter_samples_dict[vertex_id] += vertex_sample
+    samples_dataframe = pd.DataFrame()
+    [samples_dataframe.append(pd.DataFrame(list(next_sample.items()))) for next_sample in islice(iter_samples, draws)]
 
-    for vertex_id, summed_vertex_sample in iter_samples_dict.items():
-        average = summed_vertex_sample / draws
-        np.testing.assert_almost_equal(average, np.average(samples[vertex_id]))
+    for vertex_id in samples_dataframe:
+        np.testing.assert_almost_equal(np.average(dataframe[vertex_id], np.average(samples[vertex_id])))
 
 
 def set_starting_state(model):
