@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 import io.improbable.keanu.distributions.discrete.Multinomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -39,7 +39,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     }
 
     public MultinomialVertex(int n, DoubleVertex p) {
-        this(ConstantVertexFactory.of(n), p);
+        this(ConstantVertex.of(n), p);
     }
 
     @Override

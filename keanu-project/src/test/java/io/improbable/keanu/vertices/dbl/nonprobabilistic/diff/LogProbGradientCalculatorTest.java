@@ -5,7 +5,7 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -120,7 +120,7 @@ public class LogProbGradientCalculatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void doesThrowOnLogProbDiffOnNonProbabilistic() {
-        DoubleVertex A = ConstantVertexFactory.of(5.0);
+        DoubleVertex A = ConstantVertex.of(5.0);
         DoubleVertex B = A.times(4);
         LogProbGradientCalculator calculator = new LogProbGradientCalculator(ImmutableList.of(B), ImmutableList.of(A));
         calculator.getJointLogProbGradientWrtLatents();

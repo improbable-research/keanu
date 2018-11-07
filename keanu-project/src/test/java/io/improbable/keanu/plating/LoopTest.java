@@ -5,7 +5,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.loop.Loop;
 import io.improbable.keanu.plating.loop.LoopConstructionException;
 import io.improbable.keanu.plating.loop.LoopDidNotTerminateException;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexMatchers;
@@ -32,8 +32,8 @@ public class LoopTest {
 
     private final Function<DoubleVertex, DoubleVertex> increment = (v) -> v.plus(1.);
     private final Supplier<BoolVertex> flip = () -> new BernoulliVertex(0.5);
-    private final Supplier<BoolVertex> alwaysTrue = () -> ConstantVertexFactory.of(true);
-    private final Vertex startValue = ConstantVertexFactory.of(0.);
+    private final Supplier<BoolVertex> alwaysTrue = () -> ConstantVertex.of(true);
+    private final Vertex startValue = ConstantVertex.of(0.);
 
     @Test
     public void youCanGetTheOutputVertex() {
@@ -91,7 +91,7 @@ public class LoopTest {
     public void itThrowsIfYouPassInMultipleOutputVertices(){
         expectedException.expect(LoopConstructionException.class);
         expectedException.expectMessage("Duplicate label found in base case");
-        Loop.withInitialConditions(ConstantVertexFactory.of(0.).setLabel(Loop.VALUE_OUT_LABEL), ConstantVertexFactory.of(1.).setLabel(Loop.VALUE_OUT_LABEL))
+        Loop.withInitialConditions(ConstantVertex.of(0.).setLabel(Loop.VALUE_OUT_LABEL), ConstantVertex.of(1.).setLabel(Loop.VALUE_OUT_LABEL))
             .iterateWhile(alwaysTrue)
             .apply(increment);
     }
@@ -142,7 +142,7 @@ public class LoopTest {
     public void theConditionCanBeAFunctionOfThePlateVariables() {
         Function<Plate, BoolVertex> lessThanTen = plate -> {
             DoubleVertex valueIn = plate.get(Loop.VALUE_IN_LABEL);
-            return valueIn.lessThan(ConstantVertexFactory.of(10.));
+            return valueIn.lessThan(ConstantVertex.of(10.));
         };
 
         Loop loop = Loop
@@ -159,12 +159,12 @@ public class LoopTest {
     public void youCanAddCustomProxyVariableMappings() {
         VertexLabel factorInLabel = new VertexLabel("factorIn");
         VertexLabel factorOutLabel = new VertexLabel("factorOut");
-        DoubleVertex startFactorial = ConstantVertexFactory.of(1.);
-        DoubleVertex startFactor = ConstantVertexFactory.of(1.).setLabel(factorOutLabel);
+        DoubleVertex startFactorial = ConstantVertex.of(1.);
+        DoubleVertex startFactor = ConstantVertex.of(1.).setLabel(factorOutLabel);
 
         BiFunction<Plate, DoubleVertex, DoubleVertex> factorial = (plate, valueIn) -> {
             DoubleVertex factorIn = new DoubleProxyVertex(factorInLabel);
-            DoubleVertex factorOut = factorIn.plus(ConstantVertexFactory.of(1.));
+            DoubleVertex factorOut = factorIn.plus(ConstantVertex.of(1.));
             plate.add(factorIn);
             plate.add(factorOutLabel, factorOut);
             return valueIn.times(factorOut);

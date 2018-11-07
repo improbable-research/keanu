@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.Logistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -128,8 +128,8 @@ public class LogisticVertexTest {
         int sampleCount = 1000000;
         LogisticVertex vertex = new LogisticVertex(
             new long[]{sampleCount, 1},
-            ConstantVertexFactory.of(0.0),
-            ConstantVertexFactory.of(0.5)
+            ConstantVertex.of(0.0),
+            ConstantVertex.of(0.5)
         );
 
         double from = 0.5;
@@ -146,13 +146,13 @@ public class LogisticVertexTest {
         double trueB = 0.5;
 
         List<DoubleVertex> aB = new ArrayList<>();
-        aB.add(ConstantVertexFactory.of(trueA));
-        aB.add(ConstantVertexFactory.of(trueB));
+        aB.add(ConstantVertex.of(trueA));
+        aB.add(ConstantVertex.of(trueB));
 
         List<DoubleVertex> latentAB = new ArrayList<>();
         UniformVertex latentB = new UniformVertex(0.01, 10.0);
         latentB.setAndCascade(0.1);
-        latentAB.add(ConstantVertexFactory.of(trueA));
+        latentAB.add(ConstantVertex.of(trueA));
         latentAB.add(latentB);
 
         int numSamples = 2000;

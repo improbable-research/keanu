@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -159,8 +159,8 @@ public class InverseGammaVertexTest {
         double trueB = 2.0;
 
         List<DoubleVertex> aB = new ArrayList<>();
-        aB.add(ConstantVertexFactory.of(trueA));
-        aB.add(ConstantVertexFactory.of(trueB));
+        aB.add(ConstantVertex.of(trueA));
+        aB.add(ConstantVertex.of(trueB));
 
         List<DoubleVertex> latentAB = new ArrayList<>();
         UniformVertex latentA = new UniformVertex(0.01, 10.0);

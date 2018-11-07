@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -178,8 +178,8 @@ public class BetaVertexTest {
         double trueBeta = 2.;
 
         List<DoubleVertex> alphaBeta = new ArrayList<>();
-        alphaBeta.add(ConstantVertexFactory.of(trueAlpha));
-        alphaBeta.add(ConstantVertexFactory.of(trueBeta));
+        alphaBeta.add(ConstantVertex.of(trueAlpha));
+        alphaBeta.add(ConstantVertex.of(trueBeta));
 
         List<DoubleVertex> latentAlphaBeta = new ArrayList<>();
         UniformVertex latentAlpha = new UniformVertex(0.01, 10.0);

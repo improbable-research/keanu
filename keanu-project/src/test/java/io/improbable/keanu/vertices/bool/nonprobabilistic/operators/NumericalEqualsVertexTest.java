@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -12,9 +12,9 @@ public class NumericalEqualsVertexTest {
     public void canCompareNumbersNotEqual() {
 
         NumericalEqualsVertex equals = new NumericalEqualsVertex(
-            ConstantVertexFactory.of(new double[]{1, 2, 3}),
-            ConstantVertexFactory.of(new double[]{4, 5, 6}),
-            ConstantVertexFactory.of(new double[]{0, 0, 0})
+            ConstantVertex.of(new double[]{1, 2, 3}),
+            ConstantVertex.of(new double[]{4, 5, 6}),
+            ConstantVertex.of(new double[]{0, 0, 0})
         );
 
         BooleanTensor equality = equals.lazyEval();
@@ -26,9 +26,9 @@ public class NumericalEqualsVertexTest {
     public void canCompareNumbersEqual() {
 
         NumericalEqualsVertex equals = new NumericalEqualsVertex(
-            ConstantVertexFactory.of(new double[]{1, 2, 3}),
-            ConstantVertexFactory.of(new double[]{1, 2, 3}),
-            ConstantVertexFactory.of(new double[]{0, 0, 0})
+            ConstantVertex.of(new double[]{1, 2, 3}),
+            ConstantVertex.of(new double[]{1, 2, 3}),
+            ConstantVertex.of(new double[]{0, 0, 0})
         );
 
         BooleanTensor equality = equals.lazyEval();
@@ -40,9 +40,9 @@ public class NumericalEqualsVertexTest {
     public void canCompareNumbersAlmostEqual() {
 
         NumericalEqualsVertex equals = new NumericalEqualsVertex(
-            ConstantVertexFactory.of(new double[]{1, 2, 3}),
-            ConstantVertexFactory.of(new double[]{1.5, 2.01, 3}),
-            ConstantVertexFactory.of(new double[]{0.1, 0.1, 0.1})
+            ConstantVertex.of(new double[]{1, 2, 3}),
+            ConstantVertex.of(new double[]{1.5, 2.01, 3}),
+            ConstantVertex.of(new double[]{0.1, 0.1, 0.1})
         );
 
         BooleanTensor equality = equals.lazyEval();

@@ -5,6 +5,7 @@ import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.LogNormal;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -154,8 +154,8 @@ public class LogNormalVertexTest {
         double trueSigma = 2.0;
 
         List<DoubleVertex> muSigma = new ArrayList<>();
-        muSigma.add(ConstantVertexFactory.of(trueMu));
-        muSigma.add(ConstantVertexFactory.of(trueSigma));
+        muSigma.add(ConstantVertex.of(trueMu));
+        muSigma.add(ConstantVertex.of(trueSigma));
 
         List<DoubleVertex> latentMuSigma = new ArrayList<>();
         UniformVertex latentMu = new UniformVertex(0.01, 10.0);

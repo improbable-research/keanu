@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleCPTVertex;
@@ -63,7 +63,7 @@ public class ConditionalProbabilityTable {
         }
 
         public DoubleCPTBuilder then(double thn) {
-            return then(ConstantVertexFactory.of(thn));
+            return then(ConstantVertex.of(thn));
         }
     }
 
@@ -88,7 +88,7 @@ public class ConditionalProbabilityTable {
         }
 
         public DoubleCPTVertex orDefault(double defaultResult) {
-            return orDefault(ConstantVertexFactory.of(defaultResult));
+            return orDefault(ConstantVertex.of(defaultResult));
         }
 
         public static class DoubleCPTWhenBuilder {
@@ -107,7 +107,7 @@ public class ConditionalProbabilityTable {
             }
 
             public DoubleCPTBuilder then(double thn) {
-                return then(ConstantVertexFactory.of(thn));
+                return then(ConstantVertex.of(thn));
             }
         }
     }

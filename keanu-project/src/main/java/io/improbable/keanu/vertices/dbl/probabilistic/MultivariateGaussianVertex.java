@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -53,11 +53,11 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param covariance the scale of the identity matrix
      */
     public MultivariateGaussianVertex(DoubleVertex mu, double covariance) {
-        this(mu, ConstantVertexFactory.of(DoubleTensor.eye(mu.getShape()[0])).times(covariance));
+        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0])).times(covariance));
     }
 
     public MultivariateGaussianVertex(double mu, double covariance) {
-        this(ConstantVertexFactory.of(mu), ConstantVertexFactory.of(covariance));
+        this(ConstantVertex.of(mu), ConstantVertex.of(covariance));
     }
 
     @Override

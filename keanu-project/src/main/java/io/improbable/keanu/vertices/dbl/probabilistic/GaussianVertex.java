@@ -4,6 +4,8 @@ import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.network.NetworkWriter;
+import io.improbable.keanu.network.ProtobufWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
@@ -149,5 +151,10 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
             .build();
 
         return Arrays.asList(parents);
+    }
+
+    @Override
+    public void save(NetworkWriter protobufWriter) {
+        protobufWriter.save(this);
     }
 }

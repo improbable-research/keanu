@@ -10,9 +10,9 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
-public class ConstantVertexFactory {
+public class ConstantVertex {
 
-    private ConstantVertexFactory() {
+    private ConstantVertex() {
     }
 
     public static ConstantBoolVertex of(Boolean value) {

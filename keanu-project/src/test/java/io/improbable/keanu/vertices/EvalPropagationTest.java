@@ -33,7 +33,7 @@ public class EvalPropagationTest {
 
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = ConstantVertexFactory.of(4.2).floor();
+        DoubleVertex start = ConstantVertex.of(4.2).floor();
 
         int links = 20;
         DoubleVertex end = addLinks(start, n, m, links);
@@ -91,9 +91,9 @@ public class EvalPropagationTest {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
 
-        DoubleVertex start1 = ConstantVertexFactory.of(5.0);
-        DoubleVertex start2 = ConstantVertexFactory.of(5.0);
-        DoubleVertex start3 = ConstantVertexFactory.of(5.0);
+        DoubleVertex start1 = ConstantVertex.of(5.0);
+        DoubleVertex start2 = ConstantVertex.of(5.0);
+        DoubleVertex start3 = ConstantVertex.of(5.0);
 
         //start 2 is a shared parent between these sums
         DoubleVertex middleSum1 = TestGraphGenerator.sumVertex(start1, start2, n, m, id -> log.info("OP on id:" + id));

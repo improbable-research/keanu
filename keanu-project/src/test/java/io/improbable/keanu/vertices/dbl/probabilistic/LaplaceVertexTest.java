@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -144,8 +144,8 @@ public class LaplaceVertexTest {
         int sampleCount = 1000000;
         LaplaceVertex vertex = new LaplaceVertex(
             new long[]{sampleCount, 1},
-            ConstantVertexFactory.of(0.0),
-            ConstantVertexFactory.of(2.0)
+            ConstantVertex.of(0.0),
+            ConstantVertex.of(2.0)
         );
 
         double from = -4;
@@ -162,8 +162,8 @@ public class LaplaceVertexTest {
         double trueBeta = 2.0;
 
         List<DoubleVertex> muBeta = new ArrayList<>();
-        muBeta.add(ConstantVertexFactory.of(trueMu));
-        muBeta.add(ConstantVertexFactory.of(trueBeta));
+        muBeta.add(ConstantVertex.of(trueMu));
+        muBeta.add(ConstantVertex.of(trueBeta));
 
         List<DoubleVertex> latentMuBeta = new ArrayList<>();
         UniformVertex latentMu = new UniformVertex(0.01, 10.0);

@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -44,8 +44,8 @@ public class CategoricalVertexTest {
     public void cantCreateCategoricalVertexIfShapeIsNotSpecifiedAndNonScalarShapesDoNotMatch() {
         DoubleTensor t2 = DoubleTensor.create(new double[]{0., 0.5, 0.8, 0.2}, 4, 1);
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(t1));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(t2));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(t2));
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Shapes must match or be scalar");
@@ -56,8 +56,8 @@ public class CategoricalVertexTest {
     @Test
     public void canCreateCategoricalVertexIfShapeIsNotSpecifiedAndNonScalarShapesMatch() {
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(t1));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(t1));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(t1));
 
         new CategoricalVertex<>(selectableValues);
     }
@@ -65,8 +65,8 @@ public class CategoricalVertexTest {
     @Test
     public void canCreateCategoricalVertexIfShapeIsNotSpecifiedAndAllShapesAreScalar() {
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(0.5));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(0.8));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(0.5));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(0.8));
 
         new CategoricalVertex<>(selectableValues);
     }
@@ -74,7 +74,7 @@ public class CategoricalVertexTest {
     @Test
     public void cantCreateCategoricalVertexIfNonScalarShapeDoNotMatchProposedShape() {
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(t1));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
 
         long[] proposalShape = new long[]{3, 5, 6};
 
@@ -89,8 +89,8 @@ public class CategoricalVertexTest {
         DoubleTensor t2 = DoubleTensor.create(0.5, new long[]{4, 4, 4});
 
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(t1));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(t2));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(t2));
 
         long[] proposalShape = new long[]{3, 5, 6};
 
@@ -103,9 +103,9 @@ public class CategoricalVertexTest {
     @Test
     public void canCreateCategoricalVertexIfShapeIsSpecifiedAndNonScalarShapeMatchProposalShapeOrIsScalar() {
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(t1));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(t1));
-        selectableValues.put(TestEnum.C, ConstantVertexFactory.of(1.));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(t1));
+        selectableValues.put(TestEnum.C, ConstantVertex.of(1.));
 
         long[] proposalShape = new long[]{2, 2};
 
@@ -116,10 +116,10 @@ public class CategoricalVertexTest {
     public void fourValuesEquallyWeightedSummingToOne() {
 
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(0.25));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(0.25));
-        selectableValues.put(TestEnum.C, ConstantVertexFactory.of(0.25));
-        selectableValues.put(TestEnum.D, ConstantVertexFactory.of(0.25));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(0.25));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(0.25));
+        selectableValues.put(TestEnum.C, ConstantVertex.of(0.25));
+        selectableValues.put(TestEnum.D, ConstantVertex.of(0.25));
 
         Map<TestEnum, Double> proportions = testScalarSample(selectableValues, random);
         assertProportionsWithinExpectedRanges(selectableValues, proportions);
@@ -129,10 +129,10 @@ public class CategoricalVertexTest {
     public void fourValuesNotEquallyWeightedSummingToOne() {
 
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(0.1));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(0.2));
-        selectableValues.put(TestEnum.C, ConstantVertexFactory.of(0.3));
-        selectableValues.put(TestEnum.D, ConstantVertexFactory.of(0.4));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(0.1));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(0.2));
+        selectableValues.put(TestEnum.C, ConstantVertex.of(0.3));
+        selectableValues.put(TestEnum.D, ConstantVertex.of(0.4));
 
         Map<TestEnum, Double> proportions = testScalarSample(selectableValues, random);
         assertProportionsWithinExpectedRanges(selectableValues, proportions);
@@ -142,10 +142,10 @@ public class CategoricalVertexTest {
     public void fourValuesEquallyWeightedSummingToFour() {
 
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(1.0));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(1.0));
-        selectableValues.put(TestEnum.C, ConstantVertexFactory.of(1.0));
-        selectableValues.put(TestEnum.D, ConstantVertexFactory.of(1.0));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(1.0));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(1.0));
+        selectableValues.put(TestEnum.C, ConstantVertex.of(1.0));
+        selectableValues.put(TestEnum.D, ConstantVertex.of(1.0));
 
         Map<TestEnum, Double> proportions = testScalarSample(selectableValues, random);
         Map<TestEnum, DoubleVertex> normalisedSelectableValues = normaliseSelectableValues(selectableValues, 4.0);
@@ -156,10 +156,10 @@ public class CategoricalVertexTest {
     public void fourValuesNotEquallyWeightedSummingToFour() {
 
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(0.25));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(0.75));
-        selectableValues.put(TestEnum.C, ConstantVertexFactory.of(1.25));
-        selectableValues.put(TestEnum.D, ConstantVertexFactory.of(1.75));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(0.25));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(0.75));
+        selectableValues.put(TestEnum.C, ConstantVertex.of(1.25));
+        selectableValues.put(TestEnum.D, ConstantVertex.of(1.75));
 
         Map<TestEnum, Double> proportions = testScalarSample(selectableValues, random);
         Map<TestEnum, DoubleVertex> normalisedSelectableValues = normaliseSelectableValues(selectableValues, 4.0);
@@ -174,10 +174,10 @@ public class CategoricalVertexTest {
         final DoubleTensor sample = dirichletVertex.getValue();
 
         final Map<TestEnum, DoubleVertex> expectedProportions = new LinkedHashMap<>();
-        expectedProportions.put(TestEnum.A, ConstantVertexFactory.of(sample.getValue(0, 0)));
-        expectedProportions.put(TestEnum.B, ConstantVertexFactory.of(sample.getValue(0, 1)));
-        expectedProportions.put(TestEnum.C, ConstantVertexFactory.of(sample.getValue(0, 2)));
-        expectedProportions.put(TestEnum.D, ConstantVertexFactory.of(sample.getValue(0, 3)));
+        expectedProportions.put(TestEnum.A, ConstantVertex.of(sample.getValue(0, 0)));
+        expectedProportions.put(TestEnum.B, ConstantVertex.of(sample.getValue(0, 1)));
+        expectedProportions.put(TestEnum.C, ConstantVertex.of(sample.getValue(0, 2)));
+        expectedProportions.put(TestEnum.D, ConstantVertex.of(sample.getValue(0, 3)));
 
         final Map<TestEnum, Double> proportions = testScalarSampleFromVertex(categoricalVertex, random);
         assertProportionsWithinExpectedRanges(expectedProportions, proportions);
@@ -191,11 +191,11 @@ public class CategoricalVertexTest {
         final DoubleTensor sample = dirichletVertex.getValue();
 
         final Map<Integer, DoubleVertex> expectedProportions = new LinkedHashMap<>();
-        expectedProportions.put(0, ConstantVertexFactory.of(sample.getValue(0, 0)));
-        expectedProportions.put(1, ConstantVertexFactory.of(sample.getValue(0, 1)));
-        expectedProportions.put(2, ConstantVertexFactory.of(sample.getValue(0, 2)));
-        expectedProportions.put(3, ConstantVertexFactory.of(sample.getValue(0, 3)));
-        expectedProportions.put(4, ConstantVertexFactory.of(sample.getValue(0, 4)));
+        expectedProportions.put(0, ConstantVertex.of(sample.getValue(0, 0)));
+        expectedProportions.put(1, ConstantVertex.of(sample.getValue(0, 1)));
+        expectedProportions.put(2, ConstantVertex.of(sample.getValue(0, 2)));
+        expectedProportions.put(3, ConstantVertex.of(sample.getValue(0, 3)));
+        expectedProportions.put(4, ConstantVertex.of(sample.getValue(0, 4)));
 
         final Map<Integer, Double> proportions = testScalarSampleFromVertex(categoricalVertex, random);
         assertProportionsWithinExpectedRanges(expectedProportions, proportions);
@@ -213,8 +213,8 @@ public class CategoricalVertexTest {
         double probB = 0.0;
 
         LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(probA));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(probB));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(probA));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(probB));
 
         CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select = new CategoricalVertex<>(selectableValues);
         select.sample(random);
@@ -223,8 +223,8 @@ public class CategoricalVertexTest {
     @Test
     public void heterogeneousNonScalarTensorSelectableValuesCanProduceHeterogeneousNonScalarSample() {
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(DoubleTensor.create(0., 1.)));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(DoubleTensor.create(1., 0.)));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(DoubleTensor.create(0., 1.)));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(DoubleTensor.create(1., 0.)));
 
         CategoricalVertex<TestEnum, GenericTensor<TestEnum>> categoricalVertex = new CategoricalVertex<>(selectableValues);
         Tensor<TestEnum> sample = categoricalVertex.sample();
@@ -243,10 +243,10 @@ public class CategoricalVertexTest {
         double total = probA + probB + probC + probD;
 
         LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(0.25));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(0.75));
-        selectableValues.put(TestEnum.C, ConstantVertexFactory.of(1.25));
-        selectableValues.put(TestEnum.D, ConstantVertexFactory.of(1.75));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(0.25));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(0.75));
+        selectableValues.put(TestEnum.C, ConstantVertex.of(1.25));
+        selectableValues.put(TestEnum.D, ConstantVertex.of(1.75));
 
         CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select = new CategoricalVertex<>(selectableValues);
 
@@ -262,8 +262,8 @@ public class CategoricalVertexTest {
         double probB = 0.0;
 
         LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(probA));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(probB));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(probA));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(probB));
 
         CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select = new CategoricalVertex<>(selectableValues);
         select.logProb(new GenericTensor<>(TestEnum.A));
@@ -276,8 +276,8 @@ public class CategoricalVertexTest {
         double bProb = 0.2;
 
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, ConstantVertexFactory.of(DoubleTensor.create(aProbs, 2, 2)));
-        selectableValues.put(TestEnum.B, ConstantVertexFactory.of(bProb));
+        selectableValues.put(TestEnum.A, ConstantVertex.of(DoubleTensor.create(aProbs, 2, 2)));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(bProb));
 
         CategoricalVertex<TestEnum, GenericTensor<TestEnum>> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
@@ -329,7 +329,7 @@ public class CategoricalVertexTest {
         Map<T, DoubleVertex> normalised = new LinkedHashMap<>();
         for (Map.Entry<T, DoubleVertex> entry : selectableValues.entrySet()) {
             double normalizedProbability = entry.getValue().getValue().scalar() / sum;
-            normalised.put(entry.getKey(), ConstantVertexFactory.of(normalizedProbability));
+            normalised.put(entry.getKey(), ConstantVertex.of(normalizedProbability));
         }
         return normalised;
     }
