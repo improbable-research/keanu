@@ -1,73 +1,53 @@
 package io.improbable.keanu.util.dot;
 
-import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import org.apache.commons.io.FileUtils;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.Arrays;
 
-import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
 
 public class WriteDotTest {
 
-    private static BayesianNetwork gaussianNet;
-    private static BayesianNetwork booleanNet;
-    private static final String testFileDir = "dottestdir";
-    private static String gaussianDotOutput;
-    private static String boolDotOutput;
-    private static String vertexDegree1DotOutput;
-    private static String vertexDegree2DotOutput;
-    private static final String boolVertexLabel = "/BoolResult";
-    private static GaussianVertex gaussianV;
-    private static DoubleVertex constantDoubleV;
+    private static BayesianNetwork complexNet;
+    private static Vertex complexResultVertex;
+    private static final String resourcesFolder = "./src/test/resources/dotFiles";
+    private static final String GAUSSIAN_OUTPUT_FILENAME = resourcesFolder + "/GaussianNodeOutput.dot";
+    private static final String TENSOR_OUTPUT_FILENAME = resourcesFolder + "/ConstantTensorIntNodeOutput.dot";
+    private static final String SCALAR_OUTPUT_FILENAME = resourcesFolder + "/ConstantScalarIntNodeOutput.dot";
+    private static final String LABELLED_OUTPUT_FILENAME = resourcesFolder + "/ConstantLabelledIntNodeOutput.dot";
+    private static final String COMPLEX_OUTPUT_FILENAME = resourcesFolder + "/ComplexNetDotOutput.dot";
+    private static final String VERTEX_DEGREE1__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree1Output.dot";
+    private static final String VERTEX_DEGREE2__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree2Output.dot";
+
 
     @BeforeClass
-    public static void setup() {
+    public static void setUpComplexNet() {
+        complexResultVertex = (new ConstantBoolVertex(true)).or((new GaussianVertex(0, 1)).plus(new ConstantDoubleVertex(5)).equalTo(new ConstantDoubleVertex(10)));
+        complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
+    }
 
-        double mu = 0;
-        double sigma = 1;
-        gaussianV = new GaussianVertex(mu, sigma);
-        constantDoubleV = new ConstantDoubleVertex(5.43);
-        DoubleVertex guassianGraphResult = gaussianV.multiply(constantDoubleV);
-        gaussianNet = new BayesianNetwork(guassianGraphResult.getConnectedGraph());
-
-        Writer outputWriter = new StringWriter();
-        WriteDot.outputDot(outputWriter, gaussianNet);
-        gaussianDotOutput = outputWriter.toString();
-
-        BoolVertex boolGraphResult = new ConstantBoolVertex(true).or(new ConstantIntegerVertex(5).greaterThan(new ConstantDoubleVertex(5.43)));
-        boolGraphResult.setLabel(boolVertexLabel);
-        booleanNet = new BayesianNetwork(boolGraphResult.getConnectedGraph());
-        outputWriter = new StringWriter();
-        WriteDot.outputDot(outputWriter, booleanNet);
-        boolDotOutput = outputWriter.toString();
-
-        outputWriter = new StringWriter();
-        WriteDot.outputDot(outputWriter, gaussianV, 1);
-        vertexDegree1DotOutput = outputWriter.toString();
-
-        outputWriter = new StringWriter();
-        WriteDot.outputDot(outputWriter, gaussianV, 2);
-        vertexDegree2DotOutput = outputWriter.toString();
+    @Before
+    public void resetVertexIdGenerator() {
+        VertexId.ID_GENERATOR.set(0);
     }
 
     @Test
@@ -76,90 +56,95 @@ public class WriteDotTest {
         File outputFile = new File(fileName);
         FileUtils.deleteDirectory(outputFile.getParentFile());
 
-        WriteDot.outputDot(fileName, gaussianNet);
+        WriteDot.outputDot(fileName, complexNet);
         assertTrue(outputFile.exists());
 
-        WriteDot.outputDot(fileName, booleanNet);
+        WriteDot.outputDot(fileName, complexNet);
         assertThat(outputFile.getParentFile().listFiles(), arrayWithSize(2));
 
         FileUtils.deleteDirectory(outputFile.getParentFile());
     }
 
     @Test
-    public void outputContainsAllVertices() {
-        List<Vertex> allGaussianVertices = gaussianNet.getAllVertices();
-
-        for (Vertex v : allGaussianVertices) {
-            assertTrue(gaussianDotOutput.contains(v.getId().hashCode() + ""));
-        }
-
-        List<Vertex> allBoolVertices = booleanNet.getAllVertices();
-
-        for (Vertex v : allBoolVertices) {
-            assertTrue(boolDotOutput.contains(v.getId().hashCode() + ""));
-        }
-    }
-
-    @Test
-    public void outputContainsAllEdges() {
-        List<Vertex> allGaussianVertices = gaussianNet.getAllVertices();
-
-        for (Vertex v : allGaussianVertices) {
-            for (Object vChild : v.getChildren()) {
-                assertTrue(gaussianDotOutput.contains("<" + v.hashCode() + "> -> <" + vChild.hashCode() + ">"));
-            }
-        }
-
-        List<Vertex> allBoolVertices = booleanNet.getAllVertices();
-
-        for (Vertex v : allBoolVertices) {
-            for (Object vChild : v.getChildren()) {
-                assertTrue(boolDotOutput.contains("<" + v.hashCode() + "> -> <" + ((Vertex) vChild).hashCode() + ">"));
-            }
-        }
-    }
-
-    @Test
     public void outputContainsHyperparameters() throws IOException {
-        assertTrue(gaussianDotOutput.contains("[label=mu]"));
-        assertTrue(gaussianDotOutput.contains("[label=sigma]"));
+        GaussianVertex gaussianV = new GaussianVertex(0, 1);
+        BayesianNetwork gaussianNet = new BayesianNetwork(gaussianV.getConnectedGraph());
+
+        StringWriter outputWriter = new StringWriter();
+        WriteDot.outputDot(outputWriter, gaussianNet);
+
+        String expectedGaussianNodeOutput = new String(Files.readAllBytes(Paths.get(GAUSSIAN_OUTPUT_FILENAME)), Charset.defaultCharset());
+        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedGaussianNodeOutput));
     }
 
     @Test
-    public void outputContainsVertexLabels() {
-        assertTrue(boolDotOutput.contains(boolVertexLabel));
+    public void outputtingComplexNet() throws IOException {
+        StringWriter outputWriter = new StringWriter();
+        WriteDot.outputDot(outputWriter, complexNet);
+        String expectedComplexOutput = new String(Files.readAllBytes(Paths.get(COMPLEX_OUTPUT_FILENAME)), Charset.defaultCharset());
+        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedComplexOutput));
     }
 
     @Test
-    public void outputContainsAnnotations() {
-        String multiplyVertexAnnotation = MultiplicationVertex.class.getAnnotation(DisplayInformationForOutput.class).displayName();
-        assertTrue(gaussianDotOutput.contains(multiplyVertexAnnotation));
+    public void outputtingVertexDegree1Surroundings() throws IOException {
+        StringWriter outputWriter = new StringWriter();
+        WriteDot.outputDot(outputWriter, complexResultVertex, 1);
+        String expectedVertexDegree1Output = new String(Files.readAllBytes(Paths.get(VERTEX_DEGREE1__OUTPUT_FILENAME)), Charset.defaultCharset());
+        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedVertexDegree1Output));
     }
 
     @Test
-    public void outputContainsClassName() {
-        assertTrue(gaussianDotOutput.contains(GaussianVertex.class.getSimpleName()));
+    public void outputtingVertexDegree2Surroundings() throws IOException {
+        StringWriter outputWriter = new StringWriter();
+        WriteDot.outputDot(outputWriter, complexResultVertex, 2);
+        String expectedVertexDegree2Output = new String(Files.readAllBytes(Paths.get(VERTEX_DEGREE2__OUTPUT_FILENAME)), Charset.defaultCharset());
+        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedVertexDegree2Output));
     }
 
     @Test
-    public void outputVertexWithDegree1() {
-        assertTrue(vertexDegree1DotOutput.contains(gaussianV.getId().hashCode() + ""));
-        assertFalse(vertexDegree1DotOutput.contains(constantDoubleV.getId().hashCode() + ""));
-        // Vertices within 1 degree form the specified vertex cover less of a graph than vertices within two degrees.
-        assertTrue(org.apache.commons.lang3.StringUtils.countMatches(vertexDegree1DotOutput, "->") < org.apache.commons.lang3.StringUtils.countMatches(vertexDegree2DotOutput, "->"));
+    public void dotVertexLabelsAreSetCorrectly() throws IOException {
+        StringWriter outputWriter = new StringWriter();
+
+        int[] intValues = new int[] {1,2,3};
+        ConstantIntegerVertex constantIntVertex = new ConstantIntegerVertex(intValues);
+        ConstantIntegerVertex constantIntVertex2 = new ConstantIntegerVertex(2);
+        IntegerMultiplicationVertex multiplicationVertex = new IntegerMultiplicationVertex(constantIntVertex, constantIntVertex2);
+        BayesianNetwork constantIntNet = new BayesianNetwork(multiplicationVertex.getConnectedGraph());
+
+        // Check that class name and annotation (for multiplication vertex) appear in the output.
+        WriteDot.outputDot(outputWriter, constantIntNet);
+        String expectedTensorIntNodeOutput = new String(Files.readAllBytes(Paths.get(TENSOR_OUTPUT_FILENAME)), Charset.defaultCharset());
+        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedTensorIntNodeOutput));
+
+        // Check that vertex label appears in the output if it's set.
+        constantIntVertex.setLabel("SomeLabel");
+        outputWriter.getBuffer().setLength(0);
+        WriteDot.outputDot(outputWriter, constantIntNet);
+        String expectedLabelledIntNodeOutput = new String(Files.readAllBytes(Paths.get(LABELLED_OUTPUT_FILENAME)), Charset.defaultCharset());
+        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedLabelledIntNodeOutput));
+
+        // Check that value for constant vertices appears in the output if it's set and a scalar.
+        constantIntVertex.setValue(42);
+        outputWriter.getBuffer().setLength(0);
+        WriteDot.outputDot(outputWriter, constantIntNet);
+        String expectedScalarIntNodeOutput = new String(Files.readAllBytes(Paths.get(SCALAR_OUTPUT_FILENAME)), Charset.defaultCharset());
+        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedScalarIntNodeOutput));
     }
 
-    @Test
-    public void outputVertexWithDegree2() {
-        // For this net vertices within 2 connections from the Gaussian vertex cover the entire net.
-        assertTrue(vertexDegree2DotOutput.equals(gaussianDotOutput));
+    // Need to compare the outputs line by line, as the labels and edges are not written out in a fixed order.
+    private boolean dotFilesAreEqual(String output1, String output2) {
+        String[] output1Lines = output1.split("\n");
+        String[] output2Lines = output2.split("\n");
+
+        if (output1Lines.length != output2Lines.length) {
+            return false;
+        }
+
+        for (String line : output1Lines) {
+            if (!Arrays.asList(output2Lines).contains(line)) {
+                return false;
+            }
+        }
+        return true;
     }
-
-    @AfterClass
-    public static void cleanup() throws IOException {
-        File testDir = new File(testFileDir);
-        FileUtils.deleteDirectory(testDir);
-    }
-
-
 }

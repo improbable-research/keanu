@@ -1,0 +1,7 @@
+digraph BayesianNetwork {
+<91> -> <92>
+<90> -> <92>
+90[label="SomeLabel"]
+91[label="2"]
+92[label="*"]
+}

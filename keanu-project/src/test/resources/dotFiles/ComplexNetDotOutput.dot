@@ -1,0 +1,19 @@
+digraph BayesianNetwork {
+<96> -> <97>
+<98> -> <99>
+<99> -> <100>
+<94> -> <95> [label=sigma]
+<95> -> <97>
+<97> -> <99>
+<93> -> <95> [label=mu]
+<92> -> <100>
+97[label="+"]
+92[label="true"]
+95[label="GaussianVertex"]
+98[label="10.0"]
+93[label="0.0"]
+96[label="5.0"]
+100[label="OR"]
+94[label="1.0"]
+99[label="EqualsVertex"]
+}
