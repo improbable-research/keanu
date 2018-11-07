@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.LogNormal;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -43,15 +43,15 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
     }
 
     public LogNormalVertex(long[] tensorShape, DoubleVertex mu, double sigma) {
-        this(tensorShape, mu, ConstantVertex.of(sigma));
+        this(tensorShape, mu, ConstantVertexFactory.of(sigma));
     }
 
     public LogNormalVertex(long[] tensorShape, double mu, DoubleVertex sigma) {
-        this(tensorShape, ConstantVertex.of(mu), sigma);
+        this(tensorShape, ConstantVertexFactory.of(mu), sigma);
     }
 
     public LogNormalVertex(long[] tensorShape, double mu, double sigma) {
-        this(tensorShape, ConstantVertex.of(mu), ConstantVertex.of(sigma));
+        this(tensorShape, ConstantVertexFactory.of(mu), ConstantVertexFactory.of(sigma));
     }
 
     public LogNormalVertex(DoubleVertex mu, DoubleVertex sigma) {
@@ -59,15 +59,15 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
     }
 
     public LogNormalVertex(double mu, DoubleVertex sigma) {
-        this(ConstantVertex.of(mu), sigma);
+        this(ConstantVertexFactory.of(mu), sigma);
     }
 
     public LogNormalVertex(DoubleVertex mu, double sigma) {
-        this(mu, ConstantVertex.of(sigma));
+        this(mu, ConstantVertexFactory.of(sigma));
     }
 
     public LogNormalVertex(double mu, double sigma) {
-        this(ConstantVertex.of(mu), ConstantVertex.of(sigma));
+        this(ConstantVertexFactory.of(mu), ConstantVertexFactory.of(sigma));
     }
 
     @Override

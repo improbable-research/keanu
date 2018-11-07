@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.generic.GenericTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
@@ -27,8 +27,8 @@ public class MultiplexerVertexTest {
     public void multiplexerGivesReasonableDistributionOfSamples() {
         KeanuRandom random = new KeanuRandom(1);
 
-        IntegerVertex selectorOrigin = ConstantVertex.of(0);
-        IntegerVertex selectorBound = ConstantVertex.of(2);
+        IntegerVertex selectorOrigin = ConstantVertexFactory.of(0);
+        IntegerVertex selectorBound = ConstantVertexFactory.of(2);
         IntegerVertex selectorControlVertex = new UniformIntVertex(selectorOrigin, selectorBound);
         Map<TestEnum, Double> expected = new HashMap<>();
         expected.put(TestEnum.A, 0.25);
@@ -37,13 +37,13 @@ public class MultiplexerVertexTest {
         expected.put(TestEnum.D, 0.25);
 
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup1 = new LinkedHashMap<>();
-        optionGroup1.put(TestEnum.A, ConstantVertex.of(0.5));
-        optionGroup1.put(TestEnum.B, ConstantVertex.of(0.5));
+        optionGroup1.put(TestEnum.A, ConstantVertexFactory.of(0.5));
+        optionGroup1.put(TestEnum.B, ConstantVertexFactory.of(0.5));
         CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select1 = new CategoricalVertex<>(optionGroup1);
 
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup2 = new LinkedHashMap<>();
-        optionGroup2.put(TestEnum.C, ConstantVertex.of(0.5));
-        optionGroup2.put(TestEnum.D, ConstantVertex.of(0.5));
+        optionGroup2.put(TestEnum.C, ConstantVertexFactory.of(0.5));
+        optionGroup2.put(TestEnum.D, ConstantVertexFactory.of(0.5));
         CategoricalVertex<TestEnum, GenericTensor<TestEnum>> select2 = new CategoricalVertex<>(optionGroup2);
 
         MultiplexerVertex<GenericTensor<TestEnum>> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);

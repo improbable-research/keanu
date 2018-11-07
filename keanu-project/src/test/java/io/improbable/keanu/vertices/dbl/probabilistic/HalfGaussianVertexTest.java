@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -127,7 +127,7 @@ public class HalfGaussianVertexTest {
         int sampleCount = 1000000;
         HalfGaussianVertex vertex = new HalfGaussianVertex(
             new long[]{sampleCount, 1},
-            ConstantVertex.of(2.0)
+            ConstantVertexFactory.of(2.0)
         );
 
         double from = 0;
@@ -143,7 +143,7 @@ public class HalfGaussianVertexTest {
         double trueSigma = 2.0;
 
         List<DoubleVertex> sigma = new ArrayList<>();
-        sigma.add(ConstantVertex.of(trueSigma));
+        sigma.add(ConstantVertexFactory.of(trueSigma));
 
         List<DoubleVertex> latentSigmaList = new ArrayList<>();
         UniformVertex latentSigma = new UniformVertex(0.01, 10.0);

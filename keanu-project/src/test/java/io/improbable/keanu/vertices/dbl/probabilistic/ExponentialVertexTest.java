@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -125,7 +125,7 @@ public class ExponentialVertexTest {
         int sampleCount = 1000000;
         ExponentialVertex vertex = new ExponentialVertex(
             new long[]{sampleCount, 1},
-            ConstantVertex.of(0.5)
+            ConstantVertexFactory.of(0.5)
         );
 
         double from = 0.5;
@@ -141,7 +141,7 @@ public class ExponentialVertexTest {
         double trueLambda = 2.0;
 
         List<DoubleVertex> generationParameters = new ArrayList<>();
-        generationParameters.add(ConstantVertex.of(trueLambda));
+        generationParameters.add(ConstantVertexFactory.of(trueLambda));
 
         List<DoubleVertex> latents = new ArrayList<>();
         UniformVertex latentLambda = new UniformVertex(0.01, 10.0);

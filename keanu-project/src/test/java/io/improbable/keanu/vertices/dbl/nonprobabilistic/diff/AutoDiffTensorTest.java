@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
@@ -19,11 +19,11 @@ public class AutoDiffTensorTest {
         DoubleVertex A = new UniformVertex(new long[]{1, 4}, 0, 1);
         A.setValue(new double[]{-1, 3, 5, -2});
 
-        DoubleVertex prod = A.times(ConstantVertex.of(new double[]{1, 2, 3, 4}));
+        DoubleVertex prod = A.times(ConstantVertexFactory.of(new double[]{1, 2, 3, 4}));
 
-        DoubleVertex sum = prod.plus(ConstantVertex.of(new double[]{2, 4, 6, 8}));
+        DoubleVertex sum = prod.plus(ConstantVertexFactory.of(new double[]{2, 4, 6, 8}));
 
-        DoubleVertex prod2 = sum.times(ConstantVertex.of(new double[]{2, 4, 6, 8}));
+        DoubleVertex prod2 = sum.times(ConstantVertexFactory.of(new double[]{2, 4, 6, 8}));
 
         DoubleVertex output = prod2.plus(5).times(2);
 
@@ -45,11 +45,11 @@ public class AutoDiffTensorTest {
         DoubleVertex A = new UniformVertex(0, 1);
         A.setValue(2);
 
-        DoubleVertex prod = A.times(ConstantVertex.of(new double[]{1, 2, 3, 4}));
+        DoubleVertex prod = A.times(ConstantVertexFactory.of(new double[]{1, 2, 3, 4}));
 
-        DoubleVertex sum = prod.plus(ConstantVertex.of(new double[]{2, 4, 6, 8}));
+        DoubleVertex sum = prod.plus(ConstantVertexFactory.of(new double[]{2, 4, 6, 8}));
 
-        DoubleVertex prod2 = sum.times(ConstantVertex.of(new double[]{2, 4, 6, 8}));
+        DoubleVertex prod2 = sum.times(ConstantVertexFactory.of(new double[]{2, 4, 6, 8}));
 
         DoubleVertex output = prod2.plus(5).times(2);
 
@@ -69,7 +69,7 @@ public class AutoDiffTensorTest {
         DoubleVertex A = new UniformVertex(new long[]{2, 2}, 0, 1);
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
-        DoubleVertex B = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
+        DoubleVertex B = A.sum().times(ConstantVertexFactory.of(new double[]{1, 2, 3, 4})).sum();
 
         PartialDerivatives derivative = B.getDerivativeWrtLatents();
 

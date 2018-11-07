@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -144,8 +144,8 @@ public class CauchyVertexTest {
         int sampleCount = 1000000;
         CauchyVertex vertex = new CauchyVertex(
             new long[]{sampleCount, 1},
-            ConstantVertex.of(0.0),
-            ConstantVertex.of(2.0)
+            ConstantVertexFactory.of(0.0),
+            ConstantVertexFactory.of(2.0)
         );
 
         double from = -4;
@@ -162,8 +162,8 @@ public class CauchyVertexTest {
         double trueScale = 2.0;
 
         List<DoubleVertex> locationScale = new ArrayList<>();
-        locationScale.add(ConstantVertex.of(trueLocation));
-        locationScale.add(ConstantVertex.of(trueScale));
+        locationScale.add(ConstantVertexFactory.of(trueLocation));
+        locationScale.add(ConstantVertexFactory.of(trueScale));
 
         List<DoubleVertex> latentLocationScale = new ArrayList<>();
         UniformVertex latentLocation = new UniformVertex(0.01, 10.0);

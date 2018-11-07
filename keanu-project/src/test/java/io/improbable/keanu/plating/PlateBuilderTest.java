@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -111,7 +111,7 @@ public class PlateBuilderTest {
     public void ifAVertexIsLabeledThatIsWhatsUsedToReferToItInThePlate() {
         VertexLabel label = new VertexLabel("label");
 
-        Vertex<?> startVertex = ConstantVertex.of(1.).setLabel(label);
+        Vertex<?> startVertex = ConstantVertexFactory.of(1.).setLabel(label);
 
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(startVertex)
@@ -137,8 +137,8 @@ public class PlateBuilderTest {
             .count(10)
             .withFactory((plate) -> {
                 VertexLabel label = new VertexLabel("x");
-                DoubleVertex vertex1 = ConstantVertex.of(1.);
-                DoubleVertex vertex2 = ConstantVertex.of(1.);
+                DoubleVertex vertex1 = ConstantVertexFactory.of(1.);
+                DoubleVertex vertex2 = ConstantVertexFactory.of(1.);
                 plate.add(label, vertex1);
                 plate.add(label, vertex2);
             })
@@ -242,7 +242,7 @@ public class PlateBuilderTest {
         VertexLabel xPreviousLabel = PlateBuilder.proxyFor(xLabel);
         VertexLabel yLabel = new VertexLabel("y");
 
-        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
+        Vertex<DoubleTensor> initialX = ConstantVertexFactory.of(1.);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
         Plates plates = new PlateBuilder<Integer>()
@@ -287,7 +287,7 @@ public class PlateBuilderTest {
         VertexLabel xPreviousLabel = PlateBuilder.proxyFor(xLabel);
         VertexLabel yLabel = new VertexLabel("y");
 
-        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
+        Vertex<DoubleTensor> initialX = ConstantVertexFactory.of(1.);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
         Plates plates = new PlateBuilder<Integer>()
@@ -339,9 +339,9 @@ public class PlateBuilderTest {
         VertexLabel valueOutLabel = new VertexLabel("valueOut");
 
         // base case
-        DoubleVertex initialSum = ConstantVertex.of(0.);
-        BoolVertex tru = ConstantVertex.of(true);
-        DoubleVertex initialValue = ConstantVertex.of(0.);
+        DoubleVertex initialSum = ConstantVertexFactory.of(0.);
+        BoolVertex tru = ConstantVertexFactory.of(true);
+        DoubleVertex initialValue = ConstantVertexFactory.of(0.);
 
         int maximumLoopLength = 100;
 
@@ -364,7 +364,7 @@ public class PlateBuilderTest {
                 plate.addAll(ImmutableSet.of(runningTotal, stillLooping, valueIn));
 
                 // intermediate
-                DoubleVertex one = ConstantVertex.of(1.);
+                DoubleVertex one = ConstantVertexFactory.of(1.);
                 BoolVertex condition = new BernoulliVertex(0.5);
                 plate.add(oneLabel, one);
                 plate.add(conditionLabel, condition);
@@ -466,7 +466,7 @@ public class PlateBuilderTest {
         expectedException.expectMessage("Cannot find VertexLabel fake");
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
-        DoubleVertex initialState = ConstantVertex.of(1.);
+        DoubleVertex initialState = ConstantVertexFactory.of(1.);
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(realLabel, initialState)
             .withTransitionMapping(ImmutableMap.of(realLabel, fakeLabel))

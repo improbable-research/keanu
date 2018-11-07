@@ -1,6 +1,6 @@
 package io.improbable.keanu.plating;
 
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
@@ -75,6 +75,6 @@ public class PlateTest {
     public void itThrowsIfYouAddAVertexWithNoLabel() {
         expectedException.expect(PlateConstructionException.class);
         expectedException.expectMessage(endsWith(" must contain a label in order to be added to a plate"));
-        plate.add(ConstantVertex.of(1.));
+        plate.add(ConstantVertexFactory.of(1.));
     }
 }

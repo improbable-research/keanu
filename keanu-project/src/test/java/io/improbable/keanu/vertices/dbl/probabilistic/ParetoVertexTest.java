@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.Pareto;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertexFactory;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -158,8 +158,8 @@ public class ParetoVertexTest {
         double trueScale = 0.1;
 
         List<DoubleVertex> trueParams = new ArrayList<>();
-        trueParams.add(ConstantVertex.of(trueLocation));
-        trueParams.add(ConstantVertex.of(trueScale));
+        trueParams.add(ConstantVertexFactory.of(trueLocation));
+        trueParams.add(ConstantVertexFactory.of(trueScale));
 
         List<DoubleVertex> latentParams = new ArrayList<>();
         UniformVertex latentLocation = new UniformVertex(0.1, 15.0);
@@ -184,8 +184,8 @@ public class ParetoVertexTest {
         double trueScale = 3.5;
 
         List<DoubleVertex> trueParams = new ArrayList<>();
-        trueParams.add(ConstantVertex.of(trueLocation));
-        trueParams.add(ConstantVertex.of(trueScale));
+        trueParams.add(ConstantVertexFactory.of(trueLocation));
+        trueParams.add(ConstantVertexFactory.of(trueScale));
 
         List<DoubleVertex> latentParams = new ArrayList<>();
         ConstantDoubleVertex latentLocation = new ConstantDoubleVertex(trueLocation);
@@ -209,8 +209,8 @@ public class ParetoVertexTest {
         double trueScale = 3.5;
 
         List<DoubleVertex> trueParams = new ArrayList<>();
-        trueParams.add(ConstantVertex.of(trueLocation));
-        trueParams.add(ConstantVertex.of(trueScale));
+        trueParams.add(ConstantVertexFactory.of(trueLocation));
+        trueParams.add(ConstantVertexFactory.of(trueScale));
 
         List<DoubleVertex> latentParams = new ArrayList<>();
         UniformVertex latentLocation = new UniformVertex(0.01, 10);
