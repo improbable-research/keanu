@@ -7,7 +7,7 @@ from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
 from keanu.vartypes import primitive_types, const_arg_types, numpy_types
-from typing import Union, List
+from typing import List
 from py4j.java_gateway import JavaObject
 
 k = KeanuContext()
@@ -136,7 +136,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def set_and_cascade(self, v):
         self.unwrap().setAndCascade(Tensor(v).unwrap())
 
-    def sample(self) -> Union[numpy_types]:
+    def sample(self) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().sample())
 
     def get_value(self):

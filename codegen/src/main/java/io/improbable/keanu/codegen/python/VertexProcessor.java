@@ -3,7 +3,10 @@ package io.improbable.keanu.codegen.python;
 import com.google.common.base.CaseFormat;
 import freemarker.template.Template;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;
+import org.apache.commons.lang3.NotImplementedException;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.MethodParameterNamesScanner;
@@ -51,11 +54,38 @@ class VertexProcessor {
             String[] pythonParameters = reflections.getConstructorParamNames(constructor).stream().map(
                 parameter -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, parameter)).toArray(String[]::new);
 
+            Class<?>[] parameterTypes = constructor.getParameterTypes();
+
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
-            pythonConstructors.add(new PythonConstructor(javaClass, toPythonClass(javaClass), String.join(", ", pythonParameters)));
+            pythonConstructors.add(
+                new PythonConstructor(
+                    javaClass,
+                    toPythonClass(javaClass),
+                    toPythonParams(pythonParameters, parameterTypes),
+                    String.join(", ", pythonParameters)));
         }
 
         return root;
+    }
+
+    private static String toPythonParams(String[] pythonParameters, Class<?>[] parameterTypes) {
+        String[] pythonParams = new String[pythonParameters.length];
+
+        for (int i = 0; i < pythonParameters.length; i++) {
+            pythonParams[i] = pythonParameters[i] + " : " + toPythonParam(parameterTypes[i]);
+        }
+
+        return String.join(", ", pythonParams);
+    }
+
+    private static String toPythonParam(Class<?> parameterType) {
+        if (Vertex.class.isAssignableFrom(parameterType) || Tensor.class.isAssignableFrom(parameterType)) {
+            return "const_arg_types";
+        } else if (parameterType.isArray()) {
+            return "shape_types";
+        } else {
+            throw new NotImplementedException(String.format("Mapping from Java type %s is not defined.", parameterType.getName()));
+        }
     }
 
     private static List<Constructor> getSortedListOfAnnotatedVertexConstructors(Reflections reflections) {
@@ -84,11 +114,14 @@ class VertexProcessor {
         @Getter
         private String pythonClass;
         @Getter
+        private String pythonTypedParameters;
+        @Getter
         private String pythonParameters;
 
-        PythonConstructor(String javaClass, String pythonClass, String pythonParameters) {
+        PythonConstructor(String javaClass, String pythonClass, String pythonTypedParameters, String pythonParameters) {
             this.javaClass = javaClass;
             this.pythonClass = pythonClass;
+            this.pythonTypedParameters = pythonTypedParameters;
             this.pythonParameters = pythonParameters;
         }
     }

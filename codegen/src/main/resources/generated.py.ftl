@@ -3,6 +3,7 @@
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex
+from keanu.vartypes import const_arg_types, shape_types
 
 context = KeanuContext()
 
@@ -13,6 +14,6 @@ java_import(context.jvm_view(), "${import.packageName}")
 <#list constructors as constructor>
 
 
-def ${constructor.pythonClass}(${constructor.pythonParameters}) -> Vertex:
+def ${constructor.pythonClass}(${constructor.pythonTypedParameters}) -> Vertex:
     return Vertex(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters})
 </#list>

@@ -3,6 +3,7 @@
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex
+from keanu.vartypes import const_arg_types, shape_types
 
 context = KeanuContext()
 
@@ -37,113 +38,113 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 
 
-def ConstantBool(constant) -> Vertex:
+def ConstantBool(constant : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantBoolVertex, constant)
 
 
-def Equals(a, b) -> Vertex:
+def Equals(a : const_arg_types, b : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().EqualsVertex, a, b)
 
 
-def GreaterThanOrEqual(a, b) -> Vertex:
+def GreaterThanOrEqual(a : const_arg_types, b : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().GreaterThanOrEqualVertex, a, b)
 
 
-def GreaterThan(a, b) -> Vertex:
+def GreaterThan(a : const_arg_types, b : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().GreaterThanVertex, a, b)
 
 
-def LessThanOrEqual(a, b) -> Vertex:
+def LessThanOrEqual(a : const_arg_types, b : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().LessThanOrEqualVertex, a, b)
 
 
-def LessThan(a, b) -> Vertex:
+def LessThan(a : const_arg_types, b : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().LessThanVertex, a, b)
 
 
-def NotEquals(a, b) -> Vertex:
+def NotEquals(a : const_arg_types, b : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().NotEqualsVertex, a, b)
 
 
-def CastDouble(input_vertex) -> Vertex:
+def CastDouble(input_vertex : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().CastDoubleVertex, input_vertex)
 
 
-def ConstantDouble(constant) -> Vertex:
+def ConstantDouble(constant : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantDoubleVertex, constant)
 
 
-def DoubleIf(shape, predicate, thn, els) -> Vertex:
+def DoubleIf(shape : shape_types, predicate : const_arg_types, thn : const_arg_types, els : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().DoubleIfVertex, shape, predicate, thn, els)
 
 
-def Addition(left, right) -> Vertex:
+def Addition(left : const_arg_types, right : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().AdditionVertex, left, right)
 
 
-def Difference(left, right) -> Vertex:
+def Difference(left : const_arg_types, right : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().DifferenceVertex, left, right)
 
 
-def Division(left, right) -> Vertex:
+def Division(left : const_arg_types, right : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().DivisionVertex, left, right)
 
 
-def Multiplication(left, right) -> Vertex:
+def Multiplication(left : const_arg_types, right : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().MultiplicationVertex, left, right)
 
 
-def Power(base, exponent) -> Vertex:
+def Power(base : const_arg_types, exponent : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().PowerVertex, base, exponent)
 
 
-def Abs(input_vertex) -> Vertex:
+def Abs(input_vertex : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().AbsVertex, input_vertex)
 
 
-def Ceil(input_vertex) -> Vertex:
+def Ceil(input_vertex : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().CeilVertex, input_vertex)
 
 
-def Floor(input_vertex) -> Vertex:
+def Floor(input_vertex : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().FloorVertex, input_vertex)
 
 
-def Round(input_vertex) -> Vertex:
+def Round(input_vertex : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().RoundVertex, input_vertex)
 
 
-def Cauchy(location, scale) -> Vertex:
+def Cauchy(location : const_arg_types, scale : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().CauchyVertex, location, scale)
 
 
-def Exponential(rate) -> Vertex:
+def Exponential(rate : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ExponentialVertex, rate)
 
 
-def Gamma(theta, k) -> Vertex:
+def Gamma(theta : const_arg_types, k : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().GammaVertex, theta, k)
 
 
-def Gaussian(mu, sigma) -> Vertex:
+def Gaussian(mu : const_arg_types, sigma : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().GaussianVertex, mu, sigma)
 
 
-def Uniform(x_min, x_max) -> Vertex:
+def Uniform(x_min : const_arg_types, x_max : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().UniformVertex, x_min, x_max)
 
 
-def ConstantInteger(constant) -> Vertex:
+def ConstantInteger(constant : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantIntegerVertex, constant)
 
 
-def IntegerDivision(a, b) -> Vertex:
+def IntegerDivision(a : const_arg_types, b : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().IntegerDivisionVertex, a, b)
 
 
-def Poisson(mu) -> Vertex:
+def Poisson(mu : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().PoissonVertex, mu)
 
 
-def UniformInt(min, max) -> Vertex:
+def UniformInt(min : const_arg_types, max : const_arg_types) -> Vertex:
     return Vertex(context.jvm_view().UniformIntVertex, min, max)

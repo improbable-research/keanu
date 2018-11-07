@@ -1,7 +1,7 @@
 from keanu.tensor import Tensor
 from .generated import ConstantBool, ConstantInteger, ConstantDouble
 from .base import Vertex
-from typing import Union, Callable
+from typing import Callable
 
 import numpy as np
 from keanu.vartypes import int_types, float_types, bool_types, primitive_types, pandas_types, numpy_types
