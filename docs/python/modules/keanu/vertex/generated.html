@@ -218,8 +218,8 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    One to one constructor for mapping some shape of theta and k to matching shaped gamma.</span>
 
-<span class="sd">    :param k: the k (shape) of the Gamma with either the same shape as specified for this vertex</span>
 <span class="sd">    :param theta: the theta (scale) of the Gamma with either the same shape as specified for this vertex</span>
+<span class="sd">    :param k: the k (shape) of the Gamma with either the same shape as specified for this vertex</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">GammaVertex</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span></div>
 
@@ -233,8 +233,8 @@
 <span class="sd">    One to one constructor for mapping some shape of mu and sigma to</span>
 <span class="sd">    a matching shaped Uniform Vertex</span>
 
-<span class="sd">    :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar</span>
 <span class="sd">    :param x_min: the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar</span>
+<span class="sd">    :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">UniformVertex</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">)</span></div>
 
