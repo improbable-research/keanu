@@ -91,7 +91,7 @@ def test_iter_returns_same_result_as_sample(algo):
     [samples_dataframe.append(pd.DataFrame(list(next_sample.items()))) for next_sample in islice(iter_samples, draws)]
 
     for vertex_id in samples_dataframe:
-        np.testing.assert_almost_equal(np.average(dataframe[vertex_id], np.average(samples[vertex_id])))
+        np.testing.assert_almost_equal(dataframe[vertex_id].mean(), np.average(samples[vertex_id]))
 
 
 def set_starting_state(model):
