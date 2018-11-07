@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HamiltonianSampler implements SamplingAlgorithm {
 
@@ -38,9 +39,7 @@ public class HamiltonianSampler implements SamplingAlgorithm {
                               BayesianNetwork bayesNet,
                               VertexState during,
                               VertexState before,
-                              LogProbGradientCalculator logProbGradientCalculator,
-                              Map<VertexId, ?> sampleBeforeLeapfrog,
-                              double logOfMasterPBeforeLeapfrog) {
+                              LogProbGradientCalculator logProbGradientCalculator) {
 
         this.latentVertices = latentVertices;
         this.random = random;
@@ -51,15 +50,15 @@ public class HamiltonianSampler implements SamplingAlgorithm {
         this.during = during;
         this.before = before;
         this.logProbGradientCalculator = logProbGradientCalculator;
-        this.sampleBeforeLeapfrog = sampleBeforeLeapfrog;
-        this.logOfMasterPBeforeLeapfrog = logOfMasterPBeforeLeapfrog;
+        this.sampleBeforeLeapfrog = new HashMap<>();
+        this.logOfMasterPBeforeLeapfrog = bayesNet.getLogOfMasterP();
     }
 
     @Override
     public void step() {
         initializeMomentumForEachVertex(latentVertices, during.momentum, random);
-        cacheThings(during, before);
-        putSample(sampleBeforeLeapfrog, fromVertices);
+        during.cacheState(before);
+        sampleBeforeLeapfrog = putSample(fromVertices);
 
         for (int leapFrogNum = 0; leapFrogNum < leapFrogCount; leapFrogNum++) {
             during.gradient = leapfrog(
@@ -108,9 +107,7 @@ public class HamiltonianSampler implements SamplingAlgorithm {
             return sampleBeforeLeapfrog;
         } else {
             logOfMasterPBeforeLeapfrog = logOfMasterPAfterLeapfrog;
-            Map<VertexId, ?> sample = new HashMap<>();
-            putSample(sample, fromVertices);
-            return sample;
+            return putSample(fromVertices);
         }
     }
 
@@ -119,18 +116,6 @@ public class HamiltonianSampler implements SamplingAlgorithm {
                                                         KeanuRandom random) {
         for (Vertex<DoubleTensor> currentVertex : vertexes) {
             momentums.put(currentVertex.getId(), random.nextGaussian(currentVertex.getShape()));
-        }
-    }
-
-    private static void cacheThings(VertexState from, VertexState to) {
-        for (Map.Entry<VertexId, DoubleTensor> entry : from.position.entrySet()) {
-            to.position.put(entry.getKey(), entry.getValue());
-        }
-        for (Map.Entry<VertexId, DoubleTensor> entry : from.momentum.entrySet()) {
-            to.momentum.put(entry.getKey(), entry.getValue());
-        }
-        for (Map.Entry<VertexId, DoubleTensor> entry : from.gradient.entrySet()) {
-            to.gradient.put(entry.getKey(), entry.getValue());
         }
     }
 
@@ -204,29 +189,21 @@ public class HamiltonianSampler implements SamplingAlgorithm {
     }
 
     private static double dotProduct(Map<VertexId, DoubleTensor> momentums) {
-        double dotProduct = 0.0;
-        for (DoubleTensor momentum : momentums.values()) {
-            dotProduct += momentum.pow(2).sum();
-        }
-        return dotProduct;
+        return momentums.values().stream()
+            .mapToDouble(m -> m.pow(2).sum())
+            .sum();
     }
 
     /**
      * This is meant to be used for caching a pre-leapfrog sample. This sample
      * will be used if the leapfrog is rejected.
      *
-     * @param sample
      * @param fromVertices
      */
-    private static void putSample(Map<VertexId, ?> sample, List<? extends Vertex> fromVertices) {
-        for (Vertex<?> vertex : fromVertices) {
-            putValue(vertex, sample);
-        }
+    private static Map<VertexId, Object> putSample(List<? extends Vertex> fromVertices) {
+        return fromVertices.stream().collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
     }
 
-    private static <T> void putValue(Vertex<T> vertex, Map<VertexId, ?> target) {
-        ((Map<VertexId, T>) target).put(vertex.getId(), vertex.getValue());
-    }
 
     /**
      * This is used when a leapfrog is rejected. At that point the vertices are in a post
@@ -270,10 +247,16 @@ public class HamiltonianSampler implements SamplingAlgorithm {
         Map<VertexId, DoubleTensor> gradient;
         Map<VertexId, DoubleTensor> momentum;
 
-        public VertexState(Map<VertexId, DoubleTensor> position, Map<VertexId, DoubleTensor> gradient, Map<VertexId, DoubleTensor> momentum) {
+        public VertexState(Map<VertexId, DoubleTensor> position, Map<VertexId, DoubleTensor> gradient) {
             this.position = position;
             this.gradient = gradient;
-            this.momentum = momentum;
+            this.momentum = new HashMap<>();
+        }
+
+        void cacheState(VertexState that) {
+            that.position.putAll(position);
+            that.gradient.putAll(gradient);
+            that.momentum.putAll(momentum);
         }
     }
 

@@ -103,22 +103,10 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
 
         Map<VertexId, DoubleTensor> position = new HashMap<>();
         cachePosition(latentVertices, position);
-        Map<VertexId, DoubleTensor> positionBeforeLeapfrog = new HashMap<>();
-
         Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
-        Map<VertexId, DoubleTensor> gradientBeforeLeapfrog = new HashMap<>();
 
-        final Map<VertexId, DoubleTensor> momentum = new HashMap<>();
-        final Map<VertexId, DoubleTensor> momentumBeforeLeapfrog = new HashMap<>();
-
-        double logOfMasterPBeforeLeapfrog = bayesNet.getLogOfMasterP();
-        final List<Double> logOfMasterPForEachSample = new ArrayList<>();
-        logOfMasterPForEachSample.add(logOfMasterPBeforeLeapfrog);
-
-        final Map<VertexId, ?> sampleBeforeLeapfrog = new HashMap<>();
-
-        HamiltonianSampler.VertexState before = new HamiltonianSampler.VertexState(position, gradient, momentum);
-        HamiltonianSampler.VertexState after = new HamiltonianSampler.VertexState(positionBeforeLeapfrog, gradientBeforeLeapfrog, momentumBeforeLeapfrog);
+        HamiltonianSampler.VertexState before = new HamiltonianSampler.VertexState(position, gradient);
+        HamiltonianSampler.VertexState after = new HamiltonianSampler.VertexState(new HashMap<>(), new HashMap<>());
 
         return new HamiltonianSampler(
             latentVertices,
@@ -129,9 +117,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
             bayesNet,
             before,
             after,
-            logProbGradientCalculator,
-            sampleBeforeLeapfrog,
-            logOfMasterPBeforeLeapfrog
+            logProbGradientCalculator
         );
     }
 
