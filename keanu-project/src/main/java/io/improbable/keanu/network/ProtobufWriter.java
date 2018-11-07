@@ -1,5 +1,6 @@
 package io.improbable.keanu.network;
 
+import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -60,13 +61,16 @@ public class ProtobufWriter {
     }
 
     public void saveValue(DoubleVertex vertex) {
-        KeanuSavedBayesNet.StoredValue storedValue = getValue(vertex);
-        bayesNetBuilder.addDefaultState(storedValue);
+        if (vertex.hasValue()) {
+            KeanuSavedBayesNet.StoredValue storedValue = getValue(vertex);
+            bayesNetBuilder.addDefaultState(storedValue);
+        }
     }
 
     private KeanuSavedBayesNet.StoredValue getValue(DoubleVertex vertex) {
         KeanuSavedBayesNet.DoubleTensor savedValue = KeanuSavedBayesNet.DoubleTensor.newBuilder()
             .addAllValues(vertex.getValue().asFlatList())
+            .addAllShape(Longs.asList(vertex.getShape()))
             .build();
 
         KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()

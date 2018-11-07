@@ -29,19 +29,23 @@ message StoredValue {
 }
 
 message DoubleTensor {
-    repeated double values = 1;
+    repeated int64 shape = 1;
+    repeated double values = 2;
 }
 
 message IntegerTensor {
-    repeated int32 values = 1;
+    repeated int64 shape = 1;
+    repeated int32 values = 2;
 }
 
 message BooleanTensor {
-    repeated bool values = 1;
+    repeated int64 shape = 1;
+    repeated bool values = 2;
 }
 
 message GenericTensor {
-    repeated bytes values = 1;
+    repeated int64 shape = 1;
+    repeated bytes values = 2;
 }
 
 message VertexValue {
