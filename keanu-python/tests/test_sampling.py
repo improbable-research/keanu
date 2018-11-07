@@ -66,7 +66,7 @@ def test_down_sample_interval(net):
 ])
 def test_can_iter_through_samples(algo, net):
     draws = 10
-    samples = iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
+    samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
     count = 0
     for sample in islice(samples, draws):
         count += 1
@@ -84,7 +84,7 @@ def test_iter_returns_same_result_as_sample(algo):
     set_starting_state(model)
     samples = sample(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
     set_starting_state(model)
-    iter_samples = iterate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo)
+    iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo)
     iter_samples_dict = defaultdict(float)
 
     for next_sample in islice(iter_samples, draws):
