@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
@@ -31,5 +32,13 @@ public class ScalarIntegerTensorTest {
     public void argMaxFailsForAxisTooHigh() {
         IntegerTensor tensor = IntegerTensor.scalar(1);
         tensor.argMax(2);
+    }
+
+    @Test
+    public void comparesIntegerScalarWithTensor() {
+        IntegerTensor value = IntegerTensor.create(1);
+        IntegerTensor differentValue = IntegerTensor.create(1, 2, 3);
+        BooleanTensor result = value.elementwiseEquals(differentValue);
+        assertThat(result, hasValue(true, false, false));
     }
 }
