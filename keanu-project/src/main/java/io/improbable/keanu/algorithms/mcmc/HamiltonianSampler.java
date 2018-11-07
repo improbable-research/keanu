@@ -253,7 +253,7 @@ public class HamiltonianSampler implements SamplingAlgorithm {
             this.momentum = new HashMap<>();
         }
 
-        void cacheState(VertexState that) {
+        private void cacheState(VertexState that) {
             that.position.putAll(position);
             that.gradient.putAll(gradient);
             that.momentum.putAll(momentum);
