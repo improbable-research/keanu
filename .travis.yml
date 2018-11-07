@@ -13,8 +13,6 @@ matrix:
         - in deployment/secret-keys-keanu.gpg.enc -out deployment/secret-keys-keanu.gpg -d
     - language: python
       python: 3.6
-      before_install:
-        - sudo apt-get install python3-sphinx
       env:
         - PIPENV_IGNORE_VIRTUALENVS=1
         - PIPENV_YES=1
