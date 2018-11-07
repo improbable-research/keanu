@@ -5,6 +5,7 @@ methods are provided.
 
 from typing import (Any, Callable, Dict, Generic, Iterator, List, Optional, Sequence, Tuple, Type,
                     TypeVar, Union)
+import abc
 
 class dtype: ...
 _dtype = dtype
@@ -45,7 +46,7 @@ AxesType = Union[int, Tuple[int, ...]]
 OrderType = Union[str, Sequence[str]]
 DtypeType = Union[dtype, type]
 
-class flatiter(Generic[_S], Iterator[_S]):
+class flatiter(Generic[_S], Iterator[_S], metaclass=abc.ABCMeta):
     coords = ...  # type: ShapeType
     def copy(self) -> flatiter[_S]: ...
 
