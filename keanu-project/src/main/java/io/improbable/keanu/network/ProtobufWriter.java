@@ -2,6 +2,7 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -40,6 +41,11 @@ public class ProtobufWriter implements NetworkWriter {
         KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
         vertexBuilder.setConstantValue(getValue(vertex).getValue());
         bayesNetBuilder.addVertices(vertexBuilder.build());
+    }
+
+    @Override
+    public void save(ConstantVertex vertex) {
+        throw new UnsupportedOperationException("Don't know how to save an untyped ConstantVertex");
     }
 
     private KeanuSavedBayesNet.Vertex.Builder buildVertex(Vertex vertex) {
