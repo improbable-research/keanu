@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 class VertexProcessor {
 
@@ -66,7 +67,9 @@ class VertexProcessor {
             pythonConstructors.add(pythonConstructor);
             exportedMethodsList.add(pythonConstructor.pythonClass);
         }
-        String exportedMethodsString = "\"" + String.join("\", \"", exportedMethodsList) + "\"";
+        String exportedMethodsString = exportedMethodsList.stream()
+            .map(s -> "\"" + s + "\"")
+            .collect(Collectors.joining(", "));
         root.put("exportedMethods", exportedMethodsString);
 
         return root;
