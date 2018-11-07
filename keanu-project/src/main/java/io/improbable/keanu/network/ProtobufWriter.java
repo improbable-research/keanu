@@ -49,7 +49,7 @@ public class ProtobufWriter implements NetworkWriter {
             vertexBuilder = vertexBuilder.setLabel(vertex.getLabel().toString());
         }
 
-        vertexBuilder = vertexBuilder.setId(vertex.getId().toProtoBuf());
+        vertexBuilder = vertexBuilder.setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()));
         vertexBuilder = vertexBuilder.setVertexType(vertex.getClass().getCanonicalName());
 
         return vertexBuilder;
@@ -78,7 +78,7 @@ public class ProtobufWriter implements NetworkWriter {
             .build();
 
         return KeanuSavedBayesNet.StoredValue.newBuilder()
-            .setId(vertex.getId().toProtoBuf())
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()))
             .setValue(value)
             .build();
     }

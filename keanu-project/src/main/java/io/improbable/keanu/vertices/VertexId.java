@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import lombok.EqualsAndHashCode;
 
 import java.util.Arrays;
@@ -87,12 +86,6 @@ public class VertexId implements Comparable<VertexId> {
         return idValues.length;
     }
 
-    public KeanuSavedBayesNet.VertexID toProtoBuf() {
-        return KeanuSavedBayesNet.VertexID.newBuilder()
-            .addAllIdValues(Longs.asList(idValues))
-            .build();
-    }
-    
     public long[] getValue() {
         return Arrays.copyOf(idValues, idValues.length);
     }

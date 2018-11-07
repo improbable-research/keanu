@@ -11,7 +11,7 @@ message BayesianNetwork {
 }
 
 message VertexID {
-    repeated int64 idValues = 1;
+    string id = 1;
 }
 
 message Vertex {

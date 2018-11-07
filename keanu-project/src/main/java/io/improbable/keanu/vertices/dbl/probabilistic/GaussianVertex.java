@@ -28,6 +28,8 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
+    private final static String MU_NAME = "mu";
+    private final static String SIGMA_NAME = "sigma";
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -77,7 +79,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
     }
 
     public GaussianVertex(Map<String, Vertex> parentsMap, KeanuSavedBayesNet.VertexValue initialValue) {
-        this((DoubleVertex)parentsMap.get("mu"), (DoubleVertex)parentsMap.get("sigma"));
+        this((DoubleVertex)parentsMap.get(MU_NAME), (DoubleVertex)parentsMap.get(SIGMA_NAME));
     }
 
     public DoubleVertex getMu() {
@@ -138,12 +140,12 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
     public List<KeanuSavedBayesNet.NamedParent> getParentsAsProto() {
         KeanuSavedBayesNet.NamedParent parents[] = new KeanuSavedBayesNet.NamedParent[2];
         parents[0] = KeanuSavedBayesNet.NamedParent.newBuilder()
-            .setName("mu")
-            .setId(mu.getId().toProtoBuf())
+            .setName(MU_NAME)
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(mu.getId().toString()))
             .build();
         parents[1] = KeanuSavedBayesNet.NamedParent.newBuilder()
-            .setName("sigma")
-            .setId(sigma.getId().toProtoBuf())
+            .setName(SIGMA_NAME)
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(sigma.getId().toString()))
             .build();
 
         return Arrays.asList(parents);
