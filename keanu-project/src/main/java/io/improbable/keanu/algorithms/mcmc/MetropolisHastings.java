@@ -14,6 +14,8 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +31,7 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
  */
 @Builder
 public class MetropolisHastings implements PosteriorSamplingAlgorithm {
+    private static final Logger log = LoggerFactory.getLogger(MetropolisHastings.class);
 
     private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = ProposalDistribution.usePrior();
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
@@ -172,7 +175,9 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     private static <T> void addSampleForVertex(Vertex<T> vertex, Map<VertexId, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
-        samplesForVertex.add(vertex.getValue());
+        T value = vertex.getValue();
+        samplesForVertex.add(value);
+        log.trace(String.format("Sampled %s", value));
     }
 
     private static void checkBayesNetInHealthyState(BayesianNetwork bayesNet) {
