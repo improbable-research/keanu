@@ -4,7 +4,7 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.network.ProtobufWriter;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -69,7 +69,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
 
 
     @Override
-    public void save(ProtobufWriter protobufWriter) {
+    public void save(NetworkWriter protobufWriter) {
         protobufWriter.save(this);
     }
 }

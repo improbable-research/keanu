@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.ProtobufWriter;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
 
 import java.util.ArrayList;
@@ -258,11 +258,11 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         return stringBuilder.toString();
     }
 
-    public void save(ProtobufWriter protobufWriter) {
+    public void save(NetworkWriter protobufWriter) {
         protobufWriter.save(this);
     }
 
-    public void saveValue(ProtobufWriter protobufWriter) {
+    public void saveValue(NetworkWriter protobufWriter) {
         //TODO - Make this abstract after we've implemented every type
         protobufWriter.saveValue(this);
     }

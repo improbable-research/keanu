@@ -206,7 +206,7 @@ public class BayesianNetwork {
         indentation++;
     }
 
-    public void save(ProtobufWriter protobufWriter) throws IOException {
+    public void save(NetworkWriter protobufWriter) throws IOException {
         for (Vertex vertex : TopologicalSort.sort(vertices)) {
             vertex.save(protobufWriter);
         }

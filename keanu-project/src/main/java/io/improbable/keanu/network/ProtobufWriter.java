@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ProtobufWriter {
+public class ProtobufWriter implements NetworkWriter {
     private final BayesianNetwork net;
     private KeanuSavedBayesNet.BayesianNetwork.Builder bayesNetBuilder = null;
 

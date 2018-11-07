@@ -4,7 +4,7 @@ package io.improbable.keanu.vertices.dbl;
 import com.google.common.primitives.Doubles;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.kotlin.DoubleOperators;
-import io.improbable.keanu.network.ProtobufWriter;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -356,7 +356,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public void saveValue(ProtobufWriter protobufWriter) {
+    public void saveValue(NetworkWriter protobufWriter) {
         protobufWriter.saveValue(this);
     }
 }
