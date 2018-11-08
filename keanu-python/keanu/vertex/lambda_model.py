@@ -17,13 +17,13 @@ def _extract_values(vertices):
 class LambdaModel(Vertex):
     def __init__(self, 
     inputs: map, 
-    executor: Consumer, 
-    update_value: Function = Function(_extract_values)
+    executor, 
+    update_value = _extract_values
     ) -> Vertex:
         self.map = map
-        self.executor = executor
-        self.update_value = update_value
-        val = context.jvm_view().LambdaModelVertex(inputs, executor, update_value)
+        self.executor = Consumer(executor)
+        self.update_value = Function(update_value)
+        val = context.jvm_view().LambdaModelVertex(inputs, self.executor, self.update_value)
         super(LambdaModel, self).__init__(val)
 
     def get_double_model_output_vertex(self, label : str):
