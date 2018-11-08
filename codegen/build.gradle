@@ -7,6 +7,7 @@ mainClassName = 'io.improbable.keanu.codegen.python.Runner'
 
 dependencies {
     compile 'org.reflections:reflections:0.9.11'
+    compile 'com.google.code.gson:gson:2.7'
     compile 'org.freemarker:freemarker:2.3.28'
     compile project(':keanu-project')
     compile files("${System.getProperty('java.home')}/../lib/tools.jar")

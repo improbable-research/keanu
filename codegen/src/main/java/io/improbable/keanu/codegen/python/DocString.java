@@ -1,44 +1,47 @@
 package io.improbable.keanu.codegen.python;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Map;
 
 class DocString {
     private static final String THREE_QUOTES = "\"\"\"";
     private static final String NEW_LINE_TAB = "\n    ";
 
-    private String comment;
-    private Map<String, String> params;
+    private final String methodDescription;
+    private final Map<String, String> parameterNameToDescriptionMap;
 
-    DocString(String comment, Map<String, String> params) {
-        this.comment = comment;
-        this.params = params;
+    DocString(String methodDescription, Map<String, String> parameterNameToDescriptionMap) {
+        this.methodDescription = methodDescription;
+        this.parameterNameToDescriptionMap = parameterNameToDescriptionMap;
     }
 
     private boolean isEmpty() {
-        return comment.isEmpty() && params.size() == 0;
+        return StringUtils.isEmpty(methodDescription) && parameterNameToDescriptionMap.isEmpty();
     }
 
     String getAsString() {
         if (isEmpty()) {
             return "";
         }
-        if (params.size() == 0) {
-            return THREE_QUOTES + "\n" + comment + THREE_QUOTES + "\n\n";
+        if (parameterNameToDescriptionMap.size() == 0) {
+            return THREE_QUOTES + "\n" + methodDescription + THREE_QUOTES + "\n\n";
         }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(THREE_QUOTES);
         stringBuilder.append(NEW_LINE_TAB);
-        stringBuilder.append(comment.replaceAll("\n ", NEW_LINE_TAB));
+        stringBuilder.append(methodDescription.replaceAll("\n ", NEW_LINE_TAB));
         stringBuilder.append(NEW_LINE_TAB);
-        for (String param : params.keySet()) {
+        for (String param : parameterNameToDescriptionMap.keySet()) {
             stringBuilder.append(NEW_LINE_TAB);
             stringBuilder.append(":param ");
             stringBuilder.append(param);
             stringBuilder.append(": ");
-            stringBuilder.append(params.get(param));
+            stringBuilder.append(parameterNameToDescriptionMap.get(param));
         }
         stringBuilder.append(NEW_LINE_TAB);
         stringBuilder.append(THREE_QUOTES);
+        stringBuilder.append(NEW_LINE_TAB);
         return stringBuilder.toString();
     }
 }
