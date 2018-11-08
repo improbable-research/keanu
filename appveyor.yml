@@ -12,6 +12,5 @@ install:
 - appveyor DownloadFile "http://central.maven.org/maven2/org/bytedeco/javacpp-presets/mkl-dnn/0.15-1.4.2/mkl-dnn-0.15-1.4.2-windows-x86_64.jar" -FileName %KEANU_ND4J_CLASSPATH%\\mkl-dnn-0.15-1.4.2-windows-x86_64.jar
 init:
 - git config --global core.autocrlf true
-- pip install -U sphinx
 build_script:
 - cmd: ./gradlew.bat clean build -i --stacktrace
