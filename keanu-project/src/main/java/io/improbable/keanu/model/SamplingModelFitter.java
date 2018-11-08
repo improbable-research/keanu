@@ -12,6 +12,17 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
     private final int sampleCount;
     private final int dropCount;
 
+    /**
+     * This fitter uses a {@link PosteriorSamplingAlgorithm}, in contrast to the {@link MAPModelFitter} and {@link MaximumLikelihoodModelFitter}, which use gradient methods.
+     *
+     * The model's latent vertices will have their values set to the average over the samples.
+     * A down-sample of 2 is used (not configurable).
+     *
+     * @param modelGraph The graph to fit
+     * @param samplingAlgorithm The algorithm to use, e.g. {@link io.improbable.keanu.algorithms.mcmc.MetropolisHastings}
+     * @param sampleCount The number of sample points to take.
+     * @param dropCount The number of sample points to drop, in order to remove those prior to mixing.
+     */
     public SamplingModelFitter(ModelGraph<INPUT, OUTPUT> modelGraph, PosteriorSamplingAlgorithm samplingAlgorithm, int sampleCount, int dropCount) {
         this.modelGraph = modelGraph;
         this.samplingAlgorithm = samplingAlgorithm;
