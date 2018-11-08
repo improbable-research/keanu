@@ -27,7 +27,7 @@ def __infer_const_ctor_from_ndarray(ndarray : Any) -> Callable:
 
     return __infer_const_ctor_from_scalar(ndarray.item(0))
 
-def __infer_const_ctor_from_scalar(scalar : Union[int, float, bool, np.integer, np.float, np.bool_]) -> Callable:
+def __infer_const_ctor_from_scalar(scalar : Union[int, float, bool, np.integer, np.float_, np.bool_]) -> Callable:
     if isinstance(scalar, bool_types):
         return ConstantBool
     elif isinstance(scalar, int_types):

@@ -7,7 +7,7 @@ from typing import Any
 
 @pytest.fixture
 def net() -> Any:
-    gamma = Gamma(1., 1.)
+    gamma = Gamma(1., (1., ))
     exp = Exponential(1.)
     cauchy = Cauchy(gamma, exp)
 
