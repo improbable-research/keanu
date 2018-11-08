@@ -246,6 +246,6 @@ public class GradientOptimizer implements Optimizer {
 
         throw new IllegalArgumentException("Hit a NSP Error.  Min: "
             + Long.toHexString(bitwiseMinValue)
-            + " Arg: " + Long.toHexString(bitwiseArgumentValue));
+            + " Arg: " + Long.toHexString(bitwiseArgumentValue), e);
     }
 }
