@@ -6,8 +6,8 @@ import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
-from keanu.vartypes import primitive_types, const_arg_types, numpy_types
-from typing import List, Any
+from keanu.vartypes import primitive_types, const_arg_types, numpy_types, vertex_arg_types, runtime_const_arg_types, runtime_primitive_types
+from typing import List, Any, Tuple, Iterable
 from py4j.java_gateway import JavaObject
 
 k = KeanuContext()
@@ -43,76 +43,76 @@ class VertexOps:
         else:
             raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
 
-    def __add__(self, other : Any) -> Any:
+    def __add__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.Addition(self, other)
 
-    def __radd__(self, other : Any) -> Any:
+    def __radd__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.Addition(other, self)
 
-    def __sub__(self, other : Any) -> Any:
+    def __sub__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.Difference(self, other)
 
-    def __rsub__(self, other : Any) -> Any:
+    def __rsub__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.Difference(other, self)
 
-    def __mul__(self, other : Any) -> Any:
+    def __mul__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.Multiplication(self, other)
 
-    def __rmul__(self, other : Any) -> Any:
+    def __rmul__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.Multiplication(other, self)
 
-    def __pow__(self, other : Any) -> Any:
+    def __pow__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.Power(self, other)
 
-    def __rpow__(self, other : Any) -> Any:
+    def __rpow__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.Power(other, self)
 
-    def __truediv__(self, other : Any) -> Any:
+    def __truediv__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.Division(self, other)
 
-    def __rtruediv__(self, other : Any) -> Any:
+    def __rtruediv__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.Division(other, self)
 
-    def __floordiv__(self, other : Any) -> Any:
+    def __floordiv__(self, other : vertex_arg_types) -> 'Vertex':
         return kn.vertex.generated.IntegerDivision(self, other)
 
-    def __rfloordiv__(self, other : Any) -> Any:
+    def __rfloordiv__(self, other : Any) -> 'Vertex':
         return kn.vertex.generated.IntegerDivision(other, self)
 
     def __eq__(self, other : Any) -> Any:
         return kn.vertex.generated.Equals(self, other)
 
-    def __req__(self, other : Any) -> Any:
+    def __req__(self, other : Any) -> 'Vertex':
         return kn.vertex.generated.Equals(self, other)
 
     def __ne__(self, other : Any) -> Any:
         return kn.vertex.generated.NotEquals(self, other)
 
-    def __rne__(self, other : Any) -> Any:
+    def __rne__(self, other : Any) -> 'Vertex':
         return kn.vertex.generated.NotEquals(self, other)
 
-    def __gt__(self, other : Any) -> Any:
+    def __gt__(self, other : Any) -> 'Vertex':
         return kn.vertex.generated.GreaterThan(self, other)
 
-    def __ge__(self, other : Any) -> Any:
+    def __ge__(self, other : Any) -> 'Vertex':
         return kn.vertex.generated.GreaterThanOrEqual(self, other)
 
-    def __lt__(self, other : Any) -> Any:
+    def __lt__(self, other : Any) -> 'Vertex':
         return kn.vertex.generated.LessThan(self, other)
 
-    def __le__(self, other : Any) -> Any:
+    def __le__(self, other : Any) -> 'Vertex':
         return kn.vertex.generated.LessThanOrEqual(self, other)
 
-    def __abs__(self) -> Any:
+    def __abs__(self) -> 'Vertex':
         return kn.vertex.generated.Abs(self)
 
-    def __round__(self) -> Any:
+    def __round__(self) -> 'Vertex':
         return kn.vertex.generated.Round(self)
 
-    def __floor__(self) -> Any:
+    def __floor__(self) -> 'Vertex':
         return kn.vertex.generated.Floor(self)
 
-    def __ceil__(self) -> Any:
+    def __ceil__(self) -> 'Vertex':
         return kn.vertex.generated.Ceil(self)
 
 
@@ -124,49 +124,49 @@ class Vertex(JavaObjectWrapper, VertexOps):
 
         super(Vertex, self).__init__(val)
 
-    def __hash__(self) -> Any:
+    def __hash__(self) -> int:
         return hash(self.get_id())
 
-    def observe(self, v : Any) -> Any:
+    def observe(self, v : const_arg_types) -> None:
         self.unwrap().observe(Tensor(v).unwrap())
 
-    def set_value(self, v : Any) -> Any:
+    def set_value(self, v : const_arg_types) -> None:
         self.unwrap().setValue(Tensor(v).unwrap())
 
-    def set_and_cascade(self, v : Any) -> Any:
+    def set_and_cascade(self, v : const_arg_types) -> None:
         self.unwrap().setAndCascade(Tensor(v).unwrap())
 
-    def sample(self) -> Any:
+    def sample(self) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().sample())
 
-    def get_value(self) -> Any:
+    def get_value(self) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().getValue())
 
-    def get_connected_graph(self) -> Any:
+    def get_connected_graph(self) -> Iterable['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
-    def get_id(self) -> Any:
+    def get_id(self) -> Tuple[Any, ...]:
         return Vertex._get_python_id(self.unwrap())
 
     @staticmethod
-    def __parse_args(args : Any) -> List[JavaObject]:
+    def __parse_args(args : Tuple[Any, ...]) -> List[Any]:
         return list(map(Vertex.__parse_arg, args))
 
     @staticmethod
-    def __parse_arg(arg : Any) -> JavaObject:
-        if isinstance(arg, const_arg_types):
+    def __parse_arg(arg : Any) -> Any:
+        if isinstance(arg, runtime_const_arg_types):
             return kn.vertex.const.Const(arg).unwrap() # type: ignore
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()
-        elif isinstance(arg, collections.Iterable) and all(isinstance(x, primitive_types) for x in arg):
+        elif isinstance(arg, collections.Iterable) and all(isinstance(x, runtime_primitive_types) for x in arg):
             return k.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
-    def _to_generator(java_vertices : Any) -> Any:
+    def _to_generator(java_vertices : Any) -> Iterable['Vertex']:
         return (Vertex(java_vertex) for java_vertex in java_vertices)
 
     @staticmethod
-    def _get_python_id(java_vertex : Any) -> Any:
+    def _get_python_id(java_vertex : Any) -> Tuple[Any, ...]:
         return tuple(java_vertex.getId().getValue())
