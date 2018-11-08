@@ -17,18 +17,17 @@ class DocString {
     }
 
     private boolean isEmpty() {
-        return StringUtils.isEmpty(methodDescription)
-            && parameterNameToDescriptionMap.isEmpty();
+        return StringUtils.isEmpty(methodDescription) && parameterNameToDescriptionMap.isEmpty();
     }
 
     String getAsString() {
-        StringBuilder stringBuilder = new StringBuilder();
         if (isEmpty()) {
             return "";
         }
         if (parameterNameToDescriptionMap.size() == 0) {
             return THREE_QUOTES + "\n" + methodDescription + THREE_QUOTES + "\n\n";
         }
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(THREE_QUOTES);
         stringBuilder.append(NEW_LINE_TAB);
         stringBuilder.append(methodDescription.replaceAll("\n ", NEW_LINE_TAB));
