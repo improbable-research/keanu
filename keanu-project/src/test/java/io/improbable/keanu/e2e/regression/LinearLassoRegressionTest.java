@@ -1,8 +1,12 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -90,6 +94,35 @@ public class LinearLassoRegressionTest {
             .build();
 
         assertThat(linearRegressionModel.getWeight(2), closeTo(0., 1e-3));
+    }
+
+
+    @Test
+    public void youCanChooseSamplingInsteadOfGradientOptimization() {
+        LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataLaplaceWeights(2);
+
+        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(.1));
+
+        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
+            .withRegularization(RegressionRegularization.LASSO)
+            .withPriorOnIntercept(data.intercept, data.intercept * 0.01)
+            .withPriorOnWeights(
+                data.weights.asFlatDoubleArray(),
+                data.weights.times(0.001).asFlatDoubleArray()
+            )
+            .withSampling(
+                MetropolisHastings.builder()
+                    .proposalDistribution(proposalDistribution)
+                    .build(),
+                3000,
+                2500)
+            .build();
+
+        assertWeightsAndInterceptMatchTestData(
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
+            data
+        );
     }
 
 }

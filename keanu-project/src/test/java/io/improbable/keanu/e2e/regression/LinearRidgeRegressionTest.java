@@ -1,8 +1,12 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -80,4 +84,32 @@ public class LinearRidgeRegressionTest {
 
     }
 
+
+    @Test
+    public void youCanChooseSamplingInsteadOfGradientOptimization() {
+        LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataGaussianWeights(2);
+
+        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(0.01));
+
+        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
+            .withRegularization(RegressionRegularization.RIDGE)
+            .withPriorOnIntercept(0, data.intercept)
+            .withPriorOnWeights(
+                DoubleTensor.create(0., data.weights.getShape()).asFlatDoubleArray(),
+                data.weights.asFlatDoubleArray()
+            )
+            .withSampling(
+                MetropolisHastings.builder()
+                    .proposalDistribution(proposalDistribution)
+                    .build(),
+                2000,
+                1900)
+            .build();
+
+        assertWeightsAndInterceptMatchTestData(
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
+            data
+        );
+    }
 }
