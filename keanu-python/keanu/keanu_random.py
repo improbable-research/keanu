@@ -9,11 +9,11 @@ java_import(k.jvm_view(), "io.improbable.keanu.vertices.dbl.KeanuRandom")
 
 
 class KeanuRandom(JavaObjectWrapper):
-    def __init__(self, seed : Any=None) -> None:
+    def __init__(self, seed : int=None) -> None:
         if seed is None:
             super(KeanuRandom, self).__init__(k.jvm_view().KeanuRandom())
         else:
             super(KeanuRandom, self).__init__(k.jvm_view().KeanuRandom(seed))
 
-    def set_default_random_seed(self, seed : Any) -> Any:
+    def set_default_random_seed(self, seed : int) -> None:
         k.jvm_view().KeanuRandom.setDefaultRandomSeed(seed)
