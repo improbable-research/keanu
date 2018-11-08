@@ -340,11 +340,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     @Override
     public void setValue(KeanuSavedBayesNet.VertexValue valueBuf) {
-        if (valueBuf.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
-            throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
-        } else {
-            setValue(DoubleTensor.create(Doubles.toArray(valueBuf.getDoubleVal().getValuesList())));
-        }
+
     }
 
     @Override

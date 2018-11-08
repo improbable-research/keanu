@@ -1,8 +1,12 @@
 package io.improbable.keanu.network;
 
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,10 +14,12 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProtobufReader {
+public class ProtobufReader implements NetworkReader {
+
+    private final Map<Vertex, KeanuSavedBayesNet.VertexValue> values;
 
     public ProtobufReader() {
-
+        values = new HashMap<>();
     }
 
     public static BayesianNetwork loadNetwork(InputStream input) throws IOException {
@@ -30,6 +36,20 @@ public class ProtobufReader {
         loadDefaultValues(parsedNet, instantiatedVertices, bayesNet);
 
         return bayesNet;
+    }
+
+    @Override
+    public void loadValue(DoubleVertex vertex) {
+        KeanuSavedBayesNet.VertexValue value = values.get(vertex);
+
+        if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
+            throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
+        } else {
+            vertex.setValue(DoubleTensor.create(
+                Doubles.toArray(value.getDoubleVal().getValuesList()),
+                Longs.toArray(value.getDoubleVal().getShapeList()))
+            );
+        }
     }
 
     private static void loadDefaultValues(KeanuSavedBayesNet.BayesianNetwork parsedNet,

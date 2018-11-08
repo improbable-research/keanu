@@ -1,9 +1,8 @@
 package io.improbable.keanu.network;
 
-import java.io.IOException;
-import java.io.InputStream;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public interface NetworkReader {
 
-    public BayesianNetwork loadNetwork(InputStream input) throws IOException;
+    void loadValue(DoubleVertex vertex);
 }
