@@ -78,9 +78,9 @@ public class DirichletVertexTest {
 
         for (int i = 0; i < numSamples; i++) {
             DoubleTensor sample = dirichlet.sample(random);
-            samples.setValue(sample.getValue(0, 0), i, 0);
-            samples.setValue(sample.getValue(0, 1), i, 1);
-            samples.setValue(sample.getValue(0, 2), i, 2);
+            samples.setValue(sample.getValue( 0), i, 0);
+            samples.setValue(sample.getValue( 1), i, 1);
+            samples.setValue(sample.getValue( 2), i, 2);
         }
 
         DoubleTensor stringOne = samples.slice(1, 0);

@@ -44,7 +44,7 @@ public class Multinomial implements DiscreteDistribution {
         CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.validate(p);
 
         numCategories = p.getShape()[0];
-        TensorShapeValidation.checkAllShapesMatch(n.getShape(), p.slice(0, 0).getShape());
+//        TensorShapeValidation.checkAllShapesMatch(n.getShape(), p.slice(0, 0).getShape());
         this.n = n;
         this.p = p;
     }
@@ -81,7 +81,7 @@ public class Multinomial implements DiscreteDistribution {
      */
     private IntegerTensor constructSampleTensor(long[] shape, int[] samples) {
         long[] outputShape = shape;
-        if (shape[0] == 1) {
+        if (shape.length > 0 && shape[0] == 1) {
             outputShape = ArrayUtils.remove(outputShape, 0);
         }
         IntegerTensor abkTensor = IntegerTensor.create(samples, ArrayUtils.add(outputShape, numCategories));

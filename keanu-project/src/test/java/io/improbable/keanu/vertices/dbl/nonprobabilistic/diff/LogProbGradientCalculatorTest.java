@@ -113,7 +113,7 @@ public class LogProbGradientCalculatorTest {
         double expectedDLogProbWrtA = B.dLogProb(bValue, D).get(D).times(cValue).sum();
         DoubleTensor expectedDLogProbWrtC = B.dLogProb(bValue, D).get(D).times(aValue);
 
-        assertArrayEquals(new long[]{1, 1}, dBLogProbWrtAValue.getShape());
+        assertArrayEquals(new long[]{}, dBLogProbWrtAValue.getShape());
         assertThat(dBLogProbWrtAValue.scalar(), equalTo(expectedDLogProbWrtA));
         assertThat(dBLogProbWrtCValue, equalTo(expectedDLogProbWrtC));
     }
@@ -153,8 +153,8 @@ public class LogProbGradientCalculatorTest {
         DoubleTensor dHdB = dHForward.withRespectTo(B);
         DoubleTensor dJLogProbWrtH = J.dLogProbAtValue(H).get(H);
 
-        DoubleTensor expectedDJLogProbWrtAValue = dJLogProbWrtH.times(dHdA).sum(0, 1);
-        DoubleTensor expectedDJLogProbWrtBValue = dJLogProbWrtH.times(dHdB).sum(0, 1);
+        DoubleTensor expectedDJLogProbWrtAValue = dJLogProbWrtH.times(dHdA);
+        DoubleTensor expectedDJLogProbWrtBValue = dJLogProbWrtH.times(dHdB);
 
         assertEquals(expectedDJLogProbWrtAValue, dJLogProbWrtAValue);
         assertEquals(expectedDJLogProbWrtBValue, dJLogProbWrtBValue);

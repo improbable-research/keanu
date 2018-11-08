@@ -662,7 +662,7 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canFindArgMaxOfRowVector() {
-        DoubleTensor tensorRow = DoubleTensor.create(1, 3, 4, 5, 2);
+        DoubleTensor tensorRow = DoubleTensor.create(1, 3, 4, 5, 2).reshape(1, 5);
 
         assertEquals(3, tensorRow.argMax());
         assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
@@ -675,7 +675,7 @@ public class Nd4jDoubleTensorTest {
 
         assertEquals(3, tensorCol.argMax());
         assertThat(tensorCol.argMax(0), isScalarWithValue(3));
-        assertThat(tensorCol.argMax(1), valuesAndShapesMatch(IntegerTensor.zeros(1, 5)));
+        assertThat(tensorCol.argMax(1), valuesAndShapesMatch(IntegerTensor.zeros(5)));
     }
 
     @Test

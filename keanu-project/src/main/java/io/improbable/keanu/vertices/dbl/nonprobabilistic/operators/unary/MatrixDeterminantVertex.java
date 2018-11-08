@@ -41,7 +41,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex {
 
         PartialDerivatives derivativeOfOutputsWithRespectToInputs = derivativeOfOutputsWithRespectToSelf
             .multiplyBy(inputVertex.getValue().determinant())
-            .multiplyAlongWrtDimensions(inverseTranspose, this.inputVertex.getShape());
+            .multiplyAlongWrtDimensions(inverseTranspose, this.getShape());
 
         return Collections.singletonMap(inputVertex, derivativeOfOutputsWithRespectToInputs);
     }

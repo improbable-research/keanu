@@ -104,7 +104,7 @@ public class PartialDerivatives {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
             long[] vShape = v.getShape();
-            long[] ofShape = TensorShape.selectDimensions(0, v.getShape().length - wrtRank, vShape);
+            long[] ofShape = TensorShape.selectDimensions(0, Math.max(0, v.getShape().length - wrtRank), vShape);
 
             DoubleTensor summedV = v.sum(dimensions);
             long[] newShape = TensorShape.concat(ofShape, resultShape);
@@ -409,10 +409,24 @@ public class PartialDerivatives {
     }
 
     private long[] extractWrtShape(long[] partialDerivativeShape, int rankOfSource) {
+        if (partialDerivativeShape.length == 0) {
+            if (rankOfSource > 1) {
+                throw new IllegalArgumentException("Partial does not contain wrt shape requested");
+            } else {
+                return new long[0];
+            }
+        }
         return Arrays.copyOfRange(partialDerivativeShape, rankOfSource, partialDerivativeShape.length);
     }
 
     private long[] extractOfShape(long[] partialDerivativeShape, int rankOfSource) {
+        if (partialDerivativeShape.length == 0) {
+            if (rankOfSource > 1) {
+                throw new IllegalArgumentException("Partial does not contain of shape requested");
+            } else {
+                return new long[0];
+            }
+        }
         return Arrays.copyOfRange(partialDerivativeShape, 0, rankOfSource);
     }
 

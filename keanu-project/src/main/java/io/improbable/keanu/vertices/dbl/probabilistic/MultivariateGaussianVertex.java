@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +44,6 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
         this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
 
-
     /**
      * Matches a mu to a Multivariate Gaussian. The covariance value provided here
      * is used to create a covariance tensor by multiplying the scalar value against
@@ -53,11 +53,15 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param covariance the scale of the identity matrix
      */
     public MultivariateGaussianVertex(DoubleVertex mu, double covariance) {
-        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0])).times(covariance));
+        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0]).times(covariance)));
     }
 
     public MultivariateGaussianVertex(double mu, double covariance) {
-        this(ConstantVertex.of(mu), ConstantVertex.of(covariance));
+        this(singularMatrix(mu), singularMatrix(covariance));
+    }
+
+    private static DoubleVertex singularMatrix(double value) {
+        return new ConstantDoubleVertex(DoubleTensor.scalar(value).reshape(1, 1));
     }
 
     @Override

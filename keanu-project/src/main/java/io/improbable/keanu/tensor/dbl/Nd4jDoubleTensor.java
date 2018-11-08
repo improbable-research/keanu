@@ -149,29 +149,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor sum(int... overDimensions) {
-
-        for (int i = 0; i < overDimensions.length; i++) {
-            if (overDimensions[i] < 0) {
-                overDimensions[i] += tensor.rank();
-            }
-        }
-
-        long[] newShape = ArrayUtils.removeAll(tensor.shape(), overDimensions);
-        long[] newStride = TensorShape.getRowFirstStride(newShape);
-
-        int[] shapeInts = new int[newShape.length];
-        int[] strideInts = new int[newStride.length];
-
-        for (int i = 0; i < newShape.length; i++) {
-            shapeInts[i] = (int) newShape[i];
-            strideInts[i] = (int) newStride[i];
-        }
-
-        INDArray result = tensor.sum(overDimensions);
-
-        result.setShapeAndStride(shapeInts, strideInts);
-
-        return new Nd4jDoubleTensor(result);
+        return new Nd4jDoubleTensor(INDArrayShim.sum(tensor, overDimensions));
     }
 
     public Double sum() {

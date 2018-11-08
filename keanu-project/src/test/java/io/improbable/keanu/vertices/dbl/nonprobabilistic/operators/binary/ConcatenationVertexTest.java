@@ -59,7 +59,7 @@ public class ConcatenationVertexTest {
         UniformVertex a = new UniformVertex(0.0, 1.0);
         a.setValue(new double[]{1, 2, 3});
 
-        DoubleVertex b = new ConstantDoubleVertex(4.0);
+        DoubleVertex b = new ConstantDoubleVertex(new double[]{4.0});
 
         ConcatenationVertex concat = new ConcatenationVertex(0, a, b);
 
@@ -69,7 +69,7 @@ public class ConcatenationVertexTest {
 
     @Test
     public void canConcatVectorToScalar() {
-        DoubleVertex a = new ConstantDoubleVertex(1.0);
+        DoubleVertex a = new ConstantDoubleVertex(new double[]{1.0});
 
         UniformVertex b = new UniformVertex(0.0, 1.0);
         b.setValue(new double[]{2, 3, 4});

@@ -202,15 +202,6 @@ public class TensorShape {
      */
     public static long[] removeDimensionSafe(int dimension, long[] shape) {
         TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
-
-//        if (shape.length == 1) {
-//            return new long[]{1, shape[0]};
-//        }
-//
-//        if (shape.length == 2) {
-//            return new long[]{1, dimension == 1 ? shape[0] : shape[1]};
-//        }
-
         return ArrayUtils.remove(shape, dimension);
     }
 

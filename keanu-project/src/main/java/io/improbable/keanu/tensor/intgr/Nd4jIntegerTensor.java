@@ -92,7 +92,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor sum(int... overDimensions) {
-        return new Nd4jIntegerTensor(tensor.sum(overDimensions));
+        return new Nd4jIntegerTensor(INDArrayShim.sum(tensor, overDimensions));
     }
 
     @Override

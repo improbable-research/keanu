@@ -143,6 +143,8 @@ public class TensorShapeValidation {
     }
 
     public static long[] checkShapesCanBeConcatenated(int dimension, long[]... shapes) {
+
+
         long[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
 
         for (int i = 1; i < shapes.length; i++) {

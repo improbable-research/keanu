@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor;
 
 import com.google.common.primitives.Ints;
+import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.shape.Shape;
 import org.nd4j.linalg.factory.Broadcast;
@@ -110,5 +111,30 @@ public class INDArrayShim {
             }
         }
         return Ints.toArray(along);
+    }
+
+    public static INDArray sum(INDArray tensor, int... overDimensions) {
+        for (int i = 0; i < overDimensions.length; i++) {
+            if (overDimensions[i] < 0) {
+                overDimensions[i] += tensor.rank();
+            }
+        }
+
+        long[] newShape = ArrayUtils.removeAll(tensor.shape(), overDimensions);
+        long[] newStride = TensorShape.getRowFirstStride(newShape);
+
+        int[] shapeInts = new int[newShape.length];
+        int[] strideInts = new int[newStride.length];
+
+        for (int i = 0; i < newShape.length; i++) {
+            shapeInts[i] = (int) newShape[i];
+            strideInts[i] = (int) newStride[i];
+        }
+
+        INDArray result = tensor.sum(overDimensions);
+
+        result.setShapeAndStride(shapeInts, strideInts);
+
+        return result;
     }
 }

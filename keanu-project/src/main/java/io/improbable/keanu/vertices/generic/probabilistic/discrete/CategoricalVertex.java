@@ -55,7 +55,7 @@ public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extend
             .collect(
                 toMap(
                     categories::get,
-                    index -> new TakeVertex(vertex, 0, index)
+                    index -> new TakeVertex(vertex,  index)
                 )
             );
         return new CategoricalVertex<>(selectableValues);

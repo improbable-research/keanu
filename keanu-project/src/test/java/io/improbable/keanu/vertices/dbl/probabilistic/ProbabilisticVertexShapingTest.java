@@ -28,7 +28,7 @@ public class ProbabilisticVertexShapingTest {
     @Test
     public void suggestScalar() {
         long[] shapeProposal = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(scalar1, scalar2);
-        assertArrayEquals(new long[]{1, 1}, shapeProposal);
+        assertArrayEquals(new long[]{}, shapeProposal);
     }
 
     @Test(expected = IllegalArgumentException.class)

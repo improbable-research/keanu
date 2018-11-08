@@ -35,7 +35,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     static IntegerTensor create(int... values) {
-        return create(values, 1, values.length);
+        return create(values, values.length);
     }
 
     static IntegerTensor ones(long... shape) {

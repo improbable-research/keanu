@@ -39,7 +39,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     }
 
     public MultinomialVertex(int n, DoubleVertex p) {
-        this(ConstantVertex.of(n), p);
+        this(ConstantVertex.of(IntegerTensor.create(n, new long[]{1, 1})), p);
     }
 
     @Override

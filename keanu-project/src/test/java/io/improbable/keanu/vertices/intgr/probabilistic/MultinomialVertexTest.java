@@ -114,9 +114,8 @@ public class MultinomialVertexTest {
     @Test
     public void itWorksWithScalars() {
         int n = 100;
-        DoubleTensor p = DoubleTensor.create(0.01, 0.09, 0.9).transpose();
-        MultinomialVertex multinomial = new MultinomialVertex(
-            n, ConstantVertex.of(p));
+        DoubleTensor p = DoubleTensor.create(new double[]{0.01, 0.09, 0.9}, 3, 1);
+        MultinomialVertex multinomial = new MultinomialVertex(n, ConstantVertex.of(p));
         IntegerTensor samples = multinomial.sample(KeanuRandom.getDefaultRandom());
         assertThat(samples, hasShape(3, 1));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
@@ -208,8 +207,8 @@ public class MultinomialVertexTest {
     @Test
     public void youCanSampleWithATensorIfNIsScalarAndPIsAColumnVector() {
         int n = 100;
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
-        Multinomial multinomial = Multinomial.withParameters(IntegerTensor.scalar(n), p);
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(4, 1);
+        Multinomial multinomial = Multinomial.withParameters(IntegerTensor.scalar(n).reshape(1, 1), p);
         IntegerTensor samples = multinomial.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
         assertThat(samples, hasShape(4, 2, 2));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
@@ -219,8 +218,8 @@ public class MultinomialVertexTest {
     public void ifYourRandomReturnsZeroItSamplesFromTheFirstCategory() {
         KeanuRandom mockRandomAlwaysZero = mock(KeanuRandom.class);
         when(mockRandomAlwaysZero.nextDouble()).thenReturn(0.);
-        IntegerTensor n = IntegerTensor.scalar(100);
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
+        IntegerTensor n = IntegerTensor.scalar(100).reshape(1, 1);
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(4, 1);
         Multinomial multinomial = Multinomial.withParameters(n, p);
         IntegerTensor samples = multinomial.sample(new long[]{1, 1}, mockRandomAlwaysZero);
         assertThat(samples, hasValue(100, 0, 0, 0));
@@ -230,8 +229,8 @@ public class MultinomialVertexTest {
     public void ifYourRandomReturnsOneItSamplesFromTheLastCategory() {
         KeanuRandom mockRandomAlwaysZero = mock(KeanuRandom.class);
         when(mockRandomAlwaysZero.nextDouble()).thenReturn(1.);
-        IntegerTensor n = IntegerTensor.scalar(100);
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
+        IntegerTensor n = IntegerTensor.scalar(100).reshape(1, 1);
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(4, 1);
         Multinomial multinomial = Multinomial.withParameters(n, p);
         IntegerTensor samples = multinomial.sample(new long[]{1, 1}, mockRandomAlwaysZero);
         assertThat(samples, hasValue(0, 0, 0, 100));
@@ -277,8 +276,8 @@ public class MultinomialVertexTest {
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
         int N = 10000;
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4).transpose();
-        IntegerTensor n = IntegerTensor.scalar(500);
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4).reshape(4, 1);
+        IntegerTensor n = IntegerTensor.scalar(500).reshape(1, 1);
 
         MultinomialVertex vertex = new MultinomialVertex(
             new long[]{1, N},
