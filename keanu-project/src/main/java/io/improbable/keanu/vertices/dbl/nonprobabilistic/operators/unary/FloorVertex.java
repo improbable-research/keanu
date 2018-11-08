@@ -25,14 +25,4 @@ public class FloorVertex extends DoubleUnaryOpVertex {
     protected DoubleTensor op(DoubleTensor value) {
         return value.floor();
     }
-
-    @Override
-    protected  PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        throw new UnsupportedOperationException();
-    }
 }

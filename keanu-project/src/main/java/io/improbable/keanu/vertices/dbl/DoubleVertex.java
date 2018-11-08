@@ -51,7 +51,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
+public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
 
     public DoubleVertex(long[] initialShape) {
         super(initialShape);
@@ -326,20 +326,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return getValue().getValue(index);
     }
 
-    @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        if (isObserved()) {
-            return PartialDerivatives.OF_CONSTANT;
-        } else {
-            return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
+    public PartialDerivatives getDerivativeWrtLatents() {
+        if (this instanceof Differentiable) {
+            return Differentiator.forwardModeAutoDiff((Vertex & Differentiable) this);
         }
-    }
-
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        return Collections.singletonMap(
-            this,
-            PartialDerivatives.withRespectToSelf(this.getId(), this.getShape())
-        );
+        throw new UnsupportedOperationException();
     }
 }

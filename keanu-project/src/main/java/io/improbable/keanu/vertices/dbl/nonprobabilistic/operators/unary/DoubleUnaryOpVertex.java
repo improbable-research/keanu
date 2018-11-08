@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -44,16 +45,5 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
         return op(inputVertex.getValue());
     }
 
-    @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        try {
-            return forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs.get(inputVertex));
-        } catch (UnsupportedOperationException e) {
-            return super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs);
-        }
-    }
-
     protected abstract DoubleTensor op(DoubleTensor value);
-
-    protected abstract PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs);
 }

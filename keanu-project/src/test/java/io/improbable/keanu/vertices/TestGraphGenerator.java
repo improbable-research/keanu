@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
@@ -8,6 +9,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleU
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -26,7 +28,7 @@ public class TestGraphGenerator {
         return end;
     }
 
-    static class PassThroughVertex extends DoubleUnaryOpVertex {
+    static class PassThroughVertex extends DoubleUnaryOpVertex implements Differentiable {
 
         private final AtomicInteger opCount;
         private final AtomicInteger autoDiffCount;
@@ -47,7 +49,8 @@ public class TestGraphGenerator {
         }
 
         @Override
-        protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+        public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+            PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
             autoDiffCount.incrementAndGet();
             return derivativeOfParentWithRespectToInputs;
         }

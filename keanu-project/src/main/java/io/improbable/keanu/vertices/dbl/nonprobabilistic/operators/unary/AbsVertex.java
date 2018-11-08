@@ -25,14 +25,4 @@ public class AbsVertex extends DoubleUnaryOpVertex {
     protected DoubleTensor op(DoubleTensor value) {
         return value.abs();
     }
-
-    @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        throw new UnsupportedOperationException();
-    }
 }
