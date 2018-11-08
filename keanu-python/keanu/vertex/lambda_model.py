@@ -20,10 +20,10 @@ class LambdaModel(Vertex):
     executor, 
     update_value = _extract_values
     ) -> Vertex:
-        self.map = map
+        self.inputs = context.to_java_map(inputs)
         self.executor = Consumer(executor)
         self.update_value = Function(update_value)
-        val = context.jvm_view().LambdaModelVertex(inputs, self.executor, self.update_value)
+        val = context.jvm_view().LambdaModelVertex(self.inputs, self.executor, self.update_value)
         super(LambdaModel, self).__init__(val)
 
     def get_double_model_output_vertex(self, label : str):

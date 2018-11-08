@@ -12,9 +12,12 @@ def plus_one(vertices):
 
 def test_you_can_create_a_lambda_model_vertex():
     v_in = Gaussian(1., 1.)
-    inputs = context.to_java_map({ "in": v_in })
 
-    model = LambdaModel(inputs, plus_one)
+    model = LambdaModel(
+        { "in": v_in }, 
+        plus_one
+        )
+        
     v_out = model.get_double_model_output_vertex("out")
 
     v_in.set_value(1.)
