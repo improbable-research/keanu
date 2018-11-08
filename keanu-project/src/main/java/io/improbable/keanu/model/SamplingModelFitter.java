@@ -20,7 +20,7 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
     }
 
     /**
-     * Uses the Metropolis Hastings sampling algorithm to fit the model graph to a given set of input and output data.
+     * Uses a posterior sampling algorithm (e.g. Metropolis Hastings) to fit the model graph to a given set of input and output data.
      * This will mutate the graph which can then be used to construct a graph-backed model like, for instance, a
      * {@link io.improbable.keanu.model.regression.RegressionModel RegressionModel}
      *
