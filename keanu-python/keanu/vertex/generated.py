@@ -37,14 +37,14 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 
 
-def ConstantBool(constant) -> context.jvm_view().ConstantBoolVertex:
+def ConstantBool(constant) -> Vertex:
     """
     :param constant: 
     """
     return Vertex(context.jvm_view().ConstantBoolVertex, constant)
 
 
-def Equals(a, b) -> context.jvm_view().EqualsVertex:
+def Equals(a, b) -> Vertex:
     """
     :param a: 
     :param b: 
@@ -52,7 +52,7 @@ def Equals(a, b) -> context.jvm_view().EqualsVertex:
     return Vertex(context.jvm_view().EqualsVertex, a, b)
 
 
-def GreaterThanOrEqual(a, b) -> context.jvm_view().GreaterThanOrEqualVertex:
+def GreaterThanOrEqual(a, b) -> Vertex:
     """
     :param a: 
     :param b: 
@@ -60,7 +60,7 @@ def GreaterThanOrEqual(a, b) -> context.jvm_view().GreaterThanOrEqualVertex:
     return Vertex(context.jvm_view().GreaterThanOrEqualVertex, a, b)
 
 
-def GreaterThan(a, b) -> context.jvm_view().GreaterThanVertex:
+def GreaterThan(a, b) -> Vertex:
     """
     :param a: 
     :param b: 
@@ -68,7 +68,7 @@ def GreaterThan(a, b) -> context.jvm_view().GreaterThanVertex:
     return Vertex(context.jvm_view().GreaterThanVertex, a, b)
 
 
-def LessThanOrEqual(a, b) -> context.jvm_view().LessThanOrEqualVertex:
+def LessThanOrEqual(a, b) -> Vertex:
     """
     :param a: 
     :param b: 
@@ -76,7 +76,7 @@ def LessThanOrEqual(a, b) -> context.jvm_view().LessThanOrEqualVertex:
     return Vertex(context.jvm_view().LessThanOrEqualVertex, a, b)
 
 
-def LessThan(a, b) -> context.jvm_view().LessThanVertex:
+def LessThan(a, b) -> Vertex:
     """
     :param a: 
     :param b: 
@@ -84,7 +84,7 @@ def LessThan(a, b) -> context.jvm_view().LessThanVertex:
     return Vertex(context.jvm_view().LessThanVertex, a, b)
 
 
-def NotEquals(a, b) -> context.jvm_view().NotEqualsVertex:
+def NotEquals(a, b) -> Vertex:
     """
     :param a: 
     :param b: 
@@ -92,21 +92,21 @@ def NotEquals(a, b) -> context.jvm_view().NotEqualsVertex:
     return Vertex(context.jvm_view().NotEqualsVertex, a, b)
 
 
-def CastDouble(input_vertex) -> context.jvm_view().CastDoubleVertex:
+def CastDouble(input_vertex) -> Vertex:
     """
     :param input_vertex: 
     """
     return Vertex(context.jvm_view().CastDoubleVertex, input_vertex)
 
 
-def ConstantDouble(constant) -> context.jvm_view().ConstantDoubleVertex:
+def ConstantDouble(constant) -> Vertex:
     """
     :param constant: 
     """
     return Vertex(context.jvm_view().ConstantDoubleVertex, constant)
 
 
-def DoubleIf(shape, predicate, thn, els) -> context.jvm_view().DoubleIfVertex:
+def DoubleIf(shape, predicate, thn, els) -> Vertex:
     """
     :param predicate: 
     :param shape: 
@@ -116,7 +116,7 @@ def DoubleIf(shape, predicate, thn, els) -> context.jvm_view().DoubleIfVertex:
     return Vertex(context.jvm_view().DoubleIfVertex, shape, predicate, thn, els)
 
 
-def Addition(left, right) -> context.jvm_view().AdditionVertex:
+def Addition(left, right) -> Vertex:
     """
     Adds one vertex to another
     
@@ -126,7 +126,7 @@ def Addition(left, right) -> context.jvm_view().AdditionVertex:
     return Vertex(context.jvm_view().AdditionVertex, left, right)
 
 
-def Difference(left, right) -> context.jvm_view().DifferenceVertex:
+def Difference(left, right) -> Vertex:
     """
     Subtracts one vertex from another
     
@@ -136,7 +136,7 @@ def Difference(left, right) -> context.jvm_view().DifferenceVertex:
     return Vertex(context.jvm_view().DifferenceVertex, left, right)
 
 
-def Division(left, right) -> context.jvm_view().DivisionVertex:
+def Division(left, right) -> Vertex:
     """
     Divides one vertex by another
     
@@ -146,7 +146,7 @@ def Division(left, right) -> context.jvm_view().DivisionVertex:
     return Vertex(context.jvm_view().DivisionVertex, left, right)
 
 
-def Multiplication(left, right) -> context.jvm_view().MultiplicationVertex:
+def Multiplication(left, right) -> Vertex:
     """
     Multiplies one vertex by another
     
@@ -156,7 +156,7 @@ def Multiplication(left, right) -> context.jvm_view().MultiplicationVertex:
     return Vertex(context.jvm_view().MultiplicationVertex, left, right)
 
 
-def Power(base, exponent) -> context.jvm_view().PowerVertex:
+def Power(base, exponent) -> Vertex:
     """
     Raises a vertex to the power of another
     
@@ -166,7 +166,7 @@ def Power(base, exponent) -> context.jvm_view().PowerVertex:
     return Vertex(context.jvm_view().PowerVertex, base, exponent)
 
 
-def Abs(input_vertex) -> context.jvm_view().AbsVertex:
+def Abs(input_vertex) -> Vertex:
     """
     Takes the absolute of a vertex
     
@@ -175,7 +175,7 @@ def Abs(input_vertex) -> context.jvm_view().AbsVertex:
     return Vertex(context.jvm_view().AbsVertex, input_vertex)
 
 
-def Ceil(input_vertex) -> context.jvm_view().CeilVertex:
+def Ceil(input_vertex) -> Vertex:
     """
     Applies the Ceiling operator to a vertex.
     This maps a vertex to the smallest integer greater than or equal to its value
@@ -185,7 +185,7 @@ def Ceil(input_vertex) -> context.jvm_view().CeilVertex:
     return Vertex(context.jvm_view().CeilVertex, input_vertex)
 
 
-def Floor(input_vertex) -> context.jvm_view().FloorVertex:
+def Floor(input_vertex) -> Vertex:
     """
     Applies the Floor operator to a vertex.
     This maps a vertex to the biggest integer less than or equal to its value
@@ -195,7 +195,7 @@ def Floor(input_vertex) -> context.jvm_view().FloorVertex:
     return Vertex(context.jvm_view().FloorVertex, input_vertex)
 
 
-def Round(input_vertex) -> context.jvm_view().RoundVertex:
+def Round(input_vertex) -> Vertex:
     """
     Applies the Rounding operator to a vertex.
     This maps a vertex to the nearest integer value
@@ -205,7 +205,7 @@ def Round(input_vertex) -> context.jvm_view().RoundVertex:
     return Vertex(context.jvm_view().RoundVertex, input_vertex)
 
 
-def Cauchy(location, scale) -> context.jvm_view().CauchyVertex:
+def Cauchy(location, scale) -> Vertex:
     """
     :param scale: 
     :param location: 
@@ -213,7 +213,7 @@ def Cauchy(location, scale) -> context.jvm_view().CauchyVertex:
     return Vertex(context.jvm_view().CauchyVertex, location, scale)
 
 
-def Exponential(rate) -> context.jvm_view().ExponentialVertex:
+def Exponential(rate) -> Vertex:
     """
     One to one constructor for mapping some shape of rate to matching shaped exponential.
     
@@ -222,7 +222,7 @@ def Exponential(rate) -> context.jvm_view().ExponentialVertex:
     return Vertex(context.jvm_view().ExponentialVertex, rate)
 
 
-def Gamma(theta, k) -> context.jvm_view().GammaVertex:
+def Gamma(theta, k) -> Vertex:
     """
     One to one constructor for mapping some shape of theta and k to matching shaped gamma.
     
@@ -232,7 +232,7 @@ def Gamma(theta, k) -> context.jvm_view().GammaVertex:
     return Vertex(context.jvm_view().GammaVertex, theta, k)
 
 
-def Gaussian(mu, sigma) -> context.jvm_view().GaussianVertex:
+def Gaussian(mu, sigma) -> Vertex:
     """
     :param sigma: 
     :param mu: 
@@ -240,7 +240,7 @@ def Gaussian(mu, sigma) -> context.jvm_view().GaussianVertex:
     return Vertex(context.jvm_view().GaussianVertex, mu, sigma)
 
 
-def Uniform(x_min, x_max) -> context.jvm_view().UniformVertex:
+def Uniform(x_min, x_max) -> Vertex:
     """
     One to one constructor for mapping some shape of mu and sigma to
     a matching shaped Uniform Vertex
@@ -251,14 +251,14 @@ def Uniform(x_min, x_max) -> context.jvm_view().UniformVertex:
     return Vertex(context.jvm_view().UniformVertex, x_min, x_max)
 
 
-def ConstantInteger(constant) -> context.jvm_view().ConstantIntegerVertex:
+def ConstantInteger(constant) -> Vertex:
     """
     :param constant: 
     """
     return Vertex(context.jvm_view().ConstantIntegerVertex, constant)
 
 
-def IntegerDivision(a, b) -> context.jvm_view().IntegerDivisionVertex:
+def IntegerDivision(a, b) -> Vertex:
     """
     Divides one vertex by another
     
@@ -268,7 +268,7 @@ def IntegerDivision(a, b) -> context.jvm_view().IntegerDivisionVertex:
     return Vertex(context.jvm_view().IntegerDivisionVertex, a, b)
 
 
-def Poisson(mu) -> context.jvm_view().PoissonVertex:
+def Poisson(mu) -> Vertex:
     """
     One to one constructor for mapping some shape of mu to
     a matching shaped Poisson.
@@ -278,7 +278,7 @@ def Poisson(mu) -> context.jvm_view().PoissonVertex:
     return Vertex(context.jvm_view().PoissonVertex, mu)
 
 
-def UniformInt(min, max) -> context.jvm_view().UniformIntVertex:
+def UniformInt(min, max) -> Vertex:
     """
     :param min: 
     :param max: 
