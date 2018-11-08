@@ -38,52 +38,42 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 
 
 def ConstantBool(constant) -> context.jvm_view().ConstantBoolVertex:
-    
     return Vertex(context.jvm_view().ConstantBoolVertex, constant)
 
 
 def Equals(a, b) -> context.jvm_view().EqualsVertex:
-    
     return Vertex(context.jvm_view().EqualsVertex, a, b)
 
 
 def GreaterThanOrEqual(a, b) -> context.jvm_view().GreaterThanOrEqualVertex:
-    
     return Vertex(context.jvm_view().GreaterThanOrEqualVertex, a, b)
 
 
 def GreaterThan(a, b) -> context.jvm_view().GreaterThanVertex:
-    
     return Vertex(context.jvm_view().GreaterThanVertex, a, b)
 
 
 def LessThanOrEqual(a, b) -> context.jvm_view().LessThanOrEqualVertex:
-    
     return Vertex(context.jvm_view().LessThanOrEqualVertex, a, b)
 
 
 def LessThan(a, b) -> context.jvm_view().LessThanVertex:
-    
     return Vertex(context.jvm_view().LessThanVertex, a, b)
 
 
 def NotEquals(a, b) -> context.jvm_view().NotEqualsVertex:
-    
     return Vertex(context.jvm_view().NotEqualsVertex, a, b)
 
 
 def CastDouble(input_vertex) -> context.jvm_view().CastDoubleVertex:
-    
     return Vertex(context.jvm_view().CastDoubleVertex, input_vertex)
 
 
 def ConstantDouble(constant) -> context.jvm_view().ConstantDoubleVertex:
-    
     return Vertex(context.jvm_view().ConstantDoubleVertex, constant)
 
 
 def DoubleIf(shape, predicate, thn, els) -> context.jvm_view().DoubleIfVertex:
-    
     return Vertex(context.jvm_view().DoubleIfVertex, shape, predicate, thn, els)
 
 
@@ -177,7 +167,6 @@ def Round(input_vertex) -> context.jvm_view().RoundVertex:
 
 
 def Cauchy(location, scale) -> context.jvm_view().CauchyVertex:
-    
     return Vertex(context.jvm_view().CauchyVertex, location, scale)
 
 
@@ -201,7 +190,6 @@ def Gamma(theta, k) -> context.jvm_view().GammaVertex:
 
 
 def Gaussian(mu, sigma) -> context.jvm_view().GaussianVertex:
-    
     return Vertex(context.jvm_view().GaussianVertex, mu, sigma)
 
 
@@ -217,7 +205,6 @@ def Uniform(x_min, x_max) -> context.jvm_view().UniformVertex:
 
 
 def ConstantInteger(constant) -> context.jvm_view().ConstantIntegerVertex:
-    
     return Vertex(context.jvm_view().ConstantIntegerVertex, constant)
 
 
@@ -242,5 +229,4 @@ def Poisson(mu) -> context.jvm_view().PoissonVertex:
 
 
 def UniformInt(min, max) -> context.jvm_view().UniformIntVertex:
-    
     return Vertex(context.jvm_view().UniformIntVertex, min, max)
