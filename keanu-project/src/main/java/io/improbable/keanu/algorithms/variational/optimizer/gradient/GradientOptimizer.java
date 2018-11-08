@@ -16,6 +16,11 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -167,7 +172,17 @@ public class GradientOptimizer implements Optimizer {
         return optimize(bayesianNetwork.getObservedVertices());
     }
 
+    private void debugLogToFile(String message) {
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("keanu.log", true)))) {
+            out.println(message);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     private double optimize(List<Vertex> outputVertices) {
+
+        debugLogToFile("Optimisation Started");
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
@@ -214,6 +229,7 @@ public class GradientOptimizer implements Optimizer {
         );
 
         progressBar.finish();
+        debugLogToFile("Optimisation Ended");
         return pointValuePair.getValue();
     }
 
