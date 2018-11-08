@@ -93,7 +93,7 @@ public class LinearRidgeRegressionTest {
 
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .withRegularization(RegressionRegularization.RIDGE)
-            .withPriorOnIntercept(0, data.intercept)
+            .withPriorOnIntercept(data.intercept, data.intercept * 0.1)
             .withPriorOnWeights(
                 DoubleTensor.create(0., data.weights.getShape()).asFlatDoubleArray(),
                 data.weights.asFlatDoubleArray()
@@ -102,8 +102,8 @@ public class LinearRidgeRegressionTest {
                 MetropolisHastings.builder()
                     .proposalDistribution(proposalDistribution)
                     .build(),
-                2000,
-                1900)
+                4000,
+                3500)
             .build();
 
         assertWeightsAndInterceptMatchTestData(
