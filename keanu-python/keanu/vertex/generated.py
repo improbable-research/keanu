@@ -38,81 +38,42 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 
 
 def ConstantBool(constant) -> Vertex:
-    """
-    :param constant: 
-    """
     return Vertex(context.jvm_view().ConstantBoolVertex, constant)
 
 
 def Equals(a, b) -> Vertex:
-    """
-    :param a: 
-    :param b: 
-    """
     return Vertex(context.jvm_view().EqualsVertex, a, b)
 
 
 def GreaterThanOrEqual(a, b) -> Vertex:
-    """
-    :param a: 
-    :param b: 
-    """
     return Vertex(context.jvm_view().GreaterThanOrEqualVertex, a, b)
 
 
 def GreaterThan(a, b) -> Vertex:
-    """
-    :param a: 
-    :param b: 
-    """
     return Vertex(context.jvm_view().GreaterThanVertex, a, b)
 
 
 def LessThanOrEqual(a, b) -> Vertex:
-    """
-    :param a: 
-    :param b: 
-    """
     return Vertex(context.jvm_view().LessThanOrEqualVertex, a, b)
 
 
 def LessThan(a, b) -> Vertex:
-    """
-    :param a: 
-    :param b: 
-    """
     return Vertex(context.jvm_view().LessThanVertex, a, b)
 
 
 def NotEquals(a, b) -> Vertex:
-    """
-    :param a: 
-    :param b: 
-    """
     return Vertex(context.jvm_view().NotEqualsVertex, a, b)
 
 
 def CastDouble(input_vertex) -> Vertex:
-    """
-    :param input_vertex: 
-    """
     return Vertex(context.jvm_view().CastDoubleVertex, input_vertex)
 
 
 def ConstantDouble(constant) -> Vertex:
-    """
-    :param constant: 
-    """
     return Vertex(context.jvm_view().ConstantDoubleVertex, constant)
 
 
 def DoubleIf(shape, predicate, thn, els) -> Vertex:
-    """
-    :param predicate: 
-    :param shape: 
-    :param thn: 
-    :param els: 
-    """
     return Vertex(context.jvm_view().DoubleIfVertex, shape, predicate, thn, els)
 
 
@@ -206,10 +167,6 @@ def Round(input_vertex) -> Vertex:
 
 
 def Cauchy(location, scale) -> Vertex:
-    """
-    :param scale: 
-    :param location: 
-    """
     return Vertex(context.jvm_view().CauchyVertex, location, scale)
 
 
@@ -226,17 +183,13 @@ def Gamma(theta, k) -> Vertex:
     """
     One to one constructor for mapping some shape of theta and k to matching shaped gamma.
     
-    :param k: the k (shape) of the Gamma with either the same shape as specified for this vertex
     :param theta: the theta (scale) of the Gamma with either the same shape as specified for this vertex
+    :param k: the k (shape) of the Gamma with either the same shape as specified for this vertex
     """
     return Vertex(context.jvm_view().GammaVertex, theta, k)
 
 
 def Gaussian(mu, sigma) -> Vertex:
-    """
-    :param sigma: 
-    :param mu: 
-    """
     return Vertex(context.jvm_view().GaussianVertex, mu, sigma)
 
 
@@ -245,16 +198,13 @@ def Uniform(x_min, x_max) -> Vertex:
     One to one constructor for mapping some shape of mu and sigma to
     a matching shaped Uniform Vertex
     
-    :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
     :param x_min: the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
+    :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
     """
     return Vertex(context.jvm_view().UniformVertex, x_min, x_max)
 
 
 def ConstantInteger(constant) -> Vertex:
-    """
-    :param constant: 
-    """
     return Vertex(context.jvm_view().ConstantIntegerVertex, constant)
 
 
@@ -279,8 +229,4 @@ def Poisson(mu) -> Vertex:
 
 
 def UniformInt(min, max) -> Vertex:
-    """
-    :param min: 
-    :param max: 
-    """
     return Vertex(context.jvm_view().UniformIntVertex, min, max)
