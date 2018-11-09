@@ -30,12 +30,16 @@ task saveJavadocStringsToFile(type: Javadoc) {
     options.setClasspath(mainClasspath)
 }
 
-task codeGen (type: JavaExec) {
+task runCodeGeneration (type: JavaExec) {
     dependsOn saveJavadocStringsToFile
-    finalizedBy rootProject.getTasksByName("generateDocumentation", true)[0]
     classpath sourceSets.main.runtimeClasspath
     main = mainClassName
     args += project.rootDir.toString() + '/keanu-python/keanu/vertex/'
+}
+
+task codeGen {
+    dependsOn(runCodeGeneration)
+    dependsOn(":keanu-python:generateDocumentation")
 }
 
 lombok { // optional: values below are the defaults
