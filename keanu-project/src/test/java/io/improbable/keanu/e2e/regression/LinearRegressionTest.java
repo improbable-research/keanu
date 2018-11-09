@@ -1,11 +1,13 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -15,6 +17,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertSampledWeightsAndInterceptMatchTestData;
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertWeightsAndInterceptMatchTestData;
 
 public class LinearRegressionTest {
@@ -134,12 +137,13 @@ public class LinearRegressionTest {
 
         ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(0.1));
 
+        SamplingModelFitting sampling = new SamplingModelFitting(MetropolisHastings.builder()
+            .proposalDistribution(proposalDistribution)
+            .build(),
+            2000);
+
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
-            .withSampling(
-                MetropolisHastings.builder()
-                    .proposalDistribution(proposalDistribution)
-                    .build(),
-                2000)
+            .withSampling(sampling)
             .build();
 
         assertWeightsAndInterceptMatchTestData(
@@ -147,6 +151,13 @@ public class LinearRegressionTest {
             linearRegressionModel.getIntercept(),
             data
         );
+
+        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(1500).downSample(2);
+
+        assertSampledWeightsAndInterceptMatchTestData(
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightsVertexId()),
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertexId()),
+            data);
     }
 
 }

@@ -1,15 +1,18 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertSampledWeightsAndInterceptMatchTestData;
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertWeightsAndInterceptMatchTestData;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
@@ -91,6 +94,11 @@ public class LinearRidgeRegressionTest {
 
         ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(0.01));
 
+        SamplingModelFitting sampling = new SamplingModelFitting(MetropolisHastings.builder()
+            .proposalDistribution(proposalDistribution)
+            .build(),
+            4000);
+
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .withRegularization(RegressionRegularization.RIDGE)
             .withPriorOnIntercept(data.intercept, data.intercept * 0.1)
@@ -98,11 +106,7 @@ public class LinearRidgeRegressionTest {
                 DoubleTensor.create(0., data.weights.getShape()).asFlatDoubleArray(),
                 data.weights.asFlatDoubleArray()
             )
-            .withSampling(
-                MetropolisHastings.builder()
-                    .proposalDistribution(proposalDistribution)
-                    .build(),
-                4000)
+            .withSampling(sampling)
             .build();
 
         assertWeightsAndInterceptMatchTestData(
@@ -110,5 +114,12 @@ public class LinearRidgeRegressionTest {
             linearRegressionModel.getIntercept(),
             data
         );
+
+        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(3500).downSample(2);
+
+        assertSampledWeightsAndInterceptMatchTestData(
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightsVertexId()),
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertexId()),
+            data);
     }
 }

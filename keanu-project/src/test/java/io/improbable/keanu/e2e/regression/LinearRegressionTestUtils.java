@@ -2,6 +2,7 @@ package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -102,6 +103,13 @@ class LinearRegressionTestUtils {
     static void assertWeightsAndInterceptMatchTestData(DoubleTensor weights, double intercept, TestData testData) {
         assertThat("Intercept", testData.intercept, closeTo(intercept, 0.5));
         assertThat("Weights", weights, allCloseTo(0.05, testData.weights));
+    }
+
+    static void assertSampledWeightsAndInterceptMatchTestData(DoubleVertexSamples weights, DoubleVertexSamples intercept, TestData testData) {
+        assertThat(intercept.getAverages().scalar(), closeTo(testData.intercept, 0.5));
+        assertThat(intercept.getVariances().scalar(), closeTo(0.01, 0.01));
+        assertThat(weights.getAverages(), allCloseTo(0.1, testData.weights));
+        assertThat(weights.getVariances(), allCloseTo(0.01, DoubleTensor.create(0.01, 0.01)));
     }
 
     @Value

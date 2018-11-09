@@ -9,6 +9,7 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
     private final ModelGraph<INPUT, OUTPUT> modelGraph;
     private final PosteriorSamplingAlgorithm samplingAlgorithm;
     private final int sampleCount;
+    private NetworkSamples posteriorSamples;
 
     /**
      * This fitter uses a {@link PosteriorSamplingAlgorithm}, in contrast to the {@link MAPModelFitter} and {@link MaximumLikelihoodModelFitter}, which use gradient methods.
@@ -37,9 +38,13 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
     @Override
     public void fit(INPUT input, OUTPUT output) {
         modelGraph.observeValues(input, output);
-        NetworkSamples posteriorSamples = samplingAlgorithm
+        posteriorSamples = samplingAlgorithm
             .getPosteriorSamples(modelGraph.getBayesianNetwork(), sampleCount);
         NetworkState mostProbableState = posteriorSamples.getMostProbableState();
         modelGraph.getBayesianNetwork().setState(mostProbableState);
+    }
+
+    public NetworkSamples getNetworkSamples() {
+        return posteriorSamples;
     }
 }
