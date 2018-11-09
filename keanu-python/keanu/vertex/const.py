@@ -2,9 +2,8 @@ from keanu.tensor import Tensor
 from .generated import ConstantBool, ConstantInteger, ConstantDouble
 from .base import Vertex
 from typing import Callable, Any, Union
-
+from keanu.vartypes import primitive_types, numpy_types, const_arg_types, runtime_numpy_types, runtime_pandas_types, runtime_primitive_types, runtime_bool_types, runtime_int_types, runtime_float_types
 import numpy as np
-from keanu.vartypes import int_types, float_types, bool_types, primitive_types, pandas_types, numpy_types, const_arg_types, runtime_numpy_types, runtime_pandas_types, runtime_primitive_types, runtime_bool_types, runtime_int_types, runtime_float_types
 
 def Const(t : const_arg_types) -> Vertex:
     if isinstance(t, runtime_numpy_types):
@@ -21,13 +20,13 @@ def Const(t : const_arg_types) -> Vertex:
 
     return ctor(Tensor(val))
 
-def __infer_const_ctor_from_ndarray(ndarray : Any) -> Callable:
+def __infer_const_ctor_from_ndarray(ndarray : numpy_types) -> Callable:
     if len(ndarray) == 0:
         raise ValueError("Cannot infer type because the ndarray is empty")
 
     return __infer_const_ctor_from_scalar(ndarray.item(0))
 
-def __infer_const_ctor_from_scalar(scalar : Union[int, float, bool, np.integer, np.float_, np.bool_]) -> Callable:
+def __infer_const_ctor_from_scalar(scalar : primitive_types) -> Callable:
     if isinstance(scalar, runtime_bool_types):
         return ConstantBool
     elif isinstance(scalar, runtime_int_types):

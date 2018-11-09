@@ -45,7 +45,7 @@ class GradientOptimizer(Optimizer):
 
 
 class NonGradientOptimizer(Optimizer):
-    def __init__(self, net : Any, max_evaluations : Optional[int]=None, bounds_range : Optional[float]=None, initial_trust_region_radius : Optional[float]=None, stopping_trust_region_radius : Optional[float]=None) -> None:
+    def __init__(self, net : Union[Vertex, BayesNet], max_evaluations : Optional[int]=None, bounds_range : Optional[float]=None, initial_trust_region_radius : Optional[float]=None, stopping_trust_region_radius : Optional[float]=None) -> None:
         builder = k.jvm_view().NonGradientOptimizer.builder()
         builder, net = Optimizer._build_bayes_net(builder, net)
         if max_evaluations is not None:
