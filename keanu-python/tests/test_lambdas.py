@@ -8,7 +8,7 @@ context = KeanuContext()
 
 def plus_one(vertices): 
     input_vertex = vertices["in"]
-    vertices[VertexLabel("out").unwrap()] = (Vertex(input_vertex) + 1.).unwrap()
+    vertices[VertexLabel("out").unwrap()] = input_vertex + 1.
 
 def test_you_can_create_a_lambda_model_vertex():
     v_in = Gaussian(1., 1.)
@@ -17,7 +17,7 @@ def test_you_can_create_a_lambda_model_vertex():
         { "in": v_in }, 
         plus_one
         )
-        
+
     v_out = model.get_double_model_output_vertex("out")
 
     v_in.set_value(1.)
