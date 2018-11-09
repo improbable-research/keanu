@@ -2,8 +2,7 @@ package io.improbable.keanu.model;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.network.NetworkState;
 
 public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OUTPUT> {
 
@@ -45,8 +44,7 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
             .getPosteriorSamples(modelGraph.getBayesianNetwork(), sampleCount)
             .drop(dropCount)
             .downSample(2);
-        for (Vertex<DoubleTensor> vertex : modelGraph.getBayesianNetwork().getTopLevelLatentVertices()) {
-            vertex.setValue(posteriorSamples.getDoubleTensorSamples(vertex).getAverages());
-        }
+        NetworkState mostProbableState = posteriorSamples.getMostProbableState();
+        modelGraph.getBayesianNetwork().setState(mostProbableState);
     }
 }

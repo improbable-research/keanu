@@ -6,6 +6,7 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -55,6 +56,14 @@ public class BayesianNetwork {
 
     List<? extends Vertex> getVertices() {
         return vertices;
+    }
+
+    public void setState(NetworkState state) {
+        for (VertexId vertexId : state.getVertexIds()) {
+            this.vertices.stream()
+                .filter(v -> v.getId() == vertexId)
+                .forEach(v -> v.setValue(state.get(vertexId)));
+        }
     }
 
     private interface VertexFilter {
