@@ -14,10 +14,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -110,6 +112,13 @@ public class BayesianNetworkTest {
         ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
 
         ProtobufReader reader = new ProtobufReader();
-        net = reader.loadNetwork(input);
+        BayesianNetwork readNet = reader.loadNetwork(input);
+
+        assertThat(readNet.getLatentVertices().size(), is(1));
+        assertThat(readNet.getLatentVertices().get(0), instanceOf(GaussianVertex.class));
+        GaussianVertex readGaussianVertex = (GaussianVertex)readNet.getLatentVertices().get(0);
+        assertThat(readGaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
+        assertThat(readGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
+
     }
 }
