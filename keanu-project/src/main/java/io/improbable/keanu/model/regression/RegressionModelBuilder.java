@@ -28,7 +28,6 @@ public class RegressionModelBuilder<OUTPUT> {
     private Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
     private PosteriorSamplingAlgorithm samplingAlgorithm = null;
     private int samplingCount;
-    private int dropCount;
 
     public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
         this.inputTrainingData = inputTrainingData;
@@ -89,26 +88,23 @@ public class RegressionModelBuilder<OUTPUT> {
 
     /**
      * Optional - use Metropolis Hastings to fit the model instead of the default, which is gradient optimization.
-     * If you want more control over the configuration of the sampling algorithm, use {@link RegressionModelBuilder#withSampling(io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm, int, int)}
+     * If you want more control over the configuration of the sampling algorithm, use {@link RegressionModelBuilder#withSampling(io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm, int)}
      * @param sampleCount The number of sample points to take.
-     * @param dropCount The number of sample points to drop, in order to remove those prior to mixing.
      * @return this
      */
-    public RegressionModelBuilder withSampling(int sampleCount, int dropCount) {
-        return withSampling(MetropolisHastings.withDefaultConfig(), sampleCount, dropCount);
+    public RegressionModelBuilder withSampling(int sampleCount) {
+        return withSampling(MetropolisHastings.withDefaultConfig(), sampleCount);
     }
 
     /**
      * Optional - use a sampling algorithm to fit the model instead of the default, which is gradient optimization.
      * @param samplingAlgorithm The algorithm to use, e.g. {@link io.improbable.keanu.algorithms.mcmc.MetropolisHastings}
      * @param sampleCount The number of sample points to take.
-     * @param dropCount The number of sample points to drop, in order to remove those prior to mixing.
      * @return this
      */
-    public RegressionModelBuilder withSampling(PosteriorSamplingAlgorithm samplingAlgorithm, int sampleCount, int dropCount) {
+    public RegressionModelBuilder withSampling(PosteriorSamplingAlgorithm samplingAlgorithm, int sampleCount) {
         this.samplingAlgorithm = samplingAlgorithm;
         this.samplingCount = sampleCount;
-        this.dropCount = dropCount;
         return this;
     }
     /**
@@ -154,7 +150,7 @@ public class RegressionModelBuilder<OUTPUT> {
     private void performDataFitting(LinearRegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
         ModelFitter<DoubleTensor, OUTPUT> fitter = samplingAlgorithm == null ?
             this.regularization.createFitterForGraph(regressionGraph) :
-            new SamplingModelFitter<>(regressionGraph, samplingAlgorithm, samplingCount, dropCount);
+            new SamplingModelFitter<>(regressionGraph, samplingAlgorithm, samplingCount);
 
         fitter.fit(inputTrainingData, outputTrainingData);
     }

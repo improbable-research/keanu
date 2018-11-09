@@ -114,8 +114,7 @@ public class LinearLassoRegressionTest {
                 MetropolisHastings.builder()
                     .proposalDistribution(proposalDistribution)
                     .build(),
-                3000,
-                2500)
+                3000)
             .build();
 
         assertWeightsAndInterceptMatchTestData(

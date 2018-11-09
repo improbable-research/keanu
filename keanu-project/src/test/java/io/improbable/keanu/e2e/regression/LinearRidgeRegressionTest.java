@@ -102,8 +102,7 @@ public class LinearRidgeRegressionTest {
                 MetropolisHastings.builder()
                     .proposalDistribution(proposalDistribution)
                     .build(),
-                4000,
-                3500)
+                4000)
             .build();
 
         assertWeightsAndInterceptMatchTestData(
