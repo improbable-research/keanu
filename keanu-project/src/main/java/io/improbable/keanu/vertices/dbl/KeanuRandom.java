@@ -29,7 +29,7 @@ public class KeanuRandom {
          * particular to initialisation values for the BrentOptimizer).
          */
         Thread nd4jInitThread = new Thread(() -> Nd4j.scalar(1.0));
-        nd4jInitThread.run();
+        nd4jInitThread.start();
         try {
             nd4jInitThread.join();
         } catch (InterruptedException e) {
