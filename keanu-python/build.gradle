@@ -56,7 +56,15 @@ task pytest {
         }
     }
 }
+task mypy {
+    doLast {
+        exec {
+            commandLine 'mypy', '--ignore-missing-imports', 'keanu', 'tests'
+        }
+    }
+}
 
+test.dependsOn(mypy)
 test.dependsOn(pytest)
 pytest.dependsOn(installPipenv)
 pytest.dependsOn(pythonVersionInfo)
