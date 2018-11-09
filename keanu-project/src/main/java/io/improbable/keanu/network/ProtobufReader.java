@@ -39,16 +39,26 @@ public class ProtobufReader implements NetworkReader {
     }
 
     @Override
+    public DoubleTensor getInitialDoubleValue(Object valueKey) {
+        KeanuSavedBayesNet.VertexValue value = (KeanuSavedBayesNet.VertexValue)valueKey;
+
+        return extractDoubleValue(value);
+    }
+
+    @Override
     public void loadValue(DoubleVertex vertex) {
         KeanuSavedBayesNet.VertexValue value = savedValues.get(vertex);
+        DoubleTensor tensor = extractDoubleValue(value);
+        vertex.setValue(tensor);
+    }
 
+    private DoubleTensor extractDoubleValue(KeanuSavedBayesNet.VertexValue value) {
         if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
             throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
         } else {
-            vertex.setValue(DoubleTensor.create(
+            return DoubleTensor.create(
                 Doubles.toArray(value.getDoubleVal().getValuesList()),
-                Longs.toArray(value.getDoubleVal().getShapeList()))
-            );
+                Longs.toArray(value.getDoubleVal().getShapeList()));
         }
     }
 
@@ -81,7 +91,7 @@ public class ProtobufReader implements NetworkReader {
         }
     }
 
-    private static <T> Vertex<T> fromProtoBuf(KeanuSavedBayesNet.Vertex vertex,
+    private <T> Vertex<T> fromProtoBuf(KeanuSavedBayesNet.Vertex vertex,
                                              Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
         Class vertexClass;
         try {
@@ -92,7 +102,7 @@ public class ProtobufReader implements NetworkReader {
 
         Constructor vertexConstructor;
         try {
-            vertexConstructor = vertexClass.getConstructor(Map.class, KeanuSavedBayesNet.VertexValue.class);
+            vertexConstructor = vertexClass.getConstructor(Map.class, NetworkReader.class, Object.class);
         } catch (NoSuchMethodException e) {
             throw new
                 IllegalArgumentException("Vertex Type doesn't support loading from Proto: " + vertex.getVertexType(), e);
@@ -102,7 +112,7 @@ public class ProtobufReader implements NetworkReader {
         Map<String, Vertex> parentsMap = getParentsMap(vertex, existingVertices);
 
         try {
-            newVertex = (Vertex<T>)vertexConstructor.newInstance(parentsMap, vertex.getConstantValue());
+            newVertex = (Vertex<T>)vertexConstructor.newInstance(parentsMap, this, vertex.getConstantValue());
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to create Vertex of Type: " + vertex.getVertexType(), e);
         }
@@ -110,7 +120,7 @@ public class ProtobufReader implements NetworkReader {
         return newVertex;
     }
 
-    private static Map<String, Vertex> getParentsMap(KeanuSavedBayesNet.Vertex vertex,
+    private Map<String, Vertex> getParentsMap(KeanuSavedBayesNet.Vertex vertex,
                                                      Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
         Map<String, Vertex> parentsMap = new HashMap<>();
 

@@ -1,9 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import com.google.common.primitives.Doubles;
-import com.google.common.primitives.Longs;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -34,19 +32,8 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
         this(DoubleTensor.create(vector));
     }
 
-    public ConstantDoubleVertex(Map<String, Vertex> parentMap, KeanuSavedBayesNet.VertexValue initialValue) {
-        this(parseValue(initialValue));
-    }
-
-    private static DoubleTensor parseValue(KeanuSavedBayesNet.VertexValue value) {
-        if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
-            throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
-        } else {
-            return DoubleTensor.create(
-                Doubles.toArray(value.getDoubleVal().getValuesList()),
-                Longs.toArray(value.getDoubleVal().getShapeList())
-            );
-        }
+    public ConstantDoubleVertex(Map<String, Vertex> parentMap, NetworkReader reader, Object initialValue) {
+        this(reader.getInitialDoubleValue(initialValue));
     }
 
     @Override
