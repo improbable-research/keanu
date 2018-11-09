@@ -30,13 +30,13 @@ class VertexProcessor {
 
     static void process(String generatedDir) throws IOException {
         Map<String, Object> dataModel = buildDataModel();
-        Template fileTemplate = TemplateProcessor.getFileTemplate(TEMPLATE_FILE);
+        Template generatedVerticesFileTemplate = TemplateProcessor.getFileTemplate(TEMPLATE_FILE);
         Writer fileWriter = TemplateProcessor.createFileWriter(generatedDir + GENERATED_FILE);
-        Template initFileTemplate = TemplateProcessor.getFileTemplate(TEMPLATE_INIT_FILE);
+        Template generatedInitFileTemplate = TemplateProcessor.getFileTemplate(TEMPLATE_INIT_FILE);
         Writer initFileWriter = TemplateProcessor.createFileWriter(generatedDir + GENERATED_INIT_FILE);
 
-        TemplateProcessor.processDataModel(dataModel, fileTemplate, fileWriter);
-        TemplateProcessor.processDataModel(dataModel, initFileTemplate, initFileWriter);
+        TemplateProcessor.processDataModel(dataModel, generatedVerticesFileTemplate, fileWriter);
+        TemplateProcessor.processDataModel(dataModel, generatedInitFileTemplate, initFileWriter);
     }
 
     private static Map<String, Object> buildDataModel() throws IOException {
