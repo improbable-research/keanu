@@ -16,29 +16,34 @@ def _extract_values(vertices):
 
 class LambdaModel(Vertex):
     def __init__(self, 
-    inputs: map, 
-    executor, 
-    update_value = _extract_values
-    ) -> Vertex:
-        self.inputs = self.__to_java_map(inputs)
+                inputs: map, 
+                executor, 
+                update_value = _extract_values
+            ) -> Vertex:
         self.executor = executor
-        self.update_value = Function(update_value)
-        val = context.jvm_view().LambdaModelVertex(self.inputs, Consumer(self.__execute), self.update_value)
-        super(LambdaModel, self).__init__(val)
+        vertex = context.jvm_view().LambdaModelVertex(
+            LambdaModel.__to_java_map(inputs), 
+            Consumer(self.__execute), 
+            Function(update_value)
+        )
+        super(LambdaModel, self).__init__(vertex)
 
-    def __to_java_map(self, inputs):
+    @staticmethod
+    def __to_java_map(inputs):
         unwrapped_inputs = {VertexLabel(k).unwrap(): v for k,v in inputs.items()}
         return context.to_java_map(unwrapped_inputs)
 
     def __execute(self, vertices):
-        vertices_wrapped = self.__wrap(vertices)
+        vertices_wrapped = LambdaModel.__wrap(vertices)
         self.executor(vertices_wrapped)
-        self.__unwrap(vertices_wrapped, vertices)
+        LambdaModel.__unwrap(vertices_wrapped, vertices)
 
-    def __wrap(self, vertices):
+    @staticmethod
+    def __wrap(vertices):
         return {k.getUnqualifiedName(): Vertex(v) for k, v in vertices.items()}
 
-    def __unwrap(self, vertices_wrapped, vertices_unwrapped):
+    @staticmethod
+    def __unwrap(vertices_wrapped, vertices_unwrapped):
         for k, v in vertices_wrapped.items():
             vertices_unwrapped[VertexLabel(k).unwrap()] = v.unwrap()
 
