@@ -19,7 +19,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 
 class VertexProcessor {
 
@@ -54,6 +54,7 @@ class VertexProcessor {
         root.put("imports", imports);
         root.put("constructors", pythonConstructors);
         Map<String, DocString> nameToDocStringMap = KeanuProjectDoclet.getDocStringsFromFile();
+        StringJoiner exportedMethodsJoiner = new StringJoiner("\", \"", "\"", "\"");
         for (Constructor constructor : constructors) {
             String javaClass = constructor.getDeclaringClass().getSimpleName();
             String qualifiedName = constructor.getName();
@@ -65,12 +66,9 @@ class VertexProcessor {
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
             PythonConstructor pythonConstructor = new PythonConstructor(javaClass, toPythonClass(javaClass), String.join(", ", pythonParameters), docString.getAsString());
             pythonConstructors.add(pythonConstructor);
-            exportedMethodsList.add(pythonConstructor.pythonClass);
+            exportedMethodsJoiner.add(pythonConstructor.pythonClass);
         }
-        String exportedMethodsString = exportedMethodsList.stream()
-            .map(s -> "\"" + s + "\"")
-            .collect(Collectors.joining(", "));
-        root.put("exportedMethods", exportedMethodsString);
+        root.put("exportedMethods", exportedMethodsJoiner.toString());
 
         return root;
     }
