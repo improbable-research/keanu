@@ -30,8 +30,9 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
 
         long[] shape = samples.iterator().next().getShape();
 
-        return this.samples.stream()
-            .reduce(DoubleTensor.zeros(shape), (l,r) -> l.plusInPlace(r.pow(2)))
+        DoubleTensor sumOfSquares = this.samples.stream()
+            .reduce(DoubleTensor.zeros(shape), (l, r) -> l.plusInPlace(r.pow(2)));
+        return sumOfSquares
             .divInPlace(samples.size())
             .minusInPlace(getAverages().pow(2))
             .timesInPlace(samples.size())

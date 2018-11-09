@@ -109,7 +109,7 @@ class LinearRegressionTestUtils {
         assertThat(intercept.getAverages().scalar(), closeTo(testData.intercept, 0.5));
         assertThat(intercept.getVariances().scalar(), closeTo(0.01, 0.01));
         assertThat(weights.getAverages(), allCloseTo(0.1, testData.weights));
-        assertThat(weights.getVariances(), allCloseTo(0.01, DoubleTensor.create(0.01, 0.01)));
+        assertThat(weights.getVariances(), allCloseTo(0.02, DoubleTensor.create(0.01, 0.01)));
     }
 
     @Value
