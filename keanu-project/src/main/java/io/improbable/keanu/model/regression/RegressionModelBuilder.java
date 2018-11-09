@@ -87,10 +87,24 @@ public class RegressionModelBuilder<OUTPUT> {
         return this;
     }
 
+    /**
+     * Optional - use Metropolis Hastings to fit the model instead of the default, which is gradient optimization.
+     * If you want more control over the configuration of the sampling algorithm, use {@link RegressionModelBuilder#withSampling(io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm, int, int)}
+     * @param sampleCount The number of sample points to take.
+     * @param dropCount The number of sample points to drop, in order to remove those prior to mixing.
+     * @return this
+     */
     public RegressionModelBuilder withSampling(int sampleCount, int dropCount) {
         return withSampling(MetropolisHastings.withDefaultConfig(), sampleCount, dropCount);
     }
 
+    /**
+     * Optional - use a sampling algorithm to fit the model instead of the default, which is gradient optimization.
+     * @param samplingAlgorithm The algorithm to use, e.g. {@link io.improbable.keanu.algorithms.mcmc.MetropolisHastings}
+     * @param sampleCount The number of sample points to take.
+     * @param dropCount The number of sample points to drop, in order to remove those prior to mixing.
+     * @return this
+     */
     public RegressionModelBuilder withSampling(PosteriorSamplingAlgorithm samplingAlgorithm, int sampleCount, int dropCount) {
         this.samplingAlgorithm = samplingAlgorithm;
         this.samplingCount = sampleCount;
