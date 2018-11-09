@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices;
 
 import com.google.common.collect.ImmutableSet;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
 
@@ -105,11 +105,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         if (!observation.isObserved()) {
             this.value = value;
         }
-    }
-
-    public void setValue(KeanuSavedBayesNet.VertexValue value) {
-        throw new UnsupportedOperationException("This Vertex Type doesn't support loading from GPB");
-        //TODO - make abstract?
     }
 
     public T getValue() {
@@ -270,5 +265,10 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     public Map<String, Vertex> getParentsMap() {
         //TODO - Make this abstract once all Vertices have this
         return new HashMap<>();
+    }
+
+    public void loadValue(NetworkReader reader) {
+        //TODO - Make this abstract once all Vertices have this
+        throw new UnsupportedOperationException("Can't load a value for a base Vertex");
     }
 }

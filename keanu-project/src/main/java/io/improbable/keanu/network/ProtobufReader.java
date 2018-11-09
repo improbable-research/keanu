@@ -16,13 +16,13 @@ import java.util.Map;
 
 public class ProtobufReader implements NetworkReader {
 
-    private final Map<Vertex, KeanuSavedBayesNet.VertexValue> values;
+    private final Map<Vertex, KeanuSavedBayesNet.VertexValue> savedValues;
 
     public ProtobufReader() {
-        values = new HashMap<>();
+        savedValues = new HashMap<>();
     }
 
-    public static BayesianNetwork loadNetwork(InputStream input) throws IOException {
+    public BayesianNetwork loadNetwork(InputStream input) throws IOException {
         Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
         KeanuSavedBayesNet.BayesianNetwork parsedNet = KeanuSavedBayesNet.BayesianNetwork.parseFrom(input);
 
@@ -40,7 +40,7 @@ public class ProtobufReader implements NetworkReader {
 
     @Override
     public void loadValue(DoubleVertex vertex) {
-        KeanuSavedBayesNet.VertexValue value = values.get(vertex);
+        KeanuSavedBayesNet.VertexValue value = savedValues.get(vertex);
 
         if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
             throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
@@ -52,7 +52,7 @@ public class ProtobufReader implements NetworkReader {
         }
     }
 
-    private static void loadDefaultValues(KeanuSavedBayesNet.BayesianNetwork parsedNet,
+    private void loadDefaultValues(KeanuSavedBayesNet.BayesianNetwork parsedNet,
                                           Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices,
                                           BayesianNetwork bayesNet) {
         for (KeanuSavedBayesNet.StoredValue value : parsedNet.getDefaultStateList()) {
@@ -76,7 +76,8 @@ public class ProtobufReader implements NetworkReader {
                 throw new IllegalArgumentException("Value specified for unknown Vertex");
             }
 
-            targetVertex.setValue(value.getValue());
+            savedValues.put(targetVertex, value.getValue());
+            targetVertex.loadValue(this);
         }
     }
 

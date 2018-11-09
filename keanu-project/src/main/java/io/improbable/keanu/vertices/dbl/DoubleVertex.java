@@ -1,8 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
 
-import com.google.common.primitives.Doubles;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.NumberTensor;
@@ -336,11 +334,6 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         } else {
             return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
         }
-    }
-
-    @Override
-    public void setValue(KeanuSavedBayesNet.VertexValue valueBuf) {
-
     }
 
     @Override

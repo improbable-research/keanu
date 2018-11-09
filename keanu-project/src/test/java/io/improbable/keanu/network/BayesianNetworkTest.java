@@ -108,6 +108,8 @@ public class BayesianNetworkTest {
         protobufWriter.save(output, true);
         assertThat(output.size(), greaterThan(0));
         ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        net = ProtobufReader.loadNetwork(input);
+
+        ProtobufReader reader = new ProtobufReader();
+        net = reader.loadNetwork(input);
     }
 }
