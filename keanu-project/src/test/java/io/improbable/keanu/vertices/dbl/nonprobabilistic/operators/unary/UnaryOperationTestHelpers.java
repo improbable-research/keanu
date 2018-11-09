@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -26,13 +27,13 @@ public class UnaryOperationTestHelpers {
         assertEquals(expected, op.apply(A).getValue().scalar(), 1e-5);
     }
 
-    public static void calculatesDerivativeOfScalar(double aValue,
+    public static <T extends DoubleVertex & Differentiable> void calculatesDerivativeOfScalar(double aValue,
                                                     double expectedGradientWrtA,
-                                                    Function<DoubleVertex, DoubleVertex> op) {
+                                                    Function<DoubleVertex, T> op) {
 
         UniformVertex A = new UniformVertex(0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
-        DoubleVertex output = op.apply(A);
+        T output = op.apply(A);
 
         DoubleTensor wrtAForward = output.getDerivativeWrtLatents().withRespectTo(A);
         assertEquals(
@@ -65,16 +66,16 @@ public class UnaryOperationTestHelpers {
         assertEquals(expectedTensor.getValue(1, 1), result.getValue(1, 1), 1e-5);
     }
 
-    public static void calculatesDerivativeOfMatrixElementWiseOperator(double[] aValues,
+    public static <T extends DoubleVertex & Differentiable> void calculatesDerivativeOfMatrixElementWiseOperator(double[] aValues,
                                                                        double[] expectedGradientWrtA,
-                                                                       Function<DoubleVertex, DoubleVertex> op) {
+                                                                       Function<DoubleVertex, T> op) {
 
         long[] matrixShape = new long[]{2, 2};
         long[] expectedShape = TensorShape.concat(matrixShape, matrixShape);
         UniformVertex A = new UniformVertex(matrixShape, 0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, matrixShape));
 
-        DoubleVertex output = op.apply(A);
+        T output = op.apply(A);
 
         PartialDerivatives result = output.getDerivativeWrtLatents();
         DoubleTensor wrtAForward = result.withRespectTo(A);
