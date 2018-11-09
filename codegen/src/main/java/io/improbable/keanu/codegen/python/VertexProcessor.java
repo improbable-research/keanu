@@ -4,7 +4,13 @@ import com.google.common.base.CaseFormat;
 import freemarker.template.Template;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
 import org.reflections.Reflections;
@@ -79,8 +85,22 @@ class VertexProcessor {
     }
 
     private static String toPythonParam(Class<?> parameterType) {
-        if (Vertex.class.isAssignableFrom(parameterType) || Tensor.class.isAssignableFrom(parameterType)) {
+        if (IntegerVertex.class.isAssignableFrom(parameterType)) {
+            return "int_and_bool_vertex_arg_types";
+        } else if (DoubleVertex.class.isAssignableFrom(parameterType)) {
             return "vertex_arg_types";
+        } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
+            return "bool_vertex_arg_types";
+        } else if (Vertex.class.isAssignableFrom(parameterType)) {
+            return "vertex_arg_types";
+        } else if (IntegerTensor.class.isAssignableFrom(parameterType)) {
+            return "int_and_bool_tensor_arg_types";
+        } else if (DoubleTensor.class.isAssignableFrom(parameterType)) {
+            return "tensor_arg_types";
+        } else if (BooleanTensor.class.isAssignableFrom(parameterType)) {
+            return "bool_tensor_arg_types";
+        } else if (Tensor.class.isAssignableFrom(parameterType)) {
+            return "tensor_arg_types";
         } else if (parameterType.isArray()) {
             return "shape_types";
         } else {

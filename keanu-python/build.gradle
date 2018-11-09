@@ -41,7 +41,7 @@ task installDependencies {
 task pytest {
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'mypy', '--ignore-missing-imports', 'keanu', 'tests'
+            commandLine 'pipenv', 'run', 'mypy', '--ignore-missing-imports', 'keanu', 'tests', 'examples'
         }
         exec {
             // workaround for bug: this hits an NSP error if it's not run first

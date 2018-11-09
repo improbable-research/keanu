@@ -3,7 +3,15 @@
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex
-from keanu.vartypes import vertex_arg_types, shape_types
+from keanu.vartypes import (
+    vertex_arg_types,
+    int_and_bool_vertex_arg_types,
+    bool_vertex_arg_types,
+    tensor_arg_types,
+    int_and_bool_tensor_arg_types,
+    bool_tensor_arg_types,
+    shape_types
+)
 
 context = KeanuContext()
 
@@ -38,7 +46,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 
 
-def ConstantBool(constant : vertex_arg_types) -> Vertex:
+def ConstantBool(constant : bool_tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantBoolVertex, constant)
 
 
@@ -70,7 +78,7 @@ def CastDouble(input_vertex : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().CastDoubleVertex, input_vertex)
 
 
-def ConstantDouble(constant : vertex_arg_types) -> Vertex:
+def ConstantDouble(constant : tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantDoubleVertex, constant)
 
 
@@ -134,11 +142,11 @@ def Uniform(x_min : vertex_arg_types, x_max : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().UniformVertex, x_min, x_max)
 
 
-def ConstantInteger(constant : vertex_arg_types) -> Vertex:
+def ConstantInteger(constant : int_and_bool_tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantIntegerVertex, constant)
 
 
-def IntegerDivision(a : vertex_arg_types, b : vertex_arg_types) -> Vertex:
+def IntegerDivision(a : int_and_bool_vertex_arg_types, b : int_and_bool_vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().IntegerDivisionVertex, a, b)
 
 
@@ -146,5 +154,5 @@ def Poisson(mu : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().PoissonVertex, mu)
 
 
-def UniformInt(min : vertex_arg_types, max : vertex_arg_types) -> Vertex:
+def UniformInt(min : int_and_bool_vertex_arg_types, max : int_and_bool_vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().UniformIntVertex, min, max)

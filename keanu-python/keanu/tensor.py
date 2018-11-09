@@ -4,6 +4,7 @@ from typing import Any
 import numpy as np
 from .vartypes import numpy_types, const_arg_types, primitive_types, runtime_int_types, runtime_float_types, runtime_bool_types, runtime_primitive_types, runtime_pandas_types, runtime_numpy_types, runtime_pandas_types, runtime_primitive_types
 from py4j.java_gateway import java_import, JavaObject, JavaMember
+from keanu.vertex.ops import VertexOps
 
 k = KeanuContext()
 
@@ -11,7 +12,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.tensor.dbl.DoubleTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
-class Tensor(JavaObjectWrapper):
+class Tensor(JavaObjectWrapper, VertexOps):
     def __init__(self, t : const_arg_types) -> None:
         if isinstance(t, runtime_numpy_types):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t))
