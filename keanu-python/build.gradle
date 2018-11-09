@@ -57,7 +57,7 @@ task pytest {
     }
 }
 
-task generatePythonDocumentation {
+task generateDocumentation {
     group "pythonDocumentation"
     doLast {
         exec {
@@ -90,6 +90,6 @@ pytest.dependsOn(pythonVersionInfo)
 pytest.dependsOn(installDependencies)
 pythonVersionInfo.mustRunAfter(installPipenv)
 installDependencies.mustRunAfter(pythonVersionInfo)
-generatePythonDocumentation.dependsOn(":compileJava")
-generatePythonDocumentation.dependsOn(installPipenv)
-generatePythonDocumentation.dependsOn(installDependencies)
+generateDocumentation.dependsOn(":compileJava")
+generateDocumentation.dependsOn(installPipenv)
+generateDocumentation.dependsOn(installDependencies)
