@@ -5,7 +5,7 @@ from keanu.base import JavaObjectWrapper
 from keanu.vertex.ops import VertexOps
 
 int_types = Union[int, np.integer]
-float_types = Union[float, np.float16, np.float32, np.float64, np.float128]
+float_types = Union[float, np.float16, np.float32, np.float64]
 bool_types = Union[bool, np.bool_]
 
 primitive_types = Union[int_types, float_types, bool_types, np.generic]
