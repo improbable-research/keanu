@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -21,7 +21,7 @@ public class UnaryOperationTestHelpers {
                                                    double expected,
                                                    Function<DoubleVertex, DoubleVertex> op) {
 
-        ConstantDoubleVertex A = ConstantVertexFactory.of(aValue);
+        ConstantDoubleVertex A = ConstantVertex.of(aValue);
 
         assertEquals(expected, op.apply(A).getValue().scalar(), 1e-5);
     }

@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -32,15 +32,15 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     }
 
     public BinomialVertex(long[] tensorShape, double p, IntegerVertex n) {
-        this(tensorShape, ConstantVertexFactory.of(p), n);
+        this(tensorShape, ConstantVertex.of(p), n);
     }
 
     public BinomialVertex(long[] tensorShape, DoubleVertex p, int n) {
-        this(tensorShape, p, ConstantVertexFactory.of(n));
+        this(tensorShape, p, ConstantVertex.of(n));
     }
 
     public BinomialVertex(long[] tensorShape, double p, int n) {
-        this(tensorShape, ConstantVertexFactory.of(p), ConstantVertexFactory.of(n));
+        this(tensorShape, ConstantVertex.of(p), ConstantVertex.of(n));
     }
 
     public BinomialVertex(DoubleVertex p, IntegerVertex n) {
@@ -48,15 +48,15 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     }
 
     public BinomialVertex(double p, IntegerVertex n) {
-        this(ConstantVertexFactory.of(p), n);
+        this(ConstantVertex.of(p), n);
     }
 
     public BinomialVertex(DoubleVertex p, int n) {
-        this(p, ConstantVertexFactory.of(n));
+        this(p, ConstantVertex.of(n));
     }
 
     public BinomialVertex(double p, int n) {
-        this(ConstantVertexFactory.of(p), ConstantVertexFactory.of(n));
+        this(ConstantVertex.of(p), ConstantVertex.of(n));
     }
 
     @Override

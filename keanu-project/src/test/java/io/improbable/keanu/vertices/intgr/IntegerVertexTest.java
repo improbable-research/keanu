@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.intgr;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
@@ -23,8 +23,8 @@ public class IntegerVertexTest {
 
     @Before
     public void setup() {
-        v1 = ConstantVertexFactory.of(3);
-        v2 = ConstantVertexFactory.of(2);
+        v1 = ConstantVertex.of(3);
+        v2 = ConstantVertex.of(2);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class IntegerVertexTest {
 
     @Test
     public void doesEqualTo() {
-        IntegerVertex v3 = ConstantVertexFactory.of(3);
+        IntegerVertex v3 = ConstantVertex.of(3);
 
         assertFalse(v1.equalTo(v2).eval().scalar());
         assertTrue(v1.notEqualTo(v2).eval().scalar());
@@ -163,8 +163,8 @@ public class IntegerVertexTest {
 
     @Test
     public void canFindMinAndMax() {
-        IntegerVertex A = ConstantVertexFactory.of(1, 2, 3, 4);
-        IntegerVertex B = ConstantVertexFactory.of(2, 4, 1, 5);
+        IntegerVertex A = ConstantVertex.of(1, 2, 3, 4);
+        IntegerVertex B = ConstantVertex.of(2, 4, 1, 5);
 
         IntegerVertex min = IntegerVertex.min(A, B);
         IntegerVertex max = IntegerVertex.max(A, B);

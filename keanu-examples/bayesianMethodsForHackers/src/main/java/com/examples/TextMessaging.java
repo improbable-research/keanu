@@ -5,7 +5,7 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
@@ -39,7 +39,7 @@ public class TextMessaging {
         ExponentialVertex lateRate = new ExponentialVertex(alpha);
         UniformIntVertex switchPoint = new UniformIntVertex(0, numberOfDays);
 
-        IntegerVertex days = ConstantVertexFactory.of(data.day);
+        IntegerVertex days = ConstantVertex.of(data.day);
         DoubleVertex rateForDay = If.isTrue(new GreaterThanVertex<>(switchPoint, days))
             .then(earlyRate)
             .orElse(lateRate);

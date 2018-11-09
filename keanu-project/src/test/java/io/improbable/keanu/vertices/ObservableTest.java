@@ -18,21 +18,21 @@ public class ObservableTest {
 
     @Test
     public void youCanObserveANonProbabilisticBooleanVertex() {
-        BoolVertex vertex = ConstantVertexFactory.of(true);
+        BoolVertex vertex = ConstantVertex.of(true);
         assertFalse(vertex instanceof Probabilistic);
         vertex.observe(BooleanTensor.scalar(false));
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void youCannotObserveANonProbabilisticIntegerVertex() {
-        IntegerVertex vertex = ConstantVertexFactory.of(1);
+        IntegerVertex vertex = ConstantVertex.of(1);
         assertFalse(vertex instanceof Probabilistic);
         vertex.observe(IntegerTensor.scalar(0));
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void youCannotObserveANonProbabilisticDoubleVertex() {
-        DoubleVertex vertex = ConstantVertexFactory.of(1.0);
+        DoubleVertex vertex = ConstantVertex.of(1.0);
         assertFalse(vertex instanceof Probabilistic);
         vertex.observe(DoubleTensor.scalar(1.0));
     }

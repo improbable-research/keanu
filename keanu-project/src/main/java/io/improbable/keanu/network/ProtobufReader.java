@@ -76,14 +76,19 @@ public class ProtobufReader implements NetworkReader {
                 Vertex newTarget = bayesNet.getVertexByLabel(new VertexLabel(value.getVertexLabel()));
 
                 if (targetVertex != null && newTarget != targetVertex) {
-                    throw new IllegalArgumentException("Label and VertexID don't refer to same Vertex");
+                    throw new IllegalArgumentException(
+                        "Label and VertexID don't refer to same Vertex: ("
+                            + value.getVertexLabel() + ") ("
+                            + value.getId() + ")");
                 } else {
                     targetVertex = newTarget;
                 }
             }
 
             if (targetVertex == null) {
-                throw new IllegalArgumentException("Value specified for unknown Vertex");
+                throw new IllegalArgumentException("Value specified for unknown Vertex: ("
+                    + value.getVertexLabel() + ") ("
+                    + value.getId() + ")");
             }
 
             savedValues.put(targetVertex, value.getValue());
@@ -108,11 +113,11 @@ public class ProtobufReader implements NetworkReader {
                 IllegalArgumentException("Vertex Type doesn't support loading from Proto: " + vertex.getVertexType(), e);
         }
 
-        Vertex<T> newVertex;
+        Vertex newVertex;
         Map<String, Vertex> parentsMap = getParentsMap(vertex, existingVertices);
 
         try {
-            newVertex = (Vertex<T>)vertexConstructor.newInstance(parentsMap, this, vertex.getConstantValue());
+            newVertex = (Vertex)vertexConstructor.newInstance(parentsMap, this, vertex.getConstantValue());
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to create Vertex of Type: " + vertex.getVertexType(), e);
         }

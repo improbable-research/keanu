@@ -6,7 +6,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -20,9 +20,9 @@ public class Tensors {
     public void doesSimpleTensorInferenceExample() {
 
 //%%SNIPPET_START%% TensorExample
-DoubleVertex muA = ConstantVertexFactory.of(new double[]{0.5, 1.5});
+DoubleVertex muA = ConstantVertex.of(new double[]{0.5, 1.5});
 DoubleVertex A = new GaussianVertex(new long[]{1, 2}, muA, 1);
-DoubleVertex B = ConstantVertexFactory.of(new double[]{3, 4});
+DoubleVertex B = ConstantVertex.of(new double[]{3, 4});
 
 DoubleVertex C = A.times(B);
 DoubleVertex CObservation = new GaussianVertex(C, 1);
@@ -99,9 +99,9 @@ GaussianVertex vertex = new GaussianVertex(shape, mu, 0);
 
     private static void tensorFinal() {
 //%%SNIPPET_START%% TensorFinal
-DoubleVertex muA = ConstantVertexFactory.of(new double[]{0.5, 1.5});
+DoubleVertex muA = ConstantVertex.of(new double[]{0.5, 1.5});
 DoubleVertex A = new GaussianVertex(new long[]{1, 2}, muA, 1);
-DoubleVertex B = ConstantVertexFactory.of(new double[]{3, 4});
+DoubleVertex B = ConstantVertex.of(new double[]{3, 4});
 
 DoubleVertex C = A.times(B);
 DoubleVertex CObservation = new GaussianVertex(C, 1);

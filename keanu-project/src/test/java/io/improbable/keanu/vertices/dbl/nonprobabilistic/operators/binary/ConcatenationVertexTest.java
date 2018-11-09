@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -178,8 +178,8 @@ public class ConcatenationVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
-        DoubleVertex c = a.times(ConstantVertexFactory.of(DoubleTensor.linspace(0, 1, 12).reshape(2, 2, 3)));
-        DoubleVertex d = b.plus(ConstantVertexFactory.of(DoubleTensor.linspace(1, 2, 8).reshape(2, 2, 2)));
+        DoubleVertex c = a.times(ConstantVertex.of(DoubleTensor.linspace(0, 1, 12).reshape(2, 2, 3)));
+        DoubleVertex d = b.plus(ConstantVertex.of(DoubleTensor.linspace(1, 2, 8).reshape(2, 2, 2)));
 
         DoubleVertex concat = new ConcatenationVertex(2, c, d);
         DoubleVertex sum = concat.sum(1);

@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
@@ -66,7 +66,7 @@ public class BoolVertexTest {
     public void doesEqualTo() {
         v1.setValue(true);
         v2.setValue(false);
-        BoolVertex v3 = ConstantVertexFactory.of(true);
+        BoolVertex v3 = ConstantVertex.of(true);
 
         assertFalse(v1.equalTo(v2).eval().scalar());
         assertTrue(v1.notEqualTo(v2).eval().scalar());
@@ -149,8 +149,8 @@ public class BoolVertexTest {
         double p = 0.5;
 
         BernoulliVertex f = new BernoulliVertex(0.5);
-        ConstantBoolVertex tru = ConstantVertexFactory.of(true);
-        ConstantBoolVertex fal = ConstantVertexFactory.of(false);
+        ConstantBoolVertex tru = ConstantVertex.of(true);
+        ConstantBoolVertex fal = ConstantVertex.of(false);
 
         BoolVertex a = f.and(tru).or(fal);
 

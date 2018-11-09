@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -125,7 +125,7 @@ public class HalfCauchyVertexTest {
         int sampleCount = 1000000;
         HalfCauchyVertex vertex = new HalfCauchyVertex(
             new long[]{sampleCount, 1},
-            ConstantVertexFactory.of(2.0)
+            ConstantVertex.of(2.0)
         );
 
         double from = 0;
@@ -141,7 +141,7 @@ public class HalfCauchyVertexTest {
         double trueScale = 2.0;
 
         List<DoubleVertex> scale = new ArrayList<>();
-        scale.add(ConstantVertexFactory.of(trueScale));
+        scale.add(ConstantVertex.of(trueScale));
 
         List<DoubleVertex> latentScaleList = new ArrayList<>();
         UniformVertex latentScale = new UniformVertex(0.01, 10.0);

@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -27,8 +27,8 @@ public class DiscoverGraphTest {
 
     @Before
     public void setup() {
-        A = ConstantVertexFactory.of(2.0);
-        B = ConstantVertexFactory.of(2.0);
+        A = ConstantVertex.of(2.0);
+        B = ConstantVertex.of(2.0);
         C = A.log();
         D = A.multiply(B);
         E = C.plus(D);

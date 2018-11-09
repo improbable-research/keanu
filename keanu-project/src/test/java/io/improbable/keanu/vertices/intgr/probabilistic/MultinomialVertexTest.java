@@ -9,7 +9,7 @@ import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
@@ -116,7 +116,7 @@ public class MultinomialVertexTest {
         int n = 100;
         DoubleTensor p = DoubleTensor.create(0.01, 0.09, 0.9).transpose();
         MultinomialVertex multinomial = new MultinomialVertex(
-            n, ConstantVertexFactory.of(p));
+            n, ConstantVertex.of(p));
         IntegerTensor samples = multinomial.sample(KeanuRandom.getDefaultRandom());
         assertThat(samples, hasShape(3, 1));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
@@ -124,12 +124,12 @@ public class MultinomialVertexTest {
 
     @Test
     public void itWorksWithTensors() {
-        IntegerVertex n = ConstantVertexFactory.of(IntegerTensor.create(new int[]{
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(new int[]{
                 1, 5, 8, 10,
                 100, 200, 500, 1000},
             2, 4));
 
-        DoubleVertex p = ConstantVertexFactory.of(DoubleTensor.create(new double[]{
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(new double[]{
                 .1, .2, .3, .8,
                 .25, .25, .4, .45,
 
@@ -160,24 +160,24 @@ public class MultinomialVertexTest {
 
     @Test
     public void youCanUseAConcatAndReshapeVertexToPipeInTheProbabilities() {
-        IntegerVertex n = ConstantVertexFactory.of(IntegerTensor.create(new int[]{
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(new int[]{
                 1, 10,
                 100, 1000},
             2, 2));
 
-        DoubleVertex p1 = ConstantVertexFactory.of(DoubleTensor.create(new double[]{
+        DoubleVertex p1 = ConstantVertex.of(DoubleTensor.create(new double[]{
                 .1, .8,
                 .25, .2,
             },
             2, 2));
 
-        DoubleVertex p2 = ConstantVertexFactory.of(DoubleTensor.create(new double[]{
+        DoubleVertex p2 = ConstantVertex.of(DoubleTensor.create(new double[]{
                 .1, .1,
                 .50, .3,
             },
             2, 2));
 
-        DoubleVertex p3 = ConstantVertexFactory.of(DoubleTensor.create(new double[]{
+        DoubleVertex p3 = ConstantVertex.of(DoubleTensor.create(new double[]{
 
                 .8, .1,
                 .25, .5
@@ -261,9 +261,9 @@ public class MultinomialVertexTest {
         DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
 
         Map<Color, DoubleVertex> selectableValues = ImmutableMap.of(
-            Color.RED, ConstantVertexFactory.of(p.getValue(0)),
-            Color.GREEN, ConstantVertexFactory.of(p.getValue(1)),
-            Color.BLUE, ConstantVertexFactory.of(p.getValue(2)));
+            Color.RED, ConstantVertex.of(p.getValue(0)),
+            Color.GREEN, ConstantVertex.of(p.getValue(1)),
+            Color.BLUE, ConstantVertex.of(p.getValue(2)));
         CategoricalVertex<Color, GenericTensor<Color>> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
         double pRed = categoricalVertex.logProb(GenericTensor.scalar(Color.RED));
@@ -282,8 +282,8 @@ public class MultinomialVertexTest {
 
         MultinomialVertex vertex = new MultinomialVertex(
             new long[]{1, N},
-            ConstantVertexFactory.of(n),
-            ConstantVertexFactory.of(p)
+            ConstantVertex.of(n),
+            ConstantVertex.of(p)
         );
 
         IntegerTensor samples = vertex.sample();

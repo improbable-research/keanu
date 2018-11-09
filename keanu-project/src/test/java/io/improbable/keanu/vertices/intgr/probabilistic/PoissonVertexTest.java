@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.PoissonDistribution;
@@ -75,7 +75,7 @@ public class PoissonVertexTest {
 
     @Test
     public void logProbMatchesKnownLogProb() {
-        DoubleVertex mu = ConstantVertexFactory.of(new double[]{5, 7});
+        DoubleVertex mu = ConstantVertex.of(new double[]{5, 7});
         PoissonVertex poissonVertex = new PoissonVertex(mu);
         double actualLogProb = poissonVertex.logPmf(new int[]{39, 49});
 

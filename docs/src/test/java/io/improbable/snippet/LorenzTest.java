@@ -3,7 +3,7 @@ package io.improbable.snippet;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -100,7 +100,7 @@ public class LorenzTest {
                                        double rho,
                                        double beta) {
 
-        DoubleVertex rhov = ConstantVertexFactory.of(rho);
+        DoubleVertex rhov = ConstantVertex.of(rho);
 
         DoubleVertex xtplus1 = xt.multiply(1 - timestep * sigma).plus(yt.multiply(timestep * sigma));
 

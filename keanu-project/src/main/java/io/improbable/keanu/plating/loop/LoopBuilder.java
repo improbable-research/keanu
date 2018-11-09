@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -118,7 +118,7 @@ public class LoopBuilder {
 
             return initialState.withExtraEntries(ImmutableMap.of(
                 VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL, valueOutWhenAlwaysTrue,
-                LOOP_LABEL, ConstantVertexFactory.of(true)));
+                LOOP_LABEL, ConstantVertex.of(true)));
         }
 
         /**

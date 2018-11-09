@@ -5,7 +5,7 @@ import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertexFactory;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -65,7 +65,7 @@ public class LogisticRegressionTest {
 
     private BooleanTensor generateY(DoubleTensor x) {
         DoubleTensor probabilities = TRUE_WEIGHTS.matrixMultiply(x).plus(TRUE_INTERCEPT).sigmoid();
-        BoolVertex yVertex = new BernoulliVertex(ConstantVertexFactory.of(probabilities));
+        BoolVertex yVertex = new BernoulliVertex(ConstantVertex.of(probabilities));
         return yVertex.getValue();
     }
 
