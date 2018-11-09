@@ -28,7 +28,12 @@ public class KeanuRandom {
          * thread that does the load.  This causes issues with Apache Math that makes use of Sub-normal values (in
          * particular to initialisation values for the BrentOptimizer).
          */
-        Thread nd4jInitThread = new Thread(() -> Nd4j.scalar(1.0));
+        Thread nd4jInitThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DoubleTensor a = DoubleTensor.create(1.0, 1.0);
+            }
+        });
         nd4jInitThread.start();
         try {
             nd4jInitThread.join();
