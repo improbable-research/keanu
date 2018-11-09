@@ -1,8 +1,5 @@
-from keanu.context import KeanuContext
-import keanu as kn
 from typing import Any
-
-k = KeanuContext()
+import keanu as kn
 
 class VertexOps:
     """
