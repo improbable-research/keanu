@@ -3,7 +3,6 @@ import pytest
 from keanu.vertex import Gamma, Exponential, Cauchy
 from keanu.algorithm import sample
 from keanu import BayesNet
-from typing import Any
 
 @pytest.fixture
 def net() -> BayesNet:

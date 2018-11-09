@@ -1,7 +1,6 @@
 from py4j.java_gateway import java_import
 from .context import KeanuContext
 from .base import JavaObjectWrapper
-from typing import Any
 
 k = KeanuContext()
 

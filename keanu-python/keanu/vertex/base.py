@@ -6,7 +6,7 @@ import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
-from keanu.vartypes import primitive_types, tensor_arg_types, numpy_types, runtime_tensor_arg_types, runtime_primitive_types, runtime_vertex_operable_types
+from keanu.vartypes import tensor_arg_types, numpy_types, runtime_tensor_arg_types, runtime_primitive_types, runtime_vertex_operable_types
 from .ops import VertexOps
 from typing import List, Any, Tuple, Iterator
 
