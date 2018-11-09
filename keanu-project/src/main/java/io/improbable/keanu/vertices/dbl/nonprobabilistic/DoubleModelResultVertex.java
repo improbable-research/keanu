@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.model.ModelVertex;
 /**
  * A non-probabilistic double vertex whose value is extracted from an upstream model vertex.
  */
-public class DoubleModelResultVertex extends DoubleVertex implements Differentiable, ModelResultProvider<DoubleTensor>, NonProbabilistic<DoubleTensor> {
+public class DoubleModelResultVertex extends DoubleVertex implements ModelResultProvider<DoubleTensor>, NonProbabilistic<DoubleTensor> {
 
     private final ModelResult<DoubleTensor> delegate;
 
