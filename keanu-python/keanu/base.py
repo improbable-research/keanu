@@ -1,6 +1,5 @@
 import logging
 from .case_conversion import _to_camel_case_name, _to_snake_case_name
-from py4j.java_gateway import JavaObject
 from typing import Any
 
 class JavaObjectWrapper:
@@ -24,5 +23,5 @@ class JavaObjectWrapper:
         logging.warning("\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
         return self.unwrap().__getattr__(java_name)
 
-    def unwrap(self) -> JavaObject:
+    def unwrap(self) -> Any:
         return self._val

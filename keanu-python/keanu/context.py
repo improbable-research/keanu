@@ -2,7 +2,7 @@ import sys
 import io
 import os
 import logging
-from py4j.java_gateway import JavaGateway, JavaObject, CallbackServerParameters, JVMView
+from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject
 from typing import Dict, Any
 
 PATH = os.path.abspath(os.path.dirname(__file__))
@@ -57,7 +57,7 @@ class KeanuContext(metaclass=Singleton):
         jgws = JavaObject("GATEWAY_SERVER", self._gateway._gateway_client)
         jgws.resetCallbackClient(jgws.getCallbackClient().getAddress(), self._gateway.get_callback_server().get_listening_port())
 
-    def jvm_view(self) -> JVMView:
+    def jvm_view(self) -> Any:
         return self.__jvm_view
 
     def to_java_object_list(self, l : Any) -> Any:
@@ -68,7 +68,7 @@ class KeanuContext(metaclass=Singleton):
 
         return lst
 
-    def to_java_array(self, l : Any, klass : Any=None) -> JavaObject:
+    def to_java_array(self, l : Any, klass : Any=None) -> Any:
         if klass is None:
             klass = self.__infer_class_from_array(l)
         array = self._gateway.new_array(klass, len(l))
@@ -78,7 +78,7 @@ class KeanuContext(metaclass=Singleton):
 
         return array
 
-    def to_java_long_array(self, l : Any) -> JavaObject:
+    def to_java_long_array(self, l : Any) -> Any:
         return self.to_java_array(l, self._gateway.jvm.long)
 
     def __infer_class_from_array(self, l : Any) -> Any:

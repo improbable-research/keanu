@@ -8,7 +8,7 @@ from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
 from keanu.vartypes import primitive_types, const_arg_types, numpy_types, runtime_const_arg_types, runtime_primitive_types
 from .ops import VertexOps
-from typing import List, Any, Tuple, Iterable
+from typing import List, Any, Tuple, Iterator
 
 
 k = KeanuContext()
@@ -40,7 +40,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def get_value(self) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().getValue())
 
-    def get_connected_graph(self) -> Iterable['Vertex']:
+    def get_connected_graph(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
     def get_id(self) -> Tuple[Any, ...]:
@@ -62,7 +62,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
-    def _to_generator(java_vertices : Any) -> Iterable['Vertex']:
+    def _to_generator(java_vertices : Any) -> Iterator['Vertex']:
         return (Vertex(java_vertex) for java_vertex in java_vertices)
 
     @staticmethod

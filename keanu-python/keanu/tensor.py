@@ -1,6 +1,6 @@
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
-from typing import Any, TYPE_CHECKING
+from typing import Any
 import numpy as np
 from .vartypes import numpy_types, const_arg_types, primitive_types, runtime_int_types, runtime_float_types, runtime_bool_types, runtime_primitive_types, runtime_pandas_types, runtime_numpy_types, runtime_pandas_types, runtime_primitive_types
 from py4j.java_gateway import java_import, JavaObject, JavaMember
