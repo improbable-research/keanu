@@ -6,6 +6,7 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -269,6 +270,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
 
     public void loadValue(NetworkReader reader) {
         //TODO - Make this abstract once all Vertices have this
-        throw new UnsupportedOperationException("Can't load a value for a base Vertex");
+        throw new NotImplementedException();
     }
 }
