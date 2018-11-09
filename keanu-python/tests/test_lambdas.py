@@ -1,14 +1,8 @@
-from py4j.java_gateway import java_import
-from keanu.context import KeanuContext
-from keanu.tensor import Tensor
-from keanu.vertex import Const, Gaussian, LambdaModel, Vertex, VertexLabel
+from keanu.vertex import Gaussian, LambdaModel
 
-
-context = KeanuContext()
 
 def plus_one(vertices): 
-    input_vertex = vertices["in"]
-    vertices[VertexLabel("out").unwrap()] = input_vertex + 1.
+    vertices["out"] = vertices["in"] + 1.
 
 def test_you_can_create_a_lambda_model_vertex():
     v_in = Gaussian(1., 1.)
@@ -16,7 +10,7 @@ def test_you_can_create_a_lambda_model_vertex():
     model = LambdaModel(
         { "in": v_in }, 
         plus_one
-        )
+    )
 
     v_out = model.get_double_model_output_vertex("out")
 

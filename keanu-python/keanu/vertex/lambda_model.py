@@ -20,11 +20,15 @@ class LambdaModel(Vertex):
     executor, 
     update_value = _extract_values
     ) -> Vertex:
-        self.inputs = context.to_java_map(inputs)
+        self.inputs = self.__to_java_map(inputs)
         self.executor = executor
         self.update_value = Function(update_value)
         val = context.jvm_view().LambdaModelVertex(self.inputs, Consumer(self.__execute), self.update_value)
         super(LambdaModel, self).__init__(val)
+
+    def __to_java_map(self, inputs):
+        unwrapped_inputs = {VertexLabel(k).unwrap(): v for k,v in inputs.items()}
+        return context.to_java_map(unwrapped_inputs)
 
     def __execute(self, vertices):
         vertices_wrapped = self.__wrap(vertices)
@@ -32,11 +36,11 @@ class LambdaModel(Vertex):
         self.__unwrap(vertices_wrapped, vertices)
 
     def __wrap(self, vertices):
-        return {k: Vertex(v) for k, v in vertices.items()}
+        return {k.getUnqualifiedName(): Vertex(v) for k, v in vertices.items()}
 
     def __unwrap(self, vertices_wrapped, vertices_unwrapped):
         for k, v in vertices_wrapped.items():
-            vertices_unwrapped[k] = v.unwrap()
+            vertices_unwrapped[VertexLabel(k).unwrap()] = v.unwrap()
 
     def get_double_model_output_vertex(self, label : str):
         label = VertexLabel(label)
