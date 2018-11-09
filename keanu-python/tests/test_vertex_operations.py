@@ -238,4 +238,4 @@ def test_can_do_ceil():
 
     result = math.ceil(v)
     assert type(result) == Vertex
-    assert (result.get_value() == expected).all()        
+    assert (result.get_value() == expected).all()

@@ -6,7 +6,7 @@ from keanu import BayesNet
 from typing import Any
 
 @pytest.fixture
-def net() -> Any:
+def net() -> BayesNet:
     gamma = Gamma(1., 1.)
     exp = Exponential(1.)
     cauchy = Cauchy(gamma, exp)
@@ -18,7 +18,7 @@ def net() -> Any:
     ("NUTS"),
     ("hamiltonian")
 ])
-def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo : Any, net : Any) -> Any:
+def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo : str, net : BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
     vertex_ids = [vertex.get_id() for vertex in sample_from]
@@ -36,7 +36,7 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(a
         assert all(type(sample) == np.ndarray for sample in vertex_samples)
 
 
-def test_dropping_samples(net : Any) -> Any:
+def test_dropping_samples(net : BayesNet) -> None:
     draws = 10
     drop = 3
 
@@ -46,7 +46,7 @@ def test_dropping_samples(net : Any) -> Any:
     assert all(len(vertex_samples) == expected_num_samples for vertex_id, vertex_samples in samples.items())
 
 
-def test_down_sample_interval(net : Any) -> Any:
+def test_down_sample_interval(net : BayesNet) -> None:
     draws = 10
     down_sample_interval = 2
 
