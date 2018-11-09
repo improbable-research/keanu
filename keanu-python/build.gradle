@@ -69,6 +69,8 @@ task generatePythonDocumentation {
             commandLine "pipenv", "run", "make", "html"
         }
         exec {
+            // This ensures that there are no directories prefixed with an underscore
+            // because Jekyll will ignore these directories which causes the generated docs not to be served properly
             workingDir("docs/")
             commandLine "pipenv", "run", 'python', 'remove_underscores.py'
         }
