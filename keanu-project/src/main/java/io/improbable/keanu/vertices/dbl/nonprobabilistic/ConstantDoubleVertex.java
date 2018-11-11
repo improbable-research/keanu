@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.distributions.hyperparam.ParameterName;
 import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -52,7 +53,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     }
 
     @Override
-    public Map<String, Vertex> getParentsMap() {
+    public Map<ParameterName, Vertex> getParentsMap() {
         return new HashMap<>();
     }
 

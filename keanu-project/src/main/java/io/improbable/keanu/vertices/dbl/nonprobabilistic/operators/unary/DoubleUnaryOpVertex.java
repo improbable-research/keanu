@@ -1,5 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.distributions.hyperparam.ParameterName;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -7,6 +9,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
@@ -56,4 +59,13 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
     protected abstract DoubleTensor op(DoubleTensor value);
 
     protected abstract PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs);
+
+    @Override
+    public Map<ParameterName, Vertex> getParentsMap() {
+        Map<ParameterName, Vertex> parent = new LinkedHashMap<>();
+
+        parent.put(Diffs.A, inputVertex);
+
+        return parent;
+    }
 }

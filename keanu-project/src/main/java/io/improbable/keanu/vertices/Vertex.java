@@ -3,15 +3,14 @@ package io.improbable.keanu.vertices;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.distributions.hyperparam.ParameterName;
 import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -258,18 +257,9 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         netWriter.save(this);
     }
 
-    public void saveValue(NetworkWriter netWriter) {
-        //TODO - Make this abstract after we've implemented every type
-        netWriter.saveValue(this);
-    }
+    public abstract void saveValue(NetworkWriter netWriter);
 
-    public Map<String, Vertex> getParentsMap() {
-        //TODO - Make this abstract once all Vertices have this
-        return new HashMap<>();
-    }
+    public abstract Map<ParameterName, Vertex> getParentsMap();
 
-    public void loadValue(NetworkReader reader) {
-        //TODO - Make this abstract once all Vertices have this
-        throw new NotImplementedException();
-    }
+    public abstract void loadValue(NetworkReader reader);
 }

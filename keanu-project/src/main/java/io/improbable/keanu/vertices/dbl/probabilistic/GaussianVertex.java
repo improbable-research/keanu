@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.distributions.hyperparam.ParameterName;
 import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -137,10 +138,10 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
     }
 
     @Override
-    public Map<String, Vertex> getParentsMap() {
-        Map<String, Vertex> parentsMap = new LinkedHashMap<>();
-        parentsMap.put(MU_NAME, mu);
-        parentsMap.put(SIGMA_NAME, sigma);
+    public Map<ParameterName, Vertex> getParentsMap() {
+        Map<ParameterName, Vertex> parentsMap = new LinkedHashMap<>();
+        parentsMap.put(Diffs.MU, mu);
+        parentsMap.put(Diffs.SIGMA, sigma);
 
         return parentsMap;
     }

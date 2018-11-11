@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 
+import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.distributions.hyperparam.ParameterName;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -8,6 +10,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
@@ -69,6 +72,15 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
         } catch (UnsupportedOperationException e) {
             return super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs);
         }
+    }
+
+    @Override
+    public Map<ParameterName, Vertex> getParentsMap() {
+        Map<ParameterName, Vertex> parentsMap = new LinkedHashMap<>();
+        parentsMap.put(Diffs.LEFT, left);
+        parentsMap.put(Diffs.RIGHT, right);
+
+        return parentsMap;
     }
 
     protected abstract DoubleTensor op(DoubleTensor l, DoubleTensor r);

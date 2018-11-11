@@ -2,10 +2,13 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
+import io.improbable.keanu.distributions.hyperparam.ParameterName;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -64,12 +67,12 @@ public class ProtobufWriter implements NetworkWriter {
 
     private void saveParents(KeanuSavedBayesNet.Vertex.Builder vertexBuilder,
                              Vertex vertex) {
-        Map<String, Vertex> parentsMap = vertex.getParentsMap();
+        Map<ParameterName, Vertex> parentsMap = vertex.getParentsMap();
 
-        for (Map.Entry<String, Vertex> parent : parentsMap.entrySet()) {
+        for (Map.Entry<ParameterName, Vertex> parent : parentsMap.entrySet()) {
             vertexBuilder.addParents(
                 KeanuSavedBayesNet.NamedParent.newBuilder()
-                    .setName(parent.getKey())
+                    .setName(parent.getKey().getName())
                     .setId(KeanuSavedBayesNet.VertexID.newBuilder()
                         .setId(parent.getValue().getId().toString())
                     )
@@ -89,6 +92,22 @@ public class ProtobufWriter implements NetworkWriter {
         }
     }
 
+    @Override
+    public void saveValue(IntegerVertex vertex) {
+        if (vertex.hasValue()) {
+            KeanuSavedBayesNet.StoredValue value = getValue(vertex);
+            bayesNetBuilder.addDefaultState(value);
+        }
+    }
+
+    @Override
+    public void saveValue(BoolVertex vertex) {
+        if (vertex.hasValue()) {
+            KeanuSavedBayesNet.StoredValue value = getValue(vertex);
+            bayesNetBuilder.addDefaultState(value);
+        }
+    }
+
     private KeanuSavedBayesNet.StoredValue getValue(DoubleVertex vertex) {
         KeanuSavedBayesNet.DoubleTensor savedValue = KeanuSavedBayesNet.DoubleTensor.newBuilder()
             .addAllValues(vertex.getValue().asFlatList())
@@ -99,8 +118,36 @@ public class ProtobufWriter implements NetworkWriter {
             .setDoubleVal(savedValue)
             .build();
 
+        return getStoredValue(vertex, value);
+    }
+
+    private KeanuSavedBayesNet.StoredValue getValue(IntegerVertex vertex) {
+        KeanuSavedBayesNet.IntegerTensor savedValue = KeanuSavedBayesNet.IntegerTensor.newBuilder()
+            .addAllValues(vertex.getValue().asFlatList())
+            .addAllShape(Longs.asList(vertex.getShape()))
+            .build();
+        KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
+            .setIntVal(savedValue)
+            .build();
+
+        return getStoredValue(vertex, value);
+    }
+
+    private KeanuSavedBayesNet.StoredValue getValue(BoolVertex vertex) {
+        KeanuSavedBayesNet.BooleanTensor savedValue = KeanuSavedBayesNet.BooleanTensor.newBuilder()
+            .addAllValues(vertex.getValue().asFlatList())
+            .addAllShape(Longs.asList(vertex.getShape()))
+            .build();
+        KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
+            .setBoolVal(savedValue)
+            .build();
+
+        return getStoredValue(vertex, value);
+    }
+
+    private KeanuSavedBayesNet.StoredValue getStoredValue(Vertex vertex, KeanuSavedBayesNet.VertexValue value) {
         return KeanuSavedBayesNet.StoredValue.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()))
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()).build())
             .setValue(value)
             .build();
     }
