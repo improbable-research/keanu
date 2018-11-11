@@ -5,7 +5,6 @@ import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.distributions.hyperparam.ParameterName;
 import io.improbable.keanu.network.NetworkReader;
-import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
@@ -144,10 +143,5 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
         parentsMap.put(Diffs.SIGMA, sigma);
 
         return parentsMap;
-    }
-
-    @Override
-    public void save(NetworkWriter netWriter) {
-        netWriter.save(this);
     }
 }
