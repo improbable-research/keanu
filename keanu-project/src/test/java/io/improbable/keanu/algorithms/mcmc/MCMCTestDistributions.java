@@ -20,7 +20,7 @@ public class MCMCTestDistributions {
         return new BayesianNetwork(A.getConnectedGraph());
     }
 
-    public static void samplesMatchSimpleGaussian(double mu, double sigma, List<DoubleTensor> samples) {
+    public static void samplesMatchSimpleGaussian(double mu, double sigma, List<DoubleTensor> samples, double delta) {
 
         long[] shape = samples.get(0).getShape();
 
@@ -40,7 +40,7 @@ public class MCMCTestDistributions {
 
         for (int i = 0; i < means.length; i++) {
             assertEquals(mu, means[i], 0.05);
-            assertEquals(sigma, standardDeviations[i], 0.1);
+            assertEquals(sigma, standardDeviations[i], delta);
         }
     }
 

@@ -1,21 +1,30 @@
-from setuptools import setup
+from setuptools import setup, find_packages
+import shutil
 
 def readme():
     with open('README.rst', "r") as f:
         return f.read()
 
+version_string = '0.0.15.dev0'
+
+# If you don't remove the old directories, it tends to put the excluded module "examples" into the bdist
+for dir_name in ("keanu-%s.dist-info" % version_string, "keanu.egg-info", "build", "dist"):
+    shutil.rmtree(dir_name, ignore_errors=True)
+
 setup(name='keanu',
       description='A probabilistic approach from an Improbabilistic company',
       long_description=readme(),
-      version='0.0.14.dev0',
+      version=version_string,
       author='Improbable Worlds',
       author_email='keanu-engineering@improbable.io',
       url='https://github.com/improbable-research/keanu',
       license='MIT',
-      packages=['keanu'],
+      packages=find_packages(exclude=["examples"]),
+      include_package_data=True,
       install_requires=[
           'py4j',
-          'numpy'
+          'numpy',
+          'pandas'
       ],
       classifiers=[
           'Development Status :: 1 - Planning',
