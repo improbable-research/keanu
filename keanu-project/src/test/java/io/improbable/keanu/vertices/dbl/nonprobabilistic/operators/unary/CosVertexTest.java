@@ -53,7 +53,7 @@ public class CosVertexTest {
     @Test
     public void changesMatchGradient() {
         DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex outputVertex = inputVertex.times(3).cos();
+        CosVertex outputVertex = inputVertex.times(3).cos();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5);
     }

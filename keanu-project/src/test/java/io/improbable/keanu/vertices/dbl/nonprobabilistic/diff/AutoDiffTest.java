@@ -2,7 +2,9 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +48,7 @@ public class AutoDiffTest {
     public void diffOverPlusMinusMultiplyCombination() {
         DoubleVertex vC = vA.plus(vB);
         DoubleVertex vD = vA.minus(vB);
-        DoubleVertex vE = vC.multiply(vD);
+        MultiplicationVertex vE = vC.multiply(vD);
         assertDiffIsCorrect(vA, vB, vE);
     }
 
@@ -58,7 +60,7 @@ public class AutoDiffTest {
         assertDiffIsCorrect(vA, vB, vE.log());
     }
 
-    private void assertDiffIsCorrect(DoubleVertex vA, DoubleVertex vB, DoubleVertex vC) {
+    private <T extends DoubleVertex & Differentiable> void assertDiffIsCorrect(DoubleVertex vA, DoubleVertex vB, T vC) {
 
         double A = 1.0;
         double B = 2.0;
