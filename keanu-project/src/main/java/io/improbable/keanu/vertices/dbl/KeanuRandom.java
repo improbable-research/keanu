@@ -30,7 +30,12 @@ public class KeanuRandom {
          *
          * We have raised https://github.com/deeplearning4j/deeplearning4j/issues/6690 to address this
          */
-        Thread nd4jInitThread = new Thread(() -> DoubleTensor.create(1.0, 1.0));
+        Thread nd4jInitThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DoubleTensor.create(1.0, 1.0);
+            }
+        });
         nd4jInitThread.start();
         try {
             nd4jInitThread.join();
