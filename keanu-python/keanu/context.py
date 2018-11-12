@@ -3,7 +3,7 @@ import io
 import os
 import logging
 from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject
-from typing import Dict, Any
+from typing import Dict, Any, Iterable, List
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
@@ -60,7 +60,7 @@ class KeanuContext(metaclass=Singleton):
     def jvm_view(self) -> Any:
         return self.__jvm_view
 
-    def to_java_object_list(self, l : Any) -> Any:
+    def to_java_object_list(self, l : Iterable[Any]) -> Any:
         lst = self._gateway.jvm.java.util.ArrayList()
 
         for o in l:
@@ -68,7 +68,7 @@ class KeanuContext(metaclass=Singleton):
 
         return lst
 
-    def to_java_array(self, l : Any, klass : Any=None) -> Any:
+    def to_java_array(self, l : List[Any], klass : Any=None) -> Any:
         if klass is None:
             klass = self.__infer_class_from_array(l)
         array = self._gateway.new_array(klass, len(l))
@@ -81,7 +81,7 @@ class KeanuContext(metaclass=Singleton):
     def to_java_long_array(self, l : Any) -> Any:
         return self.to_java_array(l, self._gateway.jvm.long)
 
-    def __infer_class_from_array(self, l : Any) -> Any:
+    def __infer_class_from_array(self, l : List[Any]) -> Any:
         if len(l) == 0:
             raise ValueError("Cannot infer type because array is empty")
 

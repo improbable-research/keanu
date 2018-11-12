@@ -36,7 +36,7 @@ def __infer_const_ctor_from_ndarray(ndarray : numpy_types) -> Callable:
 
     return __infer_const_ctor_from_scalar(ndarray.item(0))
 
-def __infer_const_ctor_from_scalar(scalar : primitive_types) -> Callable:
+def __infer_const_ctor_from_scalar(scalar : np.generic) -> Callable:
     if isinstance(scalar, runtime_bool_types):
         return ConstantBool
     elif isinstance(scalar, runtime_int_types):

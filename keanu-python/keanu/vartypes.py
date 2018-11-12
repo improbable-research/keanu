@@ -8,7 +8,7 @@ int_types = Union[int, np.integer]
 float_types = Union[float, np.floating]
 bool_types = Union[bool, np.bool_]
 
-primitive_types = Union[int_types, float_types, bool_types, np.generic]
+primitive_types = Union[int_types, float_types, bool_types]
 
 shape_types = Iterable[primitive_types]
 

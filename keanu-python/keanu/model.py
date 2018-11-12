@@ -7,7 +7,7 @@ class Model:
         self.__dict__["_vertices"] = {}
         self.__dict__["_vertices"].update(vertices)
 
-    def to_bayes_net(self) -> Any:
+    def to_bayes_net(self) -> BayesNet:
         return BayesNet((filter(lambda vertex: isinstance(vertex, Vertex), self._vertices.values())))
 
     def __setattr__(self, k : str, v : Vertex) -> None:
