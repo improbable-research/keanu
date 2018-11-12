@@ -14,6 +14,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
  */
 @Builder
+@Slf4j
 public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = ProposalDistribution.usePrior();

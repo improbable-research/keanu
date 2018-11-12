@@ -14,7 +14,7 @@ def Const(t) -> Vertex:
         ctor = __infer_const_ctor_from_ndarray(val)
     elif isinstance(t, primitive_types):
         ctor = __infer_const_ctor_from_scalar(t)
-        val = np.array([[t]])
+        val = t
     else:
         raise NotImplementedError("Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(type(t)))
 

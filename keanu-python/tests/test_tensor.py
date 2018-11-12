@@ -58,7 +58,7 @@ def test_series_passed_to_Tensor_creates_tensor(data, expected_java_class):
     series_value = series.values
 
     assert len(tensor_value) == len(series_value)
-    assert tensor_value.shape == (len(series_value), 1)
+    assert tensor_value.shape == (len(series_value),  )
     assert series_value.shape == (len(series_value),  )
 
     assert np.array_equal(tensor_value.flatten(), series_value.flatten())

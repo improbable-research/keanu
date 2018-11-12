@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor;
 
-import com.google.common.base.Preconditions;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -143,8 +142,6 @@ public class TensorShapeValidation {
     }
 
     public static long[] checkShapesCanBeConcatenated(int dimension, long[]... shapes) {
-
-
         long[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
 
         for (int i = 1; i < shapes.length; i++) {

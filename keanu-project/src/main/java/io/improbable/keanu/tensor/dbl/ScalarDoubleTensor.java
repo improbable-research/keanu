@@ -128,6 +128,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
      */
     @Override
     public DoubleTensor sum(int... overDimensions) {
+        overDimensions = TensorShape.dimensionCorrection(shape.length, overDimensions);
         long[] summedShape = ArrayUtils.removeAll(shape, overDimensions);
         return new ScalarDoubleTensor(value, summedShape);
     }

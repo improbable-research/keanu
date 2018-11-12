@@ -7,7 +7,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.nd4j.linalg.util.ArrayUtil;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.K;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.THETA;

@@ -192,6 +192,15 @@ public class TensorShape {
         return newShape;
     }
 
+    public static int[] dimensionCorrection(int rank, int[] dimensions) {
+        for (int i = 0; i < dimensions.length; i++) {
+            if (dimensions[i] < 0) {
+                dimensions[i] += rank;
+            }
+        }
+        return dimensions;
+    }
+
     /**
      * Removes a dimension from a shape, guaranteeing that the resultant shape is at least rank 2. A row vector (1xN) is
      * returned when removing a dimension would result in lower than rank 2.

@@ -4,7 +4,6 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.function.Function;
 

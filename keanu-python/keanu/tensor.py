@@ -24,20 +24,11 @@ class Tensor(JavaObjectWrapper):
 
     @staticmethod
     def __get_tensor_from_ndarray(ndarray):
-        normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(ndarray)
-
-        ctor = Tensor.__infer_tensor_ctor_from_ndarray(normalized_ndarray)
-        values = k.to_java_array(normalized_ndarray.flatten().tolist())
-        shape = k.to_java_long_array(normalized_ndarray.shape)
+        ctor = Tensor.__infer_tensor_ctor_from_ndarray(ndarray)
+        values = k.to_java_array(ndarray.flatten().tolist())
+        shape = k.to_java_long_array(ndarray.shape)
 
         return ctor(values, shape)
-
-    @staticmethod
-    def __ensure_rank_is_atleast_two(ndarray):
-        if len(ndarray.shape) == 1:
-            return ndarray[..., None]
-        else:
-            return ndarray
 
     @staticmethod
     def __infer_tensor_ctor_from_ndarray(ndarray):

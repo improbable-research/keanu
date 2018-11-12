@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -63,8 +64,8 @@ public class If {
         }
 
         public Vertex<Tensor<T>> orElse(Vertex<? extends Tensor<T>> els) {
-            assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
-            return new IfVertex<>(els.getShape(), predicate, thn, els);
+            long[] shape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(thn.getShape(), els.getShape(), predicate.getShape());
+            return new IfVertex<>(shape, predicate, thn, els);
         }
     }
 
@@ -80,8 +81,8 @@ public class If {
         }
 
         public BoolVertex orElse(Vertex<? extends BooleanTensor> els) {
-            assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
-            return new BooleanIfVertex(els.getShape(), predicate, thn, els);
+            long[] shape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(thn.getShape(), els.getShape(), predicate.getShape());
+            return new BooleanIfVertex(shape, predicate, thn, els);
         }
     }
 
@@ -97,8 +98,8 @@ public class If {
         }
 
         public DoubleVertex orElse(Vertex<? extends DoubleTensor> els) {
-            assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
-            return new DoubleIfVertex(els.getShape(), predicate, thn, els);
+            long[] shape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(thn.getShape(), els.getShape(), predicate.getShape());
+            return new DoubleIfVertex(shape, predicate, thn, els);
         }
 
         public DoubleVertex orElse(double els) {
@@ -107,6 +108,7 @@ public class If {
     }
 
     private static void assertShapesMatchOrAreScalar(long[] thnShape, long[] elsShape, long[] predicateShape) {
+
         if (!Arrays.equals(thnShape, elsShape)
             || (!TensorShape.isScalar(predicateShape) && !TensorShape.isScalar(thnShape) && !Arrays.equals(predicateShape, thnShape))) {
             throw new IllegalArgumentException("The shape of the then and else condition must match. The predicate should either match or be scalar.");
