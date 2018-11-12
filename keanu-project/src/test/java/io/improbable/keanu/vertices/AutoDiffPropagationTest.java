@@ -16,7 +16,7 @@ public class AutoDiffPropagationTest {
         DoubleVertex start = ConstantVertex.of(Math.PI / 3).sin();
 
         int links = 20;
-        DoubleVertex end = TestGraphGenerator.addLinks(start, n, m, links);
+        TestGraphGenerator.SumVertex end = TestGraphGenerator.addLinks(start, n, m, links);
 
         end.getDerivativeWrtLatents();
 

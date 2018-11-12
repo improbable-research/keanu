@@ -6,11 +6,13 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertWeightsAndInterceptMatchTestData;
 
@@ -19,6 +21,7 @@ public class LinearRegressionTest {
     @Rule
     public DeterministicRule deterministicRule = new DeterministicRule();
 
+    @Category(Slow.class)
     @Test
     public void manuallyBuiltGraphFindsParamsForOneWeight() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData();
@@ -39,6 +42,7 @@ public class LinearRegressionTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void modelFindsParamsForOneWeight() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData();
@@ -53,6 +57,7 @@ public class LinearRegressionTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void manuallyBuiltGraphFindsParamsForTwoWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
@@ -77,6 +82,7 @@ public class LinearRegressionTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void modelFindsParamsForTwoWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
@@ -90,6 +96,7 @@ public class LinearRegressionTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void manuallyBuiltGraphFindsParamsForManyWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataUniformWeights(40);
