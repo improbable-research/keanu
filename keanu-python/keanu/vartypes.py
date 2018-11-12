@@ -2,6 +2,8 @@ from typing import Iterable, Union, Type, Any, TYPE_CHECKING
 import numpy as np
 from pandas import Series, DataFrame
 from keanu.vertex.ops import VertexOps
+from .base import JavaObjectWrapper
+
 
 # see numpy's scalar hierarchy: https://docs.scipy.org/doc/numpy/reference/arrays.scalars.html#scalars
 int_types = Union[int, np.integer]
@@ -9,8 +11,6 @@ float_types = Union[float, np.floating]
 bool_types = Union[bool, np.bool_]
 
 primitive_types = Union[int_types, float_types, bool_types]
-
-shape_types = Iterable[primitive_types]
 
 '''
 Tensor arg types
@@ -28,13 +28,16 @@ int_and_bool_tensor_arg_types = Union[int_types, bool_types, pandas_and_numpy_ty
 '''
 Vertex arg types
 '''
-vertex_operable_types = Union[VertexOps]
+wrapped_java_types = Union[JavaObjectWrapper]
+shape_types = Iterable[primitive_types]
 
 # mypy treats bool as a subtype of int and int as a subtype of float
 # see : https://github.com/python/mypy/issues/1850
-vertex_arg_types = Union[tensor_arg_types, vertex_operable_types]
-bool_vertex_arg_types = Union[bool_tensor_arg_types, vertex_operable_types]
-int_and_bool_vertex_arg_types = Union[int_and_bool_tensor_arg_types, vertex_operable_types]
+vertex_types = Union[tensor_arg_types, wrapped_java_types, VertexOps]
+bool_vertex_types = Union[bool_tensor_arg_types, wrapped_java_types, VertexOps]
+int_and_bool_vertex_types = Union[int_and_bool_tensor_arg_types, wrapped_java_types, VertexOps]
+
+vertex_arg_types = Union[vertex_types, shape_types]
 
 '''
 Runtime types
@@ -48,15 +51,15 @@ runtime_int_types : Type[Any]
 runtime_float_types : Type[Any]
 runtime_bool_types : Type[Any]
 runtime_tensor_arg_types : Type[Any]
-runtime_vertex_operable_types : Type[Any]
+runtime_wrapped_java_types : Type[Any]
 
 if not TYPE_CHECKING:
     # Union with one argument does not have __args__ parameter
-    runtime_numpy_types = numpy_types 
+    runtime_numpy_types = numpy_types
     runtime_pandas_types = pandas_types.__args__
     runtime_primitive_types = primitive_types.__args__
     runtime_int_types = int_types.__args__
     runtime_float_types = float_types.__args__
     runtime_bool_types = bool_types.__args__
     runtime_tensor_arg_types = tensor_arg_types.__args__
-    runtime_vertex_operable_types  = vertex_operable_types
+    runtime_wrapped_java_types = wrapped_java_types

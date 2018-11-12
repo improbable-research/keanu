@@ -1,10 +1,22 @@
+import numpy as np
+from py4j.java_gateway import java_import, JavaObject, JavaMember
+
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from typing import Any
-import numpy as np
-from .vartypes import numpy_types, tensor_arg_types, primitive_types, runtime_int_types, runtime_float_types, runtime_bool_types, runtime_primitive_types, runtime_pandas_types, runtime_numpy_types, runtime_pandas_types, runtime_primitive_types
-from py4j.java_gateway import java_import, JavaObject, JavaMember
-from keanu.vertex.ops import VertexOps
+from .vartypes import (
+    numpy_types,
+    tensor_arg_types,
+    primitive_types,
+    runtime_int_types,
+    runtime_float_types,
+    runtime_bool_types,
+    runtime_primitive_types,
+    runtime_pandas_types,
+    runtime_numpy_types,
+    runtime_pandas_types,
+    runtime_primitive_types
+)
 
 k = KeanuContext()
 
@@ -12,7 +24,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.tensor.dbl.DoubleTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
-class Tensor(JavaObjectWrapper, VertexOps):
+class Tensor(JavaObjectWrapper):
     def __init__(self, t : tensor_arg_types) -> None:
         if isinstance(t, runtime_numpy_types):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t))

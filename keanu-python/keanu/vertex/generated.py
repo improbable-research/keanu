@@ -4,9 +4,9 @@ from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex
 from keanu.vartypes import (
-    vertex_arg_types,
-    int_and_bool_vertex_arg_types,
-    bool_vertex_arg_types,
+    vertex_types,
+    int_and_bool_vertex_types,
+    bool_vertex_types,
     tensor_arg_types,
     int_and_bool_tensor_arg_types,
     bool_tensor_arg_types,
@@ -50,31 +50,31 @@ def ConstantBool(constant : bool_tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantBoolVertex, constant)
 
 
-def Equals(a : vertex_arg_types, b : vertex_arg_types) -> Vertex:
+def Equals(a : vertex_types, b : vertex_types) -> Vertex:
     return Vertex(context.jvm_view().EqualsVertex, a, b)
 
 
-def GreaterThanOrEqual(a : vertex_arg_types, b : vertex_arg_types) -> Vertex:
+def GreaterThanOrEqual(a : vertex_types, b : vertex_types) -> Vertex:
     return Vertex(context.jvm_view().GreaterThanOrEqualVertex, a, b)
 
 
-def GreaterThan(a : vertex_arg_types, b : vertex_arg_types) -> Vertex:
+def GreaterThan(a : vertex_types, b : vertex_types) -> Vertex:
     return Vertex(context.jvm_view().GreaterThanVertex, a, b)
 
 
-def LessThanOrEqual(a : vertex_arg_types, b : vertex_arg_types) -> Vertex:
+def LessThanOrEqual(a : vertex_types, b : vertex_types) -> Vertex:
     return Vertex(context.jvm_view().LessThanOrEqualVertex, a, b)
 
 
-def LessThan(a : vertex_arg_types, b : vertex_arg_types) -> Vertex:
+def LessThan(a : vertex_types, b : vertex_types) -> Vertex:
     return Vertex(context.jvm_view().LessThanVertex, a, b)
 
 
-def NotEquals(a : vertex_arg_types, b : vertex_arg_types) -> Vertex:
+def NotEquals(a : vertex_types, b : vertex_types) -> Vertex:
     return Vertex(context.jvm_view().NotEqualsVertex, a, b)
 
 
-def CastDouble(input_vertex : vertex_arg_types) -> Vertex:
+def CastDouble(input_vertex : vertex_types) -> Vertex:
     return Vertex(context.jvm_view().CastDoubleVertex, input_vertex)
 
 
@@ -82,11 +82,11 @@ def ConstantDouble(constant : tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantDoubleVertex, constant)
 
 
-def DoubleIf(shape : shape_types, predicate : vertex_arg_types, thn : vertex_arg_types, els : vertex_arg_types) -> Vertex:
+def DoubleIf(shape : shape_types, predicate : vertex_types, thn : vertex_types, els : vertex_types) -> Vertex:
     return Vertex(context.jvm_view().DoubleIfVertex, shape, predicate, thn, els)
 
 
-def Addition(left : vertex_arg_types, right : vertex_arg_types) -> Vertex:
+def Addition(left : vertex_types, right : vertex_types) -> Vertex:
     """
     Adds one vertex to another
     
@@ -96,7 +96,7 @@ def Addition(left : vertex_arg_types, right : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().AdditionVertex, left, right)
 
 
-def Difference(left : vertex_arg_types, right : vertex_arg_types) -> Vertex:
+def Difference(left : vertex_types, right : vertex_types) -> Vertex:
     """
     Subtracts one vertex from another
     
@@ -106,7 +106,7 @@ def Difference(left : vertex_arg_types, right : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().DifferenceVertex, left, right)
 
 
-def Division(left : vertex_arg_types, right : vertex_arg_types) -> Vertex:
+def Division(left : vertex_types, right : vertex_types) -> Vertex:
     """
     Divides one vertex by another
     
@@ -116,7 +116,7 @@ def Division(left : vertex_arg_types, right : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().DivisionVertex, left, right)
 
 
-def Multiplication(left : vertex_arg_types, right : vertex_arg_types) -> Vertex:
+def Multiplication(left : vertex_types, right : vertex_types) -> Vertex:
     """
     Multiplies one vertex by another
     
@@ -126,7 +126,7 @@ def Multiplication(left : vertex_arg_types, right : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().MultiplicationVertex, left, right)
 
 
-def Power(base : vertex_arg_types, exponent : vertex_arg_types) -> Vertex:
+def Power(base : vertex_types, exponent : vertex_types) -> Vertex:
     """
     Raises a vertex to the power of another
     
@@ -136,7 +136,7 @@ def Power(base : vertex_arg_types, exponent : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().PowerVertex, base, exponent)
 
 
-def Abs(input_vertex : vertex_arg_types) -> Vertex:
+def Abs(input_vertex : vertex_types) -> Vertex:
     """
     Takes the absolute of a vertex
     
@@ -145,7 +145,7 @@ def Abs(input_vertex : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().AbsVertex, input_vertex)
 
 
-def Ceil(input_vertex : vertex_arg_types) -> Vertex:
+def Ceil(input_vertex : vertex_types) -> Vertex:
     """
     Applies the Ceiling operator to a vertex.
     This maps a vertex to the smallest integer greater than or equal to its value
@@ -155,7 +155,7 @@ def Ceil(input_vertex : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().CeilVertex, input_vertex)
 
 
-def Floor(input_vertex : vertex_arg_types) -> Vertex:
+def Floor(input_vertex : vertex_types) -> Vertex:
     """
     Applies the Floor operator to a vertex.
     This maps a vertex to the biggest integer less than or equal to its value
@@ -165,7 +165,7 @@ def Floor(input_vertex : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().FloorVertex, input_vertex)
 
 
-def Round(input_vertex : vertex_arg_types) -> Vertex:
+def Round(input_vertex : vertex_types) -> Vertex:
     """
     Applies the Rounding operator to a vertex.
     This maps a vertex to the nearest integer value
@@ -175,11 +175,11 @@ def Round(input_vertex : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().RoundVertex, input_vertex)
 
 
-def Cauchy(location : vertex_arg_types, scale : vertex_arg_types) -> Vertex:
+def Cauchy(location : vertex_types, scale : vertex_types) -> Vertex:
     return Vertex(context.jvm_view().CauchyVertex, location, scale)
 
 
-def Exponential(rate : vertex_arg_types) -> Vertex:
+def Exponential(rate : vertex_types) -> Vertex:
     """
     One to one constructor for mapping some shape of rate to matching shaped exponential.
     
@@ -188,7 +188,7 @@ def Exponential(rate : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ExponentialVertex, rate)
 
 
-def Gamma(theta : vertex_arg_types, k : vertex_arg_types) -> Vertex:
+def Gamma(theta : vertex_types, k : vertex_types) -> Vertex:
     """
     One to one constructor for mapping some shape of theta and k to matching shaped gamma.
     
@@ -198,11 +198,11 @@ def Gamma(theta : vertex_arg_types, k : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().GammaVertex, theta, k)
 
 
-def Gaussian(mu : vertex_arg_types, sigma : vertex_arg_types) -> Vertex:
+def Gaussian(mu : vertex_types, sigma : vertex_types) -> Vertex:
     return Vertex(context.jvm_view().GaussianVertex, mu, sigma)
 
 
-def Uniform(x_min : vertex_arg_types, x_max : vertex_arg_types) -> Vertex:
+def Uniform(x_min : vertex_types, x_max : vertex_types) -> Vertex:
     """
     One to one constructor for mapping some shape of mu and sigma to
     a matching shaped Uniform Vertex
@@ -217,7 +217,7 @@ def ConstantInteger(constant : int_and_bool_tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantIntegerVertex, constant)
 
 
-def IntegerDivision(a : int_and_bool_vertex_arg_types, b : int_and_bool_vertex_arg_types) -> Vertex:
+def IntegerDivision(a : int_and_bool_vertex_types, b : int_and_bool_vertex_types) -> Vertex:
     """
     Divides one vertex by another
     
@@ -227,7 +227,7 @@ def IntegerDivision(a : int_and_bool_vertex_arg_types, b : int_and_bool_vertex_a
     return Vertex(context.jvm_view().IntegerDivisionVertex, a, b)
 
 
-def Poisson(mu : vertex_arg_types) -> Vertex:
+def Poisson(mu : vertex_types) -> Vertex:
     """
     One to one constructor for mapping some shape of mu to
     a matching shaped Poisson.
@@ -237,5 +237,5 @@ def Poisson(mu : vertex_arg_types) -> Vertex:
     return Vertex(context.jvm_view().PoissonVertex, mu)
 
 
-def UniformInt(min : int_and_bool_vertex_arg_types, max : int_and_bool_vertex_arg_types) -> Vertex:
+def UniformInt(min : int_and_bool_vertex_types, max : int_and_bool_vertex_types) -> Vertex:
     return Vertex(context.jvm_view().UniformIntVertex, min, max)

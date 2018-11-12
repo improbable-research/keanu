@@ -4,9 +4,9 @@ from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex
 from keanu.vartypes import (
-    vertex_arg_types,
-    int_and_bool_vertex_arg_types,
-    bool_vertex_arg_types,
+    vertex_types,
+    int_and_bool_vertex_types,
+    bool_vertex_types,
     tensor_arg_types,
     int_and_bool_tensor_arg_types,
     bool_tensor_arg_types,
