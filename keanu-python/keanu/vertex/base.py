@@ -6,10 +6,15 @@ import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
-from keanu.vartypes import tensor_arg_types, numpy_types, runtime_tensor_arg_types, runtime_primitive_types, runtime_vertex_operable_types
 from .ops import VertexOps
 from typing import List, Any, Tuple, Iterator
-
+from keanu.vartypes import (
+    tensor_arg_types,
+    numpy_types,
+    runtime_tensor_arg_types,
+    runtime_primitive_types,
+    runtime_vertex_operable_types
+)
 
 k = KeanuContext()
 
@@ -53,7 +58,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
     @staticmethod
     def __parse_arg(arg : Any) -> Any:
         if isinstance(arg, runtime_tensor_arg_types):
-            return kn.vertex.const.Const(arg).unwrap() # type: ignore
+            return kn.vertex.const.Const(arg).unwrap()
         elif isinstance(arg, runtime_vertex_operable_types):
             return arg.unwrap()
         elif isinstance(arg, collections.Iterable) and all(isinstance(x, runtime_primitive_types) for x in arg):

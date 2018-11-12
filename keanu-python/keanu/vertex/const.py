@@ -1,13 +1,23 @@
+import numpy as np
 from keanu.tensor import Tensor
 from .generated import ConstantBool, ConstantInteger, ConstantDouble
 from .base import Vertex
 from typing import Callable, Any, Union
-from keanu.vartypes import primitive_types, numpy_types, tensor_arg_types, runtime_numpy_types, runtime_pandas_types, runtime_primitive_types, runtime_bool_types, runtime_int_types, runtime_float_types
-import numpy as np
+from keanu.vartypes import (
+    primitive_types,
+    numpy_types,
+    tensor_arg_types,
+    runtime_numpy_types,
+    runtime_pandas_types,
+    runtime_primitive_types,
+    runtime_bool_types,
+    runtime_int_types,
+    runtime_float_types
+)
 
 def Const(t : tensor_arg_types) -> Vertex:
     if isinstance(t, runtime_numpy_types):
-        ctor : Callable = __infer_const_ctor_from_ndarray(t)
+        ctor = __infer_const_ctor_from_ndarray(t)
         val = t
     elif isinstance(t, runtime_pandas_types):
         val = t.values
