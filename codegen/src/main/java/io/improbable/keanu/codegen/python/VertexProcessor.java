@@ -20,6 +20,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
+import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ class VertexProcessor {
     final private static String TEMPLATE_FILE = "generated.py.ftl";
     final private static String GENERATED_FILE = "generated.py";
 
-    static void process(String generatedDir) {
+    static void process(String generatedDir) throws IOException {
         Map<String, Object> dataModel = buildDataModel();
         Template fileTemplate = TemplateProcessor.getFileTemplate(TEMPLATE_FILE);
         Writer fileWriter = TemplateProcessor.createFileWriter(generatedDir + GENERATED_FILE);
@@ -41,7 +42,7 @@ class VertexProcessor {
         TemplateProcessor.processDataModel(dataModel, fileTemplate, fileWriter);
     }
 
-    private static Map<String, Object> buildDataModel() {
+    private static Map<String, Object> buildDataModel() throws IOException {
         Reflections reflections = new Reflections(new ConfigurationBuilder()
             .setUrls(ClasspathHelper.forPackage("io.improbable.keanu.vertices"))
             .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner(), new MethodParameterNamesScanner()));
@@ -54,21 +55,28 @@ class VertexProcessor {
 
         root.put("imports", imports);
         root.put("constructors", pythonConstructors);
-
+        Map<String, DocString> nameToDocStringMap = KeanuProjectDoclet.getDocStringsFromFile();
         for (Constructor constructor : constructors) {
             String javaClass = constructor.getDeclaringClass().getSimpleName();
+            String qualifiedName = constructor.getName();
+            DocString docString = nameToDocStringMap.get(qualifiedName);
+
             String[] pythonParameters = reflections.getConstructorParamNames(constructor).stream().map(
                 parameter -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, parameter)).toArray(String[]::new);
 
             Class<?>[] parameterTypes = constructor.getParameterTypes();
 
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
+
             pythonConstructors.add(
                 new PythonConstructor(
                     javaClass,
                     toPythonClass(javaClass),
                     toPythonParams(pythonParameters, parameterTypes),
-                    String.join(", ", pythonParameters)));
+                    String.join(", ", pythonParameters),
+                    docString.getAsString()
+                )
+            );
         }
 
         return root;
@@ -137,12 +145,15 @@ class VertexProcessor {
         private String pythonTypedParameters;
         @Getter
         private String pythonParameters;
+        @Getter
+        private String docString;
 
-        PythonConstructor(String javaClass, String pythonClass, String pythonTypedParameters, String pythonParameters) {
+        PythonConstructor(String javaClass, String pythonClass, String pythonTypedParameters, String pythonParameters, String docString) {
             this.javaClass = javaClass;
             this.pythonClass = pythonClass;
             this.pythonTypedParameters = pythonTypedParameters;
             this.pythonParameters = pythonParameters;
+            this.docString = docString;
         }
     }
 

@@ -2,4 +2,6 @@ keanu-python-all.jar
 *.egg-info/
 Pipfile.lock
 __pycache__/
+dist/
+keanu/classpath
 .mypy_cache/
