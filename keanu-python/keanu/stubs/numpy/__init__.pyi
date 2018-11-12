@@ -470,6 +470,18 @@ def ones_like(a: Any, dtype: Any=None, order: str='K', subok: bool=True) -> ndar
 def zeros(shape: ShapeType, dtype: DtypeType=float, order: str='C') -> ndarray[Any]: ...
 def zeros_like(a: Any, dtype: Any=None, order: str='K', subok: bool=True) -> ndarray[Any]: ...
 
+#
+# Array operation routines
+#
+
+def average(a : Any, axis : AxesType=None, weights : Any=None, returned : int=False): ...
+
+#
+# Testing
+#
+
+class testing:
+    def assert_almost_equal(actual : Any, desired : Any, decimal : int=7, err_msg : str='', verbose : bool=True): ...
 
 # Specific values
 inf: float

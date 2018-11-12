@@ -3,7 +3,7 @@ from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
 from keanu.net import BayesNet
-from typing import Any, Iterable, Dict, List, Tuple
+from typing import Any, Iterable, Dict, List, Tuple, Iterator, Generator
 from keanu.vartypes import numpy_types
 
 k = KeanuContext()
@@ -24,7 +24,7 @@ def sample(net : BayesNet, sample_from : Iterable[Vertex], algo : str='metropoli
 
     return vertex_samples
 
-def generate_samples(net, sample_from, algo='metropolis', drop=0, down_sample_interval=1):
+def generate_samples(net : BayesNet, sample_from : Iterable[Vertex], algo : str='metropolis', drop : int=0, down_sample_interval : int=1) -> Generator[Dict[Tuple[Any, ...], numpy_types], None, None]:
     vertices_unwrapped = k.to_java_object_list(sample_from)
 
     sample_iterator = algorithms[algo].withDefaultConfig().generatePosteriorSamples(net.unwrap(), vertices_unwrapped)
@@ -33,7 +33,7 @@ def generate_samples(net, sample_from, algo='metropolis', drop=0, down_sample_in
 
     return _samples_generator(sample_iterator, vertices_unwrapped)
 
-def _samples_generator(sample_iterator, vertices_unwrapped):
+def _samples_generator(sample_iterator : Any, vertices_unwrapped : Any) -> Generator[Dict[Tuple[Any, ...], numpy_types], None, None]:
     while (True):
         network_sample = sample_iterator.next()
         sample = {Vertex._get_python_id(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped)) for vertex_unwrapped in vertices_unwrapped}

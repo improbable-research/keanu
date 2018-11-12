@@ -5,7 +5,7 @@ from py4j.java_gateway import java_import
 from examples import thermometers
 from keanu.vertex import Gamma, Exponential, Cauchy
 from keanu.algorithm import sample, generate_samples
-from keanu import BayesNet, KeanuRandom
+from keanu import BayesNet, KeanuRandom, Model
 from collections import defaultdict
 from itertools import islice
 
@@ -65,7 +65,7 @@ def test_down_sample_interval(net : BayesNet) -> None:
     ("metropolis"),
     ("hamiltonian")
 ])
-def test_can_iter_through_samples(algo, net):
+def test_can_iter_through_samples(algo : str, net : BayesNet) -> None:
     draws = 10
     samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
     count = 0
@@ -78,7 +78,7 @@ def test_can_iter_through_samples(algo, net):
     ("metropolis"),
     ("hamiltonian")
 ])
-def test_iter_returns_same_result_as_sample(algo):
+def test_iter_returns_same_result_as_sample(algo : str) -> None:
     draws = 100
     model = thermometers.model()
     net = BayesNet(model.temperature.get_connected_graph())
@@ -91,10 +91,10 @@ def test_iter_returns_same_result_as_sample(algo):
     [samples_dataframe.append(pd.DataFrame(list(next_sample.items()))) for next_sample in islice(iter_samples, draws)]
 
     for vertex_id in samples_dataframe:
-        np.testing.assert_almost_equal(dataframe[vertex_id].mean(), np.average(samples[vertex_id]))
+        np.testing.assert_almost_equal(samples_dataframe[vertex_id].mean(), np.average(samples[vertex_id]))
 
 
-def set_starting_state(model):
+def set_starting_state(model : Model) -> None:
     KeanuRandom.set_default_random_seed(1)
     model.temperature.set_value(model.temperature.sample())
     model.thermometer_one.set_value(model.thermometer_one.sample())
