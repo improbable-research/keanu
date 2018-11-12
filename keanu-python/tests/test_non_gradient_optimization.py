@@ -6,7 +6,8 @@ from keanu.algorithm import NonGradientOptimizer
 
 @pytest.fixture
 def model() -> Model:
-    KeanuRandom().set_default_random_seed(1)
+    KeanuRandom.set_default_random_seed(1)
+
     with Model() as m:
         m.a = Gaussian(0., 50.)
         m.b = Gaussian(0., 50.)

@@ -10,6 +10,12 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -39,7 +45,7 @@ public class HamiltonianTest {
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
 
-        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList());
+        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
     }
 
     @Test
@@ -68,22 +74,25 @@ public class HamiltonianTest {
     public void samplesFromDonut() {
 
         BayesianNetwork donutBayesNet = MCMCTestDistributions.create2DDonutDistribution();
+        Vertex<DoubleTensor> A = donutBayesNet.getContinuousLatentVertices().get(0);
+        Vertex<DoubleTensor> B = donutBayesNet.getContinuousLatentVertices().get(1);
 
         Hamiltonian hmc = Hamiltonian.builder()
             .leapFrogCount(15)
             .stepSize(0.02)
             .build();
 
-        NetworkSamples samples = hmc.getPosteriorSamples(
-            donutBayesNet,
-            donutBayesNet.getLatentVertices(),
-            2500
-        );
+        Map<Vertex, List<DoubleTensor>> samples = new HashMap<>();
 
-        Vertex<DoubleTensor> A = donutBayesNet.getContinuousLatentVertices().get(0);
-        Vertex<DoubleTensor> B = donutBayesNet.getContinuousLatentVertices().get(1);
+        hmc.generatePosteriorSamples(donutBayesNet, donutBayesNet.getLatentVertices())
+            .stream()
+            .limit(2500)
+            .forEach(x -> {
+                samples.computeIfAbsent(A, k -> new ArrayList<>()).add(x.get(A));
+                samples.computeIfAbsent(B, k -> new ArrayList<>()).add(x.get(B));
+            });
 
-        MCMCTestDistributions.samplesMatch2DDonut(samples.get(A).asList(), samples.get(B).asList());
+        MCMCTestDistributions.samplesMatch2DDonut(samples.get(A), samples.get(B));
     }
 
 
@@ -112,4 +121,28 @@ public class HamiltonianTest {
 
         assertFalse(posteriorSamples.get(A).asList().isEmpty());
     }
+
+    @Test
+    public void canStreamSamples() {
+
+        Hamiltonian hmc = Hamiltonian.builder()
+            .leapFrogCount(10)
+            .stepSize(0.4)
+            .build();
+
+        double mu = 0;
+        double sigma = 1;
+        GaussianVertex A = new GaussianVertex(mu, sigma);
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+
+        List<DoubleTensor> samples = hmc.generatePosteriorSamples(network, network.getLatentVertices())
+            .downSampleInterval(1)
+            .stream()
+            .limit(500)
+            .map(x -> x.get(A))
+            .collect(Collectors.toList());
+
+        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, samples, 0.3);
+    }
+
 }

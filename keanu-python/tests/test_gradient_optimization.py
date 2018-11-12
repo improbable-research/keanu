@@ -6,8 +6,9 @@ from keanu.algorithm import GradientOptimizer
 
 @pytest.fixture
 def model() -> Model:
-    KeanuRandom().set_default_random_seed(1)
+    KeanuRandom.set_default_random_seed(1)
     model = thermometers.model()
+
     model.thermometer_one.observe(22.0)
     model.thermometer_two.observe(20.0)
     return model

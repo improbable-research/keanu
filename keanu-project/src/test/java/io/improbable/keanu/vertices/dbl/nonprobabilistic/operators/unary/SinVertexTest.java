@@ -53,7 +53,7 @@ public class SinVertexTest {
     @Test
     public void changesMatchGradient() {
         DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex outputVertex = inputVertex.div(3).sin();
+        SinVertex outputVertex = inputVertex.div(3).sin();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5);
     }
