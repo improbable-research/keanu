@@ -27,6 +27,8 @@ public class KeanuRandom {
          * We need to load ND4J in a separate thread as on load it sets the FTZ and DAZ flags in the processor for the
          * thread that does the load.  This causes issues with Apache Math that makes use of Sub-normal values (in
          * particular to initialisation values for the BrentOptimizer).
+         *
+         * We have raised https://github.com/deeplearning4j/deeplearning4j/issues/6690 to address this
          */
         Thread nd4jInitThread = new Thread(new Runnable() {
             @Override
