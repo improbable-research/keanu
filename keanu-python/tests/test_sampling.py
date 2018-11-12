@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from py4j.java_gateway import java_import
-from examples import Thermometer
+from examples import thermometers
 from keanu.vertex import Gamma, Exponential, Cauchy
 from keanu.algorithm import sample, generate_samples
 from keanu import BayesNet, KeanuRandom
@@ -80,7 +80,7 @@ def test_can_iter_through_samples(algo, net):
 ])
 def test_iter_returns_same_result_as_sample(algo):
     draws = 100
-    model = Thermometer.model()
+    model = thermometers.model()
     net = BayesNet(model.temperature.get_connected_graph())
     set_starting_state(model)
     samples = sample(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
