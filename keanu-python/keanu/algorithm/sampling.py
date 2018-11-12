@@ -3,7 +3,8 @@ from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
 from keanu.net import BayesNet
-from typing import Any, Iterable
+from typing import Any, Iterable, Dict, List, Tuple
+from keanu.vartypes import numpy_types
 
 k = KeanuContext()
 
@@ -15,7 +16,7 @@ algorithms = {'metropolis': k.jvm_view().MetropolisHastings,
               'NUTS': k.jvm_view().NUTS,
               'hamiltonian': k.jvm_view().Hamiltonian}
 
-def sample(net : BayesNet, sample_from : Iterable[Vertex], algo : str='metropolis', draws : int=500, drop : int=0, down_sample_interval : int=1) -> Any:
+def sample(net : BayesNet, sample_from : Iterable[Vertex], algo : str='metropolis', draws : int=500, drop : int=0, down_sample_interval : int=1) -> Dict[Tuple[Any, ...], List[numpy_types]]:
     vertices_unwrapped = k.to_java_object_list(sample_from)
 
     network_samples = algorithms[algo].withDefaultConfig().getPosteriorSamples(net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
