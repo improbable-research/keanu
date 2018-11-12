@@ -3,8 +3,10 @@ package io.improbable.keanu.e2e.regression;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
+import io.improbable.keanu.testcategory.Slow;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertWeightsAndInterceptMatchTestData;
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.generateThreeFeatureDataWithOneUncorrelatedFeature;
@@ -17,6 +19,7 @@ public class LinearLassoRegressionTest {
     @Rule
     public DeterministicRule deterministicRule = new DeterministicRule();
 
+    @Category(Slow.class)
     @Test
     public void findsExpectedParamsForOneWeight() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData();
@@ -33,6 +36,7 @@ public class LinearLassoRegressionTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void findsExpectedParamsForTwoWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
@@ -64,6 +68,7 @@ public class LinearLassoRegressionTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void decreasingSigmaDecreasesL1NormOfWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataLaplaceWeights(20);
@@ -81,6 +86,7 @@ public class LinearLassoRegressionTest {
 
     }
 
+    @Category(Slow.class)
     @Test
     public void bringsUncorrelatedWeightsVeryCloseToZero() {
         LinearRegressionTestUtils.TestData data = generateThreeFeatureDataWithOneUncorrelatedFeature();

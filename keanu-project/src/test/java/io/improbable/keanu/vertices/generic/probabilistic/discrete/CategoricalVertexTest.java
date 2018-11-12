@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -12,6 +13,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
@@ -112,6 +114,7 @@ public class CategoricalVertexTest {
         new CategoricalVertex<>(proposalShape, selectableValues);
     }
 
+    @Category(Slow.class)
     @Test
     public void fourValuesEquallyWeightedSummingToOne() {
 
@@ -125,6 +128,7 @@ public class CategoricalVertexTest {
         assertProportionsWithinExpectedRanges(selectableValues, proportions);
     }
 
+    @Category(Slow.class)
     @Test
     public void fourValuesNotEquallyWeightedSummingToOne() {
 
@@ -138,6 +142,7 @@ public class CategoricalVertexTest {
         assertProportionsWithinExpectedRanges(selectableValues, proportions);
     }
 
+    @Category(Slow.class)
     @Test
     public void fourValuesEquallyWeightedSummingToFour() {
 
@@ -152,6 +157,7 @@ public class CategoricalVertexTest {
         assertProportionsWithinExpectedRanges(normalisedSelectableValues, proportions);
     }
 
+    @Category(Slow.class)
     @Test
     public void fourValuesNotEquallyWeightedSummingToFour() {
 
@@ -166,6 +172,7 @@ public class CategoricalVertexTest {
         assertProportionsWithinExpectedRanges(normalisedSelectableValues, proportions);
     }
 
+    @Category(Slow.class)
     @Test
     public void ofDirichletVertexHasCorrectProportions() {
         final DoubleTensor concentration = DoubleTensor.create(1, 2, 3, 4);
@@ -183,6 +190,7 @@ public class CategoricalVertexTest {
         assertProportionsWithinExpectedRanges(expectedProportions, proportions);
     }
 
+    @Category(Slow.class)
     @Test
     public void ofDirichletVertexUsesIntegerRangeByDefault() {
         final DoubleTensor concentration = DoubleTensor.create(1, 2, 3, 4, 5);

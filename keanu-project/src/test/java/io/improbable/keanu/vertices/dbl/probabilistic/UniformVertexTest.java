@@ -2,10 +2,12 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,6 +70,7 @@ public class UniformVertexTest {
         assertNotEquals(testUniformVertex.logProb(Nd4jDoubleTensor.scalar(lowerBound)), Double.NEGATIVE_INFINITY, 1e-6);
     }
 
+    @Category(Slow.class)
     @Test
     public void uniformSampleMethodMatchesLogProbMethod() {
         UniformVertex testUniformVertex = new UniformVertex(new long[] {1, N}, ConstantVertex.of(lowerBound), ConstantVertex.of(upperBound));
