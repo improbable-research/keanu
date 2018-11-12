@@ -7,10 +7,10 @@ name = "pypi"
 "py4j" = "*"
 numpy = "*"
 keanu = {editable = true, path = "."}
+pandas = "*"
 
 [dev-packages]
 pytest = "*"
-pandas = "*"
 
 [requires]
 python_version = "3.6"
