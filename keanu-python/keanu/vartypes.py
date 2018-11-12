@@ -3,8 +3,9 @@ import numpy as np
 from pandas import Series, DataFrame
 from keanu.vertex.ops import VertexOps
 
+# see numpy's scalar hierarchy: https://docs.scipy.org/doc/numpy/reference/arrays.scalars.html#scalars
 int_types = Union[int, np.integer]
-float_types = Union[float, np.float16, np.float32, np.float64]
+float_types = Union[float, np.floating]
 bool_types = Union[bool, np.bool_]
 
 primitive_types = Union[int_types, float_types, bool_types, np.generic]
