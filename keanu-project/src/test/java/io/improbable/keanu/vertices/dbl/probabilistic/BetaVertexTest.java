@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.gradient.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -10,6 +11,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,6 +139,7 @@ public class BetaVertexTest {
             DELTA);
     }
 
+    @Category(Slow.class)
     @Test
     public void betaSampleMethodMatchesLogProbMethodForAlphaGreaterThanBeta() {
 
@@ -154,6 +157,7 @@ public class BetaVertexTest {
         ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(vertex, from, to, bucketSize, 1e-2, random);
     }
 
+    @Category(Slow.class)
     @Test
     public void betaSampleMethodMatchesLogProbMethodForAlphaLessThanBeta() {
 

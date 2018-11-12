@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
@@ -79,7 +80,7 @@ public class SumVertexTest {
         DoubleVertex a = new UniformVertex(new long[]{2, 2, 2}, 0, 10);
         a.setValue(a.sample());
 
-        DoubleVertex b = a.sum();
+        SumVertex b = a.sum();
 
         DoubleTensor dbdaForward = b.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
@@ -96,7 +97,7 @@ public class SumVertexTest {
         a.setValue(DoubleTensor.arange(0, 4).reshape(2, 2));
 
         int sumDimension = 1;
-        DoubleVertex b = a.sum(sumDimension);
+        SumVertex b = a.sum(sumDimension);
 
         DoubleTensor dbdaForward = b.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
@@ -113,7 +114,7 @@ public class SumVertexTest {
         a.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
         int sumDimension = 1;
-        DoubleVertex b = a.sum(sumDimension);
+        SumVertex b = a.sum(sumDimension);
 
         DoubleTensor dbdaForward = b.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
@@ -134,7 +135,7 @@ public class SumVertexTest {
         DoubleVertex e = new UniformVertex(new long[]{2, 2}, 0, 10);
         e.setValue(DoubleTensor.arange(4, 8).reshape(2, 2));
 
-        DoubleVertex f = d.times(e);
+        MultiplicationVertex f = d.times(e);
 
         DoubleTensor dfdaForward = f.getDerivativeWrtLatents().withRespectTo(a);
 
@@ -166,7 +167,7 @@ public class SumVertexTest {
         DoubleVertex e = new UniformVertex(0, 10);
         e.setValue(2);
 
-        DoubleVertex f = d.times(e);
+        MultiplicationVertex f = d.times(e);
 
         DoubleTensor dfdaForward = f.getDerivativeWrtLatents().withRespectTo(a);
 
@@ -192,7 +193,7 @@ public class SumVertexTest {
         DoubleVertex e = new UniformVertex(0, 10);
         e.setValue(new double[]{1, 2, 3});
 
-        DoubleVertex f = d.times(e);
+        MultiplicationVertex f = d.times(e);
 
         DoubleTensor dfdaForward = f.getDerivativeWrtLatents().withRespectTo(a);
 
@@ -209,7 +210,7 @@ public class SumVertexTest {
     public void changesMatchGradientWhenSummingAll() {
         DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
-        DoubleVertex outputVertex = inputVertex.sum().times(inputVertex);
+        MultiplicationVertex outputVertex = inputVertex.sum().times(inputVertex);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-10);
     }
@@ -219,7 +220,7 @@ public class SumVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
-        DoubleVertex outputVertex = inputVertex.sum(0)
+        MultiplicationVertex outputVertex = inputVertex.sum(0)
             .times(
                 inputVertex.sum(1)
             ).times(

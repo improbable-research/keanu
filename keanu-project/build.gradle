@@ -25,7 +25,6 @@ dependencies {
     compile 'org.apache.commons:commons-math3:3.6.1'
     compile('org.nd4j:nd4j-native-platform:1.0.0-beta3') {
     }
-
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.google.guava:guava:20.0'
     compile 'com.google.protobuf:protobuf-java:3.6.1'
@@ -53,7 +52,18 @@ protobuf {
 test {
     systemProperty "io.improbable.keanu.defaultRandom.seed", '1'
     systemProperty "dtype", 'double'
+    useJUnit {
+        excludeCategories 'io.improbable.keanu.testcategory.Slow'
+    }
 }
+
+task testSlowOnes(type: Test) {
+    useJUnit {
+        includeCategories 'io.improbable.keanu.testcategory.Slow'
+    }
+}
+
+check.dependsOn(testSlowOnes)
 
 // Add default user/pass so it's not needed if only building and not publishing to Nexus
 if (!hasProperty('nexusUser')) {

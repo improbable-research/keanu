@@ -4,6 +4,8 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
@@ -25,7 +27,7 @@ public class AutoDiffTensorTest {
 
         DoubleVertex prod2 = sum.times(ConstantVertex.of(new double[]{2, 4, 6, 8}));
 
-        DoubleVertex output = prod2.plus(5).times(2);
+        MultiplicationVertex output = prod2.plus(5).times(2);
 
         PartialDerivatives derivative = output.getDerivativeWrtLatents();
 
@@ -51,7 +53,7 @@ public class AutoDiffTensorTest {
 
         DoubleVertex prod2 = sum.times(ConstantVertex.of(new double[]{2, 4, 6, 8}));
 
-        DoubleVertex output = prod2.plus(5).times(2);
+        MultiplicationVertex output = prod2.plus(5).times(2);
 
         PartialDerivatives derivative = output.getDerivativeWrtLatents();
 
@@ -69,7 +71,7 @@ public class AutoDiffTensorTest {
         DoubleVertex A = new UniformVertex(new long[]{2, 2}, 0, 1);
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
-        DoubleVertex B = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
+        SumVertex B = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
 
         PartialDerivatives derivative = B.getDerivativeWrtLatents();
 

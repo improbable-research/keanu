@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -9,6 +10,7 @@ import org.apache.commons.math3.util.Pair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import umontreal.ssj.probdistmulti.DirichletDist;
 
 import java.util.HashMap;
@@ -70,6 +72,7 @@ public class DirichletVertexTest {
             keanu.logPdf(new double[]{0.3, 0.4, 0.3}), 1e-6);
     }
 
+    @Category(Slow.class)
     @Test
     public void canSplitManyStringsOfVaryingSizeWithKnownMean() {
         DirichletVertex dirichlet = new DirichletVertex(10, 5, 3);
@@ -97,6 +100,7 @@ public class DirichletVertexTest {
         Assert.assertEquals(3. / 18., stringThreeLength, 1e-3);
     }
 
+    @Category(Slow.class)
     @Test
     public void twoDimensionalDirichletSampleMethodMatchesLogProbMethod() {
         DirichletVertex dirichlet = new DirichletVertex(5, 5);
@@ -118,6 +122,7 @@ public class DirichletVertexTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void threeDimensionalDirichletSampleMethodMatchesLogProbMethod() {
         DirichletVertex dirichlet = new DirichletVertex(2, 2, 2);

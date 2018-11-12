@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
@@ -129,7 +130,7 @@ public class TakeVertexTest {
         DoubleVertex E = new UniformVertex(0, 10);
         E.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 1, 4));
 
-        DoubleVertex F = D.plus(E);
+        AdditionVertex F = D.plus(E);
 
         PartialDerivatives forward = F.getDerivativeWrtLatents();
         PartialDerivatives reverse = Differentiator.reverseModeAutoDiff(F, A, B);
@@ -144,7 +145,7 @@ public class TakeVertexTest {
         DoubleVertex inputA = new UniformVertex(new long[]{3, 3, 3}, -10.0, 10.0);
         DoubleVertex inputB = new UniformVertex(new long[]{3, 3, 3}, -10.0, 10.0);
         DoubleVertex inputC = new UniformVertex(new long[]{2, 2}, -10.0, 10.0);
-        DoubleVertex outputVertex = inputA.times(10.0).times(inputB).take(0, 1, 2).plus(inputC);
+        AdditionVertex outputVertex = inputA.times(10.0).times(inputB).take(0, 1, 2).plus(inputC);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB), outputVertex, 10.0, 1e-10);
     }

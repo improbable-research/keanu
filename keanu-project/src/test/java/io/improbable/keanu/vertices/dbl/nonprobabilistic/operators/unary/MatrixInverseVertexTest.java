@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
@@ -52,7 +53,7 @@ public class MatrixInverseVertexTest {
     public void canCalculateDiffCorrectly() {
         DoubleVertex matrix = new UniformVertex(1.0, 100.0);
         matrix.setValue(DoubleTensor.arange(1, 5).reshape(2, 2));
-        DoubleVertex inverse = matrix.matrixInverse();
+        MatrixInverseVertex inverse = matrix.matrixInverse();
 
         inverse.lazyEval();
 
@@ -79,7 +80,7 @@ public class MatrixInverseVertexTest {
     public void inverseMultipliedEqualsIdentity() {
         DoubleVertex inputVertex = new UniformVertex(new long[]{4, 4}, -20.0, 20.0);
         DoubleVertex inverseVertex = inputVertex.matrixInverse();
-        DoubleVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
+        MatrixMultiplicationVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
 
         for (int i = 0; i < NUM_ITERATIONS; i++) {
             inputVertex.setValue(inputVertex.sample());
@@ -110,7 +111,7 @@ public class MatrixInverseVertexTest {
     @Test
     public void inverseDifferenceMatchesGradient() {
         DoubleVertex inputVertex = new UniformVertex(new long[]{3, 3}, 1.0, 25.0);
-        DoubleVertex invertVertex = inputVertex.matrixInverse();
+        MatrixInverseVertex invertVertex = inputVertex.matrixInverse();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(
             ImmutableList.of(inputVertex), invertVertex, 0.001, 1e-5);

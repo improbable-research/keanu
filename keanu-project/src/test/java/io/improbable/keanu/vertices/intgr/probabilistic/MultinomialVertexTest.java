@@ -9,6 +9,7 @@ import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -17,6 +18,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.Reshape
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.nd4j.linalg.exception.ND4JIllegalStateException;
 
 import java.util.Map;
@@ -273,6 +275,7 @@ public class MultinomialVertexTest {
         assertThat(multinomial.logProb(IntegerTensor.create(0, 0, 1).reshape(3, 1)).scalar(), closeTo(pBlue, 1e-7));
     }
 
+    @Category(Slow.class)
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
         int N = 10000;

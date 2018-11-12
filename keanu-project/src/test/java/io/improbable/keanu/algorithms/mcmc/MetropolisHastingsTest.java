@@ -6,6 +6,7 @@ import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -13,6 +14,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,6 +59,7 @@ public class MetropolisHastingsTest {
         assertEquals(44.0, actual, 0.1);
     }
 
+    @Category(Slow.class)
     @Test
     public void samplesContinuousTensorPrior() {
 
@@ -116,6 +119,7 @@ public class MetropolisHastingsTest {
         assertEquals(0.9, postProbTrue, 0.01);
     }
 
+    @Category(Slow.class)
     @Test
     public void samplesComplexDiscretePrior() {
 
