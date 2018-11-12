@@ -13,7 +13,7 @@ class CoalMining():
         start_year, end_year = (self._data.index.min(), self._data.index.max())
 
         with Model() as m:
-            m.switchpoint = UniformInt(int(start_year), int(end_year + 1))
+            m.switchpoint = UniformInt(start_year, end_year + 1)
 
             m.early_rate = Exponential(1.0)
             m.late_rate = Exponential(1.0)

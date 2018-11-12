@@ -43,7 +43,7 @@ public class NUTSTest {
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
 
-        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList());
+        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
     }
 
     @Test
