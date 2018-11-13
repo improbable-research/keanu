@@ -3,8 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.*;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -13,11 +12,16 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.HashMap;
 import java.util.Map;
 
-public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+
+public class DoubleIfVertex extends DoubleVertex implements SaveableVertex, Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final Vertex<? extends BooleanTensor> predicate;
     private final Vertex<? extends DoubleTensor> thn;
     private final Vertex<? extends DoubleTensor> els;
+    private static final String PREDICATE_NAME = "predicate";
+    private static final String THN_NAME = "thn";
+    private static final String ELS_NAME = "els";
 
     @ExportVertexToPythonBindings
     public DoubleIfVertex(long[] shape,
@@ -29,6 +33,28 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
         this.thn = thn;
         this.els = els;
         setParents(predicate, thn, els);
+    }
+
+    public DoubleIfVertex(@LoadParentVertex(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
+                          @LoadParentVertex(THN_NAME) Vertex<? extends DoubleTensor> thn,
+                          @LoadParentVertex(ELS_NAME) Vertex<? extends DoubleTensor> els) {
+
+        this(checkHasSingleNonScalarShapeOrAllScalar(thn.getShape(), els.getShape()), predicate, thn, els);
+    }
+
+    @SaveParentVertex(PREDICATE_NAME)
+    public Vertex<? extends BooleanTensor> getPredicate() {
+        return predicate;
+    }
+
+    @SaveParentVertex(THN_NAME)
+    public Vertex<? extends DoubleTensor> getThn() {
+        return els;
+    }
+
+    @SaveParentVertex(ELS_NAME)
+    public Vertex<? extends DoubleTensor> getEls() {
+        return thn;
     }
 
     @Override
