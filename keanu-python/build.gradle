@@ -1,6 +1,3 @@
-test.dependsOn(":keanu-project:preparePythonClasspath")
-test.dependsOn(":codegen:codeGen")
-
 task installPipenv {
     doLast {
         exec {
@@ -60,9 +57,45 @@ task pytest {
     }
 }
 
-test.dependsOn(pytest)
-pytest.dependsOn(installPipenv)
-pytest.dependsOn(pythonVersionInfo)
-pytest.dependsOn(installDependencies)
+task generateDocumentation {
+    group "pythonDocumentation"
+    dependsOn(":codegen:runCodeGeneration")
+    doLast {
+        exec {
+            workingDir("../docs/")
+            commandLine "rm", "-rf", "python/"
+        }
+        exec {
+            workingDir("docs/")
+            commandLine "pipenv", "run", "make", "html"
+        }
+        exec {
+            // This ensures that there are no directories prefixed with an underscore
+            // because Jekyll will ignore these directories which causes the generated docs not to be served properly
+            workingDir("docs/")
+            commandLine "pipenv", "run", 'python', 'remove_underscores.py'
+        }
+        exec {
+            commandLine 'mv', 'docs/_build/html/', '../docs/python/'
+        }
+        exec {
+            workingDir("docs/")
+            commandLine 'rm', '-rf', '_build/'
+        }
+    }
+}
+
 pythonVersionInfo.mustRunAfter(installPipenv)
 installDependencies.mustRunAfter(pythonVersionInfo)
+
+task preparePythonEnvironment {
+    dependsOn(installPipenv)
+    dependsOn(pythonVersionInfo)
+    dependsOn(installDependencies)
+    dependsOn(":keanu-project:preparePythonClasspath")
+    dependsOn(":codegen:runCodeGeneration")
+}
+
+generateDocumentation.dependsOn(preparePythonEnvironment)
+pytest.dependsOn(preparePythonEnvironment)
+test.dependsOn(pytest)

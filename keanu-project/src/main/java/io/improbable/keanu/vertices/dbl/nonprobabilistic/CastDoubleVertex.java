@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-
 public class CastDoubleVertex extends DoubleVertex  implements NonProbabilistic<DoubleTensor> {
 
     private final Vertex<? extends NumberTensor> inputVertex;

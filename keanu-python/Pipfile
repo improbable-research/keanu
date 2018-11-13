@@ -12,6 +12,7 @@ pandas = "*"
 [dev-packages]
 pytest = "*"
 mypy = "*"
+sphinx = "*"
 
 [requires]
 python_version = "3.6"
