@@ -119,6 +119,7 @@ public class BayesianNetworkTest {
         GaussianVertex readGaussianVertex = (GaussianVertex)readNet.getLatentVertices().get(0);
         assertThat(readGaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
         assertThat(readGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
+        readGaussianVertex.sample();
 
     }
 }
