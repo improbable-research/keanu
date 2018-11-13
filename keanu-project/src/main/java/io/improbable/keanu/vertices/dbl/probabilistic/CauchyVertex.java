@@ -26,6 +26,8 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble, S
 
     private final DoubleVertex location;
     private final DoubleVertex scale;
+    private static final String LOCATION_NAME = "location";
+    protected static final String SCALE_NAME = "scale";
 
     /**
      * One location or scale or both that match a proposed tensor shape of Cauchy
@@ -46,8 +48,8 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble, S
     }
 
     @ExportVertexToPythonBindings
-    public CauchyVertex(@LoadParentVertex(name = "location") DoubleVertex location,
-                        @LoadParentVertex(name = "scale") DoubleVertex scale) {
+    public CauchyVertex(@LoadParentVertex(name = LOCATION_NAME) DoubleVertex location,
+                        @LoadParentVertex(name = SCALE_NAME) DoubleVertex scale) {
         this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
     }
 
@@ -75,12 +77,12 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble, S
         this(tensorShape, new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
-    @SaveParentVertex(name = "location")
+    @SaveParentVertex(name = LOCATION_NAME)
     public DoubleVertex getLocation() {
         return location;
     }
 
-    @SaveParentVertex(name = "scale")
+    @SaveParentVertex(name = SCALE_NAME)
     public DoubleVertex getScale() {
         return scale;
     }

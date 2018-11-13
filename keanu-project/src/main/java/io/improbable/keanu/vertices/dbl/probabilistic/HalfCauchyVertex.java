@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -25,7 +27,8 @@ public class HalfCauchyVertex extends CauchyVertex {
         super(tensorShape, LOC_ZERO, scale);
     }
 
-    public HalfCauchyVertex(DoubleVertex scale) {
+    @ExportVertexToPythonBindings
+    public HalfCauchyVertex(@LoadParentVertex(name = SCALE_NAME) DoubleVertex scale) {
         super(LOC_ZERO, scale);
     }
 

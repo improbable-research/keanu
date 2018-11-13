@@ -29,6 +29,8 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
+    private static final String MU_NAME = "mu";
+    protected static final String SIGMA_NAME = "sigma";
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -49,8 +51,8 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
     }
 
     @ExportVertexToPythonBindings
-    public GaussianVertex(@LoadParentVertex(name = "mu") DoubleVertex mu,
-                          @LoadParentVertex(name = "sigma") DoubleVertex sigma) {
+    public GaussianVertex(@LoadParentVertex(name = MU_NAME) DoubleVertex mu,
+                          @LoadParentVertex(name = SIGMA_NAME) DoubleVertex sigma) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
@@ -82,12 +84,12 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
         this((DoubleVertex)parentMap.get("mu"), (DoubleVertex)parentMap.get("sigma"));
     }
 
-    @SaveParentVertex(name = "mu")
+    @SaveParentVertex(name = MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
-    @SaveParentVertex(name = "sigma")
+    @SaveParentVertex(name = SIGMA_NAME)
     public DoubleVertex getSigma() {
         return sigma;
     }
