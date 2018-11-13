@@ -252,10 +252,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     }
 
     public void save(NetworkWriter netWriter) {
-        if (!(this instanceof SaveableVertex)) {
-            throw new IllegalArgumentException("Trying to save a vertex that isn't Saveable");
-        }
-
         netWriter.save(this);
     }
 

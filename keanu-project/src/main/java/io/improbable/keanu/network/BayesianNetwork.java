@@ -58,7 +58,6 @@ public class BayesianNetwork {
         return vertices;
     }
 
-
     private interface VertexFilter {
         boolean filter(boolean isProbabilistic, boolean isObserved, int indentation);
     }
