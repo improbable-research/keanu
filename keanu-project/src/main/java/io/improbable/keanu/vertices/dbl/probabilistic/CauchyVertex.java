@@ -4,7 +4,9 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Cauchy;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -44,7 +46,8 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble, S
     }
 
     @ExportVertexToPythonBindings
-    public CauchyVertex(DoubleVertex location, DoubleVertex scale) {
+    public CauchyVertex(@LoadParentVertex(name = "location") DoubleVertex location,
+                        @LoadParentVertex(name = "scale") DoubleVertex scale) {
         this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
     }
 
@@ -72,10 +75,12 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble, S
         this(tensorShape, new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
+    @SaveParentVertex(name = "location")
     public DoubleVertex getLocation() {
         return location;
     }
 
+    @SaveParentVertex(name = "scale")
     public DoubleVertex getScale() {
         return scale;
     }
