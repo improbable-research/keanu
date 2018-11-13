@@ -119,7 +119,7 @@ public class TensorShape {
     }
 
     public static boolean isScalar(long[] shape) {
-        return shape.length == 0 || getLength(shape) == 1;
+        return getLength(shape) == 1;
     }
 
     public static long[] concat(long[] shape1, long[] shape2) {

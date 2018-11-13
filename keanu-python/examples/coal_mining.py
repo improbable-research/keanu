@@ -19,7 +19,7 @@ class CoalMining():
             m.late_rate = Exponential(1.0)
 
             m.years = np.array(self._data.index)
-            m.rates = DoubleIf((), m.switchpoint > m.years, m.early_rate, m.late_rate)
+            m.rates = DoubleIf(m.switchpoint > m.years, m.early_rate, m.late_rate)
             m.disasters = Poisson(m.rates)
 
         return m

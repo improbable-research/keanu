@@ -73,8 +73,8 @@ def ConstantDouble(constant) -> context.jvm_view().ConstantDoubleVertex:
     return Vertex(context.jvm_view().ConstantDoubleVertex, constant)
 
 
-def DoubleIf(shape, predicate, thn, els) -> context.jvm_view().DoubleIfVertex:
-    return Vertex(context.jvm_view().DoubleIfVertex, shape, predicate, thn, els)
+def DoubleIf(predicate, thn, els) -> context.jvm_view().DoubleIfVertex:
+    return Vertex(context.jvm_view().DoubleIfVertex, predicate, thn, els)
 
 
 def Addition(left, right) -> context.jvm_view().AdditionVertex:
