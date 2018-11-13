@@ -94,13 +94,13 @@ class VertexProcessor {
 
     private static String toPythonParam(Class<?> parameterType) {
         if (IntegerVertex.class.isAssignableFrom(parameterType)) {
-            return "int_and_bool_vertex_types";
+            return "int_and_bool_vertex_param_types";
         } else if (DoubleVertex.class.isAssignableFrom(parameterType)) {
-            return "vertex_types";
+            return "vertex_param_types";
         } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
-            return "bool_vertex_types";
+            return "bool_vertex_param_types";
         } else if (Vertex.class.isAssignableFrom(parameterType)) {
-            return "vertex_types";
+            return "vertex_param_types";
         } else if (IntegerTensor.class.isAssignableFrom(parameterType)) {
             return "int_and_bool_tensor_arg_types";
         } else if (DoubleTensor.class.isAssignableFrom(parameterType)) {

@@ -33,11 +33,11 @@ shape_types = Iterable[primitive_types]
 
 # mypy treats bool as a subtype of int and int as a subtype of float
 # see : https://github.com/python/mypy/issues/1850
-vertex_types = Union[tensor_arg_types, wrapped_java_types, VertexOps]
-bool_vertex_types = Union[bool_tensor_arg_types, wrapped_java_types, VertexOps]
-int_and_bool_vertex_types = Union[int_and_bool_tensor_arg_types, wrapped_java_types, VertexOps]
+vertex_param_types = Union[tensor_arg_types, wrapped_java_types, VertexOps]
+bool_vertex_param_types = Union[bool_tensor_arg_types, wrapped_java_types, VertexOps]
+int_and_bool_vertex_param_types = Union[int_and_bool_tensor_arg_types, wrapped_java_types, VertexOps]
 
-vertex_arg_types = Union[vertex_types, shape_types]
+vertex_arg_types = Union[vertex_param_types, shape_types]
 
 '''
 Runtime types
