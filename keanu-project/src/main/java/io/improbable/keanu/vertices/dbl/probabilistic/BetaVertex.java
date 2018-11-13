@@ -4,7 +4,9 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -54,7 +56,8 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble, Sam
      * @param alpha the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
      * @param beta  the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
-    public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
+    public BetaVertex(@LoadParentVertex(name = "alpha") DoubleVertex alpha,
+                      @LoadParentVertex(name = "beta") DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
@@ -80,6 +83,16 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble, Sam
 
     public BetaVertex(long[] tensorShape, double alpha, double beta) {
         this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
+    }
+
+    @SaveParentVertex(name = "alpha")
+    public DoubleVertex getAlpha() {
+        return alpha;
+    }
+
+    @SaveParentVertex(name = "beta")
+    public DoubleVertex getBeta() {
+        return beta;
     }
 
     @Override
