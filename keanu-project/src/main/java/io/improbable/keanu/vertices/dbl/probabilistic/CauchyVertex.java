@@ -49,8 +49,8 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
     }
 
     @ExportVertexToPythonBindings
-    public CauchyVertex(@LoadParentVertex(name = LOCATION_NAME) DoubleVertex location,
-                        @LoadParentVertex(name = SCALE_NAME) DoubleVertex scale) {
+    public CauchyVertex(@LoadParentVertex(LOCATION_NAME) DoubleVertex location,
+                        @LoadParentVertex(SCALE_NAME) DoubleVertex scale) {
         this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
     }
 
@@ -78,12 +78,12 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
         this(tensorShape, new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
-    @SaveParentVertex(name = LOCATION_NAME)
+    @SaveParentVertex(LOCATION_NAME)
     public DoubleVertex getLocation() {
         return location;
     }
 
-    @SaveParentVertex(name = SCALE_NAME)
+    @SaveParentVertex(SCALE_NAME)
     public DoubleVertex getScale() {
         return scale;
     }

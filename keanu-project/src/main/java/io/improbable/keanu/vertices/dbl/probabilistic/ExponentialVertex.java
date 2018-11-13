@@ -52,7 +52,7 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
      * @param rate the rate of the Exponential with either the same shape as specified for this vertex or scalar
      */
     @ExportVertexToPythonBindings
-    public ExponentialVertex(@LoadParentVertex(name = RATE_NAME) DoubleVertex rate) {
+    public ExponentialVertex(@LoadParentVertex(RATE_NAME) DoubleVertex rate) {
         this(checkHasSingleNonScalarShapeOrAllScalar(rate.getShape()), rate);
     }
 
@@ -60,7 +60,7 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
         this(new ConstantDoubleVertex(rate));
     }
 
-    @SaveParentVertex(name = RATE_NAME)
+    @SaveParentVertex(RATE_NAME)
     public DoubleVertex getRate() {
         return rate;
     }

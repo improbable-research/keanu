@@ -56,8 +56,8 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
      * @param beta  the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
     @ExportVertexToPythonBindings
-    public InverseGammaVertex(@LoadParentVertex(name = ALPHA_NAME) DoubleVertex alpha,
-                              @LoadParentVertex(name = BETA_NAME) DoubleVertex beta) {
+    public InverseGammaVertex(@LoadParentVertex(ALPHA_NAME) DoubleVertex alpha,
+                              @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
@@ -85,12 +85,12 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
         this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
-    @SaveParentVertex(name = ALPHA_NAME)
+    @SaveParentVertex(ALPHA_NAME)
     public DoubleVertex getAlpha() {
         return alpha;
     }
 
-    @SaveParentVertex(name = BETA_NAME)
+    @SaveParentVertex(BETA_NAME)
     public DoubleVertex getBeta() {
         return beta;
     }

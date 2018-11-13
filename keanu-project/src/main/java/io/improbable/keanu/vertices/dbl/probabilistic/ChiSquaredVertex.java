@@ -51,7 +51,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
      * @param k the number of degrees of freedom
      */
     @ExportVertexToPythonBindings
-    public ChiSquaredVertex(@LoadParentVertex(name = K_NAME) IntegerVertex k) {
+    public ChiSquaredVertex(@LoadParentVertex(K_NAME) IntegerVertex k) {
         this(k.getShape(), k);
     }
 
@@ -59,7 +59,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
         this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(k));
     }
 
-    @SaveParentVertex(name = K_NAME)
+    @SaveParentVertex(K_NAME)
     public IntegerVertex getK() {
         return k;
     }

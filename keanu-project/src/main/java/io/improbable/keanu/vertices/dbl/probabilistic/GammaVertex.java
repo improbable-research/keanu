@@ -55,8 +55,8 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
      * @param k     the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     @ExportVertexToPythonBindings
-    public GammaVertex(@LoadParentVertex(name = THETA_NAME) DoubleVertex theta,
-                       @LoadParentVertex(name = K_NAME) DoubleVertex k) {
+    public GammaVertex(@LoadParentVertex(THETA_NAME) DoubleVertex theta,
+                       @LoadParentVertex(K_NAME) DoubleVertex k) {
         this(checkHasSingleNonScalarShapeOrAllScalar(theta.getShape(), k.getShape()), theta, k);
     }
 
@@ -72,12 +72,12 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
         this(new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k));
     }
 
-    @SaveParentVertex(name = THETA_NAME)
+    @SaveParentVertex(THETA_NAME)
     public DoubleVertex getTheta() {
         return theta;
     }
 
-    @SaveParentVertex(name = K_NAME)
+    @SaveParentVertex(K_NAME)
     public DoubleVertex getK() {
         return k;
     }

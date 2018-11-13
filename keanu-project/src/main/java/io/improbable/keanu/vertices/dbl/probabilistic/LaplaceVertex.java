@@ -68,8 +68,8 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
      * @param beta the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public LaplaceVertex(@LoadParentVertex(name = MU_NAME) DoubleVertex mu,
-                         @LoadParentVertex(name = BETA_NAME) DoubleVertex beta) {
+    public LaplaceVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
+                         @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), beta.getShape()), mu, beta);
     }
 
@@ -85,12 +85,12 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
         this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta));
     }
 
-    @SaveParentVertex(name = MU_NAME)
+    @SaveParentVertex(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
-    @SaveParentVertex(name = BETA_NAME)
+    @SaveParentVertex(BETA_NAME)
     public DoubleVertex getBeta() {
         return beta;
     }

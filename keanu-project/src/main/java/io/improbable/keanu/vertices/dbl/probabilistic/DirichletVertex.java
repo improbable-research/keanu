@@ -46,7 +46,7 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
      * @param concentration the concentration values of the dirichlet
      */
     @ExportVertexToPythonBindings
-    public DirichletVertex(@LoadParentVertex(name = CONCENTRATION_NAME) DoubleVertex concentration) {
+    public DirichletVertex(@LoadParentVertex(CONCENTRATION_NAME) DoubleVertex concentration) {
         this(concentration.getShape(), concentration);
     }
 
@@ -69,7 +69,7 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
         this(new ConstantDoubleVertex(concentration));
     }
 
-    @SaveParentVertex(name = CONCENTRATION_NAME)
+    @SaveParentVertex(CONCENTRATION_NAME)
     public DoubleVertex getConcentration() {
         return concentration;
     }

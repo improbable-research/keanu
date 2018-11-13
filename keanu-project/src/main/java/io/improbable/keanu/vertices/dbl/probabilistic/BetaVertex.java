@@ -61,8 +61,8 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
      * @param beta  the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public BetaVertex(@LoadParentVertex(name = ALPHA_NAME) DoubleVertex alpha,
-                      @LoadParentVertex(name = BETA_NAME) DoubleVertex beta) {
+    public BetaVertex(@LoadParentVertex(ALPHA_NAME) DoubleVertex alpha,
+                      @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
@@ -90,12 +90,12 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
         this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
-    @SaveParentVertex(name = ALPHA_NAME)
+    @SaveParentVertex(ALPHA_NAME)
     public DoubleVertex getAlpha() {
         return alpha;
     }
 
-    @SaveParentVertex(name = BETA_NAME)
+    @SaveParentVertex(BETA_NAME)
     public DoubleVertex getBeta() {
         return beta;
     }

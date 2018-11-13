@@ -28,7 +28,7 @@ public class HalfCauchyVertex extends CauchyVertex {
     }
 
     @ExportVertexToPythonBindings
-    public HalfCauchyVertex(@LoadParentVertex(name = SCALE_NAME) DoubleVertex scale) {
+    public HalfCauchyVertex(@LoadParentVertex(SCALE_NAME) DoubleVertex scale) {
         super(LOC_ZERO, scale);
     }
 
