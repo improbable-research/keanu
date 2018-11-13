@@ -350,7 +350,6 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         );
     }
 
-    @Override
     public void saveValue(NetworkWriter netWriter) {
         netWriter.saveValue(this);
     }

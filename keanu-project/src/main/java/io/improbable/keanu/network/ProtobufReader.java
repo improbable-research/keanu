@@ -1,12 +1,18 @@
 package io.improbable.keanu.network;
 
+import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,8 +102,56 @@ public class ProtobufReader implements NetworkReader {
         }
     }
 
+    @Override
+    public void loadValue(BoolVertex vertex) {
+        KeanuSavedBayesNet.VertexValue value = savedValues.get(vertex);
+        BooleanTensor tensor = extractBoolValue(value);
+        vertex.setValue(tensor);
+    }
+
+    private BooleanTensor extractBoolValue(KeanuSavedBayesNet.VertexValue value) {
+        if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.BOOLVAL) {
+            throw new IllegalArgumentException("Non Boolean Value specified for Boolean Vertex");
+        } else {
+            return BooleanTensor.create(
+                Booleans.toArray(value.getBoolVal().getValuesList()),
+                Longs.toArray(value.getDoubleVal().getShapeList()));
+        }
+    }
+
+    @Override
+    public void loadValue(IntegerVertex vertex) {
+        KeanuSavedBayesNet.VertexValue value = savedValues.get(vertex);
+        IntegerTensor tensor = extractIntValue(value);
+        vertex.setValue(tensor);
+    }
+
+    private IntegerTensor extractIntValue(KeanuSavedBayesNet.VertexValue value) {
+        if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.INTVAL) {
+            throw new IllegalArgumentException("Non Int Value specified for Int Vertex");
+        } else {
+            return IntegerTensor.create(
+                Ints.toArray(value.getIntVal().getValuesList()),
+                Longs.toArray(value.getDoubleVal().getShapeList()));
+        }
+    }
+
+    @Override
+    public BooleanTensor getInitialBoolValue(Object valueKey) {
+        KeanuSavedBayesNet.VertexValue value = (KeanuSavedBayesNet.VertexValue)valueKey;
+
+        return extractBoolValue(value);
+    }
+
+    @Override
+    public IntegerTensor getInitialIntValue(Object valueKey) {
+        KeanuSavedBayesNet.VertexValue value = (KeanuSavedBayesNet.VertexValue)valueKey;
+
+        return extractIntValue(value);
+    }
+
     private <T> Vertex<T> fromProtoBuf(KeanuSavedBayesNet.Vertex vertex,
-                                             Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+                                       Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
         Class vertexClass;
         try {
             vertexClass = Class.forName(vertex.getVertexType());

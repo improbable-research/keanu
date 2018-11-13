@@ -5,7 +5,9 @@ import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadVertexValue;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -13,13 +15,12 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
-public class ConstantDoubleVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, ConstantVertex {
+public class ConstantDoubleVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, ConstantVertex, SaveableVertex {
 
     @ExportVertexToPythonBindings
-    public ConstantDoubleVertex(DoubleTensor constant) {
+    public ConstantDoubleVertex(@LoadVertexValue DoubleTensor constant) {
         super(constant.getShape());
         setValue(constant);
     }
@@ -49,11 +50,6 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return getValue();
-    }
-
-    @Override
-    public Map<String, Vertex> getParentsMap() {
-        return new HashMap<>();
     }
 
     public DoubleTensor calculate() {
