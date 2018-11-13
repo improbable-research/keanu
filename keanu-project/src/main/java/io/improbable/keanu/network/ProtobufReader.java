@@ -80,7 +80,7 @@ public class ProtobufReader implements NetworkReader {
                 targetVertex = instantiatedVertices.get(value.getId());
             }
 
-            if (value.getVertexLabel() != "") {
+            if (!value.getVertexLabel().isEmpty()) {
                 Vertex newTarget = bayesNet.getVertexByLabel(new VertexLabel(value.getVertexLabel()));
 
                 if (targetVertex != null && newTarget != targetVertex) {
