@@ -3,11 +3,16 @@ package io.improbable.keanu.vertices;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.network.NetworkReader;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -234,7 +239,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         return DiscoverGraph.getEntireGraph(this);
     }
 
-
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -248,5 +252,24 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
             stringBuilder.append("(" + getValue() + ")");
         }
         return stringBuilder.toString();
+    }
+
+    public void save(NetworkWriter netWriter) {
+        netWriter.save(this);
+    }
+
+    public void saveValue(NetworkWriter netWriter) {
+        //TODO - Make this abstract after we've implemented every type
+        netWriter.saveValue(this);
+    }
+
+    public Map<String, Vertex> getParentsMap() {
+        //TODO - Make this abstract once all Vertices have this
+        return new HashMap<>();
+    }
+
+    public void loadValue(NetworkReader reader) {
+        //TODO - Make this abstract once all Vertices have this
+        throw new NotImplementedException();
     }
 }

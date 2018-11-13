@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -212,4 +213,15 @@ public class BayesianNetwork {
         indentation++;
     }
 
+    public void save(NetworkWriter protobufWriter) throws IOException {
+        for (Vertex vertex : TopologicalSort.sort(vertices)) {
+            vertex.save(protobufWriter);
+        }
+    }
+
+    public void saveValues(ProtobufWriter protobufWriter) throws IOException {
+        for (Vertex vertex : vertices) {
+            vertex.saveValue(protobufWriter);
+        }
+    }
 }

@@ -21,8 +21,8 @@ import java.util.Map;
 
 class VertexProcessor {
 
-    final private static String TEMPLATE_FILE = "vertex.py.ftl";
-    final private static String GENERATED_FILE = "vertex.py";
+    final private static String TEMPLATE_FILE = "generated.py.ftl";
+    final private static String GENERATED_FILE = "generated.py";
 
     static void process(String generatedDir) {
         Map<String, Object> dataModel = buildDataModel();

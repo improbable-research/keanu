@@ -10,10 +10,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
-public class ConstantVertex {
-
-    private ConstantVertex() {
-    }
+public interface ConstantVertex {
 
     public static ConstantBoolVertex of(Boolean value) {
         return new ConstantBoolVertex(value);
@@ -73,5 +70,9 @@ public class ConstantVertex {
 
     public static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {
         return new ConstantGenericVertex<>(tensor);
+    }
+
+    public static boolean isConstantVertex(Vertex v) {
+        return v instanceof ConstantVertex;
     }
 }
