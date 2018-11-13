@@ -73,7 +73,7 @@ public class ProtobufWriter implements NetworkWriter {
         for (Method method : methods) {
             SaveParentVertex annotation = method.getAnnotation(SaveParentVertex.class);
             if (annotation != null) {
-                String parentName = annotation.name();
+                String parentName = annotation.value();
                 vertexBuilder.addParents(getEncodedParent(vertex, parentName, method));
             }
         }
