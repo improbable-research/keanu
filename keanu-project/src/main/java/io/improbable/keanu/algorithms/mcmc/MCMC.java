@@ -10,6 +10,10 @@ import lombok.Setter;
 /**
  * Class for choosing the appropriate sampling algorithm given a network.
  * If the given network is differentiable, NUTS is proposed, otherwise Metropolis Hastings is chosen.
+ *
+ * Usage:
+ * PosteriorSamplingAlgorithm samplingAlgorithm = MCMC.withDefaultConfig().forNetwork(yourNetwork);
+ * samplingAlgorithm.getPosteriorSamples(...);
  */
 @Builder
 public class MCMC {
