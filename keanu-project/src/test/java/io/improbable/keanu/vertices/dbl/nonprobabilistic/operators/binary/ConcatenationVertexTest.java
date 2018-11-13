@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -144,8 +145,8 @@ public class ConcatenationVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex c = a.times(b);
-        DoubleVertex d = a.plus(b);
+        MultiplicationVertex c = a.times(b);
+        AdditionVertex d = a.plus(b);
 
         ConcatenationVertex concat = new ConcatenationVertex(0, c, d);
         PartialDerivatives concatPartialForward = concat.getDerivativeWrtLatents();
@@ -182,7 +183,7 @@ public class ConcatenationVertexTest {
         DoubleVertex d = b.plus(ConstantVertex.of(DoubleTensor.linspace(1, 2, 8).reshape(2, 2, 2)));
 
         DoubleVertex concat = new ConcatenationVertex(2, c, d);
-        DoubleVertex sum = concat.sum(1);
+        SumVertex sum = concat.sum(1);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(Arrays.asList(a,b), sum, 10.0, 1e-10);
     }
@@ -308,8 +309,8 @@ public class ConcatenationVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex c = sharedMatrix.matrixMultiply(a);
-        DoubleVertex d = sharedMatrix.matrixMultiply(b);
+        MatrixMultiplicationVertex c = sharedMatrix.matrixMultiply(a);
+        MatrixMultiplicationVertex d = sharedMatrix.matrixMultiply(b);
 
         DoubleTensor dCdshared = c.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
         DoubleTensor dDdshared = d.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
@@ -356,8 +357,8 @@ public class ConcatenationVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex c = sharedMatrix.matrixMultiply(a);
-        DoubleVertex d = sharedMatrix.matrixMultiply(b);
+        MatrixMultiplicationVertex c = sharedMatrix.matrixMultiply(a);
+        MatrixMultiplicationVertex d = sharedMatrix.matrixMultiply(b);
 
         DoubleTensor dCdshared = c.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
         DoubleTensor dDdshared = d.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
@@ -408,9 +409,9 @@ public class ConcatenationVertexTest {
         DoubleVertex f = new UniformVertex(0, 10);
         f.setValue(DoubleTensor.create(new double[]{90, 91, 92, 93}, 2, 2));
 
-        DoubleVertex c = sharedMatrix.matrixMultiply(a);
-        DoubleVertex d = sharedMatrix.matrixMultiply(b);
-        DoubleVertex e = sharedMatrix.matrixMultiply(f);
+        MatrixMultiplicationVertex c = sharedMatrix.matrixMultiply(a);
+        MatrixMultiplicationVertex d = sharedMatrix.matrixMultiply(b);
+        MatrixMultiplicationVertex e = sharedMatrix.matrixMultiply(f);
 
         DoubleTensor dCdshared = c.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
         DoubleTensor dDdshared = d.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
@@ -461,7 +462,7 @@ public class ConcatenationVertexTest {
         DoubleVertex inputA = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex inputB = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex inputC = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex outputVertex = new ConcatenationVertex(0, inputA, inputB, inputC);
+        ConcatenationVertex outputVertex = new ConcatenationVertex(0, inputA, inputB, inputC);
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB, inputC), outputVertex, 10.0, 1e-10);
     }
 

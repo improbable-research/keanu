@@ -8,6 +8,8 @@ doks:
             text: 
             image: true
         nav:
+            - item_name: Python Docs
+              item_url: '/python'
             - item_name: JavaDoc
               external_url: true
               contains_version: true

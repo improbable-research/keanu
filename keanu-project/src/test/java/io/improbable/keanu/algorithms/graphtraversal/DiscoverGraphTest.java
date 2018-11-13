@@ -1,11 +1,13 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,6 +56,7 @@ public class DiscoverGraphTest {
         }
     }
 
+    @Category(Slow.class)
     @Test
     public void findsVeryLongGraph() {
 

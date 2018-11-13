@@ -5,6 +5,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.loop.Loop;
 import io.improbable.keanu.plating.loop.LoopConstructionException;
 import io.improbable.keanu.plating.loop.LoopDidNotTerminateException;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -15,6 +16,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 import java.util.function.BiFunction;
@@ -96,6 +98,7 @@ public class LoopTest {
             .apply(increment);
     }
 
+    @Category(Slow.class)
     @Test
     public void youCanLoopUntilAConditionIsTrue() {
         Loop loop = Loop
