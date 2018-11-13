@@ -40,7 +40,7 @@ public class ProtobufWriter implements NetworkWriter {
         if (!(this instanceof SaveableVertex)) {
             throw new IllegalArgumentException("Trying to save a vertex that isn't Saveable");
         }
-        
+
         KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
         bayesNetBuilder.addVertices(vertexBuilder.build());
     }
