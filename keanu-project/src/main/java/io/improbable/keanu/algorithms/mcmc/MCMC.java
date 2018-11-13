@@ -1,37 +1,43 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
+/**
+ * Class for choosing the appropriate sampling algorithm given a network.
+ * If the given network is differentiable, NUTS is proposed, otherwise Metropolis Hastings is chosen.
+ */
+@Builder
+public class MCMC {
 
-public class MCMC implements PosteriorSamplingAlgorithm {
-    @Override
-    public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork, Vertex vertexToSampleFrom, int sampleCount) {
-        if (bayesianNetwork.getNonDifferentiableVertices().isEmpty()) {
-            return NUTS.withDefaultConfig().getPosteriorSamples(bayesianNetwork, vertexToSampleFrom, sampleCount);
-        } else {
-            return MetropolisHastings.withDefaultConfig().getPosteriorSamples(bayesianNetwork, vertexToSampleFrom, sampleCount);
-        }
+    @Getter
+    @Setter
+    @Builder.Default
+    private KeanuRandom random = KeanuRandom.getDefaultRandom();
+
+    public static MCMC withDefaultConfig() {
+        return withDefaultConfig(KeanuRandom.getDefaultRandom());
     }
 
-    @Override
-    public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork, List<? extends Vertex> verticesToSampleFrom, int sampleCount) {
-        if (bayesianNetwork.getNonDifferentiableVertices().isEmpty()) {
-            return NUTS.withDefaultConfig().getPosteriorSamples(bayesianNetwork, verticesToSampleFrom, sampleCount);
-        } else {
-            return MetropolisHastings.withDefaultConfig().getPosteriorSamples(bayesianNetwork, verticesToSampleFrom, sampleCount);
-        }
+    public static MCMC withDefaultConfig(KeanuRandom random) {
+        return MCMC.builder()
+            .random(random)
+            .build();
     }
 
-    @Override
-    public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork, int sampleCount) {
+    /**
+     * @param bayesianNetwork network for which to choose sampling algorithm.
+     * @return recommended sampling algorithm for this network.
+     */
+    public PosteriorSamplingAlgorithm forNetwork(BayesianNetwork bayesianNetwork) {
         if (bayesianNetwork.getNonDifferentiableVertices().isEmpty()) {
-            return NUTS.withDefaultConfig().getPosteriorSamples(bayesianNetwork, sampleCount);
+            return NUTS.withDefaultConfig(random);
         } else {
-            return MetropolisHastings.withDefaultConfig().getPosteriorSamples(bayesianNetwork, sampleCount);
+            return MetropolisHastings.withDefaultConfig(random);
         }
     }
 }
