@@ -74,34 +74,61 @@ public class ProtobufReader implements NetworkReader {
                                    Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices,
                                    BayesianNetwork bayesNet) {
         for (KeanuSavedBayesNet.StoredValue value : parsedNet.getDefaultStateList()) {
-            Vertex targetVertex = null;
-
-            if (value.hasId()) {
-                targetVertex = instantiatedVertices.get(value.getId());
-            }
-
-            if (!value.getVertexLabel().isEmpty()) {
-                Vertex newTarget = bayesNet.getVertexByLabel(new VertexLabel(value.getVertexLabel()));
-
-                if (targetVertex != null && newTarget != targetVertex) {
-                    throw new IllegalArgumentException(
-                        "Label and VertexID don't refer to same Vertex: ("
-                            + value.getVertexLabel() + ") ("
-                            + value.getId() + ")");
-                } else {
-                    targetVertex = newTarget;
-                }
-            }
-
-            if (targetVertex == null) {
-                throw new IllegalArgumentException("Value specified for unknown Vertex: ("
-                    + value.getVertexLabel() + ") ("
-                    + value.getId() + ")");
-            }
+            Vertex targetVertex = getTargetVertex(value, instantiatedVertices, bayesNet);
 
             savedValues.put(targetVertex, value.getValue());
             targetVertex.loadValue(this);
         }
+    }
+
+    private Vertex getTargetVertex(KeanuSavedBayesNet.StoredValue storedValue,
+                                   Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices,
+                                   BayesianNetwork bayesNet) {
+        Vertex idTarget = getTargetByID(storedValue, instantiatedVertices);
+        Vertex labelTarget = getTargetByLabel(storedValue, instantiatedVertices, bayesNet);
+
+        return checkTargetsAreValid(idTarget, labelTarget, storedValue);
+    }
+
+    private Vertex getTargetByID(KeanuSavedBayesNet.StoredValue storedValue,
+                                 Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices) {
+        if (storedValue.hasId()) {
+            return instantiatedVertices.get(storedValue.getId());
+        } else {
+            return null;
+        }
+    }
+
+    private Vertex getTargetByLabel(KeanuSavedBayesNet.StoredValue storedValue,
+                                    Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices,
+                                    BayesianNetwork bayesNet) {
+        if (!storedValue.getVertexLabel().isEmpty()) {
+            return bayesNet.getVertexByLabel(new VertexLabel(storedValue.getVertexLabel()));
+        } else {
+            return null;
+        }
+    }
+
+    private Vertex checkTargetsAreValid(Vertex idTarget, Vertex labelTarget, KeanuSavedBayesNet.StoredValue storedValue) {
+        Vertex targetVertex;
+
+        if (idTarget != null && labelTarget != null) {
+            if (idTarget != labelTarget) {
+                throw new IllegalArgumentException("Label and VertexID don't refer to same Vertex: ("
+                        + storedValue.getVertexLabel() + ") ("
+                        + storedValue.getId() + ")");
+            } else {
+                targetVertex = idTarget;
+            }
+        } else if (idTarget == null && labelTarget == null) {
+            throw new IllegalArgumentException("Value specified for unknown Vertex: ("
+                + storedValue.getVertexLabel() + ") ("
+                + storedValue.getId() + ")");
+        } else {
+            targetVertex = (idTarget != null) ? idTarget : labelTarget;
+        }
+
+        return targetVertex;
     }
 
     @Override
