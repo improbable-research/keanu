@@ -29,8 +29,8 @@ public class GaussianVertex extends DoubleVertex implements SaveableVertex, Diff
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
-    private static final String MU_NAME = "mu";
-    private static final String SIGMA_NAME = "sigma";
+    protected static final String MU_NAME = "mu";
+    protected static final String SIGMA_NAME = "sigma";
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
