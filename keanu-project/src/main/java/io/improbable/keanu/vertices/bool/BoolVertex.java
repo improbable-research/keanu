@@ -29,7 +29,6 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> implements Boolea
         super(initialShape);
     }
 
-    @Override
     public void saveValue(NetworkWriter netWriter) {
         netWriter.saveValue(this);
     }

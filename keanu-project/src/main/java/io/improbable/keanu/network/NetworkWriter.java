@@ -23,5 +23,4 @@ public interface NetworkWriter {
     void saveValue(DoubleVertex vertex);
     void saveValue(IntegerVertex vertex);
     void saveValue(BoolVertex vertex);
-
 }

@@ -2,8 +2,8 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
-import io.improbable.keanu.distributions.hyperparam.ParameterName;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
+import java.lang.reflect.Method;
 
 public class ProtobufWriter implements NetworkWriter {
     private final BayesianNetwork net;
@@ -48,7 +48,7 @@ public class ProtobufWriter implements NetworkWriter {
 
     @Override
     public void save(ConstantVertex vertex) {
-        throw new UnsupportedOperationException("Don't know how to save an untyped ConstantVertex");
+        throw new IllegalArgumentException("Don't know how to save an untyped ConstantVertex");
     }
 
     private KeanuSavedBayesNet.Vertex.Builder buildVertex(Vertex vertex) {
@@ -67,17 +67,30 @@ public class ProtobufWriter implements NetworkWriter {
 
     private void saveParents(KeanuSavedBayesNet.Vertex.Builder vertexBuilder,
                              Vertex vertex) {
-        Map<ParameterName, Vertex> parentsMap = vertex.getParentsMap();
+        Class vertexClass = vertex.getClass();
+        Method[] methods = vertexClass.getMethods();
 
-        for (Map.Entry<ParameterName, Vertex> parent : parentsMap.entrySet()) {
-            vertexBuilder.addParents(
-                KeanuSavedBayesNet.NamedParent.newBuilder()
-                    .setName(parent.getKey().getName())
-                    .setId(KeanuSavedBayesNet.VertexID.newBuilder()
-                        .setId(parent.getValue().getId().toString())
-                    )
-            );
+        for (Method method : methods) {
+            SaveParentVertex annotation = method.getAnnotation(SaveParentVertex.class);
+            if (annotation != null) {
+                String parentName = annotation.name();
+                vertexBuilder.addParents(getEncodedParent(vertex, parentName, method));
+            }
         }
+    }
+
+    private KeanuSavedBayesNet.NamedParent getEncodedParent(Vertex vertex, String parentName, Method getParentMethod) {
+        KeanuSavedBayesNet.NamedParent.Builder parentBuilder = KeanuSavedBayesNet.NamedParent.newBuilder();
+
+        try {
+            Vertex parent = (Vertex)getParentMethod.invoke(vertex);
+            parentBuilder.setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(parent.getId().toString()));
+            parentBuilder.setName(parentName);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid parent retrieval function specified", e);
+        }
+
+        return parentBuilder.build();
     }
 
     public void saveValue(Vertex vertex) {

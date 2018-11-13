@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.distributions.hyperparam.ParameterName;
 import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
@@ -11,7 +10,6 @@ import io.improbable.keanu.tensor.Tensor;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -254,12 +252,18 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     }
 
     public void save(NetworkWriter netWriter) {
+        if (!(this instanceof SaveableVertex)) {
+            throw new IllegalArgumentException("Trying to save a vertex that isn't Saveable");
+        }
+
         netWriter.save(this);
     }
 
-    public abstract void saveValue(NetworkWriter netWriter);
+    public void saveValue(NetworkWriter netWriter) {
+        netWriter.saveValue(this);
+    }
 
-    public abstract Map<ParameterName, Vertex> getParentsMap();
-
-    public abstract void loadValue(NetworkReader reader);
+    public void loadValue(NetworkReader reader) {
+        throw new UnsupportedOperationException("TODO: Refactor");
+    }
 }
