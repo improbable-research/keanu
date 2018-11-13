@@ -1,9 +1,12 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -26,6 +29,9 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
     private final double edgeSharpness;
+    private static final String X_MIN_NAME = "xmin";
+    private static final String X_MAX_NAME = "xmin";
+    private static final String EDGE_SHARPNESS_NAME = "edgesharpness";
 
     /**
      * One xMin or Xmax or both that match a proposed tensor shape of Smooth Uniform
@@ -55,7 +61,11 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
      * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
-    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
+
+    @ExportVertexToPythonBindings
+    public SmoothUniformVertex(@LoadParentVertex(X_MIN_NAME) DoubleVertex xMin,
+                               @LoadParentVertex(X_MAX_NAME) DoubleVertex xMax,
+                               @LoadParentVertex(EDGE_SHARPNESS_NAME) double edgeSharpness) {
         this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
     }
 
@@ -114,6 +124,21 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
 
     public SmoothUniformVertex(long[] tensorShape, double xMin, double xMax) {
         this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
+    }
+
+    @SaveParentVertex(X_MIN_NAME)
+    public DoubleVertex getXMin() {
+        return xMin;
+    }
+
+    @SaveParentVertex(X_MAX_NAME)
+    public DoubleVertex getXMax() {
+        return xMax;
+    }
+
+    @SaveParentVertex(EDGE_SHARPNESS_NAME)
+    public double getEdgeSharpness() {
+        return edgeSharpness;
     }
 
     @Override
