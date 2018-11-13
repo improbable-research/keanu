@@ -28,6 +28,11 @@ public class ProtobufReader implements NetworkReader {
         savedValues = new HashMap<>();
     }
 
+    @Override
+    public void loadValue(Vertex vertex) {
+        throw new IllegalArgumentException("Cannot Load value for Untyped Vertex");
+    }
+
     public BayesianNetwork loadNetwork(InputStream input) throws IOException {
         Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
         KeanuSavedBayesNet.BayesianNetwork parsedNet = KeanuSavedBayesNet.BayesianNetwork.parseFrom(input);
