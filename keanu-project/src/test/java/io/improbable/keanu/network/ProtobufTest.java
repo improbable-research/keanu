@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
 public class ProtobufTest {
-    
+
     @Test
     public void youCanSaveAndLoadANetworkWithValues() throws IOException {
         DoubleVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
@@ -36,6 +36,11 @@ public class ProtobufTest {
         assertThat(readGaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
         assertThat(readGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         readGaussianVertex.sample();
+
+    }
+
+    @Test
+    public void allSaveableVerticesHaveCorrectAnnotations() {
 
     }
 }

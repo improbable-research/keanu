@@ -29,6 +29,8 @@ public class GaussianVertex extends DoubleVertex implements SaveableVertex, Diff
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
+    private static final String MU_NAME = "mu";
+    private static final String SIGMA_NAME = "sigma";
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -49,8 +51,8 @@ public class GaussianVertex extends DoubleVertex implements SaveableVertex, Diff
     }
 
     @ExportVertexToPythonBindings
-    public GaussianVertex(@LoadParentVertex("mu") DoubleVertex mu,
-                          @LoadParentVertex("sigma") DoubleVertex sigma) {
+    public GaussianVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
+                          @LoadParentVertex(SIGMA_NAME) DoubleVertex sigma) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
@@ -78,12 +80,12 @@ public class GaussianVertex extends DoubleVertex implements SaveableVertex, Diff
         this(tensorShape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
 
-    @SaveParentVertex("mu")
+    @SaveParentVertex(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
-    @SaveParentVertex("sigma")
+    @SaveParentVertex(SIGMA_NAME)
     public DoubleVertex getSigma() {
         return sigma;
     }
