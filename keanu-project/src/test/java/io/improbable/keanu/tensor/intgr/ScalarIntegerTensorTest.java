@@ -45,25 +45,25 @@ public class ScalarIntegerTensorTest {
 
     @Test
     public void doesKeepRankOnGTEq() {
-        IntegerTensor value = IntegerTensor.create(new int[]{1}, 1, 1, 1);
+        IntegerTensor value = IntegerTensor.scalar(1).reshape(1, 1, 1);
         assertEquals(3, value.greaterThanOrEqual(2).getRank());
     }
 
     @Test
     public void doesKeepRankOnGT() {
-        IntegerTensor value = IntegerTensor.create(new int[]{1}, 1, 1, 1);
+        IntegerTensor value = IntegerTensor.scalar(1).reshape(1, 1, 1);
         assertEquals(3, value.greaterThan(2).getRank());
     }
 
     @Test
     public void doesKeepRankOnLT() {
-        IntegerTensor value = IntegerTensor.create(new int[]{1}, 1, 1, 1);
+        IntegerTensor value = IntegerTensor.scalar(1).reshape(1, 1, 1);
         assertEquals(3, value.lessThan(2).getRank());
     }
 
     @Test
     public void doesKeepRankOnLTEq() {
-        IntegerTensor value = IntegerTensor.create(new int[]{1}, 1, 1, 1);
+        IntegerTensor value = IntegerTensor.scalar(1).reshape(1, 1, 1);
         assertEquals(3, value.lessThanOrEqual(2).getRank());
     }
 }

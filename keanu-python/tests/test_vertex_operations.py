@@ -172,7 +172,7 @@ def test_can_do_compound_operations():
     v3 = 23.
 
     result = v1 * v2 - v2 / v1 + v3 * v2
-    assert (result.get_value() == np.array([269.5, 333.6666666666667, 472.6, 567.2857142857142])).all()
+    assert (result.get_value() == np.array([[269.5, 333.6666666666667], [472.6, 567.2857142857142]])).all()
 
 
 ### Unary

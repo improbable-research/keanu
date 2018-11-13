@@ -19,7 +19,6 @@ import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVe
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.nd4j.linalg.exception.ND4JIllegalStateException;
 
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public class MultinomialVertexTest {
         }
     }
 
-    @Test(expected = ND4JIllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheParametersAreDifferentShapes() {
         IntegerTensor n = IntegerTensor.create(100, 200).reshape(1, 2);
         DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4).reshape(4, 1);

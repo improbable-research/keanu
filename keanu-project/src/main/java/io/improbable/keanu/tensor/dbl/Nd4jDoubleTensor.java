@@ -1045,10 +1045,13 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof DoubleTensor) {
-            INDArray eq = that.isScalar() ?
-                tensor.eq(((DoubleTensor) that).scalar()) :
-                tensor.eq(unsafeGetNd4J((Nd4jDoubleTensor) that));
-            return fromMask(eq, getShape());
+            if (this.isScalar()) {
+                return ((DoubleTensor) that).elementwiseEquals(this.scalar());
+            } else if (that.isScalar()) {
+                return fromMask(tensor.eq(((DoubleTensor) that).scalar()), getShape());
+            } else {
+                return fromMask(tensor.eq(unsafeGetNd4J((Nd4jDoubleTensor) that)), getShape());
+            }
         } else {
             return Tensor.elementwiseEquals(this, that);
         }

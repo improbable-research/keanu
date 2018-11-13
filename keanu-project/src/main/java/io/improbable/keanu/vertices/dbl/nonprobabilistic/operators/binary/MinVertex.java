@@ -12,7 +12,7 @@ public class MinVertex extends DoubleIfVertex {
      * @param right one of the vertices to find the minimum of
      */
     public MinVertex(DoubleVertex left, DoubleVertex right) {
-        super(left.getShape(), left.lessThanOrEqualTo(right), left, right);
+        super(left.lessThanOrEqualTo(right), left, right);
     }
 
 }

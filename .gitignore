@@ -7,3 +7,4 @@ nbproject
 build
 /out
 **/*.gpg
+venv

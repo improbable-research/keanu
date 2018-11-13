@@ -842,8 +842,16 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void comparesDoubleTensorWithScalar() {
         DoubleTensor value = DoubleTensor.create(1., 2., 3.);
-        DoubleTensor differentValue = DoubleTensor.create(1.);
+        DoubleTensor differentValue = DoubleTensor.scalar(1.);
         BooleanTensor result = value.elementwiseEquals(differentValue);
+        assertThat(result, hasValue(true, false, false));
+    }
+
+    @Test
+    public void comparesDoubleTensorWithLength1Vector() {
+        DoubleTensor value = DoubleTensor.create(new double[]{1.}, 1);
+        DoubleTensor vector = DoubleTensor.create(1., 2., 3.);
+        BooleanTensor result = value.elementwiseEquals(vector);
         assertThat(result, hasValue(true, false, false));
     }
 

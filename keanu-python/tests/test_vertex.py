@@ -16,7 +16,7 @@ def test_can_pass_scalar_to_vertex(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
     sample = gaussian.sample()
 
-    assert sample.shape == ()
+    assert isinstance(sample, float)
 
 
 def test_can_pass_ndarray_to_vertex(jvm_view):
@@ -31,7 +31,7 @@ def test_use_vertex_as_hyperparameter_of_another_vertex(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, mu, 1.)
     sample = gaussian.sample()
 
-    assert sample.shape == ()
+    assert isinstance(sample, float)
 
 
 def test_can_pass_array_to_vertex(jvm_view):
@@ -70,7 +70,7 @@ def test_vertex_can_observe_scalar(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
     gaussian.observe(4.)
 
-    assert type(gaussian.get_value()) == np.ndarray
+    assert isinstance(gaussian.get_value(), float)
     assert gaussian.get_value() == 4.
 
 
@@ -112,11 +112,8 @@ def test_scalar_vertex_value_is_a_numpy_array():
     scalar = 1.
     vertex = Const(scalar)
     value = vertex.get_value()
-    assert type(value) == np.ndarray
-    assert value.dtype == np.float64
-    assert value.shape == ()
+    assert type(value) == float
     assert value == scalar
-    assert (value == scalar).all()
 
 def test_vertex_sample_is_a_numpy_array():
     mu = np.array([[1., 2.], [3., 4.]])

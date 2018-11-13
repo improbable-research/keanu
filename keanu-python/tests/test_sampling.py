@@ -23,7 +23,7 @@ def net():
     ("NUTS"),
     ("hamiltonian")
 ])
-def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo, net):
+def test_sampling_returns_dict_of_list_of_floats_for_vertices_in_sample_from(algo, net):
     draws = 5
     sample_from = list(net.get_latent_vertices())
     vertex_ids = [vertex.get_id() for vertex in sample_from]
@@ -38,7 +38,7 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(a
 
         assert len(vertex_samples) == draws
         assert type(vertex_samples) == list
-        assert all(type(sample) == np.ndarray for sample in vertex_samples)
+        assert all(type(sample) == float for sample in vertex_samples)
 
 
 def test_dropping_samples(net):

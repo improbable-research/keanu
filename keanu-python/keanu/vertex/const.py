@@ -21,10 +21,13 @@ def Const(t) -> Vertex:
     return ctor(Tensor(val))
 
 def __infer_const_ctor_from_ndarray(ndarray):
-    if len(ndarray) == 0:
-        raise ValueError("Cannot infer type because the ndarray is empty")
+    if isinstance(ndarray, np.ndarray):
+        if len(ndarray) == 0:
+            raise ValueError("Cannot infer type because the ndarray is empty")
 
-    return __infer_const_ctor_from_scalar(ndarray.item(0))
+        return __infer_const_ctor_from_scalar(ndarray.item(0))
+    else:
+        return __infer_const_ctor_from_scalar(ndarray)
 
 def __infer_const_ctor_from_scalar(scalar):
     if isinstance(scalar, bool_types):

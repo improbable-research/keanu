@@ -42,9 +42,9 @@ def test_dataframe_passed_to_Tensor_creates_tensor(data, expected_java_class):
 
 @pytest.mark.parametrize("data, expected_java_class", [
     ([1, 2], "Nd4jIntegerTensor"),
-    ([1], "ScalarIntegerTensor"),
+    ([1], "Nd4jIntegerTensor"),
     ([1., 2.], "Nd4jDoubleTensor"),
-    ([1.], "ScalarDoubleTensor"),
+    ([1.], "Nd4jDoubleTensor"),
     ([True, False], "SimpleBooleanTensor"),
     ([True], "SimpleBooleanTensor")
 ])
@@ -99,7 +99,7 @@ def test_cannot_pass_empty_ndarray_to_Tensor():
 
 @pytest.mark.parametrize("value", [
     (np.array([[1, 2], [3, 4]])),
-    (3)
+    (np.array([3]))
 ])
 def test_convert_java_tensor_to_ndarray(value):
     t = Tensor(value)

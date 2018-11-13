@@ -12,6 +12,6 @@ public class MaxVertex extends DoubleIfVertex {
      * @param right one of the vertices to find the maximum of
      */
     public MaxVertex(DoubleVertex left, DoubleVertex right) {
-        super(left.getShape(), left.greaterThanOrEqualTo(right), left, right);
+        super(left.greaterThanOrEqualTo(right), left, right);
     }
 }
