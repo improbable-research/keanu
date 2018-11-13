@@ -205,15 +205,15 @@ public class BayesianNetwork {
         indentation++;
     }
 
-    public void save(NetworkWriter protobufWriter) throws IOException {
+    public void save(NetworkWriter networkWriter) throws IOException {
         for (Vertex vertex : TopologicalSort.sort(vertices)) {
-            vertex.save(protobufWriter);
+            vertex.save(networkWriter);
         }
     }
 
-    public void saveValues(ProtobufWriter protobufWriter) throws IOException {
+    public void saveValues(NetworkWriter networkWriter) throws IOException {
         for (Vertex vertex : vertices) {
-            vertex.saveValue(protobufWriter);
+            vertex.saveValue(networkWriter);
         }
     }
 }

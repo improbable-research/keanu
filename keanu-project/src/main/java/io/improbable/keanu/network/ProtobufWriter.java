@@ -37,7 +37,7 @@ public class ProtobufWriter implements NetworkWriter {
     }
 
     public void save(Vertex vertex) {
-        if (!(this instanceof SaveableVertex)) {
+        if (!(vertex instanceof SaveableVertex)) {
             throw new IllegalArgumentException("Trying to save a vertex that isn't Saveable");
         }
 
