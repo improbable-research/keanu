@@ -5,10 +5,7 @@ import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.*;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -22,7 +19,7 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class StudentTVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class StudentTVertex extends DoubleVertex implements SaveableVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final IntegerVertex v;
     private static final String V_NAME = "v";

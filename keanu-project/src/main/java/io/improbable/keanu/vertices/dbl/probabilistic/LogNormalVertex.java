@@ -19,7 +19,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class LogNormalVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class LogNormalVertex extends DoubleVertex implements SaveableVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;

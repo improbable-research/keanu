@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import java.util.Map;
 import java.util.Set;
 
-public class MultivariateGaussianVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class MultivariateGaussianVertex extends DoubleVertex implements SaveableVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;
