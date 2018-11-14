@@ -5,11 +5,7 @@ from keanu.context import KeanuContext
 from .base import Vertex
 from keanu.vartypes import (
     vertex_param_types,
-    int_and_bool_vertex_param_types,
-    bool_vertex_param_types,
     tensor_arg_types,
-    int_and_bool_tensor_arg_types,
-    bool_tensor_arg_types,
     shape_types
 )
 

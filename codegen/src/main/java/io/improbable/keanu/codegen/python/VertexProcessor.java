@@ -102,20 +102,12 @@ class VertexProcessor {
     }
 
     private static String toPythonParam(Class<?> parameterType) {
-        if (DoubleVertex.class.isAssignableFrom(parameterType)) {
+        if (Vertex.class.isAssignableFrom(parameterType)) {
             return "vertex_param_types";
-        } else if (IntegerVertex.class.isAssignableFrom(parameterType)) {
-            return "int_and_bool_vertex_param_types";
-        } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
-            return "bool_vertex_param_types";
-        } else if (Vertex.class.isAssignableFrom(parameterType)) {
-            return "vertex_param_types";
-        } else if (DoubleTensor.class.isAssignableFrom(parameterType)) {
+        } else if (DoubleTensor.class.isAssignableFrom(parameterType) ||
+                   IntegerTensor.class.isAssignableFrom(parameterType) ||
+                   BooleanTensor.class.isAssignableFrom(parameterType)) {
             return "tensor_arg_types";
-        } else if (IntegerTensor.class.isAssignableFrom(parameterType)) {
-            return "int_and_bool_tensor_arg_types";
-        } else if (BooleanTensor.class.isAssignableFrom(parameterType)) {
-            return "bool_tensor_arg_types";
         } else if (parameterType.isArray()) {
             return "shape_types";
         } else {

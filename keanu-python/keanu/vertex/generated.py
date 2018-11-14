@@ -5,11 +5,7 @@ from keanu.context import KeanuContext
 from .base import Vertex
 from keanu.vartypes import (
     vertex_param_types,
-    int_and_bool_vertex_param_types,
-    bool_vertex_param_types,
     tensor_arg_types,
-    int_and_bool_tensor_arg_types,
-    bool_tensor_arg_types,
     shape_types
 )
 
@@ -46,7 +42,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 
 
-def ConstantBool(constant: bool_tensor_arg_types) -> Vertex:
+def ConstantBool(constant: tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantBoolVertex, constant)
 
 
@@ -213,11 +209,11 @@ def Uniform(x_min: vertex_param_types, x_max: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().UniformVertex, x_min, x_max)
 
 
-def ConstantInteger(constant: int_and_bool_tensor_arg_types) -> Vertex:
+def ConstantInteger(constant: tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantIntegerVertex, constant)
 
 
-def IntegerDivision(a: int_and_bool_vertex_param_types, b: int_and_bool_vertex_param_types) -> Vertex:
+def IntegerDivision(a: vertex_param_types, b: vertex_param_types) -> Vertex:
     """
     Divides one vertex by another
     
@@ -237,5 +233,5 @@ def Poisson(mu: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().PoissonVertex, mu)
 
 
-def UniformInt(min: int_and_bool_vertex_param_types, max: int_and_bool_vertex_param_types) -> Vertex:
+def UniformInt(min: vertex_param_types, max: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().UniformIntVertex, min, max)

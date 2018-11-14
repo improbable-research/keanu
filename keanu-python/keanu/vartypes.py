@@ -18,11 +18,7 @@ Tensor arg types
 pandas_types = Union[Series, DataFrame]
 numpy_types = Union[ndarray]
 
-# mypy treats bool as a subtype of int and int as a subtype of float
-# see : https://github.com/python/mypy/issues/1850
 tensor_arg_types = Union[primitive_types, pandas_types, numpy_types]
-int_and_bool_tensor_arg_types = Union[int_types, bool_types, pandas_types, numpy_types]
-bool_tensor_arg_types = Union[bool_types, pandas_types, numpy_types]
 
 '''
 Vertex arg types
@@ -30,11 +26,7 @@ Vertex arg types
 wrapped_java_types = Union[JavaObjectWrapper]
 shape_types = Iterable[primitive_types]
 
-# mypy treats bool as a subtype of int and int as a subtype of float
-# see : https://github.com/python/mypy/issues/1850
 vertex_param_types = Union[tensor_arg_types, wrapped_java_types, VertexOps]
-int_and_bool_vertex_param_types = Union[int_and_bool_tensor_arg_types, wrapped_java_types, VertexOps]
-bool_vertex_param_types = Union[bool_tensor_arg_types, wrapped_java_types, VertexOps]
 
 '''
 Runtime types

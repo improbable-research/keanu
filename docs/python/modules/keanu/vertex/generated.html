@@ -39,11 +39,7 @@
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">Vertex</span>
 <span class="kn">from</span> <span class="nn">keanu.vartypes</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">vertex_param_types</span><span class="p">,</span>
-    <span class="n">int_and_bool_vertex_param_types</span><span class="p">,</span>
-    <span class="n">bool_vertex_param_types</span><span class="p">,</span>
     <span class="n">tensor_arg_types</span><span class="p">,</span>
-    <span class="n">int_and_bool_tensor_arg_types</span><span class="p">,</span>
-    <span class="n">bool_tensor_arg_types</span><span class="p">,</span>
     <span class="n">shape_types</span>
 <span class="p">)</span>
 
@@ -80,7 +76,7 @@
 <span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ConstantBool"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.ConstantBool">[docs]</a><span class="k">def</span> <span class="nf">ConstantBool</span><span class="p">(</span><span class="n">constant</span><span class="p">:</span> <span class="n">bool_tensor_arg_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+<div class="viewcode-block" id="ConstantBool"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.ConstantBool">[docs]</a><span class="k">def</span> <span class="nf">ConstantBool</span><span class="p">(</span><span class="n">constant</span><span class="p">:</span> <span class="n">tensor_arg_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">ConstantBoolVertex</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span></div>
 
 
@@ -247,11 +243,11 @@
     <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">UniformVertex</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ConstantInteger"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.ConstantInteger">[docs]</a><span class="k">def</span> <span class="nf">ConstantInteger</span><span class="p">(</span><span class="n">constant</span><span class="p">:</span> <span class="n">int_and_bool_tensor_arg_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+<div class="viewcode-block" id="ConstantInteger"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.ConstantInteger">[docs]</a><span class="k">def</span> <span class="nf">ConstantInteger</span><span class="p">(</span><span class="n">constant</span><span class="p">:</span> <span class="n">tensor_arg_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">ConstantIntegerVertex</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="IntegerDivision"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.IntegerDivision">[docs]</a><span class="k">def</span> <span class="nf">IntegerDivision</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">int_and_bool_vertex_param_types</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">int_and_bool_vertex_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+<div class="viewcode-block" id="IntegerDivision"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.IntegerDivision">[docs]</a><span class="k">def</span> <span class="nf">IntegerDivision</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">vertex_param_types</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">vertex_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Divides one vertex by another</span>
 <span class="sd">    </span>
@@ -271,7 +267,7 @@
     <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">PoissonVertex</span><span class="p">,</span> <span class="n">mu</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="UniformInt"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.UniformInt">[docs]</a><span class="k">def</span> <span class="nf">UniformInt</span><span class="p">(</span><span class="nb">min</span><span class="p">:</span> <span class="n">int_and_bool_vertex_param_types</span><span class="p">,</span> <span class="nb">max</span><span class="p">:</span> <span class="n">int_and_bool_vertex_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+<div class="viewcode-block" id="UniformInt"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.UniformInt">[docs]</a><span class="k">def</span> <span class="nf">UniformInt</span><span class="p">(</span><span class="nb">min</span><span class="p">:</span> <span class="n">vertex_param_types</span><span class="p">,</span> <span class="nb">max</span><span class="p">:</span> <span class="n">vertex_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">UniformIntVertex</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span></div>
 </pre></div>
 
