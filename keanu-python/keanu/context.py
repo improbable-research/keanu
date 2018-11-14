@@ -60,7 +60,7 @@ class KeanuContext(metaclass=Singleton):
     def jvm_view(self) -> Any:
         return self.__jvm_view
 
-    def to_java_object_list(self, l : Iterable[Any]) -> Any:
+    def to_java_object_list(self, l: Iterable[Any]) -> Any:
         lst = self._gateway.jvm.java.util.ArrayList()
 
         for o in l:
@@ -81,7 +81,7 @@ class KeanuContext(metaclass=Singleton):
     def to_java_long_array(self, l: Any) -> Any:
         return self.to_java_array(l, self._gateway.jvm.long)
 
-    def __infer_class_from_array(self, l : List[Any]) -> Any:
+    def __infer_class_from_array(self, l: List[Any]) -> Any:
         if len(l) == 0:
             raise ValueError("Cannot infer type because array is empty")
 

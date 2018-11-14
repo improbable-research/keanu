@@ -41,7 +41,7 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(a
         assert all(type(sample) == np.ndarray for sample in vertex_samples)
 
 
-def test_dropping_samples(net : BayesNet) -> None:
+def test_dropping_samples(net: BayesNet) -> None:
     draws = 10
     drop = 3
 
@@ -51,7 +51,7 @@ def test_dropping_samples(net : BayesNet) -> None:
     assert all(len(vertex_samples) == expected_num_samples for vertex_id, vertex_samples in samples.items())
 
 
-def test_down_sample_interval(net : BayesNet) -> None:
+def test_down_sample_interval(net: BayesNet) -> None:
     draws = 10
     down_sample_interval = 2
 
@@ -65,7 +65,7 @@ def test_down_sample_interval(net : BayesNet) -> None:
     ("metropolis"),
     ("hamiltonian")
 ])
-def test_can_iter_through_samples(algo : str, net : BayesNet) -> None:
+def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
     draws = 10
     samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
     count = 0
@@ -78,7 +78,7 @@ def test_can_iter_through_samples(algo : str, net : BayesNet) -> None:
     ("metropolis"),
     ("hamiltonian")
 ])
-def test_iter_returns_same_result_as_sample(algo : str) -> None:
+def test_iter_returns_same_result_as_sample(algo: str) -> None:
     draws = 100
     model = thermometers.model()
     net = BayesNet(model.temperature.get_connected_graph())
@@ -94,7 +94,7 @@ def test_iter_returns_same_result_as_sample(algo : str) -> None:
         np.testing.assert_almost_equal(samples_dataframe[vertex_id].mean(), np.average(samples[vertex_id]))
 
 
-def set_starting_state(model : Model) -> None:
+def set_starting_state(model: Model) -> None:
     KeanuRandom.set_default_random_seed(1)
     model.temperature.set_value(model.temperature.sample())
     model.thermometer_one.set_value(model.thermometer_one.sample())
