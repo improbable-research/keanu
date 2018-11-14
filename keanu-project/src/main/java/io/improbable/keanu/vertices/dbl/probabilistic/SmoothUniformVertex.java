@@ -58,11 +58,8 @@ public class SmoothUniformVertex extends DoubleVertex implements SaveableVertex,
      * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
-
     @ExportVertexToPythonBindings
-    public SmoothUniformVertex(@LoadParentVertex(X_MIN_NAME) DoubleVertex xMin,
-                               @LoadParentVertex(X_MAX_NAME) DoubleVertex xMax,
-                               @LoadParentVertex(EDGE_SHARPNESS_NAME) double edgeSharpness) {
+    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
         this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
     }
 
@@ -79,7 +76,8 @@ public class SmoothUniformVertex extends DoubleVertex implements SaveableVertex,
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
+    public SmoothUniformVertex(@LoadParentVertex(X_MIN_NAME) DoubleVertex xMin,
+                               @LoadParentVertex(X_MAX_NAME) DoubleVertex xMax) {
         this(xMin, xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
@@ -133,7 +131,6 @@ public class SmoothUniformVertex extends DoubleVertex implements SaveableVertex,
         return xMax;
     }
 
-    @SaveParentVertex(EDGE_SHARPNESS_NAME)
     public double getEdgeSharpness() {
         return edgeSharpness;
     }
