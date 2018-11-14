@@ -1,10 +1,13 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import kotlin.internal.LowPriorityInOverloadResolution;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +19,8 @@ public class ArcCosVertex extends DoubleUnaryOpVertex implements Differentiable 
      *
      * @param inputVertex the vertex
      */
-    public ArcCosVertex(DoubleVertex inputVertex) {
+    @ExportVertexToPythonBindings
+    public ArcCosVertex(@LoadParentVertex(INPUT_VERTEX_NAME) DoubleVertex inputVertex) {
         super(inputVertex);
     }
 
