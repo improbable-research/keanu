@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -23,6 +24,7 @@ public class HalfGaussianVertex extends GaussianVertex {
         super(tensorShape, MU_ZERO, sigma);
     }
 
+    @ExportVertexToPythonBindings
     public HalfGaussianVertex(@LoadParentVertex(SIGMA_NAME) DoubleVertex sigma) {
         super(MU_ZERO, sigma);
     }

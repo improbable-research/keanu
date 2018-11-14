@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class CastDoubleVertex extends DoubleVertex implements SaveableVertex, NonProbabilistic<DoubleTensor> {
 
     private final Vertex<? extends NumberTensor> inputVertex;
-    private static final String INPUT_VERTEX_NAME = "inputvertex";
+    private static final String INPUT_VERTEX_NAME = "inputVertex";
 
     @ExportVertexToPythonBindings
     public CastDoubleVertex(@LoadParentVertex(INPUT_VERTEX_NAME) Vertex<? extends NumberTensor> inputVertex) {

@@ -20,8 +20,8 @@ public class TriangularVertex extends DoubleVertex implements SaveableVertex, Di
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
     private final DoubleVertex c;
-    private static final String X_MIN_NAME = "xmin";
-    private static final String X_MAX_NAME = "xmax";
+    private static final String X_MIN_NAME = "xMin";
+    private static final String X_MAX_NAME = "xMax";
     private static final String C_NAME = "c";
 
     /**

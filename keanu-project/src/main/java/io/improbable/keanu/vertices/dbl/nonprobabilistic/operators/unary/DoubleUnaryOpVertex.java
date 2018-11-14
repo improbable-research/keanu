@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -17,7 +16,7 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
      *
      * @param inputVertex the input vertex
      */
-    public DoubleUnaryOpVertex(@LoadParentVertex(INPUT_VERTEX_NAME) DoubleVertex inputVertex) {
+    public DoubleUnaryOpVertex(DoubleVertex inputVertex) {
         this(inputVertex.getShape(), inputVertex);
     }
 

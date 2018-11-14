@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import kotlin.internal.LowPriorityInOverloadResolution;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -21,8 +21,8 @@ public class UniformVertex extends DoubleVertex implements SaveableVertex, Diffe
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
-    private static final String X_MIN_NAME = "xmin";
-    private static final String X_MAX_NAME = "xmax";
+    private static final String X_MIN_NAME = "xMin";
+    private static final String X_MAX_NAME = "xMax";
 
     /**
      * One xMin or xMax or both that match a proposed tensor shape of Uniform Vertex
