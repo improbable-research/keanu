@@ -1,14 +1,14 @@
 from typing import Iterable, Union, Type, Any, TYPE_CHECKING
-import numpy as np
+from numpy import integer, floating, bool_, ndarray
 from pandas import Series, DataFrame
 from keanu.vertex.ops import VertexOps
 from .base import JavaObjectWrapper
 
 
 # see numpy's scalar hierarchy: https://docs.scipy.org/doc/numpy/reference/arrays.scalars.html#scalars
-int_types = Union[int, np.integer]
-float_types = Union[float, np.floating]
-bool_types = Union[bool, np.bool_]
+int_types = Union[int, integer]
+float_types = Union[float, floating]
+bool_types = Union[bool, bool_]
 
 primitive_types = Union[int_types, float_types, bool_types]
 
@@ -16,7 +16,7 @@ primitive_types = Union[int_types, float_types, bool_types]
 Tensor arg types
 '''
 pandas_types = Union[Series, DataFrame]
-numpy_types = Union[np.ndarray]
+numpy_types = Union[ndarray]
 pandas_and_numpy_types = Union[pandas_types, numpy_types]
 
 # mypy treats bool as a subtype of int and int as a subtype of float
