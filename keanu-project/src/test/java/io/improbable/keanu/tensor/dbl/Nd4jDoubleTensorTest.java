@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
-import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -46,19 +45,19 @@ public class Nd4jDoubleTensorTest {
         matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
         matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
         scalarA = Nd4jDoubleTensor.scalar(2.0);
-        vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3, 1});
-        vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{1, 3});
+        vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
+        vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
         rankThreeTensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
     }
 
     @Before
-    public void enableDebugModeForNaNChecking() throws Exception {
+    public void enableDebugModeForNaNChecking() {
         TensorValidator.NAN_CATCHER.enable();
         TensorValidator.NAN_FIXER.enable();
     }
 
     @After
-    public void disableDebugModeForNaNChecking() throws Exception {
+    public void disableDebugModeForNaNChecking() {
         TensorValidator.NAN_CATCHER.disable();
         TensorValidator.NAN_FIXER.disable();
     }
@@ -666,7 +665,7 @@ public class Nd4jDoubleTensorTest {
 
         assertEquals(3, tensorRow.argMax());
         assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
-        assertThat(tensorRow.argMax(1), isScalarWithValue(3));
+        assertThat(tensorRow.argMax(1), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
     }
 
     @Test
@@ -674,7 +673,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor tensorCol = DoubleTensor.create(1, 3, 4, 5, 2).reshape(5, 1);
 
         assertEquals(3, tensorCol.argMax());
-        assertThat(tensorCol.argMax(0), isScalarWithValue(3));
+        assertThat(tensorCol.argMax(0), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
         assertThat(tensorCol.argMax(1), valuesAndShapesMatch(IntegerTensor.zeros(5)));
     }
 

@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import static java.util.stream.Collectors.toMap;
 
@@ -78,7 +78,7 @@ public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extend
     }
 
     public CategoricalVertex(Map<CATEGORY, DoubleVertex> selectableValues) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(selectableValuesShapes(selectableValues)), selectableValues);
+        this(checkHasOneNonSingularShapeOrAllSingular(selectableValuesShapes(selectableValues)), selectableValues);
     }
 
     public Map<CATEGORY, DoubleVertex> getSelectableValues() {

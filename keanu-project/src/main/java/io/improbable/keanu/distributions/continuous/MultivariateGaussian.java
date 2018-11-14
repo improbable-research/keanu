@@ -14,6 +14,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
     public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor covariance) {
         return new MultivariateGaussian(mu, covariance);
     }
+
     private MultivariateGaussian(DoubleTensor mu, DoubleTensor covariance) {
         this.mu = mu;
         this.covariance = covariance;
@@ -22,9 +23,10 @@ public class MultivariateGaussian implements ContinuousDistribution {
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
         TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
+
         final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
         final DoubleTensor variateSamples = random.nextGaussian(mu.getShape());
-        final DoubleTensor covTimesVariates = mu.isScalar() ?
+        final DoubleTensor covTimesVariates = isUnivariate() ?
             choleskyCov.times(variateSamples) : choleskyCov.matrixMultiply(variateSamples);
         return covTimesVariates.plus(mu);
     }
@@ -38,11 +40,15 @@ public class MultivariateGaussian implements ContinuousDistribution {
         DoubleTensor xMinusMuT = xMinusMu.transpose();
         DoubleTensor covInv = covariance.matrixInverse();
 
-        double scalar = mu.isScalar() ?
+        double scalar = isUnivariate() ?
             covInv.times(xMinusMu).times(xMinusMuT).scalar() :
             xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu)).scalar();
 
         return DoubleTensor.scalar(-0.5 * (scalar + kLog2Pi + logCovDet));
+    }
+
+    private boolean isUnivariate(){
+        return mu.getShape()[0] == 1;
     }
 
     @Override

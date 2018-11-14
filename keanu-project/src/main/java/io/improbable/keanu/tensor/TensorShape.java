@@ -20,6 +20,10 @@ public class TensorShape {
         return isScalar(shape);
     }
 
+    public boolean isLengthOne(){
+        return isLengthOne(shape);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -119,6 +123,10 @@ public class TensorShape {
     }
 
     public static boolean isScalar(long[] shape) {
+        return shape.length == 0;
+    }
+
+    public static boolean isLengthOne(long[] shape) {
         return getLength(shape) == 1;
     }
 

@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
-import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -567,7 +566,7 @@ public class Nd4jIntegerTensorTest {
 
         assertEquals(3, tensorRow.argMax());
         assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
-        assertThat(tensorRow.argMax(1), isScalarWithValue(3));
+        assertThat(tensorRow.argMax(1), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
     }
 
     @Test
@@ -575,7 +574,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor tensorCol = IntegerTensor.create(1, 3, 4, 5, 2).reshape(5, 1);
 
         assertEquals(3, tensorCol.argMax());
-        assertThat(tensorCol.argMax(0), isScalarWithValue(3));
+        assertThat(tensorCol.argMax(0), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
         assertThat(tensorCol.argMax(1), valuesAndShapesMatch(IntegerTensor.zeros(5)));
     }
 

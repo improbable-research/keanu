@@ -43,7 +43,7 @@ public class MultivariateGaussianTest {
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(5, 1);
 
         double expectedDensity = new NormalDistribution(5.0, 1).logDensity(0.5);
-        double density = mvg.logPdf(Nd4jDoubleTensor.scalar(0.5));
+        double density = mvg.logPdf(DoubleTensor.create(new double[]{0.5}, 1, 1));
 
         assertEquals(expectedDensity, density, 1e-2);
     }
@@ -117,7 +117,7 @@ public class MultivariateGaussianTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void whenYouSampleYouMustMatchMusShape() {
+    public void whenYouSampleYouMustMatchMustShape() {
         DoubleTensor mu = new Nd4jDoubleTensor(new double[]{0, 0}, new long[]{2, 1});
         DoubleTensor sigma = new Nd4jDoubleTensor(new double[]{1}, new long[]{1});
 

@@ -100,7 +100,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor reshape(long... newShape) {
-        if (!TensorShape.isScalar(newShape)) {
+        if (TensorShape.getLength(newShape) != 1) {
             throw new IllegalArgumentException("Cannot reshape scalar to non scalar");
         }
 
@@ -155,7 +155,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor value) {
-        if (value.isScalar()) {
+        if (value.isLengthOne()) {
             return value.times(value);
         }
         throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
@@ -163,7 +163,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
-        if (value.isScalar()) {
+        if (value.isLengthOne()) {
             if (dimsLeft.length > 1 || dimsRight.length > 1 || dimsLeft[0] != 0 || dimsRight[0] != 0) {
                 throw new IllegalArgumentException("Tensor multiply sum dimensions out of bounds for scalar");
             }
@@ -284,7 +284,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
-        if (greaterThanThis.isScalar()) {
+        if (greaterThanThis.isLengthOne()) {
             return new ScalarDoubleTensor(value > greaterThanThis.scalar() ? 1.0 : 0.0, shape);
         } else {
             return DoubleTensor.create(value, greaterThanThis.getShape())
@@ -294,7 +294,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanOrEqualToThis) {
-        if (greaterThanOrEqualToThis.isScalar()) {
+        if (greaterThanOrEqualToThis.isLengthOne()) {
             return new ScalarDoubleTensor(value >= greaterThanOrEqualToThis.scalar() ? 1.0 : 0.0, shape);
         } else {
             return DoubleTensor.create(value, greaterThanOrEqualToThis.getShape())
@@ -304,7 +304,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
-        if (lessThanThis.isScalar()) {
+        if (lessThanThis.isLengthOne()) {
             return new ScalarDoubleTensor(value < lessThanThis.scalar() ? 1.0 : 0.0, shape);
         } else {
             return DoubleTensor.create(value, lessThanThis.getShape())
@@ -314,7 +314,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanOrEqualsThis) {
-        if (lessThanOrEqualsThis.isScalar()) {
+        if (lessThanOrEqualsThis.isLengthOne()) {
             return new ScalarDoubleTensor(value <= lessThanOrEqualsThis.scalar() ? 1.0 : 0.0, shape);
         } else {
             return DoubleTensor.create(value, lessThanOrEqualsThis.getShape())
@@ -324,7 +324,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor setWithMaskInPlace(DoubleTensor withMask, Double valueToApply) {
-        if (withMask.isScalar()) {
+        if (withMask.isLengthOne()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
             return DoubleTensor.create(value, withMask.getShape())
@@ -489,7 +489,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor powInPlace(DoubleTensor exponent) {
-        if (exponent.isScalar()) {
+        if (exponent.isLengthOne()) {
             value = Math.pow(value, exponent.scalar());
         } else {
             return DoubleTensor.create(value, exponent.getShape()).powInPlace(exponent);
@@ -574,7 +574,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor atan2InPlace(DoubleTensor y) {
-        if (y.isScalar()) {
+        if (y.isLengthOne()) {
             value = Math.atan2(y.scalar(), value);
         } else {
             return Nd4jDoubleTensor.create(value, y.getShape()).atan2InPlace(y);
@@ -602,7 +602,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor minusInPlace(DoubleTensor that) {
-        if (that.isScalar()) {
+        if (that.isLengthOne()) {
             minusInPlace(that.scalar());
         } else {
             return that.unaryMinus().plusInPlace(value);
@@ -612,7 +612,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor plusInPlace(DoubleTensor that) {
-        if (that.isScalar()) {
+        if (that.isLengthOne()) {
             plusInPlace(that.scalar());
         } else {
             return that.plus(value);
@@ -622,7 +622,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor timesInPlace(DoubleTensor that) {
-        if (that.isScalar()) {
+        if (that.isLengthOne()) {
             timesInPlace(that.scalar());
         } else {
             return that.times(value);
@@ -632,7 +632,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor divInPlace(DoubleTensor that) {
-        if (that.isScalar()) {
+        if (that.isLengthOne()) {
             divInPlace(that.scalar());
         } else {
             return that.reciprocal().timesInPlace(value);
@@ -658,7 +658,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     public DoubleTensor maxInPlace(DoubleTensor max) {
-        if (max.isScalar()) {
+        if (max.isLengthOne()) {
             value = Math.max(value, max.scalar());
         } else {
             return max.duplicate().maxInPlace(this);
@@ -668,7 +668,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor minInPlace(DoubleTensor min) {
-        if (min.isScalar()) {
+        if (min.isLengthOne()) {
             value = Math.min(value, min.scalar());
         } else {
             return min.duplicate().minInPlace(this);
@@ -749,7 +749,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor lessThan(DoubleTensor that) {
-        if (that.isScalar()) {
+        if (that.isLengthOne()) {
             return lessThan(that.scalar());
         } else {
             return that.greaterThan(value);
@@ -758,7 +758,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor lessThanOrEqual(DoubleTensor that) {
-        if (that.isScalar()) {
+        if (that.isLengthOne()) {
             return lessThanOrEqual(that.scalar());
         } else {
             return that.greaterThanOrEqual(value);
@@ -782,7 +782,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor greaterThan(DoubleTensor that) {
-        if (that.isScalar()) {
+        if (that.isLengthOne()) {
             return greaterThan(that.scalar());
         } else {
             return that.lessThan(value);
@@ -791,7 +791,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor greaterThanOrEqual(DoubleTensor that) {
-        if (that.isScalar()) {
+        if (that.isLengthOne()) {
             return greaterThanOrEqual(that.scalar());
         } else {
             return that.lessThanOrEqual(value);
@@ -807,7 +807,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof DoubleTensor) {
             DoubleTensor thatAsDouble = (DoubleTensor) that;
-            if (that.isScalar()) {
+            if (that.isLengthOne()) {
                 return BooleanTensor.create(value.equals(thatAsDouble.scalar()), shape);
             } else {
                 return thatAsDouble.elementwiseEquals(value);

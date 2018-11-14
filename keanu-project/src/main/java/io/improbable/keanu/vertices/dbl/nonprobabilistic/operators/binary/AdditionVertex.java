@@ -10,6 +10,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.broadcastOutputShape;
+
 public class AdditionVertex extends DoubleBinaryOpVertex {
 
     /**
@@ -20,7 +22,7 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
      */
     @ExportVertexToPythonBindings
     public AdditionVertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right);
+        super(broadcastOutputShape(left.getShape(), right.getShape()), left, right);
     }
 
     @Override
@@ -31,8 +33,8 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
         return dLeftWrtInputs.add(dRightWrtInputs,
-            TensorShape.isScalar(left.getShape()),
-            TensorShape.isScalar(right.getShape()),
+            TensorShape.isLengthOne(left.getShape()),
+            TensorShape.isLengthOne(right.getShape()),
             this.getShape()
         );
     }

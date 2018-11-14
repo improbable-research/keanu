@@ -17,7 +17,7 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class LogisticVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
@@ -44,7 +44,7 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     public LogisticVertex(DoubleVertex mu, DoubleVertex s) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), s.getShape()), mu, s);
+        this(checkHasOneNonSingularShapeOrAllSingular(mu.getShape(), s.getShape()), mu, s);
     }
 
     public LogisticVertex(DoubleVertex mu, double s) {

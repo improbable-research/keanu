@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import static java.util.Collections.singletonMap;
 
@@ -50,7 +50,7 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
      */
     @ExportVertexToPythonBindings
     public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax);
+        this(checkHasOneNonSingularShapeOrAllSingular(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }
 
     public UniformVertex(DoubleVertex xMin, double xMax) {

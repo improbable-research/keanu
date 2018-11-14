@@ -33,7 +33,7 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
         xVertex = new ConstantDoubleVertex(DoubleTensor.zeros(featureShape));
 
         OutputVertices<OUTPUT> outputVertices = outputTransform.apply(
-            TensorShape.isScalar(weightsVertex.getShape()) ?
+            TensorShape.isLengthOne(weightsVertex.getShape()) ?
                 weightsVertex.times(xVertex).plus(interceptVertex) :
                 weightsVertex.matrixMultiply(xVertex).plus(interceptVertex)
         );

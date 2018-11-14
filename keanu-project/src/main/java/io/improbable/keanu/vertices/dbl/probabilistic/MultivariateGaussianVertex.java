@@ -58,10 +58,10 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
     }
 
     public MultivariateGaussianVertex(double mu, double covariance) {
-        this(singularMatrix(mu), singularMatrix(covariance));
+        this(oneByOneMatrix(mu), oneByOneMatrix(covariance));
     }
 
-    private static DoubleVertex singularMatrix(double value) {
+    private static DoubleVertex oneByOneMatrix(double value) {
         return new ConstantDoubleVertex(DoubleTensor.scalar(value).reshape(1, 1));
     }
 
@@ -70,7 +70,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
         DoubleTensor muValues = mu.getValue();
         DoubleTensor covarianceValues = covariance.getValue();
 
-        return io.improbable.keanu.distributions.continuous.MultivariateGaussian.withParameters(muValues, covarianceValues).logProb(value).scalar();
+        return MultivariateGaussian.withParameters(muValues, covarianceValues).logProb(value).scalar();
     }
 
     @Override

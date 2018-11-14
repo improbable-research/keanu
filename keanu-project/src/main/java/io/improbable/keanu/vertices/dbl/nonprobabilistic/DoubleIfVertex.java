@@ -24,7 +24,7 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     public DoubleIfVertex(Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
-        super(TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(thn.getShape(), els.getShape(), predicate.getShape()));
+        super(TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular(thn.getShape(), els.getShape(), predicate.getShape()));
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;

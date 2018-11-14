@@ -18,7 +18,7 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class BetaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
@@ -56,7 +56,7 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
      * @param beta  the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
+        this(checkHasOneNonSingularShapeOrAllSingular(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
     public BetaVertex(DoubleVertex alpha, double beta) {

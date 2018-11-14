@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
+import org.nd4j.linalg.api.shape.Shape;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -223,10 +224,12 @@ public class PartialDerivatives {
     private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier, long[] ofShape) {
 
         long[] partialOfShape = extractOfShape(partial.getShape(), ofShape.length);
-        if (TensorShape.isScalar(partialOfShape)) {
 
+        boolean needsBroadcast = !Arrays.equals(partialOfShape, multiplier.getShape());
+        if (needsBroadcast) {
             long[] partialWrtShape = extractWrtShape(partial.getShape(), ofShape.length);
-            long[] resultShape = TensorShape.concat(multiplier.getShape(), partialWrtShape);
+            long[] broadcastedOfShape = Shape.broadcastOutputShape(multiplier.getShape(), partialOfShape);
+            long[] resultShape = TensorShape.concat(broadcastedOfShape, partialWrtShape);
 
             DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, resultShape.length);
             DoubleTensor appropriateShapePartial = increaseRankByPrependingOnesToShape(partial, resultShape.length);
@@ -246,7 +249,8 @@ public class PartialDerivatives {
         if (needsBroadcast) {
 
             long[] partialOfShape = extractOfShape(partial.getShape(), partial.getRank() - wrtShape.length);
-            long[] resultShape = TensorShape.concat(partialOfShape, multiplier.getShape());
+            long[] broadcastedWrtShape = Shape.broadcastOutputShape(multiplier.getShape(), partialWrtShape);
+            long[] resultShape = TensorShape.concat(partialOfShape, broadcastedWrtShape);
 
             DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, resultShape.length);
             DoubleTensor appropriateShapePartial = increaseRankByAppendingOnesToShape(partial, resultShape.length);

@@ -17,7 +17,7 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class LogNormalVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
@@ -56,7 +56,7 @@ public class LogNormalVertex extends DoubleVertex implements Differentiable, Pro
     }
 
     public LogNormalVertex(DoubleVertex mu, DoubleVertex sigma) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
+        this(checkHasOneNonSingularShapeOrAllSingular(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
     public LogNormalVertex(double mu, DoubleVertex sigma) {

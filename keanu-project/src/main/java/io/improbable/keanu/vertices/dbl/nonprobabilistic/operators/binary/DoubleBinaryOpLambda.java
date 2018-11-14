@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
 
 public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
@@ -46,11 +46,11 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differen
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                 Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
+        this(checkHasOneNonSingularShapeOrAllSingular(left.getShape(), right.getShape()), left, right, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
     public DoubleBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right, op, null, null);
+        this(checkHasOneNonSingularShapeOrAllSingular(left.getShape(), right.getShape()), left, right, op, null, null);
     }
 
     @Override
