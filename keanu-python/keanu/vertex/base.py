@@ -7,10 +7,11 @@ from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
 from .ops import VertexOps
-from typing import List, Any, Tuple, Iterator
+from typing import List, Any, Tuple, Iterator, Union
 from keanu.vartypes import (
     tensor_arg_types,
-    vertex_arg_types,
+    vertex_param_types,
+    shape_types,
     numpy_types,
     runtime_tensor_arg_types,
     runtime_primitive_types,
@@ -22,7 +23,7 @@ k = KeanuContext()
 
 
 class Vertex(JavaObjectWrapper, VertexOps):
-    def __init__(self, val : Any, *args : vertex_arg_types) -> None:
+    def __init__(self, val : Any, *args : Union[vertex_param_types, shape_types]) -> None:
         if args:
             ctor = val
             val = ctor(*(Vertex.__parse_args(args)))
@@ -58,7 +59,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
         return list(map(Vertex.__parse_arg, args))
 
     @staticmethod
-    def __parse_arg(arg : vertex_arg_types) -> Any:
+    def __parse_arg(arg : Union[vertex_param_types, shape_types]) -> Any:
         if isinstance(arg, runtime_tensor_arg_types):
             return kn.vertex.const.Const(arg).unwrap()
         elif isinstance(arg, runtime_wrapped_java_types):
