@@ -58,12 +58,12 @@ class VertexProcessor {
         Map<String, Object> root = new HashMap<>();
         List<Import> imports = new ArrayList<>();
         List<PythonConstructor> pythonConstructors = new ArrayList<>();
-        List<String> exportedMethodsList = new ArrayList<>();
 
         root.put("imports", imports);
         root.put("constructors", pythonConstructors);
         Map<String, DocString> nameToDocStringMap = KeanuProjectDoclet.getDocStringsFromFile();
         StringJoiner exportedMethodsJoiner = new StringJoiner("\", \"", "\"", "\"");
+
         for (Constructor constructor : constructors) {
             String javaClass = constructor.getDeclaringClass().getSimpleName();
             String qualifiedName = constructor.getName();
@@ -103,22 +103,20 @@ class VertexProcessor {
     }
 
     private static String toPythonParam(Class<?> parameterType) {
-        if (IntegerVertex.class.isAssignableFrom(parameterType)) {
-            return "int_and_bool_vertex_param_types";
-        } else if (DoubleVertex.class.isAssignableFrom(parameterType)) {
+        if (DoubleVertex.class.isAssignableFrom(parameterType)) {
             return "vertex_param_types";
+        } else if (IntegerVertex.class.isAssignableFrom(parameterType)) {
+            return "int_and_bool_vertex_param_types";
         } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
             return "bool_vertex_param_types";
         } else if (Vertex.class.isAssignableFrom(parameterType)) {
             return "vertex_param_types";
-        } else if (IntegerTensor.class.isAssignableFrom(parameterType)) {
-            return "int_and_bool_tensor_arg_types";
         } else if (DoubleTensor.class.isAssignableFrom(parameterType)) {
             return "tensor_arg_types";
+        } else if (IntegerTensor.class.isAssignableFrom(parameterType)) {
+            return "int_and_bool_tensor_arg_types";
         } else if (BooleanTensor.class.isAssignableFrom(parameterType)) {
             return "bool_tensor_arg_types";
-        } else if (Tensor.class.isAssignableFrom(parameterType)) {
-            return "tensor_arg_types";
         } else if (parameterType.isArray()) {
             return "shape_types";
         } else {
