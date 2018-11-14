@@ -13,8 +13,8 @@ import java.util.Map;
 
 public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
-    private static final String X_NAME = "x";
-    private static final String Y_NAME = "y";
+    private static final String X_NAME = LEFT_NAME;
+    private static final String Y_NAME = RIGHT_NAME;
 
     /**
      * Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin
@@ -28,12 +28,12 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         super(x, y);
     }
 
-    @SaveParentVertex(X_NAME)
+    // No SaveParentVertex annotation needed as DoubleBinaryOpVertex.getLeft() will be used when saving the vertex
     public DoubleVertex getX() {
         return super.getLeft();
     }
 
-    @SaveParentVertex(Y_NAME)
+    // No SaveParentVertex annotation needed as DoubleBinaryOpVertex.getRight() will be used when saving the vertex
     public DoubleVertex getY() {
         return super.getRight();
     }

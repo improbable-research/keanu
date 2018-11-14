@@ -13,8 +13,8 @@ import java.util.Map;
 
 public class PowerVertex extends DoubleBinaryOpVertex {
 
-    private static final String BASE_NAME = "base";
-    private static final String EXPONENT_NAME = "exponent";
+    private static final String BASE_NAME = LEFT_NAME;
+    private static final String EXPONENT_NAME = RIGHT_NAME;
 
     /**
      * Raises a vertex to the power of another
@@ -28,12 +28,12 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         super(base, exponent);
     }
 
-    @SaveParentVertex(BASE_NAME)
+    // No SaveParentVertex annotation needed as DoubleBinaryOpVertex.getLeft() will be used when saving the vertex
     public DoubleVertex getBase() {
         return super.getLeft();
     }
 
-    @SaveParentVertex(EXPONENT_NAME)
+    // No SaveParentVertex annotation needed as DoubleBinaryOpVertex.getRight() will be used when saving the vertex
     public DoubleVertex getExponent() {
         return super.getRight();
     }
