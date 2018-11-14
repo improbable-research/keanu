@@ -10,7 +10,7 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.network.BayesianNetwork")
 
 class BayesNet(JavaObjectWrapper):
-    def __init__(self, vertices : Any) -> None:
+    def __init__(self, vertices: Any) -> None:
         java_vertices = k.to_java_object_list(vertices)
 
         super(BayesNet, self).__init__(k.jvm_view().BayesianNetwork(java_vertices))
@@ -30,5 +30,5 @@ class BayesNet(JavaObjectWrapper):
     def get_discrete_latent_vertices(self) -> Iterator[Vertex]:
         return Vertex._to_generator(self.unwrap().getDiscreteLatentVertices())
 
-    def probe_for_non_zero_probability(self, attempts : int, random : KeanuRandom) -> None:
+    def probe_for_non_zero_probability(self, attempts: int, random: KeanuRandom) -> None:
         self.unwrap().probeForNonZeroProbability(attempts, random.unwrap())

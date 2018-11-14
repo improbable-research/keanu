@@ -23,7 +23,9 @@ k = KeanuContext()
 
 
 class Vertex(JavaObjectWrapper, VertexOps):
-    def __init__(self, val : Any, *args : Union[vertex_param_types, shape_types]) -> None:
+    def __init__(self,
+                 val: Any,
+                 *args: Union[vertex_param_types, shape_types]) -> None:
         if args:
             ctor = val
             val = ctor(*(Vertex.__parse_args(args)))
@@ -33,13 +35,13 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def __hash__(self) -> int:
         return hash(self.get_id())
 
-    def observe(self, v : tensor_arg_types) -> None:
+    def observe(self, v: tensor_arg_types) -> None:
         self.unwrap().observe(Tensor(v).unwrap())
 
-    def set_value(self, v : tensor_arg_types) -> None:
+    def set_value(self, v: tensor_arg_types) -> None:
         self.unwrap().setValue(Tensor(v).unwrap())
 
-    def set_and_cascade(self, v : tensor_arg_types) -> None:
+    def set_and_cascade(self, v: tensor_arg_types) -> None:
         self.unwrap().setAndCascade(Tensor(v).unwrap())
 
     def sample(self) -> numpy_types:
@@ -55,11 +57,11 @@ class Vertex(JavaObjectWrapper, VertexOps):
         return Vertex._get_python_id(self.unwrap())
 
     @staticmethod
-    def __parse_args(args : Tuple[Any, ...]) -> List[Any]:
+    def __parse_args(args: Tuple[Any, ...]) -> List[Any]:
         return list(map(Vertex.__parse_arg, args))
 
     @staticmethod
-    def __parse_arg(arg : Union[vertex_param_types, shape_types]) -> Any:
+    def __parse_arg(arg: Union[vertex_param_types, shape_types]) -> Any:
         if isinstance(arg, runtime_tensor_arg_types):
             return kn.vertex.const.Const(arg).unwrap()
         elif isinstance(arg, runtime_wrapped_java_types):
@@ -70,9 +72,9 @@ class Vertex(JavaObjectWrapper, VertexOps):
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
-    def _to_generator(java_vertices : Any) -> Iterator['Vertex']:
+    def _to_generator(java_vertices: Any) -> Iterator['Vertex']:
         return (Vertex(java_vertex) for java_vertex in java_vertices)
 
     @staticmethod
-    def _get_python_id(java_vertex : Any) -> Tuple[Any, ...]:
+    def _get_python_id(java_vertex: Any) -> Tuple[Any, ...]:
         return tuple(java_vertex.getId().getValue())

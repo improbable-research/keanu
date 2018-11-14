@@ -68,7 +68,7 @@ class KeanuContext(metaclass=Singleton):
 
         return lst
 
-    def to_java_array(self, l : List[Any], klass : Any=None) -> Any:
+    def to_java_array(self, l: List[Any], klass: Any = None) -> Any:
         if klass is None:
             klass = self.__infer_class_from_array(l)
         array = self._gateway.new_array(klass, len(l))
@@ -78,7 +78,7 @@ class KeanuContext(metaclass=Singleton):
 
         return array
 
-    def to_java_long_array(self, l : Any) -> Any:
+    def to_java_long_array(self, l: Any) -> Any:
         return self.to_java_array(l, self._gateway.jvm.long)
 
     def __infer_class_from_array(self, l : List[Any]) -> Any:

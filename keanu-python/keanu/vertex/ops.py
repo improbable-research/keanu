@@ -7,7 +7,7 @@ class VertexOps:
     Without this the right operators would fail.
     See https://docs.scipy.org/doc/numpy-1.13.0/neps/ufunc-overrides.html
     """
-    def __array_ufunc__(self, ufunc : Any, method : Any, *inputs : Any, **kwargs : Any) -> Any:
+    def __array_ufunc__(self, ufunc: Any, method: Any, *inputs: Any, **kwargs: Any) -> Any:
         methods = {
             "equal" : VertexOps.__eq__,
             "not_equal" : VertexOps.__ne__,
@@ -31,64 +31,64 @@ class VertexOps:
         else:
             raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
 
-    def __add__(self, other : Any) -> Any:
+    def __add__(self, other: Any) -> Any:
         return kn.vertex.generated.Addition(self, other)
 
-    def __radd__(self, other : Any) -> Any:
+    def __radd__(self, other: Any) -> Any:
         return kn.vertex.generated.Addition(other, self)
 
-    def __sub__(self, other : Any) -> Any:
+    def __sub__(self, other: Any) -> Any:
         return kn.vertex.generated.Difference(self, other)
 
-    def __rsub__(self, other : Any) -> Any:
+    def __rsub__(self, other: Any) -> Any:
         return kn.vertex.generated.Difference(other, self)
 
-    def __mul__(self, other : Any) -> Any:
+    def __mul__(self, other: Any) -> Any:
         return kn.vertex.generated.Multiplication(self, other)
 
-    def __rmul__(self, other : Any) -> Any:
+    def __rmul__(self, other: Any) -> Any:
         return kn.vertex.generated.Multiplication(other, self)
 
-    def __pow__(self, other : Any) -> Any:
+    def __pow__(self, other: Any) -> Any:
         return kn.vertex.generated.Power(self, other)
 
-    def __rpow__(self, other : Any) -> Any:
+    def __rpow__(self, other: Any) -> Any:
         return kn.vertex.generated.Power(other, self)
 
-    def __truediv__(self, other : Any) -> Any:
+    def __truediv__(self, other: Any) -> Any:
         return kn.vertex.generated.Division(self, other)
 
-    def __rtruediv__(self, other : Any) -> Any:
+    def __rtruediv__(self, other: Any) -> Any:
         return kn.vertex.generated.Division(other, self)
 
-    def __floordiv__(self, other : Any) -> Any:
+    def __floordiv__(self, other: Any) -> Any:
         return kn.vertex.generated.IntegerDivision(self, other)
 
-    def __rfloordiv__(self, other : Any) -> Any:
+    def __rfloordiv__(self, other: Any) -> Any:
         return kn.vertex.generated.IntegerDivision(other, self)
 
-    def __eq__(self, other : Any) -> Any:
+    def __eq__(self, other: Any) -> Any:
         return kn.vertex.generated.Equals(self, other)
 
-    def __req__(self, other : Any) -> Any:
+    def __req__(self, other: Any) -> Any:
         return kn.vertex.generated.Equals(self, other)
 
-    def __ne__(self, other : Any) -> Any:
+    def __ne__(self, other: Any) -> Any:
         return kn.vertex.generated.NotEquals(self, other)
 
-    def __rne__(self, other : Any) -> Any:
+    def __rne__(self, other: Any) -> Any:
         return kn.vertex.generated.NotEquals(self, other)
 
-    def __gt__(self, other : Any) -> Any:
+    def __gt__(self, other: Any) -> Any:
         return kn.vertex.generated.GreaterThan(self, other)
 
-    def __ge__(self, other : Any) -> Any:
+    def __ge__(self, other: Any) -> Any:
         return kn.vertex.generated.GreaterThanOrEqual(self, other)
 
-    def __lt__(self, other : Any) -> Any:
+    def __lt__(self, other: Any) -> Any:
         return kn.vertex.generated.LessThan(self, other)
 
-    def __le__(self, other : Any) -> Any:
+    def __le__(self, other: Any) -> Any:
         return kn.vertex.generated.LessThanOrEqual(self, other)
 
     def __abs__(self) -> Any:

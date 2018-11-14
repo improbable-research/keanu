@@ -96,7 +96,7 @@ class VertexProcessor {
         String[] pythonParams = new String[pythonParameters.length];
 
         for (int i = 0; i < pythonParameters.length; i++) {
-            pythonParams[i] = pythonParameters[i] + " : " + toPythonParam(parameterTypes[i]);
+            pythonParams[i] = pythonParameters[i] + ": " + toPythonParam(parameterTypes[i]);
         }
 
         return String.join(", ", pythonParams);

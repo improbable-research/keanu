@@ -25,7 +25,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
 class Tensor(JavaObjectWrapper):
-    def __init__(self, t : tensor_arg_types) -> None:
+    def __init__(self, t: tensor_arg_types) -> None:
         if isinstance(t, runtime_numpy_types):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t))
         elif isinstance(t, runtime_pandas_types):
@@ -36,7 +36,7 @@ class Tensor(JavaObjectWrapper):
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(t)))
 
     @staticmethod
-    def __get_tensor_from_ndarray(ndarray : numpy_types) -> Any:
+    def __get_tensor_from_ndarray(ndarray: numpy_types) -> Any:
         normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(ndarray)
 
         ctor = Tensor.__infer_tensor_ctor_from_ndarray(normalized_ndarray)
@@ -46,14 +46,14 @@ class Tensor(JavaObjectWrapper):
         return ctor(values, shape)
 
     @staticmethod
-    def __ensure_rank_is_atleast_two(ndarray : numpy_types) -> numpy_types:
+    def __ensure_rank_is_atleast_two(ndarray: numpy_types) -> numpy_types:
         if len(ndarray.shape) == 1:
             return ndarray[..., None]
         else:
             return ndarray
 
     @staticmethod
-    def __infer_tensor_ctor_from_ndarray(ndarray : numpy_types) -> Any:
+    def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> Any:
         if len(ndarray) == 0:
             raise ValueError("Cannot infer type because the ndarray is empty")
 
@@ -67,7 +67,7 @@ class Tensor(JavaObjectWrapper):
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(ndarray.item(0))))
 
     @staticmethod
-    def __get_tensor_from_scalar(scalar : primitive_types) -> Any:
+    def __get_tensor_from_scalar(scalar: primitive_types) -> Any:
         if isinstance(scalar, runtime_bool_types):
             return k.jvm_view().BooleanTensor.scalar(bool(scalar))
         elif isinstance(scalar, runtime_int_types):
@@ -78,6 +78,6 @@ class Tensor(JavaObjectWrapper):
             raise NotImplementedError("Generic types in a ndarray are not supported. Was given {}".format(type(scalar)))
 
     @staticmethod
-    def _to_ndarray(java_tensor : Any) -> numpy_types:
+    def _to_ndarray(java_tensor: Any) -> numpy_types:
         np_array = np.array(list(java_tensor.asFlatArray()))
         return np_array.reshape(java_tensor.getShape())

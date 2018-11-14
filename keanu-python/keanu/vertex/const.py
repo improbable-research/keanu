@@ -15,7 +15,7 @@ from keanu.vartypes import (
     runtime_float_types
 )
 
-def Const(t : tensor_arg_types) -> Vertex:
+def Const(t: tensor_arg_types) -> Vertex:
     if isinstance(t, runtime_numpy_types):
         ctor = __infer_const_ctor_from_ndarray(t)
         val = t
@@ -30,13 +30,13 @@ def Const(t : tensor_arg_types) -> Vertex:
 
     return ctor(Tensor(val))
 
-def __infer_const_ctor_from_ndarray(ndarray : numpy_types) -> Callable:
+def __infer_const_ctor_from_ndarray(ndarray: numpy_types) -> Callable:
     if len(ndarray) == 0:
         raise ValueError("Cannot infer type because the ndarray is empty")
 
     return __infer_const_ctor_from_scalar(ndarray.item(0))
 
-def __infer_const_ctor_from_scalar(scalar : np.generic) -> Callable:
+def __infer_const_ctor_from_scalar(scalar: np.generic) -> Callable:
     if isinstance(scalar, runtime_bool_types):
         return ConstantBool
     elif isinstance(scalar, runtime_int_types):
