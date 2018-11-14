@@ -1,6 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -10,14 +13,29 @@ import java.util.Map;
 
 public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
+    private static final String X_NAME = "x";
+    private static final String Y_NAME = "y";
+
     /**
      * Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin
      *
      * @param x x coordinate
      * @param y y coordinate
      */
-    public ArcTan2Vertex(DoubleVertex x, DoubleVertex y) {
+    @ExportVertexToPythonBindings
+    public ArcTan2Vertex(@LoadParentVertex(X_NAME) DoubleVertex x,
+                         @LoadParentVertex(Y_NAME) DoubleVertex y) {
         super(x, y);
+    }
+
+    @SaveParentVertex(X_NAME)
+    public DoubleVertex getX() {
+        return super.getLeft();
+    }
+
+    @SaveParentVertex(Y_NAME)
+    public DoubleVertex getY() {
+        return super.getRight();
     }
 
     @Override
