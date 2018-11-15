@@ -176,7 +176,6 @@ public class ProtobufReader implements NetworkReader {
 
         Map<String, Vertex> parentsMap = getParentsMap(vertex, existingVertices);
 
-
         return instantiateVertex(vertexClass, parentsMap, vertex.getConstantValue());
     }
 
@@ -193,16 +192,21 @@ public class ProtobufReader implements NetworkReader {
             LoadVertexValue vertexValueAnnotation = parameters[i].getAnnotation(LoadVertexValue.class);
 
             if (parentVertexAnnotation != null) {
-                arguments[i] = parentsMap.get(parentVertexAnnotation.value());
+                Vertex parentVertex = parentsMap.get(parentVertexAnnotation.value());
+                if (parentVertex == null) {
+                    throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
+                        + parentVertexAnnotation.value());
+                }
+                arguments[i] = parentVertex;
             } else if (vertexValueAnnotation != null) {
-                arguments[i] = extractInitialValue(value);
-            }
-        }
-
-        for (Object argument: arguments) {
-            if (argument == null) {
-                throw new IllegalArgumentException("Unable to create Vertex of class: " + vertexClass + " from Value: "
-                    + value + " with parents: " + parentsMap);
+                Tensor initialValue = extractInitialValue(value);
+                if (initialValue == null) {
+                    throw new IllegalArgumentException("Failed to create vertex as required initial value not present: "
+                        + value);
+                }
+                arguments[i] = initialValue;
+            } else {
+                throw new IllegalArgumentException("Cannot create Vertex due to unknown parameter in constructor");
             }
         }
 
@@ -252,7 +256,7 @@ public class ProtobufReader implements NetworkReader {
         for (KeanuSavedBayesNet.NamedParent namedParent : vertex.getParentsList()) {
             Vertex existingParent = existingVertices.get(namedParent.getId());
             if (existingParent == null) {
-                throw new IllegalArgumentException("Invalid Parent Specified: " + namedParent);
+                throw new IllegalArgumentException("Parent named in vertex hasn't been instantiated: " + namedParent);
             }
 
             parentsMap.put(namedParent.getName(), existingParent);

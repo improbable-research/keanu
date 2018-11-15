@@ -1,5 +1,7 @@
 package io.improbable.keanu.network;
 
+import com.google.common.primitives.Longs;
+import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.LoadVertexValue;
@@ -7,9 +9,12 @@ import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.hamcrest.collection.IsEmptyCollection;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.reflections.Reflections;
 
 import java.io.ByteArrayInputStream;
@@ -38,6 +43,9 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public class ProtobufTest {
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void youCanSaveAndLoadANetworkWithValues() throws IOException {
         DoubleVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
@@ -59,6 +67,43 @@ public class ProtobufTest {
         assertThat(readGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         readGaussianVertex.sample();
 
+    }
+
+    @Test
+    public void loadFailsIfParentsAreMissing() throws IOException {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Failed to create vertex due to missing parent: sigma");
+
+        KeanuSavedBayesNet.Vertex muVertex = KeanuSavedBayesNet.Vertex.newBuilder()
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+            .setLabel("MU VERTEX")
+            .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
+            .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
+                .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+                    .addAllShape(Longs.asList(1, 1)).addValues(1.0).build()
+                ).build())
+            .build();
+
+        KeanuSavedBayesNet.Vertex gaussianVertex = KeanuSavedBayesNet.Vertex.newBuilder()
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("2"))
+            .setLabel("GAUSSIAN VERTEX")
+            .setVertexType(GaussianVertex.class.getCanonicalName())
+            .addParents(KeanuSavedBayesNet.NamedParent.newBuilder()
+                .setName("mu")
+                .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1").build())
+                .build()
+            )
+            .build();
+
+        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+            .addVertices(muVertex)
+            .addVertices(gaussianVertex).build();
+
+        ByteArrayOutputStream saveStream = new ByteArrayOutputStream();
+        savedNet.writeTo(saveStream);
+
+        ProtobufReader reader = new ProtobufReader();
+        BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(saveStream.toByteArray()));
     }
 
     @Test
