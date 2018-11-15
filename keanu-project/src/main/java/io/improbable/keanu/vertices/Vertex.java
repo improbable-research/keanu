@@ -3,13 +3,17 @@ package io.improbable.keanu.vertices;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.util.dot.GraphEdge;
+import io.improbable.keanu.util.dot.VertexDotLabel;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -252,10 +256,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     }
 
     public void save(NetworkWriter netWriter) {
-        if (!(this instanceof SaveableVertex)) {
-            throw new IllegalArgumentException("Trying to save a vertex that isn't Saveable");
-        }
-
         netWriter.save(this);
     }
 
@@ -265,5 +265,31 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
 
     public void loadValue(NetworkReader reader) {
         throw new UnsupportedOperationException("TODO: Refactor");
+    }
+
+    /**
+     * @return a DOT format label for this vertex, containing information such as vertex class name, display name and vertex label.
+     */
+    public VertexDotLabel getDotLabel() {
+        VertexDotLabel vertexDotLabel = new VertexDotLabel(this);
+        if (this.getLabel() != null) {
+            vertexDotLabel.setDotLabel(VertexDotLabel.VertexDotLabelType.VERTEX_LABEL, this.getLabel().getUnqualifiedName());
+        }
+        DisplayInformationForOutput vertexAnnotation = this.getClass().getAnnotation(DisplayInformationForOutput.class);
+        if (vertexAnnotation != null && !vertexAnnotation.displayName().isEmpty()) {
+            vertexDotLabel.setDotLabel(VertexDotLabel.VertexDotLabelType.ANNOTATION_LABEL, vertexAnnotation.displayName());
+        }
+        return vertexDotLabel;
+    }
+
+    /**
+     * @return a set of graph edges containing information about connected vertices.
+     */
+    public Set<GraphEdge> getParentEdgesInDotFormat() {
+        Set<GraphEdge> edges = new HashSet<>();
+        for (Vertex v : this.getParents()) {
+            edges.add(new GraphEdge(v, this));
+        }
+        return edges;
     }
 }

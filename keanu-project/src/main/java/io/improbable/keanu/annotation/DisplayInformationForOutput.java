@@ -9,5 +9,4 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DisplayInformationForOutput {
     String displayName() default "";
-    boolean displayHyperparameterInfo() default false;
 }

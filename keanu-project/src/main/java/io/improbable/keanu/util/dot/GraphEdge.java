@@ -3,9 +3,9 @@ package io.improbable.keanu.util.dot;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Class representing a graph edge.
@@ -14,7 +14,7 @@ public class GraphEdge {
 
     private Vertex parentVertex;
     private Vertex childVertex;
-    private List<String> dotLabels = new ArrayList<>();
+    private Set<String> dotLabels = new HashSet<>();
     private static final String DOT_LABEL_OPENING = " [label=";
     private static final String DOT_LABEL_CLOSING = "]";
 
@@ -28,9 +28,19 @@ public class GraphEdge {
         }
     }
 
+    public void appendToDotLabel(Set<String> dotLabel) {
+        dotLabels.addAll(dotLabel);
+    }
+
     public void appendToDotLabel(String dotLabel) {
         dotLabels.add(dotLabel);
     }
+
+    public Set<String> getDotLabels() { return dotLabels;}
+
+    public Vertex getParentVertex() { return parentVertex;}
+
+    public Vertex getChildVertex() { return childVertex;}
 
     // Returns a string representing this edge in a DOT format.
     public String inDotFormat() {

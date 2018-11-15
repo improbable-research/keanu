@@ -12,12 +12,13 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.HashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BayesianNetwork {
 
@@ -219,9 +220,43 @@ public class BayesianNetwork {
         }
     }
 
-    public void saveValues(ProtobufWriter protobufWriter) throws IOException {
+    public void saveValues(NetworkWriter protobufWriter) throws IOException {
         for (Vertex vertex : vertices) {
             vertex.saveValue(protobufWriter);
         }
+    }
+
+    /**
+     * Method for traversing a graph and returning a subgraph of vertices within the given degree of the specified vertex.
+     *
+     * @param vertex vertex that the subgraph will be centered around
+     * @param degree degree of connections from the vertex to be included in the subgraph
+     * @return a set of vertices within the specified degree from the given vertex
+     */
+    public Set<Vertex> getSubgraph(Vertex vertex, int degree) {
+
+        Set<Vertex> subgraphVertices = new HashSet<>();
+        Set<Vertex> verticesToProcessNow = new HashSet<>();
+        verticesToProcessNow.add(vertex);
+
+        int iterationIndex = 0;
+        while (iterationIndex <= degree && !verticesToProcessNow.isEmpty()) {
+
+            Set<Vertex> verticesToProcessNext = new HashSet<>();
+            subgraphVertices.addAll(verticesToProcessNow);
+
+            for (Vertex v : verticesToProcessNow) {
+                Stream<Vertex> connectedVertices = Stream.concat(v.getParents().stream(), v.getChildren().stream());
+                connectedVertices.forEach(connectedVertex -> {
+                    if (!subgraphVertices.contains(connectedVertex)) {
+                        verticesToProcessNext.add(connectedVertex);
+                    }
+                });
+            }
+
+            verticesToProcessNow = verticesToProcessNext;
+            iterationIndex++;
+        }
+        return subgraphVertices;
     }
 }

@@ -1,11 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.util.dot.GraphEdge;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveParentVertex;
@@ -25,7 +25,6 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-@DisplayInformationForOutput(displayHyperparameterInfo = true)
 public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
@@ -137,5 +136,21 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
         } else {
             return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
         }
+    }
+
+    /**
+     * @return a set of parent edges with edges connecting to vertices representing mu and sigma hyperparameters annotated accordingly.
+     */
+    @Override
+    public Set<GraphEdge> getParentEdgesInDotFormat() {
+        Set<GraphEdge> edges = super.getParentEdgesInDotFormat();
+
+        GraphEdge muEdge = new GraphEdge(this, mu);
+        edges.stream().filter(muEdge::equals).findFirst().get().appendToDotLabel("mu");
+
+        GraphEdge sigmaEdge = new GraphEdge(this, sigma);
+        edges.stream().filter(sigmaEdge::equals).findFirst().get().appendToDotLabel("sigma");
+
+        return edges;
     }
 }
