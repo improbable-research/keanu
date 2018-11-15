@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.Collection;
@@ -113,6 +114,14 @@ public class BayesianNetwork {
     private List<Vertex> getObservedVertices(int maxIndentation) {
         return getFilteredVertexList((isProbabilistic, isObserved, indentation) ->
             isObserved && maxIndentation >= indentation);
+    }
+
+    /**
+     * @return a list of all vertices that are not differentiable (i.e., there are points at which they do not have a derivative).
+     */
+    public List<Vertex> getNonDifferentiableVertices() {
+        return vertices.stream().filter(vertex -> !(vertex instanceof Differentiable))
+            .collect(Collectors.toList());
     }
 
     public double getLogOfMasterP() {
