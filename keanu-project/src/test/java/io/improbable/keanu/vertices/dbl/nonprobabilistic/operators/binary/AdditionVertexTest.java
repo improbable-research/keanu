@@ -79,7 +79,7 @@ public class AdditionVertexTest {
     public void changesMatchGradient() {
         DoubleVertex A = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex B = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex C = A.plus(B);
+        AdditionVertex C = A.plus(B);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), C, 1e-6, 1e-10);
     }

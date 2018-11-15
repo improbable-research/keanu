@@ -1,10 +1,12 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.Map;
 
@@ -75,6 +77,7 @@ public class SmoothUniformVertexTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void smoothUniformSampleMethodMatchesLogProbMethod() {
 

@@ -9,6 +9,9 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
@@ -27,13 +30,13 @@ public class DoubleIfVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        DoubleVertex c = a.matrixMultiply(b);
+        MatrixMultiplicationVertex c = a.matrixMultiply(b);
         DoubleVertex d = b.matrixMultiply(a);
 
         DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dCdb = c.getDerivativeWrtLatents().withRespectTo(b);
 
-        DoubleVertex ifVertex = If.isTrue(bool)
+        DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
@@ -57,13 +60,13 @@ public class DoubleIfVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
-        DoubleVertex c = a.times(b);
+        MultiplicationVertex c = a.times(b);
         DoubleVertex d = b.div(a);
 
         DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dCdb = c.getDerivativeWrtLatents().withRespectTo(b);
 
-        DoubleVertex ifVertex = If.isTrue(bool)
+        DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
@@ -91,12 +94,12 @@ public class DoubleIfVertexTest {
         b.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
         DoubleVertex c = a.matrixMultiply(b);
-        DoubleVertex d = b.matrixMultiply(a);
+        MatrixMultiplicationVertex d = b.matrixMultiply(a);
 
         DoubleTensor dDda = d.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dDdb = d.getDerivativeWrtLatents().withRespectTo(b);
 
-        DoubleVertex ifVertex = If.isTrue(bool)
+        DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
@@ -120,13 +123,13 @@ public class DoubleIfVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        DoubleVertex c = a.matrixMultiply(b);
-        DoubleVertex d = b.matrixMultiply(a);
+        MatrixMultiplicationVertex c = a.matrixMultiply(b);
+        MatrixMultiplicationVertex d = b.matrixMultiply(a);
 
         DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dDda = d.getDerivativeWrtLatents().withRespectTo(a);
 
-        DoubleVertex ifVertex = If.isTrue(bool)
+        DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
@@ -157,7 +160,7 @@ public class DoubleIfVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        DoubleVertex c = a.matrixMultiply(b);
+        MatrixMultiplicationVertex c = a.matrixMultiply(b);
 
         DoubleVertex d = new UniformVertex(0, 10);
         d.setValue(DoubleTensor.create(new double[]{9, 10, 11, 12}, 2, 2));
@@ -165,12 +168,12 @@ public class DoubleIfVertexTest {
         DoubleVertex e = new UniformVertex(0, 10);
         e.setValue(DoubleTensor.create(new double[]{13, 14, 15, 16}, 2, 2));
 
-        DoubleVertex f = d.matrixMultiply(e);
+        MatrixMultiplicationVertex f = d.matrixMultiply(e);
 
         DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dFdd = f.getDerivativeWrtLatents().withRespectTo(d);
 
-        DoubleVertex ifVertex = If.isTrue(bool)
+        DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(f);
 
@@ -213,7 +216,7 @@ public class DoubleIfVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.arange(10, 18).reshape(2, 2, 2));
 
-        DoubleVertex c = a.times(b);
+        MultiplicationVertex c = a.times(b);
 
         DoubleVertex d = new UniformVertex(0, 10);
         d.setValue(DoubleTensor.arange(20, 28).reshape(2, 2, 2));
@@ -221,12 +224,12 @@ public class DoubleIfVertexTest {
         DoubleVertex e = new UniformVertex(0, 10);
         e.setValue(DoubleTensor.arange(30, 38).reshape(2, 2, 2));
 
-        DoubleVertex f = d.plus(e);
+        AdditionVertex f = d.plus(e);
 
         DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dFdd = f.getDerivativeWrtLatents().withRespectTo(d);
 
-        DoubleVertex ifVertex = If.isTrue(bool)
+        DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(f);
 
