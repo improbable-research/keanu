@@ -679,7 +679,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
         }
 
-        System.out.println(stepsize);
         return stepsize;
     }
 
@@ -723,13 +722,9 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             autoTune.averageAcceptanceProb = updatedAverageAcceptanceProb;
             autoTune.logStepSize = updatedLogStepSize;
 
-            double stepSize = Math.exp(autoTune.logStepSize);
-            System.out.println(stepSize + " - " + Math.exp(autoTune.logStepSizeFrozen));
-
-            return stepSize;
+            return Math.exp(autoTune.logStepSize);
         } else {
 
-//            System.out.println(Math.exp(autoTune.logStepSizeFrozen));
             return Math.exp(autoTune.logStepSizeFrozen);
         }
     }

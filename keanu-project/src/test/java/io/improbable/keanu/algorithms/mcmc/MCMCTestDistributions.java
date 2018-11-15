@@ -44,7 +44,7 @@ public class MCMCTestDistributions {
         }
     }
 
-    public static BayesianNetwork createSumOfGaussianDistribution(double mu, double sigma, double observedSum) {
+    public static BayesianNetwork createSumOfGaussianDistribution(double mu, double sigma, double observedSum, double initialValue) {
 
         GaussianVertex A = new GaussianVertex(mu, sigma);
         GaussianVertex B = new GaussianVertex(mu, sigma);
@@ -52,8 +52,8 @@ public class MCMCTestDistributions {
         GaussianVertex C = new GaussianVertex(A.plus(B), 1.0);
         C.observe(observedSum);
 
-        A.setValue(mu);
-        B.setAndCascade(mu);
+        A.setValue(initialValue);
+        B.setAndCascade(initialValue);
 
         return new BayesianNetwork(A.getConnectedGraph());
     }
