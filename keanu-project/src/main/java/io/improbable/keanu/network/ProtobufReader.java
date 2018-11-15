@@ -206,7 +206,7 @@ public class ProtobufReader implements NetworkReader {
                 }
                 arguments[i] = initialValue;
             } else {
-                throw new IllegalArgumentException("Cannot create Vertex due to unknown parameter in constructor");
+                throw new IllegalArgumentException("Cannot create Vertex due to unannotated parameter in constructor");
             }
         }
 

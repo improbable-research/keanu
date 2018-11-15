@@ -99,11 +99,31 @@ public class ProtobufTest {
             .addVertices(muVertex)
             .addVertices(gaussianVertex).build();
 
-        ByteArrayOutputStream saveStream = new ByteArrayOutputStream();
-        savedNet.writeTo(saveStream);
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        savedNet.writeTo(writer);
 
         ProtobufReader reader = new ProtobufReader();
-        BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(saveStream.toByteArray()));
+        BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+    }
+
+    @Test
+    public void loadFailsIfNoConstantSpecified() throws IOException {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Failed to create vertex as required initial value not present: ");
+
+        KeanuSavedBayesNet.Vertex constantVertex = KeanuSavedBayesNet.Vertex.newBuilder()
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+            .setLabel("MU VERTEX")
+            .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
+            .build();
+
+        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+            .addVertices(constantVertex).build();
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        savedNet.writeTo(writer);
+        ProtobufReader reader = new ProtobufReader();
+        BayesianNetwork readNet = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
     @Test
