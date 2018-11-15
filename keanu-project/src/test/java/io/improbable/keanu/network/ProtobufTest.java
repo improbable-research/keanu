@@ -210,6 +210,41 @@ public class ProtobufTest {
         BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
+    @Test
+    public void loadFailsIfValueIsWrongType() throws IOException {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Non Double Value specified for Double Vertex");
+
+        KeanuSavedBayesNet.Vertex constantVertex = KeanuSavedBayesNet.Vertex.newBuilder()
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+            .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
+            .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
+                .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+                    .addAllShape(Longs.asList(1, 1)).addValues(1.0).build()
+                ).build())
+            .build();
+
+        KeanuSavedBayesNet.StoredValue constantValue = KeanuSavedBayesNet.StoredValue.newBuilder()
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+            .setValue(KeanuSavedBayesNet.VertexValue.newBuilder()
+                .setIntVal(KeanuSavedBayesNet.IntegerTensor.newBuilder()
+                    .addShape(1).addShape(1)
+                    .addValues(2)
+                    .build()
+                ).build()
+            ).build();
+
+        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+            .addVertices(constantVertex)
+            .addDefaultState(constantValue)
+            .build();
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        savedNet.writeTo(writer);
+        ProtobufReader reader = new ProtobufReader();
+        BayesianNetwork readNet = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+    }
+
     private KeanuSavedBayesNet.BayesianNetwork createBasicNetworkProtobufWithValue(String labelForValue,
                                                                                    String idForValue,
                                                                                    Double valueToStore) {
