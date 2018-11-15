@@ -45,6 +45,10 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public class ProtobufTest {
 
+    private final String GAUSS_LABEL = "GAUSSIAN VERTEX";
+    private final String GAUSS_ID = "1.1";
+    private final Double GAUSS_VALUE = 1.75;
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -177,11 +181,42 @@ public class ProtobufTest {
 
     @Test
     public void canLoadWithLabelRatherThanId() throws IOException {
-        final String GAUSS_LABEL = "GAUSSIAN VERTEX";
-        final Double GAUSS_VALUE = 1.75;
+        KeanuSavedBayesNet.BayesianNetwork savedNet = createBasicNetworkProtobufWithValue(
+            GAUSS_LABEL, GAUSS_ID, GAUSS_VALUE);
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        savedNet.writeTo(writer);
+
+        ProtobufReader reader = new ProtobufReader();
+        BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        GaussianVertex newGauss = (GaussianVertex)net.getVertexByLabel(new VertexLabel(GAUSS_LABEL));
+        assertThat(newGauss.getValue().scalar(), is(GAUSS_VALUE));
+    }
+
+    @Test
+    public void loadFailsWithConflictingVertexInfoInValue() throws IOException {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Label and VertexID don't refer to same Vertex: (sigmaVertex) " +
+            "(id: \"1.1\"\n)");
+
+        KeanuSavedBayesNet.BayesianNetwork savedNet = createBasicNetworkProtobufWithValue(
+            "sigmaVertex", GAUSS_ID, 2.1
+        );
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        savedNet.writeTo(writer);
+
+        ProtobufReader reader = new ProtobufReader();
+        BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+    }
+
+    private KeanuSavedBayesNet.BayesianNetwork createBasicNetworkProtobufWithValue(String labelForValue,
+                                                                                   String idForValue,
+                                                                                   Double valueToStore) {
 
         KeanuSavedBayesNet.Vertex muVertex = KeanuSavedBayesNet.Vertex.newBuilder()
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+            .setLabel("muVertex")
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
             .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
                 .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
@@ -191,6 +226,7 @@ public class ProtobufTest {
 
         KeanuSavedBayesNet.Vertex sigmaVertex = KeanuSavedBayesNet.Vertex.newBuilder()
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("2"))
+            .setLabel("sigmaVertex")
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
             .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
                 .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
@@ -199,7 +235,7 @@ public class ProtobufTest {
             .build();
 
         KeanuSavedBayesNet.Vertex gaussianVertex = KeanuSavedBayesNet.Vertex.newBuilder()
-            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("3"))
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(GAUSS_ID))
             .setLabel(GAUSS_LABEL)
             .setVertexType(GaussianVertex.class.getCanonicalName())
             .addParents(KeanuSavedBayesNet.NamedParent.newBuilder()
@@ -214,11 +250,12 @@ public class ProtobufTest {
             .build();
 
         KeanuSavedBayesNet.StoredValue gaussianValue = KeanuSavedBayesNet.StoredValue.newBuilder()
-            .setVertexLabel(GAUSS_LABEL)
+            .setVertexLabel(labelForValue)
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(idForValue))
             .setValue(KeanuSavedBayesNet.VertexValue.newBuilder()
                 .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
                     .addShape(1).addShape(1)
-                    .addValues(GAUSS_VALUE)
+                    .addValues(valueToStore)
                     .build()
                 ).build()
             ).build();
@@ -230,13 +267,7 @@ public class ProtobufTest {
             .addDefaultState(gaussianValue)
             .build();
 
-        ByteArrayOutputStream writer = new ByteArrayOutputStream();
-        savedNet.writeTo(writer);
-
-        ProtobufReader reader = new ProtobufReader();
-        BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
-        GaussianVertex newGauss = (GaussianVertex)net.getVertexByLabel(new VertexLabel(GAUSS_LABEL));
-        assertThat(newGauss.getValue().scalar(), is(GAUSS_VALUE));
+        return savedNet;
     }
 
     @Test

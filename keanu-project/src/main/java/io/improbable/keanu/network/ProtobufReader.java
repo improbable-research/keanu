@@ -116,7 +116,7 @@ public class ProtobufReader implements NetworkReader {
             if (idTarget != labelTarget) {
                 throw new IllegalArgumentException("Label and VertexID don't refer to same Vertex: ("
                         + storedValue.getVertexLabel() + ") ("
-                        + storedValue.getId() + ")");
+                        + storedValue.getId().toString() + ")");
             } else {
                 targetVertex = idTarget;
             }
