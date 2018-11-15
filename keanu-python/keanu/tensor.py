@@ -1,3 +1,6 @@
+import numpy as np
+from py4j.java_gateway import java_import
+
 from keanu.base import JavaObjectWrapper
 from keanu.vartypes import (
     tensor_arg_types,
@@ -5,7 +8,6 @@ from keanu.vartypes import (
     runtime_numpy_types,
     runtime_pandas_types
 )
-from py4j.java_gateway import java_import
 from typing import Callable
 
 k = KeanuContext()
