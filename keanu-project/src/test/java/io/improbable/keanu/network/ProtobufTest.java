@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.hamcrest.collection.IsEmptyCollection;
-import org.hamcrest.core.IsNull;
 import org.junit.Test;
 import org.reflections.Reflections;
 
@@ -18,21 +17,24 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class ProtobufTest {
 
@@ -118,33 +120,42 @@ public class ProtobufTest {
         assertThat("Non-root Class must not have value constructors: " + vertexClass,
             getConstructorsWithAnnotatedParameters(vertexClass, LoadVertexValue.class), IsEmptyCollection.empty());
 
-        Set<String> storedParams = getSavedParams(vertexClass);
-        Set<String> requiredParams = getRequiredParamsAndCheckOnlyUsedOnce(vertexClass);
+        Map<String, Class> storedParams = getSavedParams(vertexClass);
+        Map<String, Class> requiredParams = getRequiredParamsAndCheckOnlyUsedOnce(vertexClass);
 
-        for (String param : requiredParams) {
-            assertThat("Class must save all required params: " + vertexClass, param, isIn(storedParams));
+        for (Map.Entry<String, Class> param : requiredParams.entrySet()) {
+            assertThat("Class must save all required params: " + vertexClass,
+                storedParams, hasKey(param.getKey()));
+            assertThat("Saved and Loaded Param " + param.getKey() + " must have same type",
+                param.getValue() == storedParams.get(param.getKey()));
         }
     }
 
-    private Set<String> getSavedParams(Class<? extends Vertex> vertexClass) {
-        return filterAnnotatedObjects(vertexClass.getMethods(), SaveParentVertex.class).stream()
-            .map(v -> v.getAnnotation(SaveParentVertex.class).value())
-            .collect(Collectors.toSet());
+    private Map<String, Class> getSavedParams(Class<? extends Vertex> vertexClass) {
+        Map<String, Class> savedParams = new HashMap<>();
+
+        for (Method method : filterAnnotatedObjects(vertexClass.getMethods(), SaveParentVertex.class)) {
+            String paramName = method.getAnnotation(SaveParentVertex.class).value();
+            Class paramType = method.getReturnType();
+            savedParams.put(paramName, paramType);
+        }
+
+        return savedParams;
     }
 
-    private Set<String> getRequiredParamsAndCheckOnlyUsedOnce(Class<? extends Vertex> vertexClass) {
+    private Map<String, Class> getRequiredParamsAndCheckOnlyUsedOnce(Class<? extends Vertex> vertexClass) {
         List<Constructor> parentConstructor = getConstructorsWithAnnotatedParameters(vertexClass,
             LoadParentVertex.class);
         assertThat("Need Constructor for Class: " + vertexClass, parentConstructor.size(), is(1));
-        Set<String> requiredParameters = new HashSet<>();
+        Map<String, Class> requiredParameters = new HashMap<>();
 
         for (Parameter parameter : parentConstructor.get(0).getParameters()) {
             LoadParentVertex annotation = parameter.getAnnotation(LoadParentVertex.class);
             assertThat("Annotation has to be present on all params for class: " + vertexClass, annotation,
-                is(IsNull.notNullValue()));
-            assertThat("Annotation can only be used once for class: " + vertexClass, annotation.value(),
-                not(isIn(requiredParameters)));
-            requiredParameters.add(annotation.value());
+                is(notNullValue()));
+            assertThat("Annotation can only be used once for class: " + vertexClass, requiredParameters,
+                not(hasKey(annotation.value())));
+            requiredParameters.put(annotation.value(), parameter.getType());
         }
 
         return requiredParameters;
