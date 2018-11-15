@@ -5,7 +5,7 @@ import numbers
 import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
-from keanu.tensor import Tensor
+from keanu.tensor import _to_ndarray
 from .ops import VertexOps
 from typing import List, Any, Tuple, Iterator, Union
 from keanu.vartypes import (
@@ -17,12 +17,11 @@ from keanu.vartypes import (
     runtime_primitive_types,
     runtime_wrapped_java_types
 )
-
+from abc import ABC, abstractmethod
 
 k = KeanuContext()
 
-
-class Vertex(JavaObjectWrapper, VertexOps):
+class Vertex(JavaObjectWrapper, VertexOps, ABC):
     def __init__(self,
                  val: Any,
                  *args: Union[vertex_param_types, shape_types]) -> None:
@@ -35,20 +34,23 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def __hash__(self) -> int:
         return hash(self.get_id())
 
-    def observe(self, v: tensor_arg_types) -> None:
-        self.unwrap().observe(Tensor(v).unwrap())
+    @abstractmethod
+    def observe(self, v):
+        pass
 
-    def set_value(self, v: tensor_arg_types) -> None:
-        self.unwrap().setValue(Tensor(v).unwrap())
+    @abstractmethod
+    def set_value(self, v):
+        pass
 
-    def set_and_cascade(self, v: tensor_arg_types) -> None:
-        self.unwrap().setAndCascade(Tensor(v).unwrap())
+    @abstractmethod
+    def set_and_cascade(self, v):
+        pass
 
     def sample(self) -> numpy_types:
-        return Tensor._to_ndarray(self.unwrap().sample())
+        return _to_ndarray(self.unwrap().sample())
 
     def get_value(self) -> numpy_types:
-        return Tensor._to_ndarray(self.unwrap().getValue())
+        return _to_ndarray(self.unwrap().getValue())
 
     def get_connected_graph(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
@@ -63,13 +65,18 @@ class Vertex(JavaObjectWrapper, VertexOps):
     @staticmethod
     def __parse_arg(arg: Union[vertex_param_types, shape_types]) -> Any:
         if isinstance(arg, runtime_tensor_arg_types):
-            return kn.vertex.const.Const(arg).unwrap()
+            return const(arg).unwrap()
         elif isinstance(arg, runtime_wrapped_java_types):
             return arg.unwrap()
         elif isinstance(arg, collections.Iterable) and all(isinstance(x, runtime_primitive_types) for x in arg):
             return k.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
+
+    @staticmethod
+    @abstractmethod
+    def const(arg):
+        pass
 
     @staticmethod
     def _to_generator(java_vertices: Any) -> Iterator['Vertex']:
