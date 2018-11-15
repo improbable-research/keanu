@@ -8,3 +8,7 @@ probabilistic predictions about large, complex and multifaceted problems.
 
 This is an early stage, pre-alpha version of Keanu. We have an ambitious team
 attempting to build an even more ambitious product with the help of the open source community.
+
+Want to find out more about our API? Take a look at our python documentation_
+
+.. _documentation: https://improbable-research.github.io/keanu/
