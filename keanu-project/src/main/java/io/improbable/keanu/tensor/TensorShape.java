@@ -20,7 +20,7 @@ public class TensorShape {
         return isScalar(shape);
     }
 
-    public boolean isLengthOne(){
+    public boolean isLengthOne() {
         return isLengthOne(shape);
     }
 
@@ -45,15 +45,11 @@ public class TensorShape {
      * is the product of all ints in shape.
      */
     public static long getLength(long[] shape) {
-        if (shape.length == 0) {
-            return 1;
-        } else {
-            long length = 1;
-            for (long dim : shape) {
-                length *= dim;
-            }
-            return length;
+        long length = 1;
+        for (long dim : shape) {
+            length *= dim;
         }
+        return length;
     }
 
     /**
@@ -203,7 +199,8 @@ public class TensorShape {
     /**
      * It's possible to express negative dimensions, which are relative to the rank of a
      * tensor. E.g. given a rank 3 tensor, dimensions [-1, -2] would refer to the 3 and 2nd dimension.
-     * @param rank the rank that the dimension array is related to
+     *
+     * @param rank       the rank that the dimension array is related to
      * @param dimensions positive dimensions are absolute and negative are relative to the rank
      * @return the dimensions converted to all absolute (positive). This mutates the passed in dimension argument.
      */
@@ -217,14 +214,14 @@ public class TensorShape {
     }
 
     /**
-     * Removes a dimension from a shape, guaranteeing that the resultant shape is at least rank 2. A row vector (1xN) is
-     * returned when removing a dimension would result in lower than rank 2.
+     * Removes a dimension from a shape. This will lower the rank by one.
      *
      * @param dimension the dimension to remove
      * @param shape     the shape to remove the dimension from
      * @return the shape without the given dimension
+     * @throws IllegalArgumentException if the dimension does not exist
      */
-    public static long[] removeDimensionSafe(int dimension, long[] shape) {
+    public static long[] removeDimension(int dimension, long[] shape) {
         TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
         return ArrayUtils.remove(shape, dimension);
     }

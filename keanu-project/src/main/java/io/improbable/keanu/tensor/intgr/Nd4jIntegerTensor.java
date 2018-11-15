@@ -510,7 +510,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public IntegerTensor argMax(int axis) {
         long[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
-        return new Nd4jIntegerTensor(tensor.argMax(axis).reshape(TensorShape.removeDimensionSafe(axis, shape)));
+        return new Nd4jIntegerTensor(tensor.argMax(axis).reshape(TensorShape.removeDimension(axis, shape)));
     }
 
     @Override

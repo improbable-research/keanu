@@ -198,7 +198,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public IntegerTensor argMax(int axis) {
         long[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
-        INDArray max = tensor.argMax(axis).reshape(TensorShape.removeDimensionSafe(axis, shape));
+        INDArray max = tensor.argMax(axis).reshape(TensorShape.removeDimension(axis, shape));
         return new Nd4jIntegerTensor(max);
     }
 
