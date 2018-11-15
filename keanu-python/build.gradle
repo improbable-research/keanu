@@ -1,7 +1,7 @@
 task installPipenv {
     doLast {
         exec {
-            commandLine 'pip', 'install', 'pipenv'
+            commandLine 'pip', 'install', 'pipenv==2018.10.13'
         }
     }
 }
