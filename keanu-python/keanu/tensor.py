@@ -12,7 +12,6 @@ from .vartypes import (
     runtime_float_types,
     runtime_bool_types,
     runtime_primitive_types,
-    runtime_pandas_types,
     runtime_numpy_types,
     runtime_pandas_types,
     runtime_primitive_types
