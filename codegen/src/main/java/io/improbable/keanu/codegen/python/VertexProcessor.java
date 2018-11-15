@@ -7,6 +7,9 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
 import org.reflections.Reflections;
@@ -75,8 +78,9 @@ class VertexProcessor {
             PythonConstructor pythonConstructor = new PythonConstructor(
                 javaClass,
                 toPythonClass(javaClass),
+                toCast(constructor.getDeclaringClass()),
                 toTypedPythonParams(pythonParameters, parameterTypes),
-                String.join(", ", pythonParameters),
+                toCastedPythonParams(pythonParameters, parameterTypes),
                 docString.getAsString()
             );
 
@@ -86,6 +90,37 @@ class VertexProcessor {
         root.put("exportedMethods", exportedMethodsJoiner.toString());
 
         return root;
+    }
+
+    private static String toCast(Class<?> aClass) {
+        if (DoubleVertex.class.isAssignableFrom(aClass)) {
+            return "Double";
+        } else if (IntegerVertex.class.isAssignableFrom(aClass)) {
+            return "Integer";
+        } else if (BoolVertex.class.isAssignableFrom(aClass)) {
+            return "Bool";
+        } else {
+            throw new NotImplementedException(aClass.getCanonicalName());
+        }
+    }
+
+    private static String toCastedPythonParams(String[] pythonParameters, Class<?>[] parameterTypes) {
+        String[] pythonParams = new String[pythonParameters.length];
+
+        for (int i = 0; i < pythonParameters.length; i++) {
+            pythonParams[i] = toCastedPythonParam(pythonParameters[i], parameterTypes[i]);
+        }
+
+        return String.join(", ", pythonParams);
+    }
+
+    private static String toCastedPythonParam(String pythonParameter, Class<?> parameterType) {
+        try {
+            String cast = toCast(parameterType);
+            return cast + "(" + pythonParameter + ")";
+        } catch (NotImplementedException e){
+            return pythonParameter;
+        }
     }
 
     private static String toTypedPythonParams(String[] pythonParameters, Class<?>[] parameterTypes) {
@@ -138,15 +173,18 @@ class VertexProcessor {
         @Getter
         private String pythonClass;
         @Getter
+        private String pythonVertexClass;
+        @Getter
         private String pythonTypedParameters;
         @Getter
         private String pythonParameters;
         @Getter
         private String docString;
 
-        PythonConstructor(String javaClass, String pythonClass, String pythonTypedParameters, String pythonParameters, String docString) {
+        PythonConstructor(String javaClass, String pythonClass, String pythonVertexClass, String pythonTypedParameters, String pythonParameters, String docString) {
             this.javaClass = javaClass;
             this.pythonClass = pythonClass;
+            this.pythonVertexClass = pythonVertexClass;
             this.pythonTypedParameters = pythonTypedParameters;
             this.pythonParameters = pythonParameters;
             this.docString = docString;

@@ -2,13 +2,20 @@ import numpy as np
 from py4j.java_gateway import java_import
 
 from keanu.base import JavaObjectWrapper
-from keanu.vartypes import (
+from typing import Callable, Any
+from keanu.context import KeanuContext
+from .vartypes import (
+    numpy_types,
     tensor_arg_types,
+    primitive_types,
+    runtime_int_types,
+    runtime_float_types,
+    runtime_bool_types,
     runtime_primitive_types,
     runtime_numpy_types,
-    runtime_pandas_types
+    runtime_pandas_types,
+    runtime_primitive_types
 )
-from typing import Callable
 
 k = KeanuContext()
 
@@ -16,54 +23,91 @@ java_import(k.jvm_view(), "io.improbable.keanu.tensor.dbl.DoubleTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
-def cast_double(arg: tensor_arg_types) -> __Tensor:
+
+class Tensor(JavaObjectWrapper):
+    def __init__(self, t: tensor_arg_types) -> None:
+        if isinstance(t, runtime_numpy_types):
+            super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t))
+        elif isinstance(t, runtime_pandas_types):
+            super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t.values))
+        elif isinstance(t, runtime_primitive_types):
+            super(Tensor, self).__init__(Tensor.__get_tensor_from_scalar(t))
+        else:
+            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(t)))
+
+    @staticmethod
+    def __get_tensor_from_ndarray(ndarray: numpy_types) -> Any:
+        normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(ndarray)
+
+        ctor = Tensor.__infer_tensor_ctor_from_ndarray(normalized_ndarray)
+        values = k.to_java_array(normalized_ndarray.flatten().tolist())
+        shape = k.to_java_long_array(normalized_ndarray.shape)
+
+        return ctor(values, shape)
+
+    @staticmethod
+    def __ensure_rank_is_atleast_two(ndarray: numpy_types) -> numpy_types:
+        if len(ndarray.shape) == 1:
+            return ndarray[..., None]
+        else:
+            return ndarray
+
+    @staticmethod
+    def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> Any:
+        if len(ndarray) == 0:
+            raise ValueError("Cannot infer type because the ndarray is empty")
+
+        if isinstance(ndarray.item(0), runtime_bool_types):
+            return k.jvm_view().BooleanTensor.create
+        elif isinstance(ndarray.item(0), runtime_int_types):
+            return k.jvm_view().IntegerTensor.create
+        elif isinstance(ndarray.item(0), runtime_float_types):
+            return k.jvm_view().DoubleTensor.create
+        else:
+            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(ndarray.item(0))))
+
+    @staticmethod
+    def __get_tensor_from_scalar(scalar: primitive_types) -> Any:
+        if isinstance(scalar, runtime_bool_types):
+            return k.jvm_view().BooleanTensor.scalar(bool(scalar))
+        elif isinstance(scalar, runtime_int_types):
+            return k.jvm_view().IntegerTensor.scalar(int(scalar))
+        elif isinstance(scalar, runtime_float_types):
+            return k.jvm_view().DoubleTensor.scalar(float(scalar))
+        else:
+            raise NotImplementedError("Generic types in a ndarray are not supported. Was given {}".format(type(scalar)))
+
+    @staticmethod
+    def _to_ndarray(java_tensor: Any) -> numpy_types:
+        np_array = np.array(list(java_tensor.asFlatArray()))
+        return np_array.reshape(java_tensor.getShape())
+
+def cast_double(arg: tensor_arg_types) -> Tensor:
     if isinstance(arg, runtime_primitive_types):
-        return __Tensor(k.jvm_view().DoubleTensor.scalar(float(arg))
+        return Tensor(float(arg))
     elif isinstance(arg, runtime_numpy_types):
-        return __Tensor(__get_java_tensor(k.jvm_view().DoubleTensor.create, arg.astype(float))
+        return Tensor(arg.astype(float))
     elif isinstance(arg, runtime_pandas_types):
-        return __Tensor(__get_java_tensor(k.jvm_View().DoubleTensor.create, arg.values.astype(float))
+        return Tensor(arg.values.astype(float))
     else:
         raise NotImplementedError
 
-def cast_integer(arg: tensor_arg_types) -> __Tensor:
+def cast_integer(arg: tensor_arg_types) -> Tensor:
     if isinstance(arg, runtime_primitive_types):
-        return __Tensor(k.jvm_view().IntegerTensor.scalar(int(arg))
+        return Tensor(int(arg))
     elif isinstance(arg, runtime_numpy_types):
-        return __Tensor(__get_java_tensor(k.jvm_view().IntegerTensor.create, arg.astype(int))
+        return Tensor(arg.astype(int))
     elif isinstance(arg, runtime_pandas_types):
-        return __Tensor(__get_java_tensor(k.jvm_View().IntegerTensor.create, arg.values.astype(int))
+        return Tensor(arg.values.astype(int))
     else:
         raise NotImplementedError
 
-def cast_bool(arg: tensor_arg_types) -> __Tensor:
+def cast_bool(arg: tensor_arg_types) -> Tensor:
     if isinstance(arg, runtime_primitive_types):
-        return __Tensor(k.jvm_view().BooleanTensor.scalar(bool(arg))
+        return Tensor(bool(arg))
     elif isinstance(arg, runtime_numpy_types):
-        return __Tensor(__get_java_tensor(k.jvm_view().BooleanTensor.create, arg.astype(bool))
+        return Tensor(arg.astype(bool))
     elif isinstance(arg, runtime_pandas_types):
-        return __Tensor(__get_java_tensor(k.jvm_View().BooleanTensor.create, arg.values.astype(bool))
+        return Tensor(arg.values.astype(bool))
     else:
         raise NotImplementedError
-
-def _to_ndarray(java_tensor: Any) -> numpy_types:
-    np_array = np.array(list(java_tensor.asFlatArray()))
-    return np_array.reshape(java_tensor.getShape())
-
-def __ensure_rank_is_atleast_two(ndarray: numpy_types) -> numpy_types:
-    if len(ndarray.shape) == 1:
-        return ndarray[..., None]
-    else:
-        return ndarray
-
-def __get_java_tensor(ctor: Callable, ndarray: numpy_types) -> Any:
-    normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(ndarray)
-
-    values = k.to_java_array(normalized_ndarray.flatten().tolist())
-    shape = k.to_java_long_array(normalized_ndarray.shape)
-
-    return ctor(values, shape)
-
-class __Tensor(JavaObjectWrapper):
-    def __init__(self, java_tensor):
-        super(__Tensor, self).__init__(java_tensor)
