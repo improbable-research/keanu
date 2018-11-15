@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.LoadVertexValue;
 import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.instanceOf;
@@ -48,7 +50,9 @@ public class ProtobufTest {
 
     @Test
     public void youCanSaveAndLoadANetworkWithValues() throws IOException {
+        final String gaussianLabel = "Gaussian";
         DoubleVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
+        gaussianVertex.setLabel(gaussianLabel);
         BayesianNetwork net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
@@ -62,10 +66,12 @@ public class ProtobufTest {
 
         assertThat(readNet.getLatentVertices().size(), is(1));
         assertThat(readNet.getLatentVertices().get(0), instanceOf(GaussianVertex.class));
-        GaussianVertex readGaussianVertex = (GaussianVertex)readNet.getLatentVertices().get(0);
-        assertThat(readGaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
-        assertThat(readGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
-        readGaussianVertex.sample();
+        GaussianVertex latentGaussianVertex = (GaussianVertex)readNet.getLatentVertices().get(0);
+        GaussianVertex labelGaussianVerted = (GaussianVertex)readNet.getVertexByLabel(new VertexLabel(gaussianLabel));
+        assertThat(latentGaussianVertex, equalTo(labelGaussianVerted));
+        assertThat(latentGaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
+        assertThat(latentGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
+        latentGaussianVertex.sample();
 
     }
 
@@ -167,6 +173,70 @@ public class ProtobufTest {
         savedNet.writeTo(writer);
         ProtobufReader reader = new ProtobufReader();
         BayesianNetwork readNet = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+    }
+
+    @Test
+    public void canLoadWithLabelRatherThanId() throws IOException {
+        final String GAUSS_LABEL = "GAUSSIAN VERTEX";
+        final Double GAUSS_VALUE = 1.75;
+
+        KeanuSavedBayesNet.Vertex muVertex = KeanuSavedBayesNet.Vertex.newBuilder()
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+            .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
+            .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
+                .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+                    .addAllShape(Longs.asList(1, 1)).addValues(1.0).build()
+                ).build())
+            .build();
+
+        KeanuSavedBayesNet.Vertex sigmaVertex = KeanuSavedBayesNet.Vertex.newBuilder()
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("2"))
+            .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
+            .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
+                .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+                    .addAllShape(Longs.asList(1, 1)).addValues(2.0).build()
+                ).build())
+            .build();
+
+        KeanuSavedBayesNet.Vertex gaussianVertex = KeanuSavedBayesNet.Vertex.newBuilder()
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("3"))
+            .setLabel(GAUSS_LABEL)
+            .setVertexType(GaussianVertex.class.getCanonicalName())
+            .addParents(KeanuSavedBayesNet.NamedParent.newBuilder()
+                .setName("mu")
+                .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1").build())
+                .build()
+            ).addParents(KeanuSavedBayesNet.NamedParent.newBuilder()
+                .setName("sigma")
+                .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("2").build())
+                .build()
+            )
+            .build();
+
+        KeanuSavedBayesNet.StoredValue gaussianValue = KeanuSavedBayesNet.StoredValue.newBuilder()
+            .setVertexLabel(GAUSS_LABEL)
+            .setValue(KeanuSavedBayesNet.VertexValue.newBuilder()
+                .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+                    .addShape(1).addShape(1)
+                    .addValues(GAUSS_VALUE)
+                    .build()
+                ).build()
+            ).build();
+
+        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+            .addVertices(muVertex)
+            .addVertices(sigmaVertex)
+            .addVertices(gaussianVertex)
+            .addDefaultState(gaussianValue)
+            .build();
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        savedNet.writeTo(writer);
+
+        ProtobufReader reader = new ProtobufReader();
+        BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        GaussianVertex newGauss = (GaussianVertex)net.getVertexByLabel(new VertexLabel(GAUSS_LABEL));
+        assertThat(newGauss.getValue().scalar(), is(GAUSS_VALUE));
     }
 
     @Test

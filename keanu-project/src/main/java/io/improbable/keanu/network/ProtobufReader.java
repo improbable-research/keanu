@@ -175,8 +175,13 @@ public class ProtobufReader implements NetworkReader {
         }
 
         Map<String, Vertex> parentsMap = getParentsMap(vertex, existingVertices);
+        Vertex newVertex = instantiateVertex(vertexClass, parentsMap, vertex.getConstantValue());
 
-        return instantiateVertex(vertexClass, parentsMap, vertex.getConstantValue());
+        if (!vertex.getLabel().isEmpty()) {
+            newVertex.setLabel(vertex.getLabel());
+        }
+
+        return newVertex;
     }
 
     private Vertex instantiateVertex(Class vertexClass,
