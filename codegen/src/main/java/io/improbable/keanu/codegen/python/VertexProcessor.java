@@ -75,7 +75,7 @@ class VertexProcessor {
             PythonConstructor pythonConstructor = new PythonConstructor(
                 javaClass,
                 toPythonClass(javaClass),
-                toPythonParams(pythonParameters, parameterTypes),
+                toTypedPythonParams(pythonParameters, parameterTypes),
                 String.join(", ", pythonParameters),
                 docString.getAsString()
             );
@@ -88,17 +88,17 @@ class VertexProcessor {
         return root;
     }
 
-    private static String toPythonParams(String[] pythonParameters, Class<?>[] parameterTypes) {
+    private static String toTypedPythonParams(String[] pythonParameters, Class<?>[] parameterTypes) {
         String[] pythonParams = new String[pythonParameters.length];
 
         for (int i = 0; i < pythonParameters.length; i++) {
-            pythonParams[i] = pythonParameters[i] + ": " + toPythonParam(parameterTypes[i]);
+            pythonParams[i] = pythonParameters[i] + ": " + toTypedPythonParam(parameterTypes[i]);
         }
 
         return String.join(", ", pythonParams);
     }
 
-    private static String toPythonParam(Class<?> parameterType) {
+    private static String toTypedPythonParam(Class<?> parameterType) {
         if (Vertex.class.isAssignableFrom(parameterType)) {
             return "vertex_param_types";
         } else if (DoubleTensor.class.isAssignableFrom(parameterType) ||
