@@ -14,7 +14,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
@@ -23,9 +23,9 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
     public MultinomialVertex(long[] tensorShape, IntegerVertex n, DoubleVertex p) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, n.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, n.getShape());
         long[] pShapeExcludingFirstDimension = ArrayUtils.remove(p.getShape(), 0);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, pShapeExcludingFirstDimension);
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, pShapeExcludingFirstDimension);
 
         this.p = p;
         this.n = n;

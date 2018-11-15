@@ -38,21 +38,21 @@ public class ProbabilisticVertexShapingTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsShapeNotMatchingParent() {
-        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(new long[]{2, 4}, twoByTwo1, scalar1);
+        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(new long[]{2, 4}, twoByTwo1, scalar1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsMoreThanSingleNonScalarParent() {
-        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(new long[]{2, 2}, twoByTwo1, twoByThree);
+        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(new long[]{2, 2}, twoByTwo1, twoByThree);
     }
 
     @Test
     public void acceptsMatchingParentsShape() {
-        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(new long[]{2, 2}, twoByTwo1, scalar1);
+        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(new long[]{2, 2}, twoByTwo1, scalar1);
     }
 
     @Test
     public void acceptsNonScalarToScalarParentShape() {
-        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(new long[]{2, 4}, scalar2, scalar1);
+        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(new long[]{2, 4}, scalar2, scalar1);
     }
 }

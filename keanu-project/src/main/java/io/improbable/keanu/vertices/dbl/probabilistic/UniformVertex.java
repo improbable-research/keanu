@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static java.util.Collections.singletonMap;
 
 public class UniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
@@ -34,7 +34,7 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
      */
     public UniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;

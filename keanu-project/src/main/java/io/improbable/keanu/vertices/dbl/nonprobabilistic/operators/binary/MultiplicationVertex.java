@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.broadcastOutputShape;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
 
 public class MultiplicationVertex extends DoubleBinaryOpVertex {
 
@@ -21,7 +21,7 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
      */
     @ExportVertexToPythonBindings
     public MultiplicationVertex(DoubleVertex left, DoubleVertex right) {
-        super(broadcastOutputShape(left.getShape(), right.getShape()), left, right);
+        super(checkHasOneNonSingularShapeOrAllSingular(left.getShape(), right.getShape()), left, right);
     }
 
     @Override

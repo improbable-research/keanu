@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.broadcastOutputShape;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
 
 
 public class DifferenceVertex extends DoubleBinaryOpVertex {
@@ -23,7 +23,7 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
      */
     @ExportVertexToPythonBindings
     public DifferenceVertex(DoubleVertex left, DoubleVertex right) {
-        super(broadcastOutputShape(left.getShape(), right.getShape()), left, right);
+        super(checkHasOneNonSingularShapeOrAllSingular(left.getShape(), right.getShape()), left, right);
     }
 
     @Override
@@ -36,7 +36,8 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
         return dLeftWrtInputs.subtract(dRightWrtInputs,
             TensorShape.isLengthOne(left.getShape()),
             TensorShape.isLengthOne(right.getShape()),
-            getShape());
+            getShape()
+        );
     }
 
     @Override

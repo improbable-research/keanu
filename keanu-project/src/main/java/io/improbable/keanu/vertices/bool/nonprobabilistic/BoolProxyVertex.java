@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVertex>, NonProbabilistic<BooleanTensor> {
 
@@ -40,7 +40,7 @@ public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVerte
 
     @Override
     public void setParent(BoolVertex newParent) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(getShape(), newParent.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(getShape(), newParent.getShape());
         setParents(newParent);
     }
 

@@ -30,6 +30,12 @@ public class TensorShapeValidationTest {
         assertArrayEquals(Tensor.SCALAR_SHAPE, shapeProposal);
     }
 
+    @Test
+    public void suggestHighestRankLengthOne() {
+        long[] shapeProposal = TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular(new long[]{1, 1}, new long[]{1, 1, 1}, new long[]{1});
+        assertArrayEquals(new long[]{1, 1, 1}, shapeProposal);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void rejectsMultipleNonScalars() {
         TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular(scalar1, twoByThree, twoByTwo1);
@@ -37,22 +43,22 @@ public class TensorShapeValidationTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsShapeNotMatchingParent() {
-        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(new long[]{2, 4}, twoByTwo1, scalar1);
+        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(new long[]{2, 4}, twoByTwo1, scalar1);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsMoreThanSingleNonScalarParent() {
-        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(new long[]{2, 2}, twoByTwo1, twoByThree);
+        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(new long[]{2, 2}, twoByTwo1, twoByThree);
     }
 
     @Test
     public void acceptsMatchingParentsShape() {
-        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(new long[]{2, 2}, twoByTwo1, scalar1);
+        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(new long[]{2, 2}, twoByTwo1, scalar1);
     }
 
     @Test
     public void acceptsNonScalarToScalarParentShape() {
-        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(new long[]{2, 4}, scalar2, scalar1);
+        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(new long[]{2, 4}, scalar2, scalar1);
     }
 
     @Test

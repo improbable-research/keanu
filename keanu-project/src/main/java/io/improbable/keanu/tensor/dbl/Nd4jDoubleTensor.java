@@ -40,6 +40,10 @@ import static com.google.common.primitives.Ints.checkedCast;
 import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 import static java.util.Arrays.copyOf;
 
+/**
+ * Class for representing n-dimensional arrays of doubles. This is
+ * backed by Nd4j.
+ */
 public class Nd4jDoubleTensor implements DoubleTensor {
 
     private static final DataBuffer.Type BUFFER_TYPE = DataBuffer.Type.DOUBLE;

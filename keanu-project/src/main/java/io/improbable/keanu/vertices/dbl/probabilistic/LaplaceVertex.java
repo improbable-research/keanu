@@ -18,7 +18,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.BETA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class LaplaceVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -36,7 +36,7 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
      */
     public LaplaceVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex beta) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), beta.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), beta.getShape());
 
         this.mu = mu;
         this.beta = beta;

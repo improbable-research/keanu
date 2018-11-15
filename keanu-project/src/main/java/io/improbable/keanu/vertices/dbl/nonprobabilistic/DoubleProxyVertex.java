@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.Collections;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class DoubleProxyVertex extends DoubleVertex implements Differentiable, ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
 
@@ -46,7 +46,7 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
 
     @Override
     public void setParent(DoubleVertex newParent) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(getShape(), newParent.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(getShape(), newParent.getShape());
         setParents(newParent);
     }
 

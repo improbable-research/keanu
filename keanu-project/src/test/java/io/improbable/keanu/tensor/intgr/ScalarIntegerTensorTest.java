@@ -20,7 +20,7 @@ public class ScalarIntegerTensorTest {
     }
 
     @Test
-    public void canArgFindMaxOfScalar() {
+    public void canArgFindMaxOfOneByOne() {
         IntegerTensor tensor = IntegerTensor.scalar(1).reshape(1, 1);
 
         assertEquals(0, tensor.argMax());

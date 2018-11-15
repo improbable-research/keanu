@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
@@ -28,6 +29,10 @@ import java.util.function.Function;
 import static com.google.common.primitives.Ints.checkedCast;
 import static java.util.Arrays.copyOf;
 
+/**
+ * Class for representing n-dimensional arrays of integers. This is
+ * backed by Nd4j which actually stores the int as a double.
+ */
 public class Nd4jIntegerTensor implements IntegerTensor {
 
     private static final DataBuffer.Type BUFFER_TYPE = DataBuffer.Type.DOUBLE;
@@ -35,9 +40,17 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     public Nd4jIntegerTensor(int[] data, long[] shape) {
         this(TypedINDArrayFactory.create(
-            Arrays.stream(data).asDoubleStream().toArray(),
+            toDoubles(data),
             shape, BUFFER_TYPE)
         );
+    }
+
+    private static double[] toDoubles(int[] ints) {
+        double[] doubles = new double[ints.length];
+        for (int i = 0; i < ints.length; i++) {
+            doubles[i] = Ints.checkedCast(ints[i]);
+        }
+        return doubles;
     }
 
     public Nd4jIntegerTensor(INDArray tensor) {

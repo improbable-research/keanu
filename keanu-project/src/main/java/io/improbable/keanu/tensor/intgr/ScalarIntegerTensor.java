@@ -107,7 +107,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor sum(int... overDimensions) {
-        overDimensions = TensorShape.dimensionCorrection(shape.length, overDimensions);
+        overDimensions = TensorShape.getAbsoluteDimensions(shape.length, overDimensions);
         long[] summedShape = ArrayUtils.removeAll(shape, overDimensions);
         return new ScalarIntegerTensor(value, summedShape);
     }

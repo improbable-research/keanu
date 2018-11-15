@@ -200,7 +200,14 @@ public class TensorShape {
         return newShape;
     }
 
-    public static int[] dimensionCorrection(int rank, int[] dimensions) {
+    /**
+     * It's possible to express negative dimensions, which are relative to the rank of a
+     * tensor. E.g. given a rank 3 tensor, dimensions [-1, -2] would refer to the 3 and 2nd dimension.
+     * @param rank the rank that the dimension array is related to
+     * @param dimensions positive dimensions are absolute and negative are relative to the rank
+     * @return the dimensions converted to all absolute (positive). This mutates the passed in dimension argument.
+     */
+    public static int[] getAbsoluteDimensions(int rank, int[] dimensions) {
         for (int i = 0; i < dimensions.length; i++) {
             if (dimensions[i] < 0) {
                 dimensions[i] += rank;

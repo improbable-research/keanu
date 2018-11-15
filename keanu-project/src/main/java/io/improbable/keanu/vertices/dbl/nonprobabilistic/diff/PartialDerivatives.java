@@ -121,10 +121,10 @@ public class PartialDerivatives {
         return add(toAdd, false, false, null);
     }
 
-    public PartialDerivatives add(PartialDerivatives addition, boolean leftIsScalar, boolean rightIsScalar, long[] resultShape) {
+    public PartialDerivatives add(PartialDerivatives addition, boolean leftIsLengthOne, boolean rightIsLengthOne, long[] resultShape) {
 
-        Map<VertexId, DoubleTensor> added = cloneWithCorrectShape(derivativeWithRespectTo, leftIsScalar, resultShape);
-        Map<VertexId, DoubleTensor> toAdd = cloneWithCorrectShape(addition.derivativeWithRespectTo, rightIsScalar, resultShape);
+        Map<VertexId, DoubleTensor> added = cloneWithCorrectShape(derivativeWithRespectTo, leftIsLengthOne, resultShape);
+        Map<VertexId, DoubleTensor> toAdd = cloneWithCorrectShape(addition.derivativeWithRespectTo, rightIsLengthOne, resultShape);
 
         for (Map.Entry<VertexId, DoubleTensor> entry : toAdd.entrySet()) {
             VertexId k = entry.getKey();
@@ -144,10 +144,10 @@ public class PartialDerivatives {
         return subtract(subtraction, false, false, null);
     }
 
-    public PartialDerivatives subtract(PartialDerivatives subtraction, boolean leftIsScalar, boolean rightIsScalar, long[] resultShape) {
+    public PartialDerivatives subtract(PartialDerivatives subtraction, boolean leftIsLengthOne, boolean rightIsLengthOne, long[] resultShape) {
 
-        Map<VertexId, DoubleTensor> subtracted = cloneWithCorrectShape(derivativeWithRespectTo, leftIsScalar, resultShape);
-        Map<VertexId, DoubleTensor> toSubtract = cloneWithCorrectShape(subtraction.derivativeWithRespectTo, rightIsScalar, resultShape);
+        Map<VertexId, DoubleTensor> subtracted = cloneWithCorrectShape(derivativeWithRespectTo, leftIsLengthOne, resultShape);
+        Map<VertexId, DoubleTensor> toSubtract = cloneWithCorrectShape(subtraction.derivativeWithRespectTo, rightIsLengthOne, resultShape);
 
         for (Map.Entry<VertexId, DoubleTensor> entry : toSubtract.entrySet()) {
             VertexId k = entry.getKey();

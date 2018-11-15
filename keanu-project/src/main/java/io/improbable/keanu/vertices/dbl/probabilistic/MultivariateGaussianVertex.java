@@ -45,6 +45,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
         this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
 
+
     /**
      * Matches a mu to a Multivariate Gaussian. The covariance value provided here
      * is used to create a covariance tensor by multiplying the scalar value against

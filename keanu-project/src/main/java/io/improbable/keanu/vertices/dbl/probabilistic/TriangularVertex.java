@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class TriangularVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -33,7 +33,7 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
      */
     public TriangularVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape(), c.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape(), c.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;

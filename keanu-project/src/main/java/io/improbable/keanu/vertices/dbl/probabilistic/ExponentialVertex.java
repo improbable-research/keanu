@@ -18,7 +18,7 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class ExponentialVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -37,7 +37,7 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
      */
     public ExponentialVertex(long[] tensorShape, DoubleVertex rate) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, rate.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, rate.getShape());
 
         this.rate = rate;
         setParents(rate);

@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor> {
 
@@ -31,7 +31,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
      */
     public BernoulliVertex(long[] shape, Vertex<DoubleTensor> probTrue) {
         super(shape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, probTrue.getShape());
         this.probTrue = probTrue;
         setParents(probTrue);
     }

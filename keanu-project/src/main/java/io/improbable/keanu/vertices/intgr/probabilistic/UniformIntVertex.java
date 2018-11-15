@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
@@ -29,7 +29,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
      */
     public UniformIntVertex(long[] shape, IntegerVertex min, IntegerVertex max) {
         super(shape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, min.getShape(), max.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, min.getShape(), max.getShape());
 
         this.min = min;
         this.max = max;

@@ -14,7 +14,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class ChiSquaredVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -30,7 +30,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
      */
     public ChiSquaredVertex(long[] tensorShape, IntegerVertex k) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, k.getShape());
 
         this.k = k;
         setParents(k);

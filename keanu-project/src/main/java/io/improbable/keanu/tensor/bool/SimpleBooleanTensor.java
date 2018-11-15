@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.bool;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -61,7 +62,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape    desired shape of tensor
      */
     public SimpleBooleanTensor(boolean constant, long[] shape) {
-        int dataLength = (int) TensorShape.getLength(shape);
+        int dataLength = Ints.checkedCast(TensorShape.getLength(shape));
         this.data = new boolean[dataLength];
         Arrays.fill(this.data, constant);
         this.shape = Arrays.copyOf(shape, shape.length);

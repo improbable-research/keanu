@@ -19,7 +19,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class ParetoVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -37,7 +37,7 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
      */
     public ParetoVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, location.getShape(), scale.getShape());
 
         this.scale = scale;
         this.location = location;

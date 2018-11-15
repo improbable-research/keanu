@@ -114,7 +114,7 @@ public class INDArrayShim {
     }
 
     public static INDArray sum(INDArray tensor, int... overDimensions) {
-        overDimensions = TensorShape.dimensionCorrection(tensor.rank(), overDimensions);
+        overDimensions = TensorShape.getAbsoluteDimensions(tensor.rank(), overDimensions);
 
         long[] newShape = ArrayUtils.removeAll(tensor.shape(), overDimensions);
         long[] newStride = TensorShape.getRowFirstStride(newShape);

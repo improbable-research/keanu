@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class BinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
@@ -24,7 +24,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
 
     public BinomialVertex(long[] tensorShape, DoubleVertex p, IntegerVertex n) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, p.getShape(), n.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, p.getShape(), n.getShape());
         this.p = p;
         this.n = n;
 
