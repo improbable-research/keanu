@@ -127,6 +127,32 @@ public class ProtobufTest {
     }
 
     @Test
+    public void loadFailsIfWrongTypeConstantSpecified() throws IOException {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Incorrect Parameter Type specified.  Got: "
+            + "class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, "
+            + "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
+
+        KeanuSavedBayesNet.Vertex constantVertex = KeanuSavedBayesNet.Vertex.newBuilder()
+            .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
+            .setLabel("MU VERTEX")
+            .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
+            .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
+                .setIntVal(KeanuSavedBayesNet.IntegerTensor.newBuilder()
+                    .addAllShape(Longs.asList(1, 1)).addValues(1).build()
+                ).build())
+            .build();
+
+        KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
+            .addVertices(constantVertex).build();
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        savedNet.writeTo(writer);
+        ProtobufReader reader = new ProtobufReader();
+        BayesianNetwork readNet = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+    }
+
+    @Test
     public void allSaveableVerticesHaveCorrectAnnotations() {
         Reflections reflections = new Reflections("io.improbable.keanu.vertices");
 

@@ -144,7 +144,7 @@ public class ProtobufReader implements NetworkReader {
         } else {
             return BooleanTensor.create(
                 Booleans.toArray(value.getBoolVal().getValuesList()),
-                Longs.toArray(value.getDoubleVal().getShapeList()));
+                Longs.toArray(value.getBoolVal().getShapeList()));
         }
     }
 
@@ -161,7 +161,7 @@ public class ProtobufReader implements NetworkReader {
         } else {
             return IntegerTensor.create(
                 Ints.toArray(value.getIntVal().getValuesList()),
-                Longs.toArray(value.getDoubleVal().getShapeList()));
+                Longs.toArray(value.getIntVal().getShapeList()));
         }
     }
 
@@ -183,13 +183,12 @@ public class ProtobufReader implements NetworkReader {
                                      Map<String, Vertex> parentsMap,
                                      KeanuSavedBayesNet.VertexValue value) {
         Constructor<Vertex> loadConstructor = getAnnotatedConstructor(vertexClass);
-        Parameter[] parameters = loadConstructor.getParameters();
+        Parameter[] constructorParameters = loadConstructor.getParameters();
+        Object[] arguments = new Object[constructorParameters.length];
 
-        Object[] arguments = new Object[parameters.length];
-
-        for (int i = 0; i < parameters.length; i++) {
-            LoadParentVertex parentVertexAnnotation = parameters[i].getAnnotation(LoadParentVertex.class);
-            LoadVertexValue vertexValueAnnotation = parameters[i].getAnnotation(LoadVertexValue.class);
+        for (int i = 0; i < constructorParameters.length; i++) {
+            LoadParentVertex parentVertexAnnotation = constructorParameters[i].getAnnotation(LoadParentVertex.class);
+            LoadVertexValue vertexValueAnnotation = constructorParameters[i].getAnnotation(LoadVertexValue.class);
 
             if (parentVertexAnnotation != null) {
                 Vertex parentVertex = parentsMap.get(parentVertexAnnotation.value());
@@ -207,6 +206,14 @@ public class ProtobufReader implements NetworkReader {
                 arguments[i] = initialValue;
             } else {
                 throw new IllegalArgumentException("Cannot create Vertex due to unannotated parameter in constructor");
+            }
+
+            Class argumentClass = arguments[i].getClass();
+            Class parameterClass = constructorParameters[i].getType();
+
+            if (!parameterClass.isAssignableFrom(argumentClass)) {
+                throw new IllegalArgumentException("Incorrect Parameter Type specified.  Got: "
+                    + arguments[i].getClass() + ", Expected: " + constructorParameters[i].getType());
             }
         }
 
