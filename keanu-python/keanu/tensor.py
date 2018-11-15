@@ -1,5 +1,5 @@
 import numpy as np
-from py4j.java_gateway import java_import, JavaObject, JavaMember
+from py4j.java_gateway import java_import
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
