@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.intgr;
 
 import io.improbable.keanu.kotlin.IntegerOperators;
+import io.improbable.keanu.network.NetworkReader;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -35,6 +37,15 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
 
     public IntegerVertex(long[] shape) {
         super(shape);
+    }
+
+    public void saveValue(NetworkWriter netWriter) {
+        netWriter.saveValue(this);
+    }
+
+    @Override
+    public void loadValue(NetworkReader reader) {
+        reader.loadValue(this);
     }
 
     public static IntegerVertex concat(int dimension, IntegerVertex... toConcat) {

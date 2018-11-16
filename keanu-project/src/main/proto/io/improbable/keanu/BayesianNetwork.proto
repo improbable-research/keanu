@@ -7,30 +7,61 @@ option java_outer_classname = "KeanuSavedBayesNet";
 
 message BayesianNetwork {
     repeated Vertex vertices = 1;
-    repeated VertexValue defaultState = 2;
+    repeated StoredValue defaultState = 2;
+}
+
+message VertexID {
+    string id = 1;
 }
 
 message Vertex {
-    repeated int64 id = 1;
+    VertexID id = 1;
     string label = 2;
     string vertexType = 3;
     repeated NamedParent parents = 5;
+    VertexValue constantValue = 6;
+}
+
+message StoredValue {
+    VertexValue value = 1;
+    string vertexLabel = 2;
+    VertexID id = 3;
+}
+
+message DoubleTensor {
+    repeated int64 shape = 1;
+    repeated double values = 2;
+}
+
+message IntegerTensor {
+    repeated int64 shape = 1;
+    repeated int32 values = 2;
+}
+
+message BooleanTensor {
+    repeated int64 shape = 1;
+    repeated bool values = 2;
+}
+
+message GenericTensor {
+    repeated int64 shape = 1;
+    repeated GenericValue values = 2;
+}
+
+message GenericValue {
+    repeated bytes value = 1;
 }
 
 message VertexValue {
     oneof valueType {
-        double doubleVal = 1;
-        int32 intVal = 2;
-        bool boolVal = 3;
-        string stringVal = 4;
-        bytes genericVal = 5;
+        DoubleTensor doubleVal = 1;
+        IntegerTensor intVal = 2;
+        BooleanTensor boolVal = 3;
+        GenericTensor genericVal = 4;
     }
-
-    string vertexLabel = 6;
-    repeated int64 id = 7;
 }
 
 message NamedParent {
     string name = 1;
-    int64 parentID = 2;
+    VertexID id = 2;
 }

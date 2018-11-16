@@ -1,6 +1,4 @@
-import numpy as np
 import collections
-import numbers
 
 import keanu as kn
 from keanu.context import KeanuContext

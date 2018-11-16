@@ -5,7 +5,7 @@ def readme():
     with open('README.rst', "r") as f:
         return f.read()
 
-version_string = '0.0.15.dev0'
+version_string = '0.0.15.dev1'
 
 # If you don't remove the old directories, it tends to put the excluded module "examples" into the bdist
 for dir_name in ("keanu-%s.dist-info" % version_string, "keanu.egg-info", "build", "dist"):
