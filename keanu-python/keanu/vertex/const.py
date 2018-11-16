@@ -6,16 +6,15 @@ from typing import Callable, Any, Union
 from .vartypes import (
     numpy_types,
     tensor_arg_types,
-    vertex_param_types,
-    shape_types,
-    primitive_types,
-    runtime_int_types,
-    runtime_float_types,
-    runtime_bool_types,
-    runtime_primitive_types,
     runtime_numpy_types,
     runtime_pandas_types,
-    runtime_primitive_types
+    runtime_primitive_types,
+    runtime_bool_types,
+    runtime_int_types,
+    runtime_float_types,
+    vertex_param_types,
+    shape_types,
+    primitive_types
 )
 
 def Const(t: tensor_arg_types) -> Vertex:

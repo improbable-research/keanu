@@ -3,7 +3,7 @@ from py4j.java_gateway import java_import
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
-from typing import Any, Callable
+from typing import Any
 from .vartypes import (
     numpy_types,
     tensor_arg_types,
