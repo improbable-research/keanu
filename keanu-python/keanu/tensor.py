@@ -14,7 +14,7 @@ from .vartypes import (
     runtime_primitive_types,
     runtime_numpy_types,
     runtime_pandas_types,
-    runtime_primitive_types,
+    runtime_primitive_types
 )
 
 k = KeanuContext()

@@ -91,18 +91,6 @@ class VertexProcessor {
         return root;
     }
 
-    private static String toCast(Class<?> aClass) {
-        if (DoubleVertex.class.isAssignableFrom(aClass)) {
-            return "Double";
-        } else if (IntegerVertex.class.isAssignableFrom(aClass)) {
-            return "Integer";
-        } else if (BoolVertex.class.isAssignableFrom(aClass)) {
-            return "Bool";
-        } else {
-            throw new NotImplementedException(aClass.getCanonicalName());
-        }
-    }
-
     private static String toCastedPythonParams(String[] pythonParameters, Class<?>[] parameterTypes) {
         String[] pythonParams = new String[pythonParameters.length];
 

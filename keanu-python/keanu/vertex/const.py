@@ -1,9 +1,9 @@
 import numpy as np
-from vertex.tensor import Tensor
+from keanu.tensor import Tensor
 from .generated import ConstantBool, ConstantInteger, ConstantDouble
 from .base import Vertex
 from typing import Callable
-from .vartypes import (
+from keanu.vartypes import (
     numpy_types,
     tensor_arg_types,
     runtime_numpy_types,
