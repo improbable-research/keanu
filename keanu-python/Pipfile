@@ -12,6 +12,7 @@ pandas = "*"
 [dev-packages]
 pytest = "*"
 sphinx = "*"
+yapf = "*"
 
 [requires]
 python_version = "3.6"
