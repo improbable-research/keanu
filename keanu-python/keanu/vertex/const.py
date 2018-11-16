@@ -2,9 +2,8 @@ import numpy as np
 from keanu.tensor import Tensor
 from .generated import ConstantBool, ConstantInteger, ConstantDouble
 from .base import Vertex
-from typing import Callable, Any, Union
+from typing import Callable
 from keanu.vartypes import (
-    primitive_types,
     numpy_types,
     tensor_arg_types,
     runtime_numpy_types,

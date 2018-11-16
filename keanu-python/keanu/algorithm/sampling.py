@@ -3,7 +3,7 @@ from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
 from keanu.net import BayesNet
-from typing import Any, Iterable, Dict, List, Tuple, Iterator, Generator
+from typing import Any, Iterable, Dict, List, Tuple, Generator
 from keanu.vartypes import numpy_types
 
 k = KeanuContext()
