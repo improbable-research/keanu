@@ -81,6 +81,22 @@ task generateDocumentation {
         }
     }
 }
+task applyFormat {
+    doLast {
+        exec {
+            commandLine 'yapf', '--in-place', '--recursive', '--parallel', '.'
+        }
+    }
+}
+
+task checkFormat {
+    doLast { 
+        exec {
+            commandLine 'yapf', '--diff', '--recursive', '--parallel',  '.'
+        }
+    }
+}
+
 
 pythonVersionInfo.mustRunAfter(installPipenv)
 installDependencies.mustRunAfter(pythonVersionInfo)
