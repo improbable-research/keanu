@@ -8,6 +8,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.vertices.dbl.KeanuRandom")
 
 
 class KeanuRandom(JavaObjectWrapper):
+
     def __init__(self, seed=None):
         if seed is None:
             super(KeanuRandom, self).__init__(k.jvm_view().KeanuRandom())
@@ -16,4 +17,4 @@ class KeanuRandom(JavaObjectWrapper):
 
     @staticmethod
     def set_default_random_seed(seed):
-    	k.jvm_view().KeanuRandom.setDefaultRandomSeed(seed)
+        k.jvm_view().KeanuRandom.setDefaultRandomSeed(seed)

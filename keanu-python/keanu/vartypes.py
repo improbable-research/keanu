@@ -11,6 +11,6 @@ primitive_types = int_types + float_types + bool_types
 
 pandas_types = (pd.Series, pd.DataFrame)
 
-numpy_types = (np.ndarray, )
+numpy_types = (np.ndarray,)
 
 const_arg_types = numpy_types + pandas_types + primitive_types

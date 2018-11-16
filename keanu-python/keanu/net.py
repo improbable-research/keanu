@@ -7,11 +7,14 @@ k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.network.BayesianNetwork")
 
+
 class BayesNet(JavaObjectWrapper):
+
     def __init__(self, vertices):
         java_vertices = k.to_java_object_list(vertices)
 
-        super(BayesNet, self).__init__(k.jvm_view().BayesianNetwork(java_vertices))
+        super(BayesNet,
+              self).__init__(k.jvm_view().BayesianNetwork(java_vertices))
 
     def get_latent_or_observed_vertices(self):
         return Vertex._to_generator(self.unwrap().getLatentOrObservedVertices())

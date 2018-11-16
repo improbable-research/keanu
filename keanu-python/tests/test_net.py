@@ -2,6 +2,7 @@ from keanu.vertex import UniformInt, Gamma, Poisson, Cauchy
 from keanu import BayesNet, KeanuRandom
 import pytest
 
+
 def test_construct_bayes_net():
     uniform = UniformInt(0, 1)
     graph = set(uniform.get_connected_graph())
@@ -11,19 +12,23 @@ def test_construct_bayes_net():
     assert uniform.get_id() in vertex_ids
 
     net = BayesNet(graph)
-    latent_vertex_ids = [vertex.get_id() for vertex in net.get_latent_vertices()]
+    latent_vertex_ids = [
+        vertex.get_id() for vertex in net.get_latent_vertices()
+    ]
 
     assert len(latent_vertex_ids) == 1
     assert uniform.get_id() in latent_vertex_ids
 
-@pytest.mark.parametrize("get_method, latent, observed, continuous, discrete", [
-    ("get_latent_or_observed_vertices", True, True, True, True),
-    ("get_latent_vertices", True, False, True, True),
-    ("get_observed_vertices", False, True, True, True),
-    ("get_continuous_latent_vertices", True, False, True, False),
-    ("get_discrete_latent_vertices", True, False, False, True)
-])
-def test_can_get_vertices_from_bayes_net(get_method, latent, observed, continuous, discrete):
+
+@pytest.mark.parametrize(
+    "get_method, latent, observed, continuous, discrete",
+    [("get_latent_or_observed_vertices", True, True, True, True),
+     ("get_latent_vertices", True, False, True, True),
+     ("get_observed_vertices", False, True, True, True),
+     ("get_continuous_latent_vertices", True, False, True, False),
+     ("get_discrete_latent_vertices", True, False, False, True)])
+def test_can_get_vertices_from_bayes_net(get_method, latent, observed,
+                                         continuous, discrete):
     gamma = Gamma(1., 1.)
     gamma.observe(0.5)
 
@@ -44,7 +49,9 @@ def test_can_get_vertices_from_bayes_net(get_method, latent, observed, continuou
     if latent and continuous:
         assert cauchy.get_id() in vertex_ids
 
-    assert len(vertex_ids) == (observed and continuous) + (latent and discrete) + (latent and continuous)
+    assert len(vertex_ids) == (observed and continuous) + (
+        latent and discrete) + (latent and continuous)
+
 
 def test_probe_for_non_zero_probability_from_bayes_net():
     gamma = Gamma(1., 1.)
@@ -59,4 +66,3 @@ def test_probe_for_non_zero_probability_from_bayes_net():
 
     assert gamma.has_value()
     assert poisson.has_value()
-
