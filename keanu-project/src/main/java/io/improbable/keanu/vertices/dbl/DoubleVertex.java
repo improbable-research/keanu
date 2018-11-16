@@ -2,6 +2,8 @@ package io.improbable.keanu.vertices.dbl;
 
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.network.NetworkReader;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -323,5 +325,14 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public double getValue(int... index) {
         return getValue().getValue(index);
+    }
+
+    @Override
+    public void loadValue(NetworkReader reader) {
+        reader.loadValue(this);
+    }
+
+    public void saveValue(NetworkWriter netWriter) {
+        netWriter.saveValue(this);
     }
 }
