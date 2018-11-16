@@ -2,8 +2,8 @@ import numpy as np
 from py4j.java_gateway import java_import
 
 from keanu.base import JavaObjectWrapper
-from typing import Callable, Any
 from keanu.context import KeanuContext
+from typing import Any, Callable
 from .vartypes import (
     numpy_types,
     tensor_arg_types,
@@ -22,7 +22,6 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.dbl.DoubleTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
-
 
 class Tensor(JavaObjectWrapper):
     def __init__(self, t: tensor_arg_types) -> None:

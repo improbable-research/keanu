@@ -2,13 +2,13 @@
 
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
+from .base import Vertex
 from keanu.vartypes import (
     vertex_param_types,
     tensor_arg_types,
     shape_types
 )
 from .const import Double, Bool, Integer
-from .base import Vertex
 
 context = KeanuContext()
 

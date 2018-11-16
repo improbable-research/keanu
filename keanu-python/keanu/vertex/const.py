@@ -1,7 +1,8 @@
+import numpy as np
+from keanu.tensor import Tensor, cast_double, cast_integer, cast_bool
 from .generated import ConstantBool, ConstantInteger, ConstantDouble
 from .base import Vertex
 from typing import Callable, Any, Union
-from keanu.tensor import cast_double, cast_integer, cast_bool, Tensor
 from .vartypes import (
     numpy_types,
     tensor_arg_types,
@@ -16,7 +17,6 @@ from .vartypes import (
     runtime_pandas_types,
     runtime_primitive_types
 )
-import numpy as np
 
 def Const(t: tensor_arg_types) -> Vertex:
     if isinstance(t, runtime_numpy_types):

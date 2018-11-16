@@ -61,10 +61,6 @@ class Vertex(JavaObjectWrapper, VertexOps):
         return list(map(Vertex.__parse_arg, args))
 
     @staticmethod
-    def const(arg: tensor_arg_types) -> 'Vertex':
-        return kn.vertex.const.Const(arg)
-
-    @staticmethod
     def __parse_arg(arg: Union[vertex_param_types, shape_types]) -> Any:
         if isinstance(arg, runtime_tensor_arg_types):
             return kn.vertex.const.Const(arg).unwrap()
