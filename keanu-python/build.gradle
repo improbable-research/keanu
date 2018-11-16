@@ -103,7 +103,9 @@ task formatCheck {
     dependsOn("preparePythonEnvironment")
     doLast { 
         exec {
-            commandLine 'pipenv', 'run', 'yapf', '--style', 'google', '--diff', '--recursive', '--parallel',  '.'
+            // Exclude files that are generated
+            commandLine 'pipenv', 'run', 'yapf', '--style', 'google', '--diff', '--recursive', '--parallel', 
+            '--exclude', 'keanu/vertex/generated.py', '--exclude', 'keanu/vertex/__init__.py', '.'
         }
     }
 }
