@@ -45,6 +45,7 @@ public class ProtobufWriter implements NetworkWriter {
         bayesNetBuilder.addVertices(vertexBuilder.build());
     }
 
+    @Override
     public void save(ConstantDoubleVertex vertex) {
         KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
         vertexBuilder.setConstantValue(getValue(vertex).getValue());
