@@ -1,8 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadVertexValue;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -12,10 +16,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.Collections;
 import java.util.Map;
 
-public class ConstantDoubleVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
+public class ConstantDoubleVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, ConstantVertex, SaveableVertex {
 
     @ExportVertexToPythonBindings
-    public ConstantDoubleVertex(DoubleTensor constant) {
+    public ConstantDoubleVertex(@LoadVertexValue DoubleTensor constant) {
         super(constant.getShape());
         setValue(constant);
     }
@@ -43,8 +47,12 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
         return getValue();
     }
 
-    @Override
     public DoubleTensor calculate() {
         return getValue();
+    }
+
+    @Override
+    public void save(NetworkWriter netWriter) {
+        netWriter.save(this);
     }
 }
