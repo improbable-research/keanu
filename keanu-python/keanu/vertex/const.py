@@ -50,13 +50,10 @@ def __infer_const_ctor_from_scalar(scalar: np.generic) -> Callable:
 
 class Double(Vertex):
     def __init__(self, val: Any, *args: Union[vertex_param_types, shape_types]) -> None:
-        if args:
-            ctor = val
-            val = ctor(*(Vertex.__parse_args(args)))
+        if not args:
+            super(Double, self).__init__(ConstantDouble(cast_double(val).unwrap()))
         else:
-            val = ConstantDouble(cast_double(val).unwrap())
-
-        super(Double, self).__init__(val)
+            super(Double, self).__init__(val, args)
 
     def observe(self, v: tensor_arg_types) -> None:
         self.unwrap().observe(cast_double(v))
@@ -70,13 +67,10 @@ class Double(Vertex):
 
 class Integer(Vertex):
     def __init__(self, val: Any, *args : Union[vertex_param_types, shape_types]) -> None:
-        if args:
-            ctor = val
-            val = ctor(*(Vertex.__parse_args(args)))
+        if not args:
+            super(Integer, self).__init__(ConstantInteger(cast_integer(val).unwrap()))
         else:
-            val = ConstantInteger(cast_integer(val).unwrap())
-
-        super(Integer, self).__init__(val)
+            super(Integer, self).__init__(val, args)
 
     def observe(self, v: tensor_arg_types) -> None:
         self.unwrap().observe(cast_integer(v))
@@ -90,13 +84,10 @@ class Integer(Vertex):
 
 class Bool(Vertex):
     def __init__(self, val: Any, *args: Union[vertex_param_types, shape_types]) -> None:
-        if args:
-            ctor = val
-            val = ctor(*(Vertex.__parse_args(args)))
+        if not args:
+            super(Bool, self).__init__(ConstantBool(cast_bool(val).unwrap()))
         else:
-            val = ConstantBool(cast_bool(val).unwrap())
-
-        super(Bool, self).__init__(val)
+            super(Bool, self).__init__(val, args)
 
     def observe(self, v: tensor_arg_types) -> None:
         self.unwrap().observe(cast_bool(v))
