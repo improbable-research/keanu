@@ -103,11 +103,11 @@ class VertexProcessor {
 
     private static String toCastedPythonParam(String pythonParameter, Class<?> parameterType) {
         if (DoubleVertex.class.isAssignableFrom(parameterType)) {
-            return "cast_double(" + pythonParameter + ")";
+            return "cast_to_double(" + pythonParameter + ")";
         } else if (IntegerVertex.class.isAssignableFrom(parameterType)) {
-            return "cast_integer(" + pythonParameter + ")";
+            return "cast_to_integer(" + pythonParameter + ")";
         } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
-            return "cast_bool(" + pythonParameter + ")";
+            return "cast_to_bool(" + pythonParameter + ")";
         } else {
             return pythonParameter;
         }

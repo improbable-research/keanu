@@ -8,7 +8,7 @@ from keanu.vartypes import (
     tensor_arg_types,
     shape_types
 )
-from keanu.cast import cast_double, cast_bool, cast_integer
+from keanu.cast import cast_to_double, cast_to_integer, cast_to_bool
 
 context = KeanuContext()
 

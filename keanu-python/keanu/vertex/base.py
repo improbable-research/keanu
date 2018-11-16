@@ -33,6 +33,9 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def __hash__(self) -> int:
         return hash(self.get_id())
 
+    def logprob(self, v: tensor_arg_types) -> float:
+        return self.unwrap().logProb(Tensor(v).unwrap())
+
     def observe(self, v: tensor_arg_types) -> None:
         self.unwrap().observe(Tensor(v).unwrap())
 
