@@ -56,7 +56,7 @@ your model and determine whether or not to use gradients for you. The next secti
 
 ### Optimizer
 
-Let's say you've described the [thermometer model]({{ site.baseurl }}/docs/thermometer-example) and want to run MAP but you're not sure
+Let's say you've described the [thermometer model]({{ site.baseurl }}/docs/examples/thermometer) and want to run MAP but you're not sure
 whether to use the Gradient or Non-Gradient Optimizer. You can use the following code to let Keanu decide which one to use.
 
 ```java
