@@ -81,7 +81,7 @@ task generateDocumentation {
         }
     }
 }
-task applyFormat {
+task formatApply {
     doLast {
         exec {
             commandLine 'yapf', '--in-place', '--recursive', '--parallel', '.'
@@ -89,7 +89,7 @@ task applyFormat {
     }
 }
 
-task checkFormat {
+task formatCheck {
     doLast { 
         exec {
             commandLine 'yapf', '--diff', '--recursive', '--parallel',  '.'
