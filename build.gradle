@@ -25,4 +25,3 @@ allprojects {
 dependencies {
     compile project(":keanu-project")
 }
-

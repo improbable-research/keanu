@@ -67,7 +67,7 @@ public class SigmoidVertexTest {
     @Test
     public void changesMatchGradient() {
         DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex outputVertex = inputVertex.times(3).sigmoid();
+        SigmoidVertex outputVertex = inputVertex.times(3).sigmoid();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-6);
     }

@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -31,10 +30,6 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
 
     public ConstantDoubleVertex(double[] vector) {
         this(DoubleTensor.create(vector));
-    }
-
-    public ConstantDoubleVertex(Map<String, Vertex> parentMap, NetworkReader reader, Object initialValue) {
-        this(reader.getInitialDoubleValue(initialValue));
     }
 
     @Override

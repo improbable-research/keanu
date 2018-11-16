@@ -52,6 +52,7 @@ Want to see an example and run it yourself? Head over to [Getting Started](https
 ## Documentation
 
 Want to learn more? Head over to the [Documentation](https://improbable-research.github.io/keanu/).
+You can also see our [JavaDocs](https://www.javadoc.io/doc/io.improbable/keanu) or our [Python Docs](https://improbable-research.github.io/keanu/python)
 
 ## Future
 

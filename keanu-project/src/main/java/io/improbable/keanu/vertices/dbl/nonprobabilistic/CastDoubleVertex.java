@@ -7,9 +7,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.Map;
 
 public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
@@ -30,15 +27,5 @@ public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<D
     @Override
     public DoubleTensor calculate() {
         return inputVertex.getValue().toDouble();
-    }
-
-    @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        throw new UnsupportedOperationException("CastDoubleTensorVertex is non-differentiable");
-    }
-
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        throw new UnsupportedOperationException("CastDoubleTensorVertex is non-differentiable");
     }
 }

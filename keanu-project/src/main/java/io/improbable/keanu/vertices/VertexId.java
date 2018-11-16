@@ -1,11 +1,9 @@
 package io.improbable.keanu.vertices;
 
 import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 import lombok.EqualsAndHashCode;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -25,10 +23,6 @@ public class VertexId implements Comparable<VertexId> {
 
     public VertexId() {
         idValues[0] = ID_GENERATOR.getAndIncrement();
-    }
-
-    public VertexId(List<Long> ids) {
-        idValues = Longs.toArray(ids);
     }
 
     public void addPrefix(VertexId prefix) {

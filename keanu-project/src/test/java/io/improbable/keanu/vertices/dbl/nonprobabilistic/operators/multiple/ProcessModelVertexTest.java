@@ -1,16 +1,17 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import com.google.common.collect.ImmutableMap;
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -18,7 +19,9 @@ import io.improbable.keanu.vertices.model.LambdaModelVertex;
 import io.improbable.keanu.vertices.model.ModelVertex;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.io.IOException;
 import java.util.Map;
@@ -36,13 +39,14 @@ public class ProcessModelVertexTest {
     are also written to file.
      */
 
-    private KeanuRandom random;
     private DoubleVertex inputToModel;
     private SimpleWeatherModel weatherModel;
 
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
+
     @Before
     public void mockFilesToReadModelOutputFrom() throws IOException {
-        random = new KeanuRandom(1);
         weatherModel = new SimpleWeatherModel(inputToModel);
         inputToModel = new ConstantDoubleVertex(25.0);
     }
@@ -106,6 +110,7 @@ public class ProcessModelVertexTest {
         Assert.assertEquals(isSunny.getValue().scalar(), false);
     }
 
+    @Category(Slow.class)
     @Test
     public void modelInsideVertexIsRecalculatedOnEachParentSample() {
         int numSamples = 50;
@@ -120,13 +125,14 @@ public class ProcessModelVertexTest {
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
 
         for (int i = 0; i < numSamples; i++) {
-            double inputValue = inputToModel.sample(random).scalar();
+            double inputValue = inputToModel.sample().scalar();
             inputToModel.setAndCascade(inputValue);
             double expectedValue = (inputValue * 0.1) * (inputValue * 2);
             Assert.assertEquals(expectedValue, shouldIBringUmbrella.getValue().scalar(), 1e-6);
         }
     }
 
+    @Category(Slow.class)
     @Test
     public void modelWorksAsPartOfGradientOptimisation() {
         DoubleVertex inputToModelOne = new GaussianVertex(14.0, 5);
@@ -151,6 +157,7 @@ public class ProcessModelVertexTest {
         Assert.assertEquals(30.0, inputToModel.getValue().scalar(), 0.1);
     }
 
+    @Category(Slow.class)
     @Test
     public void modelWorksAsPartOfSampling() {
         inputToModel = new GaussianVertex(25, 5);
@@ -170,7 +177,7 @@ public class ProcessModelVertexTest {
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(chanceOfRainObservation.getConnectedGraph());
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesianNetwork,
             inputToModel,
             250
@@ -178,7 +185,7 @@ public class ProcessModelVertexTest {
 
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
 
-        Assert.assertEquals(29., averagePosteriorInput, 0.1);
+        Assert.assertEquals(29., averagePosteriorInput, 0.3);
     }
 
     private String formatCommandForExecution(Map<VertexLabel, Vertex<? extends Tensor>> inputs, String command) {
