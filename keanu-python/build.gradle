@@ -82,7 +82,16 @@ task generateDocumentation {
     }
 }
 
+task preparePythonEnvironment {
+    dependsOn(installPipenv)
+    dependsOn(pythonVersionInfo)
+    dependsOn(installDependencies)
+    dependsOn(":keanu-project:preparePythonClasspath")
+    dependsOn(":codegen:runCodeGeneration")
+}
+
 task formatApply {
+    dependsOn("preparePythonEnvironment")
     doLast {
         exec {
             commandLine 'pipenv', 'run', 'yapf', '--style', 'google', '--in-place', '--recursive', '--parallel', '.'
@@ -91,6 +100,7 @@ task formatApply {
 }
 
 task formatCheck {
+    dependsOn("preparePythonEnvironment")
     doLast { 
         exec {
             commandLine 'pipenv', 'run', 'yapf', '--style', 'google', '--diff', '--recursive', '--parallel',  '.'
@@ -101,15 +111,8 @@ task formatCheck {
 
 pythonVersionInfo.mustRunAfter(installPipenv)
 installDependencies.mustRunAfter(pythonVersionInfo)
-
-task preparePythonEnvironment {
-    dependsOn(installPipenv)
-    dependsOn(pythonVersionInfo)
-    dependsOn(installDependencies)
-    dependsOn(":keanu-project:preparePythonClasspath")
-    dependsOn(":codegen:runCodeGeneration")
-}
-
 generateDocumentation.dependsOn(preparePythonEnvironment)
 pytest.dependsOn(preparePythonEnvironment)
+test.dependsOn(formatCheck)
 test.dependsOn(pytest)
+
