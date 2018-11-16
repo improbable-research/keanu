@@ -14,7 +14,7 @@ from .vartypes import (
     runtime_primitive_types,
     runtime_numpy_types,
     runtime_pandas_types,
-    runtime_primitive_types
+    runtime_primitive_types,
 )
 
 k = KeanuContext()
@@ -80,33 +80,3 @@ class Tensor(JavaObjectWrapper):
     def _to_ndarray(java_tensor: Any) -> numpy_types:
         np_array = np.array(list(java_tensor.asFlatArray()))
         return np_array.reshape(java_tensor.getShape())
-
-def cast_double(arg: tensor_arg_types) -> Tensor:
-    if isinstance(arg, runtime_primitive_types):
-        return Tensor(float(arg))
-    elif isinstance(arg, runtime_numpy_types):
-        return Tensor(arg.astype(float))
-    elif isinstance(arg, runtime_pandas_types):
-        return Tensor(arg.values.astype(float))
-    else:
-        raise NotImplementedError
-
-def cast_integer(arg: tensor_arg_types) -> Tensor:
-    if isinstance(arg, runtime_primitive_types):
-        return Tensor(int(arg))
-    elif isinstance(arg, runtime_numpy_types):
-        return Tensor(arg.astype(int))
-    elif isinstance(arg, runtime_pandas_types):
-        return Tensor(arg.values.astype(int))
-    else:
-        raise NotImplementedError
-
-def cast_bool(arg: tensor_arg_types) -> Tensor:
-    if isinstance(arg, runtime_primitive_types):
-        return Tensor(bool(arg))
-    elif isinstance(arg, runtime_numpy_types):
-        return Tensor(arg.astype(bool))
-    elif isinstance(arg, runtime_pandas_types):
-        return Tensor(arg.values.astype(bool))
-    else:
-        raise NotImplementedError

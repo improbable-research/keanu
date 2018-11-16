@@ -8,7 +8,7 @@ from keanu.vartypes import (
     tensor_arg_types,
     shape_types
 )
-from .const import Double, Bool, Integer
+from keanu.cast import cast_double, cast_bool, cast_integer
 
 context = KeanuContext()
 
@@ -20,5 +20,5 @@ java_import(context.jvm_view(), "${import.packageName}")
 
 
 def ${constructor.pythonClass}(${constructor.pythonTypedParameters}) -> Vertex:
-    ${constructor.docString}return ${constructor.pythonVertexClass}(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters})
+    ${constructor.docString}return Vertex(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters})
 </#list>

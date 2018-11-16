@@ -78,7 +78,6 @@ class VertexProcessor {
             PythonConstructor pythonConstructor = new PythonConstructor(
                 javaClass,
                 toPythonClass(javaClass),
-                toCast(constructor.getDeclaringClass()),
                 toTypedPythonParams(pythonParameters, parameterTypes),
                 toCastedPythonParams(pythonParameters, parameterTypes),
                 docString.getAsString()
@@ -115,10 +114,13 @@ class VertexProcessor {
     }
 
     private static String toCastedPythonParam(String pythonParameter, Class<?> parameterType) {
-        try {
-            String cast = toCast(parameterType);
-            return cast + "(" + pythonParameter + ")";
-        } catch (NotImplementedException e){
+        if (DoubleVertex.class.isAssignableFrom(parameterType)) {
+            return "cast_double(" + pythonParameter + ")";
+        } else if (IntegerVertex.class.isAssignableFrom(parameterType)) {
+            return "cast_integer(" + pythonParameter + ")";
+        } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
+            return "cast_bool(" + pythonParameter + ")";
+        } else {
             return pythonParameter;
         }
     }
@@ -173,18 +175,15 @@ class VertexProcessor {
         @Getter
         private String pythonClass;
         @Getter
-        private String pythonVertexClass;
-        @Getter
         private String pythonTypedParameters;
         @Getter
         private String pythonParameters;
         @Getter
         private String docString;
 
-        PythonConstructor(String javaClass, String pythonClass, String pythonVertexClass, String pythonTypedParameters, String pythonParameters, String docString) {
+        PythonConstructor(String javaClass, String pythonClass, String pythonTypedParameters, String pythonParameters, String docString) {
             this.javaClass = javaClass;
             this.pythonClass = pythonClass;
-            this.pythonVertexClass = pythonVertexClass;
             this.pythonTypedParameters = pythonTypedParameters;
             this.pythonParameters = pythonParameters;
             this.docString = docString;
