@@ -1,4 +1,5 @@
 from keanu.cast import cast_to_double, cast_to_integer, cast_to_bool
+from keanu.vartypes import tensor_arg_types
 import pytest
 import numpy as np
 import pandas as pd
