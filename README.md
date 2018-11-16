@@ -76,6 +76,8 @@ For IntelliJ:
 
 We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) to automatically enforce some basic code style checks. If your build fails due to a formatting issue, simply run `./gradlew spotlessApply` and commit the changes.
 
+We use [yapf](https://github.com/google/yapf) for formatting python code. If your build fails due to a python formatting issue, run './gradlew keanu-python:formatApply' and commit the changes.  
+
 
 #### Python Code Generation
 
