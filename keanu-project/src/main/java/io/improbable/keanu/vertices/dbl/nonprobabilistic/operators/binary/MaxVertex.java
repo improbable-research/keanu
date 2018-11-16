@@ -7,9 +7,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 
 public class MaxVertex extends DoubleIfVertex {
 
-    private static final String LEFT_NAME = "left";
-    private static final String RIGHT_NAME = "right";
-
     /**
      * Finds the maximum between two vertices
      *
@@ -17,8 +14,8 @@ public class MaxVertex extends DoubleIfVertex {
      * @param right one of the vertices to find the maximum of
      */
     @ExportVertexToPythonBindings
-    public MaxVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
-                     @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
+    public MaxVertex(@LoadParentVertex(THN_NAME) DoubleVertex left,
+                     @LoadParentVertex(ELS_NAME) DoubleVertex right) {
         super(left.getShape(), left.greaterThanOrEqualTo(right), left, right);
     }
 }

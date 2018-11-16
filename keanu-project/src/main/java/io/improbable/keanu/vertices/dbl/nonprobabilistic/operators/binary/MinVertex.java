@@ -17,9 +17,8 @@ public class MinVertex extends DoubleIfVertex {
      * @param right one of the vertices to find the minimum of
      */
     @ExportVertexToPythonBindings
-    public MinVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
-                     @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
+    public MinVertex(@LoadParentVertex(THN_NAME) DoubleVertex left,
+                     @LoadParentVertex(ELS_NAME) DoubleVertex right) {
         super(left.getShape(), left.lessThanOrEqualTo(right), left, right);
     }
-
 }

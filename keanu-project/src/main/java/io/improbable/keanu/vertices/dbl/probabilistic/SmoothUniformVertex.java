@@ -27,7 +27,7 @@ public class SmoothUniformVertex extends DoubleVertex implements SaveableVertex,
     private final DoubleVertex xMax;
     private final double edgeSharpness;
     private static final String X_MIN_NAME = "xMin";
-    private static final String X_MAX_NAME = "xMin";
+    private static final String X_MAX_NAME = "xMax";
 
     /**
      * One xMin or Xmax or both that match a proposed tensor shape of Smooth Uniform

@@ -17,17 +17,17 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 public class DoubleIfVertex extends DoubleVertex implements SaveableVertex, Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final Vertex<? extends BooleanTensor> predicate;
-    private final Vertex<? extends DoubleTensor> thn;
-    private final Vertex<? extends DoubleTensor> els;
-    private static final String PREDICATE_NAME = "predicate";
-    private static final String THN_NAME = "thn";
-    private static final String ELS_NAME = "els";
+    private final DoubleVertex thn;
+    private final DoubleVertex els;
+    protected static final String PREDICATE_NAME = "predicate";
+    protected static final String THN_NAME = "thn";
+    protected static final String ELS_NAME = "els";
 
     @ExportVertexToPythonBindings
     public DoubleIfVertex(long[] shape,
                           Vertex<? extends BooleanTensor> predicate,
-                          Vertex<? extends DoubleTensor> thn,
-                          Vertex<? extends DoubleTensor> els) {
+                          DoubleVertex thn,
+                          DoubleVertex els) {
         super(shape);
         this.predicate = predicate;
         this.thn = thn;
@@ -36,8 +36,8 @@ public class DoubleIfVertex extends DoubleVertex implements SaveableVertex, Diff
     }
 
     public DoubleIfVertex(@LoadParentVertex(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
-                          @LoadParentVertex(THN_NAME) Vertex<? extends DoubleTensor> thn,
-                          @LoadParentVertex(ELS_NAME) Vertex<? extends DoubleTensor> els) {
+                          @LoadParentVertex(THN_NAME) DoubleVertex thn,
+                          @LoadParentVertex(ELS_NAME) DoubleVertex els) {
 
         this(checkHasSingleNonScalarShapeOrAllScalar(thn.getShape(), els.getShape()), predicate, thn, els);
     }
@@ -48,12 +48,12 @@ public class DoubleIfVertex extends DoubleVertex implements SaveableVertex, Diff
     }
 
     @SaveParentVertex(THN_NAME)
-    public Vertex<? extends DoubleTensor> getThn() {
+    public DoubleVertex getThn() {
         return els;
     }
 
     @SaveParentVertex(ELS_NAME)
-    public Vertex<? extends DoubleTensor> getEls() {
+    public DoubleVertex getEls() {
         return thn;
     }
 
