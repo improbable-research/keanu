@@ -51,12 +51,24 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     @Builder.Default
     private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
-    //The number of samples for which the stepsize will be tuned. For the remaining samples
-    //in which it is not tuned, the stepsize will be frozen to its last calculated value
+    //The number of samples for which the step size will be tuned. For the remaining samples
+    //in which it is not tuned, the step size will be frozen to its last calculated value
     @Getter
     @Setter
     @Builder.Default
     private int adaptCount = DEFAULT_ADAPT_COUNT;
+
+    //Determines whether the step size will adapt during the first adaptCount samples
+    @Getter
+    @Setter
+    @Builder.Default
+    private boolean adaptEnabled = true;
+
+    //Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.
+    @Getter
+    @Setter
+    @Builder.Default
+    private Double stepSize = null;
 
     //The target acceptance probability, a suggested value of this is 0.65,
     //Beskos et al., 2010; Neal, 2011
@@ -65,8 +77,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     @Builder.Default
     private double targetAcceptanceProb = DEFAULT_TARGET_ACCEPTANCE_PROB;
 
-    //The target acceptance probability, a suggested value of this is 0.65,
-    //Beskos et al., 2010; Neal, 2011
+    //The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This
+    //will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample.
     @Getter
     @Setter
     @Builder.Default
@@ -106,14 +118,16 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         final List<Double> logOfMasterPForEachSample = new ArrayList<>();
         logOfMasterPForEachSample.add(initialLogOfMasterP);
 
-        double stepSize = findStartingStepSize(position,
-            gradient,
-            latentVertices,
-            probabilisticVertices,
-            logProbGradientCalculator,
-            initialLogOfMasterP,
-            random
-        );
+        if (stepSize == null) {
+            stepSize = findStartingStepSize(position,
+                gradient,
+                latentVertices,
+                probabilisticVertices,
+                logProbGradientCalculator,
+                initialLogOfMasterP,
+                random
+            );
+        }
 
         AutoTune autoTune = new AutoTune(
             stepSize,
@@ -196,7 +210,9 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                 treeHeight++;
             }
 
-            stepSize = adaptStepSize(autoTune, tree, sampleNum);
+            if (this.adaptEnabled) {
+                stepSize = adaptStepSize(autoTune, tree, sampleNum);
+            }
 
             tree.positionForward = tree.acceptedPosition;
             tree.gradientForward = tree.gradientAtAcceptedPosition;
