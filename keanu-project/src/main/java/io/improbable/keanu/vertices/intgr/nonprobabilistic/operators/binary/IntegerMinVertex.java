@@ -1,9 +1,11 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class IntegerMinVertex extends IntegerBinaryOpVertex {
+public class IntegerMinVertex extends IntegerBinaryOpVertex implements SaveableVertex {
 
     /**
      * Finds the minimum between two vertices
@@ -11,7 +13,7 @@ public class IntegerMinVertex extends IntegerBinaryOpVertex {
      * @param left  one of the vertices to find the minimum of
      * @param right one of the vertices to find the minimum of
      */
-    public IntegerMinVertex(IntegerVertex left, IntegerVertex right) {
+    public IntegerMinVertex(@LoadParentVertex(A_NAME) IntegerVertex left, @LoadParentVertex(B_NAME) IntegerVertex right) {
         super(left, right);
     }
 

@@ -2,10 +2,12 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 
-public class IntegerDivisionVertex extends IntegerBinaryOpVertex {
+public class IntegerDivisionVertex extends IntegerBinaryOpVertex implements SaveableVertex {
 
     /**
      * Divides one vertex by another
@@ -14,7 +16,7 @@ public class IntegerDivisionVertex extends IntegerBinaryOpVertex {
      * @param b a vertex to divide by
      */
     @ExportVertexToPythonBindings
-    public IntegerDivisionVertex(IntegerVertex a, IntegerVertex b) {
+    public IntegerDivisionVertex(@LoadParentVertex(A_NAME) IntegerVertex a, @LoadParentVertex(B_NAME) IntegerVertex b) {
         super(a, b);
     }
 

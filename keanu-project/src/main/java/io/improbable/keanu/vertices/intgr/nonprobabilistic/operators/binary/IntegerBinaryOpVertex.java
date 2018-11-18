@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -12,6 +13,8 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
 
     protected final IntegerVertex a;
     protected final IntegerVertex b;
+    protected static final String A_NAME = "a";
+    protected static final String B_NAME = "b";
 
     /**
      * A vertex that performs a user defined operation on two input vertices
@@ -48,4 +51,14 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
     }
 
     protected abstract IntegerTensor op(IntegerTensor l, IntegerTensor r);
+
+    @SaveParentVertex(A_NAME)
+    public IntegerVertex getA() {
+        return a;
+    }
+
+    @SaveParentVertex(B_NAME)
+    public IntegerVertex getB() {
+        return b;
+    }
 }

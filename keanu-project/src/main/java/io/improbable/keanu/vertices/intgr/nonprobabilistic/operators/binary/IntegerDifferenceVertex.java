@@ -1,9 +1,11 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class IntegerDifferenceVertex extends IntegerBinaryOpVertex {
+public class IntegerDifferenceVertex extends IntegerBinaryOpVertex implements SaveableVertex {
 
     /**
      * Subtracts one vertex from another
@@ -11,7 +13,7 @@ public class IntegerDifferenceVertex extends IntegerBinaryOpVertex {
      * @param a the vertex to be subtracted from
      * @param b the vertex to subtract
      */
-    public IntegerDifferenceVertex(IntegerVertex a, IntegerVertex b) {
+    public IntegerDifferenceVertex(@LoadParentVertex(A_NAME) IntegerVertex a, @LoadParentVertex(B_NAME) IntegerVertex b) {
         super(a, b);
     }
 
