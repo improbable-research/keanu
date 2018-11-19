@@ -2,10 +2,7 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.SaveParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.*;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -41,7 +38,7 @@ public class ProtobufWriter implements NetworkWriter {
 
     @Override
     public void save(Vertex vertex) {
-        if (!(vertex instanceof SaveableVertex)) {
+        if (vertex instanceof NonSaveableVertex) {
             throw new IllegalArgumentException("Trying to save a vertex that isn't Saveable");
         }
 

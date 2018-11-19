@@ -30,7 +30,7 @@ public class TestGraphGenerator {
         return (SumVertex) end;
     }
 
-    static class PassThroughVertex extends DoubleUnaryOpVertex implements Differentiable {
+    static class PassThroughVertex extends DoubleUnaryOpVertex implements Differentiable, NonSaveableVertex {
 
         private final AtomicInteger opCount;
         private final AtomicInteger autoDiffCount;
