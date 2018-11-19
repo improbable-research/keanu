@@ -400,7 +400,7 @@ public class NUTSSampler implements SamplingAlgorithm {
         }
     }
 
-    public static LeapFrogged leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
+    private static LeapFrogged leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
                                        final LogProbGradientCalculator logProbGradientCalculator,
                                        final Map<VertexId, DoubleTensor> position,
                                        final Map<VertexId, DoubleTensor> gradient,

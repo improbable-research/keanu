@@ -42,8 +42,7 @@ public class EightSchools {
         );
 
         NUTS sampler = NUTS.builder()
-            .adaptEnabled(false)
-            .initialStepSize(0.3)
+            .maxTreeHeight(5)
             .random(random)
             .build();
 

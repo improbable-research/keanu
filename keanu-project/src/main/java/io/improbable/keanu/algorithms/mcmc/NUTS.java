@@ -6,7 +6,6 @@ import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -16,7 +15,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,11 +30,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static final int DEFAULT_ADAPT_COUNT = 1000;
     private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.65;
-
-    private static final double DELTA_MAX = 1000.0;
-    private static final double STABILISER = 10;
-    private static final double SHRINKAGE_FACTOR = 0.05;
-    private static final double TEND_TO_ZERO_EXPONENT = 0.75;
 
     public static NUTS withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
@@ -122,9 +115,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         final LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesNet.getLatentOrObservedVertices(), latentVertices);
         List<Vertex> probabilisticVertices = bayesNet.getLatentOrObservedVertices();
 
-        final Map<VertexId, List<?>> samples = new HashMap<>();
-        addSampleFromCache(samples, takeSample(sampleFromVertices));
-
         Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
         Map<VertexId, DoubleTensor> momentum = new HashMap<>();
         Map<VertexId, DoubleTensor> position = new HashMap<>();
@@ -200,23 +190,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static <T> void putValue(Vertex<T> vertex, Map<VertexId, ?> target) {
         ((Map<VertexId, T>) target).put(vertex.getId(), vertex.getValue());
-    }
-
-    /**
-     * This is used to save of the sample from the uniformly chosen acceptedPosition position
-     *
-     * @param samples      samples taken already
-     * @param cachedSample a cached sample from before leapfrog
-     */
-    private static void addSampleFromCache(Map<VertexId, List<?>> samples, Map<VertexId, ?> cachedSample) {
-        for (Map.Entry<VertexId, ?> sampleEntry : cachedSample.entrySet()) {
-            addSampleForVertex(sampleEntry.getKey(), sampleEntry.getValue(), samples);
-        }
-    }
-
-    private static <T> void addSampleForVertex(VertexId id, T value, Map<VertexId, List<?>> samples) {
-        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(id, v -> new ArrayList<T>());
-        samplesForVertex.add(value);
     }
 
 }
