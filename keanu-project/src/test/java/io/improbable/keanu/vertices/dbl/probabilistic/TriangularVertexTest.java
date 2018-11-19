@@ -1,8 +1,10 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 public class TriangularVertexTest {
 
@@ -30,6 +32,7 @@ public class TriangularVertexTest {
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorTriangularVertex, new double[]{2.5, 7.5}, expectedLogDensity);
     }
 
+    @Category(Slow.class)
     @Test
     public void gaussianSampleMethodMatchesLogProbMethod() {
 

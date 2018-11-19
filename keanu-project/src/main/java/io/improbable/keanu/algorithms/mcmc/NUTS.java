@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.backend.LogProbWithSample;
@@ -89,6 +90,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                                               final List<? extends Vertex> sampleFromVertices,
                                               final int sampleCount) {
 
+        Preconditions.checkArgument(!sampleFromVertices.isEmpty(), "List of vertices to sample from is empty");
         ProbabilisticWithGradientGraph gradientGraph;
         if (USE_TENSORFLOW) {
             gradientGraph = TensorflowGraphConverter.convertWithGradient(bayesNet);

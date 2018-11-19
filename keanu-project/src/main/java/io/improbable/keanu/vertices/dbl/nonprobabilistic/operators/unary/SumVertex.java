@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.util.Map;
 
 import static java.util.Collections.singletonMap;
 
-public class SumVertex extends DoubleUnaryOpVertex {
+public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
 
     @Getter
     private final int[] overDimensions;
@@ -80,7 +81,8 @@ public class SumVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
         DoubleTensor sumResult = this.getValue();
         int operandRank = inputVertex.getValue().getRank();
         return derivativeOfParentWithRespectToInputs.sumOverOfDimensions(overDimensions, sumResult.getShape(), operandRank);

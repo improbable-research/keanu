@@ -1,0 +1,337 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>keanu.vertex.generated &#8212; keanu 0.0.15 documentation</title>
+    <link rel="stylesheet" href="../../../static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../static/jquery.js"></script>
+    <script type="text/javascript" src="../../../static/underscore.js"></script>
+    <script type="text/javascript" src="../../../static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for keanu.vertex.generated</h1><div class="highlight"><pre>
+<span></span><span class="c1">## This is a generated file. DO NOT EDIT.</span>
+
+<span class="kn">from</span> <span class="nn">py4j.java_gateway</span> <span class="k">import</span> <span class="n">java_import</span>
+<span class="kn">from</span> <span class="nn">keanu.context</span> <span class="k">import</span> <span class="n">KeanuContext</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">Vertex</span>
+
+<span class="n">context</span> <span class="o">=</span> <span class="n">KeanuContext</span><span class="p">()</span>
+
+
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ConstantBool"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.ConstantBool">[docs]</a><span class="k">def</span> <span class="nf">ConstantBool</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">ConstantBoolVertex</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Equals"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Equals">[docs]</a><span class="k">def</span> <span class="nf">Equals</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">EqualsVertex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GreaterThanOrEqual"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.GreaterThanOrEqual">[docs]</a><span class="k">def</span> <span class="nf">GreaterThanOrEqual</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">GreaterThanOrEqualVertex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GreaterThan"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.GreaterThan">[docs]</a><span class="k">def</span> <span class="nf">GreaterThan</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">GreaterThanVertex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LessThanOrEqual"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.LessThanOrEqual">[docs]</a><span class="k">def</span> <span class="nf">LessThanOrEqual</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">LessThanOrEqualVertex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LessThan"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.LessThan">[docs]</a><span class="k">def</span> <span class="nf">LessThan</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">LessThanVertex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NotEquals"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.NotEquals">[docs]</a><span class="k">def</span> <span class="nf">NotEquals</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">NotEqualsVertex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CastDouble"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.CastDouble">[docs]</a><span class="k">def</span> <span class="nf">CastDouble</span><span class="p">(</span><span class="n">input_vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">CastDoubleVertex</span><span class="p">,</span> <span class="n">input_vertex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConstantDouble"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.ConstantDouble">[docs]</a><span class="k">def</span> <span class="nf">ConstantDouble</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">ConstantDoubleVertex</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DoubleIf"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.DoubleIf">[docs]</a><span class="k">def</span> <span class="nf">DoubleIf</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">predicate</span><span class="p">,</span> <span class="n">thn</span><span class="p">,</span> <span class="n">els</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">DoubleIfVertex</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">predicate</span><span class="p">,</span> <span class="n">thn</span><span class="p">,</span> <span class="n">els</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Addition"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Addition">[docs]</a><span class="k">def</span> <span class="nf">Addition</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds one vertex to another</span>
+<span class="sd">    </span>
+<span class="sd">    :param left: a vertex to add</span>
+<span class="sd">    :param right: a vertex to add</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">AdditionVertex</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Difference"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Difference">[docs]</a><span class="k">def</span> <span class="nf">Difference</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Subtracts one vertex from another</span>
+<span class="sd">    </span>
+<span class="sd">    :param left: the vertex that will be subtracted from</span>
+<span class="sd">    :param right: the vertex to subtract</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">DifferenceVertex</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Division"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Division">[docs]</a><span class="k">def</span> <span class="nf">Division</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Divides one vertex by another</span>
+<span class="sd">    </span>
+<span class="sd">    :param left: the vertex to be divided</span>
+<span class="sd">    :param right: the vertex to divide</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">DivisionVertex</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Multiplication"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Multiplication">[docs]</a><span class="k">def</span> <span class="nf">Multiplication</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Multiplies one vertex by another</span>
+<span class="sd">    </span>
+<span class="sd">    :param left: vertex to be multiplied</span>
+<span class="sd">    :param right: vertex to be multiplied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">MultiplicationVertex</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Power"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Power">[docs]</a><span class="k">def</span> <span class="nf">Power</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raises a vertex to the power of another</span>
+<span class="sd">    </span>
+<span class="sd">    :param base: the base vertex</span>
+<span class="sd">    :param exponent: the exponent vertex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">PowerVertex</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">exponent</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Abs"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Abs">[docs]</a><span class="k">def</span> <span class="nf">Abs</span><span class="p">(</span><span class="n">input_vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes the absolute of a vertex</span>
+<span class="sd">    </span>
+<span class="sd">    :param input_vertex: the vertex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">AbsVertex</span><span class="p">,</span> <span class="n">input_vertex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Ceil"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Ceil">[docs]</a><span class="k">def</span> <span class="nf">Ceil</span><span class="p">(</span><span class="n">input_vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies the Ceiling operator to a vertex.</span>
+<span class="sd">    This maps a vertex to the smallest integer greater than or equal to its value</span>
+<span class="sd">    </span>
+<span class="sd">    :param input_vertex: the vertex to be ceil&#39;d</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">CeilVertex</span><span class="p">,</span> <span class="n">input_vertex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Floor"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Floor">[docs]</a><span class="k">def</span> <span class="nf">Floor</span><span class="p">(</span><span class="n">input_vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies the Floor operator to a vertex.</span>
+<span class="sd">    This maps a vertex to the biggest integer less than or equal to its value</span>
+<span class="sd">    </span>
+<span class="sd">    :param input_vertex: the vertex to be floor&#39;d</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">FloorVertex</span><span class="p">,</span> <span class="n">input_vertex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Round"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Round">[docs]</a><span class="k">def</span> <span class="nf">Round</span><span class="p">(</span><span class="n">input_vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies the Rounding operator to a vertex.</span>
+<span class="sd">    This maps a vertex to the nearest integer value</span>
+<span class="sd">    </span>
+<span class="sd">    :param input_vertex: the vertex to be rounded</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">RoundVertex</span><span class="p">,</span> <span class="n">input_vertex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Cauchy"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Cauchy">[docs]</a><span class="k">def</span> <span class="nf">Cauchy</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">CauchyVertex</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Exponential"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Exponential">[docs]</a><span class="k">def</span> <span class="nf">Exponential</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    One to one constructor for mapping some shape of rate to matching shaped exponential.</span>
+<span class="sd">    </span>
+<span class="sd">    :param rate: the rate of the Exponential with either the same shape as specified for this vertex or scalar</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">ExponentialVertex</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Gamma"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Gamma">[docs]</a><span class="k">def</span> <span class="nf">Gamma</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    One to one constructor for mapping some shape of theta and k to matching shaped gamma.</span>
+<span class="sd">    </span>
+<span class="sd">    :param theta: the theta (scale) of the Gamma with either the same shape as specified for this vertex</span>
+<span class="sd">    :param k: the k (shape) of the Gamma with either the same shape as specified for this vertex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">GammaVertex</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Gaussian"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Gaussian">[docs]</a><span class="k">def</span> <span class="nf">Gaussian</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">GaussianVertex</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Uniform"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Uniform">[docs]</a><span class="k">def</span> <span class="nf">Uniform</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    One to one constructor for mapping some shape of mu and sigma to</span>
+<span class="sd">    a matching shaped Uniform Vertex</span>
+<span class="sd">    </span>
+<span class="sd">    :param x_min: the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar</span>
+<span class="sd">    :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">UniformVertex</span><span class="p">,</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConstantInteger"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.ConstantInteger">[docs]</a><span class="k">def</span> <span class="nf">ConstantInteger</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">ConstantIntegerVertex</span><span class="p">,</span> <span class="n">constant</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IntegerDivision"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.IntegerDivision">[docs]</a><span class="k">def</span> <span class="nf">IntegerDivision</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Divides one vertex by another</span>
+<span class="sd">    </span>
+<span class="sd">    :param a: a vertex to be divided</span>
+<span class="sd">    :param b: a vertex to divide by</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">IntegerDivisionVertex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Poisson"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Poisson">[docs]</a><span class="k">def</span> <span class="nf">Poisson</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    One to one constructor for mapping some shape of mu to</span>
+<span class="sd">    a matching shaped Poisson.</span>
+<span class="sd">    </span>
+<span class="sd">    :param mu: mu with same shape as desired Poisson tensor or scalar</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">PoissonVertex</span><span class="p">,</span> <span class="n">mu</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UniformInt"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.UniformInt">[docs]</a><span class="k">def</span> <span class="nf">UniformInt</span><span class="p">(</span><span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">UniformIntVertex</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">keanu</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../keanu.html">keanu</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Improbable.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

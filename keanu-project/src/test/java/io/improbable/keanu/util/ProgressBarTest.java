@@ -1,8 +1,10 @@
 package io.improbable.keanu.util;
 
+import io.improbable.keanu.testcategory.Slow;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -146,6 +148,7 @@ public class ProgressBarTest {
         verifyNoMoreInteractions(finishHandler);
     }
 
+    @Category(Slow.class)
     @Test
     public void youCanOverrideTheDefaultPrintStream() {
         PrintStream mockStream = mock(PrintStream.class);
