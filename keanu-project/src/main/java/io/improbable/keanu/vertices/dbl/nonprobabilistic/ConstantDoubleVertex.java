@@ -58,6 +58,6 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
 
     @Override
     public void save(NetworkWriter netWriter) {
-        netWriter.save(this);
+        netWriter.save((ConstantVertex)this);
     }
 }

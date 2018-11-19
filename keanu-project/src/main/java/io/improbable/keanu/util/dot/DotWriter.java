@@ -148,7 +148,7 @@ public class DotWriter implements NetworkWriter{
 
     private void setDotLabelWithValue(Vertex<? extends Tensor> vertex) {
         VertexDotLabel vertexDotLabel = vertex.getDotLabel();
-        if (vertex.getValue().isScalar()) {
+        if (vertex.hasValue() && vertex.getValue().isScalar()) {
             vertexDotLabel.setDotLabel(VertexDotLabel.VertexDotLabelType.VALUE, "" + vertex.getValue().scalar());
         }
         dotLabels.add(vertexDotLabel);

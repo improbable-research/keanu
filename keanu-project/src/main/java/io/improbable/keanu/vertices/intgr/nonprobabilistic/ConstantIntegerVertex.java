@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -32,5 +33,10 @@ public class ConstantIntegerVertex extends IntegerVertex implements NonProbabili
     @Override
     public IntegerTensor calculate() {
         return getValue();
+    }
+
+    @Override
+    public void save(NetworkWriter netWriter) {
+        netWriter.save((ConstantVertex)this);
     }
 }
