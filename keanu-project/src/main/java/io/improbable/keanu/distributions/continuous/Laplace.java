@@ -1,6 +1,5 @@
 package io.improbable.keanu.distributions.continuous;
 
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
@@ -36,7 +35,7 @@ public class Laplace implements ContinuousDistribution {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
         Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
 
-        int length = TensorShape.getLengthAsInt(shape));
+        int length = TensorShape.getLengthAsInt(shape);
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
             samples[i] = sample(muWrapped.getOrScalar(i), betaWrapped.getOrScalar(i), random);

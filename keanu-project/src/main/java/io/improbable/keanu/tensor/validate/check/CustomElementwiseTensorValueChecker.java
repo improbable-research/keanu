@@ -17,7 +17,7 @@ public class CustomElementwiseTensorValueChecker<DATATYPE, TENSOR extends Tensor
 
     @Override
     public BooleanTensor check(TENSOR tensor) {
-        int length = TensorShape.getLengthAsInt(tensor.getShape()));
+        int length = TensorShape.getLengthAsInt(tensor.getShape());
         boolean[] results = new boolean[length];
         Tensor.FlattenedView<DATATYPE> flattenedView = tensor.getFlattenedView();
         for (int i = 0; i < length; i++) {
