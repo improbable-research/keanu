@@ -27,8 +27,7 @@ from keanu.vertex import Gaussian
     (cast_to_bool, bool)
 ])
 def test_scalar_cast(value: primitive_types, cast_fn: Callable, cast_to_type: type) -> None:
-    assert type(cast_tensor_arg_to_bool(value)) == bool
-    assert type(cast_to_bool(value)) == bool
+    assert type(cast_fn(value)) == cast_to_type
 
 
 @pytest.mark.parametrize("value", [
