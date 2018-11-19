@@ -3,11 +3,15 @@ package com.examples;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
 public class TextMessagingTest {
+
+    private final Logger log = LoggerFactory.getLogger(TextMessagingTest.class);
 
     @Before
     public void setup() {
@@ -18,9 +22,9 @@ public class TextMessagingTest {
     public void testWhenTextMessagingScenarioIsRunThenSwitchPointIsAccurate() {
         TextMessaging.TextMessagingResults output = TextMessaging.run();
 
-        System.out.println("Switch Point Mode " + output.switchPointMode);
-        System.out.println("Early Rate Mean " + output.earlyRateMean);
-        System.out.println("Late Rate Mean " + output.lateRateMean);
+        log.info("Switch Point Mode " + output.switchPointMode);
+        log.info("Early Rate Mean " + output.earlyRateMean);
+        log.info("Late Rate Mean " + output.lateRateMean);
 
         assertThat(output.switchPointMode).isCloseTo(43, within(2));
         assertThat(output.earlyRateMean).isCloseTo(18, within(2d));
