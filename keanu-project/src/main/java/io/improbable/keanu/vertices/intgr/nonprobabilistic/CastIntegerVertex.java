@@ -4,12 +4,11 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class CastIntegerVertex extends IntegerVertex implements SaveableVertex, NonProbabilistic<IntegerTensor> {
+public class CastIntegerVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     private final Vertex<IntegerTensor> inputVertex;
     private static final String INPUT_NAME = "inputVertex";

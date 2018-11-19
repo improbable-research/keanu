@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.function.BiFunction;
