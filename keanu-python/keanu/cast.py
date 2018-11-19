@@ -14,9 +14,9 @@ def __cast_to(arg: tensor_arg_types, cast_to_type: type) -> tensor_arg_types:
     elif isinstance(arg, runtime_numpy_types):
         return arg.astype(cast_to_type)
     elif isinstance(arg, runtime_pandas_types):
-        return arg.apply(Series).values.astype(cast_to_type)
+        return arg.values.astype(cast_to_type)
     else:
-        raise NotImplementedError
+        raise TypeError("Cannot cast {} to {}".format(type(arg), cast_to_type))
 
 def cast_tensor_arg_to_double(arg: tensor_arg_types) -> tensor_arg_types:
     return __cast_to(arg, float)
