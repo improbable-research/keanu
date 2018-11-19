@@ -1,3 +1,4 @@
+import static org.apache.tools.ant.taskdefs.condition.Os.*
 task installPipenv {
     doLast {
         exec {
@@ -104,8 +105,10 @@ task formatCheck {
     doLast { 
         exec {
             // Exclude files that are generated
+            def keanuVertexGeneratedPath = 'keanu' + File.separator + 'vertex' + File.separator + 'generated.py'
+            def keanuVertexInitPath = 'keanu' + File.separator + 'vertex' + File.separator + '__init__.py'
             commandLine 'pipenv', 'run', 'yapf', '--style', 'google', '--diff', '--recursive', '--parallel', 
-            '--exclude', 'keanu/vertex/generated.py', '--exclude', 'keanu/vertex/__init__.py', '.'
+            '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
         }
     }
 }
