@@ -1,4 +1,6 @@
-import static org.apache.tools.ant.taskdefs.condition.Os.*
+import static org.apache.tools.ant.taskdefs.condition.Os.isFamily;
+import static org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS;
+
 task installPipenv {
     doLast {
         exec {
@@ -105,8 +107,12 @@ task formatCheck {
     doLast { 
         exec {
             // Exclude files that are generated
-            def keanuVertexGeneratedPath = 'keanu' + File.separator + 'vertex' + File.separator + 'generated.py'
-            def keanuVertexInitPath = 'keanu' + File.separator + 'vertex' + File.separator + '__init__.py'
+            def keanuVetexPath = 'keanu/vertex/'
+            if(isFamily(FAMILY_WINDOWS)) {
+                keanuVetexPath = '.\\keanu\\vertex\\'
+            }
+            def keanuVertexGeneratedPath = keanuVetexPath + 'generated.py'
+            def keanuVertexInitPath = keanuVetexPath + '__init__.py'
             commandLine 'pipenv', 'run', 'yapf', '--style', 'google', '--diff', '--recursive', '--parallel', 
             '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
         }
