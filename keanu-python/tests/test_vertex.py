@@ -69,69 +69,17 @@ def test_you_can_cascade_a_value(jvm_view):
     assert sum_of_gaussians.get_value() == 7.
 
 
-@pytest.mark.parametrize("value", [
-    (4.),
-    (True),
-    (10),
-])
-def test_double_vertex_can_observe_scalar(jvm_view, value):
-    gaussian = Double(jvm_view.GaussianVertex, 0., 1.)
-    gaussian.observe(value)
-
-    assert gaussian.get_value() == value
-
-
-@pytest.mark.parametrize("value", [
-    (np.array([[1, 44]])),
-    (np.array([[True, False]])),
-    (np.array([[44., 2.]]))
-])
-def test_double_vertex_can_observe_ndarray(jvm_view, value):
-    gaussian = Double(jvm_view.GaussianVertex, 0., 1.)
-
-    gaussian.observe(value)
-
-    assert type(gaussian.get_value()) == np.ndarray
-    assert (gaussian.get_value() == value).all()
-
-
-@pytest.mark.parametrize("value", [
-    ([[1, 44]]),
-    ([[True, False]]),
-    ([[44., 2.]])
-])
-def test_double_vertex_can_observe_dataframe(jvm_view, value):
-    dataframe = pd.DataFrame(data=value)
-    gaussian = Double(jvm_view.GaussianVertex, 0., 1.)
-
-    gaussian.observe(dataframe)
-
-    assert type(gaussian.get_value()) == np.ndarray
-    assert (gaussian.get_value() == np.array(value)).all()
-
-
-@pytest.mark.parametrize("value", [
-    ([[1, 44]]),
-    ([[True, False]]),
-    ([[44., 2.]])
-])
-def test_double_vertex_can_observe_series(jvm_view, value):
-    series = pd.Series(data=value)
-    gaussian = Double(jvm_view.GaussianVertex, 0., 1.)
-
-    gaussian.observe(series)
-
-    assert type(gaussian.get_value()) == np.ndarray
-    assert (gaussian.get_value() == np.array(value)).all()
-
-
 @pytest.mark.parametrize("at_value", [
     (1),
+    (2.),
+    (True),
     (np.array([1])),
+    (np.array([3.])),
+    (np.array([False])),
     (pd.DataFrame(data=[1])),
     (pd.Series(data=[1]))
 ])
-def test_vertex_logprob(at_value):
+def test_logprob(at_value):
     uniform = UniformInt(0, 10)
     assert uniform.logprob(at_value) == pytest.approx(math.log(0.1))
 
@@ -227,15 +175,18 @@ def test_get_vertex_id(jvm_view):
 
     assert all(value in python_id for value in java_id)
 
-@pytest.mark.parametrize("mu, sigma", [
-    (0, 1),
-    (False, True),
-    (np.array([0]), np.array([1])),
-    (np.array([False]), np.array([True])),
-    (pd.DataFrame(data=[0]), pd.DataFrame(data=[1])),
-    (pd.DataFrame(data=[False]), pd.DataFrame(data=[True])),
-    (pd.Series(data=[0]), pd.Series(data=[1])),
-    (pd.Series(data=[False]), pd.Series(data=[True]))
+
+@pytest.mark.parametrize("mu", [
+    0, 0., False,
+    np.array([0]), np.array([0.]), np.array([False]),
+    pd.DataFrame(data=[0]), pd.DataFrame(data=[0.]), pd.DataFrame(data=[False]),
+    pd.Series(data=[0]), pd.Series(data=[0.]), pd.Series(data=[False])
+])
+@pytest.mark.parametrize("sigma", [
+    1, 1., True,
+    np.array([1]), np.array([1.]), np.array([True]),
+    pd.DataFrame(data=[1]), pd.DataFrame(data=[1.]), pd.DataFrame(data=[True]),
+    pd.Series(data=[1]), pd.Series(data=[1.]), pd.Series(data=[True])
 ])
 def test_cast_for_gaussian(mu: tensor_arg_types, sigma: tensor_arg_types) -> None:
     gaussian_with_double_params = Gaussian(0., 1.)
@@ -245,11 +196,18 @@ def test_cast_for_gaussian(mu: tensor_arg_types, sigma: tensor_arg_types) -> Non
 
     assert gaussian_with_double_params.logprob(val) == gaussian_with_non_double_params.logprob(val)
 
-@pytest.mark.parametrize("min, max", [
-    (0., 5.),
-    (np.array([0.]), np.array([5.])),
-    (pd.DataFrame(data=[0.]), pd.DataFrame(data=[5.])),
-    (pd.Series(data=[0]), pd.Series(data=[5.])),
+
+@pytest.mark.parametrize("min", [
+    0, 0., False,
+    np.array([0]), np.array([0.]), np.array([False]),
+    pd.DataFrame(data=[0]), pd.DataFrame(data=[0.]), pd.DataFrame(data=[False]),
+    pd.Series(data=[0]), pd.Series(data=[0.]), pd.Series(data=[False])
+])
+@pytest.mark.parametrize("max", [
+    5, 5.,
+    np.array([5]), np.array([5.]),
+    pd.DataFrame(data=[5]), pd.DataFrame(data=[5.]),
+    pd.Series(data=[5]), pd.Series(data=[5.])
 ])
 def test_cast_for_uniform(min: tensor_arg_types, max: tensor_arg_types) -> None:
     uniform_with_int_params = UniformInt(0, 5)
