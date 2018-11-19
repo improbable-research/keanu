@@ -62,7 +62,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape    desired shape of tensor
      */
     public SimpleBooleanTensor(boolean constant, long[] shape) {
-        int dataLength = Ints.checkedCast(TensorShape.getLength(shape));
+        int dataLength = TensorShape.getLengthAsInt(shape));
         this.data = new boolean[dataLength];
         Arrays.fill(this.data, constant);
         this.shape = Arrays.copyOf(shape, shape.length);

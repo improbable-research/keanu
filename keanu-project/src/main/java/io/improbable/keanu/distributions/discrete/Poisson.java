@@ -30,7 +30,7 @@ public class Poisson implements DiscreteDistribution {
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
 
-        int length = Ints.checkedCast(TensorShape.getLength(shape));
+        int length = TensorShape.getLengthAsInt(shape));
         int[] samples = new int[length];
         for (int i = 0; i < length; i++) {
             samples[i] = sample(muWrapped.getOrScalar(i), random);

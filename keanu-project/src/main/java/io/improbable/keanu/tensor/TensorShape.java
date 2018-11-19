@@ -1,6 +1,8 @@
 package io.improbable.keanu.tensor;
 
+import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.ArrayUtils;
+import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.Arrays;
 
@@ -50,6 +52,10 @@ public class TensorShape {
             length *= dim;
         }
         return length;
+    }
+
+    public static int getLengthAsInt(long[] shape){
+        return Ints.checkedCast(getLength(shape));
     }
 
     /**

@@ -56,7 +56,7 @@ public class Multinomial implements DiscreteDistribution {
         Tensor.FlattenedView<Integer> nFlattened = n.getFlattenedView();
         List<DoubleTensor> sliced = p.sliceAlongDimension(0, 0, numCategories);
 
-        int length = Ints.checkedCast(TensorShape.getLength(shape));
+        int length = TensorShape.getLengthAsInt(shape));
         int[] samples = new int[0];
 
         for (int i = 0; i < length; i++) {

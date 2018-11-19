@@ -36,7 +36,7 @@ public class Laplace implements ContinuousDistribution {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
         Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
 
-        int length = Ints.checkedCast(TensorShape.getLength(shape));
+        int length = TensorShape.getLengthAsInt(shape));
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
             samples[i] = sample(muWrapped.getOrScalar(i), betaWrapped.getOrScalar(i), random);

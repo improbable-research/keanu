@@ -52,7 +52,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     private static <T> T[] fillArray(long[] shape, T value) {
-        Object[] data = new Object[Ints.checkedCast(TensorShape.getLength(shape))];
+        Object[] data = new Object[TensorShape.getLengthAsInt(shape))];
         Arrays.fill(data, value);
         return (T[]) data;
     }
