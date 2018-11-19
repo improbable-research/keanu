@@ -1,6 +1,7 @@
 package io.improbable.keanu.codegen.python;
 
 import com.google.common.base.CaseFormat;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import freemarker.template.Template;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -78,6 +79,7 @@ class VertexProcessor {
             PythonConstructor pythonConstructor = new PythonConstructor(
                 javaClass,
                 toPythonClass(javaClass),
+                toPythonVertexClass(constructor.getDeclaringClass()),
                 toTypedPythonParams(pythonParameters, parameterTypes),
                 toCastedPythonParams(pythonParameters, parameterTypes),
                 docString.getAsString()
@@ -89,6 +91,18 @@ class VertexProcessor {
         root.put("exportedMethods", exportedMethodsJoiner.toString());
 
         return root;
+    }
+
+    private static String toPythonVertexClass(Class<?> javaClass) {
+        if (DoubleVertex.class.isAssignableFrom(javaClass)) {
+            return "Double";
+        } else if (IntegerVertex.class.isAssignableFrom(javaClass)) {
+            return "Integer";
+        } else if (BoolVertex.class.isAssignableFrom(javaClass)) {
+            return "Bool";
+        } else {
+            return "Vertex";
+        }
     }
 
     private static String toCastedPythonParams(String[] pythonParameters, Class<?>[] parameterTypes) {
@@ -163,15 +177,18 @@ class VertexProcessor {
         @Getter
         private String pythonClass;
         @Getter
+        private String pythonVertexClass;
+        @Getter
         private String pythonTypedParameters;
         @Getter
         private String pythonParameters;
         @Getter
         private String docString;
 
-        PythonConstructor(String javaClass, String pythonClass, String pythonTypedParameters, String pythonParameters, String docString) {
+        PythonConstructor(String javaClass, String pythonClass, String pythonVertexClass, String pythonTypedParameters, String pythonParameters, String docString) {
             this.javaClass = javaClass;
             this.pythonClass = pythonClass;
+            this.pythonVertexClass = pythonVertexClass;
             this.pythonTypedParameters = pythonTypedParameters;
             this.pythonParameters = pythonParameters;
             this.docString = docString;

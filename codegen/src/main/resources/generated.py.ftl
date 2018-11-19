@@ -2,7 +2,7 @@
 
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
-from .base import Vertex
+from .base import Vertex, Double, Integer, Bool
 from keanu.vartypes import (
     vertex_param_types,
     tensor_arg_types,
@@ -20,5 +20,5 @@ java_import(context.jvm_view(), "${import.packageName}")
 
 
 def ${constructor.pythonClass}(${constructor.pythonTypedParameters}) -> Vertex:
-    ${constructor.docString}return Vertex(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters})
+    ${constructor.docString}return ${constructor.pythonVertexClass}(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters})
 </#list>

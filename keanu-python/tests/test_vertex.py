@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import pytest
-from keanu.vertex.base import Vertex
+import math
+from keanu.vertex.base import Vertex, Double, Integer, Bool
 from keanu.context import KeanuContext
 from keanu.vertex import Gaussian, Const, UniformInt
 from keanu.vartypes import tensor_arg_types
@@ -68,22 +69,61 @@ def test_you_can_cascade_a_value(jvm_view):
     assert sum_of_gaussians.get_value() == 7.
 
 
-def test_vertex_can_observe_scalar(jvm_view):
-    gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
-    gaussian.observe(4.)
+@pytest.mark.parametrize("value", [
+    (4.),
+    (True),
+    (10),
+])
+def test_double_vertex_can_observe_scalar(jvm_view, value):
+    gaussian = Double(jvm_view.GaussianVertex, 0., 1.)
+    gaussian.observe(value)
+
+    assert gaussian.get_value() == value
+
+
+@pytest.mark.parametrize("value", [
+    (np.array([[1, 44]])),
+    (np.array([[True, False]])),
+    (np.array([[44., 2.]]))
+])
+def test_double_vertex_can_observe_ndarray(jvm_view, value):
+    gaussian = Double(jvm_view.GaussianVertex, 0., 1.)
+
+    gaussian.observe(value)
 
     assert type(gaussian.get_value()) == np.ndarray
-    assert gaussian.get_value() == 4.
+    assert (gaussian.get_value() == value).all()
 
 
-def test_vertex_can_observe_ndarray(jvm_view):
-    gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
+@pytest.mark.parametrize("value", [
+    ([[1, 44]]),
+    ([[True, False]]),
+    ([[44., 2.]])
+])
+def test_double_vertex_can_observe_dataframe(jvm_view, value):
+    dataframe = pd.DataFrame(data=value)
+    gaussian = Double(jvm_view.GaussianVertex, 0., 1.)
 
-    ndarray = np.array([[1.,2.]])
-    gaussian.observe(ndarray)
+    gaussian.observe(dataframe)
 
     assert type(gaussian.get_value()) == np.ndarray
-    assert (gaussian.get_value() == ndarray).all()
+    assert (gaussian.get_value() == np.array(value)).all()
+
+
+@pytest.mark.parametrize("value", [
+    ([[1, 44]]),
+    ([[True, False]]),
+    ([[44., 2.]])
+])
+def test_double_vertex_can_observe_series(jvm_view, value):
+    series = pd.Series(data=value)
+    gaussian = Double(jvm_view.GaussianVertex, 0., 1.)
+
+    gaussian.observe(series)
+
+    assert type(gaussian.get_value()) == np.ndarray
+    assert (gaussian.get_value() == np.array(value)).all()
+
 
 @pytest.mark.parametrize("at_value", [
     (1),
@@ -93,7 +133,7 @@ def test_vertex_can_observe_ndarray(jvm_view):
 ])
 def test_vertex_logprob(at_value):
     uniform = UniformInt(0, 10)
-    uniform.logprob(at_value) == 0.1
+    assert uniform.logprob(at_value) == pytest.approx(math.log(0.1))
 
 def test_int_vertex_value_is_a_numpy_array():
     ndarray = np.array([[1, 2], [3, 4]])
