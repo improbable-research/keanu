@@ -264,7 +264,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     }
 
     public void loadValue(NetworkReader reader) {
-        throw new UnsupportedOperationException("TODO: Refactor");
+       reader.loadValue(this);
     }
 
     /**

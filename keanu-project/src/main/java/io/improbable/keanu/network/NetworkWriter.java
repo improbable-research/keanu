@@ -4,6 +4,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.io.IOException;
@@ -19,6 +20,9 @@ public interface NetworkWriter {
     }
 
     void save(ConstantVertex vertex);
+    default void save(ConstantDoubleVertex vertex) {
+        save((ConstantVertex)vertex);
+    }
 
     void saveValue(Vertex vertex);
     void saveValue(DoubleVertex vertex);

@@ -20,8 +20,6 @@ public class Diffs {
     public static final ParameterName SIGMA = new ParameterName("SIGMA");
     public static final ParameterName THETA = new ParameterName("THETA");
     public static final ParameterName LAMBDA = new ParameterName("LAMBDA");
-    public static final ParameterName LEFT = new ParameterName("LEFT");
-    public static final ParameterName RIGHT = new ParameterName("RIGHT");
 
     private final TreeSet<Diff> diffs = Sets.newTreeSet();
 

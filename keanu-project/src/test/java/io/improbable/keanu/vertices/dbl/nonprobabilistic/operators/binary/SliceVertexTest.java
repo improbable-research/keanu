@@ -90,7 +90,7 @@ public class SliceVertexTest {
         DoubleVertex alpha = new UniformVertex(0, 10);
         alpha.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25, 30, 35}, 3, 2));
 
-        DoubleVertex N = m.matrixMultiply(alpha);
+        MatrixMultiplicationVertex N = m.matrixMultiply(alpha);
 
         SliceVertex sliceN = new SliceVertex(N, dim, ind);
 
@@ -117,7 +117,7 @@ public class SliceVertexTest {
         DoubleVertex alpha = new UniformVertex(0, 10);
         alpha.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex N = m.matrixMultiply(alpha);
+        MatrixMultiplicationVertex N = m.matrixMultiply(alpha);
 
         SliceVertex sliceN = new SliceVertex(N, 1, 1);
 

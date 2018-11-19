@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -15,6 +16,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.ParetoVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -108,6 +110,7 @@ public class ModelCompositionTest {
         }
     }
 
+    @Category(Slow.class)
     @Test
     public void inferenceWorksOnGraph() {
         final int NUM_SAMPLES = 50000;

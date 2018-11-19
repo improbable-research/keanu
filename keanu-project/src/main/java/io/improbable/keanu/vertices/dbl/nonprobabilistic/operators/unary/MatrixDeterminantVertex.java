@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
@@ -19,7 +20,7 @@ import java.util.Map;
  * <p>
  * Forward mode differentiation is not implemented due to requiring a tensor trace, which is not yet implemented
  */
-public class MatrixDeterminantVertex extends DoubleUnaryOpVertex {
+public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Differentiable {
     public MatrixDeterminantVertex(DoubleVertex vertex) {
         super(Tensor.SCALAR_SHAPE, vertex);
         TensorShapeValidation.checkShapeIsSquareMatrix(vertex.getShape());
@@ -31,7 +32,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         throw new UnsupportedOperationException();
     }
 

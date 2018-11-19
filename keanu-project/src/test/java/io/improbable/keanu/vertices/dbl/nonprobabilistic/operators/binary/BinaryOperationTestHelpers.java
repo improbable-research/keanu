@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -28,17 +29,18 @@ public class BinaryOperationTestHelpers {
         assertEquals(expected, op.apply(A, B).getValue().scalar(), 1e-5);
     }
 
-    public static void calculatesDerivativeOfTwoScalars(double aValue,
-                                                        double bValue,
-                                                        double expectedGradientWrtA,
-                                                        double expectedGradientWrtB,
-                                                        BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+    public static <T extends DoubleVertex & Differentiable>
+    void calculatesDerivativeOfTwoScalars(double aValue,
+                                          double bValue,
+                                          double expectedGradientWrtA,
+                                          double expectedGradientWrtB,
+                                          BiFunction<DoubleVertex, DoubleVertex, T> op) {
 
         UniformVertex A = new UniformVertex(0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
         UniformVertex B = new UniformVertex(0.0, 1.0);
         B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
-        DoubleVertex output = op.apply(A, B);
+        T output = op.apply(A, B);
 
         PartialDerivatives wrtForward = output.getDerivativeWrtLatents();
         assertEquals(expectedGradientWrtA, wrtForward.withRespectTo(A).scalar(), 1e-5);
@@ -69,18 +71,19 @@ public class BinaryOperationTestHelpers {
         assertEquals(expectedTensor.getValue(1, 1), result.getValue(1, 1), 1e-5);
     }
 
-    public static void calculatesDerivativeOfTwoMatricesElementWiseOperator(DoubleTensor aValues,
+    public static <T extends DoubleVertex & Differentiable>
+    void calculatesDerivativeOfTwoMatricesElementWiseOperator(DoubleTensor aValues,
                                                                             DoubleTensor bValues,
                                                                             DoubleTensor expectedGradientWrtA,
                                                                             DoubleTensor expectedGradientWrtB,
-                                                                            BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+                                                                            BiFunction<DoubleVertex, DoubleVertex, T> op) {
 
         UniformVertex A = new UniformVertex(aValues.getShape(), 0.0, 1.0);
         A.setAndCascade(aValues);
         UniformVertex B = new UniformVertex(bValues.getShape(), 0.0, 1.0);
         B.setAndCascade(bValues);
 
-        DoubleVertex output = op.apply(A, B);
+        T output = op.apply(A, B);
         PartialDerivatives wrtForward = output.getDerivativeWrtLatents();
 
         DoubleTensor wrtAForward = wrtForward.withRespectTo(A);
@@ -102,17 +105,18 @@ public class BinaryOperationTestHelpers {
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBReverse.getShape());
     }
 
-    public static void calculatesDerivativeOfAVectorAndScalar(DoubleTensor aValues,
+    public static <T extends DoubleVertex & Differentiable>
+    void calculatesDerivativeOfAVectorAndScalar(DoubleTensor aValues,
                                                               double bValue,
                                                               DoubleTensor expectedGradientWrtA,
                                                               DoubleTensor expectedGradientWrtB,
-                                                              BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+                                                              BiFunction<DoubleVertex, DoubleVertex, T> op) {
         UniformVertex A = new UniformVertex(aValues.getShape(), 0.0, 1.0);
         A.setAndCascade(aValues);
         UniformVertex B = new UniformVertex(0.0, 1.0);
         B.setAndCascade(DoubleTensor.scalar(bValue));
 
-        DoubleVertex output = op.apply(A, B);
+        T output = op.apply(A, B);
         PartialDerivatives wrtForward = output.getDerivativeWrtLatents();
 
         DoubleTensor wrtAForward = wrtForward.withRespectTo(A);
@@ -133,17 +137,18 @@ public class BinaryOperationTestHelpers {
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBReverse.getShape());
     }
 
-    public static void calculatesDerivativeOfAScalarAndVector(double aValue,
+    public static <T extends DoubleVertex & Differentiable>
+    void calculatesDerivativeOfAScalarAndVector(double aValue,
                                                               DoubleTensor bValues,
                                                               DoubleTensor expectedGradientWrtA,
                                                               DoubleTensor expectedGradientWrtB,
-                                                              BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+                                                              BiFunction<DoubleVertex, DoubleVertex, T> op) {
         UniformVertex A = new UniformVertex(0.0, 1.0);
         A.setAndCascade(DoubleTensor.scalar(aValue));
         UniformVertex B = new UniformVertex(bValues.getShape(), 0.0, 1.0);
         B.setAndCascade(bValues);
 
-        DoubleVertex output = op.apply(A, B);
+        T output = op.apply(A, B);
         PartialDerivatives wrtForward = output.getDerivativeWrtLatents();
 
         DoubleTensor wrtAForward = wrtForward.withRespectTo(A);

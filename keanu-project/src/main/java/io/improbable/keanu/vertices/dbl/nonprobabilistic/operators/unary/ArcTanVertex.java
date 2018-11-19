@@ -2,13 +2,14 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ArcTanVertex extends DoubleUnaryOpVertex {
+public class ArcTanVertex extends DoubleUnaryOpVertex implements Differentiable {
 
     /**
      * Takes the inverse tan of a vertex, Arctan(vertex)
@@ -25,7 +26,8 @@ public class ArcTanVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
         DoubleTensor value = inputVertex.getValue();
 
         DoubleTensor dArcTan = value.pow(2).plusInPlace(1).reciprocalInPlace();

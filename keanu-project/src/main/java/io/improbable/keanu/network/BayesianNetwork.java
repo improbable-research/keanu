@@ -7,9 +7,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -125,6 +125,14 @@ public class BayesianNetwork {
             isObserved && maxIndentation >= indentation);
     }
 
+    /**
+     * @return a list of all vertices that are not differentiable (i.e., there are points at which they do not have a derivative).
+     */
+    public List<Vertex> getNonDifferentiableVertices() {
+        return vertices.stream().filter(vertex -> !(vertex instanceof Differentiable))
+            .collect(Collectors.toList());
+    }
+
     public double getLogOfMasterP() {
         return ProbabilityCalculator.calculateLogProbFor(getLatentOrObservedVertices());
     }
@@ -214,15 +222,15 @@ public class BayesianNetwork {
         indentation++;
     }
 
-    public void save(NetworkWriter protobufWriter) throws IOException {
+    public void save(NetworkWriter networkWriter) {
         for (Vertex vertex : TopologicalSort.sort(vertices)) {
-            vertex.save(protobufWriter);
+            vertex.save(networkWriter);
         }
     }
 
-    public void saveValues(NetworkWriter protobufWriter) throws IOException {
+    public void saveValues(NetworkWriter networkWriter) {
         for (Vertex vertex : vertices) {
-            vertex.saveValue(protobufWriter);
+            vertex.saveValue(networkWriter);
         }
     }
 

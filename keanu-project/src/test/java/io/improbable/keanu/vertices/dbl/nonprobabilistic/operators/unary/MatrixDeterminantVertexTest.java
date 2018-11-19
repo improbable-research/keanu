@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.VertexMatchers;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.apache.commons.math3.linear.SingularMatrixException;
@@ -51,7 +52,7 @@ public class MatrixDeterminantVertexTest {
         final long[] shape = new long[]{2, 2};
         final DoubleVertex input = new UniformVertex(shape, 0, 10);
         input.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, shape));
-        final DoubleVertex output = input.matrixDeterminant();
+        final MatrixDeterminantVertex output = input.matrixDeterminant();
         finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(input), output, 0.001, 1e-5);
     }
 
@@ -60,7 +61,7 @@ public class MatrixDeterminantVertexTest {
         final long[] shape = new long[]{2, 2};
         final DoubleVertex input = new UniformVertex(shape, 0, 10);
         input.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, shape));
-        final DoubleVertex output = input.matrixDeterminant().times(input);
+        final MultiplicationVertex output = input.matrixDeterminant().times(input);
 
         finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(input), output, 0.001, 1e-5);
     }

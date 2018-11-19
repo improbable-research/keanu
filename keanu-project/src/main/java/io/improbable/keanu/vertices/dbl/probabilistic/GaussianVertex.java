@@ -3,13 +3,14 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
-import io.improbable.keanu.network.NetworkReader;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.dot.GraphEdge;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -25,10 +26,12 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class GaussianVertex extends DoubleVertex implements SaveableVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
+    protected static final String MU_NAME = "mu";
+    protected static final String SIGMA_NAME = "sigma";
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -49,8 +52,8 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
     }
 
     @ExportVertexToPythonBindings
-    public GaussianVertex(@LoadParentVertex(name = "mu") DoubleVertex mu,
-                          @LoadParentVertex(name = "sigma") DoubleVertex sigma) {
+    public GaussianVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
+                          @LoadParentVertex(SIGMA_NAME) DoubleVertex sigma) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
@@ -78,16 +81,12 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble,
         this(tensorShape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
 
-    public GaussianVertex(Map<String, Vertex> parentMap, NetworkReader reader, Object initialValue) {
-        this((DoubleVertex)parentMap.get("mu"), (DoubleVertex)parentMap.get("sigma"));
-    }
-
-    @SaveParentVertex(name = "mu")
+    @SaveParentVertex(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
-    @SaveParentVertex(name = "sigma")
+    @SaveParentVertex(SIGMA_NAME)
     public DoubleVertex getSigma() {
         return sigma;
     }
