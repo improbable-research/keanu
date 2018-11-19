@@ -2,13 +2,7 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadParentVertex;
-import io.improbable.keanu.vertices.LoadVertexValue;
-import io.improbable.keanu.vertices.SaveParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.*;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -312,7 +306,7 @@ public class ProtobufTest {
 
         Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
         vertices.stream()
-            .filter(v -> SaveableVertex.class.isAssignableFrom(v))
+            .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
             .filter(v -> !Modifier.isAbstract(v.getModifiers()))
             .forEach(this::checkSaveableVertex);
     }
