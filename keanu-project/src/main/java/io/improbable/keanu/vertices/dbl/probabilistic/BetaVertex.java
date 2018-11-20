@@ -1,10 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -21,10 +25,12 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class BetaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class BetaVertex extends DoubleVertex implements SaveableVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
+    private static final String ALPHA_NAME = "alpha";
+    private static final String BETA_NAME = "beta";
 
     /**
      * One alpha or beta or both that match a proposed tensor shape of Beta.
@@ -55,7 +61,9 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
      * @param alpha the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
      * @param beta  the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
-    public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
+    @ExportVertexToPythonBindings
+    public BetaVertex(@LoadParentVertex(ALPHA_NAME) DoubleVertex alpha,
+                      @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
@@ -81,6 +89,16 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
 
     public BetaVertex(long[] tensorShape, double alpha, double beta) {
         this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
+    }
+
+    @SaveParentVertex(ALPHA_NAME)
+    public DoubleVertex getAlpha() {
+        return alpha;
+    }
+
+    @SaveParentVertex(BETA_NAME)
+    public DoubleVertex getBeta() {
+        return beta;
     }
 
     @Override

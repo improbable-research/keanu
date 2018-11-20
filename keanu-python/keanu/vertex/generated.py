@@ -26,10 +26,23 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.BetaVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.ChiSquaredVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.HalfCauchyVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.InverseGammaVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.LogNormalVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.LogisticVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.MultivariateGaussianVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.ParetoVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.SmoothUniformVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.StudentTVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.TriangularVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex")
@@ -166,8 +179,38 @@ def Round(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().RoundVertex, input_vertex)
 
 
+def Beta(alpha, beta) -> Vertex:
+    """
+    One to one constructor for mapping some tensorShape of alpha and beta to
+    a matching tensorShaped Beta.
+    
+    :param alpha: the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
+    :param beta: the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
+    """
+    return Vertex(context.jvm_view().BetaVertex, alpha, beta)
+
+
 def Cauchy(location, scale) -> Vertex:
     return Vertex(context.jvm_view().CauchyVertex, location, scale)
+
+
+def ChiSquared(k) -> Vertex:
+    """
+    One to one constructor for mapping some shape of k to
+    a matching shaped ChiSquared.
+    
+    :param k: the number of degrees of freedom
+    """
+    return Vertex(context.jvm_view().ChiSquaredVertex, k)
+
+
+def Dirichlet(concentration) -> Vertex:
+    """
+    Matches a vector of concentration values to a Dirichlet distribution
+    
+    :param concentration: the concentration values of the dirichlet
+    """
+    return Vertex(context.jvm_view().DirichletVertex, concentration)
 
 
 def Exponential(rate) -> Vertex:
@@ -191,6 +234,81 @@ def Gamma(theta, k) -> Vertex:
 
 def Gaussian(mu, sigma) -> Vertex:
     return Vertex(context.jvm_view().GaussianVertex, mu, sigma)
+
+
+def HalfCauchy(scale) -> Vertex:
+    return Vertex(context.jvm_view().HalfCauchyVertex, scale)
+
+
+def InverseGamma(alpha, beta) -> Vertex:
+    """
+    One to one constructor for mapping some shape of alpha and beta to
+    alpha matching shaped Inverse Gamma.
+    
+    :param alpha: the alpha of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
+    :param beta: the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
+    """
+    return Vertex(context.jvm_view().InverseGammaVertex, alpha, beta)
+
+
+def Laplace(mu, beta) -> Vertex:
+    """
+    One to one constructor for mapping some shape of mu and sigma to
+    a matching shaped Laplace.
+    
+    :param mu: the mu of the Laplace with either the same shape as specified for this vertex or a scalar
+    :param beta: the beta of the Laplace with either the same shape as specified for this vertex or a scalar
+    """
+    return Vertex(context.jvm_view().LaplaceVertex, mu, beta)
+
+
+def LogNormal(mu, sigma) -> Vertex:
+    return Vertex(context.jvm_view().LogNormalVertex, mu, sigma)
+
+
+def Logistic(mu, s) -> Vertex:
+    return Vertex(context.jvm_view().LogisticVertex, mu, s)
+
+
+def MultivariateGaussian(mu, covariance) -> Vertex:
+    """
+    Matches a mu and covariance of some shape to a Multivariate Gaussian
+    
+    :param mu: the mu of the Multivariate Gaussian
+    :param covariance: the covariance matrix of the Multivariate Gaussian
+    """
+    return Vertex(context.jvm_view().MultivariateGaussianVertex, mu, covariance)
+
+
+def Pareto(location, scale) -> Vertex:
+    return Vertex(context.jvm_view().ParetoVertex, location, scale)
+
+
+def SmoothUniform(x_min, x_max, edge_sharpness) -> Vertex:
+    """
+    One to one constructor for mapping some shape of mu and sigma to
+    a matching shaped Smooth Uniform.
+    
+    :param x_min: the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+    :param x_max: the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+    :param edge_sharpness: the edge sharpness of the Smooth Uniform
+    """
+    return Vertex(context.jvm_view().SmoothUniformVertex, x_min, x_max, edge_sharpness)
+
+
+def StudentT(v) -> Vertex:
+    return Vertex(context.jvm_view().StudentTVertex, v)
+
+
+def Triangular(x_min, x_max, c) -> Vertex:
+    """
+    One to one constructor for mapping some shape of xMin, xMax and c to a matching shaped triangular.
+    
+    :param x_min: the xMin of the Triangular with either the same shape as specified for this vertex or a scalar
+    :param x_max: the xMax of the Triangular with either the same shape as specified for this vertex or a scalar
+    :param c: the c of the Triangular with either the same shape as specified for this vertex or a scalar
+    """
+    return Vertex(context.jvm_view().TriangularVertex, x_min, x_max, c)
 
 
 def Uniform(x_min, x_max) -> Vertex:
