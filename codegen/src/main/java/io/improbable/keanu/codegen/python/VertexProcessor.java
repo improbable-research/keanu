@@ -1,7 +1,6 @@
 package io.improbable.keanu.codegen.python;
 
 import com.google.common.base.CaseFormat;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import freemarker.template.Template;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;

@@ -20,6 +20,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilis
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex")
@@ -69,6 +70,16 @@ def LessThan(a: vertex_param_types, b: vertex_param_types) -> Vertex:
 
 def NotEquals(a: vertex_param_types, b: vertex_param_types) -> Vertex:
     return Bool(context.jvm_view().NotEqualsVertex, a, b)
+
+
+def Bernoulli(prob_true: vertex_param_types) -> Vertex:
+    """
+    One to one constructor for mapping some shape of probTrue to
+    a matching shaped Bernoulli.
+    
+    :param prob_true: probTrue with same shape as desired Bernoulli tensor or scalar
+    """
+    return Bool(context.jvm_view().BernoulliVertex, cast_to_double(prob_true))
 
 
 def CastDouble(input_vertex: vertex_param_types) -> Vertex:

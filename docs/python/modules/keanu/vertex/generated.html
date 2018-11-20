@@ -54,6 +54,7 @@
 <span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex&quot;</span><span class="p">)</span>
 <span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex&quot;</span><span class="p">)</span>
 <span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex&quot;</span><span class="p">)</span>
 <span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex&quot;</span><span class="p">)</span>
 <span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex&quot;</span><span class="p">)</span>
 <span class="n">java_import</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex&quot;</span><span class="p">)</span>
@@ -103,6 +104,16 @@
 
 <div class="viewcode-block" id="NotEquals"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.NotEquals">[docs]</a><span class="k">def</span> <span class="nf">NotEquals</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">vertex_param_types</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">vertex_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Bool</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">NotEqualsVertex</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Bernoulli"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Bernoulli">[docs]</a><span class="k">def</span> <span class="nf">Bernoulli</span><span class="p">(</span><span class="n">prob_true</span><span class="p">:</span> <span class="n">vertex_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    One to one constructor for mapping some shape of probTrue to</span>
+<span class="sd">    a matching shaped Bernoulli.</span>
+<span class="sd">    </span>
+<span class="sd">    :param prob_true: probTrue with same shape as desired Bernoulli tensor or scalar</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Bool</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">BernoulliVertex</span><span class="p">,</span> <span class="n">cast_to_double</span><span class="p">(</span><span class="n">prob_true</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="CastDouble"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.CastDouble">[docs]</a><span class="k">def</span> <span class="nf">CastDouble</span><span class="p">(</span><span class="n">input_vertex</span><span class="p">:</span> <span class="n">vertex_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
