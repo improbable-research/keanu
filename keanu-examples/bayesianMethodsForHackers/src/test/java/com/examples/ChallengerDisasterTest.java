@@ -1,17 +1,15 @@
 package com.examples;
 
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+@Slf4j
 public class ChallengerDisasterTest {
-
-    private final Logger log = LoggerFactory.getLogger(ChallengerDisasterTest.class);
 
     @Before
     public void setup() {

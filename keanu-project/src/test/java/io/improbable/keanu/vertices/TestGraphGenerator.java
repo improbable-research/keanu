@@ -7,16 +7,14 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+@Slf4j
 public class TestGraphGenerator {
-
-    private static final Logger log = LoggerFactory.getLogger(TestGraphGenerator.class);
 
     static SumVertex addLinks(DoubleVertex end, AtomicInteger opCount, AtomicInteger autoDiffCount, int links) {
         Preconditions.checkArgument(links > 0);

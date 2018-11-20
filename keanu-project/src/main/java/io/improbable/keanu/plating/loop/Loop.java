@@ -9,8 +9,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
@@ -46,8 +45,8 @@ import java.util.Map;
  *             |   |
  *             L   V
  */
+@Slf4j
 public class Loop {
-    private Logger log = LoggerFactory.getLogger(this.getClass());
     public static final VertexLabel VALUE_OUT_LABEL = new VertexLabel("loop_value_out");
     public static final VertexLabel VALUE_IN_LABEL = PlateBuilder.proxyFor(VALUE_OUT_LABEL);
     public static final VertexLabel CONDITION_LABEL = new VertexLabel("loop_condition");
