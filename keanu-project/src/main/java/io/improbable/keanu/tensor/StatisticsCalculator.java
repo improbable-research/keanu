@@ -44,4 +44,11 @@ public class StatisticsCalculator {
     public double estimateIntercept() {
         return yMean() - estimateGradient() * xMean();
     }
+
+    public double meanSquaredError() {
+        DoubleTensor calculatedY = xData.times(estimateGradient()).plusInPlace(estimateIntercept());
+        DoubleTensor residuals = yData.minus(calculatedY);
+        long unbiasedMultiplier = size() - 2;
+        return residuals.times(residuals).sum() / unbiasedMultiplier;
+    }
 }

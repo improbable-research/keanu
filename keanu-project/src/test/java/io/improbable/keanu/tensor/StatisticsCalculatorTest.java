@@ -8,6 +8,7 @@ import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 
 public class StatisticsCalculatorTest {
@@ -82,15 +83,14 @@ public class StatisticsCalculatorTest {
 
     }
 
-//    @Test
-//    public void youCanGetTheMeanSquaredError() {
-//        double estimatedIntercept = stats.estimateIntercept();
-//        double estimatedGradient = stats.estimateGradient();
-//        DoubleTensor calculatedY = X_DATA.times(estimatedGradient).plusInPlace(estimatedIntercept);
-//        DoubleTensor residuals = Y_DATA.minus(calculatedY);
-//        StatisticsCalculator residualStats = StatisticsCalculator.forData(residuals, residuals);
-//        double meanSquaredError = residuals.times(residuals).sum() / (stats.size() - 2);
-//        assertThat(stats.getMeanSquaredError(X_DATA, Y_DATA), equalTo(meanSquaredError));
-//
-//    }
+    @Test
+    public void youCanCalculateTheMeanSquaredError() {
+        assertThat(stats.meanSquaredError(), greaterThan(0.));
+    }
+
+    @Test
+    public void theMeanSquaredErrorIsZeroWhenTheDataIsPerfectlyCorrelated() {
+        StatisticsCalculator perfectStats = new StatisticsCalculator(X_DATA, X_DATA.times(2.).plus(42.));
+        assertThat(perfectStats.meanSquaredError(), equalTo(0.));
+    }
 }
