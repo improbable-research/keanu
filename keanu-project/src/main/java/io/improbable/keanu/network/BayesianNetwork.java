@@ -254,12 +254,9 @@ public class BayesianNetwork {
             subgraphVertices.addAll(verticesToProcessNow);
 
             for (Vertex v : verticesToProcessNow) {
-                Stream<Vertex> connectedVertices = Stream.concat(v.getParents().stream(), v.getChildren().stream());
-                connectedVertices.forEach(connectedVertex -> {
-                    if (!subgraphVertices.contains(connectedVertex)) {
-                        verticesToProcessNext.add(connectedVertex);
-                    }
-                });
+                Stream.concat(v.getParents().stream(), v.getChildren().stream())
+                    .filter(connectedVertex -> !(subgraphVertices.contains(connectedVertex)))
+                    .forEach(connectedVertex -> verticesToProcessNext.add((Vertex)connectedVertex));
             }
 
             verticesToProcessNow = verticesToProcessNext;
