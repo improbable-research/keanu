@@ -7,6 +7,9 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 
 public class MinVertex extends DoubleIfVertex {
 
+    private final static String LEFT_NAME = THEN_NAME;
+    private final static String RIGHT_NAME = ELSE_NAME;
+
     /**
      * Finds the minimum between two vertices
      *
@@ -14,8 +17,8 @@ public class MinVertex extends DoubleIfVertex {
      * @param right one of the vertices to find the minimum of
      */
     @ExportVertexToPythonBindings
-    public MinVertex(@LoadParentVertex(THEN_NAME) DoubleVertex left,
-                     @LoadParentVertex(ELSE_NAME) DoubleVertex right) {
+    public MinVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
+                     @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
         super(left.getShape(), left.lessThanOrEqualTo(right), left, right);
     }
 }
