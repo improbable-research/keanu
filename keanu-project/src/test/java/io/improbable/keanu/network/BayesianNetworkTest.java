@@ -96,7 +96,7 @@ public class BayesianNetworkTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void networkWithUnsaveableVerticesThrowsExceptionOnSave() throws IOException {
+    public void networkWithNonSaveableVerticesThrowsExceptionOnSave() throws IOException {
         BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
         BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
         NetworkWriter netWriter = mock(NetworkWriter.class);
