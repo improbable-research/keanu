@@ -3,6 +3,7 @@ package io.improbable.keanu.network;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -22,6 +23,10 @@ public interface NetworkWriter {
     }
 
     default void save(ConstantIntegerVertex vertex) {
+        save((ConstantVertex)vertex);
+    }
+
+    default void save(ConstantBoolVertex vertex) {
         save((ConstantVertex)vertex);
     }
 

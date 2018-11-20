@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -57,6 +58,13 @@ public class ProtobufWriter implements NetworkWriter {
 
     @Override
     public void save(ConstantIntegerVertex vertex) {
+        KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
+        vertexBuilder.setConstantValue(getValue(vertex).getValue());
+        bayesNetBuilder.addVertices(vertexBuilder.build());
+    }
+
+    @Override
+    public void save(ConstantBoolVertex vertex) {
         KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
         vertexBuilder.setConstantValue(getValue(vertex).getValue());
         bayesNetBuilder.addVertices(vertexBuilder.build());
