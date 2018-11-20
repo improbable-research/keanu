@@ -226,7 +226,7 @@ public class BayesianNetwork {
         }
     }
 
-    private Boolean isSaveable() {
+    private boolean isSaveable() {
         return vertices.stream().filter(v -> v instanceof NonSaveableVertex).count() == 0;
     }
 
