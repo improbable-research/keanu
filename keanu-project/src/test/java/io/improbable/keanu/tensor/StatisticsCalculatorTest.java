@@ -100,9 +100,15 @@ public class StatisticsCalculatorTest {
     }
 
     @Test
+    public void youCanGetTheStandardErrorForTheIntercept() {
+        assertThat(stats.standardErrorForIntercept(), greaterThan(0.));
+    }
+
+    @Test
     public void theStandardErrorIsZeroWhenTheDataIsPerfectlyCorrelated() {
         StatisticsCalculator perfectStats = new StatisticsCalculator(X_DATA, X_DATA.times(2.).plus(42.));
         assertThat(perfectStats.standardErrorForGradient(), equalTo(0.));
+        assertThat(perfectStats.standardErrorForIntercept(), equalTo(0.));
     }
 
 }

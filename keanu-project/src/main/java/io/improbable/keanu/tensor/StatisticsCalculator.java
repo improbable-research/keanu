@@ -44,6 +44,13 @@ public class StatisticsCalculator {
         return Math.sqrt(meanSquaredError() / secondMomentOf(xData));
     }
 
+    public double standardErrorForIntercept() {
+        double value = xMean() * xMean() / secondMomentOf(xData);
+        value += 1. / size();
+        value *= meanSquaredError();
+        return Math.sqrt(value);
+    }
+
     private double secondMomentOf(final DoubleTensor data) {
         return secondMomentOf(data, data);
     }
