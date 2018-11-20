@@ -2,7 +2,13 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
-import io.improbable.keanu.vertices.*;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexValue;
+import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
