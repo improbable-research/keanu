@@ -15,10 +15,6 @@ public interface NetworkWriter {
     void save(OutputStream output, boolean saveValues) throws IOException;
     void save(Vertex vertex);
 
-    default void save(OutputStream output, Vertex vertex, int degree, boolean saveValues) throws IOException {
-        save(output, saveValues);
-    }
-
     void save(ConstantVertex vertex);
     default void save(ConstantDoubleVertex vertex) {
         save((ConstantVertex)vertex);

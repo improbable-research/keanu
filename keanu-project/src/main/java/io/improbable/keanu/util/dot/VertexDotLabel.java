@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.Vertex;
 import java.util.Objects;
 
 public class VertexDotLabel {
-    private Vertex vertex;
+    private final Vertex vertex;
     private String value = "";
     private String annotation = "";
     private String vertexLabel = "";
@@ -17,21 +17,16 @@ public class VertexDotLabel {
         this.vertex = vertex;
     }
 
-    public enum VertexDotLabelType{
-        VALUE, CLASS_NAME, ANNOTATION_LABEL, VERTEX_LABEL
+    public void setValue(String value) {
+        this.value = value;
     }
 
-    public void setDotLabel(VertexDotLabelType labelType, String label) {
-        switch (labelType) {
-            case VALUE:
-                value = label;
-                break;
-            case VERTEX_LABEL:
-                vertexLabel = label;
-                break;
-            case ANNOTATION_LABEL:
-                annotation = label;
-        }
+    public void setAnnotation(String annotation) {
+        this.annotation = annotation;
+    }
+
+    public void setVertexLabel(String vertexLabel) {
+        this.vertexLabel = vertexLabel;
     }
 
     public String inDotFormat() {
@@ -56,10 +51,15 @@ public class VertexDotLabel {
         return vertex.getClass().getSimpleName();
     }
 
+    @Override
     public boolean equals(Object o) {
-        return o.hashCode() == this.hashCode();
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VertexDotLabel that = (VertexDotLabel) o;
+        return Objects.equals(vertex, that.vertex);
     }
 
+    @Override
     public int hashCode() {
         return Objects.hash(vertex);
     }
