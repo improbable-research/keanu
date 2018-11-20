@@ -2,10 +2,9 @@ import numpy as np
 import pandas as pd
 import pytest
 import math
-from keanu.vertex.base import Vertex, Double, Integer, Bool
+from keanu.vertex.base import Vertex
 from keanu.context import KeanuContext
 from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli
-from keanu.vartypes import tensor_arg_types
 
 @pytest.fixture
 def jvm_view():
@@ -197,7 +196,7 @@ def test_get_vertex_id(jvm_view):
     (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
     (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)
 ])
-def test_you_can_set_and_get_value(vertex, vertex_type, value, assert_vertex_value_equals):
+def test_you_can_set_value(vertex, vertex_type, value, assert_vertex_value_equals):
     vertex.set_value(value)
     assert_vertex_value_equals(vertex, vertex_type, value)
 
@@ -231,15 +230,15 @@ def test_you_can_set_and_get_value(vertex, vertex_type, value, assert_vertex_val
     (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
     (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)
 ])
-def test_you_can_set_and_cascade_scalar(ctor, args, vertex_type, value, assert_vertex_value_equals):
+def test_you_can_set_and_cascade(ctor, args, vertex_type, value, assert_vertex_value_equals):
     vertex1 = ctor(*args)
     vertex2 = ctor(*args)
-
     equal_vertex = vertex1 == vertex2
     not_equal_vertex = vertex1 != vertex2
 
     vertex1.set_value(value)
     vertex2.set_and_cascade(value)
+
     assert_vertex_value_equals(vertex1, vertex_type, value)
     assert_vertex_value_equals(vertex2, vertex_type, value)
 

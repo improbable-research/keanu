@@ -31,19 +31,9 @@ def test_scalar_cast(value: primitive_types, cast_fn: Callable, cast_to_type: ty
 
 
 @pytest.mark.parametrize("value", [
-    (np.array([1])),
-    (np.array([1.])),
-    (np.array([True])),
-    (np.array([[[1]]])),
-    (np.array([[1, 4], [5, 38]])),
-    (pd.DataFrame(data=[1])),
-    (pd.DataFrame(data=[1.])),
-    (pd.DataFrame(data=[True])),
-    (pd.Series(data=[1])),
-    (pd.Series(data=[1.])),
-    (pd.Series(data=[True])),
-    (pd.Series(data=[1, 3, 4])),
-    (pd.DataFrame(data=[[1, 2], [4, 5]]))
+    np.array([1]), np.array([1.]), np.array([True]), np.array([[[1]]]), np.array([[1, 4], [5, 38]]),
+    pd.DataFrame(data=[1]), pd.DataFrame(data=[1.]), pd.DataFrame(data=[True]), pd.DataFrame(data=[[1, 2], [4, 5]]),
+    pd.Series(data=[1]), pd.Series(data=[1.]), pd.Series(data=[True]), pd.Series(data=[1, 3, 4]),
 ])
 @pytest.mark.parametrize("cast_fn, cast_to_type", [
     (cast_tensor_arg_to_double, np.floating),
