@@ -12,12 +12,12 @@ public class IntegerDivisionVertex extends IntegerBinaryOpVertex implements Save
     /**
      * Divides one vertex by another
      *
-     * @param a a vertex to be divided
-     * @param b a vertex to divide by
+     * @param left a vertex to be divided
+     * @param right a vertex to divide by
      */
     @ExportVertexToPythonBindings
-    public IntegerDivisionVertex(@LoadParentVertex(A_NAME) IntegerVertex a, @LoadParentVertex(B_NAME) IntegerVertex b) {
-        super(a, b);
+    public IntegerDivisionVertex(@LoadParentVertex(LEFT_NAME) IntegerVertex left, @LoadParentVertex(RIGHT_NAME) IntegerVertex right) {
+        super(left, right);
     }
 
     @Override

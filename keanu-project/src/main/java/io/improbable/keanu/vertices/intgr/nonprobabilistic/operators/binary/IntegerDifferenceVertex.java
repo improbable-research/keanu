@@ -10,11 +10,11 @@ public class IntegerDifferenceVertex extends IntegerBinaryOpVertex implements Sa
     /**
      * Subtracts one vertex from another
      *
-     * @param a the vertex to be subtracted from
-     * @param b the vertex to subtract
+     * @param left the vertex to be subtracted from
+     * @param right the vertex to subtract
      */
-    public IntegerDifferenceVertex(@LoadParentVertex(A_NAME) IntegerVertex a, @LoadParentVertex(B_NAME) IntegerVertex b) {
-        super(a, b);
+    public IntegerDifferenceVertex(@LoadParentVertex(LEFT_NAME) IntegerVertex left, @LoadParentVertex(RIGHT_NAME) IntegerVertex right) {
+        super(left, right);
     }
 
     @Override

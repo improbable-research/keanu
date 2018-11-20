@@ -13,7 +13,7 @@ public class IntegerMaxVertex extends IntegerBinaryOpVertex implements SaveableV
      * @param left  one of the vertices to find the maximum of
      * @param right one of the vertices to find the maximum of
      */
-    public IntegerMaxVertex(@LoadParentVertex(A_NAME) IntegerVertex left, @LoadParentVertex(B_NAME) IntegerVertex right) {
+    public IntegerMaxVertex(@LoadParentVertex(LEFT_NAME) IntegerVertex left, @LoadParentVertex(RIGHT_NAME) IntegerVertex right) {
         super(left, right);
     }
 

@@ -10,11 +10,11 @@ public class IntegerAdditionVertex extends IntegerBinaryOpVertex implements Save
     /**
      * Adds one vertex to another
      *
-     * @param a a vertex to add
-     * @param b a vertex to add
+     * @param left a vertex to add
+     * @param right a vertex to add
      */
-    public IntegerAdditionVertex(@LoadParentVertex(A_NAME) IntegerVertex a, @LoadParentVertex(B_NAME) IntegerVertex b) {
-        super(a, b);
+    public IntegerAdditionVertex(@LoadParentVertex(LEFT_NAME) IntegerVertex left, @LoadParentVertex(RIGHT_NAME) IntegerVertex right) {
+        super(left, right);
     }
 
     @Override

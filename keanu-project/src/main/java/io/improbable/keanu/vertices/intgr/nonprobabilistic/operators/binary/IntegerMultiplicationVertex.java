@@ -10,11 +10,11 @@ public class IntegerMultiplicationVertex extends IntegerBinaryOpVertex implement
     /**
      * Multiplies one vertex by another
      *
-     * @param a a vertex to be multiplied
-     * @param b a vertex to be multiplied
+     * @param left a vertex to be multiplied
+     * @param right a vertex to be multiplied
      */
-    public IntegerMultiplicationVertex(@LoadParentVertex(A_NAME) IntegerVertex a, @LoadParentVertex(B_NAME) IntegerVertex b) {
-        super(a, b);
+    public IntegerMultiplicationVertex(@LoadParentVertex(LEFT_NAME) IntegerVertex left, @LoadParentVertex(RIGHT_NAME) IntegerVertex right) {
+        super(left, right);
     }
 
     @Override

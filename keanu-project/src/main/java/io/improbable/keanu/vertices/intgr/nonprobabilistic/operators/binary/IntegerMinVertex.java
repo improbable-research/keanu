@@ -13,7 +13,7 @@ public class IntegerMinVertex extends IntegerBinaryOpVertex implements SaveableV
      * @param left  one of the vertices to find the minimum of
      * @param right one of the vertices to find the minimum of
      */
-    public IntegerMinVertex(@LoadParentVertex(A_NAME) IntegerVertex left, @LoadParentVertex(B_NAME) IntegerVertex right) {
+    public IntegerMinVertex(@LoadParentVertex(LEFT_NAME) IntegerVertex left, @LoadParentVertex(RIGHT_NAME) IntegerVertex right) {
         super(left, right);
     }
 

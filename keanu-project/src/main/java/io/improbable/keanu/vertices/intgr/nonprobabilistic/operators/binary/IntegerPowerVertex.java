@@ -9,11 +9,11 @@ public class IntegerPowerVertex extends IntegerBinaryOpVertex implements Saveabl
     /**
      * Raises one vertex to the power of another
      *
-     * @param a the base vertex
-     * @param b the exponent vertex
+     * @param left the base vertex
+     * @param right the exponent vertex
      */
-    public IntegerPowerVertex(@LoadParentVertex(A_NAME) IntegerVertex a, @LoadParentVertex(B_NAME) IntegerVertex b) {
-        super(a, b);
+    public IntegerPowerVertex(@LoadParentVertex(LEFT_NAME) IntegerVertex left, @LoadParentVertex(RIGHT_NAME) IntegerVertex right) {
+        super(left, right);
     }
 
     @Override
