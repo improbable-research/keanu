@@ -22,7 +22,7 @@ public class StatisticsCalculatorTest {
     SummaryStatistics yStats = createStatistics(Y_DATA);
     SummaryStatistics xyStats = createCombinedStatistics(X_DATA, Y_DATA);
 
-    private StatisticsCalculator stats = StatisticsCalculator.forData(X_DATA, Y_DATA);
+    private StatisticsCalculator stats = new StatisticsCalculator(X_DATA, Y_DATA);
 
     private static SummaryStatistics createStatistics(DoubleTensor data) {
         SummaryStatistics stats = new SummaryStatistics();
@@ -51,7 +51,7 @@ public class StatisticsCalculatorTest {
 
         DoubleTensor biggerData = DoubleTensor.create(1., 2., 3., 4., 5., 6.);
         DoubleTensor smallerData = DoubleTensor.create(1., 2., 3.);
-        StatisticsCalculator.forData(biggerData, smallerData);
+        new StatisticsCalculator(biggerData, smallerData);
     }
 
     @Test
@@ -76,10 +76,10 @@ public class StatisticsCalculatorTest {
         double s_xx = xStats.getSecondMoment();
 
         double expectedGradient = s_xy / s_xx;
-        assertThat(stats.estimateGradient(), equalTo(expectedGradient));
+        assertThat(stats.estimatedGradient(), equalTo(expectedGradient));
 
         double expectedIntercept = yStats.getMean() - expectedGradient * xStats.getMean();
-        assertThat(stats.estimateIntercept(), equalTo(expectedIntercept));
+        assertThat(stats.estimatedIntercept(), equalTo(expectedIntercept));
 
     }
 

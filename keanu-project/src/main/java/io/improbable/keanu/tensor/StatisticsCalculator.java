@@ -13,10 +13,6 @@ public class StatisticsCalculator {
         this.yData = yData;
     }
 
-    public static StatisticsCalculator forData(DoubleTensor xData, DoubleTensor yData) {
-        return new StatisticsCalculator(xData, yData);
-    }
-
     public long size() {
         return xData.getLength();
     }
@@ -29,7 +25,7 @@ public class StatisticsCalculator {
         return yData.average();
     }
 
-    public double estimateGradient() {
+    public double estimatedGradient() {
         double sumX = xData.sum();
         double sumY = yData.sum();
         double sumXX = xData.times(xData).sum();
@@ -41,12 +37,12 @@ public class StatisticsCalculator {
         return s_xy / s_xx;
     }
 
-    public double estimateIntercept() {
-        return yMean() - estimateGradient() * xMean();
+    public double estimatedIntercept() {
+        return yMean() - estimatedGradient() * xMean();
     }
 
     public double meanSquaredError() {
-        DoubleTensor calculatedY = xData.times(estimateGradient()).plusInPlace(estimateIntercept());
+        DoubleTensor calculatedY = xData.times(estimatedGradient()).plusInPlace(estimatedIntercept());
         DoubleTensor residuals = yData.minus(calculatedY);
         long unbiasedMultiplier = size() - 2;
         return residuals.times(residuals).sum() / unbiasedMultiplier;
