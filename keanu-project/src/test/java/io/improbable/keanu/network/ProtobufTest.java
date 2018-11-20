@@ -3,6 +3,8 @@ package io.improbable.keanu.network;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.vertices.*;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -317,6 +319,14 @@ public class ProtobufTest {
         } else {
             checkNonRootVertex(vertexClass);
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nonsaveableVertexThrowsExceptionOnSave() {
+        BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
+        BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
+        ProtobufWriter protobufWriter = new ProtobufWriter(net);
+        testVertex.save(protobufWriter);
     }
 
     private <A extends AnnotatedElement> List<A> filterAnnotatedObjects(A[] items, Class annotation) {
