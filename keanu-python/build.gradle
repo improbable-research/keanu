@@ -107,12 +107,12 @@ task formatCheck {
     doLast { 
         exec {
             // Exclude files that are generated
-            def keanuVetexPath = 'keanu/vertex/'
+            def keanuVertexPath = 'keanu/vertex/'
             if(isFamily(FAMILY_WINDOWS)) {
-                keanuVetexPath = '.\\keanu\\vertex\\'
+                keanuVertexPath = '.\\keanu\\vertex\\'
             }
-            def keanuVertexGeneratedPath = keanuVetexPath + 'generated.py'
-            def keanuVertexInitPath = keanuVetexPath + '__init__.py'
+            def keanuVertexGeneratedPath = keanuVertexPath + 'generated.py'
+            def keanuVertexInitPath = keanuVertexPath + '__init__.py'
             commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel',
             '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
         }
