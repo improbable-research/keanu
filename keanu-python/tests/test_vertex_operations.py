@@ -167,7 +167,7 @@ def test_can_do_integer_division(lhs, rhs, expected_result):
     (3., Const(np.array([2., 0.5])), np.array([[9], [1.7320508075688772]])),
 ])
 def test_can_do_pow(lhs, rhs, expected_result):
-    result = lhs**rhs
+    result = lhs ** rhs
     assert type(result) == Vertex
     assert (result.get_value() == expected_result).all()
 

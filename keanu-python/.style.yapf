@@ -1,3 +1,4 @@
 [style]
 based_on_style = google
 column_limit = 120
+spaces_around_power_operator = True

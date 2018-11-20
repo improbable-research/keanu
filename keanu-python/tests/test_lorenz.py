@@ -38,8 +38,8 @@ def test_lorenz():
         post_t = (window + 1) * (window_size - 1)
         actual_at_post_t = observed[post_t]
 
-        error = math.sqrt((actual_at_post_t.x - posterior[0])**2 + (actual_at_post_t.y - posterior[1])**2 +
-                          (actual_at_post_t.z - posterior[2])**2)
+        error = math.sqrt((actual_at_post_t.x - posterior[0]) ** 2 + (actual_at_post_t.y - posterior[1]) ** 2 +
+                          (actual_at_post_t.z - posterior[2]) ** 2)
         prior_mu = (posterior[0], posterior[1], posterior[2])
         window += 1
 
