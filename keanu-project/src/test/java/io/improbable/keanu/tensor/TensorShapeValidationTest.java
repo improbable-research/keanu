@@ -14,31 +14,31 @@ public class TensorShapeValidationTest {
 
     @Test
     public void suggestSingleNonScalarShape() {
-        long[] shapeProposal = TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular(scalar1, twoByTwo1, scalar2);
+        long[] shapeProposal = TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne(scalar1, twoByTwo1, scalar2);
         assertArrayEquals(new long[]{2, 2}, shapeProposal);
     }
 
     @Test
     public void suggestMatchingNonScalarShape() {
-        long[] shapeProposal = TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular(scalar1, twoByTwo1, twoByTwo2);
+        long[] shapeProposal = TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne(scalar1, twoByTwo1, twoByTwo2);
         assertArrayEquals(new long[]{2, 2}, shapeProposal);
     }
 
     @Test
     public void suggestScalar() {
-        long[] shapeProposal = TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular(scalar1, scalar2);
+        long[] shapeProposal = TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne(scalar1, scalar2);
         assertArrayEquals(Tensor.SCALAR_SHAPE, shapeProposal);
     }
 
     @Test
     public void suggestHighestRankLengthOne() {
-        long[] shapeProposal = TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular(new long[]{1, 1}, new long[]{1, 1, 1}, new long[]{1});
+        long[] shapeProposal = TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne(new long[]{1, 1}, new long[]{1, 1, 1}, new long[]{1});
         assertArrayEquals(new long[]{1, 1, 1}, shapeProposal);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsMultipleNonScalars() {
-        TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular(scalar1, twoByThree, twoByTwo1);
+        TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne(scalar1, twoByThree, twoByTwo1);
     }
 
     @Test(expected = IllegalArgumentException.class)

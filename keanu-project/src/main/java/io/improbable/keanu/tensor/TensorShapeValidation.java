@@ -77,7 +77,7 @@ public class TensorShapeValidation {
      * @return either a scalar shape OR the single non-scalar shape.
      * @throws IllegalArgumentException if there is more than one non-scalar shape or multiple ranks of length 1 shapes
      */
-    public static long[] checkHasOneNonSingularShapeOrAllSingular(long[]... shapes) {
+    public static long[] checkHasOneNonLengthOneShapeOrAllLengthOne(long[]... shapes) {
         Set<TensorShape> nonLengthOneShapes = getNonLengthOneShapes(shapes);
         List<TensorShape> lengthOneShapes = getLengthOneShapes(shapes);
 

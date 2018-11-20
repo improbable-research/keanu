@@ -123,8 +123,8 @@ public class INDArrayShim {
         int[] strideInts = new int[newStride.length];
 
         for (int i = 0; i < newShape.length; i++) {
-            shapeInts[i] = (int) newShape[i];
-            strideInts[i] = (int) newStride[i];
+            shapeInts[i] = Ints.checkedCast(newShape[i]);
+            strideInts[i] = Ints.checkedCast(newStride[i]);
         }
 
         INDArray result = tensor.sum(overDimensions);

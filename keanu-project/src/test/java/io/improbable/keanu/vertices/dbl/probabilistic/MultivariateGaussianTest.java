@@ -117,7 +117,7 @@ public class MultivariateGaussianTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void whenYouSampleYouMustMatchMustShape() {
+    public void whenYouSampleYouMustMatchMusShape() {
         DoubleTensor mu = new Nd4jDoubleTensor(new double[]{0, 0}, new long[]{2, 1});
         DoubleTensor sigma = new Nd4jDoubleTensor(new double[]{1}, new long[]{1});
 

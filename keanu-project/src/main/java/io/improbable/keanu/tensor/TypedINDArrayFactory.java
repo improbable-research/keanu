@@ -12,7 +12,7 @@ public class TypedINDArrayFactory {
         Nd4j.setDataType(bufferType);
         switch (shape.length) {
             case 0:
-                Preconditions.checkArgument(data.length == 1);
+                Preconditions.checkArgument(data.length == 1, "Scalar shape must have only one data element.");
                 return scalar(data[0], bufferType);
             case 1:
                 return vector(data, bufferType);
@@ -28,7 +28,7 @@ public class TypedINDArrayFactory {
             case 0:
                 return scalar(value, bufferType);
             case 1:
-                return ensureIsVector(Nd4j.valueArrayOf(shape, value));
+                return reshapeToVector(Nd4j.valueArrayOf(shape, value));
             default:
                 return Nd4j.valueArrayOf(shape, value);
         }
@@ -50,7 +50,7 @@ public class TypedINDArrayFactory {
             case 0:
                 return scalar(1.0, bufferType);
             case 1:
-                return ensureIsVector(Nd4j.ones(shape));
+                return reshapeToVector(Nd4j.ones(shape));
             default:
                 return Nd4j.ones(shape);
         }
@@ -78,10 +78,10 @@ public class TypedINDArrayFactory {
 
     public static INDArray arange(double start, double end, DataBuffer.Type bufferType) {
         Nd4j.setDataType(bufferType);
-        return ensureIsVector(Nd4j.arange(start, end));
+        return reshapeToVector(Nd4j.arange(start, end));
     }
 
-    private static INDArray ensureIsVector(INDArray vector) {
+    private static INDArray reshapeToVector(INDArray vector) {
         if (vector.shape().length > 1) {
             vector.setShapeAndStride(new int[]{(int) vector.shape()[1]}, new int[]{1});
         }

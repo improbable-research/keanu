@@ -26,8 +26,8 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     private Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
 
     public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
-        this.inputTrainingData = ensureIsMatrix(inputTrainingData);
-        this.outputTrainingData = ensureIsMatrix(outputTrainingData);
+        this.inputTrainingData = reshapeToMatrix(inputTrainingData);
+        this.outputTrainingData = reshapeToMatrix(outputTrainingData);
         this.outputTransform = outputTransform;
     }
 
@@ -36,7 +36,7 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
         return this;
     }
 
-    private <T extends Tensor> T ensureIsMatrix(T data) {
+    private <T extends Tensor> T reshapeToMatrix(T data) {
         if (data.getRank() == 0) {
             return (T) data.reshape(1, 1);
         } else if (data.getRank() == 1) {

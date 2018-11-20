@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class TriangularVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
@@ -73,7 +73,7 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
      * @param c    the c of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     public TriangularVertex(DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
-        this(checkHasOneNonSingularShapeOrAllSingular(xMin.getShape(), xMax.getShape(), c.getShape()), xMin, xMax, c);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(xMin.getShape(), xMax.getShape(), c.getShape()), xMin, xMax, c);
     }
 
     public TriangularVertex(DoubleVertex xMin, DoubleVertex xMax, double c) {

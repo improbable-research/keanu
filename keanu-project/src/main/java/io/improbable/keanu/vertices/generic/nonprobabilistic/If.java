@@ -61,7 +61,7 @@ public class If {
         }
 
         public IfVertex<T> orElse(Vertex<? extends Tensor<T>> els) {
-            long[] shape = TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular(thn.getShape(), els.getShape(), predicate.getShape());
+            long[] shape = TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne(thn.getShape(), els.getShape(), predicate.getShape());
             return new IfVertex<>(shape, predicate, thn, els);
         }
     }
@@ -78,7 +78,7 @@ public class If {
         }
 
         public BooleanIfVertex orElse(Vertex<? extends BooleanTensor> els) {
-            long[] shape = TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular(thn.getShape(), els.getShape(), predicate.getShape());
+            long[] shape = TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne(thn.getShape(), els.getShape(), predicate.getShape());
             return new BooleanIfVertex(shape, predicate, thn, els);
         }
     }

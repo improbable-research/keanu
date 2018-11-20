@@ -18,7 +18,7 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class CauchyVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
@@ -46,7 +46,7 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
 
     @ExportVertexToPythonBindings
     public CauchyVertex(DoubleVertex location, DoubleVertex scale) {
-        this(checkHasOneNonSingularShapeOrAllSingular(location.getShape(), scale.getShape()), location, scale);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(location.getShape(), scale.getShape()), location, scale);
     }
 
     public CauchyVertex(DoubleVertex location, double scale) {

@@ -350,8 +350,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixInverse() {
-        Preconditions.checkArgument(shape.length == 2, "Matrix inverse on non-matrix not allowed");
-        return new ScalarDoubleTensor(1 / value, shape);
+        Preconditions.checkArgument(isMatrix(), "Matrix inverse on non-matrix not allowed");
+        return new ScalarDoubleTensor(1. / value, shape);
     }
 
     @Override

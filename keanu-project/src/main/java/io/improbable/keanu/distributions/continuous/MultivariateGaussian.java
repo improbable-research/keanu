@@ -14,6 +14,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
     public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor covariance) {
         return new MultivariateGaussian(mu, covariance);
     }
+
     private MultivariateGaussian(DoubleTensor mu, DoubleTensor covariance) {
         this.mu = mu;
         this.covariance = covariance;
@@ -31,7 +32,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final double dimensions = mu.getShape()[0];
+        final double dimensions = numberOfDimensions();
         final double kLog2Pi = dimensions * Math.log(2 * Math.PI);
         final double logCovDet = Math.log(covariance.determinant());
         DoubleTensor xMinusMu = x.minus(mu);
@@ -45,8 +46,12 @@ public class MultivariateGaussian implements ContinuousDistribution {
         return DoubleTensor.scalar(-0.5 * (scalar + kLog2Pi + logCovDet));
     }
 
-    private boolean isUnivariate(){
-        return mu.getShape()[0] == 1;
+    private boolean isUnivariate() {
+        return numberOfDimensions() == 1;
+    }
+
+    private long numberOfDimensions() {
+        return mu.getShape()[0];
     }
 
     @Override

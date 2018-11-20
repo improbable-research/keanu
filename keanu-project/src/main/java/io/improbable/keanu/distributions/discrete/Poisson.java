@@ -1,6 +1,5 @@
 package io.improbable.keanu.distributions.discrete;
 
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;

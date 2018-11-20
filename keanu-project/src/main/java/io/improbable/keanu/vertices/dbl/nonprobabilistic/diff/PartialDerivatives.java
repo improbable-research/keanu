@@ -164,7 +164,7 @@ public class PartialDerivatives {
     }
 
     private static Map<VertexId, DoubleTensor> cloneWithCorrectShape(Map<VertexId, DoubleTensor> infinitesimals,
-                                                                     boolean ofIsScalar,
+                                                                     boolean ofIsLengthOne,
                                                                      long[] resultShape) {
 
         Map<VertexId, DoubleTensor> clone = new HashMap<>();
@@ -172,7 +172,7 @@ public class PartialDerivatives {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
 
-            if (ofIsScalar) {
+            if (ofIsLengthOne) {
                 clone.put(k, DoubleTensor.zeros(TensorShape.concat(resultShape, v.getShape())).plus(v));
             } else {
                 clone.put(k, v);
@@ -413,17 +413,14 @@ public class PartialDerivatives {
     }
 
     private long[] extractWrtShape(long[] partialDerivativeShape, int rankOfSource) {
-        if (partialDerivativeShape.length == 0) {
-            if (rankOfSource > 1) {
-                throw new IllegalArgumentException("Partial does not contain wrt shape requested");
-            } else {
-                return new long[0];
-            }
-        }
-        return Arrays.copyOfRange(partialDerivativeShape, rankOfSource, partialDerivativeShape.length);
+        return extractShape(partialDerivativeShape, rankOfSource, rankOfSource, partialDerivativeShape.length);
     }
 
     private long[] extractOfShape(long[] partialDerivativeShape, int rankOfSource) {
+        return extractShape(partialDerivativeShape, rankOfSource, 0, rankOfSource);
+    }
+
+    private long[] extractShape(long[] partialDerivativeShape, int rankOfSource, int from, int to) {
         if (partialDerivativeShape.length == 0) {
             if (rankOfSource > 1) {
                 throw new IllegalArgumentException("Partial does not contain of shape requested");
@@ -431,7 +428,7 @@ public class PartialDerivatives {
                 return new long[0];
             }
         }
-        return Arrays.copyOfRange(partialDerivativeShape, 0, rankOfSource);
+        return Arrays.copyOfRange(partialDerivativeShape, from, to);
     }
 
     private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {

@@ -2,7 +2,6 @@ package io.improbable.keanu.tensor;
 
 import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.Arrays;
 
@@ -54,7 +53,7 @@ public class TensorShape {
         return length;
     }
 
-    public static int getLengthAsInt(long[] shape){
+    public static int getLengthAsInt(long[] shape) {
         return Ints.checkedCast(getLength(shape));
     }
 
@@ -204,7 +203,7 @@ public class TensorShape {
 
     /**
      * It's possible to express negative dimensions, which are relative to the rank of a
-     * tensor. E.g. given a rank 3 tensor, dimensions [-1, -2] would refer to the 3 and 2nd dimension.
+     * tensor. E.g. given a rank 3 tensor, dimensions [-1, -2] would refer to the 3rd and 2nd dimension.
      *
      * @param rank       the rank that the dimension array is related to
      * @param dimensions positive dimensions are absolute and negative are relative to the rank
@@ -212,6 +211,10 @@ public class TensorShape {
      */
     public static int[] getAbsoluteDimensions(int rank, int[] dimensions) {
         for (int i = 0; i < dimensions.length; i++) {
+            if (dimensions[i] >= rank || dimensions[i] < -rank) {
+                throw new IllegalArgumentException("Dimension " + dimensions[i] + " is invalid for rank " + rank + " tensor.");
+            }
+
             if (dimensions[i] < 0) {
                 dimensions[i] += rank;
             }

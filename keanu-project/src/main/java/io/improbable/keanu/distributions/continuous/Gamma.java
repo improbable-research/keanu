@@ -1,6 +1,5 @@
 package io.improbable.keanu.distributions.continuous;
 
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;

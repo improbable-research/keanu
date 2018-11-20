@@ -31,7 +31,7 @@ import static java.util.Arrays.copyOf;
 
 /**
  * Class for representing n-dimensional arrays of integers. This is
- * backed by Nd4j which actually stores the int as a double.
+ * backed by Nd4j which stores the int as a double.
  */
 public class Nd4jIntegerTensor implements IntegerTensor {
 

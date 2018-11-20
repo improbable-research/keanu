@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonSingularShapeOrAllSingular;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
 public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
@@ -26,7 +26,7 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Diffe
      */
     public DoubleBinaryOpVertex(
         DoubleVertex left, DoubleVertex right) {
-        this(checkHasOneNonSingularShapeOrAllSingular(left.getShape(), right.getShape()),
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()),
             left, right);
     }
 
