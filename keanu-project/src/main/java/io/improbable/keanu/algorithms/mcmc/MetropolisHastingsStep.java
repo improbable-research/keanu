@@ -9,8 +9,7 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Value;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,9 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 class MetropolisHastingsStep {
-
-    private static final Logger log = LoggerFactory.getLogger(MetropolisHastingsStep.class);
 
     private static final double LOG_ZERO_PROBABILITY = Double.NEGATIVE_INFINITY;
 
