@@ -27,12 +27,10 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         super(base, exponent);
     }
 
-    // No SaveParentVertex annotation needed as DoubleBinaryOpVertex.getLeft() will be used when saving the vertex
     public DoubleVertex getBase() {
         return super.getLeft();
     }
 
-    // No SaveParentVertex annotation needed as DoubleBinaryOpVertex.getRight() will be used when saving the vertex
     public DoubleVertex getExponent() {
         return super.getRight();
     }

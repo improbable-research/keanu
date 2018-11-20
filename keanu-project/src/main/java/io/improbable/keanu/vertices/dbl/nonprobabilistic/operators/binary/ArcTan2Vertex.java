@@ -27,14 +27,6 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         super(x, y);
     }
 
-    public DoubleVertex getX() {
-        return super.getLeft();
-    }
-
-    public DoubleVertex getY() {
-        return super.getRight();
-    }
-
     @Override
     protected DoubleTensor op(DoubleTensor x, DoubleTensor y) {
         return x.atan2(y);
