@@ -167,7 +167,7 @@ def test_get_vertex_id(jvm_view):
     assert all(value in python_id for value in java_id)
 
 
-@pytest.mark.parametrize("vertex, vertex_type", [
+@pytest.mark.parametrize("vertex, expected_type", [
     (Gaussian(0., 1.), np.floating),
     (UniformInt(0, 10), np.integer),
     (Bernoulli(0.5), np.bool_)
@@ -196,12 +196,12 @@ def test_get_vertex_id(jvm_view):
     (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
     (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)
 ])
-def test_you_can_set_value(vertex, vertex_type, value, assert_vertex_value_equals):
+def test_you_can_set_value(vertex, expected_type, value, assert_vertex_value_equals):
     vertex.set_value(value)
-    assert_vertex_value_equals(vertex, vertex_type, value)
+    assert_vertex_value_equals(vertex, expected_type, value)
 
 
-@pytest.mark.parametrize("ctor, args, vertex_type", [
+@pytest.mark.parametrize("ctor, args, expected_type", [
     (Gaussian, (0., 1.), np.floating),
     (UniformInt, (0, 10), np.integer),
     (Bernoulli, (0.5, ), np.bool_)
@@ -230,7 +230,7 @@ def test_you_can_set_value(vertex, vertex_type, value, assert_vertex_value_equal
     (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
     (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)
 ])
-def test_you_can_set_and_cascade(ctor, args, vertex_type, value, assert_vertex_value_equals):
+def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex_value_equals):
     vertex1 = ctor(*args)
     vertex2 = ctor(*args)
     equal_vertex = vertex1 == vertex2
@@ -239,8 +239,8 @@ def test_you_can_set_and_cascade(ctor, args, vertex_type, value, assert_vertex_v
     vertex1.set_value(value)
     vertex2.set_and_cascade(value)
 
-    assert_vertex_value_equals(vertex1, vertex_type, value)
-    assert_vertex_value_equals(vertex2, vertex_type, value)
+    assert_vertex_value_equals(vertex1, expected_type, value)
+    assert_vertex_value_equals(vertex2, expected_type, value)
 
     two_values_are_equal = equal_vertex.get_value()
     assert two_values_are_equal.dtype == np.bool_
@@ -251,7 +251,7 @@ def test_you_can_set_and_cascade(ctor, args, vertex_type, value, assert_vertex_v
     assert np.all(np.invert(two_values_are_not_equal))
 
 
-@pytest.mark.parametrize("ctor, args, vertex_type", [
+@pytest.mark.parametrize("ctor, args, expected_type", [
     (Gaussian, (0., 1.), np.floating),
     (UniformInt, (0, 10), np.integer),
     (Bernoulli, (0.5, ), np.bool_)
@@ -280,9 +280,9 @@ def test_you_can_set_and_cascade(ctor, args, vertex_type, value, assert_vertex_v
     (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
     (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)
 ])
-def test_you_can_observe(ctor, args, vertex_type, value, assert_vertex_value_equals):
+def test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals):
     vertex = ctor(*args)
     assert not vertex.is_observed()
     vertex.observe(value)
     assert vertex.is_observed()
-    assert_vertex_value_equals(vertex, vertex_type, value)
+    assert_vertex_value_equals(vertex, expected_type, value)
