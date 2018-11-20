@@ -19,10 +19,7 @@ class LorenzModel:
             yield position
 
     def __get_next_position(self, current: Coordinates) -> Coordinates:
-        nextX = current.x + self.time_step * (self.sigma *
-                                              (current.y - current.x))
-        nextY = current.y + self.time_step * (
-            current.x * (self.rho - current.z) - current.y)
-        nextZ = current.z + self.time_step * (
-            current.x * current.y - self.beta * current.z)
+        nextX = current.x + self.time_step * (self.sigma * (current.y - current.x))
+        nextY = current.y + self.time_step * (current.x * (self.rho - current.z) - current.y)
+        nextZ = current.z + self.time_step * (current.x * current.y - self.beta * current.z)
         return Coordinates(nextX, nextY, nextZ)

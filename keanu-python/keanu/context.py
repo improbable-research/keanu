@@ -14,8 +14,7 @@ class Singleton(type):
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(
-                *args, **kwargs)
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
 
@@ -25,14 +24,10 @@ class KeanuContext(metaclass=Singleton):
         stderr = self.__stderr_with_redirect_disabled_for_jupyter()
         classpath = self.__build_classpath()
 
-        logging.getLogger("keanu").debug(
-            "Initiating Py4J gateway with classpath %s" % classpath)
+        logging.getLogger("keanu").debug("Initiating Py4J gateway with classpath %s" % classpath)
 
         self._gateway = JavaGateway.launch_gateway(
-            classpath=classpath,
-            die_on_exit=True,
-            redirect_stdout=sys.stdout,
-            redirect_stderr=stderr)
+            classpath=classpath, die_on_exit=True, redirect_stdout=sys.stdout, redirect_stderr=stderr)
 
         self.__get_random_port_for_callback_server()
 
@@ -56,12 +51,10 @@ class KeanuContext(metaclass=Singleton):
     def __get_random_port_for_callback_server(self):
         # See: https://github.com/bartdag/py4j/issues/147
         self._gateway.start_callback_server(
-            CallbackServerParameters(
-                port=0, daemonize=True, daemonize_connections=True))
+            CallbackServerParameters(port=0, daemonize=True, daemonize_connections=True))
         jgws = JavaObject("GATEWAY_SERVER", self._gateway._gateway_client)
-        jgws.resetCallbackClient(
-            jgws.getCallbackClient().getAddress(),
-            self._gateway.get_callback_server().get_listening_port())
+        jgws.resetCallbackClient(jgws.getCallbackClient().getAddress(),
+                                 self._gateway.get_callback_server().get_listening_port())
 
     def jvm_view(self):
         return self.__jvm_view
@@ -99,5 +92,4 @@ class KeanuContext(metaclass=Singleton):
             return self._gateway.jvm.double
         else:
             raise NotImplementedError(
-                "Cannot infer class from array because it doesn't contain primitives. Was given {}"
-                .format(type(l[0])))
+                "Cannot infer class from array because it doesn't contain primitives. Was given {}".format(type(l[0])))

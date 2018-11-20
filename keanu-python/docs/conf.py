@@ -126,8 +126,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'keanu.tex', u'keanu Documentation', u'Improbable Research',
-     'manual'),
+    (master_doc, 'keanu.tex', u'keanu Documentation', u'Improbable Research', 'manual'),
 ]
 
 # -- Options for manual page output ------------------------------------------
@@ -142,8 +141,7 @@ man_pages = [(master_doc, 'keanu', u'keanu Documentation', [author], 1)]
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'keanu', u'keanu Documentation', author, 'keanu',
-     'One line description of project.', 'Miscellaneous'),
+    (master_doc, 'keanu', u'keanu Documentation', author, 'keanu', 'One line description of project.', 'Miscellaneous'),
 ]
 
 # -- Options for Epub output -------------------------------------------------

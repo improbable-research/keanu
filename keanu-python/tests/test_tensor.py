@@ -9,13 +9,12 @@ def generic():
     pass
 
 
-@pytest.mark.parametrize("num, expected_java_class",
-                         [(1, "ScalarIntegerTensor"),
-                          (np.array([1])[0], "ScalarIntegerTensor"),
-                          (1.3, "ScalarDoubleTensor"),
-                          (np.array([1.3])[0], "ScalarDoubleTensor"),
-                          (True, "SimpleBooleanTensor"),
-                          (np.array([True])[0], "SimpleBooleanTensor")])
+@pytest.mark.parametrize("num, expected_java_class", [(1, "ScalarIntegerTensor"),
+                                                      (np.array([1])[0], "ScalarIntegerTensor"),
+                                                      (1.3, "ScalarDoubleTensor"),
+                                                      (np.array([1.3])[0], "ScalarDoubleTensor"),
+                                                      (True, "SimpleBooleanTensor"),
+                                                      (np.array([True])[0], "SimpleBooleanTensor")])
 def test_num_passed_to_Tensor_creates_scalar_tensor(num, expected_java_class):
     t = Tensor(num)
     assert_java_class(t, expected_java_class)
@@ -23,11 +22,9 @@ def test_num_passed_to_Tensor_creates_scalar_tensor(num, expected_java_class):
     assert t.scalar() == num
 
 
-@pytest.mark.parametrize(
-    "data, expected_java_class",
-    [([[1, 2], [3, 4]], "Nd4jIntegerTensor"),
-     ([[1., 2.], [3., 4.]], "Nd4jDoubleTensor"),
-     ([[True, False], [True, False]], "SimpleBooleanTensor")])
+@pytest.mark.parametrize("data, expected_java_class", [([[1, 2], [3, 4]], "Nd4jIntegerTensor"),
+                                                       ([[1., 2.], [3., 4.]], "Nd4jDoubleTensor"),
+                                                       ([[True, False], [True, False]], "SimpleBooleanTensor")])
 def test_dataframe_passed_to_Tensor_creates_tensor(data, expected_java_class):
     dataframe = pd.DataFrame(columns=['A', 'B'], data=data)
     t = Tensor(dataframe)
@@ -40,13 +37,10 @@ def test_dataframe_passed_to_Tensor_creates_tensor(data, expected_java_class):
     assert np.array_equal(tensor_value, dataframe_value)
 
 
-@pytest.mark.parametrize("data, expected_java_class",
-                         [([1, 2], "Nd4jIntegerTensor"),
-                          ([1], "ScalarIntegerTensor"),
-                          ([1., 2.], "Nd4jDoubleTensor"),
-                          ([1.], "ScalarDoubleTensor"),
-                          ([True, False], "SimpleBooleanTensor"),
-                          ([True], "SimpleBooleanTensor")])
+@pytest.mark.parametrize("data, expected_java_class", [([1, 2], "Nd4jIntegerTensor"), ([1], "ScalarIntegerTensor"),
+                                                       ([1., 2.], "Nd4jDoubleTensor"), ([1.], "ScalarDoubleTensor"),
+                                                       ([True, False], "SimpleBooleanTensor"),
+                                                       ([True], "SimpleBooleanTensor")])
 def test_series_passed_to_Tensor_creates_tensor(data, expected_java_class):
     series = pd.Series(data)
     t = Tensor(series)
@@ -67,18 +61,12 @@ def test_cannot_pass_generic_to_Tensor(generic):
     with pytest.raises(NotImplementedError) as excinfo:
         Tensor(generic)
 
-    assert str(
-        excinfo.value
-    ) == "Generic types in an ndarray are not supported. Was given {}".format(
-        type(generic))
+    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
 
 
-@pytest.mark.parametrize("arr, expected_java_class",
-                         [([1, 2], "Nd4jIntegerTensor"),
-                          ([3.4, 2.], "Nd4jDoubleTensor"),
-                          ([True, False], "SimpleBooleanTensor")])
-def test_ndarray_passed_to_Tensor_creates_nonscalar_tensor(
-        arr, expected_java_class):
+@pytest.mark.parametrize("arr, expected_java_class", [([1, 2], "Nd4jIntegerTensor"), ([3.4, 2.], "Nd4jDoubleTensor"),
+                                                      ([True, False], "SimpleBooleanTensor")])
+def test_ndarray_passed_to_Tensor_creates_nonscalar_tensor(arr, expected_java_class):
     ndarray = np.array(arr)
     t = Tensor(ndarray)
     assert_java_class(t, expected_java_class)
@@ -89,18 +77,14 @@ def test_cannot_pass_generic_ndarray_to_Tensor(generic):
     with pytest.raises(NotImplementedError) as excinfo:
         Tensor(np.array([generic, generic]))
 
-    assert str(
-        excinfo.value
-    ) == "Generic types in an ndarray are not supported. Was given {}".format(
-        type(generic))
+    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
 
 
 def test_cannot_pass_empty_ndarray_to_Tensor():
     with pytest.raises(ValueError) as excinfo:
         Tensor(np.array([]))
 
-    assert str(
-        excinfo.value) == "Cannot infer type because the ndarray is empty"
+    assert str(excinfo.value) == "Cannot infer type because the ndarray is empty"
 
 
 @pytest.mark.parametrize("value", [(np.array([[1, 2], [3, 4]])), (3)])

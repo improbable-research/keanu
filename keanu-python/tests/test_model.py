@@ -13,9 +13,7 @@ def test_to_bayes_net():
 
     assert isinstance(net, BayesNet)
 
-    net_vertex_ids = [
-        vertex.get_id() for vertex in net.get_latent_or_observed_vertices()
-    ]
+    net_vertex_ids = [vertex.get_id() for vertex in net.get_latent_or_observed_vertices()]
 
     assert len(net_vertex_ids) == 3
     assert m.mu.get_id() in net_vertex_ids
@@ -32,9 +30,7 @@ def test_to_bayes_net_excludes_non_vertices():
 
     assert isinstance(net, BayesNet)
 
-    net_vertex_ids = [
-        vertex.get_id() for vertex in net.get_latent_or_observed_vertices()
-    ]
+    net_vertex_ids = [vertex.get_id() for vertex in net.get_latent_or_observed_vertices()]
 
     assert len(net_vertex_ids) == 1
     assert m.vertex.get_id() in net_vertex_ids

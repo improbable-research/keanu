@@ -10,8 +10,7 @@ def readme():
 version_string = '0.0.15.dev1'
 
 # If you don't remove the old directories, it tends to put the excluded module "examples" into the bdist
-for dir_name in ("keanu-%s.dist-info" % version_string, "keanu.egg-info",
-                 "build", "dist"):
+for dir_name in ("keanu-%s.dist-info" % version_string, "keanu.egg-info", "build", "dist"):
     shutil.rmtree(dir_name, ignore_errors=True)
 
 setup(
@@ -27,8 +26,7 @@ setup(
     include_package_data=True,
     install_requires=['py4j', 'numpy', 'pandas'],
     classifiers=[
-        'Development Status :: 1 - Planning',
-        'License :: OSI Approved :: MIT License',
+        'Development Status :: 1 - Planning', 'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.6'
     ],
     zip_safe=False)

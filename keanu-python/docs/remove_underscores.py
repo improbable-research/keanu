@@ -24,6 +24,4 @@ for directory, subdirectories, files in os.walk(root_dir):
         except:
             pass
 
-print(
-    "Finished renaming all directories and mentions of directories with underscores"
-)
+print("Finished renaming all directories and mentions of directories with underscores")

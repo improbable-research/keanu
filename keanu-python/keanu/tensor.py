@@ -18,14 +18,11 @@ class Tensor(JavaObjectWrapper):
         if isinstance(t, np.ndarray):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t))
         elif isinstance(t, pandas_types):
-            super(Tensor, self).__init__(
-                Tensor.__get_tensor_from_ndarray(t.values))
+            super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t.values))
         elif isinstance(t, primitive_types):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_scalar(t))
         else:
-            raise NotImplementedError(
-                "Generic types in an ndarray are not supported. Was given {}".
-                format(type(t)))
+            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(t)))
 
     @staticmethod
     def __get_tensor_from_ndarray(ndarray):
@@ -56,9 +53,8 @@ class Tensor(JavaObjectWrapper):
         elif isinstance(ndarray.item(0), float_types):
             return k.jvm_view().DoubleTensor.create
         else:
-            raise NotImplementedError(
-                "Generic types in an ndarray are not supported. Was given {}".
-                format(type(ndarray.item(0))))
+            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(
+                type(ndarray.item(0))))
 
     @staticmethod
     def __get_tensor_from_scalar(scalar):
@@ -69,9 +65,7 @@ class Tensor(JavaObjectWrapper):
         elif isinstance(scalar, float_types):
             return k.jvm_view().DoubleTensor.scalar(float(scalar))
         else:
-            raise NotImplementedError(
-                "Generic types in a ndarray are not supported. Was given {}".
-                format(type(scalar)))
+            raise NotImplementedError("Generic types in a ndarray are not supported. Was given {}".format(type(scalar)))
 
     @staticmethod
     def _to_ndarray(java_tensor):

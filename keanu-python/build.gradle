@@ -97,7 +97,7 @@ task formatApply {
     dependsOn("preparePythonEnvironment")
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'yapf', '--style', 'google', '--in-place', '--recursive', '--parallel', '.'
+            commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel', '.'
         }
     }
 }
@@ -113,7 +113,7 @@ task formatCheck {
             }
             def keanuVertexGeneratedPath = keanuVetexPath + 'generated.py'
             def keanuVertexInitPath = keanuVetexPath + '__init__.py'
-            commandLine 'pipenv', 'run', 'yapf', '--style', 'google', '--diff', '--recursive', '--parallel', 
+            commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel',
             '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
         }
     }

@@ -38,8 +38,7 @@ def test_lorenz():
         post_t = (window + 1) * (window_size - 1)
         actual_at_post_t = observed[post_t]
 
-        error = math.sqrt((actual_at_post_t.x - posterior[0])**2 +
-                          (actual_at_post_t.y - posterior[1])**2 +
+        error = math.sqrt((actual_at_post_t.x - posterior[0])**2 + (actual_at_post_t.y - posterior[1])**2 +
                           (actual_at_post_t.z - posterior[2])**2)
         prior_mu = (posterior[0], posterior[1], posterior[2])
         window += 1
@@ -51,10 +50,8 @@ def add_time(current):
     rho_v = Const(rho)
     (xt, yt, zt) = current
 
-    x_tplus1 = xt * Const(1. - time_step * sigma) + (
-        yt * Const(time_step * sigma))
-    y_tplus1 = yt * Const(1. - time_step) + (xt *
-                                             (rho_v - zt) * Const(time_step))
+    x_tplus1 = xt * Const(1. - time_step * sigma) + (yt * Const(time_step * sigma))
+    y_tplus1 = yt * Const(1. - time_step) + (xt * (rho_v - zt) * Const(time_step))
     z_tplus1 = zt * Const(1. - time_step * beta) + (xt * yt * Const(time_step))
     return (x_tplus1, y_tplus1, z_tplus1)
 

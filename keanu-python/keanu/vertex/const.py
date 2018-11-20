@@ -18,8 +18,8 @@ def Const(t) -> Vertex:
         val = np.array([[t]])
     else:
         raise NotImplementedError(
-            "Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead"
-            .format(type(t)))
+            "Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(
+                type(t)))
 
     return ctor(Tensor(val))
 
@@ -39,6 +39,4 @@ def __infer_const_ctor_from_scalar(scalar):
     elif isinstance(scalar, float_types):
         return ConstantDouble
     else:
-        raise NotImplementedError(
-            "Generic types in an ndarray are not supported. Was given {}".
-            format(type(scalar)))
+        raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(scalar)))

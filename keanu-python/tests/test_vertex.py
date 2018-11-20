@@ -9,9 +9,7 @@ from keanu.vertex import Gaussian, Const
 def jvm_view():
     from py4j.java_gateway import java_import
     jvm_view = KeanuContext().jvm_view()
-    java_import(
-        jvm_view,
-        "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex")
+    java_import(jvm_view, "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex")
     return jvm_view
 
 
@@ -23,8 +21,7 @@ def test_can_pass_scalar_to_vertex(jvm_view):
 
 
 def test_can_pass_ndarray_to_vertex(jvm_view):
-    gaussian = Vertex(jvm_view.GaussianVertex, np.array([[0.1, 0.4]]),
-                      np.array([[0.4, 0.5]]))
+    gaussian = Vertex(jvm_view.GaussianVertex, np.array([[0.1, 0.4]]), np.array([[0.4, 0.5]]))
     sample = gaussian.sample()
 
     assert sample.shape == (1, 2)
@@ -51,12 +48,9 @@ def test_cannot_pass_generic_to_vertex(jvm_view):
         pass
 
     with pytest.raises(ValueError) as excinfo:
-        Vertex(jvm_view.GaussianVertex, GenericExampleClass(),
-               GenericExampleClass())
+        Vertex(jvm_view.GaussianVertex, GenericExampleClass(), GenericExampleClass())
 
-    assert str(
-        excinfo.value) == "Can't parse generic argument. Was given {}".format(
-            GenericExampleClass)
+    assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(GenericExampleClass)
 
 
 def test_you_can_set_and_get_a_value(jvm_view):
@@ -174,14 +168,10 @@ def test_java_collections_to_generator(jvm_view):
     java_collections = gaussian.unwrap().getConnectedGraph()
     python_list = list(Vertex._to_generator(java_collections))
 
-    java_vertex_ids = [
-        Vertex._get_python_id(java_vertex) for java_vertex in java_collections
-    ]
+    java_vertex_ids = [Vertex._get_python_id(java_vertex) for java_vertex in java_collections]
 
     assert java_collections.size() == len(python_list)
-    assert all(
-        type(element) == Vertex and element.get_id() in java_vertex_ids
-        for element in python_list)
+    assert all(type(element) == Vertex and element.get_id() in java_vertex_ids for element in python_list)
 
 
 def test_get_vertex_id(jvm_view):

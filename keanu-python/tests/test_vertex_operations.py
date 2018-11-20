@@ -7,42 +7,32 @@ from keanu.vertex.base import Vertex
 ### Comparisons
 
 
-@pytest.mark.parametrize(
-    "lhs, rhs, expected_result", [
-        (Const(np.array([1., 2.])), Const(np.array([1., -1.])),
-         np.array([[True], [False]])),
-        (Const(np.array([1., 2.])), np.array([1., -1.]),
-         np.array([[True], [False]])),
-        (np.array([1., 2.]), Const(np.array([1., -1.])),
-         np.array([[True], [False]])),
-        (Const(np.array([1.])), 1., np.array([[True]])),
-        (Const(np.array([2.])), 1., np.array([[False]])),
-        (1., Const(np.array([1.])), np.array([[True]])),
-        (1., Const(np.array([-1.])), np.array([[False]])),
-        (Const(np.array([1., 2.])), Const(np.array([1.])),
-         np.array([[True], [False]])),
-        (Const(np.array([1.])), Const(np.array([1., 2.])),
-         np.array([[True], [False]])),
-    ])
+@pytest.mark.parametrize("lhs, rhs, expected_result", [
+    (Const(np.array([1., 2.])), Const(np.array([1., -1.])), np.array([[True], [False]])),
+    (Const(np.array([1., 2.])), np.array([1., -1.]), np.array([[True], [False]])),
+    (np.array([1., 2.]), Const(np.array([1., -1.])), np.array([[True], [False]])),
+    (Const(np.array([1.])), 1., np.array([[True]])),
+    (Const(np.array([2.])), 1., np.array([[False]])),
+    (1., Const(np.array([1.])), np.array([[True]])),
+    (1., Const(np.array([-1.])), np.array([[False]])),
+    (Const(np.array([1., 2.])), Const(np.array([1.])), np.array([[True], [False]])),
+    (Const(np.array([1.])), Const(np.array([1., 2.])), np.array([[True], [False]])),
+])
 def test_can_do_equal_to(lhs, rhs, expected_result):
     result = lhs == rhs
     assert type(result) == Vertex
     assert (result.get_value() == expected_result).all()
 
 
-@pytest.mark.parametrize(
-    "lhs, rhs, expected_result", [
-        (Const(np.array([1., 2.])), Const(np.array([1., -1.])),
-         np.array([[False], [True]])),
-        (Const(np.array([1., 2.])), np.array([1., -1.]),
-         np.array([[False], [True]])),
-        (np.array([1., 2.]), Const(np.array([1., -1.])),
-         np.array([[False], [True]])),
-        (Const(np.array([1.])), 1., np.array([[False]])),
-        (Const(np.array([2.])), 1., np.array([[True]])),
-        (1., Const(np.array([1.])), np.array([[False]])),
-        (1., Const(np.array([-1.])), np.array([[True]])),
-    ])
+@pytest.mark.parametrize("lhs, rhs, expected_result", [
+    (Const(np.array([1., 2.])), Const(np.array([1., -1.])), np.array([[False], [True]])),
+    (Const(np.array([1., 2.])), np.array([1., -1.]), np.array([[False], [True]])),
+    (np.array([1., 2.]), Const(np.array([1., -1.])), np.array([[False], [True]])),
+    (Const(np.array([1.])), 1., np.array([[False]])),
+    (Const(np.array([2.])), 1., np.array([[True]])),
+    (1., Const(np.array([1.])), np.array([[False]])),
+    (1., Const(np.array([-1.])), np.array([[True]])),
+])
 def test_can_do_not_equal_to(lhs, rhs, expected_result):
     result = lhs != rhs
     assert type(result) == Vertex
@@ -50,12 +40,9 @@ def test_can_do_not_equal_to(lhs, rhs, expected_result):
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([10., 20.])), Const(np.array([15., 15.])),
-     np.array([[False], [True]])),
-    (Const(np.array([10., 20.])), np.array([15., 15.]),
-     np.array([[False], [True]])),
-    (np.array([10., 20.]), Const(np.array([15., 15.])),
-     np.array([[False], [True]])),
+    (Const(np.array([10., 20.])), Const(np.array([15., 15.])), np.array([[False], [True]])),
+    (Const(np.array([10., 20.])), np.array([15., 15.]), np.array([[False], [True]])),
+    (np.array([10., 20.]), Const(np.array([15., 15.])), np.array([[False], [True]])),
     (Const(np.array([10., 20.])), 15., np.array([[False], [True]])),
     (10., Const(np.array([15., 5.])), np.array([[False], [True]])),
 ])
@@ -66,12 +53,9 @@ def test_can_do_greater_than(lhs, rhs, expected_result):
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([10., 20.])), Const(np.array([15., 15.])),
-     np.array([[True], [False]])),
-    (Const(np.array([10., 20.])), np.array([15., 15.]),
-     np.array([[True], [False]])),
-    (np.array([10., 20.]), Const(np.array([15., 15.])),
-     np.array([[True], [False]])),
+    (Const(np.array([10., 20.])), Const(np.array([15., 15.])), np.array([[True], [False]])),
+    (Const(np.array([10., 20.])), np.array([15., 15.]), np.array([[True], [False]])),
+    (np.array([10., 20.]), Const(np.array([15., 15.])), np.array([[True], [False]])),
     (Const(np.array([10., 20.])), 15., np.array([[True], [False]])),
     (10., Const(np.array([15., 5.])), np.array([[True], [False]])),
 ])
@@ -82,14 +66,10 @@ def test_can_do_less_than(lhs, rhs, expected_result):
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([10., 15., 20.])), Const(np.array([15., 15., 15.])),
-     np.array([[False], [True], [True]])),
-    (Const(np.array([10., 15., 20.])), np.array([15., 15., 15.]),
-     np.array([[False], [True], [True]])),
-    (np.array([10., 15., 20.]), Const(np.array([15., 15., 15.])),
-     np.array([[False], [True], [True]])),
-    (Const(np.array([10., 15., 20.])), 15., np.array([[False], [True], [True]
-                                                     ])),
+    (Const(np.array([10., 15., 20.])), Const(np.array([15., 15., 15.])), np.array([[False], [True], [True]])),
+    (Const(np.array([10., 15., 20.])), np.array([15., 15., 15.]), np.array([[False], [True], [True]])),
+    (np.array([10., 15., 20.]), Const(np.array([15., 15., 15.])), np.array([[False], [True], [True]])),
+    (Const(np.array([10., 15., 20.])), 15., np.array([[False], [True], [True]])),
     (10., Const(np.array([15., 10., 5.])), np.array([[False], [True], [True]])),
 ])
 def test_can_do_greater_than_or_equal_to(lhs, rhs, expected_result):
@@ -99,14 +79,10 @@ def test_can_do_greater_than_or_equal_to(lhs, rhs, expected_result):
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([10., 15., 20.])), Const(np.array([15., 15., 15.])),
-     np.array([[True], [True], [False]])),
-    (Const(np.array([10., 15., 20.])), np.array([15., 15., 15.]),
-     np.array([[True], [True], [False]])),
-    (np.array([10., 15., 20.]), Const(np.array([15., 15., 15.])),
-     np.array([[True], [True], [False]])),
-    (Const(np.array([10., 15., 20.])), 15., np.array([[True], [True], [False]
-                                                     ])),
+    (Const(np.array([10., 15., 20.])), Const(np.array([15., 15., 15.])), np.array([[True], [True], [False]])),
+    (Const(np.array([10., 15., 20.])), np.array([15., 15., 15.]), np.array([[True], [True], [False]])),
+    (np.array([10., 15., 20.]), Const(np.array([15., 15., 15.])), np.array([[True], [True], [False]])),
+    (Const(np.array([10., 15., 20.])), 15., np.array([[True], [True], [False]])),
     (10., Const(np.array([15., 10., 5.])), np.array([[True], [True], [False]])),
 ])
 def test_can_do_less_than_or_equal_to(lhs, rhs, expected_result):
@@ -119,8 +95,7 @@ def test_can_do_less_than_or_equal_to(lhs, rhs, expected_result):
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([10., 20.])), Const(np.array([1., 2.])),
-     np.array([[11], [22]])),
+    (Const(np.array([10., 20.])), Const(np.array([1., 2.])), np.array([[11], [22]])),
     (Const(np.array([10., 20.])), np.array([1., 2.]), np.array([[11], [22]])),
     (np.array([10., 20.]), Const(np.array([1., 2.])), np.array([[11], [22]])),
     (Const(np.array([10., 20.])), 2., np.array([[12], [22]])),
@@ -133,8 +108,7 @@ def test_can_do_addition(lhs, rhs, expected_result):
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([10., 20.])), Const(np.array([1., 2.])),
-     np.array([[9], [18]])),
+    (Const(np.array([10., 20.])), Const(np.array([1., 2.])), np.array([[9], [18]])),
     (Const(np.array([10., 20.])), np.array([1., 2.]), np.array([[9], [18]])),
     (np.array([10., 20.]), Const(np.array([1., 2.])), np.array([[9], [18]])),
     (Const(np.array([10., 20.])), 2., np.array([[8], [18]])),
@@ -147,8 +121,7 @@ def test_can_do_subtraction(lhs, rhs, expected_result):
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([3., 2.])), Const(np.array([5., 7.])), np.array([[15], [14]
-                                                                    ])),
+    (Const(np.array([3., 2.])), Const(np.array([5., 7.])), np.array([[15], [14]])),
     (Const(np.array([3., 2.])), np.array([5., 7.]), np.array([[15], [14]])),
     (np.array([3., 2.]), Const(np.array([5., 7.])), np.array([[15], [14]])),
     (Const(np.array([3., 2.])), 5., np.array([[15], [10]])),
@@ -161,8 +134,7 @@ def test_can_do_multiplication(lhs, rhs, expected_result):
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([15., 10.])), Const(np.array([2., 4.])),
-     np.array([[7.5], [2.5]])),
+    (Const(np.array([15., 10.])), Const(np.array([2., 4.])), np.array([[7.5], [2.5]])),
     (Const(np.array([15., 10.])), np.array([2., 4.]), np.array([[7.5], [2.5]])),
     (np.array([15., 10.]), Const(np.array([2., 4.])), np.array([[7.5], [2.5]])),
     (Const(np.array([15., 10.])), 2., np.array([[7.5], [5.]])),
@@ -188,12 +160,9 @@ def test_can_do_integer_division(lhs, rhs, expected_result):
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([3., 2.])), Const(np.array([2., 0.5])),
-     np.array([[9], [1.4142135623730951]])),
-    (Const(np.array([3., 2.])), np.array([2., 0.5]),
-     np.array([[9], [1.4142135623730951]])),
-    (np.array([3., 2.]), Const(np.array([2., 0.5])),
-     np.array([[9], [1.4142135623730951]])),
+    (Const(np.array([3., 2.])), Const(np.array([2., 0.5])), np.array([[9], [1.4142135623730951]])),
+    (Const(np.array([3., 2.])), np.array([2., 0.5]), np.array([[9], [1.4142135623730951]])),
+    (np.array([3., 2.]), Const(np.array([2., 0.5])), np.array([[9], [1.4142135623730951]])),
     (Const(np.array([3., 2.])), 2., np.array([[9], [4]])),
     (3., Const(np.array([2., 0.5])), np.array([[9], [1.7320508075688772]])),
 ])
@@ -209,8 +178,7 @@ def test_can_do_compound_operations():
     v3 = 23.
 
     result = v1 * v2 - v2 / v1 + v3 * v2
-    assert (result.get_value() == np.array([[269.5, 333.6666666666667],
-                                            [472.6, 567.2857142857142]])).all()
+    assert (result.get_value() == np.array([[269.5, 333.6666666666667], [472.6, 567.2857142857142]])).all()
 
 
 ### Unary

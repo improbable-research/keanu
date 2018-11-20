@@ -9,8 +9,7 @@ class Model:
         self.__dict__["_vertices"].update(vertices)
 
     def to_bayes_net(self):
-        return BayesNet((filter(lambda vertex: isinstance(vertex, Vertex),
-                                self._vertices.values())))
+        return BayesNet((filter(lambda vertex: isinstance(vertex, Vertex), self._vertices.values())))
 
     def __setattr__(self, k, v):
         if k in self.__dict__:
