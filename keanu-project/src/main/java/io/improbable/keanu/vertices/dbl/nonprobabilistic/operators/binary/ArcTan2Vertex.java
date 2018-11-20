@@ -27,12 +27,10 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         super(x, y);
     }
 
-    // No SaveParentVertex annotation needed as DoubleBinaryOpVertex.getLeft() will be used when saving the vertex
     public DoubleVertex getX() {
         return super.getLeft();
     }
 
-    // No SaveParentVertex annotation needed as DoubleBinaryOpVertex.getRight() will be used when saving the vertex
     public DoubleVertex getY() {
         return super.getRight();
     }
