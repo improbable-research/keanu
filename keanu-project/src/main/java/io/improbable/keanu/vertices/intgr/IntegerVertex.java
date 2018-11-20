@@ -39,6 +39,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         super(shape);
     }
 
+    @Override
     public void saveValue(NetworkWriter netWriter) {
         netWriter.saveValue(this);
     }
