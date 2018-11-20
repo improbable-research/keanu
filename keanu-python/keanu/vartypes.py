@@ -1,4 +1,4 @@
-from typing import Iterable, Union, Type, Any, TYPE_CHECKING
+from typing import Iterable, Union, Type, Any, TYPE_CHECKING, Dict, Tuple, List, Generator
 from numpy import integer, floating, bool_, ndarray
 from pandas import Series, DataFrame
 from keanu.vertex.ops import VertexOps
@@ -16,17 +16,23 @@ primitive_types = Union[int_types, float_types, bool_types]
 Tensor arg types
 '''
 pandas_types = Union[Series, DataFrame]
-numpy_types = Union[ndarray]
+numpy_types = ndarray
 
 tensor_arg_types = Union[primitive_types, pandas_types, numpy_types]
 
 '''
 Vertex arg types
 '''
-wrapped_java_types = Union[JavaObjectWrapper]
+wrapped_java_types = JavaObjectWrapper
 shape_types = Iterable[primitive_types]
 
 vertex_param_types = Union[tensor_arg_types, wrapped_java_types, VertexOps]
+
+'''
+Sample types
+'''
+sample_types = Dict[Tuple[Any, ...], List[numpy_types]]
+sample_generator_types = Generator[Dict[Tuple[Any, ...], numpy_types], None, None]
 
 '''
 Runtime types
@@ -43,7 +49,6 @@ runtime_tensor_arg_types : Type[Any]
 runtime_wrapped_java_types : Type[Any]
 
 if not TYPE_CHECKING:
-    # Union with one argument does not have __args__ parameter
     runtime_numpy_types = numpy_types
     runtime_pandas_types = pandas_types.__args__
     runtime_primitive_types = primitive_types.__args__

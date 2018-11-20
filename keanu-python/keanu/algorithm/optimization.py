@@ -56,7 +56,7 @@ class GradientOptimizer(Optimizer):
 
 class NonGradientOptimizer(Optimizer):
     def __init__(self,
-                 net: Union[Vertex, BayesNet],
+                 net: Union[BayesNet, Vertex],
                  max_evaluations: Optional[int] = None,
                  bounds_range: Optional[float] = None,
                  initial_trust_region_radius: Optional[float] = None,
