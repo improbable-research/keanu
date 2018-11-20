@@ -24,8 +24,8 @@ public class DoubleIfVertex extends DoubleVertex implements SaveableVertex, Diff
     private final DoubleVertex thn;
     private final DoubleVertex els;
     protected static final String PREDICATE_NAME = "predicate";
-    protected static final String THN_NAME = "thn";
-    protected static final String ELS_NAME = "els";
+    protected static final String THEN_NAME = "then";
+    protected static final String ELSE_NAME = "else";
 
     @ExportVertexToPythonBindings
     public DoubleIfVertex(long[] shape,
@@ -40,8 +40,8 @@ public class DoubleIfVertex extends DoubleVertex implements SaveableVertex, Diff
     }
 
     public DoubleIfVertex(@LoadParentVertex(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
-                          @LoadParentVertex(THN_NAME) DoubleVertex thn,
-                          @LoadParentVertex(ELS_NAME) DoubleVertex els) {
+                          @LoadParentVertex(THEN_NAME) DoubleVertex thn,
+                          @LoadParentVertex(ELSE_NAME) DoubleVertex els) {
 
         this(checkHasSingleNonScalarShapeOrAllScalar(thn.getShape(), els.getShape()), predicate, thn, els);
     }
@@ -51,12 +51,12 @@ public class DoubleIfVertex extends DoubleVertex implements SaveableVertex, Diff
         return predicate;
     }
 
-    @SaveParentVertex(THN_NAME)
+    @SaveParentVertex(THEN_NAME)
     public DoubleVertex getThn() {
         return els;
     }
 
-    @SaveParentVertex(ELS_NAME)
+    @SaveParentVertex(ELSE_NAME)
     public DoubleVertex getEls() {
         return thn;
     }

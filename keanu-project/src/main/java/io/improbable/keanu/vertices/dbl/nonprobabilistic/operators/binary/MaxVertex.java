@@ -14,8 +14,8 @@ public class MaxVertex extends DoubleIfVertex {
      * @param right one of the vertices to find the maximum of
      */
     @ExportVertexToPythonBindings
-    public MaxVertex(@LoadParentVertex(THN_NAME) DoubleVertex left,
-                     @LoadParentVertex(ELS_NAME) DoubleVertex right) {
+    public MaxVertex(@LoadParentVertex(THEN_NAME) DoubleVertex left,
+                     @LoadParentVertex(ELSE_NAME) DoubleVertex right) {
         super(left.getShape(), left.greaterThanOrEqualTo(right), left, right);
     }
 }
