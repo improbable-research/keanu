@@ -328,7 +328,7 @@ public class ProtobufTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void nonsaveableVertexThrowsExceptionOnSave() {
+    public void nonSaveableVertexThrowsExceptionOnSave() {
         BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
         BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
         ProtobufWriter protobufWriter = new ProtobufWriter(net);
