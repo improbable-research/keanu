@@ -1,10 +1,12 @@
 package io.improbable.keanu.util.dot;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -110,8 +113,8 @@ public class DotWriter implements NetworkWriter{
 
     @Override
     public void save(Vertex vertex) {
-        dotLabels.add(vertex.getDotLabel());
-        graphEdges.addAll(vertex.getParentEdgesInDotFormat());
+        dotLabels.add(getDotLabel(vertex));
+        graphEdges.addAll(getParentEdgesInDotFormat(vertex));
     }
 
     @Override
@@ -125,32 +128,72 @@ public class DotWriter implements NetworkWriter{
     @Override
     public void saveValue(Vertex vertex) {
         setDotLabelWithValue(vertex);
-        graphEdges.addAll(vertex.getParentEdgesInDotFormat());
+        graphEdges.addAll(getParentEdgesInDotFormat(vertex));
     }
 
     @Override
     public void saveValue(DoubleVertex vertex) {
         setDotLabelWithValue(vertex);
-        graphEdges.addAll(vertex.getParentEdgesInDotFormat());
+        graphEdges.addAll(getParentEdgesInDotFormat(vertex));
     }
 
     @Override
     public void saveValue(IntegerVertex vertex) {
         setDotLabelWithValue(vertex);
-        graphEdges.addAll(vertex.getParentEdgesInDotFormat());
+        graphEdges.addAll(getParentEdgesInDotFormat(vertex));
     }
 
     @Override
     public void saveValue(BoolVertex vertex) {
         setDotLabelWithValue(vertex);
-        graphEdges.addAll(vertex.getParentEdgesInDotFormat());
+        graphEdges.addAll(getParentEdgesInDotFormat(vertex));
     }
 
     private void setDotLabelWithValue(Vertex<? extends Tensor> vertex) {
-        VertexDotLabel vertexDotLabel = vertex.getDotLabel();
+        VertexDotLabel vertexDotLabel = getDotLabel(vertex);
         if (vertex.hasValue() && vertex.getValue().isScalar()) {
             vertexDotLabel.setDotLabel(VertexDotLabel.VertexDotLabelType.VALUE, "" + vertex.getValue().scalar());
         }
         dotLabels.add(vertexDotLabel);
+    }
+
+    // Get a DOT format label for this vertex, containing information such as vertex class name, display name and vertex label.
+    private VertexDotLabel getDotLabel(Vertex vertex) {
+        VertexDotLabel vertexDotLabel = new VertexDotLabel(vertex);
+        if (vertex.getLabel() != null) {
+            vertexDotLabel.setDotLabel(VertexDotLabel.VertexDotLabelType.VERTEX_LABEL, vertex.getLabel().getUnqualifiedName());
+        }
+        DisplayInformationForOutput vertexAnnotation = vertex.getClass().getAnnotation(DisplayInformationForOutput.class);
+        if (vertexAnnotation != null && !vertexAnnotation.displayName().isEmpty()) {
+            vertexDotLabel.setDotLabel(VertexDotLabel.VertexDotLabelType.ANNOTATION_LABEL, vertexAnnotation.displayName());
+        }
+        return vertexDotLabel;
+    }
+
+    //Get a set of graph edges containing information about the connected vertices.
+    private Set<GraphEdge> getParentEdgesInDotFormat(Vertex vertex) {
+        Set<GraphEdge> edges = new HashSet<>();
+        for (Object v : vertex.getParents()) {
+            edges.add(new GraphEdge((Vertex)v, vertex));
+        }
+
+        // Check if any of the edges represent a connection between the vertex and its hyperparameter and annotate it accordingly.
+        Class vertexClass = vertex.getClass();
+        Method[] methods = vertexClass.getMethods();
+
+        for (Method method : methods) {
+            SaveParentVertex annotation = method.getAnnotation(SaveParentVertex.class);
+            if (annotation != null) {
+                String parentName = annotation.value();
+                try {
+                    Vertex parentVertex = (Vertex)method.invoke(vertex);
+                    GraphEdge parentEdge = new GraphEdge(vertex, parentVertex);
+                    edges.stream().filter(parentEdge::equals).findFirst().get().appendToDotLabel(parentName);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Invalid parent retrieval function specified", e);
+                }
+            }
+        }
+        return edges;
     }
 }
