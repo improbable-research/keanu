@@ -26,15 +26,7 @@ public class StatisticsCalculator {
     }
 
     public double estimatedGradient() {
-        double sumX = xData.sum();
-        double sumY = yData.sum();
-        double sumXX = xData.times(xData).sum();
-        double sumXY = xData.times(yData).sum();
-
-        double s_xx = sumXX - (sumX * sumX / size());
-        double s_xy = sumXY - (sumX * sumY / size());
-
-        return s_xy / s_xx;
+        return secondMomentOf(xData, yData) / secondMomentOf(xData);
     }
 
     public double estimatedIntercept() {
@@ -46,5 +38,21 @@ public class StatisticsCalculator {
         DoubleTensor residuals = yData.minus(calculatedY);
         long unbiasedMultiplier = size() - 2;
         return residuals.times(residuals).sum() / unbiasedMultiplier;
+    }
+
+    public double standardErrorForGradient() {
+        return Math.sqrt(meanSquaredError() / secondMomentOf(xData));
+    }
+
+    private double secondMomentOf(final DoubleTensor data) {
+        return secondMomentOf(data, data);
+    }
+
+    private double secondMomentOf(final DoubleTensor data1, final DoubleTensor data2) {
+        double sum1 = data1.sum();
+        double sum2 = data2.sum();
+        double sumOfSquares = data1.times(data2).sum();
+
+        return sumOfSquares - (sum1 * sum2 / size());
     }
 }

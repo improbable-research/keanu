@@ -93,4 +93,16 @@ public class StatisticsCalculatorTest {
         StatisticsCalculator perfectStats = new StatisticsCalculator(X_DATA, X_DATA.times(2.).plus(42.));
         assertThat(perfectStats.meanSquaredError(), equalTo(0.));
     }
+
+    @Test
+    public void youCanGetTheStandardErrorForTheGradient() {
+        assertThat(stats.standardErrorForGradient(), greaterThan(0.));
+    }
+
+    @Test
+    public void theStandardErrorIsZeroWhenTheDataIsPerfectlyCorrelated() {
+        StatisticsCalculator perfectStats = new StatisticsCalculator(X_DATA, X_DATA.times(2.).plus(42.));
+        assertThat(perfectStats.standardErrorForGradient(), equalTo(0.));
+    }
+
 }
