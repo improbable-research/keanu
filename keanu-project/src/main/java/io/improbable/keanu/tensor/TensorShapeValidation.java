@@ -23,27 +23,27 @@ public class TensorShapeValidation {
      *
      * @param proposalShape the tensor shape being validated
      * @param shapes        the tensors being validated against
-     * @throws IllegalArgumentException if there is more than one non-scalar shape OR if the non-scalar shape does
+     * @throws IllegalArgumentException if there is more than one non length one shape OR if the non length one shape does
      *                                  not match the proposal shape.
      */
     public static void checkTensorsMatchNonLengthOneShapeOrAreLengthOne(long[] proposalShape, long[]... shapes) {
 
-        Set<TensorShape> nonScalarShapes = getNonLengthOneShapes(shapes);
+        Set<TensorShape> nonLengthOneShapes = getNonLengthOneShapes(shapes);
 
-        if (!nonScalarShapes.isEmpty()) {
+        if (!nonLengthOneShapes.isEmpty()) {
 
-            boolean moreThanOneNonScalarShape = nonScalarShapes.size() > 1;
+            boolean moreThanOneNonLengthOneShape = nonLengthOneShapes.size() > 1;
 
-            if (moreThanOneNonScalarShape) {
-                throw new IllegalArgumentException("More than a single non-scalar shape");
+            if (moreThanOneNonLengthOneShape) {
+                throw new IllegalArgumentException("More than a single non length one shape");
             }
 
-            long[] nonScalarShape = nonScalarShapes.iterator().next().getShape();
-            boolean nonScalarShapeDoesNotMatchProposal = !Arrays.equals(nonScalarShape, proposalShape);
+            long[] nonLengthOneShape = nonLengthOneShapes.iterator().next().getShape();
+            boolean nonLengthOneShapeDoesNotMatchProposal = !Arrays.equals(nonLengthOneShape, proposalShape);
 
-            if (nonScalarShapeDoesNotMatchProposal) {
+            if (nonLengthOneShapeDoesNotMatchProposal) {
                 throw new IllegalArgumentException(
-                    "Proposed shape " + Arrays.toString(proposalShape) + " does not match other non scalar shapes"
+                    "Proposed shape " + Arrays.toString(proposalShape) + " does not match other non length one shapes"
                 );
             }
         }
@@ -71,11 +71,11 @@ public class TensorShapeValidation {
     }
 
     /**
-     * This ensures there is at most a single non-scalar shape.
+     * This ensures there is at most a single non length one shape.
      *
      * @param shapes the tensors for shape checking
-     * @return either a scalar shape OR the single non-scalar shape.
-     * @throws IllegalArgumentException if there is more than one non-scalar shape or multiple ranks of length 1 shapes
+     * @return either a length one shape OR the single non length one shape.
+     * @throws IllegalArgumentException if there is more than one non length one shape or multiple ranks of length 1 shapes
      */
     public static long[] checkHasOneNonLengthOneShapeOrAllLengthOne(long[]... shapes) {
         Set<TensorShape> nonLengthOneShapes = getNonLengthOneShapes(shapes);

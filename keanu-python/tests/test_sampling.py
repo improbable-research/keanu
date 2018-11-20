@@ -1,13 +1,14 @@
+from itertools import islice
+
 import numpy as np
 import pandas as pd
 import pytest
-from py4j.java_gateway import java_import
+
 from examples import Thermometer
-from keanu.vertex import Gamma, Exponential, Cauchy
-from keanu.algorithm import sample, generate_samples
 from keanu import BayesNet, KeanuRandom
-from collections import defaultdict
-from itertools import islice
+from keanu.algorithm import sample, generate_samples
+from keanu.vertex import Gamma, Exponential, Cauchy
+
 
 @pytest.fixture
 def net():
@@ -55,7 +56,8 @@ def test_down_sample_interval(net):
     draws = 10
     down_sample_interval = 2
 
-    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=draws, down_sample_interval=down_sample_interval)
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=draws,
+                     down_sample_interval=down_sample_interval)
 
     expected_num_samples = draws / down_sample_interval
     assert all(len(vertex_samples) == expected_num_samples for vertex_id, vertex_samples in samples.items())

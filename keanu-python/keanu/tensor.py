@@ -3,7 +3,7 @@ from py4j.java_gateway import java_import
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
-from .vartypes import int_types, float_types, bool_types, primitive_types, pandas_types
+from .vartypes import int_types, float_types, bool_types, primitive_types, pandas_types, numpy_types
 
 k = KeanuContext()
 
@@ -14,7 +14,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
 class Tensor(JavaObjectWrapper):
     def __init__(self, t):
-        if isinstance(t, np.ndarray):
+        if isinstance(t, numpy_types):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t))
         elif isinstance(t, pandas_types):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t.values))
@@ -33,15 +33,7 @@ class Tensor(JavaObjectWrapper):
 
     @staticmethod
     def __infer_tensor_ctor_from_ndarray(ndarray):
-
-        if isinstance(ndarray, bool_types):
-            return k.jvm_view().BooleanTensor.scalar
-        elif isinstance(ndarray, int_types):
-            return k.jvm_view().IntegerTensor.scalar
-        elif isinstance(ndarray, float_types):
-            return k.jvm_view().DoubleTensor.scalar
-
-        if isinstance(ndarray, np.ndarray) and len(ndarray) == 0:
+        if isinstance(ndarray, numpy_types) and len(ndarray) == 0:
             raise ValueError("Cannot infer type because the ndarray is empty")
 
         if isinstance(ndarray.item(0), bool_types):

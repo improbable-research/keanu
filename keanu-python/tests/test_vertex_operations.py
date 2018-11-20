@@ -10,10 +10,10 @@ from keanu.vertex.base import Vertex
     (Const(np.array([1., 2.])),    Const(np.array([1., -1.])), np.array([True, False])),
     (Const(np.array([1., 2.])),          np.array([1., -1.]) , np.array([True, False])),
     (      np.array([1., 2.]) ,    Const(np.array([1., -1.])), np.array([True, False])),
-    (Const(np.array([1.    ])),                    1.        , np.array([True         ])),
-    (Const(np.array([    2.])),                    1.        , np.array([        False])),
-    (                    1.   ,    Const(np.array([1.     ])), np.array([True         ])),
-    (                    1.   ,    Const(np.array([    -1.])), np.array([        False])),
+    (Const(np.array([1.    ])),                    1.        , np.array([True       ])),
+    (Const(np.array([    2.])),                    1.        , np.array([      False])),
+    (                    1.   ,    Const(np.array([1.     ])), np.array([True       ])),
+    (                    1.   ,    Const(np.array([    -1.])), np.array([      False])),
     (Const(np.array([1., 2.])),    Const(np.array([1.     ])), np.array([True, False])),
     (Const(np.array([1.    ])),    Const(np.array([1.,  2.])), np.array([True, False])),
 ])
@@ -26,10 +26,10 @@ def test_can_do_equal_to(lhs, rhs, expected_result):
     (Const(np.array([1., 2.])), Const(np.array([1., -1.])), np.array([False, True])),
     (Const(np.array([1., 2.])),       np.array([1., -1.]) , np.array([False, True])),
     (      np.array([1., 2.]) , Const(np.array([1., -1.])), np.array([False, True])),
-    (Const(np.array([1.    ])),                 1.        , np.array([False      ]  )),
-    (Const(np.array([    2.])),                 1.        , np.array([         True])),
-    (                1.       , Const(np.array([1.     ])), np.array([False        ])),
-    (                1.       , Const(np.array([    -1.])), np.array([         True])),
+    (Const(np.array([1.    ])),                 1.        , np.array([False      ])),
+    (Const(np.array([    2.])),                 1.        , np.array([       True])),
+    (                1.       , Const(np.array([1.     ])), np.array([False      ])),
+    (                1.       , Const(np.array([    -1.])), np.array([       True])),
 ])
 def test_can_do_not_equal_to(lhs, rhs, expected_result):
     result = lhs != rhs
@@ -124,8 +124,8 @@ def test_can_do_multiplication(lhs, rhs, expected_result):
     assert (result.get_value() == expected_result).all()
 
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([15., 10.])), Const(np.array([2., 4.])), np.array([7.5, 2.5] )),
-    (Const(np.array([15., 10.])),          np.array([2., 4.]) , np.array([7.5, 2.5] )),
+    (Const(np.array([15., 10.])), Const(np.array([2., 4.])), np.array([7.5, 2.5 ] )),
+    (Const(np.array([15., 10.])),       np.array([2., 4.]) , np.array([7.5, 2.5 ] )),
     (      np.array([15., 10.]) , Const(np.array([2., 4.])), np.array([7.5, 2.5 ])),
     (Const(np.array([15., 10.])),                 2.       , np.array([7.5, 5.  ])),
     (                15.,         Const(np.array([2., 4.])), np.array([7.5, 3.75])),
