@@ -4,6 +4,7 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.model.regression.RegressionModel;
@@ -105,35 +106,33 @@ public class LinearLassoRegressionTest {
         assertThat(linearRegressionModel.getWeight(2), closeTo(0., 1e-3));
     }
 
-
+    @Category(Slow.class)
     @Test
     public void youCanChooseSamplingInsteadOfGradientOptimization() {
-        LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataLaplaceWeights(2);
+        final int smallRawDataSize = 20;
+        final int samplingCount = 30000;
 
-        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(.1));
+        LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData(smallRawDataSize);
+
+        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(0.25));
 
         SamplingModelFitting sampling = new SamplingModelFitting(MetropolisHastings.builder()
             .proposalDistribution(proposalDistribution)
+            .variableSelector(MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR)
             .build(),
-            3000);
+            samplingCount);
 
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .withRegularization(RegressionRegularization.LASSO)
-            .withPriorOnIntercept(data.intercept, data.intercept * 0.01)
+            .withPriorOnIntercept(0, data.intercept)
             .withPriorOnWeights(
-                data.weights.asFlatDoubleArray(),
-                data.weights.times(0.001).asFlatDoubleArray()
+                DoubleTensor.create(0., data.weights.getShape()).asFlatDoubleArray(),
+                data.weights.asFlatDoubleArray()
             )
             .withSampling(sampling)
             .build();
 
-        assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
-            data
-        );
-
-        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(2500).downSample(2);
+        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
 
         assertSampledWeightsAndInterceptMatchTestData(
             networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightsVertexId()),
