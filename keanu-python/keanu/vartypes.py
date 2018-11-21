@@ -4,14 +4,12 @@ from pandas import Series, DataFrame
 from keanu.vertex.ops import VertexOps
 from .base import JavaObjectWrapper
 
-
 # see numpy's scalar hierarchy: https://docs.scipy.org/doc/numpy/reference/arrays.scalars.html#scalars
 int_types = Union[int, integer]
 float_types = Union[float, floating]
 bool_types = Union[bool, bool_]
 
 primitive_types = Union[int_types, float_types, bool_types]
-
 '''
 Tensor arg types
 '''
@@ -19,7 +17,6 @@ pandas_types = Union[Series, DataFrame]
 numpy_types = Union[ndarray]
 
 tensor_arg_types = Union[primitive_types, pandas_types, numpy_types]
-
 '''
 Vertex arg types
 '''
@@ -27,26 +24,24 @@ wrapped_java_types = Union[JavaObjectWrapper]
 shape_types = Iterable[primitive_types]
 
 vertex_param_types = Union[tensor_arg_types, wrapped_java_types, VertexOps]
-
 '''
 Sample types
 '''
 sample_types = Dict[Tuple[Any, ...], List[numpy_types]]
 sample_generator_types = Generator[Dict[Tuple[Any, ...], numpy_types], None, None]
-
 '''
 Runtime types
 '''
 # mypy prohibits use of static types from typing module at runtime
 # see : https://github.com/python/mypy/issues/5354
-runtime_numpy_types : Type[Any]
-runtime_pandas_types : Type[Any]
-runtime_primitive_types : Type[Any]
-runtime_int_types : Type[Any]
-runtime_float_types : Type[Any]
-runtime_bool_types : Type[Any]
-runtime_tensor_arg_types : Type[Any]
-runtime_wrapped_java_types : Type[Any]
+runtime_numpy_types: Type[Any]
+runtime_pandas_types: Type[Any]
+runtime_primitive_types: Type[Any]
+runtime_int_types: Type[Any]
+runtime_float_types: Type[Any]
+runtime_bool_types: Type[Any]
+runtime_tensor_arg_types: Type[Any]
+runtime_wrapped_java_types: Type[Any]
 
 if not TYPE_CHECKING:
     # Unions with a single element can be directly used as runtime type

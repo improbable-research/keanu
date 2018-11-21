@@ -53,8 +53,7 @@ def generate_samples(net: BayesNet,
     return _samples_generator(sample_iterator, vertices_unwrapped)
 
 
-def _samples_generator(sample_iterator: Any,
-                       vertices_unwrapped : Any) -> sample_generator_types:
+def _samples_generator(sample_iterator: Any, vertices_unwrapped: Any) -> sample_generator_types:
     while (True):
         network_sample = sample_iterator.next()
         sample = {

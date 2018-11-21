@@ -3,16 +3,8 @@ from keanu.tensor import Tensor
 from .generated import ConstantBool, ConstantInteger, ConstantDouble
 from .base import Vertex
 from typing import Callable
-from keanu.vartypes import (
-    numpy_types,
-    tensor_arg_types,
-    runtime_numpy_types,
-    runtime_pandas_types,
-    runtime_primitive_types,
-    runtime_bool_types,
-    runtime_int_types,
-    runtime_float_types
-)
+from keanu.vartypes import (numpy_types, tensor_arg_types, runtime_numpy_types, runtime_pandas_types,
+                            runtime_primitive_types, runtime_bool_types, runtime_int_types, runtime_float_types)
 
 
 def Const(t: tensor_arg_types) -> Vertex:

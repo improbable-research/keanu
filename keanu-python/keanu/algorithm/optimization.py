@@ -12,9 +12,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.
 
 class Optimizer:
 
-    def __init__(self,
-                 optimizer: Any,
-                 net: Union[BayesNet, Vertex]) -> None:
+    def __init__(self, optimizer: Any, net: Union[BayesNet, Vertex]) -> None:
         self.optimizer = optimizer
         self.net = net
 
@@ -25,8 +23,7 @@ class Optimizer:
         return self.optimizer.maxLikelihood()
 
     @staticmethod
-    def _build_bayes_net(builder: Any,
-                         net: Union[BayesNet, Vertex]) -> Any:
+    def _build_bayes_net(builder: Any, net: Union[BayesNet, Vertex]) -> Any:
 
         if not (isinstance(net, BayesNet) or isinstance(net, Vertex)):
             raise TypeError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))

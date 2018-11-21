@@ -11,9 +11,9 @@ ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
 
 # python singleton implementation https://stackoverflow.com/a/6798042/741789
 class Singleton(type):
-    _instances = {} # type: Dict[KeanuContext, KeanuContext]
+    _instances = {}  # type: Dict[KeanuContext, KeanuContext]
 
-    def __call__(cls : Any, *args : Any, **kwargs : Any) -> Any:
+    def __call__(cls: Any, *args: Any, **kwargs: Any) -> Any:
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]

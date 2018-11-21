@@ -20,7 +20,7 @@ def net() -> BayesNet:
 
 
 @pytest.mark.parametrize("algo", [("metropolis"), ("NUTS"), ("hamiltonian")])
-def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo : str, net : BayesNet) -> None:
+def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: str, net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
     vertex_ids = [vertex.get_id() for vertex in sample_from]

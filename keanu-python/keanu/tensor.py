@@ -4,18 +4,9 @@ from py4j.java_gateway import java_import
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from typing import Any
-from .vartypes import (
-    numpy_types,
-    tensor_arg_types,
-    primitive_types,
-    runtime_int_types,
-    runtime_float_types,
-    runtime_bool_types,
-    runtime_primitive_types,
-    runtime_numpy_types,
-    runtime_pandas_types,
-    runtime_primitive_types
-)
+from .vartypes import (numpy_types, tensor_arg_types, primitive_types, runtime_int_types, runtime_float_types,
+                       runtime_bool_types, runtime_primitive_types, runtime_numpy_types, runtime_pandas_types,
+                       runtime_primitive_types)
 
 k = KeanuContext()
 
