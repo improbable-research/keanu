@@ -1,5 +1,6 @@
 package io.improbable.keanu.e2e.regression;
 
+import io.improbable.keanu.tensor.StatisticsCalculator;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
@@ -23,7 +24,11 @@ class LinearRegressionTestUtils {
     private static double EXPECTED_B = 20.0;
 
     static TestData generateSingleFeatureData() {
-        DoubleVertex xGenerator = new UniformVertex(new long[]{1, N}, 0, 10);
+        return generateSingleFeatureData(N);
+    }
+
+    static TestData generateSingleFeatureData(int numSamples) {
+        DoubleVertex xGenerator = new UniformVertex(new long[]{1, numSamples}, 0, 10);
         DoubleVertex mu = xGenerator.multiply(EXPECTED_W1).plus(EXPECTED_B);
         DoubleVertex yGenerator = new GaussianVertex(mu, 1.0);
         DoubleTensor xData = xGenerator.sample();
@@ -105,11 +110,22 @@ class LinearRegressionTestUtils {
         assertThat("Weights", weights, allCloseTo(0.05, testData.weights));
     }
 
-    static void assertSampledWeightsAndInterceptMatchTestData(DoubleVertexSamples weights, DoubleVertexSamples intercept, TestData testData) {
-        assertThat(intercept.getAverages().scalar(), closeTo(testData.intercept, 0.5));
-        assertThat(intercept.getVariances().scalar(), closeTo(0.01, 0.01));
-        assertThat(weights.getAverages(), allCloseTo(0.1, testData.weights));
-        assertThat(weights.getVariances(), allCloseTo(0.02, DoubleTensor.create(0.01, 0.01)));
+    static void assertSampledWeightsAndInterceptMatchTestData(DoubleVertexSamples gradient, DoubleVertexSamples intercept, TestData testData) {
+        StatisticsCalculator statisticsCalculator = new StatisticsCalculator(testData.xTrain, testData.yTrain);
+        double estimatedGradientInSampleData = statisticsCalculator.estimatedGradient();
+        double estimatedInterceptInSampleData = statisticsCalculator.estimatedIntercept();
+        double standardErrorForGradientInSampleData = statisticsCalculator.standardErrorForGradient();
+        double standardErrorForInterceptInSampleData = statisticsCalculator.standardErrorForIntercept();
+
+        System.out.println(String.format("Gradient from sampling:     %.4f ~ %.4f", gradient.getAverages().scalar(), gradient.getVariances().sqrt().scalar()));
+        System.out.println(String.format("Gradient from initial data: %.4f ~ %.4f", estimatedGradientInSampleData, standardErrorForGradientInSampleData));
+        System.out.println(String.format("Intercept from sampling:     %.4f ~ %.4f", intercept.getAverages().scalar(), intercept.getVariances().sqrt().scalar()));
+        System.out.println(String.format("Intercept from initial data: %.4f ~ %.4f", estimatedInterceptInSampleData, standardErrorForInterceptInSampleData));
+
+        assertThat(gradient.getAverages().scalar(), closeTo(estimatedGradientInSampleData, standardErrorForGradientInSampleData));
+        assertThat(gradient.getVariances().sqrt().scalar(), closeTo(standardErrorForGradientInSampleData, 0.01));
+        assertThat(intercept.getAverages().scalar(), closeTo(estimatedInterceptInSampleData, standardErrorForInterceptInSampleData));
+        assertThat(intercept.getVariances().sqrt().scalar(), closeTo(standardErrorForInterceptInSampleData, 0.05));
     }
 
     @Value
