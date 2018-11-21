@@ -1,5 +1,5 @@
 import numpy as np
-from py4j.java_gateway import java_import
+from py4j.java_gateway import java_import, JavaObject, JavaMember
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
@@ -28,7 +28,7 @@ class Tensor(JavaObjectWrapper):
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(t)))
 
     @staticmethod
-    def __get_tensor_from_ndarray(ndarray: numpy_types) -> Any:
+    def __get_tensor_from_ndarray(ndarray: numpy_types) -> JavaObject:
         normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(ndarray)
 
         ctor = Tensor.__infer_tensor_ctor_from_ndarray(normalized_ndarray)
@@ -45,7 +45,7 @@ class Tensor(JavaObjectWrapper):
             return ndarray
 
     @staticmethod
-    def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> Any:
+    def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> JavaMember:
         if len(ndarray) == 0:
             raise ValueError("Cannot infer type because the ndarray is empty")
 
@@ -60,7 +60,7 @@ class Tensor(JavaObjectWrapper):
                 type(ndarray.item(0))))
 
     @staticmethod
-    def __get_tensor_from_scalar(scalar: primitive_types) -> Any:
+    def __get_tensor_from_scalar(scalar: primitive_types) -> JavaObject:
         if isinstance(scalar, runtime_bool_types):
             return k.jvm_view().BooleanTensor.scalar(bool(scalar))
         elif isinstance(scalar, runtime_int_types):
@@ -71,6 +71,6 @@ class Tensor(JavaObjectWrapper):
             raise NotImplementedError("Generic types in a ndarray are not supported. Was given {}".format(type(scalar)))
 
     @staticmethod
-    def _to_ndarray(java_tensor: Any) -> numpy_types:
+    def _to_ndarray(java_tensor: JavaObject) -> numpy_types:
         np_array = np.array(list(java_tensor.asFlatArray()))
         return np_array.reshape(java_tensor.getShape())

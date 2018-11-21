@@ -5,7 +5,9 @@ from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
 from .ops import VertexOps
-from typing import List, Any, Tuple, Iterator, Union
+from typing import List, Tuple, Iterator, Union
+from py4j.java_gateway import JavaObject, JavaMember
+from py4j.java_collections import JavaList, JavaArray
 from keanu.vartypes import (tensor_arg_types, vertex_param_types, shape_types, numpy_types, runtime_tensor_arg_types,
                             runtime_primitive_types, runtime_wrapped_java_types)
 
@@ -14,7 +16,7 @@ k = KeanuContext()
 
 class Vertex(JavaObjectWrapper, VertexOps):
 
-    def __init__(self, val: Any, *args: Union[vertex_param_types, shape_types]) -> None:
+    def __init__(self, val: Union[JavaMember, JavaObject], *args: Union[vertex_param_types, shape_types]) -> None:
         if args:
             ctor = val
             val = ctor(*(Vertex.__parse_args(args)))
@@ -42,15 +44,15 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def get_connected_graph(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
-    def get_id(self) -> Tuple[Any, ...]:
+    def get_id(self) -> Tuple[JavaObject, ...]:
         return Vertex._get_python_id(self.unwrap())
 
     @staticmethod
-    def __parse_args(args: Tuple[Any, ...]) -> List[Any]:
+    def __parse_args(args: Tuple[Union[vertex_param_types, shape_types], ...]) -> List[JavaObject]:
         return list(map(Vertex.__parse_arg, args))
 
     @staticmethod
-    def __parse_arg(arg: Union[vertex_param_types, shape_types]) -> Any:
+    def __parse_arg(arg: Union[vertex_param_types, shape_types]) -> JavaObject:
         if isinstance(arg, runtime_tensor_arg_types):
             return kn.vertex.const.Const(arg).unwrap()
         elif isinstance(arg, runtime_wrapped_java_types):
@@ -61,9 +63,9 @@ class Vertex(JavaObjectWrapper, VertexOps):
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
-    def _to_generator(java_vertices: Any) -> Iterator['Vertex']:
+    def _to_generator(java_vertices: Union[JavaList, JavaArray]) -> Iterator['Vertex']:
         return (Vertex(java_vertex) for java_vertex in java_vertices)
 
     @staticmethod
-    def _get_python_id(java_vertex: Any) -> Tuple[Any, ...]:
+    def _get_python_id(java_vertex: JavaObject) -> Tuple[JavaObject, ...]:
         return tuple(java_vertex.getId().getValue())
