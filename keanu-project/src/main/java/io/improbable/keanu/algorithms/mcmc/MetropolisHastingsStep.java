@@ -67,7 +67,9 @@ class MetropolisHastingsStep {
                            final double logProbabilityBeforeStep,
                            final double temperature) {
 
-        log.trace(String.format("Chosen vertices: %s", chosenVertices.stream().map(Vertex::getId).collect(Collectors.toList())));
+        log.trace(String.format("Chosen vertices: %s", chosenVertices.stream()
+            .map(Vertex::toString)
+            .collect(Collectors.toList())));
         final double affectedVerticesLogProbOld = sumLogProbabilityOfAffected(chosenVertices, affectedVerticesCache);
 
         NetworkSnapshot preProposalSnapshot = null;
