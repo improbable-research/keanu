@@ -96,4 +96,5 @@ class KeanuContext(metaclass=Singleton):
             return self._gateway.jvm.double
         else:
             raise NotImplementedError(
-                "Cannot infer class from array because it doesn't contain primitives. Was given {}".format(type(first_item)))
+                "Cannot infer class from array because it doesn't contain primitives. Was given {}".format(
+                    type(first_item)))
