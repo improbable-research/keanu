@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMatch;
 
-public class ReduceVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
+public class ReduceVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
     private final List<? extends Vertex<DoubleTensor>> inputs;
     private final BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction;

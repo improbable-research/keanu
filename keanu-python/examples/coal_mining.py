@@ -3,6 +3,7 @@ import numpy as np
 from keanu.vertex import UniformInt, Exponential, DoubleIf, Poisson
 from keanu import Model
 
+
 class CoalMining():
     __fname = "data/coal-mining-disaster-data.csv"
 

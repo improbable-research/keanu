@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -16,7 +18,8 @@ public class ExpVertex extends DoubleUnaryOpVertex implements Differentiable {
      *
      * @param inputVertex the vertex
      */
-    public ExpVertex(DoubleVertex inputVertex) {
+    @ExportVertexToPythonBindings
+    public ExpVertex(@LoadParentVertex(INPUT_VERTEX_NAME) DoubleVertex inputVertex) {
         super(inputVertex);
     }
 

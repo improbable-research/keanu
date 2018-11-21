@@ -106,7 +106,7 @@ public class EvalPropagationTest {
         assertEquals(3, n.get());
     }
 
-    static class BlackBoxVertex extends DoubleUnaryOpVertex implements Differentiable {
+    static class BlackBoxVertex extends DoubleUnaryOpVertex implements Differentiable, NonSaveableVertex {
 
         private final AtomicInteger n;
 

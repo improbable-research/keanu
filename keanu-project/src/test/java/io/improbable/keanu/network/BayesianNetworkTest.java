@@ -3,9 +3,12 @@ package io.improbable.keanu.network;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -13,6 +16,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.mock;
 
 public class BayesianNetworkTest {
 
@@ -89,5 +93,13 @@ public class BayesianNetworkTest {
         b.setLabel(LABEL_A);
 
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void networkWithNonSaveableVerticesThrowsExceptionOnSave() throws IOException {
+        BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
+        BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
+        NetworkWriter netWriter = mock(NetworkWriter.class);
+        net.save(netWriter);
     }
 }

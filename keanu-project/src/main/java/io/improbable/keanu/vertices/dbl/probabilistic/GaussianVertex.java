@@ -4,7 +4,9 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -26,6 +28,8 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
+    protected static final String MU_NAME = "mu";
+    protected static final String SIGMA_NAME = "sigma";
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -46,7 +50,8 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     @ExportVertexToPythonBindings
-    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
+    public GaussianVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
+                          @LoadParentVertex(SIGMA_NAME) DoubleVertex sigma) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
@@ -74,10 +79,12 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
         this(tensorShape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
 
+    @SaveParentVertex(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
+    @SaveParentVertex(SIGMA_NAME)
     public DoubleVertex getSigma() {
         return sigma;
     }

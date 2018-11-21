@@ -3,6 +3,8 @@ package io.improbable.keanu.vertices;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.network.NetworkReader;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
 
 import java.util.Arrays;
@@ -234,7 +236,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         return DiscoverGraph.getEntireGraph(this);
     }
 
-
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -248,5 +249,17 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
             stringBuilder.append("(" + getValue() + ")");
         }
         return stringBuilder.toString();
+    }
+
+    public void save(NetworkWriter netWriter) {
+        netWriter.save(this);
+    }
+
+    public void saveValue(NetworkWriter netWriter) {
+        netWriter.saveValue(this);
+    }
+
+    public void loadValue(NetworkReader reader) {
+       reader.loadValue(this);
     }
 }
