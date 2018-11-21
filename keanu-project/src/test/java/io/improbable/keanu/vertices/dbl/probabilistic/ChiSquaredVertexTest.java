@@ -1,9 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,7 @@ public class ChiSquaredVertexTest {
         assertEquals(sd, standardDeviation, epsilon);
     }
 
+    @Category(Slow.class)
     @Test
     public void chiSampleMethodMatchesLogProbMethod() {
         int sampleCount = 1000000;

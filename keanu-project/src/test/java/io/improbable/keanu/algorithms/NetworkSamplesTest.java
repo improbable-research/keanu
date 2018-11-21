@@ -1,9 +1,11 @@
 package io.improbable.keanu.algorithms;
 
 import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.VertexId;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,6 +44,7 @@ public class NetworkSamplesTest {
         assertTrue(droppedSamples.get(v2).asList().equals(Arrays.asList(4, 3, 2, 1, 0)));
     }
 
+    @Category(Slow.class)
     @Test
     public void doesSubsample() {
         NetworkSamples subsamples = samples.downSample(5);

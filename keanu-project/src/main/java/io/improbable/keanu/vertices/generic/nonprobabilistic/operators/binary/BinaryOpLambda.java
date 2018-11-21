@@ -1,10 +1,11 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.function.BiFunction;
 
-public class BinaryOpLambda<A, B, C> extends BinaryOpVertex<A, B, C> {
+public class BinaryOpLambda<A, B, C> extends BinaryOpVertex<A, B, C> implements NonSaveableVertex {
 
     private BiFunction<A, B, C> op;
 

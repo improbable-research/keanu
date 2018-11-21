@@ -1,16 +1,20 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MatrixInverseVertex extends DoubleUnaryOpVertex {
+public class MatrixInverseVertex extends DoubleUnaryOpVertex implements Differentiable {
 
-    public MatrixInverseVertex(DoubleVertex inputVertex) {
+    @ExportVertexToPythonBindings
+    public MatrixInverseVertex(@LoadParentVertex(INPUT_VERTEX_NAME) DoubleVertex inputVertex) {
         super(checkInputIsSquareMatrix(inputVertex.getShape()), inputVertex);
     }
 
@@ -20,7 +24,8 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
 
         //dc = -A^-1 * da * A^-1
         DoubleTensor negatedValue = this.getValue().unaryMinus();

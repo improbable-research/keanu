@@ -9,8 +9,10 @@ import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertSampledWeightsAndInterceptMatchTestData;
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertWeightsAndInterceptMatchTestData;
@@ -22,7 +24,7 @@ public class LinearRidgeRegressionTest {
     @Rule
     public DeterministicRule deterministicRule = new DeterministicRule();
 
-
+    @Category(Slow.class)
     @Test
     public void findsParamsForOneWeight() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData();
@@ -39,6 +41,7 @@ public class LinearRidgeRegressionTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void findsParamsForTwoWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
@@ -70,6 +73,7 @@ public class LinearRidgeRegressionTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void decreasingSigmaDecreasesL2NormOfWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataGaussianWeights(20);

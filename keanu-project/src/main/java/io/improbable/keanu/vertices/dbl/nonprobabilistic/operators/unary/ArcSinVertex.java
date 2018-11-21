@@ -1,21 +1,25 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ArcSinVertex extends DoubleUnaryOpVertex {
+public class ArcSinVertex extends DoubleUnaryOpVertex implements Differentiable {
 
     /**
      * Takes the inverse sin of a vertex, Arcsin(vertex)
      *
      * @param inputVertex the vertex
      */
-    public ArcSinVertex(DoubleVertex inputVertex) {
+    @ExportVertexToPythonBindings
+    public ArcSinVertex(@LoadParentVertex(INPUT_VERTEX_NAME) DoubleVertex inputVertex) {
         super(inputVertex);
     }
 
@@ -25,7 +29,8 @@ public class ArcSinVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
 
         DoubleTensor inputValue = inputVertex.getValue();
 

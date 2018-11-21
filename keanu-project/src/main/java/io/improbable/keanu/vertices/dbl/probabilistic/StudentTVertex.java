@@ -1,11 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -18,9 +22,10 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class StudentTVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final IntegerVertex v;
+    private static final String V_NAME = "v";
 
     /**
      * One v that must match a proposed tensor shape of StudentT
@@ -41,7 +46,8 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble,
         this(tensorShape, new ConstantIntegerVertex(v));
     }
 
-    public StudentTVertex(IntegerVertex v) {
+    @ExportVertexToPythonBindings
+    public StudentTVertex(@LoadParentVertex(V_NAME) IntegerVertex v) {
         this(v.getShape(), v);
     }
 
@@ -49,6 +55,7 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble,
         this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(v));
     }
 
+    @SaveParentVertex(V_NAME)
     public IntegerVertex getV() {
         return v;
     }

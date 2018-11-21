@@ -62,7 +62,7 @@ public class If {
             this.thn = thn;
         }
 
-        public Vertex<Tensor<T>> orElse(Vertex<? extends Tensor<T>> els) {
+        public IfVertex<T> orElse(Vertex<? extends Tensor<T>> els) {
             assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
             return new IfVertex<>(els.getShape(), predicate, thn, els);
         }
@@ -79,7 +79,7 @@ public class If {
             this.thn = thn;
         }
 
-        public BoolVertex orElse(Vertex<? extends BooleanTensor> els) {
+        public BooleanIfVertex orElse(Vertex<? extends BooleanTensor> els) {
             assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
             return new BooleanIfVertex(els.getShape(), predicate, thn, els);
         }
@@ -96,12 +96,12 @@ public class If {
             this.thn = thn;
         }
 
-        public DoubleVertex orElse(Vertex<? extends DoubleTensor> els) {
+        public DoubleIfVertex orElse(Vertex<? extends DoubleTensor> els) {
             assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
-            return new DoubleIfVertex(els.getShape(), predicate, thn, els);
+            return new DoubleIfVertex(els.getShape(), predicate, (DoubleVertex)thn, (DoubleVertex)els);
         }
 
-        public DoubleVertex orElse(double els) {
+        public DoubleIfVertex orElse(double els) {
             return orElse(new ConstantDoubleVertex(els));
         }
     }

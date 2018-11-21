@@ -1,10 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.InverseGamma;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -19,10 +23,12 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class InverseGammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
+    private static final String ALPHA_NAME = "alpha";
+    private static final String BETA_NAME = "beta";
 
     /**
      * One alpha or beta or both driving an arbitrarily shaped tensor of Inverse Gamma
@@ -49,7 +55,9 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
      * @param alpha the alpha of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      * @param beta  the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
-    public InverseGammaVertex(DoubleVertex alpha, DoubleVertex beta) {
+    @ExportVertexToPythonBindings
+    public InverseGammaVertex(@LoadParentVertex(ALPHA_NAME) DoubleVertex alpha,
+                              @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
@@ -75,6 +83,16 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
 
     public InverseGammaVertex(long[] tensorShape, double alpha, double beta) {
         this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
+    }
+
+    @SaveParentVertex(ALPHA_NAME)
+    public DoubleVertex getAlpha() {
+        return alpha;
+    }
+
+    @SaveParentVertex(BETA_NAME)
+    public DoubleVertex getBeta() {
+        return beta;
     }
 
     @Override

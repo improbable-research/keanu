@@ -23,6 +23,26 @@ public class KeanuRandom {
     private static final AtomicReference<KeanuRandom> DEFAULT_RANDOM = new AtomicReference<>();
 
     static {
+        /*
+         * We need to load ND4J in a separate thread as on load it sets the FTZ and DAZ flags in the processor for the
+         * thread that does the load.  This causes issues with Apache Math that makes use of Sub-normal values (in
+         * particular to initialisation values for the BrentOptimizer).
+         *
+         * We have raised https://github.com/deeplearning4j/deeplearning4j/issues/6690 to address this
+         */
+        Thread nd4jInitThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DoubleTensor.create(1.0, 1.0);
+            }
+        });
+        nd4jInitThread.start();
+        try {
+            nd4jInitThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         String randomSeed = System.getProperty("io.improbable.keanu.defaultRandom.seed");
 
         if (randomSeed != null) {

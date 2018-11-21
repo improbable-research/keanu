@@ -1,11 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.LogNormal;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -19,10 +23,12 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class LogNormalVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
+    private static final String MU_NAME = "mu";
+    private static final String SIGMA_NAME = "sigma";
 
     /**
      * One mu or s or both driving an arbitrarily shaped tensor of LogNormal
@@ -54,7 +60,9 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
         this(tensorShape, ConstantVertex.of(mu), ConstantVertex.of(sigma));
     }
 
-    public LogNormalVertex(DoubleVertex mu, DoubleVertex sigma) {
+    @ExportVertexToPythonBindings
+    public LogNormalVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
+                           @LoadParentVertex(SIGMA_NAME) DoubleVertex sigma) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
@@ -68,6 +76,16 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
 
     public LogNormalVertex(double mu, double sigma) {
         this(ConstantVertex.of(mu), ConstantVertex.of(sigma));
+    }
+
+    @SaveParentVertex(MU_NAME)
+    public DoubleVertex getMu() {
+        return mu;
+    }
+
+    @SaveParentVertex(SIGMA_NAME)
+    public DoubleVertex getSigma() {
+        return sigma;
     }
 
     @Override

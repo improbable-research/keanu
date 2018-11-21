@@ -1,7 +1,5 @@
 package io.improbable.keanu.network;
 
-import com.google.common.collect.ImmutableMap;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -91,21 +89,5 @@ public class BayesianNetworkTest {
         b.setLabel(LABEL_A);
 
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
-    }
-
-    @Test
-    public void youCanSetTheStateOfTheNetwork() {
-        assertThat(input1.hasValue(), is(false));
-        assertThat(input2.hasValue(), is(false));
-
-        network.setState(new SimpleNetworkState(ImmutableMap.of(
-            input1.getId(), BooleanTensor.scalar(true),
-            input2.getId(), BooleanTensor.scalar(false)
-        )));
-
-        BooleanTensor value = input1.getValue();
-        Boolean scalar = input1.getValue().scalar();
-        assertThat(input1.getValue().scalar(), is(true));
-        assertThat(input2.getValue().scalar(), is(false));
     }
 }

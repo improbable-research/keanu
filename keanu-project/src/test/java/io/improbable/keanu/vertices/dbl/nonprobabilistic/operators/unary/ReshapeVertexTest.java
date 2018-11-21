@@ -6,6 +6,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,7 +36,7 @@ public class ReshapeVertexTest {
         DoubleVertex alpha = new UniformVertex(0, 10);
         alpha.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex N = m.matrixMultiply(alpha);
+        MatrixMultiplicationVertex N = m.matrixMultiply(alpha);
 
         ReshapeVertex reshapedN = new ReshapeVertex(N, 4, 1);
 
@@ -58,7 +60,7 @@ public class ReshapeVertexTest {
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex N = m.matrixMultiply(a);
+        MatrixMultiplicationVertex N = m.matrixMultiply(a);
         PartialDerivatives NDiff = N.getDerivativeWrtLatents();
 
         DoubleTensor dNdm = NDiff.withRespectTo(m);
@@ -90,7 +92,7 @@ public class ReshapeVertexTest {
         DoubleVertex E = new UniformVertex(0, 10);
         E.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 4, 1));
 
-        DoubleVertex F = D.times(E);
+        MultiplicationVertex F = D.times(E);
 
         PartialDerivatives forward = F.getDerivativeWrtLatents();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A, B));
@@ -110,7 +112,7 @@ public class ReshapeVertexTest {
         DoubleVertex C = A.plus(B);
 
         DoubleVertex D = C.reshape(4, 2, 2);
-        DoubleVertex E = D.reshape(4, 4);
+        ReshapeVertex E = D.reshape(4, 4);
 
         PartialDerivatives forward = E.getDerivativeWrtLatents();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(E, ImmutableSet.of(A, B));
@@ -122,7 +124,7 @@ public class ReshapeVertexTest {
     @Test
     public void changesMatchGradient() {
         DoubleVertex inputVertex = new UniformVertex(new long[]{4, 4}, -10.0, 10.0);
-        DoubleVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
+        ReshapeVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10);
     }
