@@ -21,9 +21,9 @@ public class RegressionModelBuilder<OUTPUT> {
     private double[] priorOnWeightsMeans;
     private Double priorOnInterceptScaleParameter;
     private Double priorOnInterceptMean;
-    private DoubleTensor inputTrainingData;
-    private OUTPUT outputTrainingData;
-    private Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
+    private final DoubleTensor inputTrainingData;
+    private final OUTPUT outputTrainingData;
+    private final Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
     private SamplingModelFitting samplingAlgorithm = null;
 
     public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
