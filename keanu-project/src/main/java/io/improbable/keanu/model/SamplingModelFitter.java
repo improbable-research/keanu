@@ -15,7 +15,6 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
      * This fitter uses a {@link PosteriorSamplingAlgorithm}, in contrast to the {@link MAPModelFitter} and {@link MaximumLikelihoodModelFitter}, which use gradient methods.
      *
      * The model's latent vertices will have their values set to the average over the samples.
-     * A down-sample of 2 is used (not configurable).
      *
      * @param modelGraph The graph to fit
      * @param samplingAlgorithm The algorithm to use, e.g. {@link io.improbable.keanu.algorithms.mcmc.MetropolisHastings}
