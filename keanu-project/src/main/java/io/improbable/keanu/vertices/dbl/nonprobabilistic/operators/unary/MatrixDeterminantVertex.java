@@ -1,8 +1,10 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -21,7 +23,9 @@ import java.util.Map;
  * Forward mode differentiation is not implemented due to requiring a tensor trace, which is not yet implemented
  */
 public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Differentiable {
-    public MatrixDeterminantVertex(DoubleVertex vertex) {
+
+    @ExportVertexToPythonBindings
+    public MatrixDeterminantVertex(@LoadParentVertex(INPUT_VERTEX_NAME) DoubleVertex vertex) {
         super(Tensor.SCALAR_SHAPE, vertex);
         TensorShapeValidation.checkShapeIsSquareMatrix(vertex.getShape());
     }

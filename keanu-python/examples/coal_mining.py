@@ -3,6 +3,7 @@ import numpy as np
 from keanu.vertex import UniformInt, Exponential, DoubleIf, Poisson
 from keanu import Model
 
+
 class CoalMining():
     __fname = "data/coal-mining-disaster-data.csv"
 
@@ -25,4 +26,4 @@ class CoalMining():
         return m
 
     def training_data(self):
-        return self._data.values[:,0]
+        return self._data.values[:, 0]

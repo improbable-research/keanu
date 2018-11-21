@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.intgr;
 
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;

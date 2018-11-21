@@ -245,6 +245,39 @@ public class Nd4jBroadcastTensorTest {
     }
 
     @Test
+    public void canBroadcastSubtractVector() {
+
+        /*
+          x = np.array([-1,-2,-3]).reshape(3)
+          s = np.array([-5, -2, -3, -7, -8, -5, -2, -3, -7, -8, -5, -2, -3, -7, -8]).reshape(3,5)
+          sx = s - x
+          print(sx)
+          print(np.shape(sx))
+         */
+
+        DoubleTensor x = Nd4jDoubleTensor.create(new double[]{-1, -2, -3}, new long[]{3});
+        DoubleTensor s = Nd4jDoubleTensor.create(new double[]{
+            -5, -2, -3,
+            -7, -8, -5,
+            -2, -3, -7,
+            -8, -5, -2,
+            -3, -7, -8
+        }, new long[]{5, 3});
+
+        DoubleTensor diff = s.minus(x);
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            -4, 0, 0,
+            -6, -6, -2,
+            -1, -1, -4,
+            -7, -3, 1,
+            -2, -5, -5
+        }, new long[]{5, 3});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
     public void canBroadcastSubtract() {
 
         /*

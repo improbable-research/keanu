@@ -4,10 +4,11 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<Tensor<T>> {
+public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<Tensor<T>>, NonSaveableVertex {
 
     private final Vertex<? extends BooleanTensor> predicate;
     private final Vertex<? extends Tensor<T>> thn;
@@ -16,7 +17,7 @@ public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<T
     public IfVertex(Vertex<? extends BooleanTensor> predicate,
                     Vertex<? extends Tensor<T>> thn,
                     Vertex<? extends Tensor<T>> els) {
-        super(TensorShapeValidation.checkTernaryConditionShapeIsValid(thn.getShape(), els.getShape(), predicate.getShape()));
+        super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;

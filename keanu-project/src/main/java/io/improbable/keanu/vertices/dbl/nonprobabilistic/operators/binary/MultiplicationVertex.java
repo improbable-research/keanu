@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -20,7 +21,8 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
      * @param right vertex to be multiplied
      */
     @ExportVertexToPythonBindings
-    public MultiplicationVertex(DoubleVertex left, DoubleVertex right) {
+    public MultiplicationVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
+                                @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
         super(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right);
     }
 

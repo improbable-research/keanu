@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
@@ -83,15 +82,15 @@ public class If {
     public static class DoubleIfThenElseBuilder {
 
         private final Vertex<? extends BooleanTensor> predicate;
-        private final Vertex<? extends DoubleTensor> thn;
+        private final DoubleVertex thn;
 
         public DoubleIfThenElseBuilder(Vertex<? extends BooleanTensor> predicate,
-                                       Vertex<? extends DoubleTensor> thn) {
+                                       DoubleVertex thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
 
-        public DoubleIfVertex orElse(Vertex<? extends DoubleTensor> els) {
+        public DoubleIfVertex orElse(DoubleVertex els) {
             return new DoubleIfVertex(predicate, thn, els);
         }
 

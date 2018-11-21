@@ -44,6 +44,7 @@ def test_can_pass_array_to_vertex(jvm_view):
 
 
 def test_cannot_pass_generic_to_vertex(jvm_view):
+
     class GenericExampleClass:
         pass
 

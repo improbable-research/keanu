@@ -102,7 +102,10 @@ public class TensorShapeValidation {
      * one shape or the shape of thn/els if the predicate is length one and thn/else are not.
      */
     public static long[] checkTernaryConditionShapeIsValid(long[] predicate, long[] thn, long[] els) {
-        Preconditions.checkArgument(Arrays.equals(thn, els), "Then shape must match else shape");
+        Preconditions.checkArgument(Arrays.equals(thn, els),
+            "Then shape " + Arrays.toString(thn) +
+                " must match else shape " + Arrays.toString(els)
+        );
         return checkHasOneNonLengthOneShapeOrAllLengthOne(predicate, thn, els);
     }
 

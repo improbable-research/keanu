@@ -4,12 +4,14 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -213,4 +215,24 @@ public class BayesianNetwork {
         indentation++;
     }
 
+    public void save(NetworkWriter networkWriter) throws IOException {
+        if(isSaveable()) {
+            for (Vertex vertex : TopologicalSort.sort(vertices)) {
+                vertex.save(networkWriter);
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Trying to save a BayesianNetwork that isn't Saveable");
+        }
+    }
+
+    private boolean isSaveable() {
+        return vertices.stream().filter(v -> v instanceof NonSaveableVertex).count() == 0;
+    }
+
+    public void saveValues(NetworkWriter networkWriter) throws IOException {
+        for (Vertex vertex : vertices) {
+            vertex.saveValue(networkWriter);
+        }
+    }
 }

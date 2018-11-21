@@ -9,6 +9,7 @@ allprojects {
     version gitVersion()
 
     apply plugin: "java"
+    apply plugin: "idea"
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -23,4 +24,9 @@ allprojects {
 
 dependencies {
     compile project(":keanu-project")
+}
+
+task formatApply {
+    dependsOn("spotlessApply")
+    dependsOn("keanu-python:formatApply")
 }
