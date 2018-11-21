@@ -6,7 +6,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
  * Calculates common statistics of a 2-dimensional data set
  * Treats xData and yData as a series of points in the data set - their shapes must match.
  */
-public class StatisticsCalculator {
+public class BivariateDataStatisticsCalculator {
 
     private final DoubleTensor xData;
     private final DoubleTensor yData;
@@ -15,7 +15,7 @@ public class StatisticsCalculator {
      * @param xData the data set for the predictor variable X
      * @param yData the data set for the dependent variable Y
      */
-    public StatisticsCalculator(DoubleTensor xData, DoubleTensor yData) {
+    public BivariateDataStatisticsCalculator(DoubleTensor xData, DoubleTensor yData) {
         TensorShapeValidation.checkAllShapesMatch(xData.getShape(), yData.getShape());
         this.xData = xData;
         this.yData = yData;

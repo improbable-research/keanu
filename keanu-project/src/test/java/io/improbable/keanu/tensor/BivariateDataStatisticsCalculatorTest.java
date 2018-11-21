@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 
 
-public class StatisticsCalculatorTest {
+public class BivariateDataStatisticsCalculatorTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -22,7 +22,7 @@ public class StatisticsCalculatorTest {
     SummaryStatistics yStats = createStatistics(Y_DATA);
     SummaryStatistics xyStats = createCombinedStatistics(X_DATA, Y_DATA);
 
-    private StatisticsCalculator stats = new StatisticsCalculator(X_DATA, Y_DATA);
+    private BivariateDataStatisticsCalculator stats = new BivariateDataStatisticsCalculator(X_DATA, Y_DATA);
 
     private static SummaryStatistics createStatistics(DoubleTensor data) {
         SummaryStatistics stats = new SummaryStatistics();
@@ -51,7 +51,7 @@ public class StatisticsCalculatorTest {
 
         DoubleTensor biggerData = DoubleTensor.create(1., 2., 3., 4., 5., 6.);
         DoubleTensor smallerData = DoubleTensor.create(1., 2., 3.);
-        new StatisticsCalculator(biggerData, smallerData);
+        new BivariateDataStatisticsCalculator(biggerData, smallerData);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class StatisticsCalculatorTest {
 
     @Test
     public void theMeanSquaredErrorIsZeroWhenTheDataIsPerfectlyCorrelated() {
-        StatisticsCalculator perfectStats = new StatisticsCalculator(X_DATA, X_DATA.times(2.).plus(42.));
+        BivariateDataStatisticsCalculator perfectStats = new BivariateDataStatisticsCalculator(X_DATA, X_DATA.times(2.).plus(42.));
         assertThat(perfectStats.meanSquaredError(), equalTo(0.));
     }
 
@@ -106,7 +106,7 @@ public class StatisticsCalculatorTest {
 
     @Test
     public void theStandardErrorIsZeroWhenTheDataIsPerfectlyCorrelated() {
-        StatisticsCalculator perfectStats = new StatisticsCalculator(X_DATA, X_DATA.times(2.).plus(42.));
+        BivariateDataStatisticsCalculator perfectStats = new BivariateDataStatisticsCalculator(X_DATA, X_DATA.times(2.).plus(42.));
         assertThat(perfectStats.standardErrorForGradient(), equalTo(0.));
         assertThat(perfectStats.standardErrorForIntercept(), equalTo(0.));
     }

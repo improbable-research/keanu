@@ -1,6 +1,6 @@
 package io.improbable.keanu.e2e.regression;
 
-import io.improbable.keanu.tensor.StatisticsCalculator;
+import io.improbable.keanu.tensor.BivariateDataStatisticsCalculator;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
@@ -111,7 +111,7 @@ class LinearRegressionTestUtils {
     }
 
     static void assertSampledWeightsAndInterceptMatchTestData(DoubleVertexSamples gradient, DoubleVertexSamples intercept, TestData testData) {
-        StatisticsCalculator statisticsCalculator = new StatisticsCalculator(testData.xTrain, testData.yTrain);
+        BivariateDataStatisticsCalculator statisticsCalculator = new BivariateDataStatisticsCalculator(testData.xTrain, testData.yTrain);
         double estimatedGradientInSampleData = statisticsCalculator.estimatedGradient();
         double estimatedInterceptInSampleData = statisticsCalculator.estimatedIntercept();
         double standardErrorForGradientInSampleData = statisticsCalculator.standardErrorForGradient();
