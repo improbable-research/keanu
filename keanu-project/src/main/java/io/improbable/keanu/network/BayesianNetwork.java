@@ -10,6 +10,7 @@ import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -244,24 +245,24 @@ public class BayesianNetwork {
     public Set<Vertex> getSubgraph(Vertex vertex, int degree) {
 
         Set<Vertex> subgraphVertices = new HashSet<>();
-        Set<Vertex> verticesToProcessNow = new HashSet<>();
+        List<Vertex> verticesToProcessNow = new ArrayList<>();
         verticesToProcessNow.add(vertex);
+        subgraphVertices.add(vertex);
 
-        int iterationIndex = 0;
-        while (iterationIndex <= degree && !verticesToProcessNow.isEmpty()) {
-
-            Set<Vertex> verticesToProcessNext = new HashSet<>();
-            subgraphVertices.addAll(verticesToProcessNow);
+        for (int distance = 0; distance < degree && !verticesToProcessNow.isEmpty(); distance++) {
+            List<Vertex> connectedVertices = new ArrayList<>();
 
             for (Vertex v : verticesToProcessNow) {
-                Stream.concat(v.getParents().stream(), v.getChildren().stream())
-                    .filter(connectedVertex -> !(subgraphVertices.contains(connectedVertex)))
-                    .forEach(connectedVertex -> verticesToProcessNext.add((Vertex)connectedVertex));
+                Stream<Vertex> verticesToAdd = Stream.concat(v.getParents().stream(), v.getChildren().stream());
+                verticesToAdd
+                    .filter(a -> !subgraphVertices.contains(a))
+                    .forEach(a -> connectedVertices.add(a));
             }
 
-            verticesToProcessNow = verticesToProcessNext;
-            iterationIndex++;
+            subgraphVertices.addAll(connectedVertices);
+            verticesToProcessNow = connectedVertices;
         }
+
         return subgraphVertices;
     }
 }
