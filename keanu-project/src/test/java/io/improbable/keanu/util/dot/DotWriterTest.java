@@ -27,8 +27,9 @@ import static junit.framework.TestCase.assertTrue;
 
 public class DotWriterTest {
 
-    private static BayesianNetwork complexNet;
     private static Vertex complexResultVertex;
+    private static DotWriter complexNetDotWriter;
+    private static ByteArrayOutputStream outputWriter;
     private static final String resourcesFolder = "./src/test/resources/dotFiles";
     private static final String GAUSSIAN_OUTPUT_FILENAME = resourcesFolder + "/GaussianNodeOutput.dot";
     private static final String TENSOR_OUTPUT_FILENAME = resourcesFolder + "/ConstantTensorIntNodeOutput.dot";
@@ -42,13 +43,18 @@ public class DotWriterTest {
 
     @BeforeClass
     public static void setUpComplexNet() {
-        complexResultVertex = (new ConstantBoolVertex(true)).or((new GaussianVertex(0, 1)).plus(new ConstantDoubleVertex(5)).equalTo(new ConstantDoubleVertex(10)));
-        complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
+        complexResultVertex = (new ConstantBoolVertex(true))
+            .or((new GaussianVertex(0, 1))
+            .plus(new ConstantDoubleVertex(5))
+            .equalTo(new ConstantDoubleVertex(10)));
+        BayesianNetwork complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
+        complexNetDotWriter = new DotWriter(complexNet);
     }
 
     @Before
     public void resetVertexIdGenerator() {
         VertexId.ID_GENERATOR.set(0);
+        outputWriter = new ByteArrayOutputStream();
     }
 
     @Test
@@ -56,7 +62,6 @@ public class DotWriterTest {
         GaussianVertex gaussianV = new GaussianVertex(0, 1);
         BayesianNetwork gaussianNet = new BayesianNetwork(gaussianV.getConnectedGraph());
 
-        ByteArrayOutputStream outputWriter = new ByteArrayOutputStream();
         DotWriter dotWriter = new DotWriter(gaussianNet);
         dotWriter.save(outputWriter, false);
 
@@ -66,35 +71,27 @@ public class DotWriterTest {
 
     @Test
     public void outputtingComplexNet() throws IOException {
-        ByteArrayOutputStream outputWriter = new ByteArrayOutputStream();
-        DotWriter dotWriter = new DotWriter(complexNet);
-        dotWriter.save(outputWriter, false);
+        complexNetDotWriter.save(outputWriter, false);
         String expectedComplexOutput = new String(Files.readAllBytes(Paths.get(COMPLEX_OUTPUT_FILENAME)), Charset.defaultCharset());
         assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedComplexOutput));
     }
 
     @Test
     public void outputtingVertexDegree1Surroundings() throws IOException {
-        ByteArrayOutputStream outputWriter = new ByteArrayOutputStream();
-        DotWriter dotWriter = new DotWriter(new BayesianNetwork(complexResultVertex.getConnectedGraph()));
-        dotWriter.save(outputWriter, complexResultVertex, 1, false);
+        complexNetDotWriter.save(outputWriter, complexResultVertex, 1, false);
         String expectedVertexDegree1Output = new String(Files.readAllBytes(Paths.get(VERTEX_DEGREE1__OUTPUT_FILENAME)), Charset.defaultCharset());
         assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedVertexDegree1Output));
     }
 
     @Test
     public void outputtingVertexDegree2Surroundings() throws IOException {
-        ByteArrayOutputStream outputWriter = new ByteArrayOutputStream();
-        DotWriter dotWriter = new DotWriter(new BayesianNetwork(complexResultVertex.getConnectedGraph()));
-        dotWriter.save(outputWriter, complexResultVertex, 2, false);
+        complexNetDotWriter.save(outputWriter, complexResultVertex, 2, false);
         String expectedVertexDegree2Output = new String(Files.readAllBytes(Paths.get(VERTEX_DEGREE2__OUTPUT_FILENAME)), Charset.defaultCharset());
         assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedVertexDegree2Output));
     }
 
     @Test
     public void dotVertexLabelsAreSetCorrectly() throws IOException {
-        ByteArrayOutputStream outputWriter = new ByteArrayOutputStream();
-
         int[] intValues = new int[] {1,2,3};
         ConstantIntegerVertex constantIntVertex = new ConstantIntegerVertex(intValues);
         ConstantIntegerVertex constantIntVertex2 = new ConstantIntegerVertex(2);
@@ -126,14 +123,13 @@ public class DotWriterTest {
 
     @Test
     public void valuesAreBeingWrittenOut() throws IOException {
-        ByteArrayOutputStream outputWriter = new ByteArrayOutputStream();
         DoubleVertex unobservedGaussianVertex = new GaussianVertex(0, 1);
         DoubleVertex observedGammaVertex = new GammaVertex(2, 3);
         observedGammaVertex.observe(2.5);
         DoubleVertex gammaMultipliedVertex = observedGammaVertex.times(new ConstantDoubleVertex(4));
-        Vertex resultvertex = gammaMultipliedVertex.plus(unobservedGaussianVertex);
+        Vertex resultVertex = gammaMultipliedVertex.plus(unobservedGaussianVertex);
         gammaMultipliedVertex.setLabel("Gamma Multiplied");
-        DotWriter dotWriter = new DotWriter(new BayesianNetwork(resultvertex.getConnectedGraph()));
+        DotWriter dotWriter = new DotWriter(new BayesianNetwork(resultVertex.getConnectedGraph()));
         dotWriter.save(outputWriter, true);
         String expectedOutputWithValues = new String(Files.readAllBytes(Paths.get(OUTPUT_WITH_VALUES_FILENAME)), Charset.defaultCharset());
         assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedOutputWithValues));
@@ -148,7 +144,7 @@ public class DotWriterTest {
             return false;
         }
 
-        // Don't care about line endings.
+        // Don't care about line ending format.
         output1Lines = output1Lines.stream().map(line -> line.replace("\r", "")).collect(Collectors.toList());
         output2Lines = output2Lines.stream().map(line -> line.replace("\r", "")).collect(Collectors.toList());
 
