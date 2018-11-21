@@ -8,8 +8,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.intgr.IntegerTensorVertexSamples;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,8 +25,8 @@ import static java.util.stream.Collectors.toMap;
  * An immutable collection of network samples. A network sample is a collection
  * of values from vertices in a network at a given point in time.
  */
+@Slf4j
 public class NetworkSamples {
-    private static final Logger log = LoggerFactory.getLogger(NetworkSamples.class);
 
     private final Map<VertexId, ? extends List> samplesByVertex;
     private final List<Double> logOfMasterPForEachSample;
