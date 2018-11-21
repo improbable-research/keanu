@@ -1,9 +1,12 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Pareto;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -25,6 +28,8 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
 
     private final DoubleVertex scale;
     private final DoubleVertex location;
+    private static final String SCALE_NAME = "scale";
+    private static final String LOCATION_NAME = "location";
 
     /**
      * Provides a Vertex implementing the Pareto Distribution.
@@ -44,7 +49,9 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
         setParents(location, scale);
     }
 
-    public ParetoVertex(DoubleVertex location, DoubleVertex scale) {
+    @ExportVertexToPythonBindings
+    public ParetoVertex(@LoadParentVertex(LOCATION_NAME) DoubleVertex location,
+                        @LoadParentVertex(SCALE_NAME) DoubleVertex scale) {
         this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
     }
 
@@ -72,10 +79,12 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
         this(tensorShape, new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
+    @SaveParentVertex(SCALE_NAME)
     public DoubleVertex getScale() {
         return scale;
     }
 
+    @SaveParentVertex(LOCATION_NAME)
     public DoubleVertex getLocation() {
         return location;
     }

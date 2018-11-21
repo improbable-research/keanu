@@ -5,14 +5,15 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadVertexValue;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class ConstantIntegerVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor>, ConstantVertex {
+public class ConstantIntegerVertex extends IntegerVertex implements ConstantVertex, NonProbabilistic<IntegerTensor> {
 
     @ExportVertexToPythonBindings
-    public ConstantIntegerVertex(IntegerTensor constant) {
+    public ConstantIntegerVertex(@LoadVertexValue IntegerTensor constant) {
         super(constant.getShape());
         setValue(constant);
     }
@@ -31,12 +32,12 @@ public class ConstantIntegerVertex extends IntegerVertex implements NonProbabili
     }
 
     @Override
-    public IntegerTensor calculate() {
-        return getValue();
+    public void save(NetworkWriter netWriter) {
+        netWriter.save(this);
     }
 
     @Override
-    public void save(NetworkWriter netWriter) {
-        netWriter.save((ConstantVertex)this);
+    public IntegerTensor calculate() {
+        return getValue();
     }
 }

@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
+public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<BooleanTensor>, NonSaveableVertex {
     private final List<? extends Vertex<BooleanTensor>> inputs;
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
