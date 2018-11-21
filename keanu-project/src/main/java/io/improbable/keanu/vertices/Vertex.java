@@ -10,8 +10,10 @@ import io.improbable.keanu.tensor.Tensor;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape {
 
@@ -181,6 +183,16 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
 
     public VertexId getId() {
         return id;
+    }
+
+    public String getUniqueStringReference() {
+        if (label != null) {
+            return label.toString();
+        } else {
+            return Arrays.stream(id.idValues).boxed()
+                .map(Objects::toString)
+                .collect(Collectors.joining("_"));
+        }
     }
 
     public int getIndentation() {
