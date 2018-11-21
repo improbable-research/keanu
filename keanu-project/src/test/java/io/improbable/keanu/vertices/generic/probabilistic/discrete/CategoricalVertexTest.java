@@ -50,7 +50,7 @@ public class CategoricalVertexTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(t2));
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Shapes must match or be scalar");
+        thrown.expectMessage("Shapes must match or be length one");
 
         new CategoricalVertex<>(selectableValues);
     }
