@@ -16,14 +16,14 @@ primitive_types = Union[int_types, float_types, bool_types]
 Tensor arg types
 '''
 pandas_types = Union[Series, DataFrame]
-numpy_types = ndarray
+numpy_types = Union[ndarray]
 
 tensor_arg_types = Union[primitive_types, pandas_types, numpy_types]
 
 '''
 Vertex arg types
 '''
-wrapped_java_types = JavaObjectWrapper
+wrapped_java_types = Union[JavaObjectWrapper]
 shape_types = Iterable[primitive_types]
 
 vertex_param_types = Union[tensor_arg_types, wrapped_java_types, VertexOps]
@@ -49,6 +49,7 @@ runtime_tensor_arg_types : Type[Any]
 runtime_wrapped_java_types : Type[Any]
 
 if not TYPE_CHECKING:
+    # Unions with a single element can be directly used as runtime type
     runtime_numpy_types = numpy_types
     runtime_pandas_types = pandas_types.__args__
     runtime_primitive_types = primitive_types.__args__
