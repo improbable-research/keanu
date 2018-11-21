@@ -1,9 +1,13 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -12,10 +16,12 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import java.util.Map;
 import java.util.Set;
 
-public class MultivariateGaussianVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class MultivariateGaussianVertex extends DoubleVertex implements SaveableVertex, Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;
+    private static final String MU_NAME = "mu";
+    private static final String COVARIANCE_NAME = "covariance";
 
     /**
      * Multivariate gaussian distribution. The shape is driven from mu, which must be a vector.
@@ -40,7 +46,9 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
      * @param mu         the mu of the Multivariate Gaussian
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
-    public MultivariateGaussianVertex(DoubleVertex mu, DoubleVertex covariance) {
+    @ExportVertexToPythonBindings
+    public MultivariateGaussianVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
+                                      @LoadParentVertex(COVARIANCE_NAME) DoubleVertex covariance) {
         this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
 
@@ -59,6 +67,16 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
 
     public MultivariateGaussianVertex(double mu, double covariance) {
         this(ConstantVertex.of(mu), ConstantVertex.of(covariance));
+    }
+
+    @SaveParentVertex(MU_NAME)
+    public DoubleVertex getMu() {
+        return mu;
+    }
+
+    @SaveParentVertex(COVARIANCE_NAME)
+    public DoubleVertex getCovariance() {
+        return covariance;
     }
 
     @Override

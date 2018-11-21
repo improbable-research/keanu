@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -11,6 +12,9 @@ import java.util.Map;
 
 public class PowerVertex extends DoubleBinaryOpVertex {
 
+    private static final String BASE_NAME = LEFT_NAME;
+    private static final String EXPONENT_NAME = RIGHT_NAME;
+
     /**
      * Raises a vertex to the power of another
      *
@@ -18,8 +22,17 @@ public class PowerVertex extends DoubleBinaryOpVertex {
      * @param exponent the exponent vertex
      */
     @ExportVertexToPythonBindings
-    public PowerVertex(DoubleVertex base, DoubleVertex exponent) {
+    public PowerVertex(@LoadParentVertex(BASE_NAME) DoubleVertex base,
+                       @LoadParentVertex(EXPONENT_NAME) DoubleVertex exponent) {
         super(base, exponent);
+    }
+
+    public DoubleVertex getBase() {
+        return super.getLeft();
+    }
+
+    public DoubleVertex getExponent() {
+        return super.getRight();
     }
 
     @Override
@@ -66,13 +79,5 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         partials.put(getBase(), derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase, this.getShape()));
         partials.put(getExponent(), derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent, this.getShape()));
         return partials;
-    }
-
-    public DoubleVertex getBase() {
-        return super.getLeft();
-    }
-
-    public DoubleVertex getExponent() {
-        return super.getRight();
     }
 }

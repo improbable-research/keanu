@@ -77,6 +77,13 @@ public class TestGraphGenerator {
             this.onOp = onOp;
         }
 
+        public SumVertex(@LoadParentVertex("left")DoubleVertex left, @LoadParentVertex("right")DoubleVertex right) {
+            super(left, right);
+            this.opCount = new AtomicInteger();
+            this.autoDiffCount = new AtomicInteger();
+            this.onOp = null;
+        }
+
         @Override
         protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
             opCount.incrementAndGet();
