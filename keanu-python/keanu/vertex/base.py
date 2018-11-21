@@ -55,7 +55,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
             return kn.vertex.const.Const(arg).unwrap()
         elif isinstance(arg, runtime_wrapped_java_types):
             return arg.unwrap()
-        elif isinstance(arg, collections.Iterable) and all(isinstance(x, runtime_primitive_types) for x in arg):
+        elif isinstance(arg, collections.Collection) and all(isinstance(x, runtime_primitive_types) for x in arg):
             return k.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
