@@ -23,7 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 public class DotWriterTest {
 
@@ -66,28 +67,28 @@ public class DotWriterTest {
         dotWriter.save(outputWriter, false);
 
         String expectedGaussianNodeOutput = new String(Files.readAllBytes(Paths.get(GAUSSIAN_OUTPUT_FILENAME)), Charset.defaultCharset());
-        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedGaussianNodeOutput));
+        checkDotFilesMatch(outputWriter.toString(), expectedGaussianNodeOutput);
     }
 
     @Test
     public void outputtingComplexNet() throws IOException {
         complexNetDotWriter.save(outputWriter, false);
         String expectedComplexOutput = new String(Files.readAllBytes(Paths.get(COMPLEX_OUTPUT_FILENAME)), Charset.defaultCharset());
-        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedComplexOutput));
+        checkDotFilesMatch(outputWriter.toString(), expectedComplexOutput);
     }
 
     @Test
     public void outputtingVertexDegree1Surroundings() throws IOException {
         complexNetDotWriter.save(outputWriter, complexResultVertex, 1, false);
         String expectedVertexDegree1Output = new String(Files.readAllBytes(Paths.get(VERTEX_DEGREE1__OUTPUT_FILENAME)), Charset.defaultCharset());
-        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedVertexDegree1Output));
+        checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree1Output);
     }
 
     @Test
     public void outputtingVertexDegree2Surroundings() throws IOException {
         complexNetDotWriter.save(outputWriter, complexResultVertex, 2, false);
         String expectedVertexDegree2Output = new String(Files.readAllBytes(Paths.get(VERTEX_DEGREE2__OUTPUT_FILENAME)), Charset.defaultCharset());
-        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedVertexDegree2Output));
+        checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree2Output);
     }
 
     @Test
@@ -104,21 +105,21 @@ public class DotWriterTest {
         // Check that class name and annotation (for multiplication vertex) appear in the output.
         dotWriter.save(outputWriter, saveValues);
         String expectedTensorIntNodeOutput = new String(Files.readAllBytes(Paths.get(TENSOR_OUTPUT_FILENAME)), Charset.defaultCharset());
-        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedTensorIntNodeOutput));
+        checkDotFilesMatch(outputWriter.toString(), expectedTensorIntNodeOutput);
 
         // Check that vertex label appears in the output if it's set.
         constantIntVertex.setLabel("SomeLabel");
         outputWriter.reset();
         dotWriter.save(outputWriter, saveValues);
         String expectedLabelledIntNodeOutput = new String(Files.readAllBytes(Paths.get(LABELLED_OUTPUT_FILENAME)), Charset.defaultCharset());
-        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedLabelledIntNodeOutput));
+        checkDotFilesMatch(outputWriter.toString(), expectedLabelledIntNodeOutput);
 
         // Check that value for constant vertices appears in the output if it's set and a scalar.
         constantIntVertex.setValue(42);
         outputWriter.reset();
         dotWriter.save(outputWriter, saveValues);
         String expectedScalarIntNodeOutput = new String(Files.readAllBytes(Paths.get(SCALAR_OUTPUT_FILENAME)), Charset.defaultCharset());
-        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedScalarIntNodeOutput));
+        checkDotFilesMatch(outputWriter.toString(), expectedScalarIntNodeOutput);
     }
 
     @Test
@@ -132,27 +133,20 @@ public class DotWriterTest {
         DotWriter dotWriter = new DotWriter(new BayesianNetwork(resultVertex.getConnectedGraph()));
         dotWriter.save(outputWriter, true);
         String expectedOutputWithValues = new String(Files.readAllBytes(Paths.get(OUTPUT_WITH_VALUES_FILENAME)), Charset.defaultCharset());
-        assertTrue(dotFilesAreEqual(outputWriter.toString(), expectedOutputWithValues));
+        checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
     }
 
     // Need to compare the outputs line by line, as the labels and edges are not written out in a fixed order.
-    private boolean dotFilesAreEqual(String output1, String output2) {
-        List<String> output1Lines = Arrays.asList(output1.split("\n"));
-        List<String> output2Lines = Arrays.asList(output2.split("\n"));
+    private void checkDotFilesMatch(String output1, String output2) {
 
-        if (output1Lines.size() != output2Lines.size()) {
-            return false;
-        }
+        List<String> output1Lines = Arrays.stream(output1.split("\n"))
+            .map(s -> s.replace("\r", ""))
+            .collect(Collectors.toList());
 
-        // Don't care about line ending format.
-        output1Lines = output1Lines.stream().map(line -> line.replace("\r", "")).collect(Collectors.toList());
-        output2Lines = output2Lines.stream().map(line -> line.replace("\r", "")).collect(Collectors.toList());
+        String[] output2Lines = Arrays.stream(output2.split("\n"))
+            .map(s -> s.replace("\r", ""))
+            .toArray(String[]::new);
 
-        for (String line : output1Lines) {
-            if (!output2Lines.contains(line)) {
-                return false;
-            }
-        }
-        return true;
+        assertThat(output1Lines, containsInAnyOrder(output2Lines));
     }
 }
