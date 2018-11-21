@@ -6,17 +6,9 @@ from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
 from .ops import VertexOps
 from typing import List, Any, Tuple, Iterator, Union
-from keanu.vartypes import (
-    tensor_arg_types,
-    vertex_param_types,
-    shape_types,
-    numpy_types,
-    runtime_tensor_arg_types,
-    runtime_primitive_types,
-    runtime_wrapped_java_types
-)
+from keanu.vartypes import (tensor_arg_types, vertex_param_types, shape_types, numpy_types, runtime_tensor_arg_types,
+                            runtime_primitive_types, runtime_wrapped_java_types)
 from keanu.cast import cast_tensor_arg_to_double, cast_tensor_arg_to_integer, cast_tensor_arg_to_bool
-
 
 k = KeanuContext()
 
@@ -80,15 +72,18 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def _get_python_id(java_vertex: Any) -> Tuple[Any, ...]:
         return tuple(java_vertex.getId().getValue())
 
+
 class Double(Vertex):
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return cast_tensor_arg_to_double(v)
 
+
 class Integer(Vertex):
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return cast_tensor_arg_to_integer(v)
+
 
 class Bool(Vertex):
 

@@ -14,15 +14,18 @@ def jvm_view():
     java_import(jvm_view, "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex")
     return jvm_view
 
+
 def assert_vertex_value_equals_scalar(vertex, vertex_type, scalar):
     get_value = vertex.get_value()
     assert get_value == np.array([scalar]).astype(vertex_type)
     assert get_value.dtype == vertex_type
 
+
 def assert_vertex_value_equals_ndarray(vertex, vertex_type, ndarray):
     get_value = vertex.get_value()
     assert np.array_equal(get_value, ndarray.astype(vertex_type))
     assert get_value.dtype == vertex_type
+
 
 def assert_vertex_value_equals_pandas(vertex, vertex_type, pandas):
     get_value = vertex.get_value()
@@ -173,69 +176,54 @@ def test_get_vertex_id(jvm_view):
     assert all(value in python_id for value in java_id)
 
 
-@pytest.mark.parametrize("vertex, expected_type", [
-    (Gaussian(0., 1.), np.floating),
-    (UniformInt(0, 10), np.integer),
-    (Bernoulli(0.5), np.bool_)
-])
-@pytest.mark.parametrize("value, assert_vertex_value_equals", [
-    (4, assert_vertex_value_equals_scalar),
-    (5., assert_vertex_value_equals_scalar),
-    (True, assert_vertex_value_equals_scalar),
-
-    (np.array([[4]]), assert_vertex_value_equals_ndarray),
-    (np.array([[5.]]), assert_vertex_value_equals_ndarray),
-    (np.array([[True]]), assert_vertex_value_equals_ndarray),
-    (np.array([[1, 2], [3, 4]]), assert_vertex_value_equals_ndarray),
-
-    (pd.Series(data=[4]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[5.]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[True]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[1, 2, 3]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[1., 2., 3.]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[True, False, False]), assert_vertex_value_equals_pandas),
-
-    (pd.DataFrame(data=[[4]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[5.]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[True]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)
-])
+@pytest.mark.parametrize("vertex, expected_type", [(Gaussian(0., 1.), np.floating), (UniformInt(0, 10), np.integer),
+                                                   (Bernoulli(0.5), np.bool_)])
+@pytest.mark.parametrize("value, assert_vertex_value_equals",
+                         [(4, assert_vertex_value_equals_scalar), (5., assert_vertex_value_equals_scalar),
+                          (True, assert_vertex_value_equals_scalar),
+                          (np.array([[4]]), assert_vertex_value_equals_ndarray),
+                          (np.array([[5.]]), assert_vertex_value_equals_ndarray),
+                          (np.array([[True]]), assert_vertex_value_equals_ndarray),
+                          (np.array([[1, 2], [3, 4]]), assert_vertex_value_equals_ndarray),
+                          (pd.Series(data=[4]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[5.]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[True]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[1, 2, 3]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[1., 2., 3.]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[True, False, False]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[4]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[5.]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[True]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
 def test_you_can_set_value(vertex, expected_type, value, assert_vertex_value_equals):
     vertex.set_value(value)
     assert_vertex_value_equals(vertex, expected_type, value)
 
 
-@pytest.mark.parametrize("ctor, args, expected_type", [
-    (Gaussian, (0., 1.), np.floating),
-    (UniformInt, (0, 10), np.integer),
-    (Bernoulli, (0.5, ), np.bool_)
-])
-@pytest.mark.parametrize("value, assert_vertex_value_equals", [
-    (4, assert_vertex_value_equals_scalar),
-    (5., assert_vertex_value_equals_scalar),
-    (True, assert_vertex_value_equals_scalar),
-
-    (np.array([[4]]), assert_vertex_value_equals_ndarray),
-    (np.array([[5.]]), assert_vertex_value_equals_ndarray),
-    (np.array([[True]]), assert_vertex_value_equals_ndarray),
-    (np.array([[1, 2], [3, 4]]), assert_vertex_value_equals_ndarray),
-
-    (pd.Series(data=[4]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[5.]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[True]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[1, 2, 3]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[1., 2., 3.]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[True, False, False]), assert_vertex_value_equals_pandas),
-
-    (pd.DataFrame(data=[[4]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[5.]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[True]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)
-])
+@pytest.mark.parametrize("ctor, args, expected_type", [(Gaussian, (0., 1.), np.floating),
+                                                       (UniformInt, (0, 10), np.integer), (Bernoulli,
+                                                                                           (0.5,), np.bool_)])
+@pytest.mark.parametrize("value, assert_vertex_value_equals",
+                         [(4, assert_vertex_value_equals_scalar), (5., assert_vertex_value_equals_scalar),
+                          (True, assert_vertex_value_equals_scalar),
+                          (np.array([[4]]), assert_vertex_value_equals_ndarray),
+                          (np.array([[5.]]), assert_vertex_value_equals_ndarray),
+                          (np.array([[True]]), assert_vertex_value_equals_ndarray),
+                          (np.array([[1, 2], [3, 4]]), assert_vertex_value_equals_ndarray),
+                          (pd.Series(data=[4]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[5.]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[True]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[1, 2, 3]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[1., 2., 3.]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[True, False, False]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[4]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[5.]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[True]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
 def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex_value_equals):
     vertex1 = ctor(*args)
     vertex2 = ctor(*args)
@@ -257,35 +245,28 @@ def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex
     assert np.all(np.invert(two_values_are_not_equal))
 
 
-@pytest.mark.parametrize("ctor, args, expected_type", [
-    (Gaussian, (0., 1.), np.floating),
-    (UniformInt, (0, 10), np.integer),
-    (Bernoulli, (0.5, ), np.bool_)
-])
-@pytest.mark.parametrize("value, assert_vertex_value_equals", [
-    (4, assert_vertex_value_equals_scalar),
-    (5., assert_vertex_value_equals_scalar),
-    (True, assert_vertex_value_equals_scalar),
-
-    (np.array([[4]]), assert_vertex_value_equals_ndarray),
-    (np.array([[5.]]), assert_vertex_value_equals_ndarray),
-    (np.array([[True]]), assert_vertex_value_equals_ndarray),
-    (np.array([[1, 2], [3, 4]]), assert_vertex_value_equals_ndarray),
-
-    (pd.Series(data=[4]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[5.]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[True]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[1, 2, 3]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[1., 2., 3.]), assert_vertex_value_equals_pandas),
-    (pd.Series(data=[True, False, False]), assert_vertex_value_equals_pandas),
-
-    (pd.DataFrame(data=[[4]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[5.]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[True]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
-    (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)
-])
+@pytest.mark.parametrize("ctor, args, expected_type", [(Gaussian, (0., 1.), np.floating),
+                                                       (UniformInt, (0, 10), np.integer), (Bernoulli,
+                                                                                           (0.5,), np.bool_)])
+@pytest.mark.parametrize("value, assert_vertex_value_equals",
+                         [(4, assert_vertex_value_equals_scalar), (5., assert_vertex_value_equals_scalar),
+                          (True, assert_vertex_value_equals_scalar),
+                          (np.array([[4]]), assert_vertex_value_equals_ndarray),
+                          (np.array([[5.]]), assert_vertex_value_equals_ndarray),
+                          (np.array([[True]]), assert_vertex_value_equals_ndarray),
+                          (np.array([[1, 2], [3, 4]]), assert_vertex_value_equals_ndarray),
+                          (pd.Series(data=[4]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[5.]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[True]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[1, 2, 3]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[1., 2., 3.]), assert_vertex_value_equals_pandas),
+                          (pd.Series(data=[True, False, False]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[4]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[5.]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[True]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
+                          (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
 def test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals):
     vertex = ctor(*args)
     assert not vertex.is_observed()
