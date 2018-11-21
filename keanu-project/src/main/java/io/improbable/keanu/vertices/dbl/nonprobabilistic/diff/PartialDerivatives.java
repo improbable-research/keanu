@@ -173,10 +173,10 @@ public class PartialDerivatives {
             DoubleTensor v = entry.getValue();
 
             if (ofIsLengthOne) {
-                clone.put(k, DoubleTensor.zeros(TensorShape.concat(resultShape, v.getShape())).plus(v));
-            } else {
-                clone.put(k, v);
+                v = DoubleTensor.zeros(TensorShape.concat(resultShape, v.getShape())).plus(v);
             }
+
+            clone.put(k, v);
         }
         return clone;
     }

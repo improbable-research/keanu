@@ -35,7 +35,6 @@ public class Nd4jDoubleTensorTest {
     Nd4jDoubleTensor matrixB;
     Nd4jDoubleTensor scalarA;
     Nd4jDoubleTensor vectorA;
-    Nd4jDoubleTensor vectorB;
     Nd4jDoubleTensor rankThreeTensor;
 
     @Rule
@@ -47,7 +46,6 @@ public class Nd4jDoubleTensorTest {
         matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
         scalarA = Nd4jDoubleTensor.scalar(2.0);
         vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
-        vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
         rankThreeTensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
     }
 
@@ -451,14 +449,10 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canCalculateProductOfVector() {
         double productVectorA = vectorA.product();
-        double productVectorB = vectorB.product();
         double productRankThreeTensor = rankThreeTensor.product();
 
         assertEquals(6., productVectorA, 1e-6);
-        assertEquals(6., productVectorB, 1e-6);
         assertEquals(40320, productRankThreeTensor, 1e-6);
-
-        assertTrue(vectorA.isVector() && vectorB.isVector());
     }
 
     @Test

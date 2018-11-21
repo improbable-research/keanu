@@ -28,14 +28,14 @@ public class Nd4jIntegerTensorTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void youCannotCreateARankZeroTensor() {
+    public void youCanCreateARankZeroTensor() {
         IntegerTensor scalar = IntegerTensor.create(new int[]{2}, new long[]{});
         assertEquals(2, (int) scalar.scalar());
         TestCase.assertEquals(0, scalar.getRank());
     }
 
     @Test
-    public void youCannotCreateARankOneTensor() {
+    public void youCanCreateARankOneTensor() {
         IntegerTensor vector = IntegerTensor.create(new int[]{1, 2, 3, 4, 5}, new long[]{5});
         assertEquals(4, (int) vector.getValue(3));
         TestCase.assertEquals(1, vector.getRank());

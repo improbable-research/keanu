@@ -37,14 +37,14 @@ public class SimpleBooleanTensorTest {
     }
 
     @Test
-    public void youCannotCreateARankZeroTensor() {
+    public void youCanCreateARankZeroTensor() {
         BooleanTensor scalarTrue = SimpleBooleanTensor.create(new boolean[]{true}, new long[]{});
         assertTrue(scalarTrue.scalar());
         assertEquals(0, scalarTrue.getRank());
     }
 
     @Test
-    public void youCannotCreateARankOneTensor() {
+    public void youCanCreateARankOneTensor() {
         BooleanTensor booleanVector = SimpleBooleanTensor.create(new boolean[]{true, false, false, true, true}, new long[]{5});
         assertTrue(booleanVector.getValue(3));
         assertEquals(1, booleanVector.getRank());
