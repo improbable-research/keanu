@@ -256,7 +256,7 @@ public class BayesianNetwork {
                 Stream<Vertex> verticesToAdd = Stream.concat(v.getParents().stream(), v.getChildren().stream());
                 verticesToAdd
                     .filter(a -> !subgraphVertices.contains(a))
-                    .forEach(a -> {
+                    .forEachOrdered(a -> {
                         connectedVertices.add(a);
                         subgraphVertices.add(a);
                     });
