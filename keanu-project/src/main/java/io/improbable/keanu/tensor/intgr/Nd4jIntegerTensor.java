@@ -48,7 +48,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     private static double[] toDoubles(int[] ints) {
         double[] doubles = new double[ints.length];
         for (int i = 0; i < ints.length; i++) {
-            doubles[i] = Ints.checkedCast(ints[i]);
+            doubles[i] = ints[i];
         }
         return doubles;
     }
