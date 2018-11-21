@@ -4,6 +4,7 @@ import io.improbable.keanu.model.MAPModelFitter;
 import io.improbable.keanu.model.MaximumLikelihoodModelFitter;
 import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.model.ModelGraph;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -23,7 +24,7 @@ public enum RegressionRegularization {
     },
     LASSO {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new LaplaceVertex(new long[]{featureCount, 1}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnInterceptScaleParameter));
+            return new LaplaceVertex(new long[]{featureCount, 1}, ConstantVertex.of(DoubleTensor.createColumnVector(priorOnWeightsMeans)), ConstantVertex.of(DoubleTensor.createColumnVector(priorOnInterceptScaleParameter)));
         }
         public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
             return new LaplaceVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
@@ -34,7 +35,7 @@ public enum RegressionRegularization {
     },
     RIDGE {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new GaussianVertex(new long[]{featureCount, 1}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnInterceptScaleParameter));
+            return new GaussianVertex(new long[]{featureCount, 1}, ConstantVertex.of(DoubleTensor.createColumnVector(priorOnWeightsMeans)), ConstantVertex.of(DoubleTensor.createColumnVector(priorOnInterceptScaleParameter)));
         }
         public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
             return new GaussianVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
