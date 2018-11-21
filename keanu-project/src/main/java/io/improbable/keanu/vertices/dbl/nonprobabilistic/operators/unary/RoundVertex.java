@@ -3,11 +3,10 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 
-public class RoundVertex extends DoubleUnaryOpVertex implements SaveableVertex {
+public class RoundVertex extends DoubleUnaryOpVertex {
 
     /**
      * Applies the Rounding operator to a vertex.

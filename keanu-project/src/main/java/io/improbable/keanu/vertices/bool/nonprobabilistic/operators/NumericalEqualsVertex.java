@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -14,7 +13,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 /**
  * Returns true if a vertex value is equal to another vertex value within an epsilon.
  */
-public class NumericalEqualsVertex extends BoolVertex implements SaveableVertex, NonProbabilistic<BooleanTensor> {
+public class NumericalEqualsVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
     protected Vertex<? extends NumberTensor> a;
     protected Vertex<? extends NumberTensor> b;

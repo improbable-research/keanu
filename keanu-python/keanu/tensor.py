@@ -23,7 +23,9 @@ java_import(k.jvm_view(), "io.improbable.keanu.tensor.dbl.DoubleTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
 
+
 class Tensor(JavaObjectWrapper):
+
     def __init__(self, t: tensor_arg_types) -> None:
         if isinstance(t, runtime_numpy_types):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_ndarray(t))
@@ -63,7 +65,8 @@ class Tensor(JavaObjectWrapper):
         elif isinstance(ndarray.item(0), runtime_float_types):
             return k.jvm_view().DoubleTensor.create
         else:
-            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(ndarray.item(0))))
+            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(
+                type(ndarray.item(0))))
 
     @staticmethod
     def __get_tensor_from_scalar(scalar: primitive_types) -> Any:

@@ -9,7 +9,9 @@ k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.network.BayesianNetwork")
 
+
 class BayesNet(JavaObjectWrapper):
+
     def __init__(self, vertices: Any) -> None:
         java_vertices = k.to_java_object_list(vertices)
 

@@ -6,12 +6,11 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class CastDoubleVertex extends DoubleVertex implements SaveableVertex, NonProbabilistic<DoubleTensor> {
+public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
     private final Vertex<? extends NumberTensor> inputVertex;
     private static final String INPUT_VERTEX_NAME = "inputVertex";

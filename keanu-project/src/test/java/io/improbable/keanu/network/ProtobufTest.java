@@ -5,10 +5,12 @@ import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.LoadVertexValue;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -312,7 +314,7 @@ public class ProtobufTest {
 
         Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
         vertices.stream()
-            .filter(v -> SaveableVertex.class.isAssignableFrom(v))
+            .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
             .filter(v -> !Modifier.isAbstract(v.getModifiers()))
             .forEach(this::checkSaveableVertex);
     }
@@ -323,6 +325,14 @@ public class ProtobufTest {
         } else {
             checkNonRootVertex(vertexClass);
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nonSaveableVertexThrowsExceptionOnSave() {
+        BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
+        BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
+        ProtobufWriter protobufWriter = new ProtobufWriter(net);
+        testVertex.save(protobufWriter);
     }
 
     private <A extends AnnotatedElement> List<A> filterAnnotatedObjects(A[] items, Class annotation) {

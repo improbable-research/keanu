@@ -2,10 +2,9 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class IntegerMultiplicationVertex extends IntegerBinaryOpVertex implements SaveableVertex {
+public class IntegerMultiplicationVertex extends IntegerBinaryOpVertex {
 
     /**
      * Multiplies one vertex by another

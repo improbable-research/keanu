@@ -4,6 +4,7 @@ from py4j.protocol import Py4JJavaError
 from keanu import KeanuRandom, BayesNet, Model
 from keanu.algorithm import GradientOptimizer
 
+
 @pytest.fixture
 def model() -> Model:
     KeanuRandom.set_default_random_seed(1)
@@ -47,7 +48,7 @@ def test_thermometers_map_gradient(model: Model) -> None:
     assert logProb < 0.
 
     temperature = model.temperature.get_value()
-    assert 20.995 < temperature <  21.005
+    assert 20.995 < temperature < 21.005
 
 
 def test_thermometers_max_likelihood_gradient(model: Model) -> None:
@@ -57,4 +58,4 @@ def test_thermometers_max_likelihood_gradient(model: Model) -> None:
     assert logProb < 0.
 
     temperature = model.temperature.get_value()
-    assert 20.995 < temperature <  21.005
+    assert 20.995 < temperature < 21.005

@@ -2,10 +2,9 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 
-public class OrBinaryVertex extends BoolBinaryOpVertex<BooleanTensor, BooleanTensor> implements SaveableVertex {
+public class OrBinaryVertex extends BoolBinaryOpVertex<BooleanTensor, BooleanTensor> {
 
     public OrBinaryVertex(@LoadParentVertex(A_NAME) Vertex<BooleanTensor> a,
                           @LoadParentVertex(B_NAME) Vertex<BooleanTensor> b) {

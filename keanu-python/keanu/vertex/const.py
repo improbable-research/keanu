@@ -14,6 +14,7 @@ from keanu.vartypes import (
     runtime_float_types
 )
 
+
 def Const(t: tensor_arg_types) -> Vertex:
     if isinstance(t, runtime_numpy_types):
         ctor = __infer_const_ctor_from_ndarray(t)
@@ -25,15 +26,19 @@ def Const(t: tensor_arg_types) -> Vertex:
         ctor = __infer_const_ctor_from_scalar(t)
         val = np.array([[t]])
     else:
-        raise NotImplementedError("Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(type(t)))
+        raise NotImplementedError(
+            "Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(
+                type(t)))
 
     return ctor(Tensor(val))
+
 
 def __infer_const_ctor_from_ndarray(ndarray: numpy_types) -> Callable:
     if len(ndarray) == 0:
         raise ValueError("Cannot infer type because the ndarray is empty")
 
     return __infer_const_ctor_from_scalar(ndarray.item(0))
+
 
 def __infer_const_ctor_from_scalar(scalar: np.generic) -> Callable:
     if isinstance(scalar, runtime_bool_types):

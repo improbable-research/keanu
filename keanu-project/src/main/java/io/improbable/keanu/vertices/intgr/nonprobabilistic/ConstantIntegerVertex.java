@@ -7,11 +7,10 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexValue;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class ConstantIntegerVertex extends IntegerVertex implements ConstantVertex, SaveableVertex, NonProbabilistic<IntegerTensor> {
+public class ConstantIntegerVertex extends IntegerVertex implements ConstantVertex, NonProbabilistic<IntegerTensor> {
 
     @ExportVertexToPythonBindings
     public ConstantIntegerVertex(@LoadVertexValue IntegerTensor constant) {

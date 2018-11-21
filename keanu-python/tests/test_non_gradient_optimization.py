@@ -4,6 +4,7 @@ from keanu import KeanuRandom, Model, BayesNet
 from keanu.vertex import Gaussian
 from keanu.algorithm import NonGradientOptimizer
 
+
 @pytest.fixture
 def model() -> Model:
     KeanuRandom.set_default_random_seed(1)

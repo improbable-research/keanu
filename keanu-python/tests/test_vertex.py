@@ -4,6 +4,7 @@ from keanu.vertex.base import Vertex
 from keanu.context import KeanuContext
 from keanu.vertex import Gaussian, Const
 
+
 @pytest.fixture
 def jvm_view():
     from py4j.java_gateway import java_import
@@ -42,6 +43,7 @@ def test_can_pass_array_to_vertex(jvm_view):
 
 
 def test_cannot_pass_generic_to_vertex(jvm_view):
+
     class GenericExampleClass:
         pass
 
@@ -77,7 +79,7 @@ def test_vertex_can_observe_scalar(jvm_view):
 def test_vertex_can_observe_ndarray(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
 
-    ndarray = np.array([[1.,2.]])
+    ndarray = np.array([[1., 2.]])
     gaussian.observe(ndarray)
 
     assert type(gaussian.get_value()) == np.ndarray
@@ -92,6 +94,7 @@ def test_int_vertex_value_is_a_numpy_array():
     assert value.dtype == np.int64 or value.dtype == np.int32
     assert (value == ndarray).all()
 
+
 def test_float_vertex_value_is_a_numpy_array():
     ndarray = np.array([[1., 2.], [3., 4.]])
     vertex = Const(ndarray)
@@ -100,6 +103,7 @@ def test_float_vertex_value_is_a_numpy_array():
     assert value.dtype == np.float64
     assert (value == ndarray).all()
 
+
 def test_boolean_vertex_value_is_a_numpy_array():
     ndarray = np.array([[True, True], [False, True]])
     vertex = Const(ndarray)
@@ -107,6 +111,7 @@ def test_boolean_vertex_value_is_a_numpy_array():
     assert type(value) == np.ndarray
     assert value.dtype == np.bool
     assert (value == ndarray).all()
+
 
 def test_scalar_vertex_value_is_a_numpy_array():
     scalar = 1.
@@ -117,6 +122,7 @@ def test_scalar_vertex_value_is_a_numpy_array():
     assert value.shape == (1, 1)
     assert value == scalar
     assert (value == scalar).all()
+
 
 def test_vertex_sample_is_a_numpy_array():
     mu = np.array([[1., 2.], [3., 4.]])
