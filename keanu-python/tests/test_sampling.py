@@ -9,6 +9,7 @@ from keanu import BayesNet, KeanuRandom
 from collections import defaultdict
 from itertools import islice
 
+
 @pytest.fixture
 def net():
     gamma = Gamma(1., 1.)
@@ -18,11 +19,7 @@ def net():
     return BayesNet(cauchy.get_connected_graph())
 
 
-@pytest.mark.parametrize("algo", [
-    ("metropolis"),
-    ("NUTS"),
-    ("hamiltonian")
-])
+@pytest.mark.parametrize("algo", [("metropolis"), ("NUTS"), ("hamiltonian")])
 def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo, net):
     draws = 5
     sample_from = list(net.get_latent_vertices())
@@ -55,16 +52,14 @@ def test_down_sample_interval(net):
     draws = 10
     down_sample_interval = 2
 
-    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=draws, down_sample_interval=down_sample_interval)
+    samples = sample(
+        net=net, sample_from=net.get_latent_vertices(), draws=draws, down_sample_interval=down_sample_interval)
 
     expected_num_samples = draws / down_sample_interval
     assert all(len(vertex_samples) == expected_num_samples for vertex_id, vertex_samples in samples.items())
 
 
-@pytest.mark.parametrize("algo", [
-    ("metropolis"),
-    ("hamiltonian")
-])
+@pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
 def test_can_iter_through_samples(algo, net):
     draws = 10
     samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
@@ -74,10 +69,7 @@ def test_can_iter_through_samples(algo, net):
     assert count == draws
 
 
-@pytest.mark.parametrize("algo", [
-    ("metropolis"),
-    ("hamiltonian")
-])
+@pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
 def test_iter_returns_same_result_as_sample(algo):
     draws = 100
     model = Thermometer.model()

@@ -3,6 +3,7 @@ from examples import CoalMining
 from keanu import BayesNet
 from keanu.algorithm import sample
 
+
 def test_coalmining():
     coal_mining = CoalMining()
     model = coal_mining.model()

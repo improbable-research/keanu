@@ -10,6 +10,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.
 
 
 class Optimizer:
+
     def __init__(self, optimizer, net):
         self.optimizer = optimizer
         self.net = net
@@ -30,6 +31,7 @@ class Optimizer:
 
 
 class GradientOptimizer(Optimizer):
+
     def __init__(self, net, max_evaluations=None, relative_threshold=None, absolute_threshold=None):
         builder = k.jvm_view().GradientOptimizer.builder()
         builder, net = Optimizer._build_bayes_net(builder, net)
@@ -44,7 +46,13 @@ class GradientOptimizer(Optimizer):
 
 
 class NonGradientOptimizer(Optimizer):
-    def __init__(self, net, max_evaluations=None, bounds_range=None, initial_trust_region_radius=None, stopping_trust_region_radius=None):
+
+    def __init__(self,
+                 net,
+                 max_evaluations=None,
+                 bounds_range=None,
+                 initial_trust_region_radius=None,
+                 stopping_trust_region_radius=None):
         builder = k.jvm_view().NonGradientOptimizer.builder()
         builder, net = Optimizer._build_bayes_net(builder, net)
         if max_evaluations is not None:

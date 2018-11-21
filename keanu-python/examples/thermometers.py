@@ -1,7 +1,9 @@
 from keanu import Model
 from keanu.vertex import Uniform, Gaussian
 
+
 class Thermometer:
+
     @staticmethod
     def model():
 

@@ -1,7 +1,9 @@
 import logging
 from .case_conversion import _to_camel_case_name, _to_snake_case_name
 
+
 class JavaObjectWrapper:
+
     def __init__(self, val):
         self._val = val
         self._class = self.unwrap().getClass().getSimpleName()

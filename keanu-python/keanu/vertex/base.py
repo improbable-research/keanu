@@ -17,20 +17,21 @@ class VertexOps:
     Without this the right operators would fail.
     See https://docs.scipy.org/doc/numpy-1.13.0/neps/ufunc-overrides.html
     """
+
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         methods = {
-            "equal" : VertexOps.__eq__,
-            "not_equal" : VertexOps.__ne__,
-            "add" : VertexOps.__radd__,
-            "subtract" : VertexOps.__rsub__,
-            "multiply" : VertexOps.__rmul__,
-            "power" : VertexOps.__rpow__,
-            "true_divide" : VertexOps.__rtruediv__,
-            "floor_divide" : VertexOps.__rfloordiv__,
-            "greater" : VertexOps.__lt__,
-            "greater_equal" : VertexOps.__le__,
-            "less" : VertexOps.__gt__,
-            "less_equal" : VertexOps.__ge__,
+            "equal": VertexOps.__eq__,
+            "not_equal": VertexOps.__ne__,
+            "add": VertexOps.__radd__,
+            "subtract": VertexOps.__rsub__,
+            "multiply": VertexOps.__rmul__,
+            "power": VertexOps.__rpow__,
+            "true_divide": VertexOps.__rtruediv__,
+            "floor_divide": VertexOps.__rfloordiv__,
+            "greater": VertexOps.__lt__,
+            "greater_equal": VertexOps.__le__,
+            "less": VertexOps.__gt__,
+            "less_equal": VertexOps.__ge__,
         }
         if method == "__call__":
             try:
@@ -115,6 +116,7 @@ class VertexOps:
 
 
 class Vertex(JavaObjectWrapper, VertexOps):
+
     def __init__(self, val, *args):
         if args:
             ctor = val

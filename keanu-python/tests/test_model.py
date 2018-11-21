@@ -1,6 +1,7 @@
 from keanu import Model, BayesNet
 from keanu.vertex import Exponential, Gamma, Gaussian
 
+
 def test_to_bayes_net():
     with Model() as m:
         m.mu = Exponential(1.)

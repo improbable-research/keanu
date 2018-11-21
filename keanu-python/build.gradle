@@ -1,3 +1,8 @@
+import java.nio.file.Paths
+
+import static org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
+import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
+
 task installPipenv {
     doLast {
         exec {
@@ -82,9 +87,6 @@ task generateDocumentation {
     }
 }
 
-pythonVersionInfo.mustRunAfter(installPipenv)
-installDependencies.mustRunAfter(pythonVersionInfo)
-
 task preparePythonEnvironment {
     dependsOn(installPipenv)
     dependsOn(pythonVersionInfo)
@@ -93,6 +95,37 @@ task preparePythonEnvironment {
     dependsOn(":codegen:runCodeGeneration")
 }
 
+task formatApply {
+    dependsOn("preparePythonEnvironment")
+    doLast {
+        exec {
+            commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel', '.'
+        }
+    }
+}
+
+task formatCheck {
+    dependsOn("preparePythonEnvironment")
+    doLast { 
+        exec {
+            // Exclude files that are generated
+            def keanuVertexPath = Paths.get("keanu", "vertex")
+            if(isFamily(FAMILY_WINDOWS)) {
+                keanuVertexPath = Paths.get(".").resolve(keanuVertexPath)
+            }
+            def keanuVertexGeneratedPath = keanuVertexPath.resolve("generated.py")
+            def keanuVertexInitPath = keanuVertexPath.resolve("__init__.py")
+            commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel',
+            '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
+        }
+    }
+}
+
+
+pythonVersionInfo.mustRunAfter(installPipenv)
+installDependencies.mustRunAfter(pythonVersionInfo)
 generateDocumentation.dependsOn(preparePythonEnvironment)
 pytest.dependsOn(preparePythonEnvironment)
+test.dependsOn(formatCheck)
 test.dependsOn(pytest)
+
