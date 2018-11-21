@@ -3,10 +3,9 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class IntegerAbsVertex extends IntegerUnaryOpVertex implements SaveableVertex {
+public class IntegerAbsVertex extends IntegerUnaryOpVertex {
 
     /**
      * Takes the absolute value of a vertex

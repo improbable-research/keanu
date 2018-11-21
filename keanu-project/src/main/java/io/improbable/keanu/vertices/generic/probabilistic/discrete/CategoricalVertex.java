@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -25,7 +26,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 import static java.util.stream.Collectors.toMap;
 
 
-public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extends Vertex<TENSOR> implements Probabilistic<TENSOR> {
+public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extends Vertex<TENSOR> implements Probabilistic<TENSOR>, NonSaveableVertex {
 
     private final Map<CATEGORY, DoubleVertex> selectableValues;
 

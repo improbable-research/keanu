@@ -4,7 +4,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
-public abstract class DoubleBinaryOpVertex extends DoubleVertex implements SaveableVertex, Differentiable, NonProbabilistic<DoubleTensor> {
+public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
     protected final DoubleVertex left;
     protected final DoubleVertex right;
