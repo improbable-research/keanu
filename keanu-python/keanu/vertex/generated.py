@@ -3,6 +3,11 @@
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex
+from keanu.vartypes import (
+    vertex_param_types,
+    tensor_arg_types,
+    shape_types
+)
 
 context = KeanuContext()
 
@@ -42,7 +47,6 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex")
@@ -71,47 +75,47 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 
 
-def ConstantBool(constant) -> Vertex:
+def ConstantBool(constant: tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantBoolVertex, constant)
 
 
-def Equals(a, b) -> Vertex:
+def Equals(a: vertex_param_types, b: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().EqualsVertex, a, b)
 
 
-def GreaterThanOrEqual(a, b) -> Vertex:
+def GreaterThanOrEqual(a: vertex_param_types, b: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().GreaterThanOrEqualVertex, a, b)
 
 
-def GreaterThan(a, b) -> Vertex:
+def GreaterThan(a: vertex_param_types, b: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().GreaterThanVertex, a, b)
 
 
-def LessThanOrEqual(a, b) -> Vertex:
+def LessThanOrEqual(a: vertex_param_types, b: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().LessThanOrEqualVertex, a, b)
 
 
-def LessThan(a, b) -> Vertex:
+def LessThan(a: vertex_param_types, b: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().LessThanVertex, a, b)
 
 
-def NotEquals(a, b) -> Vertex:
+def NotEquals(a: vertex_param_types, b: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().NotEqualsVertex, a, b)
 
 
-def CastDouble(input_vertex) -> Vertex:
+def CastDouble(input_vertex: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().CastDoubleVertex, input_vertex)
 
 
-def ConstantDouble(constant) -> Vertex:
+def ConstantDouble(constant: tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantDoubleVertex, constant)
 
 
-def DoubleIf(shape, predicate, thn, els) -> Vertex:
+def DoubleIf(shape: shape_types, predicate: vertex_param_types, thn: vertex_param_types, els: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().DoubleIfVertex, shape, predicate, thn, els)
 
 
-def Addition(left, right) -> Vertex:
+def Addition(left: vertex_param_types, right: vertex_param_types) -> Vertex:
     """
     Adds one vertex to another
     
@@ -121,7 +125,7 @@ def Addition(left, right) -> Vertex:
     return Vertex(context.jvm_view().AdditionVertex, left, right)
 
 
-def ArcTan2(x, y) -> Vertex:
+def ArcTan2(x: vertex_param_types, y: vertex_param_types) -> Vertex:
     """
     Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin
     
@@ -131,7 +135,7 @@ def ArcTan2(x, y) -> Vertex:
     return Vertex(context.jvm_view().ArcTan2Vertex, x, y)
 
 
-def Difference(left, right) -> Vertex:
+def Difference(left: vertex_param_types, right: vertex_param_types) -> Vertex:
     """
     Subtracts one vertex from another
     
@@ -141,7 +145,7 @@ def Difference(left, right) -> Vertex:
     return Vertex(context.jvm_view().DifferenceVertex, left, right)
 
 
-def Division(left, right) -> Vertex:
+def Division(left: vertex_param_types, right: vertex_param_types) -> Vertex:
     """
     Divides one vertex by another
     
@@ -151,7 +155,7 @@ def Division(left, right) -> Vertex:
     return Vertex(context.jvm_view().DivisionVertex, left, right)
 
 
-def MatrixMultiplication(left, right) -> Vertex:
+def MatrixMultiplication(left: vertex_param_types, right: vertex_param_types) -> Vertex:
     """
     Matrix multiplies one vertex by another. C = AB
     
@@ -161,7 +165,7 @@ def MatrixMultiplication(left, right) -> Vertex:
     return Vertex(context.jvm_view().MatrixMultiplicationVertex, left, right)
 
 
-def Max(left, right) -> Vertex:
+def Max(left: vertex_param_types, right: vertex_param_types) -> Vertex:
     """
     Finds the maximum between two vertices
     
@@ -171,7 +175,7 @@ def Max(left, right) -> Vertex:
     return Vertex(context.jvm_view().MaxVertex, left, right)
 
 
-def Min(left, right) -> Vertex:
+def Min(left: vertex_param_types, right: vertex_param_types) -> Vertex:
     """
     Finds the minimum between two vertices
     
@@ -181,7 +185,7 @@ def Min(left, right) -> Vertex:
     return Vertex(context.jvm_view().MinVertex, left, right)
 
 
-def Multiplication(left, right) -> Vertex:
+def Multiplication(left: vertex_param_types, right: vertex_param_types) -> Vertex:
     """
     Multiplies one vertex by another
     
@@ -191,7 +195,7 @@ def Multiplication(left, right) -> Vertex:
     return Vertex(context.jvm_view().MultiplicationVertex, left, right)
 
 
-def Power(base, exponent) -> Vertex:
+def Power(base: vertex_param_types, exponent: vertex_param_types) -> Vertex:
     """
     Raises a vertex to the power of another
     
@@ -201,7 +205,7 @@ def Power(base, exponent) -> Vertex:
     return Vertex(context.jvm_view().PowerVertex, base, exponent)
 
 
-def Abs(input_vertex) -> Vertex:
+def Abs(input_vertex: vertex_param_types) -> Vertex:
     """
     Takes the absolute of a vertex
     
@@ -210,7 +214,7 @@ def Abs(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().AbsVertex, input_vertex)
 
 
-def ArcCos(input_vertex) -> Vertex:
+def ArcCos(input_vertex: vertex_param_types) -> Vertex:
     """
     Takes the inverse cosine of a vertex, Arccos(vertex)
     
@@ -219,7 +223,7 @@ def ArcCos(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().ArcCosVertex, input_vertex)
 
 
-def ArcSin(input_vertex) -> Vertex:
+def ArcSin(input_vertex: vertex_param_types) -> Vertex:
     """
     Takes the inverse sin of a vertex, Arcsin(vertex)
     
@@ -228,7 +232,7 @@ def ArcSin(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().ArcSinVertex, input_vertex)
 
 
-def ArcTan(input_vertex) -> Vertex:
+def ArcTan(input_vertex: vertex_param_types) -> Vertex:
     """
     Takes the inverse tan of a vertex, Arctan(vertex)
     
@@ -237,7 +241,7 @@ def ArcTan(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().ArcTanVertex, input_vertex)
 
 
-def Ceil(input_vertex) -> Vertex:
+def Ceil(input_vertex: vertex_param_types) -> Vertex:
     """
     Applies the Ceiling operator to a vertex.
     This maps a vertex to the smallest integer greater than or equal to its value
@@ -247,7 +251,7 @@ def Ceil(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().CeilVertex, input_vertex)
 
 
-def Cos(input_vertex) -> Vertex:
+def Cos(input_vertex: vertex_param_types) -> Vertex:
     """
     Takes the cosine of a vertex, Cos(vertex)
     
@@ -256,7 +260,7 @@ def Cos(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().CosVertex, input_vertex)
 
 
-def Exp(input_vertex) -> Vertex:
+def Exp(input_vertex: vertex_param_types) -> Vertex:
     """
     Calculates the exponential of an input vertex
     
@@ -265,7 +269,7 @@ def Exp(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().ExpVertex, input_vertex)
 
 
-def Floor(input_vertex) -> Vertex:
+def Floor(input_vertex: vertex_param_types) -> Vertex:
     """
     Applies the Floor operator to a vertex.
     This maps a vertex to the biggest integer less than or equal to its value
@@ -275,7 +279,7 @@ def Floor(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().FloorVertex, input_vertex)
 
 
-def LogGamma(input_vertex) -> Vertex:
+def LogGamma(input_vertex: vertex_param_types) -> Vertex:
     """
     Returns the log of the gamma of the inputVertex
     
@@ -284,7 +288,7 @@ def LogGamma(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().LogGammaVertex, input_vertex)
 
 
-def Log(input_vertex) -> Vertex:
+def Log(input_vertex: vertex_param_types) -> Vertex:
     """
     Returns the natural logarithm, base e, of a vertex
     
@@ -293,19 +297,19 @@ def Log(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().LogVertex, input_vertex)
 
 
-def MatrixDeterminant(vertex) -> Vertex:
+def MatrixDeterminant(vertex: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().MatrixDeterminantVertex, vertex)
 
 
-def MatrixInverse(input_vertex) -> Vertex:
+def MatrixInverse(input_vertex: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().MatrixInverseVertex, input_vertex)
 
 
-def Reshape(input_vertex, proposed_shape) -> Vertex:
+def Reshape(input_vertex: vertex_param_types, proposed_shape: shape_types) -> Vertex:
     return Vertex(context.jvm_view().ReshapeVertex, input_vertex, proposed_shape)
 
 
-def Round(input_vertex) -> Vertex:
+def Round(input_vertex: vertex_param_types) -> Vertex:
     """
     Applies the Rounding operator to a vertex.
     This maps a vertex to the nearest integer value
@@ -315,7 +319,7 @@ def Round(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().RoundVertex, input_vertex)
 
 
-def Sigmoid(input_vertex) -> Vertex:
+def Sigmoid(input_vertex: vertex_param_types) -> Vertex:
     """
     Applies the sigmoid function to a vertex.
     The sigmoid function is a special case of the Logistic function.
@@ -325,7 +329,7 @@ def Sigmoid(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().SigmoidVertex, input_vertex)
 
 
-def Sin(input_vertex) -> Vertex:
+def Sin(input_vertex: vertex_param_types) -> Vertex:
     """
     Takes the sine of a vertex. Sin(vertex).
     
@@ -334,18 +338,7 @@ def Sin(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().SinVertex, input_vertex)
 
 
-def Slice(input_vertex, dimension, index) -> Vertex:
-    """
-    Takes the slice along a given dimension and index of a vertex
-    
-    :param input_vertex: the input vertex
-    :param dimension: the dimension to extract along
-    :param index: the index of extraction
-    """
-    return Vertex(context.jvm_view().SliceVertex, input_vertex, dimension, index)
-
-
-def Sum(input_vertex, over_dimensions) -> Vertex:
+def Sum(input_vertex: vertex_param_types, over_dimensions: shape_types) -> Vertex:
     """
     Performs a sum across specified dimensions. Negative dimension indexing is not supported.
     
@@ -355,7 +348,7 @@ def Sum(input_vertex, over_dimensions) -> Vertex:
     return Vertex(context.jvm_view().SumVertex, input_vertex, over_dimensions)
 
 
-def Take(input_vertex, index) -> Vertex:
+def Take(input_vertex: vertex_param_types, index: shape_types) -> Vertex:
     """
     A vertex that extracts a scalar at a given index
     
@@ -365,7 +358,7 @@ def Take(input_vertex, index) -> Vertex:
     return Vertex(context.jvm_view().TakeVertex, input_vertex, index)
 
 
-def Tan(input_vertex) -> Vertex:
+def Tan(input_vertex: vertex_param_types) -> Vertex:
     """
     Takes the tangent of a vertex. Tan(vertex).
     
@@ -374,7 +367,7 @@ def Tan(input_vertex) -> Vertex:
     return Vertex(context.jvm_view().TanVertex, input_vertex)
 
 
-def Beta(alpha, beta) -> Vertex:
+def Beta(alpha: vertex_param_types, beta: vertex_param_types) -> Vertex:
     """
     One to one constructor for mapping some tensorShape of alpha and beta to
     a matching tensorShaped Beta.
@@ -385,11 +378,11 @@ def Beta(alpha, beta) -> Vertex:
     return Vertex(context.jvm_view().BetaVertex, alpha, beta)
 
 
-def Cauchy(location, scale) -> Vertex:
+def Cauchy(location: vertex_param_types, scale: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().CauchyVertex, location, scale)
 
 
-def ChiSquared(k) -> Vertex:
+def ChiSquared(k: vertex_param_types) -> Vertex:
     """
     One to one constructor for mapping some shape of k to
     a matching shaped ChiSquared.
@@ -399,7 +392,7 @@ def ChiSquared(k) -> Vertex:
     return Vertex(context.jvm_view().ChiSquaredVertex, k)
 
 
-def Dirichlet(concentration) -> Vertex:
+def Dirichlet(concentration: vertex_param_types) -> Vertex:
     """
     Matches a vector of concentration values to a Dirichlet distribution
     
@@ -408,7 +401,7 @@ def Dirichlet(concentration) -> Vertex:
     return Vertex(context.jvm_view().DirichletVertex, concentration)
 
 
-def Exponential(rate) -> Vertex:
+def Exponential(rate: vertex_param_types) -> Vertex:
     """
     One to one constructor for mapping some shape of rate to matching shaped exponential.
     
@@ -417,7 +410,7 @@ def Exponential(rate) -> Vertex:
     return Vertex(context.jvm_view().ExponentialVertex, rate)
 
 
-def Gamma(theta, k) -> Vertex:
+def Gamma(theta: vertex_param_types, k: vertex_param_types) -> Vertex:
     """
     One to one constructor for mapping some shape of theta and k to matching shaped gamma.
     
@@ -427,19 +420,19 @@ def Gamma(theta, k) -> Vertex:
     return Vertex(context.jvm_view().GammaVertex, theta, k)
 
 
-def Gaussian(mu, sigma) -> Vertex:
+def Gaussian(mu: vertex_param_types, sigma: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().GaussianVertex, mu, sigma)
 
 
-def HalfCauchy(scale) -> Vertex:
+def HalfCauchy(scale: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().HalfCauchyVertex, scale)
 
 
-def HalfGaussian(sigma) -> Vertex:
+def HalfGaussian(sigma: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().HalfGaussianVertex, sigma)
 
 
-def InverseGamma(alpha, beta) -> Vertex:
+def InverseGamma(alpha: vertex_param_types, beta: vertex_param_types) -> Vertex:
     """
     One to one constructor for mapping some shape of alpha and beta to
     alpha matching shaped Inverse Gamma.
@@ -450,7 +443,7 @@ def InverseGamma(alpha, beta) -> Vertex:
     return Vertex(context.jvm_view().InverseGammaVertex, alpha, beta)
 
 
-def Laplace(mu, beta) -> Vertex:
+def Laplace(mu: vertex_param_types, beta: vertex_param_types) -> Vertex:
     """
     One to one constructor for mapping some shape of mu and sigma to
     a matching shaped Laplace.
@@ -461,15 +454,15 @@ def Laplace(mu, beta) -> Vertex:
     return Vertex(context.jvm_view().LaplaceVertex, mu, beta)
 
 
-def LogNormal(mu, sigma) -> Vertex:
+def LogNormal(mu: vertex_param_types, sigma: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().LogNormalVertex, mu, sigma)
 
 
-def Logistic(mu, s) -> Vertex:
+def Logistic(mu: vertex_param_types, s: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().LogisticVertex, mu, s)
 
 
-def MultivariateGaussian(mu, covariance) -> Vertex:
+def MultivariateGaussian(mu: vertex_param_types, covariance: vertex_param_types) -> Vertex:
     """
     Matches a mu and covariance of some shape to a Multivariate Gaussian
     
@@ -479,27 +472,19 @@ def MultivariateGaussian(mu, covariance) -> Vertex:
     return Vertex(context.jvm_view().MultivariateGaussianVertex, mu, covariance)
 
 
-def Pareto(location, scale) -> Vertex:
+def Pareto(location: vertex_param_types, scale: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().ParetoVertex, location, scale)
 
 
-def SmoothUniform(x_min, x_max, edge_sharpness) -> Vertex:
-    """
-    One to one constructor for mapping some shape of mu and sigma to
-    a matching shaped Smooth Uniform.
-    
-    :param x_min: the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
-    :param x_max: the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
-    :param edge_sharpness: the edge sharpness of the Smooth Uniform
-    """
-    return Vertex(context.jvm_view().SmoothUniformVertex, x_min, x_max, edge_sharpness)
+def SmoothUniform(x_min: vertex_param_types, x_max: vertex_param_types) -> Vertex:
+    return Vertex(context.jvm_view().SmoothUniformVertex, x_min, x_max)
 
 
-def StudentT(v) -> Vertex:
+def StudentT(v: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().StudentTVertex, v)
 
 
-def Triangular(x_min, x_max, c) -> Vertex:
+def Triangular(x_min: vertex_param_types, x_max: vertex_param_types, c: vertex_param_types) -> Vertex:
     """
     One to one constructor for mapping some shape of xMin, xMax and c to a matching shaped triangular.
     
@@ -510,7 +495,7 @@ def Triangular(x_min, x_max, c) -> Vertex:
     return Vertex(context.jvm_view().TriangularVertex, x_min, x_max, c)
 
 
-def Uniform(x_min, x_max) -> Vertex:
+def Uniform(x_min: vertex_param_types, x_max: vertex_param_types) -> Vertex:
     """
     One to one constructor for mapping some shape of mu and sigma to
     a matching shaped Uniform Vertex
@@ -521,11 +506,11 @@ def Uniform(x_min, x_max) -> Vertex:
     return Vertex(context.jvm_view().UniformVertex, x_min, x_max)
 
 
-def ConstantInteger(constant) -> Vertex:
+def ConstantInteger(constant: tensor_arg_types) -> Vertex:
     return Vertex(context.jvm_view().ConstantIntegerVertex, constant)
 
 
-def IntegerDivision(left, right) -> Vertex:
+def IntegerDivision(left: vertex_param_types, right: vertex_param_types) -> Vertex:
     """
     Divides one vertex by another
     
@@ -535,7 +520,7 @@ def IntegerDivision(left, right) -> Vertex:
     return Vertex(context.jvm_view().IntegerDivisionVertex, left, right)
 
 
-def Poisson(mu) -> Vertex:
+def Poisson(mu: vertex_param_types) -> Vertex:
     """
     One to one constructor for mapping some shape of mu to
     a matching shaped Poisson.
@@ -545,5 +530,5 @@ def Poisson(mu) -> Vertex:
     return Vertex(context.jvm_view().PoissonVertex, mu)
 
 
-def UniformInt(min, max) -> Vertex:
+def UniformInt(min: vertex_param_types, max: vertex_param_types) -> Vertex:
     return Vertex(context.jvm_view().UniformIntVertex, min, max)

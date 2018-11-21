@@ -1,7 +1,7 @@
 from keanu import KeanuRandom
 
 
-def test_default_keanu_random():
+def test_default_keanu_random() -> None:
     keanu_random = KeanuRandom()
     random = keanu_random.next_double()
 
@@ -9,7 +9,7 @@ def test_default_keanu_random():
     assert 0 <= random < 1
 
 
-def test_seeded_keanu_random():
+def test_seeded_keanu_random() -> None:
     keanu_random = KeanuRandom(1)
     random = keanu_random.next_double()
 

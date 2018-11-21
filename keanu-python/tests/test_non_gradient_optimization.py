@@ -6,8 +6,9 @@ from keanu.algorithm import NonGradientOptimizer
 
 
 @pytest.fixture
-def model():
+def model() -> Model:
     KeanuRandom.set_default_random_seed(1)
+
     with Model() as m:
         m.a = Gaussian(0., 50.)
         m.b = Gaussian(0., 50.)
@@ -17,23 +18,25 @@ def model():
     return m
 
 
-def test_non_gradient_op_bayes_net(model):
+def test_non_gradient_op_bayes_net(model: Model) -> None:
     net = BayesNet(model.a.get_connected_graph())
     gradient_optimizer = NonGradientOptimizer(net)
     assert gradient_optimizer.net is net
 
 
-def test_non_gradient_op_vertex(model):
+def test_non_gradient_op_vertex(model: Model) -> None:
     non_gradient_optimizer = NonGradientOptimizer(model.a)
     assert len(list(non_gradient_optimizer.net.get_latent_vertices())) == 2
 
 
 def test_non_gradient_op_throws_with_invalid_net_param():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError) as excinfo:
         NonGradientOptimizer(500)
 
+    assert str(excinfo.value) == "net must be a Vertex or a BayesNet. Was given {}".format(int)
 
-def test_non_gradient_can_set_max_eval_builder_properties(model):
+
+def test_non_gradient_can_set_max_eval_builder_properties(model: Model) -> None:
     non_gradient_optimizer = NonGradientOptimizer(model.a, max_evaluations=5)
 
     with pytest.raises(Py4JJavaError):
@@ -41,7 +44,7 @@ def test_non_gradient_can_set_max_eval_builder_properties(model):
         logProb = non_gradient_optimizer.max_a_posteriori()
 
 
-def test_non_gradient_can_set_bounds_range_builder_properties(model):
+def test_non_gradient_can_set_bounds_range_builder_properties(model: Model) -> None:
     non_gradient_optimizer = NonGradientOptimizer(model.a, bounds_range=0.1)
     logProb = non_gradient_optimizer.max_a_posteriori()
 
@@ -49,7 +52,7 @@ def test_non_gradient_can_set_bounds_range_builder_properties(model):
     assert not (19.9 < sum_ab < 20.1)
 
 
-def test_map_non_gradient(model):
+def test_map_non_gradient(model: Model) -> None:
     non_gradient_optimizer = NonGradientOptimizer(model.a)
     logProb = non_gradient_optimizer.max_a_posteriori()
     assert logProb < 0.
@@ -58,7 +61,7 @@ def test_map_non_gradient(model):
     assert 19.9 < sum_ab < 20.1
 
 
-def test_max_likelihood_non_gradient(model):
+def test_max_likelihood_non_gradient(model: Model) -> None:
     non_gradient_optimizer = NonGradientOptimizer(model.a)
     logProb = non_gradient_optimizer.max_likelihood()
     assert logProb < 0.
