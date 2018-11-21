@@ -1,8 +1,10 @@
 import numpy as np
 import pytest
-from keanu.vertex.base import Vertex
+
 from keanu.context import KeanuContext
 from keanu.vertex import Gaussian, Const
+from keanu.vertex.base import Vertex
+
 
 @pytest.fixture
 def jvm_view():
@@ -16,14 +18,14 @@ def test_can_pass_scalar_to_vertex(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
     sample = gaussian.sample()
 
-    assert isinstance(sample, float)
+    assert type(sample) == float
 
 
 def test_can_pass_ndarray_to_vertex(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, np.array([0.1, 0.4]), np.array([0.4, 0.5]))
     sample = gaussian.sample()
 
-    assert sample.shape == (2, )
+    assert sample.shape == (2,)
 
 
 def test_use_vertex_as_hyperparameter_of_another_vertex(jvm_view):
@@ -70,14 +72,14 @@ def test_vertex_can_observe_scalar(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
     gaussian.observe(4.)
 
-    assert isinstance(gaussian.get_value(), float)
+    assert type(gaussian.get_value()) == float
     assert gaussian.get_value() == 4.
 
 
 def test_vertex_can_observe_ndarray(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
 
-    ndarray = np.array([[1.,2.]])
+    ndarray = np.array([[1., 2.]])
     gaussian.observe(ndarray)
 
     assert type(gaussian.get_value()) == np.ndarray
@@ -92,6 +94,7 @@ def test_int_vertex_value_is_a_numpy_array():
     assert value.dtype == np.int64 or value.dtype == np.int32
     assert (value == ndarray).all()
 
+
 def test_float_vertex_value_is_a_numpy_array():
     ndarray = np.array([[1., 2.], [3., 4.]])
     vertex = Const(ndarray)
@@ -99,6 +102,7 @@ def test_float_vertex_value_is_a_numpy_array():
     assert type(value) == np.ndarray
     assert value.dtype == np.float64
     assert (value == ndarray).all()
+
 
 def test_boolean_vertex_value_is_a_numpy_array():
     ndarray = np.array([[True, True], [False, True]])
@@ -108,12 +112,14 @@ def test_boolean_vertex_value_is_a_numpy_array():
     assert value.dtype == np.bool
     assert (value == ndarray).all()
 
+
 def test_scalar_vertex_value_is_a_numpy_array():
     scalar = 1.
     vertex = Const(scalar)
     value = vertex.get_value()
     assert type(value) == float
     assert value == scalar
+
 
 def test_vertex_sample_is_a_numpy_array():
     mu = np.array([[1., 2.], [3., 4.]])

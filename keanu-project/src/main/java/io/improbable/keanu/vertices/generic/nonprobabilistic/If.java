@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -61,8 +60,7 @@ public class If {
         }
 
         public IfVertex<T> orElse(Vertex<? extends Tensor<T>> els) {
-            long[] shape = TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne(thn.getShape(), els.getShape(), predicate.getShape());
-            return new IfVertex<>(shape, predicate, thn, els);
+            return new IfVertex<>(predicate, thn, els);
         }
     }
 
@@ -78,8 +76,7 @@ public class If {
         }
 
         public BooleanIfVertex orElse(Vertex<? extends BooleanTensor> els) {
-            long[] shape = TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne(thn.getShape(), els.getShape(), predicate.getShape());
-            return new BooleanIfVertex(shape, predicate, thn, els);
+            return new BooleanIfVertex(predicate, thn, els);
         }
     }
 

@@ -1,6 +1,8 @@
 package io.improbable.keanu.tensor;
 
 
+import com.google.common.base.Preconditions;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -90,6 +92,18 @@ public class TensorShapeValidation {
         }
 
         throw new IllegalArgumentException("Shapes must match or be scalar");
+    }
+
+    /**
+     * @param predicate shape of predicate
+     * @param thn       shape of then
+     * @param els       shape of else
+     * @return the result shape of predicate ? thn : els. This will be the shape of the predicate if it is not a length
+     * one shape or the shape of thn/els if the predicate is length one and thn/else are not.
+     */
+    public static long[] checkTernaryConditionShapeIsValid(long[] predicate, long[] thn, long[] els) {
+        Preconditions.checkArgument(Arrays.equals(thn, els), "Then shape must match else shape");
+        return checkHasOneNonLengthOneShapeOrAllLengthOne(predicate, thn, els);
     }
 
     public static void checkShapeIsSquareMatrix(long[] shape) {

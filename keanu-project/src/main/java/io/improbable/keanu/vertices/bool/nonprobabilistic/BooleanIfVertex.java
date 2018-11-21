@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -12,11 +13,10 @@ public class BooleanIfVertex extends BoolVertex implements NonProbabilistic<Bool
     private final Vertex<? extends BooleanTensor> thn;
     private final Vertex<? extends BooleanTensor> els;
 
-    public BooleanIfVertex(long[] shape,
-                           Vertex<? extends BooleanTensor> predicate,
+    public BooleanIfVertex(Vertex<? extends BooleanTensor> predicate,
                            Vertex<? extends BooleanTensor> thn,
                            Vertex<? extends BooleanTensor> els) {
-        super(shape);
+        super(TensorShapeValidation.checkTernaryConditionShapeIsValid(thn.getShape(), els.getShape(), predicate.getShape()));
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
