@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.distributions.discrete.Multinomial;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -24,7 +25,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     public MultinomialVertex(long[] tensorShape, IntegerVertex n, DoubleVertex p) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, n.getShape());
-        long[] pShapeExcludingFirstDimension = ArrayUtils.remove(p.getShape(), 0);
+        long[] pShapeExcludingFirstDimension = TensorShape.removeDimension(0, p.getShape());
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, pShapeExcludingFirstDimension);
 
         this.p = p;

@@ -117,21 +117,9 @@ public class INDArrayShim {
         overDimensions = TensorShape.getAbsoluteDimensions(tensor.rank(), overDimensions);
 
         long[] newShape = ArrayUtils.removeAll(tensor.shape(), overDimensions);
-//        long[] newStride = TensorShape.getRowFirstStride(newShape);
-//
-//        int[] shapeInts = new int[newShape.length];
-//        int[] strideInts = new int[newStride.length];
-//
-//        for (int i = 0; i < newShape.length; i++) {
-//            shapeInts[i] = Ints.checkedCast(newShape[i]);
-//            strideInts[i] = Ints.checkedCast(newStride[i]);
-//        }
-
         INDArray result = tensor.sum(overDimensions);
 
         return result.reshape(newShape);
-
-//        result.setShapeAndStride(shapeInts, strideInts);
     }
 
     public static INDArray slice(INDArray tensor, int dimension, long index) {

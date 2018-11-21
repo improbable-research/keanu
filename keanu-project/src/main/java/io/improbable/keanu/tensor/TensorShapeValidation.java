@@ -81,7 +81,7 @@ public class TensorShapeValidation {
      */
     public static long[] checkHasOneNonLengthOneShapeOrAllLengthOne(long[]... shapes) {
         Set<TensorShape> nonLengthOneShapes = getNonLengthOneShapes(shapes);
-        List<TensorShape> lengthOneShapes = getLengthOneShapes(shapes);
+        List<TensorShape> lengthOneShapes = getLengthOneShapesSortedByRank(shapes);
 
         if (nonLengthOneShapes.isEmpty()) {
             if (!lengthOneShapes.isEmpty()) {
@@ -91,7 +91,7 @@ public class TensorShapeValidation {
             return nonLengthOneShapes.iterator().next().getShape();
         }
 
-        throw new IllegalArgumentException("Shapes must match or be scalar");
+        throw new IllegalArgumentException("Shapes must match or be length one");
     }
 
     /**
@@ -129,7 +129,7 @@ public class TensorShapeValidation {
      * length one shapes. E.g. if given ([1,1], [1,1,1], [2,3]) then ([1,1,1], [1,1])
      * will be returned.
      */
-    private static List<TensorShape> getLengthOneShapes(long[]... shapes) {
+    private static List<TensorShape> getLengthOneShapesSortedByRank(long[]... shapes) {
         return Arrays.stream(shapes)
             .map(TensorShape::new)
             .filter(TensorShape::isLengthOne)

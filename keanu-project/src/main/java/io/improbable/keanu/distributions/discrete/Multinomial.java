@@ -38,7 +38,7 @@ public class Multinomial implements DiscreteDistribution {
      * Generalisation of the Binomial distribution to variables with more than 2 possible values
      */
     private Multinomial(IntegerTensor n, DoubleTensor p) {
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(n.getShape(), ArrayUtils.remove(p.getShape(), 0));
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(n.getShape(), TensorShape.removeDimension(0, p.getShape()));
         Preconditions.checkArgument(
             p.sum(0).elementwiseEquals(DoubleTensor.ones(n.getShape())).allTrue(),
             "Probabilities must sum to one"

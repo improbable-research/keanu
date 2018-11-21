@@ -926,4 +926,40 @@ public class Nd4jDoubleTensorTest {
         assertArrayEquals(new double[]{2}, slice.asFlatDoubleArray(), 1e-10);
     }
 
+    @Test
+    public void canConcatScalars() {
+        DoubleTensor x = DoubleTensor.scalar(2);
+        DoubleTensor y = DoubleTensor.scalar(3);
+
+        DoubleTensor concat = DoubleTensor.concat(x, y);
+        assertEquals(DoubleTensor.create(2, 3), concat);
+    }
+
+    @Test
+    public void canConcatVectors() {
+        DoubleTensor x = DoubleTensor.create(2, 3);
+        DoubleTensor y = DoubleTensor.create(4, 5);
+
+        DoubleTensor concat = DoubleTensor.concat(x, y);
+        assertEquals(DoubleTensor.create(2, 3, 4, 5), concat);
+    }
+
+    @Test
+    public void canConcatMatrices() {
+        DoubleTensor x = DoubleTensor.create(2, 3).reshape(1, 2);
+        DoubleTensor y = DoubleTensor.create(4, 5).reshape(1, 2);
+
+        DoubleTensor concat = DoubleTensor.concat(0, x, y);
+        assertEquals(DoubleTensor.create(2, 3, 4, 5).reshape(2, 2), concat);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsWhenNeedsDimensionSpecifiedForConcat() {
+        DoubleTensor x = DoubleTensor.create(2, 3).reshape(1, 2);
+        DoubleTensor y = DoubleTensor.create(4, 5, 6).reshape(1, 3);
+
+        DoubleTensor concat = DoubleTensor.concat(0, x, y);
+        assertEquals(DoubleTensor.create(2, 3, 4, 5, 6), concat);
+    }
+
 }

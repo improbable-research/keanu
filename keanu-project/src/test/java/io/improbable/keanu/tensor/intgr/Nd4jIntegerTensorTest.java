@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.intgr;
 
 import io.improbable.keanu.tensor.TensorTestHelper;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 import junit.framework.TestCase;
@@ -665,6 +666,42 @@ public class Nd4jIntegerTensorTest {
     public void canSliceRank1ToScalar() {
         IntegerTensor x = IntegerTensor.create(1, 2, 3, 4).reshape(4);
         TensorTestHelper.doesDownRankOnSliceRank1ToScalar(x);
+    }
+
+    @Test
+    public void canConcatScalars() {
+        IntegerTensor x = IntegerTensor.scalar(2);
+        IntegerTensor y = IntegerTensor.scalar(3);
+
+        IntegerTensor concat = IntegerTensor.concat(x, y);
+        assertEquals(IntegerTensor.create(2, 3), concat);
+    }
+
+    @Test
+    public void canConcatVectors() {
+        IntegerTensor x = IntegerTensor.create(2, 3);
+        IntegerTensor y = IntegerTensor.create(4, 5);
+
+        IntegerTensor concat = IntegerTensor.concat(x, y);
+        assertEquals(IntegerTensor.create(2, 3, 4, 5), concat);
+    }
+
+    @Test
+    public void canConcatMatrices() {
+        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
+        IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
+
+        IntegerTensor concat = IntegerTensor.concat(0, x, y);
+        assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(2, 2), concat);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsWhenNeedsDimensionSpecifiedForConcat() {
+        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
+        IntegerTensor y = IntegerTensor.create(4, 5, 6).reshape(1, 3);
+
+        IntegerTensor concat = IntegerTensor.concat(0, x, y);
+        assertEquals(IntegerTensor.create(2, 3, 4, 5, 6), concat);
     }
 
 
