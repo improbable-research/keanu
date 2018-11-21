@@ -68,6 +68,8 @@ public class DotWriter implements NetworkWriter{
      * @param degree degree of connections to be visualised; for instance, if the degree is 1,
      *               only connections between the vertex and its parents and children will be written out to the DOT file.
      * @param saveValues specify whether you want to output values of non-constant scalar vertices
+     *
+     * @throws IOException Any errors that occur during saving to the output stream
      */
     public void save(OutputStream output, Vertex vertex, int degree, boolean saveValues) throws IOException {
 

@@ -3,7 +3,12 @@ package io.improbable.keanu.codegen.python;
 import com.google.common.base.CaseFormat;
 import freemarker.template.Template;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;
+import org.apache.commons.lang3.NotImplementedException;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.MethodParameterNamesScanner;
@@ -49,28 +54,62 @@ class VertexProcessor {
         Map<String, Object> root = new HashMap<>();
         List<Import> imports = new ArrayList<>();
         List<PythonConstructor> pythonConstructors = new ArrayList<>();
-        List<String> exportedMethodsList = new ArrayList<>();
 
         root.put("imports", imports);
         root.put("constructors", pythonConstructors);
         Map<String, DocString> nameToDocStringMap = KeanuProjectDoclet.getDocStringsFromFile();
         StringJoiner exportedMethodsJoiner = new StringJoiner("\", \"", "\"", "\"");
+
         for (Constructor constructor : constructors) {
             String javaClass = constructor.getDeclaringClass().getSimpleName();
             String qualifiedName = constructor.getName();
             DocString docString = nameToDocStringMap.get(qualifiedName);
 
-            String[] pythonParameters = reflections.getConstructorParamNames(constructor).stream().map(
+            String[] parametersWithPythonFormatting = reflections.getConstructorParamNames(constructor).stream().map(
                 parameter -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, parameter)).toArray(String[]::new);
 
+            Class<?>[] parameterTypes = constructor.getParameterTypes();
+
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
-            PythonConstructor pythonConstructor = new PythonConstructor(javaClass, toPythonClass(javaClass), String.join(", ", pythonParameters), docString.getAsString());
+
+            PythonConstructor pythonConstructor = new PythonConstructor(
+                javaClass,
+                toPythonClass(javaClass),
+                toTypedPythonParams(parametersWithPythonFormatting, parameterTypes),
+                String.join(", ", parametersWithPythonFormatting),
+                docString.getAsString()
+            );
+
             pythonConstructors.add(pythonConstructor);
             exportedMethodsJoiner.add(pythonConstructor.pythonClass);
         }
         root.put("exportedMethods", exportedMethodsJoiner.toString());
 
         return root;
+    }
+
+    private static String toTypedPythonParams(String[] pythonParameters, Class<?>[] parameterTypes) {
+        String[] pythonParams = new String[pythonParameters.length];
+
+        for (int i = 0; i < pythonParameters.length; i++) {
+            pythonParams[i] = pythonParameters[i] + ": " + toTypedPythonParam(parameterTypes[i]);
+        }
+
+        return String.join(", ", pythonParams);
+    }
+
+    private static String toTypedPythonParam(Class<?> parameterType) {
+        if (Vertex.class.isAssignableFrom(parameterType)) {
+            return "vertex_param_types";
+        } else if (DoubleTensor.class.isAssignableFrom(parameterType) ||
+                   IntegerTensor.class.isAssignableFrom(parameterType) ||
+                   BooleanTensor.class.isAssignableFrom(parameterType)) {
+            return "tensor_arg_types";
+        } else if (parameterType.isArray()) {
+            return "shape_types";
+        } else {
+            throw new NotImplementedException(String.format("Mapping from Java type %s is not defined.", parameterType.getName()));
+        }
     }
 
     private static List<Constructor> getSortedListOfAnnotatedVertexConstructors(Reflections reflections) {
@@ -99,13 +138,16 @@ class VertexProcessor {
         @Getter
         private String pythonClass;
         @Getter
+        private String pythonTypedParameters;
+        @Getter
         private String pythonParameters;
         @Getter
         private String docString;
 
-        PythonConstructor(String javaClass, String pythonClass, String pythonParameters, String docString) {
+        PythonConstructor(String javaClass, String pythonClass, String pythonTypedParameters, String pythonParameters, String docString) {
             this.javaClass = javaClass;
             this.pythonClass = pythonClass;
+            this.pythonTypedParameters = pythonTypedParameters;
             this.pythonParameters = pythonParameters;
             this.docString = docString;
         }

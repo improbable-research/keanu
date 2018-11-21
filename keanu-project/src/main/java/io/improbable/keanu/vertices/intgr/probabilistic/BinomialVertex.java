@@ -4,7 +4,9 @@ import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -21,6 +23,8 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
 
     private final DoubleVertex p;
     private final IntegerVertex n;
+    private final static String P_NAME = "p";
+    private final static String N_NAME = "n";
 
     public BinomialVertex(long[] tensorShape, DoubleVertex p, IntegerVertex n) {
         super(tensorShape);
@@ -43,7 +47,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
         this(tensorShape, ConstantVertex.of(p), ConstantVertex.of(n));
     }
 
-    public BinomialVertex(DoubleVertex p, IntegerVertex n) {
+    public BinomialVertex(@LoadParentVertex(P_NAME) DoubleVertex p, @LoadParentVertex(N_NAME) IntegerVertex n) {
         this(checkHasSingleNonScalarShapeOrAllScalar(p.getShape(), n.getShape()), p, n);
     }
 
@@ -72,5 +76,15 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     @Override
     public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return Binomial.withParameters(p.getValue(), n.getValue()).sample(shape, random);
+    }
+
+    @SaveParentVertex(P_NAME)
+    public DoubleVertex getP() {
+        return p;
+    }
+
+    @SaveParentVertex(N_NAME)
+    public IntegerVertex getN() {
+        return n;
     }
 }

@@ -1,8 +1,8 @@
 digraph BayesianNetwork {
-<99> -> <100>
-<98> -> <99>
-<97> -> <99>
-<92> -> <100>
+<99> -> <100> [label=right]
+<98> -> <99> [label=right]
+<97> -> <99> [label=left]
+<92> -> <100> [label=left]
 92[label="true"]
 97[label="+"]
 98[label="10.0"]
