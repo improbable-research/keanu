@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerMaxVertex extends IntegerBinaryOpVertex {
@@ -11,7 +12,7 @@ public class IntegerMaxVertex extends IntegerBinaryOpVertex {
      * @param left  one of the vertices to find the maximum of
      * @param right one of the vertices to find the maximum of
      */
-    public IntegerMaxVertex(IntegerVertex left, IntegerVertex right) {
+    public IntegerMaxVertex(@LoadParentVertex(LEFT_NAME) IntegerVertex left, @LoadParentVertex(RIGHT_NAME) IntegerVertex right) {
         super(left, right);
     }
 

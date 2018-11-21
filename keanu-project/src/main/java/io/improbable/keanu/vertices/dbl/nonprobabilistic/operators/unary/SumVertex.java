@@ -1,8 +1,10 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import com.google.common.primitives.Longs;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -17,7 +19,7 @@ import java.util.Map;
 
 import static java.util.Collections.singletonMap;
 
-public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
+public class SumVertex extends DoubleUnaryOpVertex implements Differentiable, NonSaveableVertex {
 
     private final int[] overDimensions;
 
@@ -27,6 +29,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
      * @param inputVertex    the vertex to have its values summed
      * @param overDimensions dimensions to sum over
      */
+    @ExportVertexToPythonBindings
     public SumVertex(DoubleVertex inputVertex, int[] overDimensions) {
         super(getSummationResultShape(inputVertex.getShape(), overDimensions), inputVertex);
         this.overDimensions = overDimensions;
