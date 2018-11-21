@@ -65,7 +65,7 @@ class VertexProcessor {
             String qualifiedName = constructor.getName();
             DocString docString = nameToDocStringMap.get(qualifiedName);
 
-            String[] pythonParameters = reflections.getConstructorParamNames(constructor).stream().map(
+            String[] parametersWithPythonFormatting = reflections.getConstructorParamNames(constructor).stream().map(
                 parameter -> CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, parameter)).toArray(String[]::new);
 
             Class<?>[] parameterTypes = constructor.getParameterTypes();
@@ -75,8 +75,8 @@ class VertexProcessor {
             PythonConstructor pythonConstructor = new PythonConstructor(
                 javaClass,
                 toPythonClass(javaClass),
-                toTypedPythonParams(pythonParameters, parameterTypes),
-                String.join(", ", pythonParameters),
+                toTypedPythonParams(parametersWithPythonFormatting, parameterTypes),
+                String.join(", ", parametersWithPythonFormatting),
                 docString.getAsString()
             );
 
