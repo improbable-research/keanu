@@ -3,13 +3,15 @@ package io.improbable.keanu.network;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveParentVertex;
-import io.improbable.keanu.vertices.SaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,6 +25,7 @@ public class ProtobufWriter implements NetworkWriter {
         this.net = net;
     }
 
+    @Override
     public void save(OutputStream output, boolean saveValues) throws IOException {
         bayesNetBuilder = KeanuSavedBayesNet.BayesianNetwork.newBuilder();
 
@@ -36,8 +39,9 @@ public class ProtobufWriter implements NetworkWriter {
         bayesNetBuilder = null;
     }
 
+    @Override
     public void save(Vertex vertex) {
-        if (!(vertex instanceof SaveableVertex)) {
+        if (vertex instanceof NonSaveableVertex) {
             throw new IllegalArgumentException("Trying to save a vertex that isn't Saveable");
         }
 
@@ -45,7 +49,22 @@ public class ProtobufWriter implements NetworkWriter {
         bayesNetBuilder.addVertices(vertexBuilder.build());
     }
 
+    @Override
     public void save(ConstantDoubleVertex vertex) {
+        KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
+        vertexBuilder.setConstantValue(getValue(vertex).getValue());
+        bayesNetBuilder.addVertices(vertexBuilder.build());
+    }
+
+    @Override
+    public void save(ConstantIntegerVertex vertex) {
+        KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
+        vertexBuilder.setConstantValue(getValue(vertex).getValue());
+        bayesNetBuilder.addVertices(vertexBuilder.build());
+    }
+
+    @Override
+    public void save(ConstantBoolVertex vertex) {
         KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
         vertexBuilder.setConstantValue(getValue(vertex).getValue());
         bayesNetBuilder.addVertices(vertexBuilder.build());
@@ -98,11 +117,13 @@ public class ProtobufWriter implements NetworkWriter {
         return parentBuilder.build();
     }
 
+    @Override
     public void saveValue(Vertex vertex) {
         //TODO - Remove once we have a version for all Vertex data types
         throw new UnsupportedOperationException("This Vertex Doesn't Support Value Save");
     }
 
+    @Override
     public void saveValue(DoubleVertex vertex) {
         if (vertex.hasValue()) {
             KeanuSavedBayesNet.StoredValue storedValue = getValue(vertex);

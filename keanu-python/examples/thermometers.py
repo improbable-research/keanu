@@ -1,6 +1,7 @@
 from keanu import Model
 from keanu.vertex import Uniform, Gaussian
 
+
 def model() -> Model:
 
     with Model() as m:

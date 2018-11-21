@@ -98,7 +98,7 @@ public class If {
 
         public DoubleIfVertex orElse(Vertex<? extends DoubleTensor> els) {
             assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
-            return new DoubleIfVertex(els.getShape(), predicate, thn, els);
+            return new DoubleIfVertex(els.getShape(), predicate, (DoubleVertex)thn, (DoubleVertex)els);
         }
 
         public DoubleIfVertex orElse(double els) {

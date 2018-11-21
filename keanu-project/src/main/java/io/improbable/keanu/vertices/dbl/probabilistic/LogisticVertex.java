@@ -1,9 +1,12 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -24,6 +27,8 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
 
     private final DoubleVertex mu;
     private final DoubleVertex s;
+    private static final String MU_NAME = "mu";
+    private static final String S_NAME = "s";
 
     /**
      * One mu or s or both driving an arbitrarily shaped tensor of Logistic
@@ -43,7 +48,9 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
         setParents(mu, s);
     }
 
-    public LogisticVertex(DoubleVertex mu, DoubleVertex s) {
+    @ExportVertexToPythonBindings
+    public LogisticVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
+                          @LoadParentVertex(S_NAME) DoubleVertex s) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), s.getShape()), mu, s);
     }
 
@@ -57,6 +64,16 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
 
     public LogisticVertex(double mu, double s) {
         this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(s));
+    }
+
+    @SaveParentVertex(MU_NAME)
+    public DoubleVertex getMu() {
+        return mu;
+    }
+
+    @SaveParentVertex(S_NAME)
+    public DoubleVertex getS() {
+        return s;
     }
 
     @Override

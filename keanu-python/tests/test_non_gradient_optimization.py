@@ -4,6 +4,7 @@ from keanu import KeanuRandom, Model, BayesNet
 from keanu.vertex import Gaussian
 from keanu.algorithm import NonGradientOptimizer
 
+
 @pytest.fixture
 def model() -> Model:
     KeanuRandom.set_default_random_seed(1)
@@ -33,6 +34,7 @@ def test_non_gradient_op_throws_with_invalid_net_param():
         NonGradientOptimizer(500)
 
     assert str(excinfo.value) == "net must be a Vertex or a BayesNet. Was given {}".format(int)
+
 
 def test_non_gradient_can_set_max_eval_builder_properties(model: Model) -> None:
     non_gradient_optimizer = NonGradientOptimizer(model.a, max_evaluations=5)

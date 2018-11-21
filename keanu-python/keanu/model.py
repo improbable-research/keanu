@@ -2,7 +2,9 @@ from .net import BayesNet
 from .vertex.base import Vertex
 from typing import Any, Mapping
 
+
 class Model:
+
     def __init__(self, vertices: Mapping[str, Vertex] = {}) -> None:
         self.__dict__["_vertices"] = {}
         self.__dict__["_vertices"].update(vertices)

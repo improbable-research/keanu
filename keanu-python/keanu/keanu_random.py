@@ -9,6 +9,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.vertices.dbl.KeanuRandom")
 
 
 class KeanuRandom(JavaObjectWrapper):
+
     def __init__(self, seed: Optional[int] = None) -> None:
         if seed is None:
             super(KeanuRandom, self).__init__(k.jvm_view().KeanuRandom())
