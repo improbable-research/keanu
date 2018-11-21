@@ -1,6 +1,6 @@
 digraph BayesianNetwork {
-<99> -> <100>
-<92> -> <100>
+<99> -> <100> [label=right]
+<92> -> <100> [label=left]
 92[label="true"]
 100[label="OR"]
 99[label="EqualsVertex"]

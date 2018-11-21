@@ -1,12 +1,12 @@
 digraph BayesianNetwork {
-<96> -> <97>
-<97> -> <98>
+<96> -> <97> [label=right]
+<97> -> <98> [label=left]
 <91> -> <92> [label=sigma]
-<94> -> <95>
-<95> -> <97>
+<94> -> <95> [label=k]
+<95> -> <97> [label=left]
 <90> -> <92> [label=mu]
-<93> -> <95>
-<92> -> <98>
+<93> -> <95> [label=theta]
+<92> -> <98> [label=right]
 97[label="Gamma Multiplied"]
 98[label="+"]
 90[label="0.0"]
