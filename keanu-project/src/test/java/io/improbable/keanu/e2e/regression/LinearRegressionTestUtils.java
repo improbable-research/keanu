@@ -33,8 +33,8 @@ class LinearRegressionTestUtils {
     }
 
     static TestData generateTwoFeatureData() {
-        DoubleVertex x1Generator = new UniformVertex(new long[]{1, N}, 0, 10);
-        DoubleVertex x2Generator = new UniformVertex(new long[]{1, N}, 50, 100);
+        DoubleVertex x1Generator = new UniformVertex(new long[]{N, 1}, 0, 10);
+        DoubleVertex x2Generator = new UniformVertex(new long[]{N, 1}, 50, 100);
         DoubleVertex yGenerator = new GaussianVertex(
             x1Generator.multiply(EXPECTED_W1).plus(x2Generator.multiply(EXPECTED_W2)).plus(EXPECTED_B),
             1.0
@@ -46,7 +46,7 @@ class LinearRegressionTestUtils {
         x2Generator.setAndCascade(x2Data);
         DoubleTensor yData = yGenerator.sample();
 
-        return new TestData(DoubleTensor.create(EXPECTED_W1, EXPECTED_W2), EXPECTED_B, DoubleTensor.concat(0, x1Data, x2Data), yData);
+        return new TestData(DoubleTensor.create(EXPECTED_W1, EXPECTED_W2), EXPECTED_B, DoubleTensor.concat(1, x1Data, x2Data), yData);
     }
 
     static TestData generateThreeFeatureDataWithOneUncorrelatedFeature() {
@@ -83,9 +83,9 @@ class LinearRegressionTestUtils {
         long N = 1000;
         double expectedB = 20;
 
-        DoubleVertex xGenerator = new UniformVertex(new long[]{featureCount, N}, 0, 100);
-        DoubleVertex weightsGenerator = weightVertexFromShape.apply(new long[]{1, featureCount});
-        DoubleVertex yGenerator = new GaussianVertex(new long[]{1, N}, weightsGenerator.matrixMultiply(xGenerator).plus(expectedB), 1.0);
+        DoubleVertex xGenerator = new UniformVertex(new long[]{N, featureCount}, 0, 100);
+        DoubleVertex weightsGenerator = weightVertexFromShape.apply(new long[]{featureCount,1});
+        DoubleVertex yGenerator = new GaussianVertex(new long[]{N, 1}, xGenerator.matrixMultiply(weightsGenerator).plus(expectedB), 1.0);
         DoubleTensor xData = xGenerator.sample();
         DoubleTensor weights = weightsGenerator.sample();
         xGenerator.setValue(xData);
