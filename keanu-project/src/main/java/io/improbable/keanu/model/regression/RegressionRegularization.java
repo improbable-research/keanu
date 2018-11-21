@@ -44,9 +44,6 @@ public enum RegressionRegularization {
         }
     };
 
-    private static final double DEFAULT_MU = 0.0;
-    private static final double DEFAULT_SCALE_PARAMETER = 2.0;
-
     public abstract DoubleVertex getWeightsVertex(long featureCount,  double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter);
     public abstract DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter);
     public abstract <INPUT, OUTPUT> ModelFitter<INPUT, OUTPUT> createFitterForGraph(ModelGraph<INPUT, OUTPUT> graph);
