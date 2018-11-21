@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+
 
 public class Multinomial implements DiscreteDistribution {
 
@@ -36,6 +38,7 @@ public class Multinomial implements DiscreteDistribution {
      * Generalisation of the Binomial distribution to variables with more than 2 possible values
      */
     private Multinomial(IntegerTensor n, DoubleTensor p) {
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(n.getShape(), ArrayUtils.remove(p.getShape(), 0));
         Preconditions.checkArgument(
             p.sum(0).elementwiseEquals(DoubleTensor.ones(n.getShape())).allTrue(),
             "Probabilities must sum to one"
@@ -43,10 +46,10 @@ public class Multinomial implements DiscreteDistribution {
         CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.validate(p);
 
         numCategories = p.getShape()[0];
-        TensorShapeValidation.checkAllShapesMatch(n.getShape(), p.slice(0, 0).getShape());
         this.n = n;
         this.p = p;
     }
+
 
     @Override
     public IntegerTensor sample(long[] shape, KeanuRandom random) {

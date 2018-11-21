@@ -890,8 +890,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor slice(int dimension, long index) {
         INDArray dup = tensor.dup();
-        INDArray slice = dup.slice(index, dimension);
-        return new Nd4jDoubleTensor(slice);
+        return new Nd4jDoubleTensor(INDArrayShim.slice(dup, dimension, index));
     }
 
     /**

@@ -58,9 +58,16 @@ public class MultinomialVertexTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheParametersAreDifferentHighRankShapes() {
+        IntegerTensor n = IntegerTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4);
+        DoubleTensor p = DoubleTensor.linspace(0, 1, 18).reshape(3, 2, 3);
+        Multinomial.withParameters(n, p);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheParametersAreDifferentShapes() {
-        IntegerTensor n = IntegerTensor.create(100, 200).reshape(1, 2);
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4).reshape(4, 1);
+        IntegerTensor n = IntegerTensor.create(1, 2).reshape(1, 2);
+        DoubleTensor p = DoubleTensor.linspace(0, 1, 9).reshape(3, 3);
         Multinomial.withParameters(n, p);
     }
 

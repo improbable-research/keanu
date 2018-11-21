@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.TensorTestHelper;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
@@ -646,6 +647,24 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor differentValue = IntegerTensor.create(1);
         BooleanTensor result = value.elementwiseEquals(differentValue);
         assertThat(result, hasValue(true, false, false));
+    }
+
+    @Test
+    public void canSliceRank3To2() {
+        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4, 1, 2, 3, 4).reshape(2, 2, 2);
+        TensorTestHelper.doesDownRankOnSliceRank3To2(x);
+    }
+
+    @Test
+    public void canSliceRank2To1() {
+        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4).reshape(2, 2);
+        TensorTestHelper.doesDownRankOnSliceRank2To1(x);
+    }
+
+    @Test
+    public void canSliceRank1ToScalar() {
+        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4).reshape(4);
+        TensorTestHelper.doesDownRankOnSliceRank1ToScalar(x);
     }
 
 

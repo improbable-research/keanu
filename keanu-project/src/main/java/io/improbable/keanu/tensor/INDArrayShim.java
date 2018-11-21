@@ -117,20 +117,39 @@ public class INDArrayShim {
         overDimensions = TensorShape.getAbsoluteDimensions(tensor.rank(), overDimensions);
 
         long[] newShape = ArrayUtils.removeAll(tensor.shape(), overDimensions);
-        long[] newStride = TensorShape.getRowFirstStride(newShape);
-
-        int[] shapeInts = new int[newShape.length];
-        int[] strideInts = new int[newStride.length];
-
-        for (int i = 0; i < newShape.length; i++) {
-            shapeInts[i] = Ints.checkedCast(newShape[i]);
-            strideInts[i] = Ints.checkedCast(newStride[i]);
-        }
+//        long[] newStride = TensorShape.getRowFirstStride(newShape);
+//
+//        int[] shapeInts = new int[newShape.length];
+//        int[] strideInts = new int[newStride.length];
+//
+//        for (int i = 0; i < newShape.length; i++) {
+//            shapeInts[i] = Ints.checkedCast(newShape[i]);
+//            strideInts[i] = Ints.checkedCast(newStride[i]);
+//        }
 
         INDArray result = tensor.sum(overDimensions);
 
-        result.setShapeAndStride(shapeInts, strideInts);
+        return result.reshape(newShape);
 
-        return result;
+//        result.setShapeAndStride(shapeInts, strideInts);
+    }
+
+    public static INDArray slice(INDArray tensor, int dimension, long index) {
+        if (tensor.rank() <= 1) {
+            return tensor.getScalar(index);
+        } else {
+
+            INDArray result = tensor.slice(index, dimension);
+            if (tensor.rank() == 2) {
+                long[] newShape = ArrayUtils.removeAll(tensor.shape(), dimension);
+
+                //dup is required before reshaping due to a but in ND4J that doesn't always correctly
+                //duplicate true vectors.
+                return result.dup().reshape(newShape);
+            } else {
+                return result;
+            }
+        }
+
     }
 }

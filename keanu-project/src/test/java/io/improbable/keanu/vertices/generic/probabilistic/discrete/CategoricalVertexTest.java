@@ -81,7 +81,7 @@ public class CategoricalVertexTest {
         long[] proposalShape = new long[]{3, 5, 6};
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Proposed shape " + Arrays.toString(proposalShape) + " does not match other non scalar shapes");
+        thrown.expectMessage("Proposed shape " + Arrays.toString(proposalShape) + " does not match other non length one shapes");
 
         new CategoricalVertex<>(proposalShape, selectableValues);
     }
@@ -97,7 +97,7 @@ public class CategoricalVertexTest {
         long[] proposalShape = new long[]{3, 5, 6};
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("More than a single non-scalar shape");
+        thrown.expectMessage("More than a single non length one shape");
 
         new CategoricalVertex<>(proposalShape, selectableValues);
     }

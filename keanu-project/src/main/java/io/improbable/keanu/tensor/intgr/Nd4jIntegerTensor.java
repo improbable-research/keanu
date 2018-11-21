@@ -626,8 +626,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     @Override
     public IntegerTensor slice(int dimension, long index) {
         INDArray dup = tensor.dup();
-        INDArray slice = dup.slice(index, dimension);
-        return new Nd4jIntegerTensor(slice);
+        return new Nd4jIntegerTensor(INDArrayShim.slice(dup, dimension, index));
     }
 
     @Override

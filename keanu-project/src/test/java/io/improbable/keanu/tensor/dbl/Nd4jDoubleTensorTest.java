@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorTestHelper;
 import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -879,6 +880,50 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor expected = DoubleTensor.scalar(10);
         assertThat(summation, equalTo(expected));
         assertThat(summation.getShape(), equalTo(expected.getShape()));
+    }
+
+    @Test
+    public void canDuplicateRank1() {
+        DoubleTensor x = DoubleTensor.create(1, 2);
+        assertEquals(x, x.duplicate());
+    }
+
+    @Test
+    public void canDuplicateRank0() {
+        DoubleTensor x = DoubleTensor.scalar(1.0);
+        assertEquals(x, x.duplicate());
+    }
+
+    @Test
+    public void doesDownRankOnSliceRank3To2() {
+        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4, 1, 2, 3, 4).reshape(2, 2, 2);
+        TensorTestHelper.doesDownRankOnSliceRank3To2(x);
+    }
+
+    @Test
+    public void doesDownRankOnSliceRank2To1() {
+        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
+        TensorTestHelper.doesDownRankOnSliceRank2To1(x);
+    }
+
+    @Test
+    public void canSliceRank2() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        DoubleTensor slice = x.slice(1, 0);
+        assertArrayEquals(new double[]{1, 3}, slice.asFlatDoubleArray(), 1e-10);
+    }
+
+    @Test
+    public void doesDownRankOnSliceRank1ToScalar() {
+        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4).reshape(4);
+        TensorTestHelper.doesDownRankOnSliceRank1ToScalar(x);
+    }
+
+    @Test
+    public void canSliceRank1() {
+        DoubleTensor x = DoubleTensor.create(1, 2, 3, 4).reshape(4);
+        DoubleTensor slice = x.slice(0, 1);
+        assertArrayEquals(new double[]{2}, slice.asFlatDoubleArray(), 1e-10);
     }
 
 }
