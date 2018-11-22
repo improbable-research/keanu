@@ -26,9 +26,9 @@ def test_gradient_op_vertex(model: Model) -> None:
     assert len(list(gradient_optimizer.net.get_latent_vertices())) == 1
 
 
-def test_gradient_op_throws_with_invalid_net_param():
+def test_gradient_op_throws_with_invalid_net_param() -> None:
     with pytest.raises(TypeError) as excinfo:
-        GradientOptimizer(500)
+        GradientOptimizer(500)  # type: ignore
 
     assert str(excinfo.value) == "net must be a Vertex or a BayesNet. Was given {}".format(int)
 
