@@ -15,7 +15,6 @@ import java.util.Map;
 
 public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable, NonSaveableVertex {
 
-    @ExportVertexToPythonBindings
     public ReshapeVertex(DoubleVertex inputVertex, long... proposedShape) {
         super(proposedShape, inputVertex);
     }

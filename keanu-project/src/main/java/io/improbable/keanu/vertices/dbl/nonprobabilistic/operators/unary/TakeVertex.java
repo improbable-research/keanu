@@ -26,7 +26,6 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable, N
      * @param inputVertex the input vertex to extract from
      * @param index       the index to extract at
      */
-    @ExportVertexToPythonBindings
     public TakeVertex(DoubleVertex inputVertex, long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         this.index = index;
