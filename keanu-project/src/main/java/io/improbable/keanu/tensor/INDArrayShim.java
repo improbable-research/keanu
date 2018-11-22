@@ -131,7 +131,7 @@ public class INDArrayShim {
             if (tensor.rank() == 2) {
                 long[] newShape = ArrayUtils.removeAll(tensor.shape(), dimension);
 
-                //dup is required before reshaping due to a but in ND4J that doesn't always correctly
+                //dup is required before reshaping due to a bug in ND4J that doesn't always correctly
                 //duplicate true vectors.
                 return result.dup().reshape(newShape);
             } else {

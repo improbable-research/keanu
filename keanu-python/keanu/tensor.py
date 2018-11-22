@@ -38,7 +38,7 @@ class Tensor(JavaObjectWrapper):
 
     @staticmethod
     def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> Any:
-        if isinstance(ndarray, runtime_numpy_types) and len(ndarray) == 0:
+        if len(ndarray) == 0:
             raise ValueError("Cannot infer type because the ndarray is empty")
 
         if isinstance(ndarray.item(0), runtime_bool_types):
