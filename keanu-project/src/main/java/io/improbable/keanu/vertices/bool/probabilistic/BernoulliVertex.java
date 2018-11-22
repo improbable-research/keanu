@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -45,6 +46,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
      *
      * @param probTrue probTrue with same shape as desired Bernoulli tensor or scalar
      */
+    @ExportVertexToPythonBindings
     public BernoulliVertex(@LoadParentVertex(PROBTRUE_NAME) Vertex<DoubleTensor> probTrue) {
         this(probTrue.getShape(), probTrue);
     }
