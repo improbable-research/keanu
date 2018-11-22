@@ -3,7 +3,6 @@ package io.improbable.keanu.util.dot;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex;
@@ -45,7 +44,8 @@ public class DotWriterTest {
     @BeforeClass
     public static void setUpComplexNet() {
         VertexId.ID_GENERATOR.set(0);
-        complexResultVertex = (new ConstantBoolVertex(true))
+        complexResultVertex = ((new GammaVertex(0, 1))
+            .lessThan(new ConstantIntegerVertex(-1)))
             .or((new GaussianVertex(0, 1))
             .plus(new ConstantDoubleVertex(5))
             .equalTo(new ConstantDoubleVertex(10)));
