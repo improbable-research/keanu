@@ -44,6 +44,7 @@ public class DotWriterTest {
 
     @BeforeClass
     public static void setUpComplexNet() {
+        VertexId.ID_GENERATOR.set(0);
         complexResultVertex = (new ConstantBoolVertex(true))
             .or((new GaussianVertex(0, 1))
             .plus(new ConstantDoubleVertex(5))
