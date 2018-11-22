@@ -98,26 +98,35 @@ task preparePythonEnvironment {
     dependsOn(":codegen:runCodeGeneration")
 }
 
+def keanuVertexGeneratedPath
+def keanuVertexInitPath
+
+task populateExclusionPaths {
+    def keanuVertexPath = Paths.get("keanu", "vertex")
+    if(isFamily(FAMILY_WINDOWS)) {
+        keanuVertexPath = Paths.get(".").resolve(keanuVertexPath)
+    }
+    keanuVertexGeneratedPath = keanuVertexPath.resolve("generated.py")
+    keanuVertexInitPath = keanuVertexPath.resolve("__init__.py")
+}
+
 task formatApply {
-    dependsOn("preparePythonEnvironment")
+    dependsOn preparePythonEnvironment
+    dependsOn populateExclusionPaths
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel', '.'
+            commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel',
+            '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
         }
     }
 }
 
+
 task formatCheck {
-    dependsOn("preparePythonEnvironment")
+    dependsOn preparePythonEnvironment
+    dependsOn populateExclusionPaths
     doLast { 
         exec {
-            // Exclude files that are generated
-            def keanuVertexPath = Paths.get("keanu", "vertex")
-            if(isFamily(FAMILY_WINDOWS)) {
-                keanuVertexPath = Paths.get(".").resolve(keanuVertexPath)
-            }
-            def keanuVertexGeneratedPath = keanuVertexPath.resolve("generated.py")
-            def keanuVertexInitPath = keanuVertexPath.resolve("__init__.py")
             commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel',
             '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
         }
