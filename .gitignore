@@ -5,7 +5,6 @@ nbproject
 *.DS_Store
 *.iml
 build
-/out
+out/
 **/*.gpg
 /docs/python/.buildinfo
-/codegen/out/
