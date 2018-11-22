@@ -17,11 +17,11 @@ public class VertexDotLabel {
     public VertexDotLabel(Vertex vertex) {
         this.vertex = vertex;
         if (vertex.getLabel() != null) {
-            this.vertexLabel = vertex.getLabel().getUnqualifiedName();
+            vertexLabel = vertex.getLabel().getUnqualifiedName();
         }
         DisplayInformationForOutput vertexAnnotation = vertex.getClass().getAnnotation(DisplayInformationForOutput.class);
         if (vertexAnnotation != null && !vertexAnnotation.displayName().isEmpty()) {
-            this.annotation = vertexAnnotation.displayName();
+            annotation = vertexAnnotation.displayName();
         }
     }
 

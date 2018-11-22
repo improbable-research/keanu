@@ -13,7 +13,7 @@ public class GraphEdge {
 
     private final Vertex parentVertex;
     private final Vertex childVertex;
-    private final Set<String> labels = new HashSet<>();
+    private Set<String> labels = new HashSet<>();
 
     public GraphEdge(Vertex v1, Vertex v2) {
         if (v1.getId().compareTo(v2.getId()) < 0) {
