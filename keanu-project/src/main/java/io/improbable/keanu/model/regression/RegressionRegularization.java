@@ -24,7 +24,7 @@ public enum RegressionRegularization {
     },
     LASSO {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new LaplaceVertex(new long[]{featureCount, 1}, ConstantVertex.of(DoubleTensor.createColumnVector(priorOnWeightsMeans)), ConstantVertex.of(DoubleTensor.createColumnVector(priorOnInterceptScaleParameter)));
+            return new LaplaceVertex(new long[]{featureCount, 1}, ConstantVertex.of(createColumnVector(priorOnWeightsMeans)), ConstantVertex.of(createColumnVector(priorOnInterceptScaleParameter)));
         }
         public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
             return new LaplaceVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
@@ -35,7 +35,7 @@ public enum RegressionRegularization {
     },
     RIDGE {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new GaussianVertex(new long[]{featureCount, 1}, ConstantVertex.of(DoubleTensor.createColumnVector(priorOnWeightsMeans)), ConstantVertex.of(DoubleTensor.createColumnVector(priorOnInterceptScaleParameter)));
+            return new GaussianVertex(new long[]{featureCount, 1}, ConstantVertex.of(createColumnVector(priorOnWeightsMeans)), ConstantVertex.of(createColumnVector(priorOnInterceptScaleParameter)));
         }
         public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
             return new GaussianVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
@@ -44,6 +44,8 @@ public enum RegressionRegularization {
             return new MAPModelFitter<>(graph);
         }
     };
+
+    static DoubleTensor createColumnVector(double... values) {return DoubleTensor.create(values, values.length, 1); }
 
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SCALE_PARAMETER = 2.0;
