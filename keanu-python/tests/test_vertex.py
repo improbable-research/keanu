@@ -15,22 +15,25 @@ def jvm_view():
     return jvm_view
 
 
-def assert_vertex_value_equals_scalar(vertex, vertex_type, scalar):
+def assert_vertex_value_equals_scalar(vertex, expected_type, scalar):
     get_value = vertex.get_value()
-    assert get_value == np.array([scalar]).astype(vertex_type)
-    assert get_value.dtype == vertex_type
+    expected_value = np.array([scalar]).astype(expected_type)
+    assert get_value == expected_value
+    assert get_value.dtype == expected_type
 
 
-def assert_vertex_value_equals_ndarray(vertex, vertex_type, ndarray):
+def assert_vertex_value_equals_ndarray(vertex, expected_type, ndarray):
     get_value = vertex.get_value()
-    assert np.array_equal(get_value, ndarray.astype(vertex_type))
-    assert get_value.dtype == vertex_type
+    expected_value = ndarray.astype(expected_type)
+    assert np.array_equal(get_value, expected_value)
+    assert get_value.dtype == expected_type
 
 
-def assert_vertex_value_equals_pandas(vertex, vertex_type, pandas):
+def assert_vertex_value_equals_pandas(vertex, expected_type, pandas):
     get_value = vertex.get_value()
-    assert (get_value.flatten() == pandas.values.astype(vertex_type)).all()
-    assert get_value.dtype == vertex_type
+    expected_value = pandas.values.astype(expected_type).reshape(get_value.shape)
+    assert np.array_equal(get_value, expected_value)
+    assert get_value.dtype == expected_type
 
 
 def test_can_pass_scalar_to_vertex(jvm_view):
@@ -238,10 +241,12 @@ def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex
 
     two_values_are_equal = equal_vertex.get_value()
     assert two_values_are_equal.dtype == np.bool_
+    assert two_values_are_equal.shape == vertex1.get_value().shape == vertex2.get_value().shape
     assert np.all(two_values_are_equal)
 
     two_values_are_not_equal = not_equal_vertex.get_value()
     assert two_values_are_not_equal.dtype == np.bool_
+    assert two_values_are_not_equal.shape == vertex1.get_value().shape == vertex2.get_value().shape
     assert np.all(np.invert(two_values_are_not_equal))
 
 
