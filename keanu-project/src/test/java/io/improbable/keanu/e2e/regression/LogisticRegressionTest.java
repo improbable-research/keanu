@@ -50,6 +50,7 @@ public class LogisticRegressionTest {
         RegressionModel<BooleanTensor> model = RegressionModel.withTrainingData(xTrain, yTrain)
             .build();
 
+        model.fit();
         double accuracy = ModelScoring.accuracy(model.predict(xTest), yTest);
         Assert.assertTrue(accuracy > 0.75);
         assertWeightsAreCalculated(model.getWeights());

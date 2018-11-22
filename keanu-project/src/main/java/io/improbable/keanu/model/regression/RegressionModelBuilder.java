@@ -45,8 +45,8 @@ public class RegressionModelBuilder<OUTPUT> {
      * @return this
      */
     public RegressionModelBuilder withPriorOnWeights(DoubleVertex means, DoubleVertex scaleParameters) {
-        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(means.getValue().asFlatDoubleArray(), getFeatureCount());
-        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(scaleParameters.getValue().asFlatDoubleArray(), getFeatureCount());
+        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(means.getShape(), getFeatureCount());
+        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(scaleParameters.getShape(), getFeatureCount());
 
         this.priorOnWeightsMeans = means;
         this.priorOnWeightsScaleParameters = scaleParameters;
