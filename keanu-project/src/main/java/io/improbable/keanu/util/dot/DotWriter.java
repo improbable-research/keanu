@@ -27,8 +27,10 @@ import java.util.Set;
  * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
  *
  * Usage:
- * To output network to a DOT file: DotWriter.outputDot(fileName, network)
- * To output vertex and its connections up to degree n: DotWriter.outputDot(fileName, vertex, n)
+ * Create dotwriter: DotWriter writer = new DotWriter(yourBayesianNetwork);
+ * To output network to a DOT file: writer.save(outputStream, saveValues);
+ * To output vertex and its connections up to degree n: writer.save(outputStream, vertex, degree, saveValues);
+ * where saveValues specifies whether you want to output values for vertices for ehich they;ve been set.
  */
 public class DotWriter implements NetworkWriter{
 
@@ -51,6 +53,8 @@ public class DotWriter implements NetworkWriter{
      *
      * @param output output stream to use for writing
      * @param saveValues specify whether you want to output values of non-constant scalar vertices
+     *
+     * @throws IOException Any errors that occur during saving to the output stream
      */
     @Override
     public void save(OutputStream output, boolean saveValues) throws IOException {
