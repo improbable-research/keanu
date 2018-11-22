@@ -1,5 +1,6 @@
 package io.improbable.keanu.util.dot;
 
+import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 
@@ -15,18 +16,17 @@ public class VertexDotLabel {
 
     public VertexDotLabel(Vertex vertex) {
         this.vertex = vertex;
+        if (vertex.getLabel() != null) {
+            this.vertexLabel = vertex.getLabel().getUnqualifiedName();
+        }
+        DisplayInformationForOutput vertexAnnotation = vertex.getClass().getAnnotation(DisplayInformationForOutput.class);
+        if (vertexAnnotation != null && !vertexAnnotation.displayName().isEmpty()) {
+            this.annotation = vertexAnnotation.displayName();
+        }
     }
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    public void setAnnotation(String annotation) {
-        this.annotation = annotation;
-    }
-
-    public void setVertexLabel(String vertexLabel) {
-        this.vertexLabel = vertexLabel;
     }
 
     public String inDotFormat() {
@@ -41,7 +41,7 @@ public class VertexDotLabel {
         return vertex.getId().hashCode() + DOT_LABEL_OPENING + getDescriptiveInfo() + DOT_LABEL_CLOSING;
     }
 
-    public String getDescriptiveInfo() {
+    private String getDescriptiveInfo() {
         if (!vertexLabel.isEmpty()) {
             return vertexLabel;
         }

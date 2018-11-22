@@ -1,7 +1,6 @@
 package io.improbable.keanu.util.dot;
 
 import com.google.common.base.Preconditions;
-import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.Tensor;
@@ -30,7 +29,7 @@ import java.util.Set;
  * Create dotwriter: DotWriter writer = new DotWriter(yourBayesianNetwork);
  * To output network to a DOT file: writer.save(outputStream, saveValues);
  * To output vertex and its connections up to degree n: writer.save(outputStream, vertex, degree, saveValues);
- * where saveValues specifies whether you want to output values for vertices for ehich they;ve been set.
+ * where saveValues specifies whether you want to output values for vertices for which they've been set.
  */
 public class DotWriter implements NetworkWriter{
 
@@ -46,7 +45,6 @@ public class DotWriter implements NetworkWriter{
         bayesianNetwork = network;
     }
 
-    // TODO clean save values everywhere, or would we want it?
     /**
      * Outputs the network to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
@@ -64,11 +62,11 @@ public class DotWriter implements NetworkWriter{
     }
 
     /**
-     * Outputs the given graph to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
+     * Outputs a subgraph around the specified vertex to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
      * @param output output stream to use for writing
-     * @param vertex vertex around which the graph will be visualised
+     * @param vertex vertex around which the subgraph will be centered
      * @param degree degree of connections to be visualised; for instance, if the degree is 1,
      *               only connections between the vertex and its parents and children will be written out to the DOT file.
      * @param saveValues specify whether you want to output values of non-constant scalar vertices
@@ -79,7 +77,6 @@ public class DotWriter implements NetworkWriter{
 
         dotLabels = new HashSet<>();
         graphEdges = new HashSet<>();
-
         Writer outputWriter = new OutputStreamWriter(output);
 
         Set<Vertex> subGraph = bayesianNetwork.getSubgraph(vertex, degree);
@@ -115,7 +112,7 @@ public class DotWriter implements NetworkWriter{
 
     @Override
     public void save(Vertex vertex) {
-        dotLabels.add(getDotLabel(vertex));
+        dotLabels.add(new VertexDotLabel(vertex));
         graphEdges.addAll(getParentEdges(vertex));
     }
 
@@ -129,7 +126,7 @@ public class DotWriter implements NetworkWriter{
         if (vertex.hasValue() && vertex.getValue() instanceof Tensor) {
             setDotLabelWithValue(vertex);
         } else {
-            dotLabels.add(getDotLabel(vertex));
+            dotLabels.add(new VertexDotLabel(vertex));
         }
     }
 
@@ -152,23 +149,11 @@ public class DotWriter implements NetworkWriter{
     }
 
     private void setDotLabelWithValue(Vertex<? extends Tensor> vertex) {
-        VertexDotLabel vertexDotLabel = getDotLabel(vertex);
+        VertexDotLabel vertexDotLabel = new VertexDotLabel(vertex);
         if (vertex.hasValue() && vertex.getValue().isScalar()) {
             vertexDotLabel.setValue("" + vertex.getValue().scalar());
         }
         dotLabels.add(vertexDotLabel);
-    }
-
-    private VertexDotLabel getDotLabel(Vertex vertex) {
-        VertexDotLabel vertexDotLabel = new VertexDotLabel(vertex);
-        if (vertex.getLabel() != null) {
-            vertexDotLabel.setVertexLabel(vertex.getLabel().getUnqualifiedName());
-        }
-        DisplayInformationForOutput vertexAnnotation = vertex.getClass().getAnnotation(DisplayInformationForOutput.class);
-        if (vertexAnnotation != null && !vertexAnnotation.displayName().isEmpty()) {
-            vertexDotLabel.setAnnotation(vertexAnnotation.displayName());
-        }
-        return vertexDotLabel;
     }
 
     private Set<GraphEdge> getParentEdges(Vertex vertex) {
