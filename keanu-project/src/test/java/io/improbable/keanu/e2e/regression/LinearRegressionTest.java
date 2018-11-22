@@ -49,6 +49,7 @@ public class LinearRegressionTest {
 
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .build();
+        linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
             linearRegressionModel.getWeights(),
@@ -88,6 +89,7 @@ public class LinearRegressionTest {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .build();
+        linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
             linearRegressionModel.getWeights(),
@@ -124,6 +126,7 @@ public class LinearRegressionTest {
 
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .build();
+        linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
             linearRegressionModel.getWeights(),

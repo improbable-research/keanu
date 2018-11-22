@@ -6,15 +6,16 @@ import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.model.ModelGraph;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 
 public enum RegressionRegularization {
     NONE {
-        public DoubleVertex getWeightsVertex(long featureCount,  double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new GaussianVertex(new long[]{1, featureCount}, ConstantVertex.of(DEFAULT_MU), ConstantVertex.of(DEFAULT_SCALE_PARAMETER));
+        public DoubleVertex getWeightsVertex(long featureCount,  DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnInterceptScaleParameter) {
+            return new GaussianVertex(new long[]{1, featureCount}, DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
         }
-        public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
+        public DoubleVertex getInterceptVertex(DoubleVertex priorOnInterceptMean, DoubleVertex priorOnInterceptScaleParameter) {
             return new GaussianVertex(DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
         }
         public <INPUT, OUTPUT> ModelFitter<INPUT, OUTPUT> createFitterForGraph(ModelGraph<INPUT, OUTPUT> graph) {
@@ -22,10 +23,10 @@ public enum RegressionRegularization {
         }
     },
     LASSO {
-        public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new LaplaceVertex(new long[]{1, featureCount}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnInterceptScaleParameter));
+        public DoubleVertex getWeightsVertex(long featureCount, DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnInterceptScaleParameter) {
+            return new LaplaceVertex(new long[]{1, featureCount}, priorOnWeightsMeans, priorOnInterceptScaleParameter);
         }
-        public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
+        public DoubleVertex getInterceptVertex(DoubleVertex priorOnInterceptMean, DoubleVertex priorOnInterceptScaleParameter) {
             return new LaplaceVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
         }
         public <INPUT, OUTPUT> ModelFitter<INPUT, OUTPUT> createFitterForGraph(ModelGraph<INPUT, OUTPUT> graph) {
@@ -33,10 +34,10 @@ public enum RegressionRegularization {
         }
     },
     RIDGE {
-        public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new GaussianVertex(new long[]{1, featureCount}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnInterceptScaleParameter));
+        public DoubleVertex getWeightsVertex(long featureCount, DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnInterceptScaleParameter) {
+            return new GaussianVertex(new long[]{1, featureCount}, priorOnWeightsMeans, priorOnInterceptScaleParameter);
         }
-        public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
+        public DoubleVertex getInterceptVertex(DoubleVertex priorOnInterceptMean, DoubleVertex priorOnInterceptScaleParameter) {
             return new GaussianVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
         }
         public <INPUT, OUTPUT> ModelFitter<INPUT, OUTPUT> createFitterForGraph(ModelGraph<INPUT, OUTPUT> graph) {
@@ -44,10 +45,10 @@ public enum RegressionRegularization {
         }
     };
 
-    private static final double DEFAULT_MU = 0.0;
-    private static final double DEFAULT_SCALE_PARAMETER = 2.0;
+    private static final ConstantDoubleVertex DEFAULT_MU = ConstantVertex.of(0.0);
+    private static final ConstantDoubleVertex DEFAULT_SCALE_PARAMETER = ConstantVertex.of(2.0);
 
-    public abstract DoubleVertex getWeightsVertex(long featureCount,  double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter);
-    public abstract DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter);
+    public abstract DoubleVertex getWeightsVertex(long featureCount, DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnInterceptScaleParameter);
+    public abstract DoubleVertex getInterceptVertex(DoubleVertex priorOnInterceptMean, DoubleVertex priorOnInterceptScaleParameter);
     public abstract <INPUT, OUTPUT> ModelFitter<INPUT, OUTPUT> createFitterForGraph(ModelGraph<INPUT, OUTPUT> graph);
 }

@@ -1,6 +1,7 @@
 package io.improbable.keanu.model.regression;
 
 import io.improbable.keanu.model.Model;
+import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -22,11 +23,17 @@ import java.util.function.Function;
  */
 public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
     private static final double DEFAULT_OBSERVATION_SIGMA = 1.0;
+    private final DoubleTensor inputTrainingData;
+    private final OUTPUT outputTrainingData;
+    private final RegressionRegularization regularization;
 
     private final LinearRegressionGraph<OUTPUT> modelGraph;
 
-    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph) {
+    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph, DoubleTensor inputTrainingData, OUTPUT outputTrainingData, RegressionRegularization regularization) {
         this.modelGraph = modelGraph;
+        this.inputTrainingData = inputTrainingData;
+        this.outputTrainingData = outputTrainingData;
+        this.regularization = regularization;
     }
 
     public static RegressionModelBuilder<DoubleTensor> withTrainingData(DoubleTensor inputTrainingData, DoubleTensor outputTrainingData) {
@@ -63,5 +70,10 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
     @Override
     public OUTPUT predict(DoubleTensor tensor) {
         return modelGraph.predict(tensor);
+    }
+
+    public void fit() {
+        ModelFitter<DoubleTensor, OUTPUT> fitter = this.regularization.createFitterForGraph(this.modelGraph);
+        fitter.fit(inputTrainingData, outputTrainingData);
     }
 }
