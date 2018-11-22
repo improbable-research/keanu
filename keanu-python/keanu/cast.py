@@ -1,6 +1,5 @@
 from .vartypes import (vertex_param_types, tensor_arg_types, runtime_tensor_arg_types, runtime_primitive_types,
                        runtime_numpy_types, runtime_pandas_types)
-from pandas import Series
 
 
 def __cast_to(arg: tensor_arg_types, cast_to_type: type) -> tensor_arg_types:

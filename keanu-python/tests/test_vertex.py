@@ -16,17 +16,17 @@ def jvm_view():
 
 
 def assert_vertex_value_equals_scalar(vertex, expected_type, scalar):
-    get_value = vertex.get_value()
+    vertex_value = vertex.get_value()
     expected_value = np.array([scalar]).astype(expected_type)
-    assert get_value == expected_value
-    assert get_value.dtype == expected_type
+    assert vertex_value == expected_value
+    assert vertex_value.dtype == expected_type
 
 
 def assert_vertex_value_equals_ndarray(vertex, expected_type, ndarray):
-    get_value = vertex.get_value()
+    vertex_value = vertex.get_value()
     expected_value = ndarray.astype(expected_type)
-    assert np.array_equal(get_value, expected_value)
-    assert get_value.dtype == expected_type
+    assert np.array_equal(vertex_value, expected_value)
+    assert vertex_value.dtype == expected_type
 
 
 def assert_vertex_value_equals_pandas(vertex, expected_type, pandas):
