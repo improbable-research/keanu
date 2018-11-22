@@ -4,7 +4,7 @@ from keanu import BayesNet
 from keanu.algorithm import sample
 
 
-def test_coalmining():
+def test_coalmining() -> None:
     coal_mining = CoalMining()
     model = coal_mining.model()
 

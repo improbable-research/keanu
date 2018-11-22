@@ -7,10 +7,10 @@ from keanu import Model
 class CoalMining():
     __fname = "data/coal-mining-disaster-data.csv"
 
-    def __init__(self):
-        self._data = pd.read_csv(CoalMining.__fname, names=["year", "count"]).set_index("year")
+    def __init__(self) -> None:
+        self._data: pd.DataFrame = pd.read_csv(CoalMining.__fname, names=["year", "count"]).set_index("year")
 
-    def model(self):
+    def model(self) -> Model:
         start_year, end_year = (self._data.index.min(), self._data.index.max())
 
         with Model() as m:
@@ -25,5 +25,5 @@ class CoalMining():
 
         return m
 
-    def training_data(self):
+    def training_data(self) -> np.ndarray:
         return self._data.values
