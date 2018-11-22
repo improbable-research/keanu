@@ -1,7 +1,8 @@
 import math
-from keanu.vertex import Const, Gaussian
+from keanu.vertex import Const, Gaussian, Vertex
 from keanu.algorithm import GradientOptimizer
-from examples import LorenzModel
+from examples import LorenzModel, Coordinates
+from typing import Generator, Tuple, List
 
 converged_error = 0.01
 window_size = 8
@@ -13,7 +14,7 @@ rho = 28.
 time_step = 0.01
 
 
-def test_lorenz():
+def test_lorenz() -> None:
     error = math.inf
     window = 0
     prior_mu = (3., 3., 3.)
@@ -46,7 +47,7 @@ def test_lorenz():
     assert error <= converged_error
 
 
-def add_time(current):
+def add_time(current: Tuple[Vertex, Vertex, Vertex]) -> Tuple[Vertex, Vertex, Vertex]:
     rho_v = Const(rho)
     (xt, yt, zt) = current
 
@@ -56,7 +57,7 @@ def add_time(current):
     return (x_tplus1, y_tplus1, z_tplus1)
 
 
-def build_graph(initial):
+def build_graph(initial: Tuple[Vertex, Vertex, Vertex]) -> Generator[Tuple[Vertex, Vertex, Vertex], None, None]:
     (x, y, z) = initial
     yield (x, y, z)
     for _ in range(window_size):
@@ -64,7 +65,11 @@ def build_graph(initial):
         yield (x, y, z)
 
 
-def apply_observations(graph_time_steps, window, observed):
+def apply_observations(
+        graph_time_steps: List[Tuple[Vertex, Vertex, Vertex]], 
+        window: int, 
+        observed: List[Coordinates]
+        ) -> None:
     for (idx, time_slice) in enumerate(graph_time_steps):
         t = window * (window_size - 1) + idx
         xt = time_slice[0]
@@ -72,6 +77,9 @@ def apply_observations(graph_time_steps, window, observed):
         observed_xt.observe(observed[t].x)
 
 
-def get_time_slice_values(time_steps, time):
+def get_time_slice_values(
+        time_steps: List[Tuple[Vertex, Vertex, Vertex]], 
+        time: int
+        ) -> List[float]:
     time_slice = time_steps[time]
     return list(map(lambda v: v.get_value(), time_slice))
