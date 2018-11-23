@@ -22,4 +22,3 @@ def test_you_can_convert_a_numpy_array_to_a_java_array() -> None:
     assert java_list[0] == 1.
     assert java_list[1] == 2.
     assert java_list[2] == 3.
-

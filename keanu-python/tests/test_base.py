@@ -39,7 +39,8 @@ def test_java_object_wrapper_can_call_java_api_with_no_python_impl_if_snake_case
     assert not java_list_wrapper.is_empty()
 
 
-def test_java_object_wrapper_can_call_java_api_with_no_python_impl_if_both_camel_case_and_snake_case(java_list_wrapper) -> None:
+def test_java_object_wrapper_can_call_java_api_with_no_python_impl_if_both_camel_case_and_snake_case(
+        java_list_wrapper) -> None:
     assert java_list_wrapper.get(0) == 1
 
 

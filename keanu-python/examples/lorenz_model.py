@@ -6,12 +6,7 @@ Coordinates = namedtuple('Coordinates', 'x y z')
 
 class LorenzModel:
 
-    def __init__(
-        self, 
-        sigma: float, 
-        beta: float, 
-        rho: float, 
-        time_step: float) -> None:
+    def __init__(self, sigma: float, beta: float, rho: float, time_step: float) -> None:
         self.sigma = sigma
         self.beta = beta
         self.rho = rho

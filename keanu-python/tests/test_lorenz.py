@@ -65,11 +65,8 @@ def build_graph(initial: Tuple[Vertex, Vertex, Vertex]) -> Generator[Tuple[Verte
         yield (x, y, z)
 
 
-def apply_observations(
-        graph_time_steps: List[Tuple[Vertex, Vertex, Vertex]], 
-        window: int, 
-        observed: List[Coordinates]
-        ) -> None:
+def apply_observations(graph_time_steps: List[Tuple[Vertex, Vertex, Vertex]], window: int,
+                       observed: List[Coordinates]) -> None:
     for (idx, time_slice) in enumerate(graph_time_steps):
         t = window * (window_size - 1) + idx
         xt = time_slice[0]
@@ -77,9 +74,6 @@ def apply_observations(
         observed_xt.observe(observed[t].x)
 
 
-def get_time_slice_values(
-        time_steps: List[Tuple[Vertex, Vertex, Vertex]], 
-        time: int
-        ) -> List[float]:
+def get_time_slice_values(time_steps: List[Tuple[Vertex, Vertex, Vertex]], time: int) -> List[float]:
     time_slice = time_steps[time]
     return list(map(lambda v: v.get_value(), time_slice))
