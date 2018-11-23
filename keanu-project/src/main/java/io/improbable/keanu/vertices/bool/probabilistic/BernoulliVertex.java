@@ -11,6 +11,7 @@ import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
@@ -22,7 +23,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 
 public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor> {
 
-    private final Vertex<DoubleTensor> probTrue;
+    private final DoubleVertex probTrue;
     private final static String PROBTRUE_NAME = "probTrue";
 
     /**
@@ -33,7 +34,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
      * @param shape    the desired shape of the vertex
      * @param probTrue the probability the bernoulli returns true
      */
-    public BernoulliVertex(long[] shape, Vertex<DoubleTensor> probTrue) {
+    public BernoulliVertex(long[] shape, DoubleVertex probTrue) {
         super(shape);
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;
@@ -47,7 +48,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
      * @param probTrue probTrue with same shape as desired Bernoulli tensor or scalar
      */
     @ExportVertexToPythonBindings
-    public BernoulliVertex(@LoadParentVertex(PROBTRUE_NAME) Vertex<DoubleTensor> probTrue) {
+    public BernoulliVertex(@LoadParentVertex(PROBTRUE_NAME) DoubleVertex probTrue) {
         this(probTrue.getShape(), probTrue);
     }
 
@@ -60,7 +61,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
     }
 
     @SaveParentVertex(PROBTRUE_NAME)
-    public Vertex<DoubleTensor> getProbTrue() {
+    public DoubleVertex getProbTrue() {
         return probTrue;
     }
 
