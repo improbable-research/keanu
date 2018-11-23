@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.NetworkReader;
+import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 
@@ -259,7 +259,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         netSaver.saveValue(this);
     }
 
-    public void loadValue(NetworkReader reader) {
-       reader.loadValue(this);
+    public void loadValue(NetworkLoader loader) {
+       loader.loadValue(this);
     }
 }

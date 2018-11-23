@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl;
 
 
 import io.improbable.keanu.kotlin.DoubleOperators;
-import io.improbable.keanu.network.NetworkReader;
+import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -328,8 +328,8 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public void loadValue(NetworkReader reader) {
-        reader.loadValue(this);
+    public void loadValue(NetworkLoader loader) {
+        loader.loadValue(this);
     }
 
     public void saveValue(NetworkSaver netSaver) {
