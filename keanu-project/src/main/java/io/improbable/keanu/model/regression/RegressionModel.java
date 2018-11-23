@@ -76,4 +76,9 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
         ModelFitter<DoubleTensor, OUTPUT> fitter = this.regularization.createFitterForGraph(this.modelGraph);
         fitter.fit(inputTrainingData, outputTrainingData);
     }
+
+    public void observe() {
+        ModelFitter<DoubleTensor, OUTPUT> fitter = this.regularization.createFitterForGraph(this.modelGraph);
+        fitter.observe(inputTrainingData, outputTrainingData);
+    }
 }
