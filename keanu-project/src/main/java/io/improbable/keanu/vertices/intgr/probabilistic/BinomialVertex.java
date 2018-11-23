@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -47,6 +48,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
         this(tensorShape, ConstantVertex.of(p), ConstantVertex.of(n));
     }
 
+    @ExportVertexToPythonBindings
     public BinomialVertex(@LoadParentVertex(P_NAME) DoubleVertex p, @LoadParentVertex(N_NAME) IntegerVertex n) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(p.getShape(), n.getShape()), p, n);
     }

@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Multinomial;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -38,6 +39,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
         addParent(n);
     }
 
+    @ExportVertexToPythonBindings
     public MultinomialVertex(@LoadParentVertex(N_NAME) IntegerVertex n, @LoadParentVertex(P_NAME) DoubleVertex p) {
         this(n.getShape(), n, p);
     }

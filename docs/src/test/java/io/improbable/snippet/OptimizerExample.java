@@ -7,8 +7,12 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OptimizerExample {
+
+    private static final Logger log = LoggerFactory.getLogger(OptimizerExample.class);
 
     public static void main(String[] args) {
 
@@ -17,8 +21,8 @@ public class OptimizerExample {
         GaussianVertex secondThermometer = new GaussianVertex(temperature, 5.);
         firstThermometer.observe(25.);
 
-        System.out.println("Gradient Optimizer, temperature: " + runGradientOptimizer(temperature));
-        System.out.println("Non-Gradient Optimizer, temperature: " + runNonGradientOptimizer(temperature));
+        log.info("Gradient Optimizer, temperature: " + runGradientOptimizer(temperature));
+        log.info("Non-Gradient Optimizer, temperature: " + runNonGradientOptimizer(temperature));
 
     }
 

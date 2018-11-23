@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import math
 from keanu.vertex import Const
-from keanu.vertex.base import Vertex
+from keanu.vertex.base import Vertex, Double, Integer, Bool
 
 ### Comparisons
 
@@ -22,7 +22,7 @@ from keanu.vertex.base import Vertex
 # yapf: enable
 def test_can_do_equal_to(lhs, rhs, expected_result):
     result = lhs == rhs
-    assert type(result) == Vertex
+    assert type(result) == Bool
     assert (result.get_value() == expected_result).all()
 
 
@@ -39,7 +39,7 @@ def test_can_do_equal_to(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_not_equal_to(lhs, rhs, expected_result):
     result = lhs != rhs
-    assert type(result) == Vertex
+    assert type(result) == Bool
     assert (result.get_value() == expected_result).all()
 
 
@@ -54,7 +54,7 @@ def test_can_do_not_equal_to(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_greater_than(lhs, rhs, expected_result):
     result = lhs > rhs
-    assert type(result) == Vertex
+    assert type(result) == Bool
     assert (result.get_value() == expected_result).all()
 
 
@@ -69,7 +69,7 @@ def test_can_do_greater_than(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_less_than(lhs, rhs, expected_result):
     result = lhs < rhs
-    assert type(result) == Vertex
+    assert type(result) == Bool
     assert (result.get_value() == expected_result).all()
 
 
@@ -84,7 +84,7 @@ def test_can_do_less_than(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_greater_than_or_equal_to(lhs, rhs, expected_result):
     result = lhs >= rhs
-    assert type(result) == Vertex
+    assert type(result) == Bool
     assert (result.get_value() == expected_result).all()
 
 
@@ -99,7 +99,7 @@ def test_can_do_greater_than_or_equal_to(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_less_than_or_equal_to(lhs, rhs, expected_result):
     result = lhs <= rhs
-    assert type(result) == Vertex
+    assert type(result) == Bool
     assert (result.get_value() == expected_result).all()
 
 
@@ -117,7 +117,7 @@ def test_can_do_less_than_or_equal_to(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_addition(lhs, rhs, expected_result):
     result = lhs + rhs
-    assert type(result) == Vertex
+    assert type(result) == Double
     assert (result.get_value() == expected_result).all()
 
 
@@ -132,7 +132,7 @@ def test_can_do_addition(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_subtraction(lhs, rhs, expected_result):
     result = lhs - rhs
-    assert type(result) == Vertex
+    assert type(result) == Double
     assert (result.get_value() == expected_result).all()
 
 
@@ -147,7 +147,7 @@ def test_can_do_subtraction(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_multiplication(lhs, rhs, expected_result):
     result = lhs * rhs
-    assert type(result) == Vertex
+    assert type(result) == Double
     assert (result.get_value() == expected_result).all()
 
 
@@ -162,7 +162,7 @@ def test_can_do_multiplication(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_division(lhs, rhs, expected_result):
     result = lhs / rhs
-    assert type(result) == Vertex
+    assert type(result) == Double
     assert (result.get_value() == expected_result).all()
 
 
@@ -177,7 +177,7 @@ def test_can_do_division(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_integer_division(lhs, rhs, expected_result):
     result = lhs // rhs
-    assert type(result) == Vertex
+    assert type(result) == Integer
     assert (result.get_value() == expected_result).all()
 
 
@@ -192,7 +192,7 @@ def test_can_do_integer_division(lhs, rhs, expected_result):
 # yapf: enable
 def test_can_do_pow(lhs, rhs, expected_result):
     result = lhs ** rhs
-    assert type(result) == Vertex
+    assert type(result) == Double
     assert (result.get_value() == expected_result).all()
 
 
@@ -214,7 +214,7 @@ def test_can_do_abs():
     expected = np.array([[2., 3.], [5., 7.]])
 
     result = abs(v)
-    assert type(result) == Vertex
+    assert type(result) == Double
     assert (result.get_value() == expected).all()
 
 
@@ -224,7 +224,7 @@ def test_can_do_round():
     expected = np.array([[4., 5., 6., 7.], [-4., -5., -6., -7.]])
 
     result = round(v)
-    assert type(result) == Vertex
+    assert type(result) == Double
     assert (result.get_value() == expected).all()
 
 
@@ -234,7 +234,7 @@ def test_can_do_floor():
     expected = np.array([[4., 4., 5., 6.], [-5., -5., -6., -7.]])
 
     result = math.floor(v)
-    assert type(result) == Vertex
+    assert type(result) == Double
     assert (result.get_value() == expected).all()
 
 
@@ -244,5 +244,5 @@ def test_can_do_ceil():
     expected = np.array([[5., 5., 6., 7.], [-4., -4., -5., -6.]])
 
     result = math.ceil(v)
-    assert type(result) == Vertex
+    assert type(result) == Double
     assert (result.get_value() == expected).all()

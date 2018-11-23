@@ -8,6 +8,7 @@ from .ops import VertexOps
 from typing import List, Any, Tuple, Iterator, Union
 from keanu.vartypes import (tensor_arg_types, vertex_param_types, shape_types, numpy_types, runtime_tensor_arg_types,
                             runtime_primitive_types, runtime_wrapped_java_types)
+from keanu.cast import cast_tensor_arg_to_double, cast_tensor_arg_to_integer, cast_tensor_arg_to_bool
 
 k = KeanuContext()
 
@@ -21,17 +22,20 @@ class Vertex(JavaObjectWrapper, VertexOps):
 
         super(Vertex, self).__init__(val)
 
+    def cast(self, v: tensor_arg_types) -> tensor_arg_types:
+        return v
+
     def __hash__(self) -> int:
         return hash(self.get_id())
 
     def observe(self, v: tensor_arg_types) -> None:
-        self.unwrap().observe(Tensor(v).unwrap())
+        self.unwrap().observe(Tensor(self.cast(v)).unwrap())
 
     def set_value(self, v: tensor_arg_types) -> None:
-        self.unwrap().setValue(Tensor(v).unwrap())
+        self.unwrap().setValue(Tensor(self.cast(v)).unwrap())
 
     def set_and_cascade(self, v: tensor_arg_types) -> None:
-        self.unwrap().setAndCascade(Tensor(v).unwrap())
+        self.unwrap().setAndCascade(Tensor(self.cast(v)).unwrap())
 
     def sample(self) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().sample())
@@ -67,3 +71,21 @@ class Vertex(JavaObjectWrapper, VertexOps):
     @staticmethod
     def _get_python_id(java_vertex: Any) -> Tuple[Any, ...]:
         return tuple(java_vertex.getId().getValue())
+
+
+class Double(Vertex):
+
+    def cast(self, v: tensor_arg_types) -> tensor_arg_types:
+        return cast_tensor_arg_to_double(v)
+
+
+class Integer(Vertex):
+
+    def cast(self, v: tensor_arg_types) -> tensor_arg_types:
+        return cast_tensor_arg_to_integer(v)
+
+
+class Bool(Vertex):
+
+    def cast(self, v: tensor_arg_types) -> tensor_arg_types:
+        return cast_tensor_arg_to_bool(v)

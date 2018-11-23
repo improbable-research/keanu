@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -91,7 +92,11 @@ public class TensorShapeValidation {
             return nonLengthOneShapes.iterator().next().getShape();
         }
 
-        throw new IllegalArgumentException("Shapes must match or be length one");
+        throw new IllegalArgumentException("Shapes must match or be length one but were: " +
+            Arrays.stream(shapes)
+                .map(Arrays::toString)
+                .collect(Collectors.joining(","))
+        );
     }
 
     /**

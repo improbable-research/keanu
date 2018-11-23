@@ -3,18 +3,18 @@ package io.improbable.keanu.vertices;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.improbable.keanu.vertices.TestGraphGenerator.*;
+import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
+import static io.improbable.keanu.vertices.TestGraphGenerator.passThroughVertex;
+import static io.improbable.keanu.vertices.TestGraphGenerator.sumVertex;
 import static org.junit.Assert.assertEquals;
 
+@Slf4j
 public class VertexValuePropagationTest {
-
-    private final Logger log = LoggerFactory.getLogger(VertexValuePropagationTest.class);
 
     @Test
     public void doesNotDoUnnecessaryOperationsOnCascade() {
