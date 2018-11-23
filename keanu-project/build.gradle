@@ -54,6 +54,7 @@ protobuf {
 test {
     systemProperty "io.improbable.keanu.defaultRandom.seed", '1'
     systemProperty "dtype", 'double'
+    systemProperty "io.improbable.keanu.util.ProgressBar.disableProgressBar", 'true'
     useJUnit {
         excludeCategories 'io.improbable.keanu.testcategory.Slow'
     }
