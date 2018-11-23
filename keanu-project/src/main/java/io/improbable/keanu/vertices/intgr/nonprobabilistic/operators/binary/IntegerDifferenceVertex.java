@@ -1,10 +1,12 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
+@DisplayInformationForOutput(displayName = "-")
 public class IntegerDifferenceVertex extends IntegerBinaryOpVertex {
 
     /**
