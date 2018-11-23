@@ -56,6 +56,7 @@ def test_can_pass_pandas_dataframe_to_vertex(jvm_view):
 
     assert sample.shape == (2, 1)
 
+
 def test_can_pass_pandas_series_to_vertex(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, pd.Series(data=[0.1, 0.4]), pd.Series(data=[0.1, 0.4]))
     sample = gaussian.sample()
@@ -79,6 +80,7 @@ def test_can_pass_array_to_vertex(jvm_view):
 
 
 def test_cannot_pass_generic_to_vertex(jvm_view):
+
     class GenericExampleClass:
         pass
 
