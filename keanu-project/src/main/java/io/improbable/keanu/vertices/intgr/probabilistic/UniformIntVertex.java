@@ -5,7 +5,9 @@ import io.improbable.keanu.distributions.discrete.UniformInt;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -21,6 +23,8 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
 
     private IntegerVertex min;
     private IntegerVertex max;
+    private static final String MIN_NAME = "min";
+    private static final String MAX_NAME = "max";
 
     /**
      * @param shape tensor shape of value
@@ -53,7 +57,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
     }
 
     @ExportVertexToPythonBindings
-    public UniformIntVertex(IntegerVertex min, IntegerVertex max) {
+    public UniformIntVertex(@LoadParentVertex(MIN_NAME) IntegerVertex min, @LoadParentVertex(MAX_NAME) IntegerVertex max) {
         this(checkHasSingleNonScalarShapeOrAllScalar(min.getShape(), max.getShape()), min, max);
     }
 
@@ -69,11 +73,13 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
         this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
     }
 
-    public Vertex<IntegerTensor> getMin() {
+    @SaveParentVertex(MIN_NAME)
+    public IntegerVertex getMin() {
         return min;
     }
 
-    public Vertex<IntegerTensor> getMax() {
+    @SaveParentVertex(MAX_NAME)
+    public IntegerVertex getMax() {
         return max;
     }
 

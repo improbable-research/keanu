@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -14,6 +15,8 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
 
     protected final Vertex<A> left;
     protected final Vertex<B> right;
+    protected final static String A_NAME = "left";
+    protected final static String B_NAME = "right";
 
     public BoolBinaryOpVertex(Vertex<A> left, Vertex<B> right) {
         this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
@@ -52,4 +55,14 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
     }
 
     protected abstract BooleanTensor op(A l, B r);
+
+    @SaveParentVertex(A_NAME)
+    public Vertex<A> getA() {
+        return left;
+    }
+
+    @SaveParentVertex(B_NAME)
+    public Vertex<B> getB() {
+        return right;
+    }
 }

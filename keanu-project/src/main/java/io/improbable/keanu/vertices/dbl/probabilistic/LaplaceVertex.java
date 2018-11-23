@@ -1,9 +1,12 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -24,6 +27,8 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
 
     private final DoubleVertex mu;
     private final DoubleVertex beta;
+    private static final String MU_NAME = "mu";
+    private static final String BETA_NAME = "beta";
 
     /**
      * One mu or beta or both that match a proposed tensor shape of Laplace
@@ -62,7 +67,9 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
      * @param mu   the mu of the Laplace with either the same shape as specified for this vertex or a scalar
      * @param beta the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
-    public LaplaceVertex(DoubleVertex mu, DoubleVertex beta) {
+    @ExportVertexToPythonBindings
+    public LaplaceVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
+                         @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), beta.getShape()), mu, beta);
     }
 
@@ -76,6 +83,16 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
 
     public LaplaceVertex(double mu, double beta) {
         this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta));
+    }
+
+    @SaveParentVertex(MU_NAME)
+    public DoubleVertex getMu() {
+        return mu;
+    }
+
+    @SaveParentVertex(BETA_NAME)
+    public DoubleVertex getBeta() {
+        return beta;
     }
 
     @Override

@@ -12,26 +12,30 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Model {
 
+    private static final Logger log = LoggerFactory.getLogger(Model.class);
+
     public static void main(String[] args) {
 
-        System.out.println("Loading data from a csv file");
+        log.info("Loading data from a csv file");
         Data coalMiningDisasterData = Data.load("coal-mining-disaster-data.csv");
 
-        System.out.println("Creating model using loaded data");
+        log.info("Creating model using loaded data");
         Model coalMiningDisastersModel = new Model(coalMiningDisasterData);
 
-        System.out.println("Running model...");
+        log.info("Running model...");
         coalMiningDisastersModel.run();
-        System.out.println("Run complete");
+        log.info("Run complete");
 
         int switchYear = coalMiningDisastersModel.results
             .getIntegerTensorSamples(coalMiningDisastersModel.switchpoint)
             .getScalarMode();
 
-        System.out.println("Switch year found: " + switchYear);
+        log.info("Switch year found: " + switchYear);
     }
 
     ExponentialVertex earlyRate;

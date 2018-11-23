@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -17,7 +19,9 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
      * @param right vertex B
      */
 
-    public MatrixMultiplicationVertex(DoubleVertex left, DoubleVertex right) {
+    @ExportVertexToPythonBindings
+    public MatrixMultiplicationVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
+                                      @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
         super(getResultingShape(left.getShape(), right.getShape()),
             left, right);
     }

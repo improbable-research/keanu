@@ -1,10 +1,11 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class ConstantGenericVertex<T> extends Vertex<T> implements NonProbabilistic<T> {
+public class ConstantGenericVertex<T> extends Vertex<T> implements NonProbabilistic<T>, NonSaveableVertex {
 
     public ConstantGenericVertex(T value) {
         setValue(value);
