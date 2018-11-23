@@ -65,7 +65,7 @@ public class BayesianNetworkGetSubgraphTest {
     }
 
     @Test
-    public void aSubgraphOfDegreeTwoContainsDegreeOneConnections() {
+    public void aSubgraphOfDegreeTwoContainsDegreeOneAndTwoConnections() {
         Set<Vertex> expectedDegree2Subgraph = ImmutableSet.of(v, parent, child, grandChild, grandParent);
         Set<Vertex> degree2SubGraph = network.getSubgraph(v, 2);
         assertThat(degree2SubGraph, containsInAnyOrder(expectedDegree2Subgraph.toArray()));
