@@ -139,7 +139,7 @@ def test_boolean_vertex_value_is_a_numpy_array() -> None:
     vertex = Const(ndarray)
     value = vertex.get_value()
     assert type(value) == np.ndarray
-    assert value.dtype == np.bool
+    assert value.dtype == np.bool_
     assert (value == ndarray).all()
 
 

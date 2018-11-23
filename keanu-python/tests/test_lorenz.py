@@ -1,8 +1,11 @@
 import math
+
+import numpy as np
+
 from keanu.vertex import Const, Gaussian, Vertex
 from keanu.algorithm import GradientOptimizer
 from examples import LorenzModel, Coordinates
-from typing import Generator, Tuple, List
+from typing import Generator, Tuple, List, Union
 
 converged_error = 0.01
 window_size = 8
@@ -17,7 +20,7 @@ time_step = 0.01
 def test_lorenz() -> None:
     error = math.inf
     window = 0
-    prior_mu = (3., 3., 3.)
+    prior_mu: Union[Tuple[float, float, float], Tuple[np.ndarray, np.ndarray, np.ndarray]] = (3., 3., 3.)
 
     model = LorenzModel(sigma, beta, rho, time_step)
     observed = list(model.run_model(window_size * max_windows))
@@ -74,6 +77,6 @@ def apply_observations(graph_time_steps: List[Tuple[Vertex, Vertex, Vertex]], wi
         observed_xt.observe(observed[t].x)
 
 
-def get_time_slice_values(time_steps: List[Tuple[Vertex, Vertex, Vertex]], time: int) -> List[float]:
+def get_time_slice_values(time_steps: List[Tuple[Vertex, Vertex, Vertex]], time: int) -> List[np.ndarray]:
     time_slice = time_steps[time]
     return list(map(lambda v: v.get_value(), time_slice))
