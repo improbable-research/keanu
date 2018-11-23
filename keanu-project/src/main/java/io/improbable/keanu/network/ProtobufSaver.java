@@ -16,12 +16,13 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
-public class ProtobufWriter implements NetworkWriter {
+public class ProtobufSaver implements NetworkSaver {
     private final BayesianNetwork net;
     private KeanuSavedBayesNet.BayesianNetwork.Builder bayesNetBuilder = null;
 
-    public ProtobufWriter(BayesianNetwork net) {
+    public ProtobufSaver(BayesianNetwork net) {
         this.net = net;
     }
 
@@ -119,8 +120,9 @@ public class ProtobufWriter implements NetworkWriter {
 
     @Override
     public void saveValue(Vertex vertex) {
-        //TODO - Remove once we have a version for all Vertex data types
-        throw new UnsupportedOperationException("This Vertex Doesn't Support Value Save");
+        if (vertex.hasValue()) {
+            KeanuSavedBayesNet.StoredValue value = getValue(vertex, vertex.getValue().toString());
+        }
     }
 
     @Override
@@ -145,6 +147,20 @@ public class ProtobufWriter implements NetworkWriter {
             KeanuSavedBayesNet.StoredValue value = getValue(vertex);
             bayesNetBuilder.addDefaultState(value);
         }
+    }
+
+    private KeanuSavedBayesNet.StoredValue getValue(Vertex vertex, String formattedValue) {
+        KeanuSavedBayesNet.GenericTensor savedValue = KeanuSavedBayesNet.GenericTensor.newBuilder()
+            .addAllShape(Arrays.asList(1l, 1l))
+            .addValues(formattedValue)
+            .build();
+
+        KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
+            .setGenericVal(savedValue)
+            .build();
+
+        return getStoredValue(vertex, value);
+
     }
 
     private KeanuSavedBayesNet.StoredValue getValue(DoubleVertex vertex) {

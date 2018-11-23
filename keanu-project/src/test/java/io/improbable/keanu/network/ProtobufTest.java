@@ -63,8 +63,8 @@ public class ProtobufTest {
         BayesianNetwork net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        ProtobufWriter protobufWriter = new ProtobufWriter(net);
-        protobufWriter.save(output, true);
+        ProtobufSaver protobufSaver = new ProtobufSaver(net);
+        protobufSaver.save(output, true);
         assertThat(output.size(), greaterThan(0));
         ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
 
@@ -331,8 +331,8 @@ public class ProtobufTest {
     public void nonSaveableVertexThrowsExceptionOnSave() {
         BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
         BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
-        ProtobufWriter protobufWriter = new ProtobufWriter(net);
-        testVertex.save(protobufWriter);
+        ProtobufSaver protobufSaver = new ProtobufSaver(net);
+        testVertex.save(protobufSaver);
     }
 
     private <A extends AnnotatedElement> List<A> filterAnnotatedObjects(A[] items, Class annotation) {

@@ -2,7 +2,7 @@ package io.improbable.keanu.util.dot;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.network.NetworkWriter;
+import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.SaveParentVertex;
@@ -26,12 +26,12 @@ import java.util.Set;
  * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
  *
  * Usage:
- * Create dotwriter: DotWriter writer = new DotWriter(yourBayesianNetwork);
+ * Create dotSaver: DotSaver writer = new DotSaver(yourBayesianNetwork);
  * To output network to a DOT file: writer.save(outputStream, saveValues);
  * To output vertex and its connections up to degree n: writer.save(outputStream, vertex, degree, saveValues);
  * where saveValues specifies whether you want to output values for vertices for which they've been set.
  */
-public class DotWriter implements NetworkWriter{
+public class DotSaver implements NetworkSaver {
 
     private static final String DOT_HEADER = "digraph BayesianNetwork {\n";
     private static final String DOT_ENDING = "}";
@@ -41,7 +41,7 @@ public class DotWriter implements NetworkWriter{
     private Set<GraphEdge> graphEdges = new HashSet<>();
     private BayesianNetwork bayesianNetwork;
 
-    public DotWriter(BayesianNetwork network) {
+    public DotSaver(BayesianNetwork network) {
         bayesianNetwork = network;
     }
 
