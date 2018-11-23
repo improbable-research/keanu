@@ -17,7 +17,8 @@ k = KeanuContext()
 
 class Vertex(JavaObjectWrapper, VertexOps):
 
-    def __init__(self, val_or_ctor: Union[JavaMember, JavaObject], *args: Union[vertex_param_types, shape_types]) -> None:
+    def __init__(self, val_or_ctor: Union[JavaMember, JavaObject],
+                 *args: Union[vertex_param_types, shape_types]) -> None:
         val: JavaObject
         if args:
             ctor = val_or_ctor
