@@ -16,7 +16,6 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class ProtobufSaver implements NetworkSaver {
     private final BayesianNetwork net;
@@ -122,14 +121,15 @@ public class ProtobufSaver implements NetworkSaver {
     public void saveValue(Vertex vertex) {
         if (vertex.hasValue()) {
             KeanuSavedBayesNet.StoredValue value = getValue(vertex, vertex.getValue().toString());
+            bayesNetBuilder.addDefaultState(value);
         }
     }
 
     @Override
     public void saveValue(DoubleVertex vertex) {
         if (vertex.hasValue()) {
-            KeanuSavedBayesNet.StoredValue storedValue = getValue(vertex);
-            bayesNetBuilder.addDefaultState(storedValue);
+            KeanuSavedBayesNet.StoredValue value = getValue(vertex);
+            bayesNetBuilder.addDefaultState(value);
         }
     }
 
@@ -151,7 +151,7 @@ public class ProtobufSaver implements NetworkSaver {
 
     private KeanuSavedBayesNet.StoredValue getValue(Vertex vertex, String formattedValue) {
         KeanuSavedBayesNet.GenericTensor savedValue = KeanuSavedBayesNet.GenericTensor.newBuilder()
-            .addAllShape(Arrays.asList(1l, 1l))
+            .addAllShape(Longs.asList(vertex.getShape()))
             .addValues(formattedValue)
             .build();
 
