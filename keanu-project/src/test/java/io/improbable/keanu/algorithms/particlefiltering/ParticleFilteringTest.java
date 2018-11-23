@@ -4,19 +4,17 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertTrue;
 
+@Slf4j
 public class ParticleFilteringTest {
 
     @Rule
     public DeterministicRule deterministicRule = new DeterministicRule();
-
-    private final Logger log = LoggerFactory.getLogger(ParticleFilteringTest.class);
 
     @Test
     public void findsCorrectTemp() {
