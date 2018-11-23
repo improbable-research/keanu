@@ -14,8 +14,8 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
 
     protected final Vertex<A> a;
     protected final Vertex<B> b;
-    protected final static String A_NAME = "a";
-    protected final static String B_NAME = "b";
+    protected final static String A_NAME = "left";
+    protected final static String B_NAME = "right";
 
     public BoolBinaryOpVertex(Vertex<A> a, Vertex<B> b) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(a.getShape(), b.getShape()), a, b);
