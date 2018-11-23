@@ -606,9 +606,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof IntegerTensor) {
             if (this.isLengthOne()) {
-                return that.elementwiseEquals(this.scalar());
+                return ((IntegerTensor) that).elementwiseEquals(this.scalar());
             } else if (that.isLengthOne()) {
-                return fromMask(tensor.eq(((IntegerTensor) that).scalar()), getShape());
+                return elementwiseEquals(((IntegerTensor) that).scalar());
             } else {
                 return fromMask(tensor.eq(unsafeGetNd4J((Nd4jIntegerTensor) that)), getShape());
             }

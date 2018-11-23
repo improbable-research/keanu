@@ -1050,9 +1050,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof DoubleTensor) {
             if (isLengthOne()) {
-                return that.elementwiseEquals(this.scalar());
+                return ((DoubleTensor)that).elementwiseEquals(this.scalar());
             } else if (that.isLengthOne()) {
-                return fromMask(tensor.eq(((DoubleTensor) that).scalar()), getShape());
+                return elementwiseEquals(((DoubleTensor) that).scalar());
             } else {
                 return fromMask(tensor.eq(unsafeGetNd4J((Nd4jDoubleTensor) that)), getShape());
             }
