@@ -26,6 +26,7 @@ import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.HalfCauchyVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
@@ -55,18 +56,22 @@ public class RadonHeirarchicalRegression {
 
     @Test
     public void linearRegressionWithOneHeirarchy() {
-        buildSingleHeirarchicalNetwork(radonData);
+        buildNHeirarchicalNetwork(radonData, 1);
     }
 
     @Test
-    public void heirarchicalLinearRegressionRadon() {
-        Map<String, List<Data>> countryRadon = partitionDataOnCounty(radonData, 1);
+    public void linearRegressionWithTwoHeirarchy() {
+        buildNHeirarchicalNetwork(radonData, 2);
+    }
 
-        BayesianNetwork bayesianNetwork = buildHeirarchicalNetwork(countryRadon);
+    @Test
+    public void linearRegressionWithThreeHeirarchy() {
+        buildNHeirarchicalNetwork(radonData, 3);
+    }
 
-//        sample(bayesianNetwork, muAlpha, muBeta);
-//        NUTSSample(bayesianNetwork, muAlpha, muBeta);
-        optimise(bayesianNetwork);
+    @Test
+    public void linearRegressionWithFourHeirarchy() {
+        buildNHeirarchicalNetwork(radonData, 10);
     }
 
     private Map<String, List<Data>> partitionDataOnCounty(List<Data> radonData, int countyCount) {
@@ -97,15 +102,51 @@ public class RadonHeirarchicalRegression {
         return model;
     }
 
-    private RegressionModel buildSingleHeirarchicalNetwork(List<Data> radonData) {
-        GaussianVertex muAlpha = new GaussianVertex(0, 5).setLabel("MuAlpha");
-        GaussianVertex muBeta = new GaussianVertex(0, 5).setLabel("MuBeta");
+    private void buildNHeirarchicalNetwork(List<Data> radonData, int n) {
+        GaussianVertex muAlpha = new GaussianVertex(0, 100).setLabel("MuAlpha");
+        GaussianVertex muBeta = new GaussianVertex(0, 100).setLabel("MuBeta");
 
-        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(100.).setLabel("SigmaAlpha");
+        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(100).setLabel("SigmaAlpha");
         HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(100.).setLabel("SigmaBeta");
 
-        double[] floor = radonData.stream().mapToDouble(k -> k.floor).toArray();
-        double[] radon = radonData.stream().mapToDouble(k -> k.log_radon).toArray();
+        int nPartitions = radonData.size() / n;
+
+        double[] allFloor = radonData.stream().mapToDouble(k -> k.floor).toArray();
+        double[] allRadon = radonData.stream().mapToDouble(k -> k.log_radon).toArray();
+
+        List<RegressionModel> models = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            RegressionModel model = createModel(allFloor, allRadon, i, nPartitions, muBeta, muAlpha, sigmaBeta, sigmaAlpha);
+            models.add(model);
+        }
+
+        muAlpha.setValue(-1);
+        muBeta.setValue(-1);
+
+        sigmaAlpha.setValue(0.3);
+        sigmaBeta.setValue(0.4);
+
+        optimise(new BayesianNetwork(muAlpha.getConnectedGraph()));
+
+        int count = 1;
+        for (RegressionModel model : models) {
+            System.out.println("Model number: " + count);
+            count++;
+            System.out.println("Model weights");
+            System.out.println(model.getWeights());
+            System.out.println("Model intercept");
+            System.out.println(model.getIntercept());
+        }
+    }
+
+    private RegressionModel createModel(double[] allFloor, double[] allRadon, int i, int size, DoubleVertex muBeta, DoubleVertex muAlpha, DoubleVertex sigmaAlpha, DoubleVertex sigmaBeta) {
+        int startIndex = size * i;
+        int endIndex = size * (i + 1);
+
+        double[] floor = Arrays.copyOfRange(allFloor, startIndex, endIndex);
+        double[] radon = Arrays.copyOfRange(allRadon, startIndex, endIndex);
+
         DoubleTensor x = DoubleTensor.create(floor);
         DoubleTensor y = DoubleTensor.create(radon);
         RegressionModel model = RegressionModel.
@@ -116,41 +157,7 @@ public class RadonHeirarchicalRegression {
             build();
         model.observe();
 
-        optimise(new BayesianNetwork(muAlpha.getConnectedGraph()));
-        System.out.println("Model weights");
-        System.out.println(model.getWeights());
-        System.out.println("Model intercept");
-        System.out.println(model.getIntercept());
         return model;
-    }
-
-    private BayesianNetwork buildHeirarchicalNetwork(Map<String, List<Data>> countryRadon) {
-        GaussianVertex muAlpha = new GaussianVertex(0, 100).setLabel("MuAlpha");
-        GaussianVertex muBeta = new GaussianVertex(0, 100).setLabel("MuBeta");
-
-        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(5.).setLabel("SigmaAlpha");
-        HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(5.).setLabel("SigmaBeta");
-
-        for (String county : countryRadon.keySet()) {
-            double[] radon = countryRadon.get(county).stream().mapToDouble(k -> k.log_radon).toArray();
-            double[] floor = countryRadon.get(county).stream().mapToDouble(k -> k.floor).toArray();
-            DoubleTensor x = DoubleTensor.create(floor);
-            DoubleTensor y = DoubleTensor.create(radon);
-            RegressionModel model = RegressionModel.
-                withTrainingData(x, y).
-                withRegularization(RegressionRegularization.RIDGE).
-                withPriorOnWeights(muBeta, sigmaBeta).
-                withPriorOnIntercept(muAlpha, sigmaAlpha).
-                build();
-            model.observe();
-            model.fit();
-        }
-
-        muAlpha.setValue(1.5);
-        muBeta.setValue(-0.7);
-        sigmaAlpha.setValue(2);
-        sigmaBeta.setValue(2);
-        return new BayesianNetwork(muAlpha.getConnectedGraph());
     }
 
     private void optimise(BayesianNetwork bayesianNetwork) {
@@ -159,7 +166,7 @@ public class RadonHeirarchicalRegression {
         Vertex sigmaAlpha = bayesianNetwork.getVertexByLabel(new VertexLabel("SigmaAlpha"));
         Vertex sigmaBeta = bayesianNetwork.getVertexByLabel(new VertexLabel("SigmaBeta"));
 
-        GradientOptimizer optimizer = GradientOptimizer.builder().bayesianNetwork(bayesianNetwork).maxEvaluations(10000).build();
+        GradientOptimizer optimizer = GradientOptimizer.builder().bayesianNetwork(bayesianNetwork).absoluteThreshold(0.1).maxEvaluations(10000).build();
         optimizer.maxAPosteriori();
 
         System.out.println("MuA: " + muAlpha.getValue());
