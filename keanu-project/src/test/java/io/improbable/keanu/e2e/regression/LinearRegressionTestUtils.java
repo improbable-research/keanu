@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import lombok.Value;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Function;
 
@@ -17,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 
 @UtilityClass
+@Slf4j
 class LinearRegressionTestUtils {
     private static int N = 100000;
     private static double EXPECTED_W1 = 3.0;
@@ -117,10 +119,10 @@ class LinearRegressionTestUtils {
         double standardErrorForGradientInSampleData = statisticsCalculator.standardErrorForGradient();
         double standardErrorForInterceptInSampleData = statisticsCalculator.standardErrorForIntercept();
 
-        System.out.println(String.format("Gradient from sampling:     %.4f ~ %.4f", gradient.getAverages().scalar(), gradient.getVariances().sqrt().scalar()));
-        System.out.println(String.format("Gradient from initial data: %.4f ~ %.4f", estimatedGradientInSampleData, standardErrorForGradientInSampleData));
-        System.out.println(String.format("Intercept from sampling:     %.4f ~ %.4f", intercept.getAverages().scalar(), intercept.getVariances().sqrt().scalar()));
-        System.out.println(String.format("Intercept from initial data: %.4f ~ %.4f", estimatedInterceptInSampleData, standardErrorForInterceptInSampleData));
+        log.info(String.format("Gradient from sampling:     %.4f ~ %.4f", gradient.getAverages().scalar(), gradient.getVariances().sqrt().scalar()));
+        log.info(String.format("Gradient from initial data: %.4f ~ %.4f", estimatedGradientInSampleData, standardErrorForGradientInSampleData));
+        log.info(String.format("Intercept from sampling:     %.4f ~ %.4f", intercept.getAverages().scalar(), intercept.getVariances().sqrt().scalar()));
+        log.info(String.format("Intercept from initial data: %.4f ~ %.4f", estimatedInterceptInSampleData, standardErrorForInterceptInSampleData));
 
         assertThat(gradient.getAverages().scalar(), closeTo(estimatedGradientInSampleData, standardErrorForGradientInSampleData));
         assertThat(gradient.getVariances().sqrt().scalar(), closeTo(standardErrorForGradientInSampleData, 0.01));
