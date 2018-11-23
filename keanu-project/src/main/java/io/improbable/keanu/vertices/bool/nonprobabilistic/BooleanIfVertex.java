@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -28,6 +29,7 @@ public class BooleanIfVertex extends BoolVertex implements NonProbabilistic<Bool
         setParents(predicate, thn, els);
     }
 
+    @ExportVertexToPythonBindings
     public BooleanIfVertex(@LoadParentVertex(PRED_NAME) Vertex<? extends BooleanTensor> predicate,
                            @LoadParentVertex(THN_NAME) Vertex<? extends BooleanTensor> thn,
                            @LoadParentVertex(ELS_NAME) Vertex<? extends BooleanTensor> els) {

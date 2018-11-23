@@ -24,14 +24,14 @@ import java.util.Set;
 /**
  * Utility class for outputting a network to a DOT file that can then be used by a range of graph visualisers.
  * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
- *
+ * <p>
  * Usage:
  * Create dotwriter: DotWriter writer = new DotWriter(yourBayesianNetwork);
  * To output network to a DOT file: writer.save(outputStream, saveValues);
  * To output vertex and its connections up to degree n: writer.save(outputStream, vertex, degree, saveValues);
  * where saveValues specifies whether you want to output values for vertices for which they've been set.
  */
-public class DotWriter implements NetworkWriter{
+public class DotWriter implements NetworkWriter {
 
     private static final String DOT_HEADER = "digraph BayesianNetwork {\n";
     private static final String DOT_ENDING = "}";
@@ -49,9 +49,8 @@ public class DotWriter implements NetworkWriter{
      * Outputs the network to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
-     * @param output output stream to use for writing
+     * @param output     output stream to use for writing
      * @param saveValues specify whether you want to output values of non-constant scalar vertices
-     *
      * @throws IOException Any errors that occur during saving to the output stream
      */
     @Override
@@ -65,12 +64,11 @@ public class DotWriter implements NetworkWriter{
      * Outputs a subgraph around the specified vertex to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
-     * @param output output stream to use for writing
-     * @param vertex vertex around which the subgraph will be centered
-     * @param degree degree of connections to be visualised; for instance, if the degree is 1,
-     *               only connections between the vertex and its parents and children will be written out to the DOT file.
+     * @param output     output stream to use for writing
+     * @param vertex     vertex around which the subgraph will be centered
+     * @param degree     degree of connections to be visualised; for instance, if the degree is 1,
+     *                   only connections between the vertex and its parents and children will be written out to the DOT file.
      * @param saveValues specify whether you want to output values of non-constant scalar vertices
-     *
      * @throws IOException Any errors that occur during saving to the output stream
      */
     public void save(OutputStream output, Vertex vertex, int degree, boolean saveValues) throws IOException {
@@ -83,8 +81,7 @@ public class DotWriter implements NetworkWriter{
         for (Vertex v : subGraph) {
             if (saveValues) {
                 v.saveValue(this);
-            }
-            else {
+            } else {
                 v.save(this);
             }
         }
@@ -97,7 +94,7 @@ public class DotWriter implements NetworkWriter{
     }
 
     private static void outputLabels(Collection<VertexDotLabel> dotLabels, Writer outputWriter) throws IOException {
-        for (VertexDotLabel dotLabel: dotLabels) {
+        for (VertexDotLabel dotLabel : dotLabels) {
             outputWriter.write(dotLabel.inDotFormat() + "\n");
         }
     }
@@ -118,7 +115,7 @@ public class DotWriter implements NetworkWriter{
 
     @Override
     public void save(ConstantVertex vertex) {
-        saveValue((Vertex)vertex);
+        saveValue((Vertex) vertex);
     }
 
     @Override
@@ -159,7 +156,7 @@ public class DotWriter implements NetworkWriter{
     private Set<GraphEdge> getParentEdges(Vertex vertex) {
         Set<GraphEdge> edges = new HashSet<>();
         for (Object v : vertex.getParents()) {
-            edges.add(new GraphEdge((Vertex)v, vertex));
+            edges.add(new GraphEdge((Vertex) v, vertex));
         }
 
         // Check if any of the edges represent a connection between the vertex and its hyperparameter and annotate it accordingly.
@@ -171,7 +168,7 @@ public class DotWriter implements NetworkWriter{
             if (annotation != null) {
                 String parentName = annotation.value();
                 try {
-                    Vertex parentVertex = (Vertex)method.invoke(vertex);
+                    Vertex parentVertex = (Vertex) method.invoke(vertex);
                     GraphEdge parentEdge = new GraphEdge(vertex, parentVertex);
                     edges.stream().filter(parentEdge::equals).findFirst().get().appendToLabel(parentName);
                 } catch (Exception e) {

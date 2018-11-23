@@ -29,9 +29,13 @@ public class GraphEdge {
         labels.add(dotLabel);
     }
 
-    public Vertex getParentVertex() { return parentVertex;}
+    public Vertex getParentVertex() {
+        return parentVertex;
+    }
 
-    public Vertex getChildVertex() { return childVertex;}
+    public Vertex getChildVertex() {
+        return childVertex;
+    }
 
     public Set<String> getLabels() {
         return labels;

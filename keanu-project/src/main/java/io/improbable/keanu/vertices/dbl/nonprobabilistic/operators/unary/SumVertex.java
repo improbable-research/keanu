@@ -29,7 +29,6 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable, No
      * @param inputVertex    the vertex to have its values summed
      * @param overDimensions dimensions to sum over
      */
-    @ExportVertexToPythonBindings
     public SumVertex(DoubleVertex inputVertex, int[] overDimensions) {
         super(getSummationResultShape(inputVertex.getShape(), overDimensions), inputVertex);
         this.overDimensions = overDimensions;
@@ -40,6 +39,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable, No
      *
      * @param inputVertex the vertex to have its values summed
      */
+    @ExportVertexToPythonBindings
     public SumVertex(DoubleVertex inputVertex) {
         this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getShape().length));
     }

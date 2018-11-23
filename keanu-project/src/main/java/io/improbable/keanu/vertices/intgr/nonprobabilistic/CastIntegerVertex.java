@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -13,6 +14,7 @@ public class CastIntegerVertex extends IntegerVertex implements NonProbabilistic
     private final Vertex<IntegerTensor> inputVertex;
     private static final String INPUT_NAME = "inputVertex";
 
+    @ExportVertexToPythonBindings
     public CastIntegerVertex(@LoadParentVertex(INPUT_NAME) Vertex<IntegerTensor> inputVertex) {
         super(inputVertex.getShape());
         this.inputVertex = inputVertex;
