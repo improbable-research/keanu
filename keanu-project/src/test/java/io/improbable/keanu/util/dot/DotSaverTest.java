@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
-public class DotWriterTest {
+public class DotSaverTest {
 
     private static Vertex complexResultVertex;
-    private static DotWriter complexNetDotWriter;
+    private static DotSaver complexNetDotSaver;
     private static ByteArrayOutputStream outputWriter;
     private static final String resourcesFolder = "./src/test/resources/dotFiles";
     private static final String GAUSSIAN_OUTPUT_FILENAME = resourcesFolder + "/GaussianNodeOutput.dot";
@@ -50,7 +50,7 @@ public class DotWriterTest {
             .plus(new ConstantDoubleVertex(5))
             .equalTo(new ConstantDoubleVertex(10)));
         BayesianNetwork complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
-        complexNetDotWriter = new DotWriter(complexNet);
+        complexNetDotSaver = new DotSaver(complexNet);
     }
 
     @Before
@@ -64,8 +64,8 @@ public class DotWriterTest {
         GaussianVertex gaussianV = new GaussianVertex(0, 1);
         BayesianNetwork gaussianNet = new BayesianNetwork(gaussianV.getConnectedGraph());
 
-        DotWriter dotWriter = new DotWriter(gaussianNet);
-        dotWriter.save(outputWriter, false);
+        DotSaver dotSaver = new DotSaver(gaussianNet);
+        dotSaver.save(outputWriter, false);
 
         String expectedGaussianNodeOutput = new String(Files.readAllBytes(Paths.get(GAUSSIAN_OUTPUT_FILENAME)), Charset.defaultCharset());
         checkDotFilesMatch(outputWriter.toString(), expectedGaussianNodeOutput);
@@ -73,21 +73,21 @@ public class DotWriterTest {
 
     @Test
     public void outputtingComplexNet() throws IOException {
-        complexNetDotWriter.save(outputWriter, false);
+        complexNetDotSaver.save(outputWriter, false);
         String expectedComplexOutput = new String(Files.readAllBytes(Paths.get(COMPLEX_OUTPUT_FILENAME)), Charset.defaultCharset());
         checkDotFilesMatch(outputWriter.toString(), expectedComplexOutput);
     }
 
     @Test
     public void outputtingVertexDegree1Surroundings() throws IOException {
-        complexNetDotWriter.save(outputWriter, complexResultVertex, 1, false);
+        complexNetDotSaver.save(outputWriter, complexResultVertex, 1, false);
         String expectedVertexDegree1Output = new String(Files.readAllBytes(Paths.get(VERTEX_DEGREE1__OUTPUT_FILENAME)), Charset.defaultCharset());
         checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree1Output);
     }
 
     @Test
     public void outputtingVertexDegree2Surroundings() throws IOException {
-        complexNetDotWriter.save(outputWriter, complexResultVertex, 2, false);
+        complexNetDotSaver.save(outputWriter, complexResultVertex, 2, false);
         String expectedVertexDegree2Output = new String(Files.readAllBytes(Paths.get(VERTEX_DEGREE2__OUTPUT_FILENAME)), Charset.defaultCharset());
         checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree2Output);
     }
@@ -100,25 +100,25 @@ public class DotWriterTest {
         IntegerMultiplicationVertex multiplicationVertex = new IntegerMultiplicationVertex(constantIntVertex, constantIntVertex2);
         BayesianNetwork constantIntNet = new BayesianNetwork(multiplicationVertex.getConnectedGraph());
 
-        DotWriter dotWriter = new DotWriter(constantIntNet);
+        DotSaver dotSaver = new DotSaver(constantIntNet);
         boolean saveValues = false;
 
         // Check that class name and annotation (for multiplication vertex) appear in the output.
-        dotWriter.save(outputWriter, saveValues);
+        dotSaver.save(outputWriter, saveValues);
         String expectedTensorIntNodeOutput = new String(Files.readAllBytes(Paths.get(TENSOR_OUTPUT_FILENAME)), Charset.defaultCharset());
         checkDotFilesMatch(outputWriter.toString(), expectedTensorIntNodeOutput);
 
         // Check that vertex label appears in the output if it's set.
         constantIntVertex.setLabel("SomeLabel");
         outputWriter.reset();
-        dotWriter.save(outputWriter, saveValues);
+        dotSaver.save(outputWriter, saveValues);
         String expectedLabelledIntNodeOutput = new String(Files.readAllBytes(Paths.get(LABELLED_OUTPUT_FILENAME)), Charset.defaultCharset());
         checkDotFilesMatch(outputWriter.toString(), expectedLabelledIntNodeOutput);
 
         // Check that value for constant vertices appears in the output if it's set and a scalar.
         constantIntVertex.setValue(42);
         outputWriter.reset();
-        dotWriter.save(outputWriter, saveValues);
+        dotSaver.save(outputWriter, saveValues);
         String expectedScalarIntNodeOutput = new String(Files.readAllBytes(Paths.get(SCALAR_OUTPUT_FILENAME)), Charset.defaultCharset());
         checkDotFilesMatch(outputWriter.toString(), expectedScalarIntNodeOutput);
     }
@@ -131,8 +131,8 @@ public class DotWriterTest {
         DoubleVertex gammaMultipliedVertex = observedGammaVertex.times(new ConstantDoubleVertex(4));
         Vertex resultVertex = gammaMultipliedVertex.plus(unobservedGaussianVertex);
         gammaMultipliedVertex.setLabel("Gamma Multiplied");
-        DotWriter dotWriter = new DotWriter(new BayesianNetwork(resultVertex.getConnectedGraph()));
-        dotWriter.save(outputWriter, true);
+        DotSaver dotSaver = new DotSaver(new BayesianNetwork(resultVertex.getConnectedGraph()));
+        dotSaver.save(outputWriter, true);
         String expectedOutputWithValues = new String(Files.readAllBytes(Paths.get(OUTPUT_WITH_VALUES_FILENAME)), Charset.defaultCharset());
         checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
     }
