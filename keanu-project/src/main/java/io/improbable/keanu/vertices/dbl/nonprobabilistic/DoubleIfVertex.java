@@ -26,7 +26,6 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     protected static final String THEN_NAME = "then";
     protected static final String ELSE_NAME = "else";
 
-    @ExportVertexToPythonBindings
     public DoubleIfVertex(long[] shape,
                           Vertex<? extends BooleanTensor> predicate,
                           DoubleVertex thn,
@@ -38,6 +37,7 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
         setParents(predicate, thn, els);
     }
 
+    @ExportVertexToPythonBindings
     public DoubleIfVertex(@LoadParentVertex(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
                           @LoadParentVertex(THEN_NAME) DoubleVertex thn,
                           @LoadParentVertex(ELSE_NAME) DoubleVertex els) {
