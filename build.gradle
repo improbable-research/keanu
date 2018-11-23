@@ -25,3 +25,8 @@ allprojects {
 dependencies {
     compile project(":keanu-project")
 }
+
+task formatApply {
+    dependsOn("spotlessApply")
+    dependsOn("keanu-python:formatApply")
+}

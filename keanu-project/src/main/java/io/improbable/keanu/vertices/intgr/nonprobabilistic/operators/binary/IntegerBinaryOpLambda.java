@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -11,7 +12,7 @@ import java.util.function.BiFunction;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 
-public class IntegerBinaryOpLambda<A, B> extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
+public class IntegerBinaryOpLambda<A, B> extends IntegerVertex implements NonProbabilistic<IntegerTensor>, NonSaveableVertex {
 
     protected final Vertex<A> left;
     protected final Vertex<B> right;
