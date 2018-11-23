@@ -28,8 +28,8 @@ vertex_param_types = Union[tensor_arg_types, wrapped_java_types, VertexOps]
 '''
 Sample types
 '''
-sample_types = Dict[JavaObject, List[numpy_types]]
-sample_generator_types = Generator[Dict[JavaObject, numpy_types], None, None]
+sample_types = Dict[Tuple[JavaObject, ...], List[numpy_types]]
+sample_generator_types = Generator[Dict[Tuple[JavaObject, ...], numpy_types], None, None]
 '''
 Runtime types
 '''

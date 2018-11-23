@@ -80,7 +80,7 @@ class KeanuContext(metaclass=Singleton):
 
         return array
 
-    def to_java_long_array(self, l: Collection[Any]) -> JavaClass:
+    def to_java_long_array(self, l: Collection[Any]) -> JavaArray:
         return self.to_java_array(l, self._gateway.jvm.long)
 
     def __infer_class_from_array(self, l: Collection[Any]) -> JavaClass:

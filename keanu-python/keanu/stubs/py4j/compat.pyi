@@ -10,13 +10,6 @@ version_info: Any
 def items(d: Any): ...
 def iteritems(d: Any): ...
 def next(x: Any): ...
-range = xrange
-long = long
-basestring = basestring
-unicode = unicode
-bytearray2 = bytearray
-unichr = unichr
-bytestr = str
 tobytestr = str
 
 def isbytestr(s: Any): ...
@@ -28,7 +21,6 @@ def strtobyte(b: Any): ...
 
 Empty: Any
 next = next
-range = range
 long = int
 basestring = str
 unicode = str
@@ -36,7 +28,7 @@ bytearray2 = bytes
 unichr = chr
 bytestr = bytes
 
-def hasattr2(obj: Any, attr: Any): ...
+def hasattr2(o: Any, name: str) -> bool: ...
 hasattr2 = hasattr
 
 class CompatThread(Thread):

@@ -78,7 +78,7 @@ def test_cannot_pass_generic_to_vertex(jvm_view) -> None:
         pass
 
     with pytest.raises(ValueError) as excinfo:
-        Vertex(jvm_view.GaussianVertex, GenericExampleClass(), GenericExampleClass())
+        Vertex(jvm_view.GaussianVertex, GenericExampleClass(), GenericExampleClass()) # type: ignore # this is expected to fail mypy
 
     assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(GenericExampleClass)
 

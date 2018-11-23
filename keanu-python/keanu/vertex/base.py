@@ -5,7 +5,7 @@ from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
 from .ops import VertexOps
-from typing import List, Tuple, Iterator, Union
+from typing import List, Tuple, Iterator, Union, cast
 from py4j.java_gateway import JavaObject, JavaMember
 from py4j.java_collections import JavaList, JavaArray
 from keanu.vartypes import (tensor_arg_types, vertex_param_types, shape_types, numpy_types, runtime_tensor_arg_types,
@@ -17,10 +17,13 @@ k = KeanuContext()
 
 class Vertex(JavaObjectWrapper, VertexOps):
 
-    def __init__(self, val: Union[JavaMember, JavaObject], *args: Union[vertex_param_types, shape_types]) -> None:
+    def __init__(self, val_or_ctor: Union[JavaMember, JavaObject], *args: Union[vertex_param_types, shape_types]) -> None:
+        val: JavaObject
         if args:
-            ctor = val
+            ctor = val_or_ctor
             val = ctor(*(Vertex.__parse_args(args)))
+        else:
+            val = cast(JavaObject, val_or_ctor)
 
         super(Vertex, self).__init__(val)
 
