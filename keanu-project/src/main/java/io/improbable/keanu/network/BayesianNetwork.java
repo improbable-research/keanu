@@ -224,10 +224,10 @@ public class BayesianNetwork {
         indentation++;
     }
 
-    public void save(NetworkWriter networkWriter) {
+    public void save(NetworkSaver networkSaver) {
         if(isSaveable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
-                vertex.save(networkWriter);
+                vertex.save(networkSaver);
             }
         }
         else {
@@ -239,9 +239,9 @@ public class BayesianNetwork {
         return vertices.stream().filter(v -> v instanceof NonSaveableVertex).count() == 0;
     }
 
-    public void saveValues(NetworkWriter networkWriter) {
+    public void saveValues(NetworkSaver networkSaver) {
         for (Vertex vertex : vertices) {
-            vertex.saveValue(networkWriter);
+            vertex.saveValue(networkSaver);
         }
     }
 

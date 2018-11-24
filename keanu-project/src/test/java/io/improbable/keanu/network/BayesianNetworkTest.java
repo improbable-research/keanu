@@ -99,7 +99,7 @@ public class BayesianNetworkTest {
     public void networkWithNonSaveableVerticesThrowsExceptionOnSave() throws IOException {
         BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
         BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
-        NetworkWriter netWriter = mock(NetworkWriter.class);
-        net.save(netWriter);
+        NetworkSaver netSaver = mock(NetworkSaver.class);
+        net.save(netSaver);
     }
 }
