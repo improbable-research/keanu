@@ -24,11 +24,11 @@ import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProtobufReader implements NetworkReader {
+public class ProtobufLoader implements NetworkLoader {
 
     private final Map<Vertex, KeanuSavedBayesNet.VertexValue> savedValues;
 
-    public ProtobufReader() {
+    public ProtobufLoader() {
         savedValues = new HashMap<>();
     }
 
