@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.LoadVertexValue;
 import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -325,6 +325,9 @@ public class ProtobufTest {
             .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
             .filter(v -> !Modifier.isAbstract(v.getModifiers()))
             .forEach(this::checkSaveableVertex);
+        vertices.stream()
+            .filter(v -> NonSaveableVertex.class.isAssignableFrom(v))
+            .forEach(v -> System.out.println(v));
     }
 
     private void checkSaveableVertex(Class<? extends Vertex> vertexClass) {
@@ -391,8 +394,8 @@ public class ProtobufTest {
     private Map<String, Class> getSavedParams(Class<? extends Vertex> vertexClass) {
         Map<String, Class> savedParams = new HashMap<>();
 
-        for (Method method : filterAnnotatedObjects(vertexClass.getMethods(), SaveParentVertex.class)) {
-            String paramName = method.getAnnotation(SaveParentVertex.class).value();
+        for (Method method : filterAnnotatedObjects(vertexClass.getMethods(), SaveVertexParam.class)) {
+            String paramName = method.getAnnotation(SaveVertexParam.class).value();
             Class paramType = method.getReturnType();
             savedParams.put(paramName, paramType);
         }

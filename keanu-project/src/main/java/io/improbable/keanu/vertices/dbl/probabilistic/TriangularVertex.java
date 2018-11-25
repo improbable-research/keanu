@@ -5,7 +5,7 @@ import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -109,17 +109,17 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), new ConstantDoubleVertex(c));
     }
 
-    @SaveParentVertex(X_MIN_NAME)
+    @SaveVertexParam(X_MIN_NAME)
     public DoubleVertex getXMin() {
         return xMin;
     }
 
-    @SaveParentVertex(X_MAX_NAME)
+    @SaveVertexParam(X_MAX_NAME)
     public DoubleVertex getXMax() {
         return xMax;
     }
 
-    @SaveParentVertex(C_NAME)
+    @SaveVertexParam(C_NAME)
     public DoubleVertex getC() {
         return c;
     }

@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -63,12 +63,12 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
         return Multinomial.withParameters(n.getValue(), p.getValue()).sample(shape, random);
     }
 
-    @SaveParentVertex(P_NAME)
+    @SaveVertexParam(P_NAME)
     public DoubleVertex getP() {
         return p;
     }
 
-    @SaveParentVertex(N_NAME)
+    @SaveVertexParam(N_NAME)
     public IntegerVertex getN() {
         return n;
     }

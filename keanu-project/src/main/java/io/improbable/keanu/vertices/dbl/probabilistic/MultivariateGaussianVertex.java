@@ -6,7 +6,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -68,12 +68,12 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
         this(ConstantVertex.of(mu), ConstantVertex.of(covariance));
     }
 
-    @SaveParentVertex(MU_NAME)
+    @SaveVertexParam(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
-    @SaveParentVertex(COVARIANCE_NAME)
+    @SaveVertexParam(COVARIANCE_NAME)
     public DoubleVertex getCovariance() {
         return covariance;
     }

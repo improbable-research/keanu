@@ -6,7 +6,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -49,17 +49,17 @@ public class NumericalEqualsVertex extends BoolVertex implements NonProbabilisti
         return absoluteDifference.lessThanOrEqual(epsilon.toDouble());
     }
 
-    @SaveParentVertex(A_NAME)
+    @SaveVertexParam(A_NAME)
     public Vertex<? extends NumberTensor> getA() {
         return a;
     }
 
-    @SaveParentVertex(B_NAME)
+    @SaveVertexParam(B_NAME)
     public Vertex<? extends NumberTensor> getB() {
         return b;
     }
 
-    @SaveParentVertex(EPISILON_NAME)
+    @SaveVertexParam(EPISILON_NAME)
     public Vertex<? extends NumberTensor> getEpsilon() {
         return epsilon;
     }

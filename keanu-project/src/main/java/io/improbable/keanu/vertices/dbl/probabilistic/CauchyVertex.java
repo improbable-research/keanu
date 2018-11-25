@@ -6,7 +6,7 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -78,12 +78,12 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
         this(tensorShape, new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
-    @SaveParentVertex(LOCATION_NAME)
+    @SaveVertexParam(LOCATION_NAME)
     public DoubleVertex getLocation() {
         return location;
     }
 
-    @SaveParentVertex(SCALE_NAME)
+    @SaveVertexParam(SCALE_NAME)
     public DoubleVertex getScale() {
         return scale;
     }

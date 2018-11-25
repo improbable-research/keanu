@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -31,7 +31,7 @@ public class CastIntegerVertex extends IntegerVertex implements NonProbabilistic
         return inputVertex.getValue();
     }
 
-    @SaveParentVertex(INPUT_NAME)
+    @SaveVertexParam(INPUT_NAME)
     public Vertex<IntegerTensor> getInputVertex() {
         return inputVertex;
     }

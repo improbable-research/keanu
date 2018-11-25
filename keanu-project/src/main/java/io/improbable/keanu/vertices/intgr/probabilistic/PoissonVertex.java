@@ -8,7 +8,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -66,7 +66,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
         this(Tensor.SCALAR_SHAPE, new ConstantDoubleVertex(mu));
     }
 
-    @SaveParentVertex(MU_NAME)
+    @SaveVertexParam(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }

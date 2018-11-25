@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -45,17 +45,17 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
         this(checkHasSingleNonScalarShapeOrAllScalar(thn.getShape(), els.getShape()), predicate, thn, els);
     }
 
-    @SaveParentVertex(PREDICATE_NAME)
+    @SaveVertexParam(PREDICATE_NAME)
     public Vertex<? extends BooleanTensor> getPredicate() {
         return predicate;
     }
 
-    @SaveParentVertex(THEN_NAME)
+    @SaveVertexParam(THEN_NAME)
     public DoubleVertex getThn() {
         return els;
     }
 
-    @SaveParentVertex(ELSE_NAME)
+    @SaveVertexParam(ELSE_NAME)
     public DoubleVertex getEls() {
         return thn;
     }

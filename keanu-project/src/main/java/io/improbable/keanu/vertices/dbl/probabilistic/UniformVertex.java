@@ -5,7 +5,7 @@ import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -82,12 +82,12 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
         this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax));
     }
 
-    @SaveParentVertex(X_MIN_NAME)
+    @SaveVertexParam(X_MIN_NAME)
     public DoubleVertex getXMin() {
         return xMin;
     }
 
-    @SaveParentVertex(X_MAX_NAME)
+    @SaveVertexParam(X_MAX_NAME)
     public DoubleVertex getXMax() {
         return xMax;
     }

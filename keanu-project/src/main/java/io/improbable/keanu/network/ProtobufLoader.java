@@ -262,7 +262,7 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private Map<String, Vertex> getParentsMap(KeanuSavedBayesNet.Vertex vertex,
-                                                     Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+                                              Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
         Map<String, Vertex> parentsMap = new HashMap<>();
 
         for (KeanuSavedBayesNet.NamedParent namedParent : vertex.getParentsList()) {

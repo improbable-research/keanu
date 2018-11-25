@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -60,7 +60,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
         this(shape, new ConstantDoubleVertex(probTrue));
     }
 
-    @SaveParentVertex(PROBTRUE_NAME)
+    @SaveVertexParam(PROBTRUE_NAME)
     public DoubleVertex getProbTrue() {
         return probTrue;
     }

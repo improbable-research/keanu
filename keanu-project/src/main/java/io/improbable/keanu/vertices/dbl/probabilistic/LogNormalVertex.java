@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -78,12 +78,12 @@ public class LogNormalVertex extends DoubleVertex implements Differentiable, Pro
         this(ConstantVertex.of(mu), ConstantVertex.of(sigma));
     }
 
-    @SaveParentVertex(MU_NAME)
+    @SaveVertexParam(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
-    @SaveParentVertex(SIGMA_NAME)
+    @SaveVertexParam(SIGMA_NAME)
     public DoubleVertex getSigma() {
         return sigma;
     }

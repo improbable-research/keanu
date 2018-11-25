@@ -6,7 +6,7 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -72,12 +72,12 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
         this(new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k));
     }
 
-    @SaveParentVertex(THETA_NAME)
+    @SaveVertexParam(THETA_NAME)
     public DoubleVertex getTheta() {
         return theta;
     }
 
-    @SaveParentVertex(K_NAME)
+    @SaveVertexParam(K_NAME)
     public DoubleVertex getK() {
         return k;
     }

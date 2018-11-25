@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -31,7 +31,7 @@ public class CastBoolVertex extends BoolVertex implements NonProbabilistic<Boole
         return inputVertex.getValue();
     }
 
-    @SaveParentVertex(INPUT_NAME)
+    @SaveVertexParam(INPUT_NAME)
     public Vertex<? extends BooleanTensor> getInputVertex() {
         return inputVertex;
     }

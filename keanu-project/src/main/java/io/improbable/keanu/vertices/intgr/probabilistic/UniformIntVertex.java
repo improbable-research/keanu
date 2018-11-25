@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -73,12 +73,12 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
         this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
     }
 
-    @SaveParentVertex(MIN_NAME)
+    @SaveVertexParam(MIN_NAME)
     public IntegerVertex getMin() {
         return min;
     }
 
-    @SaveParentVertex(MAX_NAME)
+    @SaveVertexParam(MAX_NAME)
     public IntegerVertex getMax() {
         return max;
     }

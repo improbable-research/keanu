@@ -6,7 +6,7 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -69,7 +69,7 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
         this(new ConstantDoubleVertex(concentration));
     }
 
-    @SaveParentVertex(CONCENTRATION_NAME)
+    @SaveVertexParam(CONCENTRATION_NAME)
     public DoubleVertex getConcentration() {
         return concentration;
     }

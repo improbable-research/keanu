@@ -5,7 +5,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -164,7 +164,7 @@ public class DotSaver implements NetworkSaver {
         Method[] methods = vertexClass.getMethods();
 
         for (Method method : methods) {
-            SaveParentVertex annotation = method.getAnnotation(SaveParentVertex.class);
+            SaveVertexParam annotation = method.getAnnotation(SaveVertexParam.class);
             if (annotation != null) {
                 String parentName = annotation.value();
                 try {
