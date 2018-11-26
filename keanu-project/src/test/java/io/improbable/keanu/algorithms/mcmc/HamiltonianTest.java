@@ -54,7 +54,7 @@ public class HamiltonianTest {
     @Test
     public void samplesContinuousPrior() {
 
-        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0);
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0, 20.0);
 
         Hamiltonian hmc = Hamiltonian.builder()
             .leapFrogCount(20)

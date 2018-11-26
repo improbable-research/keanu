@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
@@ -10,7 +11,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.HashMap;
 import java.util.Map;
 
-
+@DisplayInformationForOutput(displayName = "-")
 public class DifferenceVertex extends DoubleBinaryOpVertex {
 
     /**
