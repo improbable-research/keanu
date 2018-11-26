@@ -10,6 +10,8 @@ import abc
 class dtype: ...
 _dtype = dtype
 
+class ufunc:
+    __name__: str
 
 class flagsobj:
     """numpy.flagsobj"""
@@ -479,6 +481,7 @@ def array_equal(a: _ArrayLike[Any], b: _ArrayLike[Any]) -> bool: ...
 def concatenate(a_tuple: List[ndarray], axis: int=0, out: ndarray=None) -> ndarray: ...
 def argmax(a: ndarray, axis: int=None, out: ndarray=None) -> ndarray: ...
 def bincount(x: _ArrayLike[Any], weights: _ArrayLike[Any]=None, minlength: int=0) -> ndarray: ...
+def logical_not(x, *args: Any, **kwargs: Any) -> bool_: ...
 
 #
 # Testing
@@ -489,3 +492,4 @@ class testing:
 
 # Specific values
 inf: float
+
