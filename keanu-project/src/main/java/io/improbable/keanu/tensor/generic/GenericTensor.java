@@ -40,6 +40,10 @@ public class GenericTensor<T> implements Tensor<T> {
         }
     }
 
+    public GenericTensor(T[] data) {
+        this(data, new long[]{data.length});
+    }
+
     public GenericTensor(T scalar) {
         this.data = (T[]) (new Object[]{scalar});
         this.shape = Tensor.SCALAR_SHAPE;

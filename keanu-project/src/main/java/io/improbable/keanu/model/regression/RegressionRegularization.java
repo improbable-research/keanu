@@ -14,8 +14,8 @@ public enum RegressionRegularization {
     NONE {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
             return new GaussianVertex(new long[]{1, featureCount},
-                ConstantVertex.of(priorOnWeightsMeans),
-                ConstantVertex.of(priorOnInterceptScaleParameter)).setLabel("weights");
+                ConstantVertex.of(priorOnWeightsMeans, 1, featureCount),
+                ConstantVertex.of(priorOnInterceptScaleParameter, 1, featureCount)).setLabel("weights");
         }
 
         public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
