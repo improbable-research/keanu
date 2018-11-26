@@ -9,7 +9,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LoadVertexValue;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -192,7 +192,7 @@ public class ProtobufLoader implements NetworkLoader {
         Object[] arguments = new Object[constructorParameters.length];
 
         for (int i = 0; i < constructorParameters.length; i++) {
-            LoadParentVertex parentVertexAnnotation = constructorParameters[i].getAnnotation(LoadParentVertex.class);
+            LoadVertexParam parentVertexAnnotation = constructorParameters[i].getAnnotation(LoadVertexParam.class);
             LoadVertexValue vertexValueAnnotation = constructorParameters[i].getAnnotation(LoadVertexValue.class);
 
             if (parentVertexAnnotation != null) {
@@ -253,7 +253,7 @@ public class ProtobufLoader implements NetworkLoader {
 
             if (parameters.length > 0 &&
                 (parameters[0].isAnnotationPresent(LoadVertexValue.class) ||
-                 parameters[0].isAnnotationPresent(LoadParentVertex.class))) {
+                 parameters[0].isAnnotationPresent(LoadVertexParam.class))) {
                 return constructor;
             }
         }
@@ -265,8 +265,8 @@ public class ProtobufLoader implements NetworkLoader {
                                               Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
         Map<String, Vertex> parentsMap = new HashMap<>();
 
-        for (KeanuSavedBayesNet.NamedParent namedParent : vertex.getParentsList()) {
-            Vertex existingParent = existingVertices.get(namedParent.getId());
+        for (KeanuSavedBayesNet.NamedParam namedParent : vertex.getParametersList()) {
+            Vertex existingParent = existingVertices.get(namedParent.getParentVertex());
             if (existingParent == null) {
                 throw new IllegalArgumentException("Parent named in vertex hasn't been instantiated: " + namedParent);
             }

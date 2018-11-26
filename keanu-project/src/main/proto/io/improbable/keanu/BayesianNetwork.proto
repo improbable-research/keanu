@@ -18,14 +18,8 @@ message Vertex {
     VertexID id = 1;
     string label = 2;
     string vertexType = 3;
-    repeated NamedParent parents = 5;
+    repeated NamedParam parameters = 5;
     VertexValue constantValue = 6;
-}
-
-message StoredValue {
-    VertexValue value = 1;
-    string vertexLabel = 2;
-    VertexID id = 3;
 }
 
 message DoubleTensor {
@@ -48,6 +42,22 @@ message GenericTensor {
     repeated string values = 2;
 }
 
+message NamedParam {
+    string name = 1;
+    oneof param {
+        DoubleTensor doubleTensorParam = 2;
+        IntegerTensor intTensorParam = 3;
+        BooleanTensor boolTensorParam = 4;
+        VertexID parentVertex = 5;
+    }
+}
+
+message StoredValue {
+    VertexValue value = 1;
+    string vertexLabel = 2;
+    VertexID id = 3;
+}
+
 message VertexValue {
     oneof valueType {
         DoubleTensor doubleVal = 1;
@@ -55,9 +65,4 @@ message VertexValue {
         BooleanTensor boolVal = 3;
         GenericTensor genericVal = 4;
     }
-}
-
-message NamedParent {
-    string name = 1;
-    VertexID id = 2;
 }

@@ -3,7 +3,7 @@ package io.improbable.keanu.network;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LoadVertexValue;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -101,9 +101,9 @@ public class ProtobufTest {
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("2"))
             .setLabel("GAUSSIAN VERTEX")
             .setVertexType(GaussianVertex.class.getCanonicalName())
-            .addParents(KeanuSavedBayesNet.NamedParent.newBuilder()
+            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
                 .setName("mu")
-                .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1").build())
+                .setParentVertex(KeanuSavedBayesNet.VertexID.newBuilder().setId("1").build())
                 .build()
             )
             .build();
@@ -276,13 +276,13 @@ public class ProtobufTest {
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(GAUSS_ID))
             .setLabel(GAUSS_LABEL)
             .setVertexType(GaussianVertex.class.getCanonicalName())
-            .addParents(KeanuSavedBayesNet.NamedParent.newBuilder()
+            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
                 .setName("mu")
-                .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1").build())
+                .setParentVertex(KeanuSavedBayesNet.VertexID.newBuilder().setId("1").build())
                 .build()
-            ).addParents(KeanuSavedBayesNet.NamedParent.newBuilder()
+            ).addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
                 .setName("sigma")
-                .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("2").build())
+                .setParentVertex(KeanuSavedBayesNet.VertexID.newBuilder().setId("2").build())
                 .build()
             )
             .build();
@@ -360,7 +360,7 @@ public class ProtobufTest {
          * annotations.
          */
         assertThat("Root classes must not have any Parent Constructors: " + vertexClass,
-            getConstructorsWithAnnotatedParameters(vertexClass, LoadParentVertex.class), IsEmptyCollection.empty());
+            getConstructorsWithAnnotatedParameters(vertexClass, LoadVertexParam.class), IsEmptyCollection.empty());
 
         List<Constructor> loadValueConstructors = getConstructorsWithAnnotatedParameters(vertexClass,
             LoadVertexValue.class);
@@ -405,12 +405,12 @@ public class ProtobufTest {
 
     private Map<String, Class> getRequiredParamsAndCheckOnlyUsedOnce(Class<? extends Vertex> vertexClass) {
         List<Constructor> parentConstructor = getConstructorsWithAnnotatedParameters(vertexClass,
-            LoadParentVertex.class);
+            LoadVertexParam.class);
         assertThat("Need Constructor for Class: " + vertexClass, parentConstructor.size(), is(1));
         Map<String, Class> requiredParameters = new HashMap<>();
 
         for (Parameter parameter : parentConstructor.get(0).getParameters()) {
-            LoadParentVertex annotation = parameter.getAnnotation(LoadParentVertex.class);
+            LoadVertexParam annotation = parameter.getAnnotation(LoadVertexParam.class);
             assertThat("Annotation has to be present on all params for class: " + vertexClass, annotation,
                 is(notNullValue()));
             assertThat("Annotation can only be used once for class: " + vertexClass, requiredParameters,

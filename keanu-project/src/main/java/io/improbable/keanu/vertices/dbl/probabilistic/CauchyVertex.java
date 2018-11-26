@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Cauchy;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -49,8 +49,8 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
     }
 
     @ExportVertexToPythonBindings
-    public CauchyVertex(@LoadParentVertex(LOCATION_NAME) DoubleVertex location,
-                        @LoadParentVertex(SCALE_NAME) DoubleVertex scale) {
+    public CauchyVertex(@LoadVertexParam(LOCATION_NAME) DoubleVertex location,
+                        @LoadVertexParam(SCALE_NAME) DoubleVertex scale) {
         this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
     }
 

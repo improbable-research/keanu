@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -49,8 +49,8 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     @ExportVertexToPythonBindings
-    public LogisticVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
-                          @LoadParentVertex(S_NAME) DoubleVertex s) {
+    public LogisticVertex(@LoadVertexParam(MU_NAME) DoubleVertex mu,
+                          @LoadVertexParam(S_NAME) DoubleVertex s) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), s.getShape()), mu, s);
     }
 

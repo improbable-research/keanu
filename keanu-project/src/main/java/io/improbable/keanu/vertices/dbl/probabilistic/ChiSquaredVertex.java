@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -51,7 +51,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
      * @param k the number of degrees of freedom
      */
     @ExportVertexToPythonBindings
-    public ChiSquaredVertex(@LoadParentVertex(K_NAME) IntegerVertex k) {
+    public ChiSquaredVertex(@LoadVertexParam(K_NAME) IntegerVertex k) {
         this(k.getShape(), k);
     }
 

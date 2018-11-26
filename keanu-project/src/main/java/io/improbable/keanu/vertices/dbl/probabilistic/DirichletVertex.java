@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -46,7 +46,7 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
      * @param concentration the concentration values of the dirichlet
      */
     @ExportVertexToPythonBindings
-    public DirichletVertex(@LoadParentVertex(CONCENTRATION_NAME) DoubleVertex concentration) {
+    public DirichletVertex(@LoadVertexParam(CONCENTRATION_NAME) DoubleVertex concentration) {
         this(concentration.getShape(), concentration);
     }
 

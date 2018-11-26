@@ -5,7 +5,7 @@ import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -47,7 +47,7 @@ public class StudentTVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     @ExportVertexToPythonBindings
-    public StudentTVertex(@LoadParentVertex(V_NAME) IntegerVertex v) {
+    public StudentTVertex(@LoadVertexParam(V_NAME) IntegerVertex v) {
         this(v.getShape(), v);
     }
 

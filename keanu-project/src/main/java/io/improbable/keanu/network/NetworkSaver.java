@@ -16,7 +16,10 @@ public interface NetworkSaver {
 
     void save(OutputStream output, boolean saveValues) throws IOException;
     void save(Vertex vertex);
-    void save(ConstantVertex vertex);
+
+    default void save(ConstantVertex vertex) {
+        save((Vertex)vertex);
+    }
 
     default void save(ConstantDoubleVertex vertex) {
         save((ConstantVertex)vertex);

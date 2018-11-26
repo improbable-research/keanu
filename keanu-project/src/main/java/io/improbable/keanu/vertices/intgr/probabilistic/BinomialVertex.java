@@ -5,7 +5,7 @@ import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -49,7 +49,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     }
 
     @ExportVertexToPythonBindings
-    public BinomialVertex(@LoadParentVertex(P_NAME) DoubleVertex p, @LoadParentVertex(N_NAME) IntegerVertex n) {
+    public BinomialVertex(@LoadVertexParam(P_NAME) DoubleVertex p, @LoadVertexParam(N_NAME) IntegerVertex n) {
         this(checkHasSingleNonScalarShapeOrAllScalar(p.getShape(), n.getShape()), p, n);
     }
 

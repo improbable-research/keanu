@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -78,8 +78,8 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
     }
 
     @ExportVertexToPythonBindings
-    public SmoothUniformVertex(@LoadParentVertex(X_MIN_NAME) DoubleVertex xMin,
-                               @LoadParentVertex(X_MAX_NAME) DoubleVertex xMax) {
+    public SmoothUniformVertex(@LoadVertexParam(X_MIN_NAME) DoubleVertex xMin,
+                               @LoadVertexParam(X_MAX_NAME) DoubleVertex xMax) {
         this(xMin, xMax, DEFAULT_EDGE_SHARPNESS);
     }
 

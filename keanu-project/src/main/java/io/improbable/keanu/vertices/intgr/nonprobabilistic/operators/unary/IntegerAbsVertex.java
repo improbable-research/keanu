@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerAbsVertex extends IntegerUnaryOpVertex {
@@ -13,7 +13,7 @@ public class IntegerAbsVertex extends IntegerUnaryOpVertex {
      * @param inputVertex the vertex
      */
     @ExportVertexToPythonBindings
-    public IntegerAbsVertex(@LoadParentVertex(INPUT_NAME) IntegerVertex inputVertex) {
+    public IntegerAbsVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }
 

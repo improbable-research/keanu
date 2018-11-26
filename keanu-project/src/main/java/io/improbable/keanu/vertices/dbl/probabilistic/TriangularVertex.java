@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -79,9 +79,9 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
      * @param c    the c of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public TriangularVertex(@LoadParentVertex(X_MIN_NAME) DoubleVertex xMin,
-                            @LoadParentVertex(X_MAX_NAME) DoubleVertex xMax,
-                            @LoadParentVertex(C_NAME) DoubleVertex c) {
+    public TriangularVertex(@LoadVertexParam(X_MIN_NAME) DoubleVertex xMin,
+                            @LoadVertexParam(X_MAX_NAME) DoubleVertex xMax,
+                            @LoadVertexParam(C_NAME) DoubleVertex c) {
         this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape(), c.getShape()), xMin, xMax, c);
     }
 

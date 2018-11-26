@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.InverseGamma;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -56,8 +56,8 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
      * @param beta  the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
     @ExportVertexToPythonBindings
-    public InverseGammaVertex(@LoadParentVertex(ALPHA_NAME) DoubleVertex alpha,
-                              @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
+    public InverseGammaVertex(@LoadVertexParam(ALPHA_NAME) DoubleVertex alpha,
+                              @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 

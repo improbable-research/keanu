@@ -5,7 +5,7 @@ import io.improbable.keanu.distributions.discrete.UniformInt;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -57,7 +57,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
     }
 
     @ExportVertexToPythonBindings
-    public UniformIntVertex(@LoadParentVertex(MIN_NAME) IntegerVertex min, @LoadParentVertex(MAX_NAME) IntegerVertex max) {
+    public UniformIntVertex(@LoadVertexParam(MIN_NAME) IntegerVertex min, @LoadVertexParam(MAX_NAME) IntegerVertex max) {
         this(checkHasSingleNonScalarShapeOrAllScalar(min.getShape(), max.getShape()), min, max);
     }
 

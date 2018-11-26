@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -25,7 +25,7 @@ import java.util.Map;
 public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Differentiable {
 
     @ExportVertexToPythonBindings
-    public MatrixDeterminantVertex(@LoadParentVertex(INPUT_VERTEX_NAME) DoubleVertex vertex) {
+    public MatrixDeterminantVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex vertex) {
         super(Tensor.SCALAR_SHAPE, vertex);
         TensorShapeValidation.checkShapeIsSquareMatrix(vertex.getShape());
     }

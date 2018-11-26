@@ -5,7 +5,7 @@ import io.improbable.keanu.distributions.discrete.Multinomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -40,7 +40,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     }
 
     @ExportVertexToPythonBindings
-    public MultinomialVertex(@LoadParentVertex(N_NAME) IntegerVertex n, @LoadParentVertex(P_NAME) DoubleVertex p) {
+    public MultinomialVertex(@LoadVertexParam(N_NAME) IntegerVertex n, @LoadVertexParam(P_NAME) DoubleVertex p) {
         this(n.getShape(), n, p);
     }
 

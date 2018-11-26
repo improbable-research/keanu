@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -50,8 +50,8 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     @ExportVertexToPythonBindings
-    public GaussianVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
-                          @LoadParentVertex(SIGMA_NAME) DoubleVertex sigma) {
+    public GaussianVertex(@LoadVertexParam(MU_NAME) DoubleVertex mu,
+                          @LoadVertexParam(SIGMA_NAME) DoubleVertex sigma) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 

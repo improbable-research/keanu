@@ -2,16 +2,13 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
-import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -49,32 +46,6 @@ public class ProtobufSaver implements NetworkSaver {
         bayesNetBuilder.addVertices(vertexBuilder.build());
     }
 
-    @Override
-    public void save(ConstantDoubleVertex vertex) {
-        KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
-        vertexBuilder.setConstantValue(getValue(vertex).getValue());
-        bayesNetBuilder.addVertices(vertexBuilder.build());
-    }
-
-    @Override
-    public void save(ConstantIntegerVertex vertex) {
-        KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
-        vertexBuilder.setConstantValue(getValue(vertex).getValue());
-        bayesNetBuilder.addVertices(vertexBuilder.build());
-    }
-
-    @Override
-    public void save(ConstantBoolVertex vertex) {
-        KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
-        vertexBuilder.setConstantValue(getValue(vertex).getValue());
-        bayesNetBuilder.addVertices(vertexBuilder.build());
-    }
-
-    @Override
-    public void save(ConstantVertex vertex) {
-        throw new IllegalArgumentException("Don't know how to save an untyped ConstantVertex");
-    }
-
     private KeanuSavedBayesNet.Vertex.Builder buildVertex(Vertex vertex) {
         KeanuSavedBayesNet.Vertex.Builder vertexBuilder = KeanuSavedBayesNet.Vertex.newBuilder();
 
@@ -84,37 +55,67 @@ public class ProtobufSaver implements NetworkSaver {
 
         vertexBuilder = vertexBuilder.setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()));
         vertexBuilder = vertexBuilder.setVertexType(vertex.getClass().getCanonicalName());
-        saveParents(vertexBuilder, vertex);
+        saveParams(vertexBuilder, vertex);
 
         return vertexBuilder;
     }
 
-    private void saveParents(KeanuSavedBayesNet.Vertex.Builder vertexBuilder,
-                             Vertex vertex) {
+    private void saveParams(KeanuSavedBayesNet.Vertex.Builder vertexBuilder,
+                            Vertex vertex) {
         Class vertexClass = vertex.getClass();
         Method[] methods = vertexClass.getMethods();
 
         for (Method method : methods) {
-            SaveVertexParam annotation = method.getAnnotation(SaveVertexParam.class);
-            if (annotation != null) {
-                String parentName = annotation.value();
-                vertexBuilder.addParents(getEncodedParent(vertex, parentName, method));
+            SaveVertexParam vertexAnnotation = method.getAnnotation(SaveVertexParam.class);
+            if (vertexAnnotation != null) {
+                String parentName = vertexAnnotation.value();
+                vertexBuilder.addParameters(getEncodedParam(vertex, parentName, method));
             }
         }
     }
 
-    private KeanuSavedBayesNet.NamedParent getEncodedParent(Vertex vertex, String parentName, Method getParentMethod) {
-        KeanuSavedBayesNet.NamedParent.Builder parentBuilder = KeanuSavedBayesNet.NamedParent.newBuilder();
+    private KeanuSavedBayesNet.NamedParam getEncodedParam(Vertex vertex, String paramName, Method getParamMethod) {
+        Object param;
 
         try {
-            Vertex parent = (Vertex)getParentMethod.invoke(vertex);
-            parentBuilder.setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(parent.getId().toString()));
-            parentBuilder.setName(parentName);
+            param = getParamMethod.invoke(vertex);
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid parent retrieval function specified", e);
         }
 
-        return parentBuilder.build();
+        if (param == null) {
+            throw new IllegalArgumentException("No value returned from Save Function");
+        }
+
+        return getTypedParam(paramName, param);
+    }
+
+    private KeanuSavedBayesNet.NamedParam getTypedParam(String paramName, Object param) {
+        if (Vertex.class.isAssignableFrom(param.getClass()))  {
+            return getParam(paramName, (Vertex)param);
+        } else if (DoubleTensor.class.isAssignableFrom(param.getClass())){
+            return getParam(paramName, (DoubleTensor)param);
+        } else {
+            throw new IllegalArgumentException("Unknown Parameter Type to Save: " + param.getClass().toString());
+        }
+    }
+
+    private KeanuSavedBayesNet.NamedParam getParam(String paramName, Vertex parent) {
+        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
+
+        paramBuilder.setName(paramName);
+        paramBuilder.setParentVertex(KeanuSavedBayesNet.VertexID.newBuilder().setId(parent.getId().toString()));
+
+        return paramBuilder.build();
+    }
+
+    private KeanuSavedBayesNet.NamedParam getParam(String paramName, DoubleTensor param) {
+        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
+
+        paramBuilder.setName(paramName);
+        paramBuilder.setDoubleTensorParam(getTensor(param));
+
+        return paramBuilder.build();
     }
 
     @Override
@@ -164,10 +165,7 @@ public class ProtobufSaver implements NetworkSaver {
     }
 
     private KeanuSavedBayesNet.StoredValue getValue(DoubleVertex vertex) {
-        KeanuSavedBayesNet.DoubleTensor savedValue = KeanuSavedBayesNet.DoubleTensor.newBuilder()
-            .addAllValues(vertex.getValue().asFlatList())
-            .addAllShape(Longs.asList(vertex.getShape()))
-            .build();
+        KeanuSavedBayesNet.DoubleTensor savedValue = getTensor(vertex.getValue());
 
         KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
             .setDoubleVal(savedValue)
@@ -198,6 +196,13 @@ public class ProtobufSaver implements NetworkSaver {
             .build();
 
         return getStoredValue(vertex, value);
+    }
+
+    private KeanuSavedBayesNet.DoubleTensor getTensor(DoubleTensor tensor) {
+        return KeanuSavedBayesNet.DoubleTensor.newBuilder()
+            .addAllValues(tensor.asFlatList())
+            .addAllShape(Longs.asList(tensor.getShape()))
+            .build();
     }
 
     private KeanuSavedBayesNet.StoredValue getStoredValue(Vertex vertex, KeanuSavedBayesNet.VertexValue value) {

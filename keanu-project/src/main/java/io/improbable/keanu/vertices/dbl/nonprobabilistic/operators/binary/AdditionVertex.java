@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -21,8 +21,8 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
      * @param right a vertex to add
      */
     @ExportVertexToPythonBindings
-    public AdditionVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
-                          @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
+    public AdditionVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
+                          @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
         super(left, right);
     }
 

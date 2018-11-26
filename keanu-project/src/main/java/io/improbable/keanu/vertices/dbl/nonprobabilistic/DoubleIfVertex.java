@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -38,9 +38,9 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     }
 
     @ExportVertexToPythonBindings
-    public DoubleIfVertex(@LoadParentVertex(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
-                          @LoadParentVertex(THEN_NAME) DoubleVertex thn,
-                          @LoadParentVertex(ELSE_NAME) DoubleVertex els) {
+    public DoubleIfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
+                          @LoadVertexParam(THEN_NAME) DoubleVertex thn,
+                          @LoadVertexParam(ELSE_NAME) DoubleVertex els) {
 
         this(checkHasSingleNonScalarShapeOrAllScalar(thn.getShape(), els.getShape()), predicate, thn, els);
     }

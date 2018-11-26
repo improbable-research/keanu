@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -53,8 +53,8 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
      * @param xMax the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public UniformVertex(@LoadParentVertex(X_MIN_NAME) DoubleVertex xMin,
-                         @LoadParentVertex(X_MAX_NAME) DoubleVertex xMax) {
+    public UniformVertex(@LoadVertexParam(X_MIN_NAME) DoubleVertex xMin,
+                         @LoadVertexParam(X_MAX_NAME) DoubleVertex xMax) {
         this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }
 

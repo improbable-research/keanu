@@ -4,7 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadVertexValue;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -13,9 +13,10 @@ public class ConstantBoolVertex extends BoolVertex implements ConstantVertex, No
 
     public static final BoolVertex TRUE = new ConstantBoolVertex(true);
     public static final BoolVertex FALSE = new ConstantBoolVertex(false);
+    private final static String CONSTANT_NAME = "constant";
 
     @ExportVertexToPythonBindings
-    public ConstantBoolVertex(@LoadVertexValue BooleanTensor constant) {
+    public ConstantBoolVertex(@LoadVertexParam(CONSTANT_NAME) BooleanTensor constant) {
         super(constant.getShape());
         setValue(constant);
     }
