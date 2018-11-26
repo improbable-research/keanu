@@ -125,10 +125,12 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def __rfloordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.IntegerDivision(other, self)
 
-    def __eq__(self, other: vertex_operation_param_types) -> 'Vertex':  # type: ignore
+    def __eq__(  # type: ignore # see https://github.com/python/mypy/issues/2783
+            self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.Equals(self, other)
 
-    def __ne__(self, other: vertex_operation_param_types) -> 'Vertex':  # type: ignore
+    def __ne__(  # type: ignore # see https://github.com/python/mypy/issues/2783
+            self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.NotEquals(self, other)
 
     def __gt__(self, other: vertex_operation_param_types) -> 'Vertex':
