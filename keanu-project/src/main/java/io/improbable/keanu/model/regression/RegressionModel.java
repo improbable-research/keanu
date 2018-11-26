@@ -67,6 +67,14 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
         return getWeights().getFlattenedView().getOrScalar(index);
     }
 
+    public DoubleVertex getInterceptVertex() {
+        return modelGraph.getInterceptVertex();
+    }
+
+    public DoubleVertex getWeightVertex() {
+        return modelGraph.getWeightVertex();
+    }
+
     @Override
     public OUTPUT predict(DoubleTensor tensor) {
         return modelGraph.predict(tensor);

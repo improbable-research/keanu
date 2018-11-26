@@ -128,7 +128,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                 tree.momentumForward,
                 tree.momentumBackward
             );
-
+            System.out.println("Tree: " + treeHeight);
             treeHeight++;
         }
 
@@ -140,6 +140,8 @@ public class NUTSSampler implements SamplingAlgorithm {
         tree.gradientForward = tree.gradientAtAcceptedPosition;
         tree.positionBackward = tree.acceptedPosition;
         tree.gradientBackward = tree.gradientAtAcceptedPosition;
+        System.out.println("Step size: " + stepSize);
+        System.out.println("Log prob: " + tree.logOfMasterPAtAcceptedPosition);
 
         sampleNum++;
     }
@@ -514,7 +516,7 @@ public class NUTSSampler implements SamplingAlgorithm {
 
             logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
         }
-
+        System.out.println("Starting step size: " + stepsize);
         return stepsize;
     }
 

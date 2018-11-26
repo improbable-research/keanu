@@ -2,9 +2,7 @@ package io.improbable.keanu.e2e.regression;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,26 +10,16 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.algorithms.mcmc.NUTS;
-import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
-import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.HalfCauchyVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import umontreal.ssj.probdist.HalfNormalDist;
 
 public class RadonHeirarchicalRegression {
 
@@ -41,174 +29,146 @@ public class RadonHeirarchicalRegression {
     private List<Data> radonData;
 
     @Before
-    public void loadCsv() {
+    public void readRadonCSV() {
         radonData = ReadCsv.fromResources("data/datasets/radon/radon.csv")
             .asRowsDefinedBy(Data.class)
             .load(true);
     }
 
     @Test
-    public void linearRegressionRadon() {
-        RegressionModel model = buildSimpleNetwork(radonData);
+    public void canPerformSimpleLinearRegression() {
+        RegressionModel model = linearRegression(radonData);
         Assert.assertTrue(model.getWeight(0) > -0.7 && model.getWeight(0) < -0.4);
         Assert.assertTrue(model.getIntercept() > 1.2 && model.getIntercept() < 1.5);
     }
 
     @Test
-    public void linearRegressionWithOneHeirarchy() {
-        buildNHeirarchicalNetwork(radonData, 1);
+    public void canPerformRegressionWithOneHeirarchy() {
+        buildHeirarchicalNetwork(radonData, 1);
     }
 
     @Test
-    public void linearRegressionWithTwoHeirarchy() {
-        buildNHeirarchicalNetwork(radonData, 2);
+    public void canPerformRegressionWithTwoHeirarchies() {
+        buildHeirarchicalNetwork(radonData, 2);
     }
 
     @Test
-    public void linearRegressionWithThreeHeirarchy() {
-        buildNHeirarchicalNetwork(radonData, 3);
+    public void canPerformRegressionWithFiveHeirarchies() {
+        buildHeirarchicalNetwork(radonData, 5);
     }
 
     @Test
-    public void linearRegressionWithFourHeirarchy() {
-        buildNHeirarchicalNetwork(radonData, 10);
+    public void canPerformRegressionWithTenHeirarchies() {
+        buildHeirarchicalNetwork(radonData, 10);
     }
 
-    private Map<String, List<Data>> partitionDataOnCounty(List<Data> radonData, int countyCount) {
-        Map<String, List<Data>> countyRadon = new HashMap<>();
-        for (Data data : radonData) {
-            if (countyRadon.keySet().size() == countyCount && !countyRadon.containsKey(data.county)) {
-                break;
-            }
-            countyRadon.computeIfAbsent(data.county, k -> new ArrayList<>()).add(data);
-        }
-        return countyRadon;
-    }
-
-    private RegressionModel buildSimpleNetwork(List<Data> data) {
+    private RegressionModel linearRegression(List<Data> data) {
         double[] radon = data.stream().mapToDouble(k -> k.log_radon).toArray();
         double[] floor = data.stream().mapToDouble(k -> k.floor).toArray();
         DoubleTensor y = DoubleTensor.create(radon);
         DoubleTensor x = DoubleTensor.create(floor);
+
         RegressionModel model = RegressionModel.
             withTrainingData(x, y).
             withRegularization(RegressionRegularization.RIDGE).
-            withPriorOnWeights(ConstantVertex.of(0.), ConstantVertex.of(5.)).
-            withPriorOnIntercept(ConstantVertex.of(0.), ConstantVertex.of(5.)).
+            withPriorOnWeights(0., 5.).
+            withPriorOnIntercept(0., 5.).
             build();
+
         model.observe();
         model.fit();
-        System.out.println("Running linear regression");
+
         return model;
     }
 
-    private void buildNHeirarchicalNetwork(List<Data> radonData, int n) {
-        GaussianVertex muAlpha = new GaussianVertex(0, 100).setLabel("MuAlpha");
-        GaussianVertex muBeta = new GaussianVertex(0, 100).setLabel("MuBeta");
+    private void buildHeirarchicalNetwork(List<Data> radonData, int numberOfModels) {
+        GaussianVertex muAlpha = new GaussianVertex(0, 100).setLabel("MuIntercept");
+        GaussianVertex muBeta = new GaussianVertex(0, 100).setLabel("MuGradient");
 
-        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(100).setLabel("SigmaAlpha");
-        HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(100.).setLabel("SigmaBeta");
+        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(100).setLabel("SigmaIntercept");
+        HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(100.).setLabel("SigmaGradient");
 
-        int nPartitions = radonData.size() / n;
+        int numPartitions = radonData.size() / numberOfModels;
 
         double[] allFloor = radonData.stream().mapToDouble(k -> k.floor).toArray();
         double[] allRadon = radonData.stream().mapToDouble(k -> k.log_radon).toArray();
 
         List<RegressionModel> models = new ArrayList<>();
 
-        for (int i = 0; i < n; i++) {
-            RegressionModel model = createModel(allFloor, allRadon, i, nPartitions, muBeta, muAlpha, sigmaBeta, sigmaAlpha);
+        for (int i = 0; i < numberOfModels; i++) {
+            RegressionModel model = createSubModel(allFloor, allRadon, i, numPartitions, muBeta, muAlpha, sigmaBeta, sigmaAlpha);
             models.add(model);
         }
 
-        muAlpha.setValue(-1);
-        muBeta.setValue(-1);
+        muAlpha.setValue(1.5);
+        muBeta.setValue(-1.);
 
         sigmaAlpha.setValue(0.3);
         sigmaBeta.setValue(0.4);
 
-        optimise(new BayesianNetwork(muAlpha.getConnectedGraph()));
-
-        int count = 1;
-        for (RegressionModel model : models) {
-            System.out.println("Model number: " + count);
-            count++;
-            System.out.println("Model weights");
-            System.out.println(model.getWeights());
-            System.out.println("Model intercept");
-            System.out.println(model.getIntercept());
-        }
+        optimise(new BayesianNetwork(muAlpha.getConnectedGraph()), models);
     }
 
-    private RegressionModel createModel(double[] allFloor, double[] allRadon, int i, int size, DoubleVertex muBeta, DoubleVertex muAlpha, DoubleVertex sigmaAlpha, DoubleVertex sigmaBeta) {
+    private RegressionModel createSubModel(double[] allFloor,
+                                           double[] allRadon,
+                                           int i,
+                                           int size,
+                                           DoubleVertex muGradient,
+                                           DoubleVertex muIntercept,
+                                           DoubleVertex sigmaGradient,
+                                           DoubleVertex sigmaIntercept) {
+
         int startIndex = size * i;
         int endIndex = size * (i + 1);
 
-        double[] floor = Arrays.copyOfRange(allFloor, startIndex, endIndex);
-        double[] radon = Arrays.copyOfRange(allRadon, startIndex, endIndex);
+        double[] floorForSubModel = Arrays.copyOfRange(allFloor, startIndex, endIndex);
+        double[] radonForSubModel = Arrays.copyOfRange(allRadon, startIndex, endIndex);
 
-        DoubleTensor x = DoubleTensor.create(floor);
-        DoubleTensor y = DoubleTensor.create(radon);
+        DoubleTensor x = DoubleTensor.create(floorForSubModel);
+        DoubleTensor y = DoubleTensor.create(radonForSubModel);
+
         RegressionModel model = RegressionModel.
             withTrainingData(x, y).
             withRegularization(RegressionRegularization.RIDGE).
-            withPriorOnWeights(muBeta, sigmaBeta).
-            withPriorOnIntercept(muAlpha, sigmaAlpha).
+            withPriorOnWeights(muGradient, sigmaGradient).
+            withPriorOnIntercept(muIntercept, sigmaIntercept).
             build();
+
         model.observe();
 
         return model;
     }
 
-    private void optimise(BayesianNetwork bayesianNetwork) {
-        Vertex muAlpha = bayesianNetwork.getVertexByLabel(new VertexLabel("MuAlpha"));
-        Vertex muBeta = bayesianNetwork.getVertexByLabel(new VertexLabel("MuBeta"));
-        Vertex sigmaAlpha = bayesianNetwork.getVertexByLabel(new VertexLabel("SigmaAlpha"));
-        Vertex sigmaBeta = bayesianNetwork.getVertexByLabel(new VertexLabel("SigmaBeta"));
-
-        GradientOptimizer optimizer = GradientOptimizer.builder().bayesianNetwork(bayesianNetwork).absoluteThreshold(0.1).maxEvaluations(10000).build();
+    private void optimise(BayesianNetwork bayesianNetwork, List<RegressionModel> models) {
+        GradientOptimizer optimizer = GradientOptimizer.builder()
+            .bayesianNetwork(bayesianNetwork)
+            .absoluteThreshold(0.1)
+            .maxEvaluations(10000)
+            .build();
         optimizer.maxAPosteriori();
 
-        System.out.println("MuA: " + muAlpha.getValue());
-        System.out.println("MuB: " + muBeta.getValue());
-        System.out.println("SiA: " + sigmaAlpha.getValue());
-        System.out.println("SiB: " + sigmaBeta.getValue());
+        assertValuesAreCorrect(bayesianNetwork, models);
     }
 
-    private void sample(BayesianNetwork bayesianNetwork) {
-        Vertex muAlpha = bayesianNetwork.getVertexByLabel(new VertexLabel("MuAlpha"));
-        Vertex muBeta = bayesianNetwork.getVertexByLabel(new VertexLabel("MuBeta"));
+    private void assertValuesAreCorrect(BayesianNetwork bayesianNetwork, List<RegressionModel> models) {
+        DoubleVertex muIntercept = (DoubleVertex) bayesianNetwork.getVertexByLabel(new VertexLabel("MuIntercept"));
+        DoubleVertex muGradient = (DoubleVertex) bayesianNetwork.getVertexByLabel(new VertexLabel("MuGradient"));
+        DoubleVertex sigmaIntercept = (DoubleVertex) bayesianNetwork.getVertexByLabel(new VertexLabel("SigmaIntercept"));
+        DoubleVertex sigmaGradient = (DoubleVertex) bayesianNetwork.getVertexByLabel(new VertexLabel("SigmaGradient"));
 
-        NetworkSamples posteriorSamples = MetropolisHastings.builder().build().
-            getPosteriorSamples(
-                bayesianNetwork,
-                Arrays.asList(muAlpha, muBeta),
-                50000
-            ).drop(5000)
-            .downSample(bayesianNetwork.getContinuousLatentVertices().size());
+        Assert.assertTrue(-0.4 > muGradient.getValue().scalar() && muGradient.getValue().scalar() > -0.9);
+        Assert.assertTrue(1.8 > muIntercept.getValue().scalar() && muIntercept.getValue().scalar() > 1.2);
 
-        double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(muAlpha).getAverages().scalar();
-        double averagePosteriorB = posteriorSamples.getDoubleTensorSamples(muBeta).getAverages().scalar();
+        Assert.assertTrue(0.5 > sigmaGradient.getValue().scalar() && sigmaGradient.getValue().scalar() > 0.);
+        Assert.assertTrue(0.5 > sigmaIntercept.getValue().scalar() && sigmaIntercept.getValue().scalar() > 0.);
 
-        System.out.println("Alpha: " + averagePosteriorA);
-        System.out.println("Beta: " + averagePosteriorB);
-    }
+        for (RegressionModel subModel : models) {
+            double weight = subModel.getWeightVertex().getValue().scalar();
+            double intercept = subModel.getInterceptVertex().getValue().scalar();
 
-
-    private void NUTSSample(BayesianNetwork bayesianNetwork) {
-        Vertex muAlpha = bayesianNetwork.getVertexByLabel(new VertexLabel("MuAlpha"));
-        Vertex muBeta = bayesianNetwork.getVertexByLabel(new VertexLabel("MuBeta"));
-
-        NetworkSamples posteriorSamples = NUTS.builder()
-            .maxTreeHeight(5)
-            .build()
-            .getPosteriorSamples(bayesianNetwork, Arrays.asList(muAlpha, muBeta), 500).downSample(100);
-
-        double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(muAlpha).getAverages().scalar();
-        double averagePosteriorB = posteriorSamples.getDoubleTensorSamples(muBeta).getAverages().scalar();
-
-        System.out.println("Alpha: " + averagePosteriorA);
-        System.out.println("Beta: " + averagePosteriorB);
+            Assert.assertTrue(-0.0 > weight && weight > -1.0);
+            Assert.assertTrue(2. > intercept && intercept > 1.);
+        }
     }
 
     public static class Data {

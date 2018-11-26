@@ -54,6 +54,10 @@ public class RegressionModelBuilder<OUTPUT> {
         return this;
     }
 
+    public RegressionModelBuilder withPriorOnWeights(double means, double scaleParameters) {
+        return withPriorOnIntercept(ConstantVertex.of(means), ConstantVertex.of(scaleParameters));
+    }
+
     /**
      * Set the input parameters to the distribution describing the prior belief about the intercept of the regression model
      *
