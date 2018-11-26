@@ -1,0 +1,7 @@
+digraph BayesianNetwork {
+<101> -> <102> [label=right]
+<94> -> <102> [label=left]
+101[label="EqualsVertex"]
+102[label="OR"]
+94[label="LessThanVertex"]
+}

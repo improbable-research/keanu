@@ -2,11 +2,12 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class MultiplexerVertex<T> extends Vertex<T> implements NonProbabilistic<T> {
+public class MultiplexerVertex<T> extends Vertex<T> implements NonProbabilistic<T>, NonSaveableVertex {
 
     private final IntegerVertex selectorControlVertex;
     private final Vertex<T>[] selectVertices;

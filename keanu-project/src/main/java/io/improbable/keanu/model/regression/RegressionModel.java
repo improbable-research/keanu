@@ -5,6 +5,7 @@ import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -25,15 +26,14 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
     private static final double DEFAULT_OBSERVATION_SIGMA = 1.0;
     private final DoubleTensor inputTrainingData;
     private final OUTPUT outputTrainingData;
-    private final RegressionRegularization regularization;
-
+    private final ModelFitter<DoubleTensor, OUTPUT> fitter;
     private final LinearRegressionGraph<OUTPUT> modelGraph;
 
-    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph, DoubleTensor inputTrainingData, OUTPUT outputTrainingData, RegressionRegularization regularization) {
+    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph, DoubleTensor inputTrainingData, OUTPUT outputTrainingData, ModelFitter<DoubleTensor, OUTPUT> fitter) {
         this.modelGraph = modelGraph;
         this.inputTrainingData = inputTrainingData;
         this.outputTrainingData = outputTrainingData;
-        this.regularization = regularization;
+        this.fitter = fitter;
     }
 
     public static RegressionModelBuilder<DoubleTensor> withTrainingData(DoubleTensor inputTrainingData, DoubleTensor outputTrainingData) {
@@ -80,13 +80,19 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
         return modelGraph.predict(tensor);
     }
 
+    public VertexId getInterceptVertexId() {
+        return modelGraph.getInterceptVertexId();
+    }
+
+    public VertexId getWeightsVertexId() {
+        return modelGraph.getWeightsVertexId();
+    }
+
     public void fit() {
-        ModelFitter<DoubleTensor, OUTPUT> fitter = this.regularization.createFitterForGraph(this.modelGraph);
         fitter.fit(inputTrainingData, outputTrainingData);
     }
 
     public void observe() {
-        ModelFitter<DoubleTensor, OUTPUT> fitter = this.regularization.createFitterForGraph(this.modelGraph);
         fitter.observe(inputTrainingData, outputTrainingData);
     }
 }

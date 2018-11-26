@@ -1,10 +1,13 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Multinomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -20,6 +23,8 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
     private final DoubleVertex p;
     private final IntegerVertex n;
+    private static final String P_NAME = "p";
+    private static final String N_NAME = "n";
 
     public MultinomialVertex(long[] tensorShape, IntegerVertex n, DoubleVertex p) {
         super(tensorShape);
@@ -34,7 +39,8 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
         addParent(n);
     }
 
-    public MultinomialVertex(IntegerVertex n, DoubleVertex p) {
+    @ExportVertexToPythonBindings
+    public MultinomialVertex(@LoadParentVertex(N_NAME) IntegerVertex n, @LoadParentVertex(P_NAME) DoubleVertex p) {
         this(n.getShape(), n, p);
     }
 
@@ -55,5 +61,15 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     @Override
     public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return Multinomial.withParameters(n.getValue(), p.getValue()).sample(shape, random);
+    }
+
+    @SaveParentVertex(P_NAME)
+    public DoubleVertex getP() {
+        return p;
+    }
+
+    @SaveParentVertex(N_NAME)
+    public IntegerVertex getN() {
+        return n;
     }
 }

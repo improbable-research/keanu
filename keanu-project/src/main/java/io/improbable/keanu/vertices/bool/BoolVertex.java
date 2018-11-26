@@ -2,8 +2,8 @@ package io.improbable.keanu.vertices.bool;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.kotlin.BooleanOperators;
-import io.improbable.keanu.network.NetworkReader;
-import io.improbable.keanu.network.NetworkWriter;
+import io.improbable.keanu.network.NetworkLoader;
+import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -29,13 +29,13 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> implements Boolea
         super(initialShape);
     }
 
-    public void saveValue(NetworkWriter netWriter) {
-        netWriter.saveValue(this);
+    public void saveValue(NetworkSaver netSaver) {
+        netSaver.saveValue(this);
     }
 
     @Override
-    public void loadValue(NetworkReader reader) {
-        reader.loadValue(this);
+    public void loadValue(NetworkLoader loader) {
+        loader.loadValue(this);
     }
 
     @SafeVarargs

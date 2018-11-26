@@ -15,6 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
+ * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
+ * https://arxiv.org/pdf/1111.4246.pdf
+ */
 public class NUTSSampler implements SamplingAlgorithm {
 
     private static final double DELTA_MAX = 1000.0;
@@ -35,6 +40,19 @@ public class NUTSSampler implements SamplingAlgorithm {
     private Double stepSize;
     private int sampleNum;
 
+    /**
+     * @param sampleFromVertices        vertices to sample from
+     * @param latentVertices            vertices that represent latent variables
+     * @param probabilisticVertices     vertices that contribute to total log probability (i.e. latent + observed)
+     * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
+     * @param adaptEnabled              enable the NUTS step size adaptation
+     * @param autoTune                  configuration for tuning the stepsize, if adaptEnabled
+     * @param tree                      initial tree that will contain the state of the tree build
+     * @param stepSize                  The initial step size. A heuristic will be used to determine a suitable initial stepsize if none
+     *                                  is given.
+     * @param maxTreeHeight             The largest tree height before stopping the hamilitonian process
+     * @param random                    the source of randomness
+     */
     public NUTSSampler(List<? extends Vertex> sampleFromVertices,
                        List<Vertex<DoubleTensor>> latentVertices,
                        List<Vertex> probabilisticVertices,
@@ -403,11 +421,11 @@ public class NUTSSampler implements SamplingAlgorithm {
     }
 
     private static LeapFrogged leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
-                                       final LogProbGradientCalculator logProbGradientCalculator,
-                                       final Map<VertexId, DoubleTensor> position,
-                                       final Map<VertexId, DoubleTensor> gradient,
-                                       final Map<VertexId, DoubleTensor> momentum,
-                                       final double epsilon) {
+                                        final LogProbGradientCalculator logProbGradientCalculator,
+                                        final Map<VertexId, DoubleTensor> position,
+                                        final Map<VertexId, DoubleTensor> gradient,
+                                        final Map<VertexId, DoubleTensor> momentum,
+                                        final double epsilon) {
 
         final double halfTimeStep = epsilon / 2.0;
 
@@ -442,6 +460,20 @@ public class NUTSSampler implements SamplingAlgorithm {
         }
 
         return new LeapFrogged(nextPosition, nextMomentum, nextPositionGradient);
+    }
+
+    private static class LeapFrogged {
+        final Map<VertexId, DoubleTensor> position;
+        final Map<VertexId, DoubleTensor> momentum;
+        final Map<VertexId, DoubleTensor> gradient;
+
+        LeapFrogged(Map<VertexId, DoubleTensor> position,
+                    Map<VertexId, DoubleTensor> momentum,
+                    Map<VertexId, DoubleTensor> gradient) {
+            this.position = position;
+            this.momentum = momentum;
+            this.gradient = gradient;
+        }
     }
 
     private static double dotProduct(Map<VertexId, DoubleTensor> momentums) {
@@ -486,6 +518,9 @@ public class NUTSSampler implements SamplingAlgorithm {
         samplesForVertex.add(value);
     }
 
+    /**
+     * Taken from algorithm 4 in https://arxiv.org/pdf/1111.4246.pdf.
+     */
     static double findStartingStepSize(Map<VertexId, DoubleTensor> position,
                                        Map<VertexId, DoubleTensor> gradient,
                                        List<Vertex<DoubleTensor>> vertices,
@@ -520,6 +555,9 @@ public class NUTSSampler implements SamplingAlgorithm {
         return stepsize;
     }
 
+    /**
+     * Taken from algorithm 5 in https://arxiv.org/pdf/1111.4246.pdf.
+     */
     private static double adaptStepSize(AutoTune autoTune, BuiltTree tree, int sampleNum) {
 
         if (sampleNum <= autoTune.adaptCount) {
@@ -564,20 +602,6 @@ public class NUTSSampler implements SamplingAlgorithm {
         } else {
 
             return Math.exp(autoTune.logStepSizeFrozen);
-        }
-    }
-
-    static class LeapFrogged {
-        final Map<VertexId, DoubleTensor> position;
-        final Map<VertexId, DoubleTensor> momentum;
-        final Map<VertexId, DoubleTensor> gradient;
-
-        LeapFrogged(Map<VertexId, DoubleTensor> position,
-                    Map<VertexId, DoubleTensor> momentum,
-                    Map<VertexId, DoubleTensor> gradient) {
-            this.position = position;
-            this.momentum = momentum;
-            this.gradient = gradient;
         }
     }
 

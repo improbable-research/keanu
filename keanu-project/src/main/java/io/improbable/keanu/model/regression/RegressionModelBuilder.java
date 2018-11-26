@@ -1,11 +1,12 @@
 package io.improbable.keanu.model.regression;
 
+import java.util.function.Function;
+
 import io.improbable.keanu.model.ModelFitter;
+import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-
-import java.util.function.Function;
 
 /**
  * Builder class for doing linear regression without regularisation.
@@ -24,6 +25,7 @@ public class RegressionModelBuilder<OUTPUT> {
     private DoubleTensor inputTrainingData;
     private OUTPUT outputTrainingData;
     private Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
+    private SamplingModelFitting samplingAlgorithm = null;
 
     public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
         this.inputTrainingData = inputTrainingData;
@@ -94,6 +96,15 @@ public class RegressionModelBuilder<OUTPUT> {
     }
 
     /**
+     * Optional - use a sampling algorithm to fit the model instead of the default, which is gradient optimization.
+     * @param sampling Defines the number of samples to take and the algorithm to use, e.g. {@link io.improbable.keanu.algorithms.mcmc.MetropolisHastings}
+     * @return this
+     */
+    public RegressionModelBuilder withSampling(SamplingModelFitting sampling) {
+        this.samplingAlgorithm = sampling;
+        return this;
+    }
+    /**
      * @return A linear regression model from the data passed to the builder
      */
     public RegressionModel<OUTPUT> build() {
@@ -106,7 +117,11 @@ public class RegressionModelBuilder<OUTPUT> {
                 getWeightsVertex()
         );
 
-        return new RegressionModel<>(regressionGraph, inputTrainingData, outputTrainingData, regularization);
+        ModelFitter<DoubleTensor, OUTPUT> fitter = samplingAlgorithm == null ?
+            this.regularization.createFitterForGraph(regressionGraph) :
+            samplingAlgorithm.createFitterForGraph(regressionGraph);
+
+        return new RegressionModel<>(regressionGraph, inputTrainingData, outputTrainingData, fitter);
     }
 
     private void checkVariablesAreCorrectlyInitialised() {
@@ -135,7 +150,16 @@ public class RegressionModelBuilder<OUTPUT> {
         return this.regularization.getWeightsVertex(getFeatureCount(), priorOnWeightsMeans, priorOnWeightsScaleParameters);
     }
 
+    private void performDataFitting(LinearRegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
+        ModelFitter<DoubleTensor, OUTPUT> fitter = samplingAlgorithm == null ?
+            this.regularization.createFitterForGraph(regressionGraph) :
+            samplingAlgorithm.createFitterForGraph(regressionGraph);
+
+        fitter.fit(inputTrainingData, outputTrainingData);
+    }
+
     private long getFeatureCount() {
         return this.inputTrainingData.getShape()[0];
     }
+
 }
