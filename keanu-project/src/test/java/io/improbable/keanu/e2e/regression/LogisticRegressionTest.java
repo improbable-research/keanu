@@ -74,7 +74,4 @@ public class LogisticRegressionTest {
         assertThat(weights, allCloseTo(0.15, TRUE_WEIGHTS));
     }
 
-    private void assertRegularizedWeightsAreSmaller(DoubleVertex unregularizedWeights, DoubleVertex regularizedWeights) {
-        assertThat(regularizedWeights.getValue().abs(), lessThanOrEqualTo(unregularizedWeights.getValue().abs()));
-    }
 }

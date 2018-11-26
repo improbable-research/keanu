@@ -121,11 +121,14 @@ public class LinearRidgeRegressionTest {
             .withRegularization(RegressionRegularization.RIDGE)
             .withPriorOnIntercept(0, data.intercept)
             .withPriorOnWeights(
-                DoubleTensor.create(0., data.weights.getShape()).asFlatDoubleArray(),
-                data.weights.asFlatDoubleArray()
+                DoubleTensor.create(0., data.weights.getShape()),
+                data.weights
             )
             .withSampling(sampling)
             .build();
+
+        linearRegressionModel.observe();
+        linearRegressionModel.fit();
 
         NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
 

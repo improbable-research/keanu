@@ -37,7 +37,7 @@ public class LinearLassoRegressionTest {
             .withPriorOnIntercept(0, 20)
             .build();
 
-
+        linearRegressionModel.observe();
         linearRegressionModel.fit();
         
         assertWeightsAndInterceptMatchTestData(
@@ -55,6 +55,8 @@ public class LinearLassoRegressionTest {
             .withRegularization(RegressionRegularization.LASSO)
             .withPriorOnIntercept(0, 20)
             .build();
+
+        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -72,6 +74,8 @@ public class LinearLassoRegressionTest {
             .withRegularization(RegressionRegularization.LASSO)
             .withPriorOnIntercept(0, 20)
             .build();
+
+        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -95,7 +99,10 @@ public class LinearLassoRegressionTest {
             .withPriorOnWeightsAndIntercept(0, 0.00001)
             .build();
 
+        linearRegressionModelWide.observe();
         linearRegressionModelWide.fit();
+
+        linearRegressionModelNarrow.observe();
         linearRegressionModelNarrow.fit();
 
         assertThat(linearRegressionModelNarrow.getWeights().abs().sum(), lessThan(linearRegressionModelWide.getWeights().abs().sum()));
@@ -110,6 +117,8 @@ public class LinearLassoRegressionTest {
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .withRegularization(RegressionRegularization.LASSO)
             .build();
+
+        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertThat(linearRegressionModel.getWeight(2), closeTo(0., 1e-3));
@@ -135,11 +144,14 @@ public class LinearLassoRegressionTest {
             .withRegularization(RegressionRegularization.LASSO)
             .withPriorOnIntercept(0, data.intercept)
             .withPriorOnWeights(
-                DoubleTensor.create(0., data.weights.getShape()).asFlatDoubleArray(),
-                data.weights.asFlatDoubleArray()
+                DoubleTensor.create(0., data.weights.getShape()),
+                data.weights
             )
             .withSampling(sampling)
             .build();
+
+        linearRegressionModel.observe();
+        linearRegressionModel.fit();
 
         NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
 
