@@ -4,6 +4,7 @@ import io.improbable.keanu.model.MAPModelFitter;
 import io.improbable.keanu.model.MaximumLikelihoodModelFitter;
 import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.model.ModelGraph;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -13,13 +14,12 @@ public enum RegressionRegularization {
     NONE {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
             return new GaussianVertex(new long[]{1, featureCount},
-                new ConstantDoubleVertex(DEFAULT_MU),
-                new ConstantDoubleVertex(DEFAULT_SCALE_PARAMETER)
-            );
+                ConstantVertex.of(priorOnWeightsMeans),
+                ConstantVertex.of(priorOnInterceptScaleParameter)).setLabel("weights");
         }
 
         public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
-            return new GaussianVertex(DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
+            return new GaussianVertex(priorOnInterceptMean, priorOnInterceptScaleParameter).setLabel("intercept");
         }
 
         public <INPUT, OUTPUT> ModelFitter<INPUT, OUTPUT> createFitterForGraph(ModelGraph<INPUT, OUTPUT> graph) {
@@ -58,9 +58,6 @@ public enum RegressionRegularization {
             return new MAPModelFitter<>(graph);
         }
     };
-
-    private static final double DEFAULT_MU = 0.0;
-    private static final double DEFAULT_SCALE_PARAMETER = 2.0;
 
     public abstract DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter);
 

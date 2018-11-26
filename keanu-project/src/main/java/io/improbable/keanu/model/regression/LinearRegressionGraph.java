@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import lombok.Getter;
@@ -60,6 +61,14 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
 
     public double getIntercept() {
         return interceptVertex.getValue().scalar();
+    }
+
+    public VertexId getInterceptVertexId() {
+        return interceptVertex.getId();
+    }
+
+    public VertexId getWeightsVertexId() {
+        return weightsVertex.getId();
     }
 
     @Value
