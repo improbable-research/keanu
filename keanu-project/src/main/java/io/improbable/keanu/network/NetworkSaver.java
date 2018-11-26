@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 import java.io.IOException;
 import java.io.OutputStream;
 
-public interface NetworkWriter {
+public interface NetworkSaver {
 
     void save(OutputStream output, boolean saveValues) throws IOException;
     void save(Vertex vertex);

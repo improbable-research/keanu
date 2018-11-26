@@ -51,17 +51,18 @@ public class NUTSTest {
     @Test
     public void samplesContinuousPrior() {
 
-        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.);
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 20.0);
 
         NUTS nuts = NUTS.builder()
-            .adaptCount(100)
+            .adaptCount(0)
+            .maxTreeHeight(8)
             .random(random)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVertices(),
-            2000
+            3000
         );
 
         Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
