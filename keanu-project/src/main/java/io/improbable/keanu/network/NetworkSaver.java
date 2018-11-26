@@ -34,7 +34,16 @@ public interface NetworkSaver {
     }
 
     void saveValue(Vertex vertex);
-    void saveValue(DoubleVertex vertex);
-    void saveValue(IntegerVertex vertex);
-    void saveValue(BoolVertex vertex);
+
+    default void saveValue(DoubleVertex vertex) {
+        saveValue((Vertex)vertex);
+    }
+
+    default void saveValue(IntegerVertex vertex)  {
+        saveValue((Vertex)vertex);
+    }
+
+    default void saveValue(BoolVertex vertex)  {
+        saveValue((Vertex)vertex);
+    }
 }
