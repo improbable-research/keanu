@@ -146,7 +146,7 @@ public class KDEApproximationTest {
 
         int numSamples = 100;
         DoubleTensor sample = KDE.sample(numSamples, KeanuRandom.getDefaultRandom());
-        assertThat(sample, hasShape(1, 100));
+        assertThat(sample, hasShape(100));
     }
 
     @Test
@@ -161,8 +161,7 @@ public class KDEApproximationTest {
 
         int nSamples = 1000;
         resampledKDE.resample(nSamples, KeanuRandom.getDefaultRandom());
-        assertEquals(1, resampledKDE.getSampleShape()[0]);
-        assertEquals(nSamples, resampledKDE.getSampleShape()[1]);
+        assertEquals(nSamples, resampledKDE.getSampleShape()[0]);
     }
 
     @Test(expected = IllegalArgumentException.class)

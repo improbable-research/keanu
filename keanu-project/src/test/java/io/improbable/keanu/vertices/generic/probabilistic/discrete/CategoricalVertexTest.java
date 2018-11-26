@@ -50,7 +50,7 @@ public class CategoricalVertexTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(t2));
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Shapes must match or be scalar");
+        thrown.expectMessage("Shapes must match or be length one");
 
         new CategoricalVertex<>(selectableValues);
     }
@@ -81,7 +81,7 @@ public class CategoricalVertexTest {
         long[] proposalShape = new long[]{3, 5, 6};
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Proposed shape " + Arrays.toString(proposalShape) + " does not match other non scalar shapes");
+        thrown.expectMessage("Proposed shape " + Arrays.toString(proposalShape) + " does not match other non length one shapes");
 
         new CategoricalVertex<>(proposalShape, selectableValues);
     }
@@ -97,7 +97,7 @@ public class CategoricalVertexTest {
         long[] proposalShape = new long[]{3, 5, 6};
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("More than a single non-scalar shape");
+        thrown.expectMessage("More than a single non length one shape");
 
         new CategoricalVertex<>(proposalShape, selectableValues);
     }
@@ -181,10 +181,10 @@ public class CategoricalVertexTest {
         final DoubleTensor sample = dirichletVertex.getValue();
 
         final Map<TestEnum, DoubleVertex> expectedProportions = new LinkedHashMap<>();
-        expectedProportions.put(TestEnum.A, ConstantVertex.of(sample.getValue(0, 0)));
-        expectedProportions.put(TestEnum.B, ConstantVertex.of(sample.getValue(0, 1)));
-        expectedProportions.put(TestEnum.C, ConstantVertex.of(sample.getValue(0, 2)));
-        expectedProportions.put(TestEnum.D, ConstantVertex.of(sample.getValue(0, 3)));
+        expectedProportions.put(TestEnum.A, ConstantVertex.of(sample.getValue(0)));
+        expectedProportions.put(TestEnum.B, ConstantVertex.of(sample.getValue(1)));
+        expectedProportions.put(TestEnum.C, ConstantVertex.of(sample.getValue(2)));
+        expectedProportions.put(TestEnum.D, ConstantVertex.of(sample.getValue(3)));
 
         final Map<TestEnum, Double> proportions = testScalarSampleFromVertex(categoricalVertex, random);
         assertProportionsWithinExpectedRanges(expectedProportions, proportions);
@@ -199,11 +199,11 @@ public class CategoricalVertexTest {
         final DoubleTensor sample = dirichletVertex.getValue();
 
         final Map<Integer, DoubleVertex> expectedProportions = new LinkedHashMap<>();
-        expectedProportions.put(0, ConstantVertex.of(sample.getValue(0, 0)));
-        expectedProportions.put(1, ConstantVertex.of(sample.getValue(0, 1)));
-        expectedProportions.put(2, ConstantVertex.of(sample.getValue(0, 2)));
-        expectedProportions.put(3, ConstantVertex.of(sample.getValue(0, 3)));
-        expectedProportions.put(4, ConstantVertex.of(sample.getValue(0, 4)));
+        expectedProportions.put(0, ConstantVertex.of(sample.getValue(0)));
+        expectedProportions.put(1, ConstantVertex.of(sample.getValue(1)));
+        expectedProportions.put(2, ConstantVertex.of(sample.getValue(2)));
+        expectedProportions.put(3, ConstantVertex.of(sample.getValue(3)));
+        expectedProportions.put(4, ConstantVertex.of(sample.getValue(4)));
 
         final Map<Integer, Double> proportions = testScalarSampleFromVertex(categoricalVertex, random);
         assertProportionsWithinExpectedRanges(expectedProportions, proportions);
@@ -237,8 +237,8 @@ public class CategoricalVertexTest {
         CategoricalVertex<TestEnum, GenericTensor<TestEnum>> categoricalVertex = new CategoricalVertex<>(selectableValues);
         Tensor<TestEnum> sample = categoricalVertex.sample();
 
-        assertThat(sample.getValue(0, 0), equalTo(TestEnum.B));
-        assertThat(sample.getValue(0, 1), equalTo(TestEnum.A));
+        assertThat(sample.getValue(0), equalTo(TestEnum.B));
+        assertThat(sample.getValue(1), equalTo(TestEnum.A));
     }
 
     @Test
