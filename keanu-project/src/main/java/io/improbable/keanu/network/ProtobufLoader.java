@@ -5,7 +5,6 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -64,9 +63,7 @@ public class ProtobufLoader implements NetworkLoader {
         if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
             throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
         } else {
-            return DoubleTensor.create(
-                Doubles.toArray(value.getDoubleVal().getValuesList()),
-                Longs.toArray(value.getDoubleVal().getShapeList()));
+            return extractDoubleTensor(value.getDoubleVal());
         }
     }
 
@@ -174,8 +171,8 @@ public class ProtobufLoader implements NetworkLoader {
             throw new IllegalArgumentException("Unknown Vertex Type Specified: " + vertex.getVertexType(), e);
         }
 
-        Map<String, Vertex> parentsMap = getParentsMap(vertex, existingVertices);
-        Vertex newVertex = instantiateVertex(vertexClass, parentsMap, vertex.getConstantValue());
+        Map<String, Object> parameterMap = getParamMap(vertex, existingVertices);
+        Vertex newVertex = instantiateVertex(vertexClass, parameterMap);
 
         if (!vertex.getLabel().isEmpty()) {
             newVertex.setLabel(vertex.getLabel());
@@ -185,30 +182,21 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private Vertex instantiateVertex(Class vertexClass,
-                                     Map<String, Vertex> parentsMap,
-                                     KeanuSavedBayesNet.VertexValue value) {
+                                     Map<String, Object> paramMap) {
         Constructor<Vertex> loadConstructor = getAnnotatedConstructor(vertexClass);
         Parameter[] constructorParameters = loadConstructor.getParameters();
         Object[] arguments = new Object[constructorParameters.length];
 
         for (int i = 0; i < constructorParameters.length; i++) {
-            LoadVertexParam parentVertexAnnotation = constructorParameters[i].getAnnotation(LoadVertexParam.class);
-            LoadVertexValue vertexValueAnnotation = constructorParameters[i].getAnnotation(LoadVertexValue.class);
+            LoadVertexParam paramAnnotation = constructorParameters[i].getAnnotation(LoadVertexParam.class);
 
-            if (parentVertexAnnotation != null) {
-                Vertex parentVertex = parentsMap.get(parentVertexAnnotation.value());
-                if (parentVertex == null) {
+            if (paramAnnotation != null) {
+                Object parameter = paramMap.get(paramAnnotation.value());
+                if (parameter == null) {
                     throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
-                        + parentVertexAnnotation.value());
+                        + paramAnnotation.value());
                 }
-                arguments[i] = parentVertex;
-            } else if (vertexValueAnnotation != null) {
-                Tensor initialValue = extractInitialValue(value);
-                if (initialValue == null) {
-                    throw new IllegalArgumentException("Failed to create vertex as required initial value not present: "
-                        + value);
-                }
-                arguments[i] = initialValue;
+                arguments[i] = parameter;
             } else {
                 throw new IllegalArgumentException("Cannot create Vertex due to unannotated parameter in constructor");
             }
@@ -229,22 +217,6 @@ public class ProtobufLoader implements NetworkLoader {
         }
     }
 
-    private Tensor extractInitialValue(KeanuSavedBayesNet.VertexValue value) {
-        switch (value.getValueTypeCase()) {
-            case INTVAL:
-                return extractIntValue(value);
-
-            case BOOLVAL:
-                return extractBoolValue(value);
-
-            case DOUBLEVAL:
-                return extractDoubleValue(value);
-
-            default:
-                return null;
-        }
-    }
-
     private Constructor getAnnotatedConstructor(Class vertexClass) {
         Constructor[] constructors = vertexClass.getConstructors();
 
@@ -261,19 +233,34 @@ public class ProtobufLoader implements NetworkLoader {
         throw new IllegalArgumentException("No Annotated Load Constructor for Vertex of type: " + vertexClass);
     }
 
-    private Map<String, Vertex> getParentsMap(KeanuSavedBayesNet.Vertex vertex,
-                                              Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
-        Map<String, Vertex> parentsMap = new HashMap<>();
+    private Map<String, Object> getParamMap(KeanuSavedBayesNet.Vertex vertex,
+                                            Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+        Map<String, Object> parentsMap = new HashMap<>();
 
-        for (KeanuSavedBayesNet.NamedParam namedParent : vertex.getParametersList()) {
-            Vertex existingParent = existingVertices.get(namedParent.getParentVertex());
-            if (existingParent == null) {
-                throw new IllegalArgumentException("Parent named in vertex hasn't been instantiated: " + namedParent);
-            }
-
-            parentsMap.put(namedParent.getName(), existingParent);
+        for (KeanuSavedBayesNet.NamedParam parameter : vertex.getParametersList()) {
+            parentsMap.put(parameter.getName(), getDecodedParam(parameter, existingVertices));
         }
 
         return parentsMap;
+    }
+
+    private DoubleTensor extractDoubleTensor(KeanuSavedBayesNet.DoubleTensor tensor) {
+        return DoubleTensor.create(
+            Doubles.toArray(tensor.getValuesList()),
+            Longs.toArray(tensor.getShapeList()));
+    }
+
+    private Object getDecodedParam(KeanuSavedBayesNet.NamedParam parameter,
+                                   Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+        switch (parameter.getParamCase()) {
+            case PARENTVERTEX:
+                return existingVertices.get(parameter.getParentVertex());
+
+            case DOUBLETENSORPARAM:
+                return extractDoubleTensor(parameter.getDoubleTensorParam());
+
+            default:
+                return null;
+        }
     }
 }

@@ -19,7 +19,6 @@ message Vertex {
     string label = 2;
     string vertexType = 3;
     repeated NamedParam parameters = 5;
-    VertexValue constantValue = 6;
 }
 
 message DoubleTensor {

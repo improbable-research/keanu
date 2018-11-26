@@ -91,10 +91,12 @@ public class ProtobufTest {
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
             .setLabel("MU VERTEX")
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
-            .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
-                .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
-                    .addAllShape(Longs.asList(1, 1)).addValues(1.0).build()
-                ).build())
+            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+                .setName("constant")
+                .setDoubleTensorParam(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+                    .addAllShape(Longs.asList(1, 1))
+                    .addValues(0.0).build())
+                .build())
             .build();
 
         KeanuSavedBayesNet.Vertex gaussianVertex = KeanuSavedBayesNet.Vertex.newBuilder()
@@ -141,7 +143,7 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfNoConstantSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Failed to create vertex as required initial value not present: ");
+        expectedException.expectMessage("Failed to create vertex due to missing parent: constant");
 
         KeanuSavedBayesNet.Vertex constantVertex = KeanuSavedBayesNet.Vertex.newBuilder()
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
@@ -160,15 +162,16 @@ public class ProtobufTest {
     @Test
     public void loadFailsIfWrongArgumentTypeSpecified() throws IOException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Incorrect Parameter Type specified.  Got: "
-            + "class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, "
-            + "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
+        expectedException.expectMessage("Incorrect Parameter Type specified.  " +
+            "Got: class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, " +
+            "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
 
         KeanuSavedBayesNet.Vertex constantVertex = KeanuSavedBayesNet.Vertex.newBuilder()
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
-            .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
-                .setIntVal(KeanuSavedBayesNet.IntegerTensor.newBuilder()
+            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+                .setName("constant")
+                .setIntTensorParam(KeanuSavedBayesNet.IntegerTensor.newBuilder()
                     .addAllShape(Longs.asList(1, 1)).addValues(1).build()
                 ).build())
             .build();
@@ -221,8 +224,9 @@ public class ProtobufTest {
         KeanuSavedBayesNet.Vertex constantVertex = KeanuSavedBayesNet.Vertex.newBuilder()
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
-            .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
-                .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+                .setName("constant")
+                .setDoubleTensorParam(KeanuSavedBayesNet.DoubleTensor.newBuilder()
                     .addAllShape(Longs.asList(1, 1)).addValues(1.0).build()
                 ).build())
             .build();
@@ -256,8 +260,9 @@ public class ProtobufTest {
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
             .setLabel("muVertex")
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
-            .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
-                .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+                .setName("constant")
+                .setDoubleTensorParam(KeanuSavedBayesNet.DoubleTensor.newBuilder()
                     .addAllShape(Longs.asList(1, 1)).addValues(1.0).build()
                 ).build())
             .build();
@@ -266,8 +271,9 @@ public class ProtobufTest {
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("2"))
             .setLabel("sigmaVertex")
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
-            .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
-                .setDoubleVal(KeanuSavedBayesNet.DoubleTensor.newBuilder()
+            .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
+                .setName("constant")
+                .setDoubleTensorParam(KeanuSavedBayesNet.DoubleTensor.newBuilder()
                     .addAllShape(Longs.asList(1, 1)).addValues(2.0).build()
                 ).build())
             .build();
