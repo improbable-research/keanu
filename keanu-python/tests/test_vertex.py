@@ -50,7 +50,7 @@ def test_can_pass_ndarray_to_vertex(jvm_view) -> None:
     assert sample.shape == (1, 2)
 
 
-def test_can_pass_pandas_to_vertex(jvm_view):
+def test_can_pass_pandas_to_vertex(jvm_view) -> None:
     gaussian = Vertex(jvm_view.GaussianVertex, pd.DataFrame(data=[0.1, 0.4]), pd.Series(data=[0.1, 0.4]))
     sample = gaussian.sample()
 
@@ -234,7 +234,7 @@ def test_get_vertex_id(jvm_view) -> None:
                           (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
-def test_you_can_set_value(vertex, expected_type, value, assert_vertex_value_equals):
+def test_you_can_set_value(vertex, expected_type, value, assert_vertex_value_equals) -> None:
     vertex.set_value(value)
     assert_vertex_value_equals(vertex, expected_type, value)
 
@@ -261,7 +261,7 @@ def test_you_can_set_value(vertex, expected_type, value, assert_vertex_value_equ
                           (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
-def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex_value_equals):
+def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex_value_equals) -> None:
     vertex1 = ctor(*args)
     vertex2 = ctor(*args)
     equal_vertex = vertex1 == vertex2
@@ -306,7 +306,7 @@ def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex
                           (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
-def test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals):
+def test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals) -> None:
     vertex = ctor(*args)
     assert not vertex.is_observed()
     vertex.observe(value)
