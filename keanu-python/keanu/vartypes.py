@@ -1,7 +1,6 @@
 from typing import Iterable, Union, Type, Any, TYPE_CHECKING, Dict, Tuple, List, Generator
 from numpy import integer, floating, bool_, ndarray
 from pandas import Series, DataFrame
-from keanu.vertex.ops import VertexOps
 from .base import JavaObjectWrapper
 from py4j.java_gateway import JavaObject
 
@@ -23,8 +22,6 @@ Vertex arg types
 '''
 wrapped_java_types = Union[JavaObjectWrapper]
 shape_types = Iterable[primitive_types]
-
-vertex_param_types = Union[tensor_arg_types, wrapped_java_types, VertexOps]
 '''
 Sample types
 '''

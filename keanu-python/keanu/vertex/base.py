@@ -1,21 +1,24 @@
 import collections
 
+import numpy as np
+
 import keanu as kn
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 from keanu.tensor import Tensor
-from .ops import VertexOps
-from typing import List, Tuple, Iterator, Union, cast
+from typing import List, Tuple, Iterator, Union, Any, Dict, SupportsRound, Optional, cast
 from py4j.java_gateway import JavaObject, JavaMember
 from py4j.java_collections import JavaList, JavaArray
-from keanu.vartypes import (tensor_arg_types, vertex_param_types, shape_types, numpy_types, runtime_tensor_arg_types,
+from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_tensor_arg_types,
                             runtime_primitive_types, runtime_wrapped_java_types)
-from keanu.cast import cast_tensor_arg_to_double, cast_tensor_arg_to_integer, cast_tensor_arg_to_bool
 
 k = KeanuContext()
 
+vertex_operation_param_types = Union['Vertex', tensor_arg_types]
+vertex_param_types = Union['Vertex', tensor_arg_types, wrapped_java_types]
 
-class Vertex(JavaObjectWrapper, VertexOps):
+
+class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
     def __init__(self, val_or_ctor: Union[JavaMember, JavaObject],
                  *args: Union[vertex_param_types, shape_types]) -> None:
@@ -55,6 +58,105 @@ class Vertex(JavaObjectWrapper, VertexOps):
     def get_id(self) -> Tuple[JavaObject, ...]:
         return Vertex._get_python_id(self.unwrap())
 
+    """
+    __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.
+    Without this the right operators would fail.
+    See https://docs.scipy.org/doc/numpy-1.13.0/neps/ufunc-overrides.html
+    """
+
+    def __array_ufunc__(self, ufunc: np.ufunc, method: str, input0: np.ndarray, input1: 'Vertex') -> 'Vertex':
+        methods = {
+            "equal": Vertex.__eq__,
+            "not_equal": Vertex.__ne__,
+            "add": Vertex.__radd__,
+            "subtract": Vertex.__rsub__,
+            "multiply": Vertex.__rmul__,
+            "power": Vertex.__rpow__,
+            "true_divide": Vertex.__rtruediv__,
+            "floor_divide": Vertex.__rfloordiv__,
+            "greater": Vertex.__lt__,
+            "greater_equal": Vertex.__le__,
+            "less": Vertex.__gt__,
+            "less_equal": Vertex.__ge__,
+        }
+        if method == "__call__":
+            try:
+                dispatch_method = methods[ufunc.__name__]
+                result = dispatch_method(input1, input0)
+                return result
+            except KeyError:
+                raise NotImplementedError("NumPy ufunc of type %s not implemented" % ufunc.__name__)
+        else:
+            raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
+
+    def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Addition(self, other)
+
+    def __radd__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Addition(other, self)
+
+    def __sub__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Difference(self, other)
+
+    def __rsub__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Difference(other, self)
+
+    def __mul__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Multiplication(self, other)
+
+    def __rmul__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Multiplication(other, self)
+
+    def __pow__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Power(self, other)
+
+    def __rpow__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Power(other, self)
+
+    def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Division(self, other)
+
+    def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Division(other, self)
+
+    def __floordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerDivision(self, other)
+
+    def __rfloordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerDivision(other, self)
+
+    def __eq__(self, other: vertex_operation_param_types) -> 'Vertex':  # type: ignore
+        return kn.vertex.generated.Equals(self, other)
+
+    def __ne__(self, other: vertex_operation_param_types) -> 'Vertex':  # type: ignore
+        return kn.vertex.generated.NotEquals(self, other)
+
+    def __gt__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.GreaterThan(self, other)
+
+    def __ge__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.GreaterThanOrEqual(self, other)
+
+    def __lt__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.LessThan(self, other)
+
+    def __le__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.LessThanOrEqual(self, other)
+
+    def __abs__(self) -> 'Vertex':
+        return kn.vertex.generated.Abs(self)
+
+    def __round__(self, ndigits: Optional[int] = 0) -> 'Vertex':
+        if ndigits != 0:
+            raise NotImplementedError("Keanu only supports rounding to 0 digits")
+        return kn.vertex.generated.Round(self)
+
+    def __floor__(self) -> 'Vertex':
+        return kn.vertex.generated.Floor(self)
+
+    def __ceil__(self) -> 'Vertex':
+        return kn.vertex.generated.Ceil(self)
+
     @staticmethod
     def __parse_args(args: Tuple[Union[vertex_param_types, shape_types], ...]) -> List[JavaObject]:
         return list(map(Vertex.__parse_arg, args))
@@ -82,16 +184,19 @@ class Vertex(JavaObjectWrapper, VertexOps):
 class Double(Vertex):
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
+        from keanu.cast import cast_tensor_arg_to_double
         return cast_tensor_arg_to_double(v)
 
 
 class Integer(Vertex):
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
+        from keanu.cast import cast_tensor_arg_to_integer
         return cast_tensor_arg_to_integer(v)
 
 
 class Bool(Vertex):
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
+        from keanu.cast import cast_tensor_arg_to_bool
         return cast_tensor_arg_to_bool(v)
