@@ -2,7 +2,7 @@
 
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
-from .base import Vertex, Double, Integer, Bool, vertex_param_types
+from .base import Vertex, Double, Integer, Bool, vertex_constructor_param_types
 from keanu.vartypes import (
     tensor_arg_types,
     shape_types

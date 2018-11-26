@@ -15,13 +15,13 @@ from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, n
 k = KeanuContext()
 
 vertex_operation_param_types = Union['Vertex', tensor_arg_types]
-vertex_param_types = Union['Vertex', tensor_arg_types, wrapped_java_types]
+vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_types]
 
 
 class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
     def __init__(self, val_or_ctor: Union[JavaMember, JavaObject],
-                 *args: Union[vertex_param_types, shape_types]) -> None:
+                 *args: Union[vertex_constructor_param_types, shape_types]) -> None:
         val: JavaObject
         if args:
             ctor = val_or_ctor
@@ -158,11 +158,11 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return kn.vertex.generated.Ceil(self)
 
     @staticmethod
-    def __parse_args(args: Tuple[Union[vertex_param_types, shape_types], ...]) -> List[JavaObject]:
+    def __parse_args(args: Tuple[Union[vertex_constructor_param_types, shape_types], ...]) -> List[JavaObject]:
         return list(map(Vertex.__parse_arg, args))
 
     @staticmethod
-    def __parse_arg(arg: Union[vertex_param_types, shape_types]) -> JavaObject:
+    def __parse_arg(arg: Union[vertex_constructor_param_types, shape_types]) -> JavaObject:
         if isinstance(arg, runtime_tensor_arg_types):
             return kn.vertex.const.Const(arg).unwrap()
         elif isinstance(arg, runtime_wrapped_java_types):
