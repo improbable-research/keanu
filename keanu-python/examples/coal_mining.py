@@ -8,8 +8,7 @@ class CoalMining():
     __fname = "data/coal-mining-disaster-data.csv"
 
     def __init__(self) -> None:
-        self._data: pd.DataFrame = pd.read_csv(  # type: ignore # TODO: stub pandas io
-            CoalMining.__fname, names=["year", "count"]).set_index("year")
+        self._data: pd.DataFrame = pd.read_csv(CoalMining.__fname, names=["year", "count"]).set_index("year")
 
     def model(self) -> Model:
         start_year, end_year = (self._data.index.min(), self._data.index.max())
