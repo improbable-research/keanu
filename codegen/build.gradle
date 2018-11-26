@@ -27,6 +27,7 @@ task saveJavadocStringsToFile(type: Javadoc) {
     options.setDoclet("io.improbable.keanu.codegen.python.KeanuProjectDoclet")
 
     classpath = project(':keanu-project').sourceSets.main.runtimeClasspath
+    classpath += project(':keanu-project').sourceSets.main.compileClasspath
 }
 
 task runCodeGeneration (type: JavaExec) {
