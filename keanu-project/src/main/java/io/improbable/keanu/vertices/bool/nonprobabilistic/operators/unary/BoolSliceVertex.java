@@ -1,11 +1,12 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 
 import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
-public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
+public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> implements NonSaveableVertex {
     private final int dimension;
     private final long index;
 
