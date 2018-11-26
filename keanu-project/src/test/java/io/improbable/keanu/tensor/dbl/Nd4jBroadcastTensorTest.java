@@ -107,6 +107,36 @@ public class Nd4jBroadcastTensorTest {
     }
 
     @Test
+    public void canBroadcastMultiplyRank1AndMatrix() {
+
+        /*
+          a = np.array([1, 2, 3]).reshape(3)
+          b = np.array([1, 2, 3, 5, 6, 7]).reshape(2, 3)
+          ab = a * b
+          print(ab)
+          print(np.shape(ab))
+         */
+
+        DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3
+        }, new long[]{3});
+
+        DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3,
+            5, 6, 7
+        }, new long[]{2, 3});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 4, 9,
+            5, 12, 21
+        }, new long[]{2, 3});
+
+
+        assertTimesOperationEquals(rank4, matrix, expected);
+        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
+    }
+
+    @Test
     public void canBroadcastMultiplyRank5ContainingMatrixAndMatrix() {
 
         /*
@@ -202,6 +232,42 @@ public class Nd4jBroadcastTensorTest {
             -3, 0, -1, -5, -6,
             -2, 1, 0, -4, -5
         }, new long[]{3, 5});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
+    public void canBroadcastAddVector() {
+
+        /*
+          x = np.array([1,2,3]).reshape(3)
+          s = np.array([-5, -5, -5,
+            -2, -2, -2,
+            -3, -3, -3,
+            -7, -7, -7,
+            -8, -8, -8]).reshape(3,5)
+          sx = s + x
+          print(sx)
+          print(np.shape(sx))
+         */
+
+        DoubleTensor x = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
+        DoubleTensor s = Nd4jDoubleTensor.create(new double[]{
+            -5, -5, -5,
+            -2, -2, -2,
+            -3, -3, -3,
+            -7, -7, -7,
+            -8, -8, -8
+        }, new long[]{5, 3});
+
+        DoubleTensor diff = s.plus(x);
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            -4, -3, -2,
+            -1, 0, 1,
+            -2, -1, 0,
+            -6, -5, -4,
+            -7, -6, -5
+        }, new long[]{5, 3});
 
         assertEquals(expected, diff);
     }
@@ -369,6 +435,43 @@ public class Nd4jBroadcastTensorTest {
             5 / 2.0, 2 / 2.0, 3 / 2.0, 7 / 2.0, 8 / 2.0,
             5 / 3.0, 2 / 3.0, 3 / 3.0, 7 / 3.0, 8 / 3.0
         }, new long[]{3, 5});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
+    public void canBroadcastDivideVector() {
+
+        /*
+          x = np.array([1,2,3]).reshape(3)
+          s = np.array([5, 5, 5,
+            2, 2, 2,
+            3, 3, 3,
+            7, 7, 7,
+            8, 8, 8]).reshape(5,3)
+          sx = s / x
+          print(sx)
+          print(np.shape(sx))
+         */
+
+        DoubleTensor x = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
+        DoubleTensor s = Nd4jDoubleTensor.create(new double[]{
+            5, 5, 5,
+            2, 2, 2,
+            3, 3, 3,
+            7, 7, 7,
+            8, 8, 8
+        }, new long[]{5, 3});
+
+        DoubleTensor diff = s.div(x);
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            5 / 1.0, 5 / 2.0, 5 / 3.0,
+            2 / 1.0, 2 / 2.0, 2 / 3.0,
+            3 / 1.0, 3 / 2.0, 3 / 3.0,
+            7 / 1.0, 7 / 2.0, 7 / 3.0,
+            8 / 1.0, 8 / 2.0, 8 / 3.0
+        }, new long[]{5, 3});
 
         assertEquals(expected, diff);
     }
