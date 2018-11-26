@@ -1,11 +1,8 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 
+import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
 
@@ -14,42 +11,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.setAndCascadePoint;
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.convertFromPoint;
 
 
 public class FitnessFunctionWithGradient {
 
-    private final List<? extends Vertex> ofVertices;
-    private final List<? extends Vertex<DoubleTensor>> wrtVertices;
-    private final LogProbGradientCalculator logProbGradientCalculator;
+    private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+    private final boolean useLikelihood;
 
     private final BiConsumer<double[], double[]> onGradientCalculation;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunctionWithGradient(List<? extends Vertex> ofVertices,
-                                       List<? extends Vertex<DoubleTensor>> wrtVertices,
+    public FitnessFunctionWithGradient(ProbabilisticWithGradientGraph probabilisticWithGradientGraph,
+                                       boolean useLikelihood,
                                        BiConsumer<double[], double[]> onGradientCalculation,
                                        BiConsumer<double[], Double> onFitnessCalculation) {
-        this.ofVertices = ofVertices;
-        this.wrtVertices = wrtVertices;
-        this.logProbGradientCalculator = new LogProbGradientCalculator(ofVertices, wrtVertices);
+        this.probabilisticWithGradientGraph = probabilisticWithGradientGraph;
+        this.useLikelihood = useLikelihood;
         this.onGradientCalculation = onGradientCalculation;
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public FitnessFunctionWithGradient(List<? extends Vertex> ofVertices,
-                                       List<? extends Vertex<DoubleTensor>> wrtVertices) {
-        this(ofVertices, wrtVertices, null, null);
+    public FitnessFunctionWithGradient(ProbabilisticWithGradientGraph probabilisticWithGradientGraph, boolean useLikelihood) {
+        this(probabilisticWithGradientGraph, useLikelihood, null, null);
     }
 
     public MultivariateVectorFunction gradient() {
         return point -> {
 
-            setAndCascadePoint(point, wrtVertices);
+            Map<String, DoubleTensor> values = getValues(point);
 
-            Map<VertexId, DoubleTensor> diffs = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+            Map<String, DoubleTensor> diffs = useLikelihood ?
+                probabilisticWithGradientGraph.logLikelihoodGradients(values) :
+                probabilisticWithGradientGraph.logProbGradients(values);
 
-            double[] gradients = alignGradientsToAppropriateIndex(diffs, wrtVertices);
+            double[] gradients = alignGradientsToAppropriateIndex(
+                diffs,
+                probabilisticWithGradientGraph.getLatentVariables(),
+                probabilisticWithGradientGraph.getLatentVariablesShapes()
+            );
 
             if (onGradientCalculation != null) {
                 onGradientCalculation.accept(point, gradients);
@@ -61,8 +61,12 @@ public class FitnessFunctionWithGradient {
 
     public MultivariateFunction fitness() {
         return point -> {
-            setAndCascadePoint(point, wrtVertices);
-            double logOfTotalProbability = ProbabilityCalculator.calculateLogProbFor(ofVertices);
+
+            Map<String, DoubleTensor> values = getValues(point);
+
+            double logOfTotalProbability = useLikelihood ?
+                probabilisticWithGradientGraph.logLikelihood(values) :
+                probabilisticWithGradientGraph.logProb(values);
 
             if (onFitnessCalculation != null) {
                 onFitnessCalculation.accept(point, logOfTotalProbability);
@@ -72,16 +76,25 @@ public class FitnessFunctionWithGradient {
         };
     }
 
-    private static double[] alignGradientsToAppropriateIndex(Map<VertexId, DoubleTensor /*Gradient*/> diffs,
-                                                             List<? extends Vertex<DoubleTensor>> latentVertices) {
+    private Map<String, DoubleTensor> getValues(double[] point) {
+        return convertFromPoint(
+            point,
+            probabilisticWithGradientGraph.getLatentVariables(),
+            probabilisticWithGradientGraph.getLatentVariablesShapes()
+        );
+    }
+
+    private static double[] alignGradientsToAppropriateIndex(Map<String, DoubleTensor> diffs,
+                                                             List<String> latentVertices,
+                                                             Map<String, long[]> latentShapes) {
 
         List<DoubleTensor> tensors = new ArrayList<>();
-        for (Vertex<DoubleTensor> vertex : latentVertices) {
-            DoubleTensor tensor = diffs.get(vertex.getId());
+        for (String vertex : latentVertices) {
+            DoubleTensor tensor = diffs.get(vertex);
             if (tensor != null) {
                 tensors.add(tensor);
             } else {
-                tensors.add(DoubleTensor.zeros(vertex.getShape()));
+                tensors.add(DoubleTensor.zeros(latentShapes.get(vertex)));
             }
         }
 

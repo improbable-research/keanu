@@ -3,12 +3,14 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
 import io.improbable.keanu.backend.ProbabilisticGraph;
+import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.backend.keanu.KeanuProbabilisticWithGradientGraph;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Builder;
 import lombok.Getter;
-import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
@@ -57,8 +60,10 @@ public class GradientOptimizer implements Optimizer {
                 "Discrete Latents (" + discreteLatentVertices.size() + " found)");
         }
 
+        bayesNet.cascadeObservations();
+
         return GradientOptimizer.builder()
-            .bayesianNetwork(bayesNet)
+            .probabilisticWithGradientGraph(new KeanuProbabilisticWithGradientGraph(bayesNet))
             .build();
     }
 
@@ -87,7 +92,7 @@ public class GradientOptimizer implements Optimizer {
     }
 
     @Getter
-    private BayesianNetwork bayesianNetwork;
+    private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
 
     /**
      * maxEvaluations the maximum number of objective function evaluations before throwing an exception
@@ -154,20 +159,38 @@ public class GradientOptimizer implements Optimizer {
         }
     }
 
+    private void assertHasLatents() {
+        if (probabilisticWithGradientGraph.getLatentVariables().isEmpty()) {
+            throw new IllegalArgumentException("Cannot find MAP of network without any latent variables");
+        }
+    }
+
     @Override
     public double maxAPosteriori() {
-        if (bayesianNetwork.getLatentOrObservedVertices().isEmpty()) {
-            throw new IllegalArgumentException("Cannot find MAP of network without any probabilistic vertices");
-        }
-        return optimize(bayesianNetwork.getLatentOrObservedVertices());
+        assertHasLatents();
+
+        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
+            probabilisticWithGradientGraph,
+            false,
+            this::handleGradientCalculation,
+            this::handleFitnessCalculation
+        );
+
+        return optimize(fitnessFunction);
     }
 
     @Override
     public double maxLikelihood() {
-        if (bayesianNetwork.getObservedVertices().isEmpty()) {
-            throw new IllegalArgumentException("Cannot find max likelihood of network without any observations");
-        }
-        return optimize(bayesianNetwork.getObservedVertices());
+        assertHasLatents();
+
+        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
+            probabilisticWithGradientGraph,
+            true,
+            this::handleGradientCalculation,
+            this::handleFitnessCalculation
+        );
+
+        return optimize(fitnessFunction);
     }
 
     @Override
@@ -175,23 +198,19 @@ public class GradientOptimizer implements Optimizer {
         return null;
     }
 
-    private double optimize(List<Vertex> outputVertices) {
+    private double optimize(FitnessFunctionWithGradient fitnessFunction) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
-
-        bayesianNetwork.cascadeObservations();
-
-        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
-            outputVertices,
-            bayesianNetwork.getContinuousLatentVertices(),
-            this::handleGradientCalculation,
-            this::handleFitnessCalculation
-        );
 
         ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
 
-        double[] startingPoint = Optimizer.currentPoint(bayesianNetwork.getContinuousLatentVertices());
+        double[] startingPoint = Optimizer.convertToPoint(
+            probabilisticWithGradientGraph.getLatentVariables(),
+            (Map<String, ? extends NumberTensor>) probabilisticWithGradientGraph.getLatentVariablesValues(),
+            probabilisticWithGradientGraph.getLatentVariablesShapes()
+        );
+
         double initialFitness = fitness.getObjectiveFunction().value(startingPoint);
         double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
 
@@ -203,15 +222,10 @@ public class GradientOptimizer implements Optimizer {
 
         NonLinearConjugateGradientOptimizer optimizer;
 
-        try {
-            optimizer = new NonLinearConjugateGradientOptimizer(
-                updateFormula.apacheMapping,
-                new SimpleValueChecker(relativeThreshold, absoluteThreshold)
-            );
-        } catch (NotStrictlyPositiveException e) {
-            translateNSPExceptionToIllegalArgException(e);
-            throw e;
-        }
+        optimizer = new NonLinearConjugateGradientOptimizer(
+            updateFormula.apacheMapping,
+            new SimpleValueChecker(relativeThreshold, absoluteThreshold)
+        );
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
@@ -232,12 +246,4 @@ public class GradientOptimizer implements Optimizer {
         }
     }
 
-    private static void translateNSPExceptionToIllegalArgException(NotStrictlyPositiveException e) {
-        long bitwiseMinValue = Double.doubleToLongBits(e.getMin().doubleValue());
-        long bitwiseArgumentValue = Double.doubleToLongBits(e.getArgument().doubleValue());
-
-        throw new IllegalArgumentException("Hit a NSP Error.  Min: "
-            + Long.toHexString(bitwiseMinValue)
-            + " Arg: " + Long.toHexString(bitwiseArgumentValue), e);
-    }
 }

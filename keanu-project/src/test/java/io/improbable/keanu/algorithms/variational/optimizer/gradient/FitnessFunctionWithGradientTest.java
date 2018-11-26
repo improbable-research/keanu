@@ -1,5 +1,8 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.backend.keanu.KeanuProbabilisticWithGradientGraph;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
@@ -117,7 +120,9 @@ public class FitnessFunctionWithGradientTest {
                                                       List<Vertex> vertices,
                                                       List<? extends Vertex<DoubleTensor>> latentVertices) {
 
-        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(vertices, latentVertices);
+        KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(vertices.get(0).getConnectedGraph()));
+
+        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(graph, false);
 
         double[] point = Arrays.copyOf(bottomLeft, bottomLeft.length);
 
