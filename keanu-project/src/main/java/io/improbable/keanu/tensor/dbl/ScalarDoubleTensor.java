@@ -860,7 +860,10 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public String toString() {
-        return String.format("[[%.4f]]", value);
+        return "{\n" +
+            "data = [" + value + "]" +
+            "\nshape = " + Arrays.toString(shape) +
+            "\n}";
     }
 
     private static class SimpleDoubleFlattenedView implements FlattenedView<Double> {
