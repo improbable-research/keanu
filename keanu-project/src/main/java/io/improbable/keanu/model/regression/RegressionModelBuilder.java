@@ -1,6 +1,7 @@
 package io.improbable.keanu.model.regression;
 
 import io.improbable.keanu.model.ModelFitter;
+import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
@@ -20,9 +21,10 @@ public class RegressionModelBuilder<OUTPUT> {
     private double[] priorOnWeightsMeans;
     private Double priorOnInterceptScaleParameter;
     private Double priorOnInterceptMean;
-    private DoubleTensor inputTrainingData;
-    private OUTPUT outputTrainingData;
-    private Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
+    private final DoubleTensor inputTrainingData;
+    private final OUTPUT outputTrainingData;
+    private final Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
+    private SamplingModelFitting samplingAlgorithm = null;
 
     public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
         this.inputTrainingData = inputTrainingData;
@@ -82,6 +84,15 @@ public class RegressionModelBuilder<OUTPUT> {
     }
 
     /**
+     * Optional - use a sampling algorithm to fit the model instead of the default, which is gradient optimization.
+     * @param sampling Defines the number of samples to take and the algorithm to use, e.g. {@link io.improbable.keanu.algorithms.mcmc.MetropolisHastings}
+     * @return this
+     */
+    public RegressionModelBuilder withSampling(SamplingModelFitting sampling) {
+        this.samplingAlgorithm = sampling;
+        return this;
+    }
+    /**
      * @return A linear regression model from the data passed to the builder
      */
     public RegressionModel<OUTPUT> build() {
@@ -122,11 +133,15 @@ public class RegressionModelBuilder<OUTPUT> {
     }
 
     private void performDataFitting(LinearRegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
-        ModelFitter<DoubleTensor, OUTPUT> fitter = this.regularization.createFitterForGraph(regressionGraph);
+        ModelFitter<DoubleTensor, OUTPUT> fitter = samplingAlgorithm == null ?
+            this.regularization.createFitterForGraph(regressionGraph) :
+            samplingAlgorithm.createFitterForGraph(regressionGraph);
+
         fitter.fit(inputTrainingData, outputTrainingData);
     }
 
     private long getFeatureCount() {
         return this.inputTrainingData.getShape()[0];
     }
+
 }
