@@ -1,6 +1,5 @@
 package io.improbable.keanu.backend;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.backend.keanu.KeanuGraphConverter;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -14,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -72,12 +70,6 @@ public class ProbabilisticGraphTest {
         canCalculateLogProb(probabilisticGraph);
     }
 
-    @Test
-    public void canCalculateLogProbAndSampleOnKeanuProbabilisticGraph() {
-        ProbabilisticGraph probabilisticGraph = KeanuGraphConverter.convert(new BayesianNetwork(D.getConnectedGraph()));
-        canConvertSimpleNetworkAndTakeSample(probabilisticGraph);
-    }
-
     private double expectedLogProb(DoubleTensor a, DoubleTensor b, DoubleTensor d) {
         NormalDistribution latents = new NormalDistribution(0.0, 1.0);
 
@@ -124,19 +116,4 @@ public class ProbabilisticGraphTest {
         assertEquals(expectedPostUpdateLogProb, postUpdateLogProb, 1e-5);
     }
 
-    public void canConvertSimpleNetworkAndTakeSample(ProbabilisticGraph probabilisticGraph) {
-
-        LogProbWithSample logProbWithSample = probabilisticGraph.logProbWithSample(ImmutableMap.of(
-            A_LABEL, initialA,
-            B_LABEL, initialB
-        ), ImmutableList.of(A_LABEL, B_LABEL, C_LABEL));
-
-        double expectedLogProb = expectedLogProb(initialA, initialB, observationD);
-        assertEquals(expectedLogProb, logProbWithSample.getLogProb(), 1e-5);
-
-        Map<String, ?> sample = logProbWithSample.getSample();
-        assertEquals(initialA, ((DoubleTensor) sample.get(A_LABEL)));
-        assertEquals(initialB, ((DoubleTensor) sample.get(B_LABEL)));
-        assertEquals(initialA.plus(initialB), ((DoubleTensor) sample.get(C_LABEL)));
-    }
 }

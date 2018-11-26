@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -9,6 +10,8 @@ import org.apache.commons.math3.optim.SimpleBounds;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class creates an Apache math commons simple bounds object for a given collection of
@@ -21,17 +24,33 @@ class ApacheMathSimpleBoundsCalculator {
     private final double boundsRange;
     private final OptimizerBounds optimizerBounds;
 
-    SimpleBounds getBounds(List<? extends Vertex<DoubleTensor>> latentVertices, double[] startPoint) {
+    SimpleBounds getBounds(List<? extends Vertex> latentVertices, double[] startPoint) {
+
+        List<String> latentVertexNames = latentVertices.stream()
+            .map(Vertex::getUniqueStringReference)
+            .collect(Collectors.toList());
+
+        Map<String, long[]> latentVertexShapes = latentVertices.stream().collect(Collectors.
+            toMap(
+                Vertex::getUniqueStringReference,
+                Vertex::getShape
+            ));
+
+        return getBounds(latentVertexNames, latentVertexShapes, startPoint);
+    }
+
+    SimpleBounds getBounds(List<String> latentVariables, Map<String, long[]> latentShapes, double[] startPoint) {
         List<Double> minBounds = new ArrayList<>();
         List<Double> maxBounds = new ArrayList<>();
 
-        for (Vertex<DoubleTensor> vertex : latentVertices) {
+        for (String variable : latentVariables) {
 
-            if (optimizerBounds.hasBound(vertex)) {
-                validateBoundsForVertex(vertex);
-                addBoundsForVertex(vertex, minBounds, maxBounds);
+            long[] variableShape = latentShapes.get(variable);
+            if (optimizerBounds.hasBound(variable)) {
+                validateBoundsForVariable(variable, variableShape);
+                addBoundsForVariable(variable, variableShape, minBounds, maxBounds);
             } else {
-                int length = (int) TensorShape.getLength(vertex.getShape());
+                int length = Ints.checkedCast(TensorShape.getLength(variableShape));
                 int startIndex = minBounds.size();
                 for (int i = 0; i < length; i++) {
                     minBounds.add(startPoint[i + startIndex] - boundsRange);
@@ -46,33 +65,33 @@ class ApacheMathSimpleBoundsCalculator {
         );
     }
 
-    private void addBoundsForVertex(Vertex<DoubleTensor> vertex,
-                                    List<Double> minBounds,
-                                    List<Double> maxBounds) {
+    private void addBoundsForVariable(String variable,
+                                      long[] variableShape,
+                                      List<Double> minBounds,
+                                      List<Double> maxBounds) {
 
-        DoubleTensor lowerBound = optimizerBounds.getLower(vertex);
-        DoubleTensor upperBound = optimizerBounds.getUpper(vertex);
+        DoubleTensor lowerBound = optimizerBounds.getLower(variable);
+        DoubleTensor upperBound = optimizerBounds.getUpper(variable);
 
         if (lowerBound.isScalar()) {
-            minBounds.addAll(DoubleTensor.create(lowerBound.scalar(), vertex.getShape()).asFlatList());
+            minBounds.addAll(DoubleTensor.create(lowerBound.scalar(), variableShape).asFlatList());
         } else {
             minBounds.addAll(lowerBound.asFlatList());
         }
 
         if (upperBound.isScalar()) {
-            maxBounds.addAll(DoubleTensor.create(upperBound.scalar(), vertex.getShape()).asFlatList());
+            maxBounds.addAll(DoubleTensor.create(upperBound.scalar(), variableShape).asFlatList());
         } else {
             maxBounds.addAll(upperBound.asFlatList());
         }
     }
 
-    private void validateBoundsForVertex(Vertex<DoubleTensor> vertex) {
-        long[] vertexShape = vertex.getShape();
-        if (!optimizerBounds.getLower(vertex).isScalar() && !Arrays.equals(vertexShape, optimizerBounds.getLower(vertex).getShape())) {
-            throw new IllegalArgumentException("Lower bounds shape does not match vertex shape");
+    private void validateBoundsForVariable(String variable, long[] variableShape) {
+        if (!optimizerBounds.getLower(variable).isScalar() && !Arrays.equals(variableShape, optimizerBounds.getLower(variable).getShape())) {
+            throw new IllegalArgumentException("Lower bounds shape does not match variable shape");
         }
-        if (!optimizerBounds.getUpper(vertex).isScalar() && !Arrays.equals(vertexShape, optimizerBounds.getUpper(vertex).getShape())) {
-            throw new IllegalArgumentException("Upper bounds shape does not match vertex shape");
+        if (!optimizerBounds.getUpper(variable).isScalar() && !Arrays.equals(variableShape, optimizerBounds.getUpper(variable).getShape())) {
+            throw new IllegalArgumentException("Upper bounds shape does not match variable shape");
         }
     }
 

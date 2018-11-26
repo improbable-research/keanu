@@ -1,23 +1,30 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
+import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
 public interface Optimizer {
+
     /**
      * Adds a callback to be called whenever the optimizer evaluates the fitness of a point. E.g. for logging.
+     *
      * @param fitnessCalculationHandler a function to be called whenever the optimizer evaluates the fitness of a point.
      *                                  The double[] argument to the handler represents the point being evaluated.
      *                                  The Double argument to the handler represents the fitness of that point.
@@ -27,6 +34,7 @@ public interface Optimizer {
     /**
      * Removes a callback function that previously would have been called whenever the optimizer
      * evaluated the fitness of a point. If the callback is not registered then this function will do nothing.
+     *
      * @param fitnessCalculationHandler the function to be removed from the list of fitness evaluation callbacks
      */
     void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
@@ -49,7 +57,7 @@ public interface Optimizer {
      */
     double maxLikelihood();
 
-    BayesianNetwork getBayesianNetwork();
+    ProbabilisticGraph getProbabilisticGraph();
 
     /**
      * Creates an {@link Optimizer} which provides methods for optimizing the values of latent variables
@@ -107,6 +115,59 @@ public interface Optimizer {
         }
 
         return point;
+    }
+
+    static double[] convertToPoint(List<String> latentVariables,
+                                   Map<String, ? extends NumberTensor> latentVariableValues,
+                                   Map<String, long[]> latentShapes) {
+
+        long totalLatentDimensions = totalNumberOfLatentDimensions(latentShapes);
+
+        if (totalLatentDimensions > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Greater than " + Integer.MAX_VALUE + " latent dimensions not supported");
+        }
+
+        int position = 0;
+        double[] point = new double[(int) totalLatentDimensions];
+
+        for (String variable : latentVariables) {
+            double[] values = latentVariableValues.get(variable).asFlatDoubleArray();
+            System.arraycopy(values, 0, point, position, values.length);
+            position += values.length;
+        }
+
+        return point;
+    }
+
+    static Map<String, DoubleTensor> convertFromPoint(double[] point,
+                                                      List<String> latentVariables,
+                                                      Map<String, long[]> latentShapes) {
+
+        Map<String, DoubleTensor> tensors = new HashMap<>();
+        int position = 0;
+        for (String variable : latentVariables) {
+
+            long[] latentShape = latentShapes.get(variable);
+            int dimensions = Ints.checkedCast(TensorShape.getLength(latentShape));
+
+            double[] values = new double[dimensions];
+            System.arraycopy(point, position, values, 0, dimensions);
+
+            DoubleTensor newTensor = DoubleTensor.create(values, latentShape);
+
+            tensors.put(variable, newTensor);
+            position += dimensions;
+        }
+
+        return tensors;
+    }
+
+    static long totalNumberOfLatentDimensions(Map<String, long[]> continuousLatentVariableShapes) {
+        return continuousLatentVariableShapes.values().stream().mapToLong(Optimizer::numDimensions).sum();
+    }
+
+    static long numDimensions(long[] shape) {
+        return TensorShape.getLength(shape);
     }
 
     static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices) {

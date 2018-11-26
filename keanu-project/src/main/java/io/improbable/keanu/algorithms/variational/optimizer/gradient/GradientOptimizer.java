@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
+import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
@@ -39,6 +40,7 @@ public class GradientOptimizer implements Optimizer {
             this.apacheMapping = apacheMapping;
         }
     }
+
     /**
      * Creates a {@link GradientOptimizer} which provides methods for optimizing the values of latent variables
      * of the Bayesian network to maximise probability.
@@ -111,9 +113,10 @@ public class GradientOptimizer implements Optimizer {
 
     /**
      * Adds a callback to be called whenever the optimizer evaluates the gradient at a point.
+     *
      * @param gradientCalculationHandler a function to be called whenever the optimizer evaluates the gradient at a point.
-     *                                  The double[] argument to the handler represents the point being evaluated.
-     *                                  The double[] argument to the handler represents the gradient of that point.
+     *                                   The double[] argument to the handler represents the point being evaluated.
+     *                                   The double[] argument to the handler represents the gradient of that point.
      */
     public void addGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
         this.onGradientCalculations.add(gradientCalculationHandler);
@@ -165,6 +168,11 @@ public class GradientOptimizer implements Optimizer {
             throw new IllegalArgumentException("Cannot find max likelihood of network without any observations");
         }
         return optimize(bayesianNetwork.getObservedVertices());
+    }
+
+    @Override
+    public ProbabilisticGraph getProbabilisticGraph() {
+        return null;
     }
 
     private double optimize(List<Vertex> outputVertices) {

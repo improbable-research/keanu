@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
+import io.improbable.keanu.backend.keanu.KeanuProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -30,12 +31,12 @@ public class NonGradientOptimizerTest {
         A.setValue(new double[]{0, 0});
 
         OptimizerBounds bounds = new OptimizerBounds();
-        bounds.addBound(A, DoubleTensor.create(new double[]{-1, -2}), 0.9);
+        bounds.addBound(A, DoubleTensor.create(-1, -2), 0.9);
 
         NonGradientOptimizer optimizer = NonGradientOptimizer.builder()
             .boundsRange(10)
             .optimizerBounds(bounds)
-            .bayesianNetwork(new BayesianNetwork(A.getConnectedGraph()))
+            .probabilisticGraph(new KeanuProbabilisticGraph(new BayesianNetwork(A.getConnectedGraph())))
             .build();
 
         optimizer.maxAPosteriori();

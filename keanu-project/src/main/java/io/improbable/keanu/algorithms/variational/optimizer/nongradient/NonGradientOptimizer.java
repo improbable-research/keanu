@@ -1,8 +1,10 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.backend.ProbabilisticGraph;
+import io.improbable.keanu.backend.keanu.KeanuProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Builder;
@@ -17,6 +19,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
@@ -24,6 +27,7 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 /**
  * This class can be used to construct a BOBYQA non-gradient optimizer.
  * This will use a quadratic approximation of the gradient to perform optimization without derivatives.
+ *
  * @see <a href="http://www.damtp.cam.ac.uk/user/na/NA_papers/NA2009_06.pdf">BOBYQA Optimizer</a>
  */
 @Builder
@@ -36,8 +40,9 @@ public class NonGradientOptimizer implements Optimizer {
      * @return a {@link NonGradientOptimizer}
      */
     public static NonGradientOptimizer of(BayesianNetwork bayesNet) {
+        bayesNet.cascadeObservations();
         return NonGradientOptimizer.builder()
-            .bayesianNetwork(bayesNet)
+            .probabilisticGraph(new KeanuProbabilisticGraph(bayesNet))
             .build();
     }
 
@@ -66,7 +71,7 @@ public class NonGradientOptimizer implements Optimizer {
     }
 
     @Getter
-    private final BayesianNetwork bayesianNetwork;
+    private final ProbabilisticGraph probabilisticGraph;
 
     /**
      * maxEvaluations the maximum number of objective function evaluations before throwing an exception
@@ -117,31 +122,30 @@ public class NonGradientOptimizer implements Optimizer {
         }
     }
 
-
-    private double optimize(List<Vertex> outputVertices) {
+    private double optimize(FitnessFunction fitnessFunction) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
-        bayesianNetwork.cascadeObservations();
 
-        if (bayesianNetwork.isInImpossibleState()) {
+        double logProb = probabilisticGraph.logProb();
+        List<String> latentVariables = probabilisticGraph.getLatentVariables();
+        Map<String, long[]> latentVariablesShapes = probabilisticGraph.getLatentVariablesShapes();
+
+        if (logProb == Double.NEGATIVE_INFINITY || Double.isNaN(logProb)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        List<? extends Vertex<DoubleTensor>> latentVertices = bayesianNetwork.getContinuousLatentVertices();
-
-        FitnessFunction fitnessFunction = new FitnessFunction(
-            outputVertices,
-            latentVertices,
-            this::handleFitnessCalculation
-        );
-
         BOBYQAOptimizer optimizer = new BOBYQAOptimizer(
-            getNumInterpolationPoints(latentVertices),
+            getNumInterpolationPoints(probabilisticGraph.getLatentVariablesShapes()),
             initialTrustRegionRadius,
             stoppingTrustRegionRadius
         );
 
-        double[] startPoint = Optimizer.currentPoint(latentVertices);
+        double[] startPoint = Optimizer.convertToPoint(
+            probabilisticGraph.getLatentVariables(),
+            (Map<String, NumberTensor>) probabilisticGraph.getLatentVariablesValues(),
+            probabilisticGraph.getLatentVariablesShapes()
+        );
+
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
         if (FitnessFunction.isValidInitialFitness(initialFitness)) {
@@ -149,32 +153,40 @@ public class NonGradientOptimizer implements Optimizer {
         }
 
         ApacheMathSimpleBoundsCalculator boundsCalculator = new ApacheMathSimpleBoundsCalculator(boundsRange, optimizerBounds);
-        SimpleBounds bounds = boundsCalculator.getBounds(latentVertices, startPoint);
+        SimpleBounds bounds = boundsCalculator.getBounds(latentVariables, latentVariablesShapes, startPoint);
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
             new ObjectiveFunction(fitnessFunction.fitness()),
             bounds,
             MAXIMIZE,
-            new InitialGuess(Optimizer.currentPoint(latentVertices))
+            new InitialGuess(startPoint)
         );
 
         progressBar.finish();
         return pointValuePair.getValue();
     }
 
-    private int getNumInterpolationPoints(List<? extends Vertex<DoubleTensor>> latentVertices) {
-        return (int) (2 * Optimizer.totalNumberOfLatentDimensions(latentVertices) + 1);
+    private int getNumInterpolationPoints(Map<String, long[]> latentVariableShapes) {
+        return (int) (2 * Optimizer.totalNumberOfLatentDimensions(latentVariableShapes) + 1);
     }
 
     @Override
     public double maxAPosteriori() {
-        return optimize(bayesianNetwork.getLatentOrObservedVertices());
+        return optimize(new FitnessFunction(
+            probabilisticGraph,
+            false,
+            this::handleFitnessCalculation
+        ));
     }
 
     @Override
     public double maxLikelihood() {
-        return optimize(bayesianNetwork.getObservedVertices());
+        return optimize(new FitnessFunction(
+            probabilisticGraph,
+            true,
+            this::handleFitnessCalculation
+        ));
     }
 
 }

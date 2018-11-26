@@ -2,12 +2,15 @@ package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -26,7 +29,7 @@ public class BoundsCalculatorTest {
 
         ApacheMathSimpleBoundsCalculator boundsCalculator = new ApacheMathSimpleBoundsCalculator(Double.POSITIVE_INFINITY, bounds);
 
-        ImmutableList<DoubleVertex> latentVertices = ImmutableList.of(A);
+        List<DoubleVertex> latentVertices = ImmutableList.of(A);
         SimpleBounds simpleBounds = boundsCalculator.getBounds(latentVertices, new double[]{0, 0, 0});
 
         assertArrayEquals(new double[]{-2, -1}, simpleBounds.getLower(), 0.0);
@@ -51,7 +54,7 @@ public class BoundsCalculatorTest {
             DoubleTensor.create(new double[]{2, 1, 3, 4}, new long[]{2, 2})
         );
 
-        ImmutableList<DoubleVertex> latentVertices = ImmutableList.of(A, C, F);
+        List<Vertex> latentVertices = ImmutableList.of(A, C, F);
 
         ApacheMathSimpleBoundsCalculator boundsInfCalculator = new ApacheMathSimpleBoundsCalculator(Double.POSITIVE_INFINITY, bounds);
         SimpleBounds boundsA = boundsInfCalculator.getBounds(latentVertices, new double[]{0, 0, 0, 0, 0, 0, 0, 0});

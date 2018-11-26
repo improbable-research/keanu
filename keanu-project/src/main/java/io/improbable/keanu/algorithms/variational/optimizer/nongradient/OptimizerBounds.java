@@ -10,42 +10,70 @@ import java.util.Map;
 public class OptimizerBounds {
 
     @Value
-    private static class VertexBounds {
+    private static class VariableBounds {
         DoubleTensor min;
         DoubleTensor max;
     }
 
-    private Map<Vertex<? extends DoubleTensor>, VertexBounds> vertexBounds = new HashMap<>();
+    private Map<String, VariableBounds> variableBounds = new HashMap<>();
 
-    public void addBound(Vertex<? extends DoubleTensor> vertex, DoubleTensor min, DoubleTensor max) {
+    public void addBound(String variable, DoubleTensor min, DoubleTensor max) {
         DoubleTensor minDup = min.duplicate();
         DoubleTensor maxDup = max.duplicate();
 
-        vertexBounds.put(vertex, new VertexBounds(minDup, maxDup));
+        variableBounds.put(variable, new VariableBounds(minDup, maxDup));
     }
 
-    public void addBound(Vertex<? extends DoubleTensor> vertex, double min, DoubleTensor max) {
-        addBound(vertex, DoubleTensor.scalar(min), max);
+    public void addBound(String variable, double min, DoubleTensor max) {
+        addBound(variable, DoubleTensor.scalar(min), max);
     }
 
-    public void addBound(Vertex<? extends DoubleTensor> vertex, DoubleTensor min, double max) {
-        addBound(vertex, min, DoubleTensor.scalar(max));
+    public void addBound(String variable, DoubleTensor min, double max) {
+        addBound(variable, min, DoubleTensor.scalar(max));
     }
 
-    public void addBound(Vertex<? extends DoubleTensor> vertex, double min, double max) {
-        addBound(vertex, DoubleTensor.scalar(min), DoubleTensor.scalar(max));
+    public void addBound(String variable, double min, double max) {
+        addBound(variable, DoubleTensor.scalar(min), DoubleTensor.scalar(max));
     }
 
-    public boolean hasBound(Vertex<? extends DoubleTensor> vertex) {
-        return vertexBounds.containsKey(vertex);
+    public boolean hasBound(String variable) {
+        return variableBounds.containsKey(variable);
     }
 
-    public DoubleTensor getLower(Vertex<? extends DoubleTensor> vertex) {
-        return vertexBounds.get(vertex).getMin();
+    public DoubleTensor getLower(String variable) {
+        return variableBounds.get(variable).getMin();
     }
 
-    public DoubleTensor getUpper(Vertex<? extends DoubleTensor> vertex) {
-        return vertexBounds.get(vertex).getMax();
+    public DoubleTensor getUpper(String variable) {
+        return variableBounds.get(variable).getMax();
+    }
+
+    public void addBound(Vertex<?> variable, DoubleTensor min, DoubleTensor max) {
+        addBound(variable.getUniqueStringReference(), min, max);
+    }
+
+    public void addBound(Vertex<?> variable, double min, DoubleTensor max) {
+        addBound(variable.getUniqueStringReference(), DoubleTensor.scalar(min), max);
+    }
+
+    public void addBound(Vertex<?> variable, DoubleTensor min, double max) {
+        addBound(variable.getUniqueStringReference(), min, DoubleTensor.scalar(max));
+    }
+
+    public void addBound(Vertex<?> variable, double min, double max) {
+        addBound(variable.getUniqueStringReference(), DoubleTensor.scalar(min), DoubleTensor.scalar(max));
+    }
+
+    public boolean hasBound(Vertex<?> variable) {
+        return hasBound(variable.getUniqueStringReference());
+    }
+
+    public DoubleTensor getLower(Vertex<?> variable) {
+        return getLower(variable.getUniqueStringReference());
+    }
+
+    public DoubleTensor getUpper(Vertex<?> variable) {
+        return getUpper(variable.getUniqueStringReference());
     }
 
 }

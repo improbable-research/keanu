@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public interface ProbabilisticGraph extends AutoCloseable {
+public interface ProbabilisticGraph {
 
     default double logProb() {
         return logProb(Collections.emptyMap());
@@ -12,13 +12,15 @@ public interface ProbabilisticGraph extends AutoCloseable {
 
     double logProb(Map<String, ?> inputs);
 
-    LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> outputs);
+    default double logLikelihood() {
+        return logLikelihood(Collections.emptyMap());
+    }
+
+    double logLikelihood(Map<String, ?> inputs);
 
     List<String> getLatentVariables();
 
     Map<String, ?> getLatentVariablesValues();
 
-    @Override
-    default void close() {
-    }
+    Map<String, long[]> getLatentVariablesShapes();
 }

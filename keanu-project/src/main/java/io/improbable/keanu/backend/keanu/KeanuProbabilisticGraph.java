@@ -1,9 +1,10 @@
 package io.improbable.keanu.backend.keanu;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;
 
@@ -31,20 +32,13 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     @Override
     public double logProb(Map<String, ?> inputs) {
         cascadeUpdate(inputs);
-        return this.bayesianNetwork.getLogOfMasterP();
+        return ProbabilityCalculator.calculateLogProbFor(this.bayesianNetwork.getLatentOrObservedVertices());
     }
 
     @Override
-    public LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> outputs) {
-
-        double logProb = logProb(inputs);
-        Map<String, Object> sample = outputs.stream()
-            .collect(toMap(
-                output -> output,
-                output -> vertexLookup.get(output).getValue()
-            ));
-
-        return new LogProbWithSample(logProb, sample);
+    public double logLikelihood(Map<String, ?> inputs) {
+        cascadeUpdate(inputs);
+        return ProbabilityCalculator.calculateLogProbFor(this.bayesianNetwork.getObservedVertices());
     }
 
     @Override
@@ -60,6 +54,16 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
             .collect(toMap(
                 Vertex::getUniqueStringReference,
                 Vertex::getValue)
+            );
+    }
+
+    @Override
+    public Map<String, long[]> getLatentVariablesShapes() {
+        Map<String, ?> latentVariablesValues = getLatentVariablesValues();
+        return getLatentVariables().stream()
+            .collect(Collectors.toMap(
+                v -> v,
+                v -> ((Tensor) latentVariablesValues.get(v)).getShape())
             );
     }
 
