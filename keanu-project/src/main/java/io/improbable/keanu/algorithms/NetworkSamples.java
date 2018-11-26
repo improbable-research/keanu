@@ -8,13 +8,16 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.intgr.IntegerTensorVertexSamples;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -22,6 +25,7 @@ import static java.util.stream.Collectors.toMap;
  * An immutable collection of network samples. A network sample is a collection
  * of values from vertices in a network at a given point in time.
  */
+@Slf4j
 public class NetworkSamples {
 
     private final Map<VertexId, ? extends List> samplesByVertex;
@@ -130,6 +134,16 @@ public class NetworkSamples {
             states.add(new SamplesBackedNetworkState(samplesByVertex, i));
         }
         return states;
+    }
+
+    public NetworkState getMostProbableState() {
+        Integer sampleNumberWithMostProbableState = IntStream.range(0, logOfMasterPForEachSample.size())
+            .boxed().max(Comparator.comparing(i -> logOfMasterPForEachSample.get(i).doubleValue()))
+            .orElse(0);
+        log.debug(String.format("Most probable state is %d: %.4f",
+            sampleNumberWithMostProbableState,
+            logOfMasterPForEachSample.get(sampleNumberWithMostProbableState)));
+        return getNetworkState(sampleNumberWithMostProbableState);
     }
 
     private static class SamplesBackedNetworkState implements NetworkState {
