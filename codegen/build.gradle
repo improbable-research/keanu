@@ -19,15 +19,14 @@ dependencies {
 }
 
 task saveJavadocStringsToFile(type: Javadoc) {
-    source = fileTree(dir:'../keanu-project', includes:["**/*.java"])
+    source = project(':keanu-project').sourceSets.main.allJava
 
     def docletClasspath = rootProject.compileJava.classpath.files.toList()
     docletClasspath.add(new File(layout.projectDirectory.get().path + "/build/classes/java/main"))
     options.setDocletpath(docletClasspath)
     options.setDoclet("io.improbable.keanu.codegen.python.KeanuProjectDoclet")
 
-    def mainClasspath = fileTree(dir:'../keanu-project').files.toList()
-    options.setClasspath(mainClasspath)
+    classpath = project(':keanu-project').sourceSets.main.runtimeClasspath
 }
 
 task runCodeGeneration (type: JavaExec) {
