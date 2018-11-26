@@ -165,7 +165,7 @@ public class DotSaver implements NetworkSaver {
 
         for (Method method : methods) {
             SaveVertexParam annotation = method.getAnnotation(SaveVertexParam.class);
-            if (annotation != null) {
+            if (annotation != null && Vertex.class.isAssignableFrom(method.getReturnType())) {
                 String parentName = annotation.value();
                 try {
                     Vertex parentVertex = (Vertex) method.invoke(vertex);

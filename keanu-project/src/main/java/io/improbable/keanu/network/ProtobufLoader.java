@@ -237,24 +237,6 @@ public class ProtobufLoader implements NetworkLoader {
         return parentsMap;
     }
 
-    private DoubleTensor extractDoubleTensor(KeanuSavedBayesNet.DoubleTensor tensor) {
-        return DoubleTensor.create(
-            Doubles.toArray(tensor.getValuesList()),
-            Longs.toArray(tensor.getShapeList()));
-    }
-
-    private IntegerTensor extractIntTensor(KeanuSavedBayesNet.IntegerTensor tensor) {
-        return IntegerTensor.create(
-            Ints.toArray(tensor.getValuesList()),
-            Longs.toArray(tensor.getShapeList()));
-    }
-
-    private BooleanTensor extractBoolTensor(KeanuSavedBayesNet.BooleanTensor tensor) {
-        return BooleanTensor.create(
-            Booleans.toArray(tensor.getValuesList()),
-            Longs.toArray(tensor.getShapeList()));
-    }
-
     private Object getDecodedParam(KeanuSavedBayesNet.NamedParam parameter,
                                    Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
         switch (parameter.getParamCase()) {
@@ -274,5 +256,23 @@ public class ProtobufLoader implements NetworkLoader {
                 throw new IllegalArgumentException("Unknown Param Type Received: "
                     + parameter.getParamCase().toString());
         }
+    }
+
+    private DoubleTensor extractDoubleTensor(KeanuSavedBayesNet.DoubleTensor tensor) {
+        return DoubleTensor.create(
+            Doubles.toArray(tensor.getValuesList()),
+            Longs.toArray(tensor.getShapeList()));
+    }
+
+    private IntegerTensor extractIntTensor(KeanuSavedBayesNet.IntegerTensor tensor) {
+        return IntegerTensor.create(
+            Ints.toArray(tensor.getValuesList()),
+            Longs.toArray(tensor.getShapeList()));
+    }
+
+    private BooleanTensor extractBoolTensor(KeanuSavedBayesNet.BooleanTensor tensor) {
+        return BooleanTensor.create(
+            Booleans.toArray(tensor.getValuesList()),
+            Longs.toArray(tensor.getShapeList()));
     }
 }
