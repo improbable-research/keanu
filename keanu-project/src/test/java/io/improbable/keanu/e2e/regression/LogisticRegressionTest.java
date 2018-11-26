@@ -17,7 +17,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
-import static io.improbable.keanu.tensor.TensorMatchers.lessThanOrEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LogisticRegressionTest {

@@ -1,12 +1,12 @@
 package io.improbable.keanu.model.regression;
 
-import java.util.function.Function;
-
 import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+
+import java.util.function.Function;
 
 /**
  * Builder class for doing linear regression without regularisation.
