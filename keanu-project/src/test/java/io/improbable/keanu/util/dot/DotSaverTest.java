@@ -1,5 +1,7 @@
 package io.improbable.keanu.util.dot;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -9,15 +11,14 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,12 +26,13 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
+@Slf4j
 public class DotSaverTest {
 
     private static Vertex complexResultVertex;
     private static DotSaver complexNetDotSaver;
     private static ByteArrayOutputStream outputWriter;
-    private static final String resourcesFolder = "./src/test/resources/dotFiles";
+    private static final String resourcesFolder = "dotFiles";
     private static final String GAUSSIAN_OUTPUT_FILENAME = resourcesFolder + "/GaussianNodeOutput.dot";
     private static final String TENSOR_OUTPUT_FILENAME = resourcesFolder + "/ConstantTensorIntNodeOutput.dot";
     private static final String SCALAR_OUTPUT_FILENAME = resourcesFolder + "/ConstantScalarIntNodeOutput.dot";
@@ -67,28 +69,28 @@ public class DotSaverTest {
         DotSaver dotSaver = new DotSaver(gaussianNet);
         dotSaver.save(outputWriter, false);
 
-        String expectedGaussianNodeOutput = new String(Files.readAllBytes(Paths.get(GAUSSIAN_OUTPUT_FILENAME)), Charset.defaultCharset());
+        String expectedGaussianNodeOutput = readFileToString(GAUSSIAN_OUTPUT_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedGaussianNodeOutput);
     }
 
     @Test
     public void outputtingComplexNet() throws IOException {
         complexNetDotSaver.save(outputWriter, false);
-        String expectedComplexOutput = new String(Files.readAllBytes(Paths.get(COMPLEX_OUTPUT_FILENAME)), Charset.defaultCharset());
+        String expectedComplexOutput = readFileToString(COMPLEX_OUTPUT_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedComplexOutput);
     }
 
     @Test
     public void outputtingVertexDegree1Surroundings() throws IOException {
         complexNetDotSaver.save(outputWriter, complexResultVertex, 1, false);
-        String expectedVertexDegree1Output = new String(Files.readAllBytes(Paths.get(VERTEX_DEGREE1__OUTPUT_FILENAME)), Charset.defaultCharset());
+        String expectedVertexDegree1Output = readFileToString(VERTEX_DEGREE1__OUTPUT_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree1Output);
     }
 
     @Test
     public void outputtingVertexDegree2Surroundings() throws IOException {
         complexNetDotSaver.save(outputWriter, complexResultVertex, 2, false);
-        String expectedVertexDegree2Output = new String(Files.readAllBytes(Paths.get(VERTEX_DEGREE2__OUTPUT_FILENAME)), Charset.defaultCharset());
+        String expectedVertexDegree2Output = readFileToString(VERTEX_DEGREE2__OUTPUT_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree2Output);
     }
 
@@ -105,21 +107,21 @@ public class DotSaverTest {
 
         // Check that class name and annotation (for multiplication vertex) appear in the output.
         dotSaver.save(outputWriter, saveValues);
-        String expectedTensorIntNodeOutput = new String(Files.readAllBytes(Paths.get(TENSOR_OUTPUT_FILENAME)), Charset.defaultCharset());
+        String expectedTensorIntNodeOutput = readFileToString(TENSOR_OUTPUT_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedTensorIntNodeOutput);
 
         // Check that vertex label appears in the output if it's set.
         constantIntVertex.setLabel("SomeLabel");
         outputWriter.reset();
         dotSaver.save(outputWriter, saveValues);
-        String expectedLabelledIntNodeOutput = new String(Files.readAllBytes(Paths.get(LABELLED_OUTPUT_FILENAME)), Charset.defaultCharset());
+        String expectedLabelledIntNodeOutput = readFileToString(LABELLED_OUTPUT_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedLabelledIntNodeOutput);
 
         // Check that value for constant vertices appears in the output if it's set and a scalar.
         constantIntVertex.setValue(42);
         outputWriter.reset();
         dotSaver.save(outputWriter, saveValues);
-        String expectedScalarIntNodeOutput = new String(Files.readAllBytes(Paths.get(SCALAR_OUTPUT_FILENAME)), Charset.defaultCharset());
+        String expectedScalarIntNodeOutput = readFileToString(SCALAR_OUTPUT_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedScalarIntNodeOutput);
     }
 
@@ -133,7 +135,7 @@ public class DotSaverTest {
         gammaMultipliedVertex.setLabel("Gamma Multiplied");
         DotSaver dotSaver = new DotSaver(new BayesianNetwork(resultVertex.getConnectedGraph()));
         dotSaver.save(outputWriter, true);
-        String expectedOutputWithValues = new String(Files.readAllBytes(Paths.get(OUTPUT_WITH_VALUES_FILENAME)), Charset.defaultCharset());
+        String expectedOutputWithValues = readFileToString(OUTPUT_WITH_VALUES_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
     }
 
@@ -149,5 +151,11 @@ public class DotSaverTest {
             .toArray(String[]::new);
 
         assertThat(output1Lines, containsInAnyOrder(output2Lines));
+    }
+
+    private static String readFileToString(String fileOnClassPath) throws IOException {
+        URL url = Resources.getResource(fileOnClassPath);
+        String fileAsString = Resources.toString(url, Charsets.UTF_8);
+        return fileAsString;
     }
 }
