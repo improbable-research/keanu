@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.network.NetworkWriter;
+import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexValue;
@@ -43,7 +43,7 @@ public class ConstantBoolVertex extends BoolVertex implements ConstantVertex, No
     }
 
     @Override
-    public void save(NetworkWriter netWriter) {
-        netWriter.save(this);
+    public void save(NetworkSaver netSaver) {
+        netSaver.save(this);
     }
 }
