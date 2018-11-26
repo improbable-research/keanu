@@ -9,6 +9,7 @@ import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import org.junit.Rule;
@@ -35,6 +36,7 @@ public class LinearRidgeRegressionTest {
             .withPriorOnIntercept(0, 40)
             .build();
 
+        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -53,6 +55,7 @@ public class LinearRidgeRegressionTest {
             .withPriorOnIntercept(0, 40)
             .build();
 
+        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -71,6 +74,7 @@ public class LinearRidgeRegressionTest {
             .withPriorOnIntercept(0, 40)
             .build();
 
+        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -94,7 +98,10 @@ public class LinearRidgeRegressionTest {
             .withPriorOnWeightsAndIntercept(0, 0.00001)
             .build();
 
+        linearRegressionModelWide.observe();
         linearRegressionModelWide.fit();
+
+        linearRegressionModelNarrow.observe();
         linearRegressionModelNarrow.fit();
 
         assertThat(linearRegressionModelNarrow.getWeights().pow(2).sum(), lessThan(linearRegressionModelWide.getWeights().pow(2).sum()));

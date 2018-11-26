@@ -53,10 +53,6 @@ class CsvColumnDeserializer {
             return BooleanTensor.create(convertToBooleans(s));
         }
 
-        if (fieldType == String[].class) {
-            return convertToStrings(s);
-        }
-
         throw new IllegalArgumentException("Could not convert " + s + " to " + fieldType);
     }
 
@@ -92,8 +88,4 @@ class CsvColumnDeserializer {
         return ArrayUtils.toPrimitive(bools.toArray(new Boolean[data.size()]));
     }
 
-    private static String[] convertToStrings(List<String> data) {
-        String[] dataAsArray = new String[data.size()];
-        return data.toArray(dataAsArray);
-    }
 }

@@ -21,12 +21,11 @@ public class MaximumLikelihoodModelFitter<INPUT, OUTPUT> implements ModelFitter<
      */
     @Override
     public void fit(INPUT input, OUTPUT output) {
-        modelGraph.observeValues(input, output);
         GradientOptimizer.of(modelGraph.getBayesianNetwork()).maxLikelihood();
     }
 
     @Override
     public void observe(INPUT input, OUTPUT output) {
-
+        modelGraph.observeValues(input, output);
     }
 }

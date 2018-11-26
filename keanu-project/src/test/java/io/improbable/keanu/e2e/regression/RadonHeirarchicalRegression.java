@@ -85,8 +85,8 @@ public class RadonHeirarchicalRegression {
         GaussianVertex muAlpha = new GaussianVertex(0, 100).setLabel("MuIntercept");
         GaussianVertex muBeta = new GaussianVertex(0, 100).setLabel("MuGradient");
 
-        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(100).setLabel("SigmaIntercept");
-        HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(100.).setLabel("SigmaGradient");
+        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(10.).setLabel("SigmaIntercept");
+        HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(10.).setLabel("SigmaGradient");
 
         int numPartitions = radonData.size() / numberOfModels;
 
@@ -100,11 +100,11 @@ public class RadonHeirarchicalRegression {
             models.add(model);
         }
 
-        muAlpha.setValue(1.5);
-        muBeta.setValue(-1.);
+        muAlpha.setValue(1.);
+        sigmaAlpha.setValue(0.5);
 
-        sigmaAlpha.setValue(0.3);
-        sigmaBeta.setValue(0.4);
+        muBeta.setValue(-1.);
+        sigmaBeta.setValue(0.5);
 
         optimise(new BayesianNetwork(muAlpha.getConnectedGraph()), models);
     }
@@ -140,9 +140,10 @@ public class RadonHeirarchicalRegression {
     }
 
     private void optimise(BayesianNetwork bayesianNetwork, List<RegressionModel> models) {
+        bayesianNetwork.probeForNonZeroProbability(10);
         GradientOptimizer optimizer = GradientOptimizer.builder()
             .bayesianNetwork(bayesianNetwork)
-            .absoluteThreshold(0.1)
+            .absoluteThreshold(0.25)
             .maxEvaluations(10000)
             .build();
         optimizer.maxAPosteriori();

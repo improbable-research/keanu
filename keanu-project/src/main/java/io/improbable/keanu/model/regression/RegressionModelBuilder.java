@@ -17,14 +17,15 @@ public class RegressionModelBuilder<OUTPUT> {
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SCALE_PARAMETER = 1.0;
 
+    private final DoubleTensor inputTrainingData;
+    private final OUTPUT outputTrainingData;
+    private final Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
+
     private RegressionRegularization regularization = RegressionRegularization.NONE;
     private DoubleVertex priorOnWeightsScaleParameters;
     private DoubleVertex priorOnWeightsMeans;
     private DoubleVertex priorOnInterceptScaleParameter;
     private DoubleVertex priorOnInterceptMean;
-    private DoubleTensor inputTrainingData;
-    private OUTPUT outputTrainingData;
-    private Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
     private SamplingModelFitting samplingAlgorithm = null;
 
     public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
@@ -47,8 +48,8 @@ public class RegressionModelBuilder<OUTPUT> {
      * @return this
      */
     public RegressionModelBuilder withPriorOnWeights(DoubleVertex means, DoubleVertex scaleParameters) {
-        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(means.getShape(), getFeatureCount());
-        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(scaleParameters.getShape(), getFeatureCount());
+        RegressionWeights.checkShapeHasCorrectNumberOfFeatures(means.getShape(), getFeatureCount());
+        RegressionWeights.checkShapeHasCorrectNumberOfFeatures(scaleParameters.getShape(), getFeatureCount());
 
         this.priorOnWeightsMeans = means;
         this.priorOnWeightsScaleParameters = scaleParameters;
@@ -72,14 +73,14 @@ public class RegressionModelBuilder<OUTPUT> {
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return this
      */
-    public RegressionModelBuilder withPriorOnIntercept(double mean, double scaleParameter) {
-        return withPriorOnIntercept(ConstantVertex.of(mean), ConstantVertex.of(scaleParameter));
-    }
-
     public RegressionModelBuilder withPriorOnIntercept(DoubleVertex mean, DoubleVertex scaleParameter) {
         this.priorOnInterceptMean = mean;
         this.priorOnInterceptScaleParameter = scaleParameter;
         return this;
+    }
+
+    public RegressionModelBuilder withPriorOnIntercept(double mean, double scaleParameter) {
+        return withPriorOnIntercept(ConstantVertex.of(mean), ConstantVertex.of(scaleParameter));
     }
 
     /**

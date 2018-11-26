@@ -21,7 +21,6 @@ public class MAPModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OUTPUT>
      */
     @Override
     public void fit(INPUT input, OUTPUT output) {
-        modelGraph.observeValues(input, output);
         GradientOptimizer.of(modelGraph.getBayesianNetwork()).maxAPosteriori();
     }
 
