@@ -153,14 +153,9 @@ public class DotSaverTest {
         assertThat(output1Lines, containsInAnyOrder(output2Lines));
     }
 
-    private static String readFileToString(String fileOnClassPath) {
+    private static String readFileToString(String fileOnClassPath) throws IOException {
         URL url = Resources.getResource(fileOnClassPath);
-        String fileAsString = null;
-        try {
-            fileAsString = Resources.toString(url, Charsets.UTF_8);
-        } catch (IOException e) {
-            log.error("Could not read the resource file " + fileOnClassPath, e);
-        }
+        String fileAsString = Resources.toString(url, Charsets.UTF_8);
         return fileAsString;
     }
 }
