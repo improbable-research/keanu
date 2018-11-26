@@ -9,7 +9,6 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.LoadVertexValue;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -223,9 +222,7 @@ public class ProtobufLoader implements NetworkLoader {
         for (Constructor constructor : constructors) {
             Parameter[] parameters = constructor.getParameters();
 
-            if (parameters.length > 0 &&
-                (parameters[0].isAnnotationPresent(LoadVertexValue.class) ||
-                 parameters[0].isAnnotationPresent(LoadVertexParam.class))) {
+            if (parameters.length > 0 && parameters[0].isAnnotationPresent(LoadVertexParam.class)) {
                 return constructor;
             }
         }

@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -42,5 +43,10 @@ public class ConstantBoolVertex extends BoolVertex implements ConstantVertex, No
     @Override
     public void save(NetworkSaver netSaver) {
         netSaver.save(this);
+    }
+
+    @SaveVertexParam(CONSTANT_NAME)
+    public BooleanTensor getConstantValue() {
+        return getValue();
     }
 }

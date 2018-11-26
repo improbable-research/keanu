@@ -2,9 +2,7 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.LoadVertexValue;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -14,7 +12,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.hamcrest.collection.IsEmptyCollection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -337,10 +334,19 @@ public class ProtobufTest {
     }
 
     private void checkSaveableVertex(Class<? extends Vertex> vertexClass) {
-        if (ConstantVertex.class.isAssignableFrom(vertexClass)) {
-            checkRootVertex(vertexClass);
-        } else {
-            checkNonRootVertex(vertexClass);
+        /*
+         * For each vertex we need to check that we have a single constructor we can use for loading and that we save
+         * all the necessary Params for that constructor
+         */
+        Map<String, Class> storedParams = getSavedParams(vertexClass);
+        Map<String, Class> requiredParams = getRequiredParamsAndCheckOnlyUsedOnce(vertexClass);
+
+        for (Map.Entry<String, Class> param : requiredParams.entrySet()) {
+            assertThat("Class must save all required params: " + vertexClass,
+                storedParams, hasKey(param.getKey()));
+            assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
+                    + storedParams.get(param.getKey()) + ", " + param.getValue(),
+                param.getValue().isAssignableFrom(storedParams.get(param.getKey())));
         }
     }
 
@@ -358,43 +364,6 @@ public class ProtobufTest {
         return Arrays.stream(parentClass.getConstructors())
             .filter(constructor -> !filterAnnotatedObjects(constructor.getParameters(), annotation).isEmpty())
             .collect(Collectors.toList());
-    }
-
-    private void checkRootVertex(Class<? extends Vertex> vertexClass) {
-        /*
-         * For a root Vertex Class we need to check that there is a constructor that takes a value, and no other
-         * annotations.
-         */
-        assertThat("Root classes must not have any Parent Constructors: " + vertexClass,
-            getConstructorsWithAnnotatedParameters(vertexClass, LoadVertexParam.class), IsEmptyCollection.empty());
-
-        List<Constructor> loadValueConstructors = getConstructorsWithAnnotatedParameters(vertexClass,
-            LoadVertexValue.class);
-        assertThat("Root class must have a single value constructor: " + vertexClass,
-            loadValueConstructors.size(), is(1));
-
-        assertThat("Root class must have a singleton Constructor: " + vertexClass,
-            loadValueConstructors.get(0).getParameterCount(), is(1));
-    }
-
-    private void checkNonRootVertex(Class<? extends Vertex> vertexClass) {
-        /*
-         * For a non-root vertex we need to check that we have a constructor that is annotated with the same things as
-         * our parents (and that all parameters are labelled with a valid input).
-         */
-        assertThat("Non-root Class must not have value constructors: " + vertexClass,
-            getConstructorsWithAnnotatedParameters(vertexClass, LoadVertexValue.class), IsEmptyCollection.empty());
-
-        Map<String, Class> storedParams = getSavedParams(vertexClass);
-        Map<String, Class> requiredParams = getRequiredParamsAndCheckOnlyUsedOnce(vertexClass);
-
-        for (Map.Entry<String, Class> param : requiredParams.entrySet()) {
-            assertThat("Class must save all required params: " + vertexClass,
-                storedParams, hasKey(param.getKey()));
-            assertThat(vertexClass + ": Saved and Loaded Param " + param.getKey() + " must have same type: "
-                + storedParams.get(param.getKey()) + ", " + param.getValue(),
-                param.getValue().isAssignableFrom(storedParams.get(param.getKey())));
-        }
     }
 
     private Map<String, Class> getSavedParams(Class<? extends Vertex> vertexClass) {
