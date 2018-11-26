@@ -24,7 +24,7 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
 
     public LinearRegressionGraph(long[] featureShape, Function<DoubleVertex, OutputVertices<OUTPUT>> outputTransform, DoubleVertex interceptVertex, DoubleVertex weightsVertex) {
         long featureCount = featureShape[1];
-        TensorShapeValidation.checkShapesMatch(weightsVertex.getShape(), new long[]{featureCount,1});
+        TensorShapeValidation.checkShapesMatch(weightsVertex.getShape(), new long[]{featureCount, 1});
         TensorShapeValidation.checkShapesMatch(interceptVertex.getShape(), new long[]{1, 1});
 
         this.weightsVertex = weightsVertex;
