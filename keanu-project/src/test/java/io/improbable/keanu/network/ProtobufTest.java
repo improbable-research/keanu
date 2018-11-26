@@ -76,7 +76,6 @@ public class ProtobufTest {
         assertThat(latentGaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
         assertThat(latentGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         latentGaussianVertex.sample();
-
     }
 
     @Test

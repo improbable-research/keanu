@@ -138,9 +138,7 @@ public class ProtobufLoader implements NetworkLoader {
         if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.BOOLVAL) {
             throw new IllegalArgumentException("Non Boolean Value specified for Boolean Vertex");
         } else {
-            return BooleanTensor.create(
-                Booleans.toArray(value.getBoolVal().getValuesList()),
-                Longs.toArray(value.getBoolVal().getShapeList()));
+            return extractBoolTensor(value.getBoolVal());
         }
     }
 
@@ -155,9 +153,7 @@ public class ProtobufLoader implements NetworkLoader {
         if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.INTVAL) {
             throw new IllegalArgumentException("Non Int Value specified for Int Vertex");
         } else {
-            return IntegerTensor.create(
-                Ints.toArray(value.getIntVal().getValuesList()),
-                Longs.toArray(value.getIntVal().getShapeList()));
+            return extractIntTensor(value.getIntVal());
         }
     }
 
@@ -247,6 +243,18 @@ public class ProtobufLoader implements NetworkLoader {
             Longs.toArray(tensor.getShapeList()));
     }
 
+    private IntegerTensor extractIntTensor(KeanuSavedBayesNet.IntegerTensor tensor) {
+        return IntegerTensor.create(
+            Ints.toArray(tensor.getValuesList()),
+            Longs.toArray(tensor.getShapeList()));
+    }
+
+    private BooleanTensor extractBoolTensor(KeanuSavedBayesNet.BooleanTensor tensor) {
+        return BooleanTensor.create(
+            Booleans.toArray(tensor.getValuesList()),
+            Longs.toArray(tensor.getShapeList()));
+    }
+
     private Object getDecodedParam(KeanuSavedBayesNet.NamedParam parameter,
                                    Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
         switch (parameter.getParamCase()) {
@@ -256,8 +264,15 @@ public class ProtobufLoader implements NetworkLoader {
             case DOUBLETENSORPARAM:
                 return extractDoubleTensor(parameter.getDoubleTensorParam());
 
+            case INTTENSORPARAM:
+                return extractIntTensor(parameter.getIntTensorParam());
+
+            case BOOLTENSORPARAM:
+                return extractBoolTensor(parameter.getBoolTensorParam());
+
             default:
-                return null;
+                throw new IllegalArgumentException("Unknown Param Type Received: "
+                    + parameter.getParamCase().toString());
         }
     }
 }

@@ -2,7 +2,9 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -95,6 +97,10 @@ public class ProtobufSaver implements NetworkSaver {
             return getParam(paramName, (Vertex)param);
         } else if (DoubleTensor.class.isAssignableFrom(param.getClass())){
             return getParam(paramName, (DoubleTensor)param);
+        } else if (IntegerTensor.class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, (IntegerTensor) param);
+        } else if (BooleanTensor.class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, (BooleanTensor) param);
         } else {
             throw new IllegalArgumentException("Unknown Parameter Type to Save: " + param.getClass().toString());
         }
@@ -116,6 +122,45 @@ public class ProtobufSaver implements NetworkSaver {
         paramBuilder.setDoubleTensorParam(getTensor(param));
 
         return paramBuilder.build();
+    }
+
+    private KeanuSavedBayesNet.NamedParam getParam(String paramName, IntegerTensor param) {
+        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
+
+        paramBuilder.setName(paramName);
+        paramBuilder.setIntTensorParam(getTensor(param));
+
+        return paramBuilder.build();
+    }
+
+    private KeanuSavedBayesNet.NamedParam getParam(String paramName, BooleanTensor param) {
+        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
+
+        paramBuilder.setName(paramName);
+        paramBuilder.setBoolTensorParam(getTensor(param));
+
+        return paramBuilder.build();
+    }
+
+    private KeanuSavedBayesNet.DoubleTensor getTensor(DoubleTensor tensor) {
+        return KeanuSavedBayesNet.DoubleTensor.newBuilder()
+            .addAllValues(tensor.asFlatList())
+            .addAllShape(Longs.asList(tensor.getShape()))
+            .build();
+    }
+
+    private KeanuSavedBayesNet.IntegerTensor getTensor(IntegerTensor tensor) {
+        return KeanuSavedBayesNet.IntegerTensor.newBuilder()
+            .addAllValues(tensor.asFlatList())
+            .addAllShape(Longs.asList(tensor.getShape()))
+            .build();
+    }
+
+    private KeanuSavedBayesNet.BooleanTensor getTensor(BooleanTensor tensor) {
+        return KeanuSavedBayesNet.BooleanTensor.newBuilder()
+            .addAllValues(tensor.asFlatList())
+            .addAllShape(Longs.asList(tensor.getShape()))
+            .build();
     }
 
     @Override
@@ -175,10 +220,8 @@ public class ProtobufSaver implements NetworkSaver {
     }
 
     private KeanuSavedBayesNet.StoredValue getValue(IntegerVertex vertex) {
-        KeanuSavedBayesNet.IntegerTensor savedValue = KeanuSavedBayesNet.IntegerTensor.newBuilder()
-            .addAllValues(vertex.getValue().asFlatList())
-            .addAllShape(Longs.asList(vertex.getShape()))
-            .build();
+        KeanuSavedBayesNet.IntegerTensor savedValue = getTensor(vertex.getValue());
+
         KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
             .setIntVal(savedValue)
             .build();
@@ -187,22 +230,13 @@ public class ProtobufSaver implements NetworkSaver {
     }
 
     private KeanuSavedBayesNet.StoredValue getValue(BoolVertex vertex) {
-        KeanuSavedBayesNet.BooleanTensor savedValue = KeanuSavedBayesNet.BooleanTensor.newBuilder()
-            .addAllValues(vertex.getValue().asFlatList())
-            .addAllShape(Longs.asList(vertex.getShape()))
-            .build();
+        KeanuSavedBayesNet.BooleanTensor savedValue = getTensor(vertex.getValue());
+
         KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
             .setBoolVal(savedValue)
             .build();
 
         return getStoredValue(vertex, value);
-    }
-
-    private KeanuSavedBayesNet.DoubleTensor getTensor(DoubleTensor tensor) {
-        return KeanuSavedBayesNet.DoubleTensor.newBuilder()
-            .addAllValues(tensor.asFlatList())
-            .addAllShape(Longs.asList(tensor.getShape()))
-            .build();
     }
 
     private KeanuSavedBayesNet.StoredValue getStoredValue(Vertex vertex, KeanuSavedBayesNet.VertexValue value) {
