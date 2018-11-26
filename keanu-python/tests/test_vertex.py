@@ -1,7 +1,11 @@
+from typing import Type, Callable, Tuple, Union
+
 import numpy as np
 import pandas as pd
 import pytest
 import math
+
+from keanu.vartypes import numpy_types, tensor_arg_types
 from keanu.vertex.base import Vertex
 from keanu.context import KeanuContext
 from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli
@@ -234,7 +238,8 @@ def test_get_vertex_id(jvm_view) -> None:
                           (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
-def test_you_can_set_value(vertex, expected_type, value, assert_vertex_value_equals) -> None:
+def test_you_can_set_value(vertex: Vertex, expected_type: Type, value: tensor_arg_types,
+                           assert_vertex_value_equals: Callable) -> None:
     vertex.set_value(value)
     assert_vertex_value_equals(vertex, expected_type, value)
 
@@ -261,7 +266,8 @@ def test_you_can_set_value(vertex, expected_type, value, assert_vertex_value_equ
                           (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
-def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex_value_equals) -> None:
+def test_you_can_set_and_cascade(ctor: Callable, args: Union[Tuple[float, ...], Tuple[int, ...]], expected_type: Type,
+                                 value: tensor_arg_types, assert_vertex_value_equals: Callable) -> None:
     vertex1 = ctor(*args)
     vertex2 = ctor(*args)
     equal_vertex = vertex1 == vertex2
@@ -306,7 +312,9 @@ def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex
                           (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
-def test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals) -> None:
+def test_you_can_observe(ctor: Callable, args: Union[Tuple[float, ...], Tuple[int, ...]], expected_type: Type,
+                         value: tensor_arg_types, assert_vertex_value_equals: Callable) -> None:
+
     vertex = ctor(*args)
     assert not vertex.is_observed()
     vertex.observe(value)
