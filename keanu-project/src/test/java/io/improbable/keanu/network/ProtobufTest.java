@@ -2,14 +2,14 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
@@ -310,9 +310,26 @@ public class ProtobufTest {
         return savedNet;
     }
 
+    private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {
+
+        private TestNonSaveableVertex() {
+            super(new long[]{1, 1});
+        }
+
+        @Override
+        public DoubleTensor sample(KeanuRandom random) {
+            return null;
+        }
+
+        @Override
+        public DoubleTensor sample() {
+            return null;
+        }
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void nonSaveableVertexThrowsExceptionOnSave() {
-        BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
+        DoubleVertex testVertex = new TestNonSaveableVertex();
         BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
         ProtobufSaver protobufSaver = new ProtobufSaver(net);
         testVertex.save(protobufSaver);
