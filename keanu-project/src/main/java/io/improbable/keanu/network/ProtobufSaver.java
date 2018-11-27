@@ -1,5 +1,6 @@
 package io.improbable.keanu.network;
 
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -113,6 +114,8 @@ public class ProtobufSaver implements NetworkSaver {
             return getParam(paramName, (long[]) param);
         } else if (Vertex[].class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (Vertex[]) param);
+        } else if (int[].class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, (int[]) param);
         } else {
             throw new IllegalArgumentException("Unknown Parameter Type to Save: " + param.getClass().toString());
         }
@@ -195,6 +198,15 @@ public class ProtobufSaver implements NetworkSaver {
 
         paramBuilder.setName(paramName);
         paramBuilder.setLongArrayParam(KeanuSavedBayesNet.LongArray.newBuilder().addAllValues(Longs.asList(param)));
+
+        return paramBuilder.build();
+    }
+
+    private KeanuSavedBayesNet.NamedParam getParam(String paramName, int[] param) {
+        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
+
+        paramBuilder.setName(paramName);
+        paramBuilder.setIntArrayParam(KeanuSavedBayesNet.IntArray.newBuilder().addAllValues(Ints.asList(param)));
 
         return paramBuilder.build();
     }

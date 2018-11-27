@@ -267,6 +267,9 @@ public class ProtobufLoader implements NetworkLoader {
             case LONGARRAYPARAM:
                 return Longs.toArray(parameter.getLongArrayParam().getValuesList());
 
+            case INTARRAYPARAM:
+                return Ints.toArray(parameter.getIntArrayParam().getValuesList());
+
             case VERTEXARRAYPARAM:
                 return extractVertexArray(parameter, existingVertices);
 

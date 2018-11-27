@@ -45,6 +45,10 @@ message LongArray {
     repeated int64 values = 1;
 }
 
+message IntArray {
+    repeated int32 values = 1;
+}
+
 message VertexArray {
     repeated VertexID values = 1;
 }
@@ -62,6 +66,7 @@ message NamedParam {
         string stringParam = 9;
         LongArray longArrayParam = 10;
         VertexArray vertexArrayParam = 11;
+        IntArray intArrayParam = 12;
     }
 }
 

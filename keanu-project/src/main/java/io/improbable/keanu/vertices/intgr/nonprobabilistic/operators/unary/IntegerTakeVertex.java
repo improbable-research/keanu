@@ -3,9 +3,13 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerTakeVertex extends IntegerUnaryOpVertex {
+
+    private static final String INDEX_NAME = "index";
     private final long[] index;
 
     /**
@@ -14,7 +18,8 @@ public class IntegerTakeVertex extends IntegerUnaryOpVertex {
      * @param inputVertex the input vertex to extract from
      * @param index the index to extract at
      */
-    public IntegerTakeVertex(IntegerVertex inputVertex, long... index) {
+    public IntegerTakeVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
+                             @LoadVertexParam(INDEX_NAME) long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         this.index = index;
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
@@ -23,5 +28,10 @@ public class IntegerTakeVertex extends IntegerUnaryOpVertex {
     @Override
     protected IntegerTensor op(IntegerTensor value) {
         return IntegerTensor.scalar(value.getValue(index));
+    }
+
+    @SaveVertexParam(INDEX_NAME)
+    public long[] getIndexParam() {
+        return index;
     }
 }
