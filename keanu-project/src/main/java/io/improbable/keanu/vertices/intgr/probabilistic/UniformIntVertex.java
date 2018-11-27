@@ -16,8 +16,8 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
@@ -33,7 +33,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
      */
     public UniformIntVertex(long[] shape, IntegerVertex min, IntegerVertex max) {
         super(shape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, min.getShape(), max.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, min.getShape(), max.getShape());
 
         this.min = min;
         this.max = max;
@@ -58,7 +58,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
 
     @ExportVertexToPythonBindings
     public UniformIntVertex(@LoadParentVertex(MIN_NAME) IntegerVertex min, @LoadParentVertex(MAX_NAME) IntegerVertex max) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(min.getShape(), max.getShape()), min, max);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(min.getShape(), max.getShape()), min, max);
     }
 
     public UniformIntVertex(IntegerVertex min, int max) {

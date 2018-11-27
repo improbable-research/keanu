@@ -16,7 +16,7 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
     }
 
     static BooleanTensor create(boolean... values) {
-        return create(values, 1, values.length);
+        return create(values, values.length);
     }
 
     static BooleanTensor scalar(boolean scalarValue) {

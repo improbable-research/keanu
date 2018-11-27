@@ -3,7 +3,6 @@ package io.improbable.keanu.tensor.generic;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +40,10 @@ public class GenericTensor<T> implements Tensor<T> {
         }
     }
 
+    public GenericTensor(T[] data) {
+        this(data, new long[]{data.length});
+    }
+
     public GenericTensor(T scalar) {
         this.data = (T[]) (new Object[]{scalar});
         this.shape = Tensor.SCALAR_SHAPE;
@@ -52,7 +55,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     private static <T> T[] fillArray(long[] shape, T value) {
-        Object[] data = new Object[ArrayUtil.prod(shape)];
+        Object[] data = new Object[TensorShape.getLengthAsInt(shape)];
         Arrays.fill(data, value);
         return (T[]) data;
     }

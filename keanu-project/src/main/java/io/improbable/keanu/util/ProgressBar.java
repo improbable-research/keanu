@@ -67,6 +67,11 @@ public class ProgressBar {
     public ProgressBar(PrintStream printStream, ScheduledExecutorService scheduler) {
         this.printStream = printStream;
         this.scheduler = scheduler;
+        // Progress bar is disabled for testing.
+        String disableProgressBar = System.getProperty("io.improbable.keanu.util.ProgressBar.disableProgressBar");
+        if (disableProgressBar != null && disableProgressBar.equals("true")) {
+            ProgressBar.disable();
+        }
         startUpdateThread();
     }
 
@@ -154,7 +159,6 @@ public class ProgressBar {
             if (update.getProgressPercentage() != null) {
                 sb.append(String.format(" %3.1f%%", Math.min(100.0, Math.max(0, update.getProgressPercentage() * 100))));
             }
-
             printStream.print(sb.toString());
         }
     }

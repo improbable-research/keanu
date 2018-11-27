@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static java.util.Collections.singletonMap;
 
 public class SmoothUniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
@@ -44,7 +44,7 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
      */
     public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
@@ -60,9 +60,8 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
      * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
-    @ExportVertexToPythonBindings
     public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
     }
 
 
@@ -78,6 +77,7 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
+    @ExportVertexToPythonBindings
     public SmoothUniformVertex(@LoadParentVertex(X_MIN_NAME) DoubleVertex xMin,
                                @LoadParentVertex(X_MAX_NAME) DoubleVertex xMax) {
         this(xMin, xMax, DEFAULT_EDGE_SHARPNESS);

@@ -21,9 +21,9 @@ public class CheatingStudents {
 
         int numberOfSamples = 10000;
         UniformVertex probabilityOfCheating = new UniformVertex(0.0, 1.0);
-        BoolVertex studentCheated = new BernoulliVertex(new long[]{1, numberOfStudents}, probabilityOfCheating);
-        BoolVertex answerIsTrue = new BernoulliVertex(new long[]{1, numberOfStudents}, 0.5);
-        BoolVertex randomAnswer = new BernoulliVertex(new long[]{1, numberOfStudents}, 0.5);
+        BoolVertex studentCheated = new BernoulliVertex(new long[]{numberOfStudents}, probabilityOfCheating);
+        BoolVertex answerIsTrue = new BernoulliVertex(new long[]{numberOfStudents}, 0.5);
+        BoolVertex randomAnswer = new BernoulliVertex(new long[]{numberOfStudents}, 0.5);
 
         DoubleVertex answer = If.isTrue(answerIsTrue)
             .then(

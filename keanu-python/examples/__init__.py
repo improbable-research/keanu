@@ -1,3 +1,3 @@
 from .coal_mining import CoalMining
 from .lorenz_model import LorenzModel
-from .thermometers import Thermometer
+from . import thermometers

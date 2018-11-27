@@ -31,7 +31,7 @@ public class SumVertexTest {
     @Test
     public void doesSumAllSpecifiedDimensions() {
         DoubleVertex a = new UniformVertex(new long[]{1, 5}, 0, 10);
-        a.setValue(new double[]{1, 2, 3, 4, 5});
+        a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4, 5}, 1, 5));
 
         DoubleVertex summed = a.sum(0, 1);
         DoubleTensor expected = DoubleTensor.scalar(1 + 2 + 3 + 4 + 5);
@@ -62,9 +62,9 @@ public class SumVertexTest {
         assertArrayEquals(new long[]{3, 5, 6, 1}, a.sum(0, 2).getShape());
         assertArrayEquals(new long[]{5, 6}, a.sum(0, 1, 2, 5).getShape());
         assertArrayEquals(new long[]{6, 1}, a.sum(0, 1, 2, 3).getShape());
-        assertArrayEquals(new long[]{2, 1}, a.sum(1, 2, 3, 4, 5).getShape());
-        assertArrayEquals(new long[]{1, 3}, a.sum(0, 2, 3, 4, 5).getShape());
-        assertArrayEquals(new long[]{1, 1}, a.sum(0, 1, 2, 3, 4, 5).getShape());
+        assertArrayEquals(new long[]{2}, a.sum(1, 2, 3, 4, 5).getShape());
+        assertArrayEquals(new long[]{3}, a.sum(0, 2, 3, 4, 5).getShape());
+        assertArrayEquals(new long[]{}, a.sum(0, 1, 2, 3, 4, 5).getShape());
     }
 
     @Test
@@ -72,7 +72,7 @@ public class SumVertexTest {
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(2);
 
-        assertArrayEquals(new long[]{1, 1}, a.sum(0).getShape());
+        assertArrayEquals(new long[0], a.sum().getShape());
     }
 
     @Test
@@ -85,7 +85,7 @@ public class SumVertexTest {
         DoubleTensor dbdaForward = b.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
-        DoubleTensor expectedDbDa = DoubleTensor.ones(new long[]{1, 1, 2, 2, 2});
+        DoubleTensor expectedDbDa = DoubleTensor.ones(new long[]{2, 2, 2});
 
         assertThat(dbdaForward, equalTo(expectedDbDa));
         assertThat(dbdaReverse, equalTo(expectedDbDa));
@@ -102,7 +102,7 @@ public class SumVertexTest {
         DoubleTensor dbdaForward = b.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
-        DoubleTensor expectedDbDa = DoubleTensor.eye(4).reshape(2, 2, 2, 2).sum(sumDimension).reshape(2, 1, 2, 2);
+        DoubleTensor expectedDbDa = DoubleTensor.eye(4).reshape(2, 2, 2, 2).sum(sumDimension).reshape(2, 2, 2);
 
         assertThat(dbdaForward, equalTo(expectedDbDa));
         assertThat(dbdaReverse, equalTo(expectedDbDa));
@@ -177,7 +177,7 @@ public class SumVertexTest {
         DoubleTensor expectedDfdx = DoubleTensor.create(new double[]{
             2, 2, 2,
             2, 2, 2
-        }, 1, 1, 2, 3);
+        }, 2, 3);
 
         assertThat(dfdaForward, equalTo(expectedDfdx));
         assertThat(dfdaReverse, equalTo(expectedDfdx));
@@ -200,9 +200,7 @@ public class SumVertexTest {
         PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
         DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
-        DoubleTensor expectedDfda = DoubleTensor.create(new double[]{
-            1, 2, 3,
-        }, 1, 3, 1, 1);
+        DoubleTensor expectedDfda = DoubleTensor.create(1, 2, 3);
 
         assertThat(dfdaForward, equalTo(expectedDfda));
         assertThat(dfdaReverse, equalTo(expectedDfda));
