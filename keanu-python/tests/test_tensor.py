@@ -118,7 +118,7 @@ def assert_java_class(java_object_wrapper, java_class_str):
     (np.array([[1, 2], [3, 4]]), np.array([[11, 12], [13, 14]]))
 ])
 def test_you_can_apply_a_function_to_a_tensor(value, expected_result):
-    t = kn.Tensor(value)
+    t = Tensor(value)
     result = t.apply(lambda x : x + 10)
-    ndarray = kn.Tensor._to_ndarray(result)
+    ndarray = Tensor._to_ndarray(result)
     assert (ndarray == expected_result).all()
