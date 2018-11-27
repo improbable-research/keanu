@@ -267,10 +267,32 @@ public class ProtobufLoader implements NetworkLoader {
             case LONGARRAYPARAM:
                 return Longs.toArray(parameter.getLongArrayParam().getValuesList());
 
+            case VERTEXARRAYPARAM:
+                return extractVertexArray(parameter, existingVertices);
+
             default:
                 throw new IllegalArgumentException("Unknown Param Type Received: "
                     + parameter.getParamCase().toString());
         }
+    }
+
+    private Vertex[] extractVertexArray(KeanuSavedBayesNet.NamedParam param,
+                                        Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+        Vertex[] newVertexArray = new Vertex[param.getVertexArrayParam().getValuesCount()];
+
+        for (int i = 0; i < newVertexArray.length; i++) {
+            KeanuSavedBayesNet.VertexID parentId = param.getVertexArrayParam().getValues(i);
+            Vertex parentVertex = existingVertices.get(parentId);
+
+            if (parentVertex == null) {
+                throw new IllegalArgumentException("Saved Structure references unknown Parent: "
+                    + parentId.toString());
+            }
+
+            newVertexArray[i] = parentVertex;
+        }
+
+        return newVertexArray;
     }
 
     private DoubleTensor extractDoubleTensor(KeanuSavedBayesNet.DoubleTensor tensor) {
