@@ -12,24 +12,28 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.model.LambdaModelV
 class LambdaModel(Vertex):
 
     def __init__(self, inputs, executor, update_value=None):
+        self.vertices_wrapped = inputs
+        vertex_map = LambdaModel.__to_java_map(inputs)
         self.executor = executor
-        inputs_as_java_map = LambdaModel.__to_java_map(inputs)
-        if update_value is None:
-            update_value = lambda: inputs_as_java_map
+        self.update_value = update_value or (lambda: self.vertices_wrapped)
 
-        vertex = context.jvm_view().LambdaModelVertex(inputs_as_java_map, Consumer(self.__execute),
-                                                      Supplier(update_value))
+        vertex = context.jvm_view().LambdaModelVertex(vertex_map, Consumer(self.__execute),
+                                                      Supplier(lambda: self.__update_value()))
         super(LambdaModel, self).__init__(vertex)
+
+    def __execute(self, vertices_unwrapped):
+        self.vertices_wrapped = LambdaModel.__wrap(vertices_unwrapped)
+        self.executor(self.vertices_wrapped)
+        LambdaModel.__unwrap(self.vertices_wrapped, vertices_unwrapped)
+
+    def __update_value(self):
+        values = self.update_value()
+        return LambdaModel.__to_java_map(values)
 
     @staticmethod
     def __to_java_map(inputs):
         unwrapped_inputs = {VertexLabel(k).unwrap(): v for k, v in inputs.items()}
         return context.to_java_map(unwrapped_inputs)
-
-    def __execute(self, vertices):
-        vertices_wrapped = LambdaModel.__wrap(vertices)
-        self.executor(vertices_wrapped)
-        LambdaModel.__unwrap(vertices_wrapped, vertices)
 
     @staticmethod
     def __wrap(vertices):
