@@ -3,6 +3,8 @@ from typing import SupportsFloat, SupportsRound, Union, Any
 import numpy as np
 import pytest
 import math
+
+from keanu.vartypes import numpy_types
 from keanu.vertex import Const
 from keanu.vertex.base import Vertex, Double, Integer, Bool
 
@@ -18,7 +20,7 @@ from keanu.vertex.base import Vertex, Double, Integer, Bool
     (Const(np.array([1., 2.])),    Const(np.array([1.     ])), np.array([[True], [False]])),
 ])
 # yapf: enable
-def test_can_do_equal_to(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], expected_result: np.ndarray) -> None:
+def test_can_do_equal_to(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
     result = lhs == rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -36,7 +38,7 @@ def test_can_do_equal_to(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], exp
     (Const(np.array([1., 2.])), Const(np.array([1.     ])), np.array([[False], [True]])),
 ])
 # yapf: enable
-def test_can_do_not_equal_to(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], expected_result: np.ndarray) -> None:
+def test_can_do_not_equal_to(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
     result = lhs != rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -52,7 +54,7 @@ def test_can_do_not_equal_to(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float],
     (Const(np.array([10., 20.])),                      15.   , np.array([[False], [True]])),
 ])
 # yapf: enable
-def test_can_do_greater_than(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], expected_result: np.ndarray) -> None:
+def test_can_do_greater_than(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
     result: Union[Vertex, np._ArrayLike[bool]] = lhs > rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -68,7 +70,7 @@ def test_can_do_greater_than(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float],
     (Const(np.array([10., 20.])),                      15.   , np.array([[True], [False]])),
 ])
 # yapf: enable
-def test_can_do_less_than(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], expected_result: np.ndarray) -> None:
+def test_can_do_less_than(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
     result: Union[Vertex, np._ArrayLike[bool]] = lhs < rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -84,8 +86,8 @@ def test_can_do_less_than(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], ex
     (Const(np.array([10., 15., 20.])),                           15.   , np.array([[False], [True], [True]])),
 ])
 # yapf: enable
-def test_can_do_greater_than_or_equal_to(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float],
-                                         expected_result: np.ndarray) -> None:
+def test_can_do_greater_than_or_equal_to(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
+                                         expected_result: numpy_types) -> None:
     result = lhs >= rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -97,8 +99,8 @@ def test_can_do_greater_than_or_equal_to(lhs: Vertex, rhs: Union[Vertex, np.ndar
     (10.                      , Const(np.array([15., 10., 5. ])), np.array([[False], [True], [True]])),
 ])
 # yapf: enable
-def test_can_do_greater_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, np.ndarray, float], rhs: Vertex,
-                                                            expected_result: np.ndarray) -> None:
+def test_can_do_greater_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
+                                                            expected_result: numpy_types) -> None:
     result = lhs >= rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -111,8 +113,8 @@ def test_can_do_greater_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, n
     (Const(np.array([10., 15., 20.])),                           15.   , np.array([[True], [True], [False]])),
 ])
 # yapf: enable
-def test_can_do_less_than_or_equal_to(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float],
-                                      expected_result: np.ndarray) -> None:
+def test_can_do_less_than_or_equal_to(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
+                                      expected_result: numpy_types) -> None:
     result = lhs <= rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -124,8 +126,8 @@ def test_can_do_less_than_or_equal_to(lhs: Vertex, rhs: Union[Vertex, np.ndarray
     (10.                      , Const(np.array([15., 10., 5. ])), np.array([[True], [True], [False]])),
 ])
 # yapf: enable
-def test_can_do_less_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, np.ndarray, float], rhs: Vertex,
-                                                         expected_result: np.ndarray) -> None:
+def test_can_do_less_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
+                                                         expected_result: numpy_types) -> None:
     result = lhs <= rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -141,8 +143,8 @@ def test_can_do_less_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, np.n
     (Const(np.array([10., 20.])),                     2.   , np.array([[12], [22]])),
 ])
 # yapf: enable
-def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, np.ndarray, float],
-                         expected_result: np.ndarray) -> None:
+def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, numpy_types, float],
+                         expected_result: numpy_types) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs + rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -158,7 +160,7 @@ def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, np.ndarray, floa
     (Const(np.array([10., 20.])),                     2.   , np.array([[8], [18]])),
 ])
 # yapf: enable
-def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], expected_result: np.ndarray) -> None:
+def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs - rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -174,7 +176,7 @@ def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], 
     (Const(np.array([3., 2.])),                 5.       , np.array([[15], [10]])),
 ])
 # yapf: enable
-def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], expected_result: np.ndarray) -> None:
+def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs * rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -190,7 +192,7 @@ def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float
     (Const(np.array([15., 10.])),                 2.       , np.array([[7.5], [5.  ]])),
 ])
 # yapf: enable
-def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], expected_result: np.ndarray) -> None:
+def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs / rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -206,8 +208,8 @@ def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], exp
     (Const(np.array([15, 10])),                 2      , np.array([[7], [5]])),
 ])
 # yapf: enable
-def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float],
-                                 expected_result: np.ndarray) -> None:
+def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
+                                 expected_result: numpy_types) -> None:
     result = lhs // rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -218,8 +220,8 @@ def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, np.ndarray, flo
     (15, Const(np.array([2, 4])), np.array([[7], [3]])),
 ])
 # yapf: enable
-def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, np.ndarray, float], rhs: Vertex,
-                                                    expected_result: np.ndarray) -> None:
+def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
+                                                    expected_result: numpy_types) -> None:
     result = lhs // rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -235,7 +237,7 @@ def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, np.ndarra
     (Const(np.array([3., 2.])),                 2.        , np.array([[9], [4                 ]])),
 ])
 # yapf: enable
-def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], expected_result: np.ndarray) -> None:
+def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
     result = lhs ** rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()
@@ -247,8 +249,8 @@ def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, np.ndarray, float], expected
     (3.                , Const(np.array([2., 0.5])), np.array([[9], [1.7320508075688772]])),
 ])
 # yapf: enable
-def test_can_do_pow_with_vertex_on_rhs(lhs: Union[Vertex, np.ndarray, float], rhs: Vertex,
-                                       expected_result: np.ndarray) -> None:
+def test_can_do_pow_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
+                                       expected_result: numpy_types) -> None:
     result = lhs ** rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()

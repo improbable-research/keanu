@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+
+from keanu.vartypes import numpy_types
 from keanu.vertex import UniformInt, Exponential, DoubleIf, Poisson
 from keanu import Model
 
@@ -25,5 +27,5 @@ class CoalMining():
 
         return m
 
-    def training_data(self) -> np.ndarray:
+    def training_data(self) -> numpy_types:
         return self._data.values

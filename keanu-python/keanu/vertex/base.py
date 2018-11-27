@@ -64,7 +64,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     See https://docs.scipy.org/doc/numpy-1.13.0/neps/ufunc-overrides.html
     """
 
-    def __array_ufunc__(self, ufunc: np.ufunc, method: str, input0: np.ndarray, input1: 'Vertex') -> 'Vertex':
+    def __array_ufunc__(self, ufunc: np.ufunc, method: str, input0: numpy_types, input1: 'Vertex') -> 'Vertex':
         methods = {
             "equal": Vertex.__eq__,
             "not_equal": Vertex.__ne__,

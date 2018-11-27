@@ -3,6 +3,8 @@ from typing import List, Union
 import numpy as np
 import pandas as pd
 import pytest
+
+from keanu.vartypes import numpy_types, primitive_types
 from keanu.vertex import Const
 from keanu.vertex.base import JavaObjectWrapper
 
@@ -15,7 +17,7 @@ def generic():
 @pytest.mark.parametrize("arr, expected_java_class", [([[1, 2], [3, 4]], "ConstantIntegerVertex"),
                                                       ([[1., 2.], [3., 4.]], "ConstantDoubleVertex"),
                                                       ([[True, False], [False, True]], "ConstantBoolVertex")])
-def test_const_takes_ndarray(arr: List[List[Union[int, float, bool]]], expected_java_class: str) -> None:
+def test_const_takes_ndarray(arr: List[List[primitive_types]], expected_java_class: str) -> None:
     ndarray = np.array(arr)
     v = Const(ndarray)
 
@@ -26,7 +28,7 @@ def test_const_takes_ndarray(arr: List[List[Union[int, float, bool]]], expected_
 @pytest.mark.parametrize("data, expected_java_class", [([1, 2], "ConstantIntegerVertex"),
                                                        ([1., 2.], "ConstantDoubleVertex"),
                                                        ([True, False], "ConstantBoolVertex")])
-def test_const_takes_panda_series(data: List[Union[int, float, bool]], expected_java_class: str) -> None:
+def test_const_takes_panda_series(data: List[primitive_types], expected_java_class: str) -> None:
     series = pd.Series(data)
     v = Const(series)
 
@@ -45,7 +47,7 @@ def test_const_takes_panda_series(data: List[Union[int, float, bool]], expected_
 @pytest.mark.parametrize("data, expected_java_class", [([[1, 2], [3, 4]], "ConstantIntegerVertex"),
                                                        ([[1., 2.], [3., 4.]], "ConstantDoubleVertex"),
                                                        ([[True, False], [True, False]], "ConstantBoolVertex")])
-def test_const_takes_panda_dataframe(data: List[List[Union[int, float, bool]]], expected_java_class: str) -> None:
+def test_const_takes_panda_dataframe(data: List[List[primitive_types]], expected_java_class: str) -> None:
     dataframe = pd.DataFrame(columns=['A', 'B'], data=data)
     v = Const(dataframe)
 
@@ -63,7 +65,7 @@ def test_const_takes_panda_dataframe(data: List[List[Union[int, float, bool]]], 
                                                       (np.array([3.4])[0], "ConstantDoubleVertex"),
                                                       (True, "ConstantBoolVertex"),
                                                       (np.array([True])[0], "ConstantBoolVertex")])
-def test_const_takes_num(num: Union[int, float, bool, np.ndarray], expected_java_class: str) -> None:
+def test_const_takes_num(num: Union[primitive_types, numpy_types], expected_java_class: str) -> None:
     v = Const(num)
 
     assert_java_class(v, expected_java_class)
