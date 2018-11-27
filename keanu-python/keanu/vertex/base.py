@@ -1,14 +1,15 @@
 import collections
+from typing import List, Tuple, Iterator, Union, SupportsRound, Optional
+from typing import cast as typing_cast
 
 import numpy as np
+from py4j.java_collections import JavaList, JavaArray
+from py4j.java_gateway import JavaObject, JavaMember
 
 import keanu as kn
-from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
+from keanu.context import KeanuContext
 from keanu.tensor import Tensor
-from typing import List, Tuple, Iterator, Union, Any, Dict, SupportsRound, Optional, cast
-from py4j.java_gateway import JavaObject, JavaMember
-from py4j.java_collections import JavaList, JavaArray
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_tensor_arg_types,
                             runtime_primitive_types, runtime_wrapped_java_types)
 
@@ -27,7 +28,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             ctor = val_or_ctor
             val = ctor(*(Vertex.__parse_args(args)))
         else:
-            val = cast(JavaObject, val_or_ctor)
+            val = typing_cast(JavaObject, val_or_ctor)
 
         super(Vertex, self).__init__(val)
 
