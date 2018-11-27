@@ -50,7 +50,7 @@ public class BayesianNetwork {
 
     private double calculateAverageVertexDegree(Set<? extends Vertex> vertices) {
         OptionalDouble optionalDouble = vertices.stream().mapToInt(Vertex::getDegree).average();
-        return optionalDouble.isPresent() ? optionalDouble.getAsDouble() : 0;
+        return optionalDouble.isPresent() ? optionalDouble.getAsDouble() : 0.;
     }
 
     public BayesianNetwork(Collection<? extends Vertex> vertices) {
