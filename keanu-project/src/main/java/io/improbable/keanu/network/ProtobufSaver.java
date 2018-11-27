@@ -96,11 +96,13 @@ public class ProtobufSaver implements NetworkSaver {
         if (Vertex.class.isAssignableFrom(param.getClass()))  {
             return getParam(paramName, (Vertex)param);
         } else if (DoubleTensor.class.isAssignableFrom(param.getClass())){
-            return getParam(paramName, (DoubleTensor)param);
+            return getParam(paramName, (DoubleTensor) param);
         } else if (IntegerTensor.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (IntegerTensor) param);
         } else if (BooleanTensor.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (BooleanTensor) param);
+        } else if (double.class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, (double) param);
         } else {
             throw new IllegalArgumentException("Unknown Parameter Type to Save: " + param.getClass().toString());
         }
@@ -138,6 +140,15 @@ public class ProtobufSaver implements NetworkSaver {
 
         paramBuilder.setName(paramName);
         paramBuilder.setBoolTensorParam(getTensor(param));
+
+        return paramBuilder.build();
+    }
+
+    private KeanuSavedBayesNet.NamedParam getParam(String paramName, double param) {
+        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
+
+        paramBuilder.setName(paramName);
+        paramBuilder.setDoubleParam(param);
 
         return paramBuilder.build();
     }

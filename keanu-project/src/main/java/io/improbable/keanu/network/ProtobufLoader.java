@@ -252,6 +252,9 @@ public class ProtobufLoader implements NetworkLoader {
             case BOOLTENSORPARAM:
                 return extractBoolTensor(parameter.getBoolTensorParam());
 
+            case DOUBLEPARAM:
+                return parameter.getDoubleParam();
+
             default:
                 throw new IllegalArgumentException("Unknown Param Type Received: "
                     + parameter.getParamCase().toString());
