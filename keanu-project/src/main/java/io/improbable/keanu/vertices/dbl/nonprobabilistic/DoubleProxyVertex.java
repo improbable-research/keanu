@@ -3,9 +3,10 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.ProxyVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -18,7 +19,9 @@ import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class DoubleProxyVertex extends DoubleVertex implements Differentiable, ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class DoubleProxyVertex extends DoubleVertex implements Differentiable, ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
+
+    private static final String LABEL_PARAM_NAME = "label";
 
     /**
      * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
@@ -33,6 +36,10 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
     public DoubleProxyVertex(long[] shape, VertexLabel label) {
         super(shape);
         this.setLabel(label);
+    }
+
+    public DoubleProxyVertex(@LoadVertexParam(LABEL_PARAM_NAME) String label) {
+        this(new VertexLabel(label));
     }
 
     @Override
@@ -68,6 +75,11 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         return Collections.singletonMap(getParent(), derivativeOfOutputsWithRespectToSelf);
+    }
+
+    @SaveVertexParam(LABEL_PARAM_NAME)
+    public String getLabelParamName() {
+        return getLabel().toString();
     }
 
 }
