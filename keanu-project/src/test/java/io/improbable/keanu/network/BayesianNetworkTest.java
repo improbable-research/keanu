@@ -1,10 +1,13 @@
 package io.improbable.keanu.network;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -95,9 +98,25 @@ public class BayesianNetworkTest {
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
     }
 
+    private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {
+        @Override
+        public DoubleTensor sample(KeanuRandom random) {
+            return null;
+        }
+
+        @Override
+        public DoubleTensor sample() {
+            return null;
+        }
+
+        private TestNonSaveableVertex() {
+            super(new long[]{1, 1});
+        }
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void networkWithNonSaveableVerticesThrowsExceptionOnSave() throws IOException {
-        BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
+        DoubleVertex testVertex = new TestNonSaveableVertex();
         BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
         NetworkSaver netSaver = mock(NetworkSaver.class);
         net.save(netSaver);
