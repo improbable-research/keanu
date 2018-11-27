@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,9 +31,26 @@ public class BayesianNetwork {
     private final int TOP_LEVEL_INDENTATION = 1;
     private int indentation = TOP_LEVEL_INDENTATION;
 
+    private final int vertexCount;
+    private final Map<VertexId, Integer> vertexDegrees;
+    private final double averageVertexDegree;
+
     public BayesianNetwork(Set<? extends Vertex> vertices) {
         this.vertices = ImmutableList.copyOf(vertices);
         this.vertexLabels = buildLabelMap(vertices);
+
+        this.vertexCount = vertices.size();
+        this.vertexDegrees = calculateVertexDegrees(vertices);
+        this.averageVertexDegree = calculateAverageVertexDegree(vertices);
+    }
+
+    private Map<VertexId,Integer> calculateVertexDegrees(Set<? extends Vertex> vertices) {
+        return vertices.stream().collect(Collectors.toMap(Vertex::getId, Vertex::getDegree));
+    }
+
+    private double calculateAverageVertexDegree(Set<? extends Vertex> vertices) {
+        OptionalDouble optionalDouble = vertices.stream().mapToInt(Vertex::getDegree).average();
+        return optionalDouble.isPresent() ? optionalDouble.getAsDouble() : 0;
     }
 
     public BayesianNetwork(Collection<? extends Vertex> vertices) {
@@ -61,6 +79,22 @@ public class BayesianNetwork {
 
     List<? extends Vertex> getVertices() {
         return vertices;
+    }
+
+    public int getVertexCount() {
+        return vertexCount;
+    }
+
+    public int getVertexDegree(Vertex vertex) {
+        return vertexDegrees.get(vertex.getId());
+    }
+
+    public int getVertexDegree(VertexId id) {
+        return vertexDegrees.get(id);
+    }
+
+    public double getAverageVertexDegree() {
+        return averageVertexDegree;
     }
 
     public void setState(NetworkState state) {

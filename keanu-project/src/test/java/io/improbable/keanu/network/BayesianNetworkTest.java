@@ -1,14 +1,20 @@
 package io.improbable.keanu.network;
 
+import io.improbable.keanu.plating.loop.Loop;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import static org.hamcrest.Matchers.equalTo;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -34,7 +40,6 @@ public class BayesianNetworkTest {
         input2 = new BernoulliVertex(0.75);
         output = input1.or(input2);
         network = new BayesianNetwork(output.getConnectedGraph());
-
     }
 
     @Test
@@ -101,5 +106,63 @@ public class BayesianNetworkTest {
         BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
         NetworkSaver netSaver = mock(NetworkSaver.class);
         net.save(netSaver);
+    }
+
+    @Test
+    public void youCanGetVertexCountOfInitialBayesNet() {
+        ConstantDoubleVertex probTrue = ConstantVertex.of(0.5);
+        BoolVertex a = new BernoulliVertex(probTrue);
+        BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
+
+        BoolVertex b = new BernoulliVertex(0.5);
+        BoolVertex ored = a.or(b);
+
+        assertThat(net.getVertexCount(), equalTo(2));
+    }
+
+    @Test
+    public void youCanGetVertexDegreeOfInitialBayesNet() {
+        ConstantDoubleVertex probTrue = ConstantVertex.of(0.5);
+        BoolVertex a = new BernoulliVertex(probTrue);
+        BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
+
+        BoolVertex b = new BernoulliVertex(0.5);
+        BoolVertex ored = a.or(b);
+
+        assertThat(net.getVertexDegree(a.getId()), equalTo(1));
+        assertThat(net.getVertexDegree(a), equalTo(1));
+    }
+
+    @Test
+    public void youCanCalculateAverageVertexDegreeOfInitialBayesNet() {
+        ConstantDoubleVertex mu = ConstantVertex.of(0.);
+        ConstantDoubleVertex sigma = ConstantVertex.of(1.);
+        GaussianVertex a = new GaussianVertex(mu, sigma);
+
+        GaussianVertex b = new GaussianVertex(a, sigma);
+        GaussianVertex c = new GaussianVertex(a, sigma);
+
+        BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
+
+        GaussianVertex d = new GaussianVertex(a, 1.);
+        GaussianVertex e = new GaussianVertex(a, 1.);
+
+        assertThat(net.getAverageVertexDegree(), equalTo((1. + 3. + 4. + 2. + 2.) / 5.));
+    }
+
+    @Test
+    public void youCanCalculateMetricsOfVerticesInALoop() {
+         Loop loop = Loop
+            .withInitialConditions(ConstantVertex.of(0.))
+            .iterateWhile(() -> new BernoulliVertex(ConstantVertex.of(0.5)))
+            .apply((v) -> v.plus(ConstantVertex.of(1.)));
+         Vertex<?> output = loop.getOutput();
+
+         Set<Vertex> connectedGraphInLoop = output.getConnectedGraph();
+         BayesianNetwork net = new BayesianNetwork(connectedGraphInLoop);
+
+         assertThat(net.getVertexCount(), equalTo(connectedGraphInLoop.size()));
+         assertThat(net.getVertexDegree(output), equalTo(output.getDegree()));
+         assertThat(net.getAverageVertexDegree(), equalTo(connectedGraphInLoop.stream().mapToInt(Vertex::getDegree).average().getAsDouble()));
     }
 }
