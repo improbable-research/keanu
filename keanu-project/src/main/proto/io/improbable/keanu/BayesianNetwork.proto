@@ -49,6 +49,9 @@ message NamedParam {
         BooleanTensor boolTensorParam = 4;
         VertexID parentVertex = 5;
         double doubleParam = 6;
+        int32 intParam = 7;
+        int64 longParam = 8;
+        string stringParam = 9;
     }
 }
 

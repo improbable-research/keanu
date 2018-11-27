@@ -255,6 +255,15 @@ public class ProtobufLoader implements NetworkLoader {
             case DOUBLEPARAM:
                 return parameter.getDoubleParam();
 
+            case INTPARAM:
+                return parameter.getIntParam();
+
+            case LONGPARAM:
+                return parameter.getLongParam();
+
+            case STRINGPARAM:
+                return parameter.getStringParam();
+
             default:
                 throw new IllegalArgumentException("Unknown Param Type Received: "
                     + parameter.getParamCase().toString());
