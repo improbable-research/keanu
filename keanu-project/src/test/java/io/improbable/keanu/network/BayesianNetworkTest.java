@@ -112,12 +112,16 @@ public class BayesianNetworkTest {
     public void youCanGetVertexCountOfInitialBayesNet() {
         ConstantDoubleVertex probTrue = ConstantVertex.of(0.5);
         BoolVertex a = new BernoulliVertex(probTrue);
-        BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
+        Set<Vertex> connectedGraph = a.getConnectedGraph();
+        BayesianNetwork net = new BayesianNetwork(connectedGraph);
+        int initialVertexCount = connectedGraph.size();
+
+        assertThat(initialVertexCount, equalTo(2));
 
         BoolVertex b = new BernoulliVertex(0.5);
         BoolVertex ored = a.or(b);
 
-        assertThat(net.getVertexCount(), equalTo(2));
+        assertThat(net.getVertexCount(), equalTo(initialVertexCount));
     }
 
     @Test
@@ -125,12 +129,15 @@ public class BayesianNetworkTest {
         ConstantDoubleVertex probTrue = ConstantVertex.of(0.5);
         BoolVertex a = new BernoulliVertex(probTrue);
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
+        int initialDegreeOfA = a.getDegree();
+
+        assertThat(initialDegreeOfA, equalTo(1));
 
         BoolVertex b = new BernoulliVertex(0.5);
         BoolVertex ored = a.or(b);
 
-        assertThat(net.getVertexDegree(a.getId()), equalTo(1));
-        assertThat(net.getVertexDegree(a), equalTo(1));
+        assertThat(net.getVertexDegree(a.getId()), equalTo(initialDegreeOfA));
+        assertThat(net.getVertexDegree(a), equalTo(initialDegreeOfA));
     }
 
     @Test
@@ -145,16 +152,18 @@ public class BayesianNetworkTest {
         ConstantDoubleVertex mu = ConstantVertex.of(0.);
         ConstantDoubleVertex sigma = ConstantVertex.of(1.);
         GaussianVertex a = new GaussianVertex(mu, sigma);
-
         GaussianVertex b = new GaussianVertex(a, sigma);
         GaussianVertex c = new GaussianVertex(a, sigma);
+        Set<Vertex> connectedGraph = a.getConnectedGraph();
+        BayesianNetwork net = new BayesianNetwork(connectedGraph);
+        double initialAverageVertexDegree = connectedGraph.stream().mapToInt(Vertex::getDegree).average().getAsDouble();
 
-        BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
+        assertThat(initialAverageVertexDegree, equalTo((1. + 3. + 4. + 2. + 2.) / 5.));
 
         GaussianVertex d = new GaussianVertex(a, 1.);
         GaussianVertex e = new GaussianVertex(a, 1.);
 
-        assertThat(net.getAverageVertexDegree(), equalTo((1. + 3. + 4. + 2. + 2.) / 5.));
+        assertThat(net.getAverageVertexDegree(), equalTo(initialAverageVertexDegree));
     }
 
     @Test
