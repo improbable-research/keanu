@@ -85,11 +85,11 @@ public class BayesianNetwork {
         return vertexCount;
     }
 
-    public int getVertexDegree(Vertex vertex) {
+    public Integer getVertexDegree(Vertex vertex) {
         return vertexDegrees.get(vertex.getId());
     }
 
-    public int getVertexDegree(VertexId id) {
+    public Integer getVertexDegree(VertexId id) {
         return vertexDegrees.get(id);
     }
 

@@ -134,6 +134,13 @@ public class BayesianNetworkTest {
     }
 
     @Test
+    public void degreeOfNonExistentVertexIsNull() {
+        BoolVertex nonExistentVertex = new BernoulliVertex(0.5);
+        assertThat(network.getVertexDegree(nonExistentVertex), equalTo(null));
+        assertThat(network.getVertexDegree(nonExistentVertex.getId()), equalTo(null));
+    }
+
+    @Test
     public void youCanCalculateAverageVertexDegreeOfInitialBayesNet() {
         ConstantDoubleVertex mu = ConstantVertex.of(0.);
         ConstantDoubleVertex sigma = ConstantVertex.of(1.);
