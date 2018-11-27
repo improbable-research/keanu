@@ -94,6 +94,7 @@ public class NUTSSampler implements SamplingAlgorithm {
 
     @Override
     public void step() {
+
         initializeMomentumForEachVertex(latentVertices, tree.momentumForward, random);
         cache(tree.momentumForward, tree.momentumBackward);
 
@@ -145,6 +146,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                 tree.momentumForward,
                 tree.momentumBackward
             );
+
             treeHeight++;
         }
 
@@ -547,6 +549,7 @@ public class NUTSSampler implements SamplingAlgorithm {
 
             logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
         }
+
         return stepsize;
     }
 

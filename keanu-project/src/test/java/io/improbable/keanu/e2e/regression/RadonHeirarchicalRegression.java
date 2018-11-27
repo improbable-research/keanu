@@ -52,8 +52,8 @@ public class RadonHeirarchicalRegression {
     }
 
     @Test
-    public void canPerformRegressionWithFiveHeirarchies() {
-        buildHeirarchicalNetwork(radonData, 5);
+    public void canPerformRegressionWithFourHeirarchies() {
+        buildHeirarchicalNetwork(radonData, 4);
     }
 
     @Test
