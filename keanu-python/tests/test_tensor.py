@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+
 from keanu.tensor import Tensor
 
 
@@ -37,8 +38,8 @@ def test_dataframe_passed_to_Tensor_creates_tensor(data, expected_java_class):
     assert np.array_equal(tensor_value, dataframe_value)
 
 
-@pytest.mark.parametrize("data, expected_java_class", [([1, 2], "Nd4jIntegerTensor"), ([1], "ScalarIntegerTensor"),
-                                                       ([1., 2.], "Nd4jDoubleTensor"), ([1.], "ScalarDoubleTensor"),
+@pytest.mark.parametrize("data, expected_java_class", [([1, 2], "Nd4jIntegerTensor"), ([1], "Nd4jIntegerTensor"),
+                                                       ([1., 2.], "Nd4jDoubleTensor"), ([1.], "Nd4jDoubleTensor"),
                                                        ([True, False], "SimpleBooleanTensor"),
                                                        ([True], "SimpleBooleanTensor")])
 def test_series_passed_to_Tensor_creates_tensor(data, expected_java_class):
@@ -51,7 +52,7 @@ def test_series_passed_to_Tensor_creates_tensor(data, expected_java_class):
     series_value = series.values
 
     assert len(tensor_value) == len(series_value)
-    assert tensor_value.shape == (len(series_value), 1)
+    assert tensor_value.shape == (len(series_value),)
     assert series_value.shape == (len(series_value),)
 
     assert np.array_equal(tensor_value.flatten(), series_value.flatten())
@@ -87,7 +88,7 @@ def test_cannot_pass_empty_ndarray_to_Tensor():
     assert str(excinfo.value) == "Cannot infer type because the ndarray is empty"
 
 
-@pytest.mark.parametrize("value", [(np.array([[1, 2], [3, 4]])), (3)])
+@pytest.mark.parametrize("value", [(np.array([[1, 2], [3, 4]])), np.array([3])])
 def test_convert_java_tensor_to_ndarray(value):
     t = Tensor(value)
     ndarray = Tensor._to_ndarray(t.unwrap())

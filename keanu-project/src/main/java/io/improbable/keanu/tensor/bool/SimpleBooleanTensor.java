@@ -1,8 +1,8 @@
 package io.improbable.keanu.tensor.bool;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -33,8 +33,11 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape desired shape of tensor
      */
     public SimpleBooleanTensor(boolean[] data, long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
-        this.data = new boolean[checkedCast(TensorShape.getLength(shape))];
+        Preconditions.checkArgument(
+            TensorShape.getLength(shape) == data.length,
+            "Shape " + Arrays.toString(shape) + " does not match data length " + data.length
+        );
+        this.data = new boolean[data.length];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -53,7 +56,6 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape shape to use as place holder
      */
     public SimpleBooleanTensor(long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -64,8 +66,8 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape    desired shape of tensor
      */
     public SimpleBooleanTensor(boolean constant, long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
-        this.data = new boolean[(int) TensorShape.getLength(shape)];
+        int dataLength = TensorShape.getLengthAsInt(shape);
+        this.data = new boolean[dataLength];
         Arrays.fill(this.data, constant);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);

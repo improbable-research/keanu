@@ -1,13 +1,13 @@
+from itertools import islice
+
 import numpy as np
 import pandas as pd
 import pytest
-from py4j.java_gateway import java_import
+
 from examples import thermometers
-from keanu.vertex import Gamma, Exponential, Cauchy
-from keanu.algorithm import sample, generate_samples
 from keanu import BayesNet, KeanuRandom, Model
-from collections import defaultdict
-from itertools import islice
+from keanu.algorithm import sample, generate_samples
+from keanu.vertex import Gamma, Exponential, Cauchy
 
 
 @pytest.fixture
@@ -35,7 +35,7 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(a
 
         assert len(vertex_samples) == draws
         assert type(vertex_samples) == list
-        assert all(type(sample) == np.ndarray for sample in vertex_samples)
+        assert all(type(sample) == float for sample in vertex_samples)
 
 
 def test_dropping_samples(net: BayesNet) -> None:

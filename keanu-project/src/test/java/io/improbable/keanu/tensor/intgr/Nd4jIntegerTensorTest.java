@@ -1,8 +1,10 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.TensorTestHelper;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+import junit.framework.TestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -11,7 +13,6 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
-import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -26,17 +27,17 @@ public class Nd4jIntegerTensorTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void youCannotCreateARankZeroTensor() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Tensors must have rank >=2 : []");
-        IntegerTensor.create(new int[] {}, new long[] {});
+    public void youCanCreateARankZeroTensor() {
+        IntegerTensor scalar = IntegerTensor.create(new int[]{2}, new long[]{});
+        assertEquals(2, (int) scalar.scalar());
+        TestCase.assertEquals(0, scalar.getRank());
     }
 
     @Test
-    public void youCannotCreateARankOneTensor() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Tensors must have rank >=2 : [5]");
-        IntegerTensor.create(new int[] {1, 2, 3, 4, 5}, new long[] {5});
+    public void youCanCreateARankOneTensor() {
+        IntegerTensor vector = IntegerTensor.create(new int[]{1, 2, 3, 4, 5}, new long[]{5});
+        assertEquals(4, (int) vector.getValue(3));
+        TestCase.assertEquals(1, vector.getRank());
     }
 
     @Test
@@ -388,7 +389,7 @@ public class Nd4jIntegerTensorTest {
     public void canElementwiseEqualsAScalarValue() {
         int value = 42;
         int otherValue = 43;
-        IntegerTensor allTheSame = IntegerTensor.create(value, new long[] {2, 3});
+        IntegerTensor allTheSame = IntegerTensor.create(value, new long[]{2, 3});
         IntegerTensor notAllTheSame = allTheSame.duplicate().setValue(otherValue, 1, 1);
 
         assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
@@ -562,11 +563,11 @@ public class Nd4jIntegerTensorTest {
 
     @Test
     public void canFindArgMaxOfRowVector() {
-        IntegerTensor tensorRow = IntegerTensor.create(1, 3, 4, 5, 2);
+        IntegerTensor tensorRow = IntegerTensor.create(1, 3, 4, 5, 2).reshape(1, 5);
 
         assertEquals(3, tensorRow.argMax());
-        assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(1, 5)));
-        assertThat(tensorRow.argMax(1), isScalarWithValue(3));
+        assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(5)));
+        assertThat(tensorRow.argMax(1), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
     }
 
     @Test
@@ -574,8 +575,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor tensorCol = IntegerTensor.create(1, 3, 4, 5, 2).reshape(5, 1);
 
         assertEquals(3, tensorCol.argMax());
-        assertThat(tensorCol.argMax(0), isScalarWithValue(3));
-        assertThat(tensorCol.argMax(1), valuesAndShapesMatch(IntegerTensor.zeros(1, 5)));
+        assertThat(tensorCol.argMax(0), valuesAndShapesMatch(IntegerTensor.create(new int[]{3}, 1)));
+        assertThat(tensorCol.argMax(1), valuesAndShapesMatch(IntegerTensor.zeros(5)));
     }
 
     @Test
@@ -646,6 +647,60 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor differentValue = IntegerTensor.create(1);
         BooleanTensor result = value.elementwiseEquals(differentValue);
         assertThat(result, hasValue(true, false, false));
+    }
+
+    @Test
+    public void canSliceRank3To2() {
+        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4, 1, 2, 3, 4).reshape(2, 2, 2);
+        TensorTestHelper.doesDownRankOnSliceRank3To2(x);
+    }
+
+    @Test
+    public void canSliceRank2To1() {
+        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4).reshape(2, 2);
+        TensorTestHelper.doesDownRankOnSliceRank2To1(x);
+    }
+
+    @Test
+    public void canSliceRank1ToScalar() {
+        IntegerTensor x = IntegerTensor.create(1, 2, 3, 4).reshape(4);
+        TensorTestHelper.doesDownRankOnSliceRank1ToScalar(x);
+    }
+
+    @Test
+    public void canConcatScalars() {
+        IntegerTensor x = IntegerTensor.scalar(2);
+        IntegerTensor y = IntegerTensor.scalar(3);
+
+        IntegerTensor concat = IntegerTensor.concat(x, y);
+        assertEquals(IntegerTensor.create(2, 3), concat);
+    }
+
+    @Test
+    public void canConcatVectors() {
+        IntegerTensor x = IntegerTensor.create(2, 3);
+        IntegerTensor y = IntegerTensor.create(4, 5);
+
+        IntegerTensor concat = IntegerTensor.concat(x, y);
+        assertEquals(IntegerTensor.create(2, 3, 4, 5), concat);
+    }
+
+    @Test
+    public void canConcatMatrices() {
+        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
+        IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
+
+        IntegerTensor concat = IntegerTensor.concat(0, x, y);
+        assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(2, 2), concat);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsWhenNeedsDimensionSpecifiedForConcat() {
+        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
+        IntegerTensor y = IntegerTensor.create(4, 5, 6).reshape(1, 3);
+
+        IntegerTensor concat = IntegerTensor.concat(0, x, y);
+        assertEquals(IntegerTensor.create(2, 3, 4, 5, 6), concat);
     }
 
 

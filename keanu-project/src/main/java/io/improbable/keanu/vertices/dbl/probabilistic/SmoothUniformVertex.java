@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static java.util.Collections.singletonMap;
 
 public class SmoothUniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
@@ -44,7 +44,7 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
      */
     public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
@@ -61,7 +61,7 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
     public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
     }
 
 

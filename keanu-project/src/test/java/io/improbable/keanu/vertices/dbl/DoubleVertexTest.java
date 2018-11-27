@@ -63,7 +63,7 @@ public class DoubleVertexTest {
         DoubleVertex gaussianVertex = new GaussianVertex(0, 1);
         double[] values = new double[]{1, 2, 3};
         gaussianVertex.setAndCascade(values);
-        assertEquals(1, gaussianVertex.take(0, 0).getValue().scalar(), 0.0);
+        assertEquals(1, gaussianVertex.take(0).getValue().scalar(), 0.0);
     }
 
     @Test
