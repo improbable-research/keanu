@@ -8,6 +8,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Test;
@@ -22,15 +24,15 @@ public class DifferentiatorTest {
 
         DoubleVertex A = new GaussianVertex(0, 1);
         DoubleVertex B = new GaussianVertex(0, 1);
-        DoubleVertex C = A.times(B);
+        MultiplicationVertex C = A.times(B);
 
         PartialDerivatives dC = C.getDerivativeWrtLatents();
 
         DoubleTensor dCdA = dC.withRespectTo(A);
         DoubleTensor dCdB = dC.withRespectTo(B);
 
-        assertEquals(A.getValue().reshape(1, 1, 1, 1), dCdB);
-        assertEquals(B.getValue().reshape(1, 1, 1, 1), dCdA);
+        assertEquals(A.getValue(), dCdB);
+        assertEquals(B.getValue(), dCdA);
     }
 
     @Test
@@ -83,7 +85,7 @@ public class DifferentiatorTest {
         DoubleVertex E = C.times(D).pow(A).acos();
         DoubleVertex G = E.log().tan().asin().atan();
         DoubleVertex F = D.plus(B).exp();
-        DoubleVertex H = G.plus(F).sum();
+        SumVertex H = G.plus(F).sum();
 
         PartialDerivatives dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
         PartialDerivatives dHForward = H.getDerivativeWrtLatents();
@@ -115,7 +117,7 @@ public class DifferentiatorTest {
         DoubleVertex E = J.times(D).pow(A).acos();
         DoubleVertex G = E.log().tan().atan();
         DoubleVertex F = D.plus(B).exp();
-        DoubleVertex H = G.plus(F).sum().times(A).sum().times(C);
+        MultiplicationVertex H = G.plus(F).sum().times(A).sum().times(C);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B, C), H, 0.001, 1e-3);
     }

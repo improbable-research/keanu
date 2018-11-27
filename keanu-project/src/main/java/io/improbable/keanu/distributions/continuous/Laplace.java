@@ -3,9 +3,9 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.nd4j.linalg.util.ArrayUtil;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.BETA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
@@ -17,9 +17,9 @@ public class Laplace implements ContinuousDistribution {
     private final DoubleTensor beta;
 
     /**
-     * @param mu     location
-     * @param beta   shape
-     * @return       a new ContinuousDistribution object
+     * @param mu   location
+     * @param beta shape
+     * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor beta) {
         return new Laplace(mu, beta);
@@ -35,7 +35,7 @@ public class Laplace implements ContinuousDistribution {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
         Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
 
-        int length = ArrayUtil.prod(shape);
+        int length = TensorShape.getLengthAsInt(shape);
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
             samples[i] = sample(muWrapped.getOrScalar(i), betaWrapped.getOrScalar(i), random);

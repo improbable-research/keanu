@@ -2,10 +2,12 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +18,7 @@ public class FitnessFunctionWithGradientTest {
 
     private final double dx = 0.0000000001;
 
+    @Category(Slow.class)
     @Test
     public void calculatesGradientCorrectlyWithMultiplyAndMinus() {
 
@@ -43,6 +46,7 @@ public class FitnessFunctionWithGradientTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void calculatesGradientCorrectlyWithAdditionAndDivision() {
 
@@ -70,6 +74,7 @@ public class FitnessFunctionWithGradientTest {
         );
     }
 
+    @Category(Slow.class)
     @Test
     public void calculatesGradientCorrectlyWithAdditionMultiplicationSubtractionDivision() {
 

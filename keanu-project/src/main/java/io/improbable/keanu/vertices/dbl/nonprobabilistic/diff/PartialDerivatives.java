@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
+import org.nd4j.linalg.api.shape.Shape;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -96,6 +97,10 @@ public class PartialDerivatives {
     public PartialDerivatives sumOverWrtDimensions(int[] dimensions, long[] resultShape, int wrtRank) {
         Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
+        if (dimensions.length == 0) {
+            return new PartialDerivatives(summed);
+        }
+
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
@@ -113,13 +118,13 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives add(PartialDerivatives toAdd) {
-        return add(toAdd, null);
+        return add(toAdd, false, false, null);
     }
 
-    public PartialDerivatives add(PartialDerivatives addition, long[] ofShape) {
+    public PartialDerivatives add(PartialDerivatives addition, boolean leftIsLengthOne, boolean rightIsLengthOne, long[] resultShape) {
 
-        Map<VertexId, DoubleTensor> added = cloneWithCorrectShape(derivativeWithRespectTo, ofShape);
-        Map<VertexId, DoubleTensor> toAdd = cloneWithCorrectShape(addition.derivativeWithRespectTo, ofShape);
+        Map<VertexId, DoubleTensor> added = cloneWithCorrectShape(derivativeWithRespectTo, leftIsLengthOne, resultShape);
+        Map<VertexId, DoubleTensor> toAdd = cloneWithCorrectShape(addition.derivativeWithRespectTo, rightIsLengthOne, resultShape);
 
         for (Map.Entry<VertexId, DoubleTensor> entry : toAdd.entrySet()) {
             VertexId k = entry.getKey();
@@ -136,13 +141,13 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives subtract(PartialDerivatives subtraction) {
-        return subtract(subtraction, null);
+        return subtract(subtraction, false, false, null);
     }
 
-    public PartialDerivatives subtract(PartialDerivatives subtraction, long[] ofShape) {
+    public PartialDerivatives subtract(PartialDerivatives subtraction, boolean leftIsLengthOne, boolean rightIsLengthOne, long[] resultShape) {
 
-        Map<VertexId, DoubleTensor> subtracted = cloneWithCorrectShape(derivativeWithRespectTo, ofShape);
-        Map<VertexId, DoubleTensor> toSubtract = cloneWithCorrectShape(subtraction.derivativeWithRespectTo, ofShape);
+        Map<VertexId, DoubleTensor> subtracted = cloneWithCorrectShape(derivativeWithRespectTo, leftIsLengthOne, resultShape);
+        Map<VertexId, DoubleTensor> toSubtract = cloneWithCorrectShape(subtraction.derivativeWithRespectTo, rightIsLengthOne, resultShape);
 
         for (Map.Entry<VertexId, DoubleTensor> entry : toSubtract.entrySet()) {
             VertexId k = entry.getKey();
@@ -158,35 +163,22 @@ public class PartialDerivatives {
         return new PartialDerivatives(subtracted);
     }
 
-    private static Map<VertexId, DoubleTensor> cloneWithCorrectShape(Map<VertexId, DoubleTensor> infinitesimals, long[] ofShape) {
+    private static Map<VertexId, DoubleTensor> cloneWithCorrectShape(Map<VertexId, DoubleTensor> infinitesimals,
+                                                                     boolean ofIsLengthOne,
+                                                                     long[] resultShape) {
 
         Map<VertexId, DoubleTensor> clone = new HashMap<>();
         for (Map.Entry<VertexId, DoubleTensor> entry : infinitesimals.entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
 
-            if (ofShape == null || ofShapeMatches(ofShape, v.getShape())) {
-                clone.put(k, v);
-            } else {
-                clone.put(k, DoubleTensor.zeros(shapeWrtScalar(ofShape, v.getShape())).plus(v));
+            if (ofIsLengthOne) {
+                v = DoubleTensor.zeros(TensorShape.concat(resultShape, v.getShape())).plus(v);
             }
+
+            clone.put(k, v);
         }
         return clone;
-    }
-
-    private static boolean ofShapeMatches(long[] ofShape, long[] partialShape) {
-        for (int i = 0; i < ofShape.length; i++) {
-            if (ofShape[i] != partialShape[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static long[] shapeWrtScalar(long[] ofShape, long[] partialShape) {
-        long[] fixedShape = Arrays.copyOf(partialShape, partialShape.length);
-        System.arraycopy(ofShape, 0, fixedShape, 0, ofShape.length);
-        return fixedShape;
     }
 
     public PartialDerivatives multiplyAlongOfDimensions(DoubleTensor multiplier, long[] ofShape) {
@@ -232,10 +224,12 @@ public class PartialDerivatives {
     private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier, long[] ofShape) {
 
         long[] partialOfShape = extractOfShape(partial.getShape(), ofShape.length);
-        if (TensorShape.isScalar(partialOfShape)) {
 
+        boolean needsBroadcast = !Arrays.equals(partialOfShape, multiplier.getShape());
+        if (needsBroadcast) {
             long[] partialWrtShape = extractWrtShape(partial.getShape(), ofShape.length);
-            long[] resultShape = TensorShape.concat(multiplier.getShape(), partialWrtShape);
+            long[] broadcastedOfShape = Shape.broadcastOutputShape(multiplier.getShape(), partialOfShape);
+            long[] resultShape = TensorShape.concat(broadcastedOfShape, partialWrtShape);
 
             DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, resultShape.length);
             DoubleTensor appropriateShapePartial = increaseRankByPrependingOnesToShape(partial, resultShape.length);
@@ -255,7 +249,8 @@ public class PartialDerivatives {
         if (needsBroadcast) {
 
             long[] partialOfShape = extractOfShape(partial.getShape(), partial.getRank() - wrtShape.length);
-            long[] resultShape = TensorShape.concat(partialOfShape, multiplier.getShape());
+            long[] broadcastedWrtShape = Shape.broadcastOutputShape(multiplier.getShape(), partialWrtShape);
+            long[] resultShape = TensorShape.concat(partialOfShape, broadcastedWrtShape);
 
             DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, resultShape.length);
             DoubleTensor appropriateShapePartial = increaseRankByAppendingOnesToShape(partial, resultShape.length);
@@ -418,11 +413,22 @@ public class PartialDerivatives {
     }
 
     private long[] extractWrtShape(long[] partialDerivativeShape, int rankOfSource) {
-        return Arrays.copyOfRange(partialDerivativeShape, rankOfSource, partialDerivativeShape.length);
+        return extractShape(partialDerivativeShape, rankOfSource, rankOfSource, partialDerivativeShape.length);
     }
 
     private long[] extractOfShape(long[] partialDerivativeShape, int rankOfSource) {
-        return Arrays.copyOfRange(partialDerivativeShape, 0, rankOfSource);
+        return extractShape(partialDerivativeShape, rankOfSource, 0, rankOfSource);
+    }
+
+    private long[] extractShape(long[] partialDerivativeShape, int rankOfSource, int from, int to) {
+        if (partialDerivativeShape.length == 0) {
+            if (rankOfSource > 1) {
+                throw new IllegalArgumentException("Partial does not contain of shape requested");
+            } else {
+                return new long[0];
+            }
+        }
+        return Arrays.copyOfRange(partialDerivativeShape, from, to);
     }
 
     private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {

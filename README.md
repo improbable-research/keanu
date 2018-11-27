@@ -52,6 +52,7 @@ Want to see an example and run it yourself? Head over to [Getting Started](https
 ## Documentation
 
 Want to learn more? Head over to the [Documentation](https://improbable-research.github.io/keanu/).
+You can also see our [JavaDocs](https://www.javadoc.io/doc/io.improbable/keanu) or our [Python Docs](https://improbable-research.github.io/keanu/python)
 
 ## Future
 
@@ -73,8 +74,7 @@ For IntelliJ:
 
 #### Formatting
 
-We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) to automatically enforce some basic code style checks. If your build fails due to a formatting issue, simply run `./gradlew spotlessApply` and commit the changes.
-
+We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) and [yapf](https://github.com/google/yapf) to automatically enforce some basic code style checks. If your build fails due to a formatting issue, simply run `./gradlew formatApply` and commit the changes.
 
 #### Python Code Generation
 

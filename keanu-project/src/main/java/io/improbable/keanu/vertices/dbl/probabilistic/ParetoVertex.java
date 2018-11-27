@@ -1,10 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Pareto;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -17,13 +21,15 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class ParetoVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex scale;
     private final DoubleVertex location;
+    private static final String SCALE_NAME = "scale";
+    private static final String LOCATION_NAME = "location";
 
     /**
      * Provides a Vertex implementing the Pareto Distribution.
@@ -36,15 +42,17 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble, S
      */
     public ParetoVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, location.getShape(), scale.getShape());
 
         this.scale = scale;
         this.location = location;
         setParents(location, scale);
     }
 
-    public ParetoVertex(DoubleVertex location, DoubleVertex scale) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
+    @ExportVertexToPythonBindings
+    public ParetoVertex(@LoadParentVertex(LOCATION_NAME) DoubleVertex location,
+                        @LoadParentVertex(SCALE_NAME) DoubleVertex scale) {
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(location.getShape(), scale.getShape()), location, scale);
     }
 
     public ParetoVertex(double location, DoubleVertex scale) {
@@ -71,10 +79,12 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble, S
         this(tensorShape, new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
+    @SaveParentVertex(SCALE_NAME)
     public DoubleVertex getScale() {
         return scale;
     }
 
+    @SaveParentVertex(LOCATION_NAME)
     public DoubleVertex getLocation() {
         return location;
     }

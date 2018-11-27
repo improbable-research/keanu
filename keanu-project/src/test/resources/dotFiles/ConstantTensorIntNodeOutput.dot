@@ -1,0 +1,7 @@
+digraph BayesianNetwork {
+<91> -> <92> [label=right]
+<90> -> <92> [label=left]
+91[label="2"]
+90[label="ConstantIntegerVertex"]
+92[label="*"]
+}

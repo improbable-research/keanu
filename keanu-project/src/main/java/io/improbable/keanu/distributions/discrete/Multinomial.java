@@ -3,6 +3,7 @@ package io.improbable.keanu.distributions.discrete;
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -10,11 +11,12 @@ import io.improbable.keanu.tensor.validate.DebugTensorValidator;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 
 public class Multinomial implements DiscreteDistribution {
@@ -36,6 +38,7 @@ public class Multinomial implements DiscreteDistribution {
      * Generalisation of the Binomial distribution to variables with more than 2 possible values
      */
     private Multinomial(IntegerTensor n, DoubleTensor p) {
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(n.getShape(), TensorShape.removeDimension(0, p.getShape()));
         Preconditions.checkArgument(
             p.sum(0).elementwiseEquals(DoubleTensor.ones(n.getShape())).allTrue(),
             "Probabilities must sum to one"
@@ -43,19 +46,19 @@ public class Multinomial implements DiscreteDistribution {
         CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.validate(p);
 
         numCategories = p.getShape()[0];
-        TensorShapeValidation.checkAllShapesMatch(n.getShape(), p.slice(0, 0).getShape());
         this.n = n;
         this.p = p;
     }
 
+
     @Override
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
-        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(shape, n.getShape());
+        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, n.getShape());
 
         Tensor.FlattenedView<Integer> nFlattened = n.getFlattenedView();
         List<DoubleTensor> sliced = p.sliceAlongDimension(0, 0, numCategories);
 
-        int length = ArrayUtil.prod(shape);
+        int length = TensorShape.getLengthAsInt(shape);
         int[] samples = new int[0];
 
         for (int i = 0; i < length; i++) {

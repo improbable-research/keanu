@@ -6,6 +6,7 @@ import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -14,6 +15,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.KDEVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +52,7 @@ public class KDEApproximationTest {
         assertTrue(String.format("Only %f out of %d correct!", nCorrect, expected.asFlatList().size()), nCorrect / expected.asFlatList().size() > correctPercentage);
     }
 
+    @Category(Slow.class)
     @Test
     public void matchesKnownLogDensityOfScalar() {
         double mu = 1.;
@@ -73,6 +76,7 @@ public class KDEApproximationTest {
         isCloseMostOfTheTime(expectedPdf, approximatedPdf, correctPercentage, delta);
     }
 
+    @Category(Slow.class)
     @Test
     public void matchesKnownDerivativeLogDensityOfScalar() {
         double mu = 1.;
@@ -94,6 +98,7 @@ public class KDEApproximationTest {
         isCloseMostOfTheTime(expectedDerivative, approximateDerivative, correctPercentage, DELTA);
     }
 
+    @Category(Slow.class)
     @Test
     public void dLogPdfForMultipleInputsTest() {
         double mu = 0.;
@@ -141,7 +146,7 @@ public class KDEApproximationTest {
 
         int numSamples = 100;
         DoubleTensor sample = KDE.sample(numSamples, KeanuRandom.getDefaultRandom());
-        assertThat(sample, hasShape(1, 100));
+        assertThat(sample, hasShape(100));
     }
 
     @Test
@@ -156,8 +161,7 @@ public class KDEApproximationTest {
 
         int nSamples = 1000;
         resampledKDE.resample(nSamples, KeanuRandom.getDefaultRandom());
-        assertEquals(1, resampledKDE.getSampleShape()[0]);
-        assertEquals(nSamples, resampledKDE.getSampleShape()[1]);
+        assertEquals(nSamples, resampledKDE.getSampleShape()[0]);
     }
 
     @Test(expected = IllegalArgumentException.class)

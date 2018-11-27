@@ -4,8 +4,11 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -17,13 +20,15 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.K;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.THETA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class GammaVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class GammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex theta;
     private final DoubleVertex k;
+    private static final String THETA_NAME = "theta";
+    private static final String K_NAME = "k";
 
     /**
      * Theta or k or both driving an arbitrarily shaped tensor of Gamma
@@ -36,7 +41,7 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble, Sa
      */
     public GammaVertex(long[] tensorShape, DoubleVertex theta, DoubleVertex k) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, theta.getShape(), k.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, theta.getShape(), k.getShape());
 
         this.theta = theta;
         this.k = k;
@@ -50,8 +55,9 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble, Sa
      * @param k     the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     @ExportVertexToPythonBindings
-    public GammaVertex(DoubleVertex theta, DoubleVertex k) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(theta.getShape(), k.getShape()), theta, k);
+    public GammaVertex(@LoadParentVertex(THETA_NAME) DoubleVertex theta,
+                       @LoadParentVertex(K_NAME) DoubleVertex k) {
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(theta.getShape(), k.getShape()), theta, k);
     }
 
     public GammaVertex(DoubleVertex theta, double k) {
@@ -64,6 +70,16 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble, Sa
 
     public GammaVertex(double theta, double k) {
         this(new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k));
+    }
+
+    @SaveParentVertex(THETA_NAME)
+    public DoubleVertex getTheta() {
+        return theta;
+    }
+
+    @SaveParentVertex(K_NAME)
+    public DoubleVertex getK() {
+        return k;
     }
 
     @Override

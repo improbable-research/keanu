@@ -19,22 +19,27 @@ dependencies {
 }
 
 task saveJavadocStringsToFile(type: Javadoc) {
-    source = fileTree(dir:'../keanu-project', includes:["**/*.java"])
+    source = project(':keanu-project').sourceSets.main.allJava
 
     def docletClasspath = rootProject.compileJava.classpath.files.toList()
     docletClasspath.add(new File(layout.projectDirectory.get().path + "/build/classes/java/main"))
     options.setDocletpath(docletClasspath)
     options.setDoclet("io.improbable.keanu.codegen.python.KeanuProjectDoclet")
 
-    def mainClasspath = fileTree(dir:'../keanu-project').files.toList()
-    options.setClasspath(mainClasspath)
+    classpath = project(':keanu-project').sourceSets.main.runtimeClasspath
+    classpath += project(':keanu-project').sourceSets.main.compileClasspath
 }
 
-task codeGen (type: JavaExec) {
+task runCodeGeneration (type: JavaExec) {
     dependsOn saveJavadocStringsToFile
     classpath sourceSets.main.runtimeClasspath
     main = mainClassName
     args += project.rootDir.toString() + '/keanu-python/keanu/vertex/'
+}
+
+task codeGen {
+    dependsOn(runCodeGeneration)
+    dependsOn(":keanu-python:generateDocumentation")
 }
 
 lombok { // optional: values below are the defaults

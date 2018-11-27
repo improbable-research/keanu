@@ -4,12 +4,14 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
@@ -24,6 +26,7 @@ public class MultivariateGaussianTest {
         random = new KeanuRandom(1);
     }
 
+    @Category(Slow.class)
     @Test
     public void samplingFromUnivariateGaussianMatchesLogDensity() {
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(0, 1);
@@ -40,7 +43,7 @@ public class MultivariateGaussianTest {
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(5, 1);
 
         double expectedDensity = new NormalDistribution(5.0, 1).logDensity(0.5);
-        double density = mvg.logPdf(Nd4jDoubleTensor.scalar(0.5));
+        double density = mvg.logPdf(DoubleTensor.create(new double[]{0.5}, 1, 1));
 
         assertEquals(expectedDensity, density, 1e-2);
     }
@@ -98,6 +101,7 @@ public class MultivariateGaussianTest {
         assertEquals(expected, density, 0.001);
     }
 
+    @Category(Slow.class)
     @Test
     public void gaussianSampleMethodMatchesLogProbMethod() {
         DoubleVertex mu = ConstantVertex.of(

@@ -3,13 +3,14 @@ package io.improbable.keanu.e2e.lorenz;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.experimental.categories.Category;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,9 +19,10 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
+@Slf4j
 public class LorenzTest {
-    private final Logger log = LoggerFactory.getLogger(LorenzTest.class);
 
+    @Category(Slow.class)
     @Test
     public void convergesOnLorenz() {
 

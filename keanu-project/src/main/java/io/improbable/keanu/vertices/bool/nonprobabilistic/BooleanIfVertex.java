@@ -1,7 +1,11 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -11,12 +15,15 @@ public class BooleanIfVertex extends BoolVertex implements NonProbabilistic<Bool
     private final Vertex<? extends BooleanTensor> predicate;
     private final Vertex<? extends BooleanTensor> thn;
     private final Vertex<? extends BooleanTensor> els;
+    private final static String PRED_NAME = "predicate";
+    private final static String THN_NAME = "then";
+    private final static String ELS_NAME = "else";
 
-    public BooleanIfVertex(long[] shape,
-                           Vertex<? extends BooleanTensor> predicate,
-                           Vertex<? extends BooleanTensor> thn,
-                           Vertex<? extends BooleanTensor> els) {
-        super(shape);
+    @ExportVertexToPythonBindings
+    public BooleanIfVertex(@LoadParentVertex(PRED_NAME) Vertex<? extends BooleanTensor> predicate,
+                           @LoadParentVertex(THN_NAME) Vertex<? extends BooleanTensor> thn,
+                           @LoadParentVertex(ELS_NAME) Vertex<? extends BooleanTensor> els) {
+        super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
@@ -35,5 +42,20 @@ public class BooleanIfVertex extends BoolVertex implements NonProbabilistic<Bool
     @Override
     public BooleanTensor calculate() {
         return op(predicate.getValue(), thn.getValue(), els.getValue());
+    }
+
+    @SaveParentVertex(PRED_NAME)
+    public Vertex<? extends BooleanTensor> getPredicate() {
+        return predicate;
+    }
+
+    @SaveParentVertex(THN_NAME)
+    public Vertex<? extends BooleanTensor> getThn() {
+        return thn;
+    }
+
+    @SaveParentVertex(ELS_NAME)
+    public Vertex<? extends BooleanTensor> getEls() {
+        return els;
     }
 }

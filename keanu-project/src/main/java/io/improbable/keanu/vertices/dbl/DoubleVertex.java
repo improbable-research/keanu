@@ -2,6 +2,8 @@ package io.improbable.keanu.vertices.dbl;
 
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.network.NetworkLoader;
+import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -47,11 +49,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
+public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
 
     public DoubleVertex(long[] initialShape) {
         super(initialShape);
@@ -63,140 +64,140 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
      *                  dimension
      * @return a vertex that represents the concatenation of the toConcat
      */
-    public static DoubleVertex concat(int dimension, DoubleVertex... toConcat) {
+    public static ConcatenationVertex concat(int dimension, DoubleVertex... toConcat) {
         return new ConcatenationVertex(dimension, toConcat);
     }
 
-    public static DoubleVertex min(DoubleVertex a, DoubleVertex b) {
+    public static MinVertex min(DoubleVertex a, DoubleVertex b) {
         return new MinVertex(a, b);
     }
 
-    public static DoubleVertex max(DoubleVertex a, DoubleVertex b) {
+    public static MaxVertex max(DoubleVertex a, DoubleVertex b) {
         return new MaxVertex(a, b);
     }
 
-    public DoubleVertex minus(DoubleVertex that) {
+    public DifferenceVertex minus(DoubleVertex that) {
         return new DifferenceVertex(this, that);
     }
 
-    public DoubleVertex plus(DoubleVertex that) {
+    public AdditionVertex plus(DoubleVertex that) {
         return new AdditionVertex(this, that);
     }
 
-    public DoubleVertex multiply(DoubleVertex that) {
+    public MultiplicationVertex multiply(DoubleVertex that) {
         return new MultiplicationVertex(this, that);
     }
 
-    public DoubleVertex matrixMultiply(DoubleVertex that) {
+    public MatrixMultiplicationVertex matrixMultiply(DoubleVertex that) {
         return new MatrixMultiplicationVertex(this, that);
     }
 
-    public DoubleVertex matrixInverse() {
+    public MatrixInverseVertex matrixInverse() {
         return new MatrixInverseVertex(this);
     }
 
-    public DoubleVertex matrixDeterminant() {
+    public MatrixDeterminantVertex matrixDeterminant() {
         return new MatrixDeterminantVertex(this);
     }
 
-    public DoubleVertex divideBy(DoubleVertex that) {
+    public DivisionVertex divideBy(DoubleVertex that) {
         return new DivisionVertex(this, that);
     }
 
-    public DoubleVertex pow(DoubleVertex exponent) {
+    public PowerVertex pow(DoubleVertex exponent) {
         return new PowerVertex(this, exponent);
     }
 
     @Override
-    public DoubleVertex minus(double that) {
+    public DifferenceVertex minus(double that) {
         return minus(new ConstantDoubleVertex(that));
     }
 
     @Override
-    public DoubleVertex reverseMinus(double that) {
+    public DifferenceVertex reverseMinus(double that) {
         return new ConstantDoubleVertex(that).minus(this);
     }
 
     @Override
-    public DoubleVertex plus(double that) {
+    public AdditionVertex plus(double that) {
         return plus(new ConstantDoubleVertex(that));
     }
 
-    public DoubleVertex multiply(double that) {
+    public MultiplicationVertex multiply(double that) {
         return multiply(new ConstantDoubleVertex(that));
     }
 
-    public DoubleVertex divideBy(double that) {
+    public DivisionVertex divideBy(double that) {
         return divideBy(new ConstantDoubleVertex(that));
     }
 
     @Override
-    public DoubleVertex pow(double that) {
+    public PowerVertex pow(double that) {
         return pow(new ConstantDoubleVertex(that));
     }
 
-    public DoubleVertex abs() {
+    public AbsVertex abs() {
         return new AbsVertex(this);
     }
 
-    public DoubleVertex floor() {
+    public FloorVertex floor() {
         return new FloorVertex(this);
     }
 
-    public DoubleVertex ceil() {
+    public CeilVertex ceil() {
         return new CeilVertex(this);
     }
 
-    public DoubleVertex round() {
+    public RoundVertex round() {
         return new RoundVertex(this);
     }
 
     @Override
-    public DoubleVertex exp() {
+    public ExpVertex exp() {
         return new ExpVertex(this);
     }
 
-    public DoubleVertex log() {
+    public LogVertex log() {
         return new LogVertex(this);
     }
 
-    public DoubleVertex logGamma() {
+    public LogGammaVertex logGamma() {
         return new LogGammaVertex(this);
     }
 
-    public DoubleVertex sigmoid() {
+    public SigmoidVertex sigmoid() {
         return new SigmoidVertex(this);
     }
 
     @Override
-    public DoubleVertex sin() {
+    public SinVertex sin() {
         return new SinVertex(this);
     }
 
     @Override
-    public DoubleVertex cos() {
+    public CosVertex cos() {
         return new CosVertex(this);
     }
 
-    public DoubleVertex tan() {
+    public TanVertex tan() {
         return new TanVertex(this);
     }
 
     @Override
-    public DoubleVertex asin() {
+    public ArcSinVertex asin() {
         return new ArcSinVertex(this);
     }
 
     @Override
-    public DoubleVertex acos() {
+    public ArcCosVertex acos() {
         return new ArcCosVertex(this);
     }
 
-    public DoubleVertex atan() {
+    public ArcTanVertex atan() {
         return new ArcTanVertex(this);
     }
 
-    public DoubleVertex atan2(DoubleVertex that) {
+    public ArcTan2Vertex atan2(DoubleVertex that) {
         return new ArcTan2Vertex(this, that);
     }
 
@@ -205,7 +206,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
      *
      * @return a vertex representing the summation result
      */
-    public DoubleVertex sum() {
+    public SumVertex sum() {
         return new SumVertex(this);
     }
 
@@ -215,21 +216,21 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
      * @param sumOverDimensions dimensions to sum over. Negative dimension indexing is not supported
      * @return a vertex representing the summation result
      */
-    public DoubleVertex sum(int... sumOverDimensions) {
+    public SumVertex sum(int... sumOverDimensions) {
         return new SumVertex(this, sumOverDimensions);
     }
 
-    public DoubleVertex reshape(long... proposedShape) {
+    public ReshapeVertex reshape(long... proposedShape) {
         return new ReshapeVertex(this, proposedShape);
     }
 
-    public DoubleVertex lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
+    public DoubleUnaryOpLambda<DoubleTensor> lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
                                Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
-    public DoubleVertex lambda(Function<DoubleTensor, DoubleTensor> op,
+    public DoubleUnaryOpLambda<DoubleTensor> lambda(Function<DoubleTensor, DoubleTensor> op,
                                Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
@@ -237,32 +238,32 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
     @Override
-    public DoubleVertex times(DoubleVertex that) {
+    public MultiplicationVertex times(DoubleVertex that) {
         return multiply(that);
     }
 
     @Override
-    public DoubleVertex div(DoubleVertex that) {
+    public DivisionVertex div(DoubleVertex that) {
         return divideBy(that);
     }
 
     @Override
-    public DoubleVertex times(double that) {
+    public MultiplicationVertex times(double that) {
         return multiply(that);
     }
 
     @Override
-    public DoubleVertex div(double that) {
+    public DivisionVertex div(double that) {
         return divideBy(that);
     }
 
     @Override
-    public DoubleVertex reverseDiv(double that) {
+    public DivisionVertex reverseDiv(double that) {
         return new ConstantDoubleVertex(that).div(this);
     }
 
     @Override
-    public DoubleVertex unaryMinus() {
+    public MultiplicationVertex unaryMinus() {
         return multiply(-1.0);
     }
 
@@ -290,11 +291,11 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new LessThanOrEqualVertex<>(this, rhs);
     }
 
-    public DoubleVertex take(long... index) {
+    public TakeVertex take(long... index) {
         return new TakeVertex(this, index);
     }
 
-    public DoubleVertex slice(int dimension, int index) {
+    public SliceVertex slice(int dimension, int index) {
         return new SliceVertex(this, dimension, index);
     }
 
@@ -327,19 +328,11 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        if (isObserved()) {
-            return PartialDerivatives.OF_CONSTANT;
-        } else {
-            return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
-        }
+    public void loadValue(NetworkLoader loader) {
+        loader.loadValue(this);
     }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        return Collections.singletonMap(
-            this,
-            PartialDerivatives.withRespectToSelf(this.getId(), this.getShape())
-        );
+    public void saveValue(NetworkSaver netSaver) {
+        netSaver.saveValue(this);
     }
 }

@@ -1,23 +1,23 @@
 package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
 import static org.junit.Assert.assertEquals;
 
+@Slf4j
 public class EvalPropagationTest {
-
-    private final Logger log = LoggerFactory.getLogger(EvalPropagationTest.class);
 
     @Test
     public void doesNotDoUnnecessaryOperationsOnEval() {
@@ -106,7 +106,7 @@ public class EvalPropagationTest {
         assertEquals(3, n.get());
     }
 
-    static class BlackBoxVertex extends DoubleUnaryOpVertex {
+    static class BlackBoxVertex extends DoubleUnaryOpVertex implements Differentiable, NonSaveableVertex {
 
         private final AtomicInteger n;
 
@@ -122,7 +122,7 @@ public class EvalPropagationTest {
         }
 
         @Override
-        protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+        public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
             return null;
         }
     }

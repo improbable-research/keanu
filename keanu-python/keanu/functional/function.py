@@ -1,4 +1,5 @@
 class Function:
+
     def __init__(self, lambda_function):
         self.lambda_function = lambda_function
 

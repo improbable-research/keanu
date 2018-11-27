@@ -1,16 +1,14 @@
 from keanu.vertex import Gaussian, LambdaModel
 
 
-def plus_one(vertices): 
+def plus_one(vertices):
     vertices["out"] = vertices["in"] + 1.
+
 
 def test_you_can_create_a_lambda_model_vertex():
     v_in = Gaussian(1., 1.)
 
-    model = LambdaModel(
-        { "in": v_in }, 
-        plus_one
-    )
+    model = LambdaModel({"in": v_in}, plus_one)
 
     v_out = model.get_double_model_output_vertex("out")
 

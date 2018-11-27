@@ -3,11 +3,13 @@ package io.improbable.keanu.algorithms.mcmc;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -23,6 +25,7 @@ public class NUTSTest {
         random = new KeanuRandom(1);
     }
 
+    @Category(Slow.class)
     @Test
     public void samplesGaussian() {
         double mu = 0.0;
@@ -48,17 +51,18 @@ public class NUTSTest {
     @Test
     public void samplesContinuousPrior() {
 
-        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.);
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 20.0);
 
         NUTS nuts = NUTS.builder()
-            .adaptCount(100)
+            .adaptCount(0)
+            .maxTreeHeight(8)
             .random(random)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVertices(),
-            2000
+            3000
         );
 
         Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
@@ -67,6 +71,7 @@ public class NUTSTest {
         MCMCTestDistributions.samplesMatchesSumOfGaussians(44.0, posteriorSamples.get(A).asList(), posteriorSamples.get(B).asList());
     }
 
+    @Category(Slow.class)
     @Test
     public void samplesFromDonut() {
         BayesianNetwork donutBayesNet = MCMCTestDistributions.create2DDonutDistribution();

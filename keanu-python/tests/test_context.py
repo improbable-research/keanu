@@ -1,15 +1,18 @@
 from keanu.context import KeanuContext
 import py4j
 
+
 def test_the_context_is_a_singleton():
     context1 = KeanuContext()
     context2 = KeanuContext()
     assert context1 == context2
 
+
 def test_there_is_only_one_jvm_view():
     view1 = KeanuContext().jvm_view()
     view2 = KeanuContext().jvm_view()
     assert view1 == view2
+
 
 def test_you_can_convert_a_numpy_array_to_a_java_array():
     python_list = [1., 2., 3.]

@@ -1,10 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -16,9 +20,10 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.C;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
-public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class DirichletVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex concentration;
+    private static final String CONCENTRATION_NAME = "concentration";
 
     /**
      * Dirichlet distribution. The shape is driven from concentration, which must be a vector.
@@ -40,7 +45,8 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
      *
      * @param concentration the concentration values of the dirichlet
      */
-    public DirichletVertex(DoubleVertex concentration) {
+    @ExportVertexToPythonBindings
+    public DirichletVertex(@LoadParentVertex(CONCENTRATION_NAME) DoubleVertex concentration) {
         this(concentration.getShape(), concentration);
     }
 
@@ -61,6 +67,11 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
      */
     public DirichletVertex(double... concentration) {
         this(new ConstantDoubleVertex(concentration));
+    }
+
+    @SaveParentVertex(CONCENTRATION_NAME)
+    public DoubleVertex getConcentration() {
+        return concentration;
     }
 
     @Override

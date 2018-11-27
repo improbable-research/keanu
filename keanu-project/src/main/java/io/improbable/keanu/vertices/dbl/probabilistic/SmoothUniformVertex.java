@@ -1,10 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -14,17 +18,19 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static java.util.Collections.singletonMap;
 
-public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class SmoothUniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private static final double DEFAULT_EDGE_SHARPNESS = 0.01;
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
     private final double edgeSharpness;
+    private static final String X_MIN_NAME = "xMin";
+    private static final String X_MAX_NAME = "xMax";
 
     /**
      * One xMin or Xmax or both that match a proposed tensor shape of Smooth Uniform
@@ -38,7 +44,7 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
      */
     public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
@@ -55,7 +61,7 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
     public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
     }
 
 
@@ -71,7 +77,9 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
+    @ExportVertexToPythonBindings
+    public SmoothUniformVertex(@LoadParentVertex(X_MIN_NAME) DoubleVertex xMin,
+                               @LoadParentVertex(X_MAX_NAME) DoubleVertex xMax) {
         this(xMin, xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
@@ -113,6 +121,20 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
 
     public SmoothUniformVertex(long[] tensorShape, double xMin, double xMax) {
         this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
+    }
+
+    @SaveParentVertex(X_MIN_NAME)
+    public DoubleVertex getXMin() {
+        return xMin;
+    }
+
+    @SaveParentVertex(X_MAX_NAME)
+    public DoubleVertex getXMax() {
+        return xMax;
+    }
+
+    public double getEdgeSharpness() {
+        return edgeSharpness;
     }
 
     @Override

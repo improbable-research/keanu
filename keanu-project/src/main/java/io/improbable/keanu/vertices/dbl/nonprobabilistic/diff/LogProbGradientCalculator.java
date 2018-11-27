@@ -141,7 +141,12 @@ public class LogProbGradientCalculator {
                 partialWrtVertexWithDiff.putWithRespectTo(vertexWithDiff.getId(), dLogProbOfWrtVertexWithDiff);
 
                 PartialDerivatives dOfWrtLatentsContributionFromParent = Differentiator
-                    .reverseModeAutoDiff(vertexWithDiff, partialWrtVertexWithDiff, this.parentToLatentLookup.get(vertexWithDiff));
+                    .reverseModeAutoDiff(
+                        vertexWithDiff,
+                        partialWrtVertexWithDiff,
+                        ofVertex.getShape(),
+                        this.parentToLatentLookup.get(vertexWithDiff)
+                    );
 
                 dOfWrtLatentsAccumulated = dOfWrtLatentsAccumulated.add(dOfWrtLatentsContributionFromParent);
             }

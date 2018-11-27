@@ -2,8 +2,10 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
@@ -12,7 +14,7 @@ import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
-public class SliceVertex extends DoubleUnaryOpVertex {
+public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable, NonSaveableVertex {
 
     private final int dimension;
     private final long index;
@@ -50,7 +52,8 @@ public class SliceVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
         boolean needReshape = this.getValue().getRank() == inputVertex.getValue().getRank();
         return derivativeOfParentWithRespectToInputs.slice(dimension, index, needReshape);
     }

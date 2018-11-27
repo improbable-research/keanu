@@ -16,7 +16,10 @@ import org.junit.Test;
 import java.util.Collections;
 
 import static io.improbable.keanu.vertices.bool.BoolVertex.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class BoolVertexTest {
 
@@ -209,7 +212,7 @@ public class BoolVertexTest {
         BoolVertex flip = new BernoulliVertex(0.5);
         boolean[] values = new boolean[]{true, false, true};
         flip.setAndCascade(values);
-        assertEquals(true, flip.take(0, 0).getValue().scalar());
+        assertEquals(true, flip.take(0).getValue().scalar());
     }
 
     @Test

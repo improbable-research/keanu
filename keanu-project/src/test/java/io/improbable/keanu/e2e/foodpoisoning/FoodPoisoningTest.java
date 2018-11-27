@@ -7,6 +7,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -15,6 +16,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.function.Consumer;
 
@@ -36,6 +38,7 @@ public class FoodPoisoningTest {
         infectedToilet = new BernoulliVertex(0.1);
     }
 
+    @Category(Slow.class)
     @Test
     public void oystersAreInfected() {
         generateSurveyData(50, true, false, false);
@@ -48,6 +51,7 @@ public class FoodPoisoningTest {
         assertEquals(0.0, samples.get(infectedToilet).probability(v -> v.scalar()), 0.01);
     }
 
+    @Category(Slow.class)
     @Test
     public void lambAndOystersAreInfected() {
         generateSurveyData(50, true, true, false);
@@ -59,6 +63,7 @@ public class FoodPoisoningTest {
         assertEquals(0.0, samples.get(infectedToilet).probability(v -> v.scalar()), 0.01);
     }
 
+    @Category(Slow.class)
     @Test
     public void nothingIsInfected() {
         generateSurveyData(50, false, false, false);

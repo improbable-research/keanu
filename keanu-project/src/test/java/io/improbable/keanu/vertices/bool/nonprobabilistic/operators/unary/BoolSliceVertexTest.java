@@ -22,27 +22,27 @@ public class BoolSliceVertexTest {
         BoolSliceVertex rowOne = new BoolSliceVertex(matrixA, 0, 0);
 
         Assert.assertArrayEquals(new double[]{1, 1, 0}, rowOne.getValue().asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{1, 3}, rowOne.getShape());
+        Assert.assertArrayEquals(new long[]{3}, rowOne.getShape());
 
         BoolSliceVertex rowTwo = new BoolSliceVertex(matrixA, 0, 1);
 
         Assert.assertArrayEquals(new double[]{0, 1, 1}, rowTwo.getValue().asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{1, 3}, rowTwo.getShape());
+        Assert.assertArrayEquals(new long[]{3}, rowTwo.getShape());
 
         BoolSliceVertex columnOne = new BoolSliceVertex(matrixA, 1, 0);
 
         Assert.assertArrayEquals(new double[]{1, 0}, columnOne.getValue().asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{2, 1}, columnOne.getShape());
+        Assert.assertArrayEquals(new long[]{2}, columnOne.getShape());
 
         BoolSliceVertex columnTwo = new BoolSliceVertex(matrixA, 1, 1);
 
         Assert.assertArrayEquals(new double[]{1, 1}, columnTwo.getValue().asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{2, 1}, columnTwo.getShape());
+        Assert.assertArrayEquals(new long[]{2}, columnTwo.getShape());
 
         BoolSliceVertex columnThree = new BoolSliceVertex(matrixA, 1, 2);
 
         Assert.assertArrayEquals(new double[]{0, 1}, columnThree.getValue().asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{2, 1}, columnThree.getShape());
+        Assert.assertArrayEquals(new long[]{2}, columnThree.getShape());
     }
 
     @Test
