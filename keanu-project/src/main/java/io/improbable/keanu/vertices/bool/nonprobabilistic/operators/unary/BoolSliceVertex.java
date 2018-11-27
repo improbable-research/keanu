@@ -1,12 +1,17 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
 
 import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
-public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> implements NonSaveableVertex {
+public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
+
+    private final static String DIMENSION_NAME = "dimension";
+    private final static String INDEX_NAME = "index";
+
     private final int dimension;
     private final long index;
 
@@ -17,7 +22,9 @@ public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> implements
      * @param dimension the dimension to extract along
      * @param index the index of extraction
      */
-    public BoolSliceVertex(BoolVertex inputVertex, int dimension, long index) {
+    public BoolSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
+                           @LoadVertexParam(DIMENSION_NAME) int dimension,
+                           @LoadVertexParam(INDEX_NAME) long index) {
         super(shapeSlice(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
@@ -26,5 +33,15 @@ public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> implements
     @Override
     protected BooleanTensor op(BooleanTensor value) {
         return value.slice(dimension, index);
+    }
+
+    @SaveVertexParam(DIMENSION_NAME)
+    public int getDimensionParam() {
+        return dimension;
+    }
+
+    @SaveVertexParam(INDEX_NAME)
+    public long getIndexParam() {
+        return index;
     }
 }
