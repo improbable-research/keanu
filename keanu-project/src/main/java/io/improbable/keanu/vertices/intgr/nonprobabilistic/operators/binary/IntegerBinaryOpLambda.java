@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.function.BiFunction;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 
 public class IntegerBinaryOpLambda<A, B> extends IntegerVertex implements NonProbabilistic<IntegerTensor>, NonSaveableVertex {
@@ -30,7 +30,7 @@ public class IntegerBinaryOpLambda<A, B> extends IntegerVertex implements NonPro
     }
 
     public IntegerBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, IntegerTensor> op) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right, op);
+        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right, op);
     }
 
     @Override

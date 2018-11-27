@@ -1,8 +1,6 @@
 package io.improbable.keanu.model.regression;
 
 import io.improbable.keanu.model.ModelFitter;
-import io.improbable.keanu.model.SamplingModelFitting;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
@@ -13,7 +11,7 @@ import java.util.function.Function;
  *
  * @see RegressionModel
  */
-public class RegressionModelBuilder<OUTPUT extends Tensor> {
+public class RegressionModelBuilder<OUTPUT> {
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SCALE_PARAMETER = 1.0;
 
@@ -22,14 +20,13 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     private double[] priorOnWeightsMeans;
     private Double priorOnInterceptScaleParameter;
     private Double priorOnInterceptMean;
-    private final DoubleTensor inputTrainingData;
-    private final OUTPUT outputTrainingData;
-    private final Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
-    private SamplingModelFitting samplingAlgorithm = null;
+    private DoubleTensor inputTrainingData;
+    private OUTPUT outputTrainingData;
+    private Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
 
     public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
-        this.inputTrainingData = reshapeToMatrix(inputTrainingData);
-        this.outputTrainingData = reshapeToMatrix(outputTrainingData);
+        this.inputTrainingData = inputTrainingData;
+        this.outputTrainingData = outputTrainingData;
         this.outputTransform = outputTransform;
     }
 
@@ -38,20 +35,10 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
         return this;
     }
 
-    private static <T extends Tensor> T reshapeToMatrix(T data) {
-        if (data.getRank() == 0) {
-            return (T) data.reshape(1, 1);
-        } else if (data.getRank() == 1) {
-            return (T) data.reshape(1, data.getShape()[0]);
-        } else {
-            return data;
-        }
-    }
-
     /**
      * Set the input parameters to the distribution describing the prior belief about the weights of the regression model
      *
-     * @param means           An array of means of the distribution describing the prior belief about the regression weights
+     * @param means An array of means of the distribution describing the prior belief about the regression weights
      * @param scaleParameters An array of scale parameters of the distribution describing the prior belief about the regression weights.
      *                        This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return this
@@ -69,7 +56,7 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     /**
      * Set the input parameters to the distribution describing the prior belief about the intercept of the regression model
      *
-     * @param mean           The mean of the distribution describing the prior belief about the regression intercept
+     * @param mean The mean of the distribution describing the prior belief about the regression intercept
      * @param scaleParameter The scale parameter of the distribution describing the prior belief about the regression intercept.
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return this
@@ -83,7 +70,7 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     /**
      * Set the input parameters to the distribution describing the prior belief about both the intercept and weights of the regression model
      *
-     * @param mean           The mean of the distribution describing the prior belief about both the regression intercept and weights
+     * @param mean The mean of the distribution describing the prior belief about both the regression intercept and weights
      * @param scaleParameter The scale parameter of the distribution describing the prior belief about both regression intercept and weights.
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return this
@@ -95,27 +82,16 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     }
 
     /**
-     * Optional - use a sampling algorithm to fit the model instead of the default, which is gradient optimization.
-     *
-     * @param sampling Defines the number of samples to take and the algorithm to use, e.g. {@link io.improbable.keanu.algorithms.mcmc.MetropolisHastings}
-     * @return this
-     */
-    public RegressionModelBuilder withSampling(SamplingModelFitting sampling) {
-        this.samplingAlgorithm = sampling;
-        return this;
-    }
-
-    /**
      * @return A linear regression model from the data passed to the builder
      */
     public RegressionModel<OUTPUT> build() {
         checkVariablesAreCorrectlyInitialised();
 
         LinearRegressionGraph<OUTPUT> regressionGraph = new LinearRegressionGraph<>(
-            this.inputTrainingData.getShape(),
-            outputTransform,
-            getInterceptVertex(),
-            getWeightsVertex()
+                this.inputTrainingData.getShape(),
+                outputTransform,
+                getInterceptVertex(),
+                getWeightsVertex()
         );
 
         performDataFitting(regressionGraph, outputTrainingData);
@@ -146,15 +122,11 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     }
 
     private void performDataFitting(LinearRegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
-        ModelFitter<DoubleTensor, OUTPUT> fitter = samplingAlgorithm == null ?
-            this.regularization.createFitterForGraph(regressionGraph) :
-            samplingAlgorithm.createFitterForGraph(regressionGraph);
-
+        ModelFitter<DoubleTensor, OUTPUT> fitter = this.regularization.createFitterForGraph(regressionGraph);
         fitter.fit(inputTrainingData, outputTrainingData);
     }
 
     private long getFeatureCount() {
         return this.inputTrainingData.getShape()[1];
     }
-
 }

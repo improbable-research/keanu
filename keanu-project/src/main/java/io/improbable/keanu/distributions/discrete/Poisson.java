@@ -2,10 +2,10 @@ package io.improbable.keanu.distributions.discrete;
 
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.nd4j.linalg.util.ArrayUtil;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -29,7 +29,7 @@ public class Poisson implements DiscreteDistribution {
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
 
-        int length = TensorShape.getLengthAsInt(shape);
+        int length = ArrayUtil.prod(shape);
         int[] samples = new int[length];
         for (int i = 0; i < length; i++) {
             samples[i] = sample(muWrapped.getOrScalar(i), random);

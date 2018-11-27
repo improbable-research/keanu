@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<IntegerVertex>, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
 
@@ -41,7 +41,7 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
 
     @Override
     public void setParent(IntegerVertex newParent) {
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(getShape(), newParent.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(getShape(), newParent.getShape());
         setParents(newParent);
     }
 

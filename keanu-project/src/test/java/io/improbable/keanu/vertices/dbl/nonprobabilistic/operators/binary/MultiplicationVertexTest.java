@@ -47,10 +47,10 @@ public class MultiplicationVertexTest {
     @Test
     public void calculatesDerivativeOfTwoVectorsElementWiseMultiplied() {
         calculatesDerivativeOfTwoMatricesElementWiseOperator(
-            DoubleTensor.create(1.0, 2.0, 3.0, 4.0),
-            DoubleTensor.create(2.0, 3.0, 4.0, 5.0),
-            DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}).diag().reshape(4, 4),
-            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}).diag().reshape(4, 4),
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4),
+            DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 1, 4),
+            DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}).diag().reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}).diag().reshape(1, 4, 1, 4),
             DoubleVertex::multiply
         );
     }
@@ -58,10 +58,10 @@ public class MultiplicationVertexTest {
     @Test
     public void calculatesDerivativeOfAVectorsAndScalarMultiplied() {
         calculatesDerivativeOfAVectorAndScalar(
-            DoubleTensor.create(1.0, 2.0, 3.0, 4.0),
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             2,
-            DoubleTensor.eye(4).times(2).reshape(4, 4),
-            DoubleTensor.create(1.0, 2.0, 3.0, 4.0),
+            DoubleTensor.eye(4).times(2).reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4, 1, 1),
             DoubleVertex::multiply
         );
     }
@@ -70,9 +70,9 @@ public class MultiplicationVertexTest {
     public void calculatesDerivativeofAScalarAndVectorsMultiplied() {
         calculatesDerivativeOfAScalarAndVector(
             2,
-            DoubleTensor.create(1.0, 2.0, 3.0, 4.0),
-            DoubleTensor.create(1.0, 2.0, 3.0, 4.0),
-            DoubleTensor.eye(4).timesInPlace(2).reshape(4, 4),
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}).reshape(1, 4, 1, 1),
+            DoubleTensor.eye(4).timesInPlace(2).reshape(1, 4, 1, 4),
             DoubleVertex::multiply
         );
     }

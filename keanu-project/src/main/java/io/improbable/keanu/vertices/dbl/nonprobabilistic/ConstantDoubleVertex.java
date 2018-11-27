@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.network.NetworkSaver;
+import io.improbable.keanu.network.NetworkWriter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexValue;
@@ -31,10 +31,6 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
         this(DoubleTensor.create(vector));
     }
 
-    public ConstantDoubleVertex(double[] data, long[] shape) {
-        this(DoubleTensor.create(data, shape));
-    }
-
     @Override
     public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         return PartialDerivatives.OF_CONSTANT;
@@ -55,7 +51,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     }
 
     @Override
-    public void save(NetworkSaver netSaver) {
-        netSaver.save(this);
+    public void save(NetworkWriter netWriter) {
+        netWriter.save(this);
     }
 }

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 
-import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -23,7 +22,6 @@ public class NumericalEqualsVertex extends BoolVertex implements NonProbabilisti
     private final static String B_NAME = "b";
     private final static String EPISILON_NAME = "episilon";
 
-    @ExportVertexToPythonBindings
     public NumericalEqualsVertex(@LoadParentVertex(A_NAME) Vertex<? extends NumberTensor> a,
                                  @LoadParentVertex(B_NAME) Vertex<? extends NumberTensor> b,
                                  @LoadParentVertex(EPISILON_NAME) Vertex<? extends NumberTensor> epsilon) {

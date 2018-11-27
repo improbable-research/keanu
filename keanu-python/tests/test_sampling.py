@@ -1,17 +1,16 @@
-from itertools import islice
-
 import numpy as np
 import pandas as pd
 import pytest
-
-from examples import thermometers
-from keanu import BayesNet, KeanuRandom, Model
-from keanu.algorithm import sample, generate_samples
+from py4j.java_gateway import java_import
+from examples import Thermometer
 from keanu.vertex import Gamma, Exponential, Cauchy
-
+from keanu.algorithm import sample, generate_samples
+from keanu import BayesNet, KeanuRandom
+from collections import defaultdict
+from itertools import islice
 
 @pytest.fixture
-def net() -> BayesNet:
+def net():
     gamma = Gamma(1., 1.)
     exp = Exponential(1.)
     cauchy = Cauchy(gamma, exp)
@@ -19,8 +18,12 @@ def net() -> BayesNet:
     return BayesNet(cauchy.get_connected_graph())
 
 
-@pytest.mark.parametrize("algo", [("metropolis"), ("NUTS"), ("hamiltonian")])
-def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: str, net: BayesNet) -> None:
+@pytest.mark.parametrize("algo", [
+    ("metropolis"),
+    ("NUTS"),
+    ("hamiltonian")
+])
+def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo, net):
     draws = 5
     sample_from = list(net.get_latent_vertices())
     vertex_ids = [vertex.get_id() for vertex in sample_from]
@@ -35,10 +38,10 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(a
 
         assert len(vertex_samples) == draws
         assert type(vertex_samples) == list
-        assert all(type(sample) == float for sample in vertex_samples)
+        assert all(type(sample) == np.ndarray for sample in vertex_samples)
 
 
-def test_dropping_samples(net: BayesNet) -> None:
+def test_dropping_samples(net):
     draws = 10
     drop = 3
 
@@ -48,19 +51,21 @@ def test_dropping_samples(net: BayesNet) -> None:
     assert all(len(vertex_samples) == expected_num_samples for vertex_id, vertex_samples in samples.items())
 
 
-def test_down_sample_interval(net: BayesNet) -> None:
+def test_down_sample_interval(net):
     draws = 10
     down_sample_interval = 2
 
-    samples = sample(
-        net=net, sample_from=net.get_latent_vertices(), draws=draws, down_sample_interval=down_sample_interval)
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=draws, down_sample_interval=down_sample_interval)
 
     expected_num_samples = draws / down_sample_interval
     assert all(len(vertex_samples) == expected_num_samples for vertex_id, vertex_samples in samples.items())
 
 
-@pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
-def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
+@pytest.mark.parametrize("algo", [
+    ("metropolis"),
+    ("hamiltonian")
+])
+def test_can_iter_through_samples(algo, net):
     draws = 10
     samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
     count = 0
@@ -69,10 +74,13 @@ def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
     assert count == draws
 
 
-@pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
-def test_iter_returns_same_result_as_sample(algo: str) -> None:
+@pytest.mark.parametrize("algo", [
+    ("metropolis"),
+    ("hamiltonian")
+])
+def test_iter_returns_same_result_as_sample(algo):
     draws = 100
-    model = thermometers.model()
+    model = Thermometer.model()
     net = BayesNet(model.temperature.get_connected_graph())
     set_starting_state(model)
     samples = sample(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
@@ -83,10 +91,10 @@ def test_iter_returns_same_result_as_sample(algo: str) -> None:
     [samples_dataframe.append(pd.DataFrame(list(next_sample.items()))) for next_sample in islice(iter_samples, draws)]
 
     for vertex_id in samples_dataframe:
-        np.testing.assert_almost_equal(samples_dataframe[vertex_id].mean(), np.average(samples[vertex_id]))
+        np.testing.assert_almost_equal(dataframe[vertex_id].mean(), np.average(samples[vertex_id]))
 
 
-def set_starting_state(model: Model) -> None:
+def set_starting_state(model):
     KeanuRandom.set_default_random_seed(1)
     model.temperature.set_value(model.temperature.sample())
     model.thermometer_one.set_value(model.thermometer_one.sample())

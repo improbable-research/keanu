@@ -2,18 +2,20 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
-@Slf4j
 public class ChiSquaredVertexTest {
+
+    private final Logger log = LoggerFactory.getLogger(ChiSquaredVertexTest.class);
 
     private KeanuRandom random;
 

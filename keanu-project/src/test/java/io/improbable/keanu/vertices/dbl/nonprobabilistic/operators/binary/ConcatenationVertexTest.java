@@ -23,13 +23,13 @@ public class ConcatenationVertexTest {
     @Test
     public void canConcatVectorsOfSameSize() {
         UniformVertex a = new UniformVertex(0.0, 1.0);
-        a.setValue(DoubleTensor.create(new double[]{1, 2, 3}, 1, 3));
+        a.setValue(new double[]{1, 2, 3});
 
         UniformVertex b = new UniformVertex(0.0, 1.0);
-        b.setValue(DoubleTensor.create(new double[]{4, 5, 6}, 1, 3));
+        b.setValue(new double[]{4, 5, 6});
 
         UniformVertex c = new UniformVertex(0.0, 1.0);
-        c.setValue(DoubleTensor.create(new double[]{7, 8, 9}, 1, 3));
+        c.setValue(new double[]{7, 8, 9});
 
         ConcatenationVertex concatZero = new ConcatenationVertex(0, a, b);
         ConcatenationVertex concatOne = new ConcatenationVertex(1, a, b, c);
@@ -49,9 +49,9 @@ public class ConcatenationVertexTest {
         UniformVertex b = new UniformVertex(0.0, 1.0);
         b.setValue(new double[]{4, 5, 6, 7, 8, 9});
 
-        ConcatenationVertex concatZero = new ConcatenationVertex(0, a, b);
+        ConcatenationVertex concatZero = new ConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new long[]{9}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{1, 9}, concatZero.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatZero.getValue().asFlatDoubleArray(), 0.001);
     }
 
@@ -60,34 +60,34 @@ public class ConcatenationVertexTest {
         UniformVertex a = new UniformVertex(0.0, 1.0);
         a.setValue(new double[]{1, 2, 3});
 
-        DoubleVertex b = new ConstantDoubleVertex(new double[]{4.0});
+        DoubleVertex b = new ConstantDoubleVertex(4.0);
 
-        ConcatenationVertex concat = new ConcatenationVertex(0, a, b);
+        ConcatenationVertex concat = new ConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new long[]{4}, concat.getShape());
+        Assert.assertArrayEquals(new long[]{1, 4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test
     public void canConcatVectorToScalar() {
-        DoubleVertex a = new ConstantDoubleVertex(new double[]{1.0});
+        DoubleVertex a = new ConstantDoubleVertex(1.0);
 
         UniformVertex b = new UniformVertex(0.0, 1.0);
         b.setValue(new double[]{2, 3, 4});
 
-        ConcatenationVertex concat = new ConcatenationVertex(0, a, b);
+        ConcatenationVertex concat = new ConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new long[]{4}, concat.getShape());
+        Assert.assertArrayEquals(new long[]{1, 4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void errorThrownOnConcatOfWrongSize() {
         UniformVertex a = new UniformVertex(0.0, 1.0);
-        a.setValue(DoubleTensor.create(new double[]{1, 2, 3}, 1, 3));
+        a.setValue(new double[]{1, 2, 3});
 
         UniformVertex a1 = new UniformVertex(0.0, 1.0);
-        a1.setValue(DoubleTensor.create(new double[]{4, 5, 6, 7, 8, 9}, 1, 6));
+        a1.setValue(new double[]{4, 5, 6, 7, 8, 9});
 
         new ConcatenationVertex(0, a, a1);
     }
@@ -185,7 +185,7 @@ public class ConcatenationVertexTest {
         DoubleVertex concat = new ConcatenationVertex(2, c, d);
         SumVertex sum = concat.sum(1);
 
-        finiteDifferenceMatchesForwardAndReverseModeGradient(Arrays.asList(a, b), sum, 10.0, 1e-10);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(Arrays.asList(a,b), sum, 10.0, 1e-10);
     }
 
     @Test

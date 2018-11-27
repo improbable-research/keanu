@@ -36,7 +36,7 @@ public class KDEVertex extends DoubleVertex implements Differentiable, Probabili
     public KDEVertex(List<Double> samples) {
         this(DoubleTensor.create(samples.stream()
             .mapToDouble(Double::doubleValue)
-            .toArray(), new long[]{samples.size()}));
+            .toArray(), new long[]{samples.size(), 1}));
     }
 
     public KDEVertex(List<Double> samples, double bandwidth) {
@@ -46,8 +46,8 @@ public class KDEVertex extends DoubleVertex implements Differentiable, Probabili
     }
 
     private DoubleTensor getDiffs(DoubleTensor x) {
-        DoubleTensor diffs = DoubleTensor.zeros(samples.getShape()[0], x.getShape()[0]);
-        return diffs.plusInPlace(x.reshape(1, x.getShape()[0])).minusInPlace(samples.reshape(samples.getShape()[0], 1)).divInPlace(bandwidth);
+        DoubleTensor diffs = DoubleTensor.zeros(new long[]{samples.getShape()[0], x.getShape()[1]});
+        return diffs.plusInPlace(x).minusInPlace(samples).divInPlace(bandwidth);
     }
 
     public DoubleTensor pdf(DoubleTensor x) {
@@ -93,7 +93,7 @@ public class KDEVertex extends DoubleVertex implements Differentiable, Probabili
         DoubleTensor value = Uniform.withParameters(
             DoubleTensor.scalar(0),
             DoubleTensor.scalar(samples.getLength())
-        ).sample(new long[]{nSamples}, random);
+        ).sample(new long[]{1, nSamples}, random);
 
         DoubleTensor index = value.floorInPlace();
         double[] shuffledSamples = new double[nSamples];
@@ -104,7 +104,7 @@ public class KDEVertex extends DoubleVertex implements Differentiable, Probabili
         }
 
         DoubleTensor sampleMus = DoubleTensor.create(shuffledSamples);
-        return random.nextGaussian(new long[]{nSamples}).timesInPlace(bandwidth).plusInPlace(sampleMus);
+        return random.nextGaussian(new long[]{1, nSamples}).timesInPlace(bandwidth).plusInPlace(sampleMus);
     }
 
     @Override

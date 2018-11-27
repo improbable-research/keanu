@@ -21,8 +21,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import static java.util.stream.Collectors.toMap;
 
 
@@ -56,7 +56,7 @@ public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extend
             .collect(
                 toMap(
                     categories::get,
-                    index -> new TakeVertex(vertex, index)
+                    index -> new TakeVertex(vertex, 0, index)
                 )
             );
         return new CategoricalVertex<>(selectableValues);
@@ -71,7 +71,7 @@ public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extend
 
     public CategoricalVertex(long[] tensorShape, Map<CATEGORY, DoubleVertex> selectableValues) {
         super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, selectableValuesShapes(selectableValues));
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, selectableValuesShapes(selectableValues));
 
         this.selectableValues = selectableValues;
 
@@ -79,7 +79,7 @@ public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extend
     }
 
     public CategoricalVertex(Map<CATEGORY, DoubleVertex> selectableValues) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(selectableValuesShapes(selectableValues)), selectableValues);
+        this(checkHasSingleNonScalarShapeOrAllScalar(selectableValuesShapes(selectableValues)), selectableValues);
     }
 
     public Map<CATEGORY, DoubleVertex> getSelectableValues() {

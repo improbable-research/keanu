@@ -17,11 +17,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 
-public class ProtobufSaver implements NetworkSaver {
+public class ProtobufWriter implements NetworkWriter {
     private final BayesianNetwork net;
     private KeanuSavedBayesNet.BayesianNetwork.Builder bayesNetBuilder = null;
 
-    public ProtobufSaver(BayesianNetwork net) {
+    public ProtobufWriter(BayesianNetwork net) {
         this.net = net;
     }
 
@@ -119,17 +119,15 @@ public class ProtobufSaver implements NetworkSaver {
 
     @Override
     public void saveValue(Vertex vertex) {
-        if (vertex.hasValue()) {
-            KeanuSavedBayesNet.StoredValue value = getValue(vertex, vertex.getValue().toString());
-            bayesNetBuilder.addDefaultState(value);
-        }
+        //TODO - Remove once we have a version for all Vertex data types
+        throw new UnsupportedOperationException("This Vertex Doesn't Support Value Save");
     }
 
     @Override
     public void saveValue(DoubleVertex vertex) {
         if (vertex.hasValue()) {
-            KeanuSavedBayesNet.StoredValue value = getValue(vertex);
-            bayesNetBuilder.addDefaultState(value);
+            KeanuSavedBayesNet.StoredValue storedValue = getValue(vertex);
+            bayesNetBuilder.addDefaultState(storedValue);
         }
     }
 
@@ -147,20 +145,6 @@ public class ProtobufSaver implements NetworkSaver {
             KeanuSavedBayesNet.StoredValue value = getValue(vertex);
             bayesNetBuilder.addDefaultState(value);
         }
-    }
-
-    private KeanuSavedBayesNet.StoredValue getValue(Vertex vertex, String formattedValue) {
-        KeanuSavedBayesNet.GenericTensor savedValue = KeanuSavedBayesNet.GenericTensor.newBuilder()
-            .addAllShape(Longs.asList(vertex.getShape()))
-            .addValues(formattedValue)
-            .build();
-
-        KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()
-            .setGenericVal(savedValue)
-            .build();
-
-        return getStoredValue(vertex, value);
-
     }
 
     private KeanuSavedBayesNet.StoredValue getValue(DoubleVertex vertex) {

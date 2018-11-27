@@ -23,13 +23,15 @@ archivesBaseName = "keanu"
 dependencies {
 
     compile 'org.apache.commons:commons-math3:3.6.1'
-    compile 'org.nd4j:nd4j-native-platform:1.0.0-beta2'
+    compile('org.nd4j:nd4j-native-platform:1.0.0-beta2') {
+    }
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.google.guava:guava:20.0'
     compile 'com.google.protobuf:protobuf-java:3.6.1'
     compile group: 'com.opencsv', name: 'opencsv', version: '4.2'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta2'
     compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.8.0-beta2'
+
 
     //testing
     testCompile 'junit:junit:4.12'
@@ -52,7 +54,6 @@ protobuf {
 test {
     systemProperty "io.improbable.keanu.defaultRandom.seed", '1'
     systemProperty "dtype", 'double'
-    systemProperty "io.improbable.keanu.util.ProgressBar.disableProgressBar", 'true'
     useJUnit {
         excludeCategories 'io.improbable.keanu.testcategory.Slow'
     }

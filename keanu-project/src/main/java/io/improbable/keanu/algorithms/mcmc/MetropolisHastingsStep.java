@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
 class MetropolisHastingsStep {
 
     private static final double LOG_ZERO_PROBABILITY = Double.NEGATIVE_INFINITY;
@@ -67,9 +65,6 @@ class MetropolisHastingsStep {
                            final double logProbabilityBeforeStep,
                            final double temperature) {
 
-        log.trace(String.format("Chosen vertices: %s", chosenVertices.stream()
-            .map(Vertex::toString)
-            .collect(Collectors.toList())));
         final double affectedVerticesLogProbOld = sumLogProbabilityOfAffected(chosenVertices, affectedVerticesCache);
 
         NetworkSnapshot preProposalSnapshot = null;
@@ -98,13 +93,8 @@ class MetropolisHastingsStep {
 
             final boolean shouldAccept = r >= random.nextDouble();
 
-
             if (shouldAccept) {
-                log.trace(String.format("ACCEPT %.4f", logR));
-                log.trace(String.format("New log prob = %.4f", logProbabilityAfterStep));
                 return new StepResult(true, logProbabilityAfterStep);
-            } else {
-                log.trace(String.format("REJECT %.4f", logR));
             }
         }
 

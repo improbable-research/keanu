@@ -1,21 +1,13 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
-import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
-import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertSampledWeightsAndInterceptMatchTestData;
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertWeightsAndInterceptMatchTestData;
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.generateThreeFeatureDataWithOneUncorrelatedFeature;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -104,40 +96,6 @@ public class LinearLassoRegressionTest {
             .build();
 
         assertThat(linearRegressionModel.getWeight(2), closeTo(0., 1e-3));
-    }
-
-    @Category(Slow.class)
-    @Test
-    public void youCanChooseSamplingInsteadOfGradientOptimization() {
-        final int smallRawDataSize = 20;
-        final int samplingCount = 30000;
-
-        LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData(smallRawDataSize);
-
-        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(0.25));
-
-        SamplingModelFitting sampling = new SamplingModelFitting(MetropolisHastings.builder()
-            .proposalDistribution(proposalDistribution)
-            .variableSelector(MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR)
-            .build(),
-            samplingCount);
-
-        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
-            .withRegularization(RegressionRegularization.LASSO)
-            .withPriorOnIntercept(0, data.intercept)
-            .withPriorOnWeights(
-                DoubleTensor.create(0., data.weights.getShape()).asFlatDoubleArray(),
-                data.weights.asFlatDoubleArray()
-            )
-            .withSampling(sampling)
-            .build();
-
-        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
-
-        assertSampledWeightsAndInterceptMatchTestData(
-            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightsVertexId()),
-            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertexId()),
-            data);
     }
 
 }

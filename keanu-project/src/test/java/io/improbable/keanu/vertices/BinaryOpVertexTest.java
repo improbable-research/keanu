@@ -7,19 +7,20 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpLambda;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Slf4j
 public class BinaryOpVertexTest {
+    private final Logger log = LoggerFactory.getLogger(BinaryOpVertexTest.class);
 
     private KeanuRandom random;
 

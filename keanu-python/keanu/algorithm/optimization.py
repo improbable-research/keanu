@@ -2,7 +2,6 @@ from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from keanu.net import BayesNet
 from keanu.vertex.base import Vertex
-from typing import Union, Any, Optional
 
 k = KeanuContext()
 
@@ -11,20 +10,18 @@ java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.
 
 
 class Optimizer:
-
-    def __init__(self, optimizer: Any, net: Union[BayesNet, Vertex]) -> None:
+    def __init__(self, optimizer, net):
         self.optimizer = optimizer
         self.net = net
 
-    def max_a_posteriori(self) -> float:
+    def max_a_posteriori(self):
         return self.optimizer.maxAPosteriori()
 
-    def max_likelihood(self) -> float:
+    def max_likelihood(self):
         return self.optimizer.maxLikelihood()
 
     @staticmethod
-    def _build_bayes_net(builder: Any, net: Union[BayesNet, Vertex]) -> Any:
-
+    def _build_bayes_net(builder, net):
         if not (isinstance(net, BayesNet) or isinstance(net, Vertex)):
             raise TypeError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))
         elif isinstance(net, Vertex):
@@ -33,12 +30,7 @@ class Optimizer:
 
 
 class GradientOptimizer(Optimizer):
-
-    def __init__(self,
-                 net: Union[BayesNet, Vertex],
-                 max_evaluations: Optional[int] = None,
-                 relative_threshold: Optional[float] = None,
-                 absolute_threshold: Optional[float] = None) -> None:
+    def __init__(self, net, max_evaluations=None, relative_threshold=None, absolute_threshold=None):
         builder = k.jvm_view().GradientOptimizer.builder()
         builder, net = Optimizer._build_bayes_net(builder, net)
         if max_evaluations is not None:
@@ -52,13 +44,7 @@ class GradientOptimizer(Optimizer):
 
 
 class NonGradientOptimizer(Optimizer):
-
-    def __init__(self,
-                 net: Union[BayesNet, Vertex],
-                 max_evaluations: Optional[int] = None,
-                 bounds_range: Optional[float] = None,
-                 initial_trust_region_radius: Optional[float] = None,
-                 stopping_trust_region_radius: Optional[float] = None) -> None:
+    def __init__(self, net, max_evaluations=None, bounds_range=None, initial_trust_region_radius=None, stopping_trust_region_radius=None):
         builder = k.jvm_view().NonGradientOptimizer.builder()
         builder, net = Optimizer._build_bayes_net(builder, net)
         if max_evaluations is not None:

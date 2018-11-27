@@ -45,7 +45,11 @@ message BooleanTensor {
 
 message GenericTensor {
     repeated int64 shape = 1;
-    repeated string values = 2;
+    repeated GenericValue values = 2;
+}
+
+message GenericValue {
+    repeated bytes value = 1;
 }
 
 message VertexValue {

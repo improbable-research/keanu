@@ -35,7 +35,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     static IntegerTensor create(int... values) {
-        return create(values, values.length);
+        return create(values, 1, values.length);
     }
 
     static IntegerTensor ones(long... shape) {
@@ -66,17 +66,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return new ScalarIntegerTensor(scalarValue);
     }
 
-    static IntegerTensor concat(IntegerTensor... toConcat) {
-        return concat(0, toConcat);
-    }
-
     static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {
             concatAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toConcat[i]).dup();
-            if (concatAsINDArray[i].shape().length == 0) {
-                concatAsINDArray[i] = concatAsINDArray[i].reshape(1);
-            }
         }
         INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
         return new Nd4jIntegerTensor(concat);

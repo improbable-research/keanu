@@ -9,17 +9,19 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
-@Slf4j
 public class RocketTest {
+
+    private final Logger log = LoggerFactory.getLogger(RocketTest.class);
 
     @Category(Slow.class)
     @Test

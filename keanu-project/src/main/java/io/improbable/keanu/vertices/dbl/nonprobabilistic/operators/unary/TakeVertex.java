@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -25,6 +26,7 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable, N
      * @param inputVertex the input vertex to extract from
      * @param index       the index to extract at
      */
+    @ExportVertexToPythonBindings
     public TakeVertex(DoubleVertex inputVertex, long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         this.index = index;

@@ -36,10 +36,10 @@ public class PowerVertexTest {
     @Test
     public void calculatesDerivativeOfTwoMatricesElementWisePower() {
         calculatesDerivativeOfTwoMatricesElementWiseOperator(
-            DoubleTensor.create(1.0, 2.0, 3.0, 4.0),
-            DoubleTensor.create(2.0, 3.0, 4.0, 5.0),
-            DoubleTensor.create(2.0, 3.0 * 4, 4.0 * 27, 5.0 * 256).diag().reshape(4, 4),
-            DoubleTensor.create(Math.log(1.0) * 1, Math.log(2.0) * 8, Math.log(3.0) * 81, Math.log(4.0) * 1024).diag().reshape(4, 4),
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4),
+            DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 1, 4),
+            DoubleTensor.create(new double[]{2.0, 3.0 * 4, 4.0 * 27, 5.0 * 256}).diag().reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{Math.log(1.0) * 1, Math.log(2.0) * 8, Math.log(3.0) * 81, Math.log(4.0) * 1024}).diag().reshape(1, 4, 1, 4),
             DoubleVertex::pow
         );
     }
@@ -47,10 +47,10 @@ public class PowerVertexTest {
     @Test
     public void calculatesDerivativeOfAVectorsAndScalarPower() {
         calculatesDerivativeOfAVectorAndScalar(
-            DoubleTensor.create(1.0, 2.0, 3.0, 4.0),
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             3,
-            DoubleTensor.create(3.0, 3.0 * 4., 3.0 * 9, 3.0 * 16).diag().reshape(4, 4),
-            DoubleTensor.create(Math.log(1.0), Math.log(2.0) * 8, Math.log(3.0) * 27, Math.log(4.0) * 64),
+            DoubleTensor.create(new double[]{3.0, 3.0 * 4., 3.0 * 9, 3.0 * 16}).diag().reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{Math.log(1.0), Math.log(2.0) * 8, Math.log(3.0) * 27, Math.log(4.0) * 64}).reshape(1, 4, 1, 1),
             DoubleVertex::pow
         );
     }
@@ -59,9 +59,9 @@ public class PowerVertexTest {
     public void calculatesDerivativeofAScalarAndVectorPower() {
         calculatesDerivativeOfAScalarAndVector(
             3,
-            DoubleTensor.create(1.0, 2.0, 3.0, 4.0),
-            DoubleTensor.create(1., 2.0 * 3, 3.0 * 9., 4.0 * 27),
-            DoubleTensor.create(Math.log(3.0) * 3, Math.log(3.0) * 9, Math.log(3.0) * 27, Math.log(3.0) * 81).diag().reshape(4, 4),
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            DoubleTensor.create(new double[]{1., 2.0 * 3, 3.0 * 9., 4.0 * 27}).reshape(1, 4, 1, 1),
+            DoubleTensor.create(new double[]{Math.log(3.0) * 3, Math.log(3.0) * 9, Math.log(3.0) * 27, Math.log(3.0) * 81}).diag().reshape(1, 4, 1, 4),
             DoubleVertex::pow
         );
     }

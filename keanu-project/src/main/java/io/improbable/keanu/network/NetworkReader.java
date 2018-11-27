@@ -5,7 +5,7 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public interface NetworkLoader {
+public interface NetworkReader {
 
     void loadValue(DoubleVertex vertex);
     void loadValue(BoolVertex vertex);

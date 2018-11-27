@@ -14,7 +14,6 @@ public class MultivariateGaussian implements ContinuousDistribution {
     public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor covariance) {
         return new MultivariateGaussian(mu, covariance);
     }
-
     private MultivariateGaussian(DoubleTensor mu, DoubleTensor covariance) {
         this.mu = mu;
         this.covariance = covariance;
@@ -22,36 +21,28 @@ public class MultivariateGaussian implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, mu.getShape());
+        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
         final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
         final DoubleTensor variateSamples = random.nextGaussian(mu.getShape());
-        final DoubleTensor covTimesVariates = isUnivariate() ?
+        final DoubleTensor covTimesVariates = mu.isScalar() ?
             choleskyCov.times(variateSamples) : choleskyCov.matrixMultiply(variateSamples);
         return covTimesVariates.plus(mu);
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final double dimensions = numberOfDimensions();
+        final double dimensions = mu.getShape()[0];
         final double kLog2Pi = dimensions * Math.log(2 * Math.PI);
         final double logCovDet = Math.log(covariance.determinant());
         DoubleTensor xMinusMu = x.minus(mu);
         DoubleTensor xMinusMuT = xMinusMu.transpose();
         DoubleTensor covInv = covariance.matrixInverse();
 
-        double scalar = isUnivariate() ?
+        double scalar = mu.isScalar() ?
             covInv.times(xMinusMu).times(xMinusMuT).scalar() :
             xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu)).scalar();
 
         return DoubleTensor.scalar(-0.5 * (scalar + kLog2Pi + logCovDet));
-    }
-
-    private boolean isUnivariate() {
-        return numberOfDimensions() == 1;
-    }
-
-    private long numberOfDimensions() {
-        return mu.getShape()[0];
     }
 
     @Override

@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms;
 
-import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.VertexId;
 import org.junit.Before;
@@ -13,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertTrue;
 
 public class NetworkSamplesTest {
@@ -89,12 +86,5 @@ public class NetworkSamplesTest {
         });
         assertTrue(result == 1.0);
 
-    }
-
-    @Test
-    public void youCanGetTheMostProbableState() {
-        NetworkState mostProbableState = samples.getMostProbableState();
-        assertThat(mostProbableState.get(v1), equalTo(10));
-        assertThat(mostProbableState.get(v2), equalTo(0));
     }
 }

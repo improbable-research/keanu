@@ -1,8 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Multinomial;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -13,11 +11,12 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
@@ -28,9 +27,9 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
     public MultinomialVertex(long[] tensorShape, IntegerVertex n, DoubleVertex p) {
         super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, n.getShape());
-        long[] pShapeExcludingFirstDimension = TensorShape.removeDimension(0, p.getShape());
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, pShapeExcludingFirstDimension);
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, n.getShape());
+        long[] pShapeExcludingFirstDimension = ArrayUtils.remove(p.getShape(), 0);
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, pShapeExcludingFirstDimension);
 
         this.p = p;
         this.n = n;
@@ -39,13 +38,12 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
         addParent(n);
     }
 
-    @ExportVertexToPythonBindings
     public MultinomialVertex(@LoadParentVertex(N_NAME) IntegerVertex n, @LoadParentVertex(P_NAME) DoubleVertex p) {
         this(n.getShape(), n, p);
     }
 
     public MultinomialVertex(int n, DoubleVertex p) {
-        this(ConstantVertex.of(IntegerTensor.create(n, new long[]{1, 1})), p);
+        this(ConstantVertex.of(n), p);
     }
 
     @Override

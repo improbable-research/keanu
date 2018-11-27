@@ -16,8 +16,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import static java.util.Collections.singletonMap;
 
 public class UniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
@@ -38,7 +38,7 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
      */
     public UniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
         super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
@@ -55,7 +55,7 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
     @ExportVertexToPythonBindings
     public UniformVertex(@LoadParentVertex(X_MIN_NAME) DoubleVertex xMin,
                          @LoadParentVertex(X_MAX_NAME) DoubleVertex xMax) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(xMin.getShape(), xMax.getShape()), xMin, xMax);
+        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }
 
     public UniformVertex(DoubleVertex xMin, double xMax) {

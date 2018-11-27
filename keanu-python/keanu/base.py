@@ -1,18 +1,15 @@
 import logging
 from .case_conversion import _to_camel_case_name, _to_snake_case_name
-from typing import Any, Callable
-
 
 class JavaObjectWrapper:
-
-    def __init__(self, val: Any) -> None:
+    def __init__(self, val):
         self._val = val
         self._class = self.unwrap().getClass().getSimpleName()
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return "[{0} => {1}]".format(self._class, type(self))
 
-    def __getattr__(self, k: str) -> Callable:
+    def __getattr__(self, k):
         python_name = _to_snake_case_name(k)
 
         if k != python_name:
@@ -25,5 +22,5 @@ class JavaObjectWrapper:
         logging.warning("\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
         return self.unwrap().__getattr__(java_name)
 
-    def unwrap(self) -> Any:
+    def unwrap(self):
         return self._val

@@ -7,21 +7,18 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class BayesianNetwork {
 
@@ -61,21 +58,6 @@ public class BayesianNetwork {
 
     List<? extends Vertex> getVertices() {
         return vertices;
-    }
-
-    public void setState(NetworkState state) {
-        for (VertexId vertexId : state.getVertexIds()) {
-            this.vertices.stream()
-                .filter(v -> v.getId() == vertexId)
-                .forEach(v -> v.setValue(state.get(vertexId)));
-        }
-    }
-
-    /**
-     * @return A list of all vertices in the network.
-     */
-    public List<Vertex> getAllVertices() {
-        return Collections.unmodifiableList(vertices);
     }
 
     private interface VertexFilter {
@@ -233,10 +215,10 @@ public class BayesianNetwork {
         indentation++;
     }
 
-    public void save(NetworkSaver networkSaver) {
+    public void save(NetworkWriter networkWriter) throws IOException {
         if(isSaveable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
-                vertex.save(networkSaver);
+                vertex.save(networkWriter);
             }
         }
         else {
@@ -248,42 +230,9 @@ public class BayesianNetwork {
         return vertices.stream().filter(v -> v instanceof NonSaveableVertex).count() == 0;
     }
 
-    public void saveValues(NetworkSaver networkSaver) {
+    public void saveValues(NetworkWriter networkWriter) throws IOException {
         for (Vertex vertex : vertices) {
-            vertex.saveValue(networkSaver);
+            vertex.saveValue(networkWriter);
         }
-    }
-
-    /**
-     * Method for traversing a graph and returning a subgraph of vertices within the given degree of the specified vertex.
-     *
-     * @param vertex vertex that the subgraph will be centered around
-     * @param degree degree of connections from the vertex to be included in the subgraph
-     * @return a set of vertices within the specified degree from the given vertex
-     */
-    public Set<Vertex> getSubgraph(Vertex vertex, int degree) {
-
-        Set<Vertex> subgraphVertices = new HashSet<>();
-        List<Vertex> verticesToProcessNow = new ArrayList<>();
-        verticesToProcessNow.add(vertex);
-        subgraphVertices.add(vertex);
-
-        for (int distance = 0; distance < degree && !verticesToProcessNow.isEmpty(); distance++) {
-            List<Vertex> connectedVertices = new ArrayList<>();
-
-            for (Vertex v : verticesToProcessNow) {
-                Stream<Vertex> verticesToAdd = Stream.concat(v.getParents().stream(), v.getChildren().stream());
-                verticesToAdd
-                    .filter(a -> !subgraphVertices.contains(a))
-                    .forEachOrdered(a -> {
-                        connectedVertices.add(a);
-                        subgraphVertices.add(a);
-                    });
-            }
-
-            verticesToProcessNow = connectedVertices;
-        }
-
-        return subgraphVertices;
     }
 }

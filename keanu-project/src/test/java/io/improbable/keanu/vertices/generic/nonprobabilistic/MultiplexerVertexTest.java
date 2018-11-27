@@ -8,9 +8,10 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -18,8 +19,8 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-@Slf4j
 public class MultiplexerVertexTest {
+    private final Logger log = LoggerFactory.getLogger(MultiplexerVertexTest.class);
 
     private int N = 100000;
     private double epsilon = 0.01;

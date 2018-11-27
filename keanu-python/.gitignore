@@ -4,4 +4,3 @@ Pipfile.lock
 __pycache__/
 dist/
 keanu/classpath
-.mypy_cache/

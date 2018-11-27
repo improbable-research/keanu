@@ -1,24 +1,25 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import static java.lang.Math.pow;
 import static junit.framework.TestCase.assertEquals;
 
-@Slf4j
 public class StudentTVertexTest {
     private static final double DELTA = 0.0001;
     private static final int[] TEST_VALUES_OF_V = new int[]{
         1, 2, 3
     };
+    private final Logger log = LoggerFactory.getLogger(StudentTVertexTest.class);
     private KeanuRandom random;
 
     @Before

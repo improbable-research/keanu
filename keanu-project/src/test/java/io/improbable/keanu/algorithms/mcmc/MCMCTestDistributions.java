@@ -44,7 +44,7 @@ public class MCMCTestDistributions {
         }
     }
 
-    public static BayesianNetwork createSumOfGaussianDistribution(double mu, double sigma, double observedSum, double initialValue) {
+    public static BayesianNetwork createSumOfGaussianDistribution(double mu, double sigma, double observedSum) {
 
         GaussianVertex A = new GaussianVertex(mu, sigma);
         GaussianVertex B = new GaussianVertex(mu, sigma);
@@ -52,10 +52,10 @@ public class MCMCTestDistributions {
         GaussianVertex C = new GaussianVertex(A.plus(B), 1.0);
         C.observe(observedSum);
 
-        A.setValue(initialValue);
-        B.setAndCascade(initialValue);
+        A.setValue(mu);
+        B.setAndCascade(mu);
 
-        return new BayesianNetwork(A.getConnectedGraph());
+        return new BayesianNetwork(Arrays.asList(A, B, C));
     }
 
     public static void samplesMatchesSumOfGaussians(double expected, List<DoubleTensor> sampleA, List<DoubleTensor> samplesB) {
@@ -81,7 +81,7 @@ public class MCMCTestDistributions {
         A.setValue(Math.sqrt(0.5));
         B.setAndCascade(0.0);
 
-        return new BayesianNetwork(A.getConnectedGraph());
+        return new BayesianNetwork(Arrays.asList(A, B, D));
     }
 
     public static void samplesMatch2DDonut(List<DoubleTensor> samplesA, List<DoubleTensor> samplesB) {

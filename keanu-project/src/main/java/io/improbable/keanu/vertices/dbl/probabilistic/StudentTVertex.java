@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class StudentTVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -37,7 +37,7 @@ public class StudentTVertex extends DoubleVertex implements Differentiable, Prob
      */
     public StudentTVertex(long[] tensorShape, IntegerVertex v) {
         super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, v.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());
         this.v = v;
         setParents(v);
     }

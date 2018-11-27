@@ -20,8 +20,8 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.BETA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class LaplaceVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -41,7 +41,7 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
      */
     public LaplaceVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex beta) {
         super(tensorShape);
-        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), beta.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), beta.getShape());
 
         this.mu = mu;
         this.beta = beta;
@@ -70,7 +70,7 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
     @ExportVertexToPythonBindings
     public LaplaceVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
                          @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
-        this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), beta.getShape()), mu, beta);
+        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), beta.getShape()), mu, beta);
     }
 
     public LaplaceVertex(DoubleVertex mu, double beta) {

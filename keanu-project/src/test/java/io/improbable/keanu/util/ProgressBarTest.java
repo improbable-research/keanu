@@ -52,7 +52,6 @@ public class ProgressBarTest {
             });
 
         progressBar = new ProgressBar(printStream, scheduler);
-        ProgressBar.enable();
     }
 
     @After
@@ -172,6 +171,5 @@ public class ProgressBarTest {
     @After
     public void tearDown() throws Exception {
         ProgressBar.setDefaultPrintStream(System.out);
-        ProgressBar.disable();
     }
 }

@@ -24,10 +24,6 @@ public interface ConstantVertex {
         return new ConstantBoolVertex(value);
     }
 
-    static ConstantBoolVertex of(boolean[] value, long... shape) {
-        return new ConstantBoolVertex(value, shape);
-    }
-
     static ConstantBoolVertex of(BooleanTensor value) {
         return new ConstantBoolVertex(value);
     }
@@ -42,10 +38,6 @@ public interface ConstantVertex {
 
     static ConstantIntegerVertex of(int... value) {
         return new ConstantIntegerVertex(value);
-    }
-
-    static ConstantIntegerVertex of(int[] value, long... shape) {
-        return new ConstantIntegerVertex(value, shape);
     }
 
     static ConstantIntegerVertex of(IntegerTensor value) {
@@ -64,10 +56,6 @@ public interface ConstantVertex {
         return new ConstantDoubleVertex(value);
     }
 
-    static ConstantDoubleVertex of(double[] value, long... shape) {
-        return new ConstantDoubleVertex(value, shape);
-    }
-
     static ConstantDoubleVertex of(DoubleTensor value) {
         return new ConstantDoubleVertex(value);
     }
@@ -77,7 +65,7 @@ public interface ConstantVertex {
     }
 
     static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC[] values) {
-        return new ConstantGenericVertex<>(new GenericTensor<>(values));
+        return new ConstantGenericVertex<>(new GenericTensor<>(values, new long[]{1, values.length}));
     }
 
     static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {

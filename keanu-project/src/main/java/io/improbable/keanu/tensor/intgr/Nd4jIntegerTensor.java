@@ -28,31 +28,17 @@ import java.util.function.Function;
 import static com.google.common.primitives.Ints.checkedCast;
 import static java.util.Arrays.copyOf;
 
-/**
- * Class for representing n-dimensional arrays of integers. This is
- * backed by Nd4j which stores the int as a double.
- */
 public class Nd4jIntegerTensor implements IntegerTensor {
 
     private static final DataBuffer.Type BUFFER_TYPE = DataBuffer.Type.DOUBLE;
     private INDArray tensor;
 
     public Nd4jIntegerTensor(int[] data, long[] shape) {
-        this(TypedINDArrayFactory.create(
-            toDoubles(data),
-            shape, BUFFER_TYPE)
-        );
-    }
-
-    private static double[] toDoubles(int[] ints) {
-        double[] doubles = new double[ints.length];
-        for (int i = 0; i < ints.length; i++) {
-            doubles[i] = ints[i];
-        }
-        return doubles;
+        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
     }
 
     public Nd4jIntegerTensor(INDArray tensor) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(tensor.shape());
         this.tensor = tensor;
     }
 
@@ -81,7 +67,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     static INDArray unsafeGetNd4J(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             return TypedINDArrayFactory.scalar(that.scalar().doubleValue(), BUFFER_TYPE).reshape(that.getShape());
         }
         return ((Nd4jIntegerTensor) that).tensor;
@@ -104,7 +90,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor sum(int... overDimensions) {
-        return new Nd4jIntegerTensor(INDArrayShim.sum(tensor, overDimensions));
+        return new Nd4jIntegerTensor(tensor.sum(overDimensions));
     }
 
     @Override
@@ -189,7 +175,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
         INDArray mask = tensor.dup();
 
-        if (greaterThanThis.isLengthOne()) {
+        if (greaterThanThis.isScalar()) {
             Nd4j.getExecutioner().exec(
                 new OldGreaterThan(mask,
                     TypedINDArrayFactory.valueArrayOf(mask.shape(), greaterThanThis.scalar(), BUFFER_TYPE),
@@ -212,7 +198,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
         INDArray mask = tensor.dup();
 
-        if (greaterThanOrEqualToThis.isLengthOne()) {
+        if (greaterThanOrEqualToThis.isScalar()) {
             Nd4j.getExecutioner().exec(
                 new OldGreaterThanOrEqual(mask,
                     TypedINDArrayFactory.valueArrayOf(mask.shape(), greaterThanOrEqualToThis.scalar(), BUFFER_TYPE),
@@ -235,7 +221,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
         INDArray mask = tensor.dup();
 
-        if (lessThanThis.isLengthOne()) {
+        if (lessThanThis.isScalar()) {
             Nd4j.getExecutioner().exec(
                 new OldLessThan(mask,
                     TypedINDArrayFactory.valueArrayOf(mask.shape(), lessThanThis.scalar(), BUFFER_TYPE),
@@ -258,7 +244,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
         INDArray mask = tensor.dup();
 
-        if (lessThanOrEqualToThis.isLengthOne()) {
+        if (lessThanOrEqualToThis.isScalar()) {
             Nd4j.getExecutioner().exec(
                 new OldLessThanOrEqual(mask,
                     TypedINDArrayFactory.valueArrayOf(mask.shape(), lessThanOrEqualToThis.scalar(), BUFFER_TYPE),
@@ -332,7 +318,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor powInPlace(IntegerTensor exponent) {
-        if (exponent.isLengthOne()) {
+        if (exponent.isScalar()) {
             Transforms.pow(tensor, exponent.scalar(), false);
         } else {
             INDArray exponentArray = unsafeGetNd4J(exponent);
@@ -349,7 +335,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor minusInPlace(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             tensor.subi(that.scalar());
         } else {
             INDArray result = INDArrayShim.subi(tensor, unsafeGetNd4J(that));
@@ -362,7 +348,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor plusInPlace(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             tensor.addi(that.scalar());
         } else {
             INDArray result = INDArrayShim.addi(tensor, unsafeGetNd4J(that));
@@ -375,7 +361,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor timesInPlace(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             tensor.muli(that.scalar());
         } else {
             INDArray result = INDArrayShim.muli(tensor, unsafeGetNd4J(that));
@@ -388,7 +374,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor divInPlace(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             tensor.divi(that.scalar());
         } else {
             INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that));
@@ -435,7 +421,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public BooleanTensor lessThan(IntegerTensor value) {
 
         INDArray mask;
-        if (value.isLengthOne()) {
+        if (value.isScalar()) {
             mask = tensor.lt(value.scalar());
         } else {
             INDArray indArray = unsafeGetNd4J(value);
@@ -449,7 +435,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public BooleanTensor lessThanOrEqual(IntegerTensor value) {
 
         INDArray mask;
-        if (value.isLengthOne()) {
+        if (value.isScalar()) {
             mask = tensor.lte(value.scalar());
         } else {
             INDArray indArray = unsafeGetNd4J(value);
@@ -472,7 +458,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor minInPlace(IntegerTensor min) {
-        if (min.isLengthOne()) {
+        if (min.isScalar()) {
             Transforms.min(tensor, min.scalar(), false);
         } else {
             Transforms.min(tensor, unsafeGetNd4J(min), false);
@@ -482,7 +468,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor maxInPlace(IntegerTensor max) {
-        if (max.isLengthOne()) {
+        if (max.isScalar()) {
             Transforms.max(tensor, max.scalar(), false);
         } else {
             Transforms.max(tensor, unsafeGetNd4J(max), false);
@@ -509,14 +495,14 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public IntegerTensor argMax(int axis) {
         long[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
-        return new Nd4jIntegerTensor(tensor.argMax(axis).reshape(TensorShape.removeDimension(axis, shape)));
+        return new Nd4jIntegerTensor(tensor.argMax(axis).reshape(TensorShape.removeDimensionSafe(axis, shape)));
     }
 
     @Override
     public BooleanTensor greaterThan(IntegerTensor value) {
 
         INDArray mask;
-        if (value.isLengthOne()) {
+        if (value.isScalar()) {
             mask = tensor.gt(value.scalar());
         } else {
             INDArray indArray = unsafeGetNd4J(value);
@@ -530,7 +516,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public BooleanTensor greaterThanOrEqual(IntegerTensor value) {
 
         INDArray mask;
-        if (value.isLengthOne()) {
+        if (value.isScalar()) {
             mask = tensor.gte(value.scalar());
         } else {
             INDArray indArray = unsafeGetNd4J(value);
@@ -605,13 +591,10 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     @Override
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof IntegerTensor) {
-            if (this.isLengthOne()) {
-                return ((IntegerTensor) that).elementwiseEquals(this.scalar());
-            } else if (that.isLengthOne()) {
-                return elementwiseEquals(((IntegerTensor) that).scalar());
-            } else {
-                return fromMask(tensor.eq(unsafeGetNd4J((Nd4jIntegerTensor) that)), getShape());
-            }
+            INDArray eq = that.isScalar() ?
+                tensor.eq(((IntegerTensor) that).scalar()) :
+                tensor.eq(unsafeGetNd4J((IntegerTensor) that));
+            return fromMask(eq, getShape());
         } else {
             return Tensor.elementwiseEquals(this, that);
         }
@@ -625,7 +608,8 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     @Override
     public IntegerTensor slice(int dimension, long index) {
         INDArray dup = tensor.dup();
-        return new Nd4jIntegerTensor(INDArrayShim.slice(dup, dimension, index));
+        INDArray slice = dup.slice(index, dimension);
+        return new Nd4jIntegerTensor(slice);
     }
 
     @Override
@@ -703,7 +687,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
         @Override
         public Integer getOrScalar(long index) {
-            if (tensor.length() == 1) {
+            if (tensor.isScalar()) {
                 return get(0);
             } else {
                 return get(index);

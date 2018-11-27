@@ -3,8 +3,7 @@ import re
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')
 all_cap_re = re.compile('([a-z0-9])([A-Z])')
 
-
-def _to_camel_case_name(name: str) -> str:
+def _to_camel_case_name(name):
     """
     >>> _to_camel_case_name("snake_case_name")
     'snakeCaseName'
@@ -14,8 +13,7 @@ def _to_camel_case_name(name: str) -> str:
     first, *rest = name.split('_')
     return first + ''.join(word.capitalize() for word in rest)
 
-
-def _to_snake_case_name(name: str) -> str:
+def _to_snake_case_name(name):
     """
     >>> _to_snake_case_name("camelCaseName")
     'camel_case_name'

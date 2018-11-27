@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -12,7 +11,6 @@ public class IntegerSumVertex extends IntegerUnaryOpVertex {
      *
      * @param inputVertex the vertex to have its values summed
      */
-    @ExportVertexToPythonBindings
     public IntegerSumVertex(@LoadParentVertex(INPUT_NAME) IntegerVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

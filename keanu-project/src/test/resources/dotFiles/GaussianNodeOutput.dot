@@ -1,7 +1,0 @@
-digraph BayesianNetwork {
-<91> -> <92> [label=sigma]
-<90> -> <92> [label=mu]
-92[label="GaussianVertex"]
-91[label="1.0"]
-90[label="0.0"]
-}

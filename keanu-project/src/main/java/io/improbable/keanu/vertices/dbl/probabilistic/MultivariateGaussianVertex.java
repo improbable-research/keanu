@@ -11,7 +11,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.Map;
 import java.util.Set;
@@ -62,15 +61,11 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
      * @param covariance the scale of the identity matrix
      */
     public MultivariateGaussianVertex(DoubleVertex mu, double covariance) {
-        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0]).times(covariance)));
+        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0])).times(covariance));
     }
 
     public MultivariateGaussianVertex(double mu, double covariance) {
-        this(oneByOneMatrix(mu), oneByOneMatrix(covariance));
-    }
-
-    private static DoubleVertex oneByOneMatrix(double value) {
-        return new ConstantDoubleVertex(DoubleTensor.scalar(value).reshape(1, 1));
+        this(ConstantVertex.of(mu), ConstantVertex.of(covariance));
     }
 
     @SaveParentVertex(MU_NAME)
@@ -88,7 +83,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
         DoubleTensor muValues = mu.getValue();
         DoubleTensor covarianceValues = covariance.getValue();
 
-        return MultivariateGaussian.withParameters(muValues, covarianceValues).logProb(value).scalar();
+        return io.improbable.keanu.distributions.continuous.MultivariateGaussian.withParameters(muValues, covarianceValues).logProb(value).scalar();
     }
 
     @Override

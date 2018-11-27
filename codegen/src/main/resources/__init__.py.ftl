@@ -5,4 +5,3 @@ __all__ = [${exportedMethods}]
 
 from .generated import *
 from .const import Const
-from . import generated, const

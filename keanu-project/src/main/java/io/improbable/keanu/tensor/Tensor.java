@@ -69,8 +69,8 @@ public interface Tensor<T> {
         return BooleanTensor.create(equality, Arrays.copyOf(shape, shape.length));
     }
 
-    long[] SCALAR_SHAPE = new long[]{};
-    long[] SCALAR_STRIDE = new long[]{};
+    long[] SCALAR_SHAPE = new long[]{1, 1};
+    long[] SCALAR_STRIDE = new long[]{1};
 
     int getRank();
 
@@ -119,12 +119,8 @@ public interface Tensor<T> {
         return Arrays.asList(asFlatArray());
     }
 
-    default boolean isLengthOne(){
-        return getLength() == 1;
-    }
-
     default boolean isScalar() {
-        return getRank() == 0;
+        return getLength() == 1;
     }
 
     /**
@@ -139,7 +135,7 @@ public interface Tensor<T> {
      * @return true if the tensor is a vector
      */
     default boolean isVector() {
-        return getRank() == 1;
+        return getRank() == 1 || (getRank() == 2 && (getShape()[0] == 1 || getShape()[1] == 1));
     }
 
     default boolean isMatrix() {

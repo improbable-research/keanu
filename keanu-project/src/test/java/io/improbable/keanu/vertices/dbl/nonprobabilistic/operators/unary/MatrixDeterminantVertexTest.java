@@ -42,8 +42,8 @@ public class MatrixDeterminantVertexTest {
     }
 
     @Test
-    public void calculatesDeterminantOnOneByOne() {
-        final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.scalar(5).reshape(1, 1));
+    public void calculatesDeterminantOnScalar() {
+        final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.scalar(5));
         assertThat(input.matrixDeterminant(), hasValue(isScalarWithValue(5d)));
     }
 

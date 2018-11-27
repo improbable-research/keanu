@@ -19,6 +19,6 @@ public class MaxVertex extends DoubleIfVertex {
     @ExportVertexToPythonBindings
     public MaxVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
                      @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
-        super(left.greaterThanOrEqualTo(right), left, right);
+        super(left.getShape(), left.greaterThanOrEqualTo(right), left, right);
     }
 }

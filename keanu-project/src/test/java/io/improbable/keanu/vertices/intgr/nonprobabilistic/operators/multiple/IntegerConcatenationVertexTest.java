@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
@@ -11,9 +10,9 @@ public class IntegerConcatenationVertexTest {
 
     @Test
     public void canConcatVectorsOfSameSize() {
-        ConstantIntegerVertex a = new ConstantIntegerVertex(IntegerTensor.create(new int[]{1, 2, 3}, 1, 3));
-        ConstantIntegerVertex b = new ConstantIntegerVertex(IntegerTensor.create(new int[]{4, 5, 6}, 1, 3));
-        ConstantIntegerVertex c = new ConstantIntegerVertex(IntegerTensor.create(new int[]{7, 8, 9}, 1, 3));
+        ConstantIntegerVertex a = new ConstantIntegerVertex(new int[]{1, 2, 3});
+        ConstantIntegerVertex b = new ConstantIntegerVertex(new int[]{4, 5, 6});
+        ConstantIntegerVertex c = new ConstantIntegerVertex(new int[]{7, 8, 9});
 
         IntegerConcatenationVertex concatZero = new IntegerConcatenationVertex(0, a, b);
         IntegerConcatenationVertex concatOne = new IntegerConcatenationVertex(1, a, b, c);
@@ -31,38 +30,38 @@ public class IntegerConcatenationVertexTest {
         ConstantIntegerVertex a = new ConstantIntegerVertex(new int[]{1, 2, 3});
         ConstantIntegerVertex b = new ConstantIntegerVertex(new int[]{4, 5, 6, 7, 8, 9});
 
-        IntegerConcatenationVertex concatZero = new IntegerConcatenationVertex(0, a, b);
+        IntegerConcatenationVertex concatZero = new IntegerConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new long[]{9}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{1, 9}, concatZero.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatZero.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test
     public void canConcatScalarToVector() {
         ConstantIntegerVertex a = new ConstantIntegerVertex(new int[]{1, 2, 3});
-        ConstantIntegerVertex b = new ConstantIntegerVertex(new int[]{4});
+        ConstantIntegerVertex b = new ConstantIntegerVertex(4);
 
-        IntegerConcatenationVertex concat = new IntegerConcatenationVertex(0, a, b);
+        IntegerConcatenationVertex concat = new IntegerConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new long[]{4}, concat.getShape());
+        Assert.assertArrayEquals(new long[]{1, 4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test
     public void canConcatVectorToScalar() {
-        ConstantIntegerVertex a = new ConstantIntegerVertex(new int[]{1});
+        ConstantIntegerVertex a = new ConstantIntegerVertex(1);
         ConstantIntegerVertex b = new ConstantIntegerVertex(new int[]{2, 3, 4});
 
-        IntegerConcatenationVertex concat = new IntegerConcatenationVertex(0, a, b);
+        IntegerConcatenationVertex concat = new IntegerConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new long[]{4}, concat.getShape());
+        Assert.assertArrayEquals(new long[]{1, 4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test (expected = IllegalArgumentException.class)
     public void errorThrownOnConcatOfWrongSize() {
-        ConstantIntegerVertex a = new ConstantIntegerVertex(IntegerTensor.create(new int[]{1, 2, 3}, 1, 3));
-        ConstantIntegerVertex b = new ConstantIntegerVertex(IntegerTensor.create(new int[]{4, 5, 6, 7, 8, 9}, 1, 6));
+        ConstantIntegerVertex a = new ConstantIntegerVertex(new int[]{1, 2, 3});
+        ConstantIntegerVertex b = new ConstantIntegerVertex(new int[]{4, 5, 6, 7, 8, 9});
 
         new IntegerConcatenationVertex(0, a, b);
     }

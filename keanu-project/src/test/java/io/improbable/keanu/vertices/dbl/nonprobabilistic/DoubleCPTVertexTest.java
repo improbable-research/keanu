@@ -14,11 +14,11 @@ import static org.junit.Assert.assertEquals;
 
 public class DoubleCPTVertexTest {
 
-    private DoubleTensor aValue = DoubleTensor.create(0.5, 0.25);
-    private DoubleTensor bValue = DoubleTensor.create(-0.5, -0.25);
+    private DoubleTensor aValue = DoubleTensor.create(new double[]{0.5, 0.25});
+    private DoubleTensor bValue = DoubleTensor.create(new double[]{-0.5, -0.25});
 
     private DoubleCPTVertex doubleCPTNetwork(boolean left, boolean right) {
-        DoubleVertex A = new GaussianVertex(new long[]{2}, 0, 1);
+        DoubleVertex A = new GaussianVertex(new long[]{1, 2}, 0, 1);
         A.setValue(aValue);
         DoubleVertex B = new GaussianVertex(0, 1);
         B.observe(bValue);
@@ -51,7 +51,7 @@ public class DoubleCPTVertexTest {
 
     @Test
     public void canGetDiffFromACondition() {
-        long[] expectedShape = new long[]{2, 2};
+        long[] expectedShape = new long[]{1, 2, 1, 2};
         assertDiffFromACondition(true, true, bValue.diag().reshape(expectedShape));
         assertDiffFromACondition(true, false, bValue.reciprocal().diag().reshape(expectedShape));
         assertDiffFromACondition(false, true, DoubleTensor.eye(2).reshape(expectedShape));

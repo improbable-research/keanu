@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
@@ -16,6 +15,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
@@ -27,14 +27,22 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     protected static final String ELSE_NAME = "else";
 
     @ExportVertexToPythonBindings
-    public DoubleIfVertex(@LoadParentVertex(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
-                          @LoadParentVertex(THEN_NAME) DoubleVertex thn,
-                          @LoadParentVertex(ELSE_NAME) DoubleVertex els) {
-        super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
+    public DoubleIfVertex(long[] shape,
+                          Vertex<? extends BooleanTensor> predicate,
+                          DoubleVertex thn,
+                          DoubleVertex els) {
+        super(shape);
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
         setParents(predicate, thn, els);
+    }
+
+    public DoubleIfVertex(@LoadParentVertex(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
+                          @LoadParentVertex(THEN_NAME) DoubleVertex thn,
+                          @LoadParentVertex(ELSE_NAME) DoubleVertex els) {
+
+        this(checkHasSingleNonScalarShapeOrAllScalar(thn.getShape(), els.getShape()), predicate, thn, els);
     }
 
     @SaveParentVertex(PREDICATE_NAME)
