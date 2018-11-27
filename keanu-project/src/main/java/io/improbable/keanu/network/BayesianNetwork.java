@@ -32,7 +32,7 @@ public class BayesianNetwork {
     private int indentation = TOP_LEVEL_INDENTATION;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
-        Preconditions.checkArgument(!vertices.isEmpty(), "List of vertices in the network is empty");
+        Preconditions.checkArgument(!vertices.isEmpty(), "A bayesian network must contain at least one vertex");
         this.vertices = ImmutableList.copyOf(vertices);
         this.vertexLabels = buildLabelMap(vertices);
     }
