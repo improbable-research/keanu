@@ -149,8 +149,12 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+task deletePythonClasspath(type: Delete) {
+    delete fileTree("../keanu-python/keanu/classpath/")
+}
 task copyJarsIntoPythonClasspath(type: Copy) {
     dependsOn(build)
+    dependsOn(deletePythonClasspath)
     into "$rootDir/keanu-python/keanu/classpath/"
     from jar
     from configurations.compile
