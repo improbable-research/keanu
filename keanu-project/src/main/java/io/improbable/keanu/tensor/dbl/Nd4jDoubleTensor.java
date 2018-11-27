@@ -51,7 +51,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     public Nd4jDoubleTensor(INDArray tensor) {
         TensorShapeValidation.checkRankIsAtLeastTwo(tensor.shape());
-        tensor.isMatrix();
         this.tensor = tensor;
     }
 

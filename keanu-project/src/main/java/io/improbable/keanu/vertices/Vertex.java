@@ -111,10 +111,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         return hasValue() ? value : lazyEval();
     }
 
-    protected T getRawValue() {
-        return value;
-    }
-
     public boolean hasValue() {
         if (value instanceof Tensor) {
             return !((Tensor) value).isShapePlaceholder();

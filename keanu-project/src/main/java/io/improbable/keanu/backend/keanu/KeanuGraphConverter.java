@@ -7,10 +7,6 @@ import java.util.Set;
 
 public class KeanuGraphConverter {
 
-    public static KeanuComputableGraph convert(Set<Vertex> vertices) {
-        return new KeanuComputableGraph(vertices);
-    }
-
     public static KeanuProbabilisticGraph convert(BayesianNetwork network) {
         return new KeanuProbabilisticGraph(network);
     }

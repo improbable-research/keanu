@@ -1,5 +1,6 @@
 package io.improbable.keanu.backend.keanu;
 
+import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -17,40 +18,51 @@ import static java.util.stream.Collectors.toMap;
 
 public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
-    @Getter
-    private final BayesianNetwork bayesianNetwork;
-
-    @Getter
     private final Map<String, Vertex> vertexLookup;
 
+    @Getter
+    private final List<Vertex> latentVertices;
+
+    @Getter
+    private final List<Vertex> observedVertices;
+
+    @Getter
+    private final List<Vertex> latentOrObservedVertices;
+
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
-        this.bayesianNetwork = bayesianNetwork;
+
         this.vertexLookup = bayesianNetwork.getVertices().stream()
             .collect(toMap(Vertex::getUniqueStringReference, v -> v));
+
+        this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
+        this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
+        this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
     }
 
     @Override
     public double logProb(Map<String, ?> inputs) {
         cascadeUpdate(inputs);
-        return ProbabilityCalculator.calculateLogProbFor(this.bayesianNetwork.getLatentOrObservedVertices());
+        return ProbabilityCalculator.calculateLogProbFor(this.latentOrObservedVertices);
     }
 
     @Override
     public double logLikelihood(Map<String, ?> inputs) {
         cascadeUpdate(inputs);
-        return ProbabilityCalculator.calculateLogProbFor(this.bayesianNetwork.getObservedVertices());
+        return ProbabilityCalculator.calculateLogProbFor(this.observedVertices);
     }
 
     @Override
     public List<String> getLatentVariables() {
-        return bayesianNetwork.getLatentVertices().stream()
-            .map(Vertex::getUniqueStringReference)
-            .collect(Collectors.toList());
+        return ImmutableList.copyOf(
+            this.latentVertices.stream()
+                .map(Vertex::getUniqueStringReference)
+                .collect(Collectors.toList())
+        );
     }
 
     @Override
     public Map<String, ?> getLatentVariablesValues() {
-        return bayesianNetwork.getLatentVertices().stream()
+        return latentVertices.stream()
             .collect(toMap(
                 Vertex::getUniqueStringReference,
                 Vertex::getValue)
@@ -65,6 +77,10 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
                 v -> v,
                 v -> ((Tensor) latentVariablesValues.get(v)).getShape())
             );
+    }
+
+    public Vertex getVertex(String vertexName){
+        return vertexLookup.get(vertexName);
     }
 
     public void cascadeUpdate(Map<String, ?> inputs) {

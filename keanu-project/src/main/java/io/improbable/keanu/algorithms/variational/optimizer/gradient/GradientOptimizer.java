@@ -193,11 +193,6 @@ public class GradientOptimizer implements Optimizer {
         return optimize(fitnessFunction);
     }
 
-    @Override
-    public ProbabilisticGraph getProbabilisticGraph() {
-        return null;
-    }
-
     private double optimize(FitnessFunctionWithGradient fitnessFunction) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);

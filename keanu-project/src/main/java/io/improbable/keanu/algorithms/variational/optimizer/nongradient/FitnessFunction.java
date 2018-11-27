@@ -35,9 +35,15 @@ public class FitnessFunction {
     public MultivariateFunction fitness() {
         return point -> {
 
-            Map<String, DoubleTensor> values = convertFromPoint(point, latentVariables, latentShapes);
+            Map<String, DoubleTensor> values = convertFromPoint(
+                point,
+                latentVariables,
+                latentShapes
+            );
 
-            double logOfTotalProbability = useLikelihood ? probabilisticGraph.logLikelihood(values) : probabilisticGraph.logProb(values);
+            double logOfTotalProbability = useLikelihood ?
+                probabilisticGraph.logLikelihood(values) :
+                probabilisticGraph.logProb(values);
 
             if (onFitnessCalculation != null) {
                 onFitnessCalculation.accept(point, logOfTotalProbability);

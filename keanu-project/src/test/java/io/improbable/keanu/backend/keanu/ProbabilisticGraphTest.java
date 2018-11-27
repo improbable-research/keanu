@@ -1,7 +1,7 @@
-package io.improbable.keanu.backend;
+package io.improbable.keanu.backend.keanu;
 
 import com.google.common.collect.ImmutableMap;
-import io.improbable.keanu.backend.keanu.KeanuGraphConverter;
+import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -33,7 +33,6 @@ public class ProbabilisticGraphTest {
     private static final String C_LABEL = "C";
     private static final String D_LABEL = "D";
 
-
     @Parameterized.Parameters(name = "{index}: Test with A={0}, B={1}, observed sum D:{2}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -60,13 +59,13 @@ public class ProbabilisticGraphTest {
 
     @Test
     public void canCalculateLogProbOnKeanuProbabilisticGraph() {
-        ProbabilisticGraph probabilisticGraph = KeanuGraphConverter.convert(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticGraph probabilisticGraph = new KeanuProbabilisticGraph(new BayesianNetwork(D.getConnectedGraph()));
         canCalculateLogProb(probabilisticGraph);
     }
 
     @Test
     public void canCalculateLogProbOnKeanuProbabilisticWithGradientGraph() {
-        ProbabilisticGraph probabilisticGraph = KeanuGraphConverter.convertWithGradient(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticGraph probabilisticGraph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(D.getConnectedGraph()));
         canCalculateLogProb(probabilisticGraph);
     }
 

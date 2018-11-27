@@ -36,13 +36,13 @@ public class NonGradientOptimizer implements Optimizer {
      * Creates a BOBYQA {@link NonGradientOptimizer} which provides methods for optimizing the values of latent variables
      * of the Bayesian network to maximise probability.
      *
-     * @param bayesNet The Bayesian network to run optimization on.
+     * @param bayesianNetwork The Bayesian network to run optimization on.
      * @return a {@link NonGradientOptimizer}
      */
-    public static NonGradientOptimizer of(BayesianNetwork bayesNet) {
-        bayesNet.cascadeObservations();
+    public static NonGradientOptimizer of(BayesianNetwork bayesianNetwork) {
+        bayesianNetwork.cascadeObservations();
         return NonGradientOptimizer.builder()
-            .probabilisticGraph(new KeanuProbabilisticGraph(bayesNet))
+            .probabilisticGraph(new KeanuProbabilisticGraph(bayesianNetwork))
             .build();
     }
 

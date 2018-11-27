@@ -32,11 +32,11 @@ public class KeanuProbabilisticWithGradientGraphTest {
         BernoulliVertex C = new BernoulliVertex(A.times(B));
         C.observe(true);
 
-        KeanuProbabilisticWithGradientGraph graph = KeanuGraphConverter.convertWithGradient(
+        KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(
             new BayesianNetwork(C.getConnectedGraph())
         );
 
-        Map<String, DoubleTensor> gradients = graph.logProbGradients(null);
+        Map<String, DoubleTensor> gradients = graph.logProbGradients();
 
         DoubleTensor dLogProbWrtA = gradients.get(A_LABEL);
         DoubleTensor dLogProbWrtB = gradients.get(B_LABEL);
