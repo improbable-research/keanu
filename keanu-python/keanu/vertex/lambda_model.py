@@ -2,7 +2,7 @@ from keanu.context import KeanuContext
 from keanu.vertex import Vertex
 from keanu.vertex.vertex_label import VertexLabel
 from keanu.tensor import Tensor
-from keanu.functional import Consumer, Function
+from keanu.functional import Consumer, Supplier
 from keanu.vertex.base import JavaObjectWrapper
 from py4j.java_gateway import java_import
 
@@ -10,21 +10,22 @@ from py4j.java_gateway import java_import
 context = KeanuContext()
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.model.LambdaModelVertex")
 
-def _extract_values(vertices):
-    value_map = {k: JavaObjectWrapper(v.getValue()) for k, v in vertices.items()}
-    return context.to_java_map(value_map)
 
 class LambdaModel(Vertex):
     def __init__(self, 
                 inputs: map, 
                 executor, 
-                update_value = _extract_values
+                update_value = None
             ) -> Vertex:
         self.executor = executor
+        inputs_as_java_map = LambdaModel.__to_java_map(inputs)
+        if update_value is None:
+            update_value = lambda : inputs_as_java_map
+
         vertex = context.jvm_view().LambdaModelVertex(
-            LambdaModel.__to_java_map(inputs), 
+            inputs_as_java_map,
             Consumer(self.__execute), 
-            Function(update_value)
+            Supplier(update_value)
         )
         super(LambdaModel, self).__init__(vertex)
 
