@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toMap;
 public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph implements ProbabilisticWithGradientGraph {
 
     private LogProbGradientCalculator logProbGradientCalculator;
-    private LogProbGradientCalculator loglikelihoodGradientCalculator;
+    private LogProbGradientCalculator logLikelihoodGradientCalculator;
     private Map<VertexId, String> idToLabelLookup;
 
     public KeanuProbabilisticWithGradientGraph(BayesianNetwork bayesianNetwork) {
@@ -35,7 +35,7 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
             continuousLatentVertices
         );
 
-        this.loglikelihoodGradientCalculator = new LogProbGradientCalculator(
+        this.logLikelihoodGradientCalculator = new LogProbGradientCalculator(
             bayesianNetwork.getObservedVertices(),
             continuousLatentVertices
         );
@@ -53,7 +53,7 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
 
     @Override
     public Map<String, DoubleTensor> logLikelihoodGradients(Map<String, ?> inputs) {
-        return gradients(inputs, loglikelihoodGradientCalculator);
+        return gradients(inputs, logLikelihoodGradientCalculator);
     }
 
     @Override
