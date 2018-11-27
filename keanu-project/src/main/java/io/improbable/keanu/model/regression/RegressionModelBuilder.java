@@ -69,11 +69,14 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     }
 
     public RegressionModelBuilder withPriorOnWeights(DoubleTensor means, DoubleTensor scaleParameters) {
-        return withPriorOnIntercept(ConstantVertex.of(means), ConstantVertex.of(scaleParameters));
+        return withPriorOnWeights(ConstantVertex.of(means), ConstantVertex.of(scaleParameters));
     }
 
     public RegressionModelBuilder withPriorOnWeights(double means, double scaleParameters) {
-        return withPriorOnIntercept(ConstantVertex.of(means), ConstantVertex.of(scaleParameters));
+        return withPriorOnWeights(
+            DoubleTensor.create(new double[]{means}, 1, 1),
+            DoubleTensor.create(new double[]{scaleParameters}, 1, 1)
+        );
     }
 
     /**

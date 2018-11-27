@@ -64,8 +64,8 @@ public class RadonHeirarchicalRegression {
     private RegressionModel linearRegression(List<Data> data) {
         double[] radon = data.stream().mapToDouble(k -> k.log_radon).toArray();
         double[] floor = data.stream().mapToDouble(k -> k.floor).toArray();
-        DoubleTensor y = DoubleTensor.create(radon);
-        DoubleTensor x = DoubleTensor.create(floor);
+        DoubleTensor y = DoubleTensor.create(radon, 1, radon.length);
+        DoubleTensor x = DoubleTensor.create(floor, 1, floor.length);
 
         RegressionModel model = RegressionModel.
             withTrainingData(x, y).
@@ -81,11 +81,11 @@ public class RadonHeirarchicalRegression {
     }
 
     private void buildHeirarchicalNetwork(List<Data> radonData, int numberOfModels) {
-        GaussianVertex muAlpha = new GaussianVertex(0, 100).setLabel("MuIntercept");
-        GaussianVertex muBeta = new GaussianVertex(0, 100).setLabel("MuGradient");
+        GaussianVertex muAlpha = new GaussianVertex(new long[]{1, 1}, 0, 100).setLabel("MuIntercept");
+        GaussianVertex muBeta = new GaussianVertex(new long[]{1, 1}, 0, 100).setLabel("MuGradient");
 
-        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(10.).setLabel("SigmaIntercept");
-        HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(10.).setLabel("SigmaGradient");
+        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(new long[]{1, 1}, 10.).setLabel("SigmaIntercept");
+        HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(new long[]{1, 1}, 10.).setLabel("SigmaGradient");
 
         int numPartitions = radonData.size() / numberOfModels;
 
@@ -123,8 +123,8 @@ public class RadonHeirarchicalRegression {
         double[] floorForSubModel = Arrays.copyOfRange(allFloor, startIndex, endIndex);
         double[] radonForSubModel = Arrays.copyOfRange(allRadon, startIndex, endIndex);
 
-        DoubleTensor x = DoubleTensor.create(floorForSubModel);
-        DoubleTensor y = DoubleTensor.create(radonForSubModel);
+        DoubleTensor x = DoubleTensor.create(floorForSubModel, 1, floorForSubModel.length);
+        DoubleTensor y = DoubleTensor.create(radonForSubModel, 1, floorForSubModel.length);
 
         RegressionModel model = RegressionModel.
             withTrainingData(x, y).
@@ -139,7 +139,7 @@ public class RadonHeirarchicalRegression {
     }
 
     private void optimise(BayesianNetwork bayesianNetwork, List<RegressionModel> models) {
-        bayesianNetwork.probeForNonZeroProbability(10);
+        bayesianNetwork.probeForNonZeroProbability(100);
         GradientOptimizer optimizer = GradientOptimizer.builder()
             .bayesianNetwork(bayesianNetwork)
             .absoluteThreshold(0.25)
@@ -165,8 +165,7 @@ public class RadonHeirarchicalRegression {
         for (RegressionModel subModel : models) {
             double weight = subModel.getWeightVertex().getValue().scalar();
             double intercept = subModel.getInterceptVertex().getValue().scalar();
-
-            Assert.assertTrue(-0.0 > weight && weight > -1.0);
+            Assert.assertTrue(-0.0 > weight && weight > -1.5);
             Assert.assertTrue(2. > intercept && intercept > 1.);
         }
     }
