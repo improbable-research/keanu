@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -10,7 +12,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
+
+@DisplayInformationForOutput(displayName = "-")
 public class DifferenceVertex extends DoubleBinaryOpVertex {
 
     /**
@@ -22,7 +27,7 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     @ExportVertexToPythonBindings
     public DifferenceVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
                             @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
-        super(left, right);
+        super(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right);
     }
 
     @Override
@@ -32,7 +37,11 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
 
     @Override
     protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
-        return dLeftWrtInputs.subtract(dRightWrtInputs, getShape());
+        return dLeftWrtInputs.subtract(dRightWrtInputs,
+            TensorShape.isLengthOne(left.getShape()),
+            TensorShape.isLengthOne(right.getShape()),
+            getShape()
+        );
     }
 
     @Override

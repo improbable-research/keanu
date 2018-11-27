@@ -8,17 +8,17 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
 public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
     protected final Vertex<A> a;
     protected final Vertex<B> b;
-    protected final static String A_NAME = "a";
-    protected final static String B_NAME = "b";
+    protected final static String A_NAME = "left";
+    protected final static String B_NAME = "right";
 
     public BoolBinaryOpVertex(Vertex<A> a, Vertex<B> b) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(a.getShape(), b.getShape()), a, b);
     }
 
     public BoolBinaryOpVertex(long[] shape, Vertex<A> a, Vertex<B> b) {

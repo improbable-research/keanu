@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -16,8 +17,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class BinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
@@ -28,7 +29,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
 
     public BinomialVertex(long[] tensorShape, DoubleVertex p, IntegerVertex n) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, p.getShape(), n.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, p.getShape(), n.getShape());
         this.p = p;
         this.n = n;
 
@@ -47,8 +48,9 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
         this(tensorShape, ConstantVertex.of(p), ConstantVertex.of(n));
     }
 
+    @ExportVertexToPythonBindings
     public BinomialVertex(@LoadParentVertex(P_NAME) DoubleVertex p, @LoadParentVertex(N_NAME) IntegerVertex n) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(p.getShape(), n.getShape()), p, n);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(p.getShape(), n.getShape()), p, n);
     }
 
     public BinomialVertex(double p, IntegerVertex n) {
