@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.mock;
 public class BayesianNetworkTest {
 
     BayesianNetwork network;
+    Set<Vertex> connectedGraph;
     BoolVertex input1;
     BoolVertex input2;
     BoolVertex output;
@@ -35,7 +37,8 @@ public class BayesianNetworkTest {
         input1 = new BernoulliVertex(0.25);
         input2 = new BernoulliVertex(0.75);
         output = input1.or(input2);
-        network = new BayesianNetwork(output.getConnectedGraph());
+        connectedGraph = output.getConnectedGraph();
+        network = new BayesianNetwork(connectedGraph);
     }
 
     @Test
@@ -111,7 +114,7 @@ public class BayesianNetworkTest {
 
     @Test
     public void testGetNumVertices() {
-        assertThat(network.getNumVertices(), equalTo(5));
+        assertThat(network.getNumVertices(), equalTo(connectedGraph.size()));
     }
 
     @Test
