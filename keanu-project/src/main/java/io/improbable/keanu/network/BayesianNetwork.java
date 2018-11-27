@@ -1,5 +1,6 @@
 package io.improbable.keanu.network;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
@@ -19,7 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,26 +31,10 @@ public class BayesianNetwork {
     private final int TOP_LEVEL_INDENTATION = 1;
     private int indentation = TOP_LEVEL_INDENTATION;
 
-    private final int vertexCount;
-    private final Map<VertexId, Integer> vertexDegrees;
-    private final double averageVertexDegree;
-
     public BayesianNetwork(Set<? extends Vertex> vertices) {
+        Preconditions.checkArgument(!vertices.isEmpty(), "List of vertices in the network is empty");
         this.vertices = ImmutableList.copyOf(vertices);
         this.vertexLabels = buildLabelMap(vertices);
-
-        this.vertexCount = vertices.size();
-        this.vertexDegrees = calculateVertexDegrees(vertices);
-        this.averageVertexDegree = calculateAverageVertexDegree(vertices);
-    }
-
-    private Map<VertexId,Integer> calculateVertexDegrees(Set<? extends Vertex> vertices) {
-        return vertices.stream().collect(Collectors.toMap(Vertex::getId, Vertex::getDegree));
-    }
-
-    private double calculateAverageVertexDegree(Set<? extends Vertex> vertices) {
-        OptionalDouble optionalDouble = vertices.stream().mapToInt(Vertex::getDegree).average();
-        return optionalDouble.isPresent() ? optionalDouble.getAsDouble() : 0.;
     }
 
     public BayesianNetwork(Collection<? extends Vertex> vertices) {
@@ -81,20 +65,12 @@ public class BayesianNetwork {
         return vertices;
     }
 
-    public int getVertexCount() {
-        return vertexCount;
-    }
-
-    public Integer getVertexDegree(Vertex vertex) {
-        return vertexDegrees.get(vertex.getId());
-    }
-
-    public Integer getVertexDegree(VertexId id) {
-        return vertexDegrees.get(id);
+    public int getNumVertices() {
+        return getVertices().size();
     }
 
     public double getAverageVertexDegree() {
-        return averageVertexDegree;
+        return getVertices().stream().mapToDouble(Vertex::getDegree).average().getAsDouble();
     }
 
     public void setState(NetworkState state) {

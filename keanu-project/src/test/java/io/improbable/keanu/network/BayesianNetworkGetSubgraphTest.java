@@ -2,7 +2,6 @@ package io.improbable.keanu.network;
 
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -48,12 +47,6 @@ public class BayesianNetworkGetSubgraphTest {
         when(child.getChildren()).thenReturn(grandChildren);
 
         when(v.getConnectedGraph()).thenReturn(ImmutableSet.of(v, parent, child, grandChild, grandParent));
-
-        when(grandParent.getId()).thenReturn(new VertexId(0));
-        when(parent.getId()).thenReturn(new VertexId(1));
-        when(v.getId()).thenReturn(new VertexId(2));
-        when(child.getId()).thenReturn(new VertexId(3));
-        when(grandChild.getId()).thenReturn(new VertexId(4));
 
         network = new BayesianNetwork(v.getConnectedGraph());
     }
