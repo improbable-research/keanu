@@ -19,6 +19,6 @@ public class MinVertex extends DoubleIfVertex {
     @ExportVertexToPythonBindings
     public MinVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
                      @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
-        super(left.getShape(), left.lessThanOrEqualTo(right), left, right);
+        super(left.lessThanOrEqualTo(right), left, right);
     }
 }

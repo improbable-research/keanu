@@ -19,8 +19,8 @@ import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class ExponentialVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -40,7 +40,7 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
      */
     public ExponentialVertex(long[] tensorShape, DoubleVertex rate) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, rate.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, rate.getShape());
 
         this.rate = rate;
         setParents(rate);
@@ -53,7 +53,7 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
      */
     @ExportVertexToPythonBindings
     public ExponentialVertex(@LoadVertexParam(RATE_NAME) DoubleVertex rate) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(rate.getShape()), rate);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(rate.getShape()), rate);
     }
 
     public ExponentialVertex(double rate) {

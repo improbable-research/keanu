@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -18,21 +19,14 @@ public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<T
     private final Vertex<? extends Tensor<T>> thn;
     private final Vertex<? extends Tensor<T>> els;
 
-    public IfVertex(long[] shape,
-                    Vertex<? extends BooleanTensor> predicate,
-                    Vertex<? extends Tensor<T>> thn,
-                    Vertex<? extends Tensor<T>> els) {
-        super(shape);
+    public IfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
+                    @LoadVertexParam(THEN_NAME) Vertex<? extends Tensor<T>> thn,
+                    @LoadVertexParam(ELSE_NAME) Vertex<? extends Tensor<T>> els) {
+        super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
         setParents(predicate, thn, els);
-    }
-
-    public IfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
-                    @LoadVertexParam(THEN_NAME) Vertex<? extends Tensor<T>> thn,
-                    @LoadVertexParam(ELSE_NAME) Vertex<? extends Tensor<T>> els) {
-        this(thn.getShape(), predicate, thn, els);
     }
 
     private Tensor<T> op(BooleanTensor predicate, Tensor<T> thn, Tensor<T> els) {

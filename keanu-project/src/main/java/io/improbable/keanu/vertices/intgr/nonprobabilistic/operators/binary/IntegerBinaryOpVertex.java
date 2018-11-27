@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
 public abstract class IntegerBinaryOpVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
@@ -19,11 +19,11 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
     /**
      * A vertex that performs a user defined operation on two input vertices
      *
-     * @param left first input vertex
+     * @param left  first input vertex
      * @param right second input vertex
      */
     public IntegerBinaryOpVertex(IntegerVertex left, IntegerVertex right) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right);
     }
 
     /**

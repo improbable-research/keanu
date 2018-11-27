@@ -20,8 +20,8 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class LogisticVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -41,7 +41,7 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
      */
     public LogisticVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex s) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), s.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), s.getShape());
 
         this.mu = mu;
         this.s = s;
@@ -51,7 +51,7 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
     @ExportVertexToPythonBindings
     public LogisticVertex(@LoadVertexParam(MU_NAME) DoubleVertex mu,
                           @LoadVertexParam(S_NAME) DoubleVertex s) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), s.getShape()), mu, s);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), s.getShape()), mu, s);
     }
 
     public LogisticVertex(DoubleVertex mu, double s) {

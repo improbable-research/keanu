@@ -30,6 +30,10 @@ public class ConstantBoolVertex extends BoolVertex implements ConstantVertex, No
         this(BooleanTensor.create(vector));
     }
 
+    public ConstantBoolVertex(boolean[] data, long[] shape) {
+        this(BooleanTensor.create(data, shape));
+    }
+
     @Override
     public BooleanTensor sample(KeanuRandom random) {
         return getValue();

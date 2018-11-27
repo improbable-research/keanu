@@ -29,6 +29,10 @@ public class ConstantIntegerVertex extends IntegerVertex implements ConstantVert
         this(IntegerTensor.scalar(constant));
     }
 
+    public ConstantIntegerVertex(int[] data, long[] shape) {
+        this(IntegerTensor.create(data, shape));
+    }
+
     @Override
     public IntegerTensor sample(KeanuRandom random) {
         return getValue();

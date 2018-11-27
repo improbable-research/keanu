@@ -168,7 +168,7 @@ public class ProtobufTest {
             .addParameters(KeanuSavedBayesNet.NamedParam.newBuilder()
                 .setName("constant")
                 .setIntTensorParam(KeanuSavedBayesNet.IntegerTensor.newBuilder()
-                    .addAllShape(Longs.asList(1, 1)).addValues(1).build()
+                    .addAllShape(Longs.asList()).addValues(1).build()
                 ).build())
             .build();
 
