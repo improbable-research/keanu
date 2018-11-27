@@ -41,6 +41,10 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return create(values, values.length);
     }
 
+    static DoubleTensor create(double value) {
+        return create(value, Tensor.SCALAR_SHAPE);
+    }
+
     static DoubleTensor ones(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(1.0);

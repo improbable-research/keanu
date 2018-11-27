@@ -34,6 +34,11 @@ import static java.util.Arrays.copyOf;
  */
 public class Nd4jIntegerTensor implements IntegerTensor {
 
+
+    static {
+        INDArrayShim.startNewThreadForNd4j();
+    }
+
     private static final DataBuffer.Type BUFFER_TYPE = DataBuffer.Type.DOUBLE;
     private INDArray tensor;
 
