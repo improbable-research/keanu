@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.model;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.BoolModelResultVertex;
@@ -17,7 +16,7 @@ public interface ModelVertex<T> extends NonProbabilistic<T> {
 
     void run();
 
-    Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs);
+    Map<VertexLabel, Tensor> updateValues();
 
     boolean hasCalculated();
 

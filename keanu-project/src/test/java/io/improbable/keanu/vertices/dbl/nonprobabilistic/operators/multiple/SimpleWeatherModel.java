@@ -62,7 +62,7 @@ public class SimpleWeatherModel {
         }
     }
 
-    public Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+    public Map<VertexLabel, Tensor> updateValues() {
         Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
 
         try {
@@ -77,7 +77,7 @@ public class SimpleWeatherModel {
         return modelOutput;
     }
 
-    public Map<VertexLabel, Tensor> updateValuesMultipleTypes(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+    public Map<VertexLabel, Tensor> updateValuesMultipleTypes() {
         Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
 
         try {

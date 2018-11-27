@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
@@ -19,7 +19,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
     private Map<VertexLabel, Tensor> outputs;
     private Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor;
-    private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput;
+    private Supplier<Map<VertexLabel, Tensor>> extractOutput;
     private boolean hasValue;
 
     /**
@@ -27,15 +27,14 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
      * It is able to execute a lambda and is able to parse the result.
      * It stores multiple output values in a map.
      * Use a ModelResultVertex to extract a value by label from this vertex.
-     *
-     * @param inputs       input vertices to the model
+     *  @param inputs       input vertices to the model
      * @param executor     the operation to perform
      * @param updateValues a function to extract the output values (once the operation has been performed) and update
      *                     the models output values.
      */
     public LambdaModelVertex(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                              Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
-                             Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
+                             Supplier<Map<VertexLabel, Tensor>> updateValues) {
         super(Tensor.SCALAR_SHAPE);
         this.inputs = inputs;
         this.outputs = Collections.emptyMap();
@@ -59,7 +58,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
      */
     public static LambdaModelVertex createFromProcess(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                                                       String command,
-                                                      Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
+                                                      Supplier<Map<VertexLabel, Tensor>> updateValues) {
         return new LambdaModelVertex(inputs, i -> {
             try {
                 Process cmd = Runtime.getRuntime().exec(command);
@@ -80,7 +79,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     @Override
     public DoubleTensor calculate() {
         run();
-        updateValues(inputs);
+        updateValues();
         return DoubleTensor.scalar(0.0);
     }
 
@@ -104,8 +103,8 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     }
 
     @Override
-    public Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        outputs = extractOutput.apply(inputs);
+    public Map<VertexLabel, Tensor> updateValues() {
+        outputs = extractOutput.get();
         return outputs;
     }
 
