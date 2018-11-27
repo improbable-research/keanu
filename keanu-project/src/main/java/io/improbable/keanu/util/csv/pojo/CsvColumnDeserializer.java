@@ -38,7 +38,7 @@ class CsvColumnDeserializer {
         }
 
         if (fieldType == DoubleTensor.class) {
-            return DoubleTensor.create(convertToDoubles(s));
+            return DoubleTensor.create(convertToDoubles(s), 1, s.size());
         }
 
         if (fieldType == boolean[].class) {
