@@ -72,8 +72,8 @@ public class LinearRegressionTest {
         DoubleVertex w1 = new GaussianVertex(0.0, 10.0);
         DoubleVertex w2 = new GaussianVertex(0.0, 10.0);
         DoubleVertex b = new GaussianVertex(0.0, 10.0);
-        DoubleVertex x1 = ConstantVertex.of(data.xTrain.slice(1, 0));
-        DoubleVertex x2 = ConstantVertex.of(data.xTrain.slice(1, 1));
+        DoubleVertex x1 = ConstantVertex.of(data.xTrain.slice(1, 0).reshape(100000, 1));
+        DoubleVertex x2 = ConstantVertex.of(data.xTrain.slice(1, 1).reshape(100000, 1));
         DoubleVertex y = new GaussianVertex(x1.multiply(w1).plus(x2.multiply(w2)).plus(b), 5.0);
         y.observe(data.yTrain);
 
