@@ -41,6 +41,10 @@ message GenericTensor {
     repeated string values = 2;
 }
 
+message LongArray {
+    repeated int64 values = 1;
+}
+
 message NamedParam {
     string name = 1;
     oneof param {
@@ -52,6 +56,7 @@ message NamedParam {
         int32 intParam = 7;
         int64 longParam = 8;
         string stringParam = 9;
+        LongArray longArrayParam = 10;
     }
 }
 

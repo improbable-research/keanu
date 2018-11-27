@@ -109,6 +109,8 @@ public class ProtobufSaver implements NetworkSaver {
             return getParam(paramName, (long) param);
         } else if (String.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (String) param);
+        } else if (long[].class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, (long[]) param);
         } else {
             throw new IllegalArgumentException("Unknown Parameter Type to Save: " + param.getClass().toString());
         }
@@ -182,6 +184,15 @@ public class ProtobufSaver implements NetworkSaver {
 
         paramBuilder.setName(paramName);
         paramBuilder.setLongParam(param);
+
+        return paramBuilder.build();
+    }
+
+    private KeanuSavedBayesNet.NamedParam getParam(String paramName, long[] param) {
+        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
+
+        paramBuilder.setName(paramName);
+        paramBuilder.setLongArrayParam(KeanuSavedBayesNet.LongArray.newBuilder().addAllValues(Longs.asList(param)));
 
         return paramBuilder.build();
     }

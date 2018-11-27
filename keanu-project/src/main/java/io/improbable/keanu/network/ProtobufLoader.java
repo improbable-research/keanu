@@ -264,6 +264,9 @@ public class ProtobufLoader implements NetworkLoader {
             case STRINGPARAM:
                 return parameter.getStringParam();
 
+            case LONGARRAYPARAM:
+                return Longs.toArray(parameter.getLongArrayParam().getValuesList());
+
             default:
                 throw new IllegalArgumentException("Unknown Param Type Received: "
                     + parameter.getParamCase().toString());
