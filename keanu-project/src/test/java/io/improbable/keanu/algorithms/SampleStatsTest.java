@@ -1,17 +1,13 @@
 package io.improbable.keanu.algorithms;
 
-import io.improbable.keanu.algorithms.SampleStats;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class SampleStatsTest {
@@ -25,7 +21,7 @@ public class SampleStatsTest {
         }
         double[] autocorr = SampleStats.acf(samples);
 
-        assertThat(autocorr[30],lessThan(0.1));
+        assertThat(autocorr[80],lessThan(0.1));
     }
 
     @Test
