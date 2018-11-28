@@ -44,11 +44,6 @@ public class SampleStats {
     }
 
 
-    private static double[] padWithZeroes(double[] values, int newLength) {
-        //TODO: Check padding size?
-        return Arrays.copyOf(values, newLength);
-    }
-
     private static int nextPowerOfTwo(int x) {
         int highestOneBit = Integer.highestOneBit(x);
         if (x == highestOneBit) {
