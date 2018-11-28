@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
 import pytest
-import math
-from keanu.vertex.base import Vertex
+
 from keanu.context import KeanuContext
 from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli
+from keanu.vertex.base import Vertex
 
 
 @pytest.fixture
@@ -17,9 +17,8 @@ def jvm_view():
 
 def assert_vertex_value_equals_scalar(vertex, expected_type, scalar):
     vertex_value = vertex.get_value()
-    expected_value = np.array([scalar]).astype(expected_type)
-    assert vertex_value == expected_value
-    assert vertex_value.dtype == expected_type
+    assert vertex_value == scalar
+    assert type(vertex_value) == expected_type
 
 
 def assert_vertex_value_equals_ndarray(vertex, expected_type, ndarray):
@@ -40,21 +39,28 @@ def test_can_pass_scalar_to_vertex(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
     sample = gaussian.sample()
 
-    assert sample.shape == (1, 1)
+    assert type(sample) == float
 
 
 def test_can_pass_ndarray_to_vertex(jvm_view):
-    gaussian = Vertex(jvm_view.GaussianVertex, np.array([[0.1, 0.4]]), np.array([[0.4, 0.5]]))
+    gaussian = Vertex(jvm_view.GaussianVertex, np.array([0.1, 0.4]), np.array([0.4, 0.5]))
     sample = gaussian.sample()
 
-    assert sample.shape == (1, 2)
+    assert sample.shape == (2,)
 
 
-def test_can_pass_pandas_to_vertex(jvm_view):
-    gaussian = Vertex(jvm_view.GaussianVertex, pd.DataFrame(data=[0.1, 0.4]), pd.Series(data=[0.1, 0.4]))
+def test_can_pass_pandas_dataframe_to_vertex(jvm_view):
+    gaussian = Vertex(jvm_view.GaussianVertex, pd.DataFrame(data=[0.1, 0.4]), pd.DataFrame(data=[0.1, 0.4]))
     sample = gaussian.sample()
 
     assert sample.shape == (2, 1)
+
+
+def test_can_pass_pandas_series_to_vertex(jvm_view):
+    gaussian = Vertex(jvm_view.GaussianVertex, pd.Series(data=[0.1, 0.4]), pd.Series(data=[0.1, 0.4]))
+    sample = gaussian.sample()
+
+    assert sample.shape == (2,)
 
 
 def test_can_pass_vertex_to_vertex(jvm_view):
@@ -62,7 +68,7 @@ def test_can_pass_vertex_to_vertex(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, mu, 1.)
     sample = gaussian.sample()
 
-    assert sample.shape == (1, 1)
+    assert isinstance(sample, float)
 
 
 def test_can_pass_array_to_vertex(jvm_view):
@@ -114,11 +120,8 @@ def test_scalar_vertex_value_is_a_numpy_array():
     scalar = 1.
     vertex = Const(scalar)
     value = vertex.get_value()
-    assert type(value) == np.ndarray
-    assert value.dtype == np.float64
-    assert value.shape == (1, 1)
+    assert type(value) == float
     assert value == scalar
-    assert (value == scalar).all()
 
 
 def test_vertex_sample_is_a_numpy_array():
@@ -182,9 +185,7 @@ def test_get_vertex_id(jvm_view):
 @pytest.mark.parametrize("vertex, expected_type", [(Gaussian(0., 1.), np.floating), (UniformInt(0, 10), np.integer),
                                                    (Bernoulli(0.5), np.bool_)])
 @pytest.mark.parametrize("value, assert_vertex_value_equals",
-                         [(4, assert_vertex_value_equals_scalar), (5., assert_vertex_value_equals_scalar),
-                          (True, assert_vertex_value_equals_scalar),
-                          (np.array([[4]]), assert_vertex_value_equals_ndarray),
+                         [(np.array([[4]]), assert_vertex_value_equals_ndarray),
                           (np.array([[5.]]), assert_vertex_value_equals_ndarray),
                           (np.array([[True]]), assert_vertex_value_equals_ndarray),
                           (np.array([[1, 2], [3, 4]]), assert_vertex_value_equals_ndarray),
@@ -205,13 +206,18 @@ def test_you_can_set_value(vertex, expected_type, value, assert_vertex_value_equ
     assert_vertex_value_equals(vertex, expected_type, value)
 
 
+@pytest.mark.parametrize("vertex, expected_type, value", [(Gaussian(0., 1.), float, 4.), (UniformInt(0, 10), int, 5),
+                                                          (Bernoulli(0.5), bool, True)])
+def test_you_can_set_scalar_value(vertex, expected_type, value):
+    vertex.set_value(value)
+    assert_vertex_value_equals_scalar(vertex, expected_type, value)
+
+
 @pytest.mark.parametrize("ctor, args, expected_type", [(Gaussian, (0., 1.), np.floating),
                                                        (UniformInt, (0, 10), np.integer), (Bernoulli,
                                                                                            (0.5,), np.bool_)])
 @pytest.mark.parametrize("value, assert_vertex_value_equals",
-                         [(4, assert_vertex_value_equals_scalar), (5., assert_vertex_value_equals_scalar),
-                          (True, assert_vertex_value_equals_scalar),
-                          (np.array([[4]]), assert_vertex_value_equals_ndarray),
+                         [(np.array([[4]]), assert_vertex_value_equals_ndarray),
                           (np.array([[5.]]), assert_vertex_value_equals_ndarray),
                           (np.array([[True]]), assert_vertex_value_equals_ndarray),
                           (np.array([[1, 2], [3, 4]]), assert_vertex_value_equals_ndarray),
@@ -240,23 +246,33 @@ def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex
     assert_vertex_value_equals(vertex2, expected_type, value)
 
     two_values_are_equal = equal_vertex.get_value()
-    assert two_values_are_equal.dtype == np.bool_
-    assert two_values_are_equal.shape == vertex1.get_value().shape == vertex2.get_value().shape
-    assert np.all(two_values_are_equal)
+    is_scalar = type(two_values_are_equal) == bool
+    assert type(two_values_are_equal) == bool or two_values_are_equal.dtype == np.bool_
+
+    if not is_scalar:
+        assert two_values_are_equal.shape == vertex1.get_value().shape == vertex2.get_value().shape
+        assert np.all(two_values_are_equal)
 
     two_values_are_not_equal = not_equal_vertex.get_value()
-    assert two_values_are_not_equal.dtype == np.bool_
-    assert two_values_are_not_equal.shape == vertex1.get_value().shape == vertex2.get_value().shape
-    assert np.all(np.invert(two_values_are_not_equal))
+    assert type(two_values_are_equal) == bool or two_values_are_not_equal.dtype == np.bool_
+
+    if not is_scalar:
+        assert two_values_are_not_equal.shape == vertex1.get_value().shape == vertex2.get_value().shape
+        assert np.all(np.invert(two_values_are_not_equal))
+
+
+@pytest.mark.parametrize("ctor, args, expected_type, value", [(Gaussian, (0., 1.), float, 4.),
+                                                              (UniformInt, (0, 10), int, 5),
+                                                              (Bernoulli, (0.5,), bool, True)])
+def test_you_can_set_and_cascade_scalar(ctor, args, expected_type, value):
+    test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex_value_equals_scalar)
 
 
 @pytest.mark.parametrize("ctor, args, expected_type", [(Gaussian, (0., 1.), np.floating),
                                                        (UniformInt, (0, 10), np.integer), (Bernoulli,
                                                                                            (0.5,), np.bool_)])
 @pytest.mark.parametrize("value, assert_vertex_value_equals",
-                         [(4, assert_vertex_value_equals_scalar), (5., assert_vertex_value_equals_scalar),
-                          (True, assert_vertex_value_equals_scalar),
-                          (np.array([[4]]), assert_vertex_value_equals_ndarray),
+                         [(np.array([[4]]), assert_vertex_value_equals_ndarray),
                           (np.array([[5.]]), assert_vertex_value_equals_ndarray),
                           (np.array([[True]]), assert_vertex_value_equals_ndarray),
                           (np.array([[1, 2], [3, 4]]), assert_vertex_value_equals_ndarray),
@@ -278,3 +294,10 @@ def test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_e
     vertex.observe(value)
     assert vertex.is_observed()
     assert_vertex_value_equals(vertex, expected_type, value)
+
+
+@pytest.mark.parametrize("ctor, args, expected_type, value", [(Gaussian, (0., 1.), float, 4.),
+                                                              (UniformInt, (0, 10), int, 5),
+                                                              (Bernoulli, (0.5,), bool, True)])
+def test_you_can_observe_scalar(ctor, args, expected_type, value):
+    test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals_scalar)

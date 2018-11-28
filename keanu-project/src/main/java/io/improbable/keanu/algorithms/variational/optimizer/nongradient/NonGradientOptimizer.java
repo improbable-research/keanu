@@ -7,8 +7,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -30,8 +29,9 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
  *
  * @see <a href="http://www.damtp.cam.ac.uk/user/na/NA_papers/NA2009_06.pdf">BOBYQA Optimizer</a>
  */
-@Builder
+@AllArgsConstructor
 public class NonGradientOptimizer implements Optimizer {
+
     /**
      * Creates a BOBYQA {@link NonGradientOptimizer} which provides methods for optimizing the values of latent variables
      * of the Bayesian network to maximise probability.
@@ -42,7 +42,7 @@ public class NonGradientOptimizer implements Optimizer {
     public static NonGradientOptimizer of(BayesianNetwork bayesianNetwork) {
         bayesianNetwork.cascadeObservations();
         return NonGradientOptimizer.builder()
-            .probabilisticGraph(new KeanuProbabilisticGraph(bayesianNetwork))
+            .bayesianNetwork(bayesianNetwork)
             .build();
     }
 
@@ -70,41 +70,39 @@ public class NonGradientOptimizer implements Optimizer {
         return of(vertexFromNetwork.getConnectedGraph());
     }
 
-    @Getter
     private final ProbabilisticGraph probabilisticGraph;
 
     /**
      * maxEvaluations the maximum number of objective function evaluations before throwing an exception
      * indicating convergence failure.
      */
-    @Builder.Default
-    private int maxEvaluations = Integer.MAX_VALUE;
+    private int maxEvaluations;
 
     /**
      * bounding box around starting point
      */
-    @Builder.Default
-    private final double boundsRange = Double.POSITIVE_INFINITY;
+    private final double boundsRange;
 
     /**
      * bounds for each specific continuous latent vertex
      */
-    @Builder.Default
-    private final OptimizerBounds optimizerBounds = new OptimizerBounds();
+    private final OptimizerBounds optimizerBounds;
 
     /**
      * radius around region to start testing points
      */
-    @Builder.Default
-    double initialTrustRegionRadius = BOBYQAOptimizer.DEFAULT_INITIAL_RADIUS;
+    private final double initialTrustRegionRadius;
 
     /**
      * stopping trust region radius
      */
-    @Builder.Default
-    double stoppingTrustRegionRadius = BOBYQAOptimizer.DEFAULT_STOPPING_RADIUS;
+    private final double stoppingTrustRegionRadius;
 
     private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
+
+    public static NonGradientOptimizerBuilder builder() {
+        return new NonGradientOptimizerBuilder();
+    }
 
     @Override
     public void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
@@ -189,4 +187,70 @@ public class NonGradientOptimizer implements Optimizer {
         ));
     }
 
+    public static class NonGradientOptimizerBuilder {
+
+        private ProbabilisticGraph probabilisticGraph;
+
+        private int maxEvaluations = Integer.MAX_VALUE;
+        private double boundsRange = Double.POSITIVE_INFINITY;
+        private OptimizerBounds optimizerBounds = new OptimizerBounds();
+        private double initialTrustRegionRadius = BOBYQAOptimizer.DEFAULT_INITIAL_RADIUS;
+        private double stoppingTrustRegionRadius = BOBYQAOptimizer.DEFAULT_STOPPING_RADIUS;
+
+        NonGradientOptimizerBuilder() {
+        }
+
+        public NonGradientOptimizerBuilder bayesianNetwork(Collection<? extends Vertex> vertices) {
+            return bayesianNetwork(new BayesianNetwork(vertices));
+        }
+
+        public NonGradientOptimizerBuilder bayesianNetwork(BayesianNetwork bayesianNetwork) {
+            return bayesianNetwork(new KeanuProbabilisticGraph(bayesianNetwork));
+        }
+
+        public NonGradientOptimizerBuilder bayesianNetwork(ProbabilisticGraph probabilisticGraph) {
+            this.probabilisticGraph = probabilisticGraph;
+            return this;
+        }
+
+        public NonGradientOptimizerBuilder maxEvaluations(int maxEvaluations) {
+            this.maxEvaluations = maxEvaluations;
+            return this;
+        }
+
+        public NonGradientOptimizerBuilder boundsRange(double boundsRange) {
+            this.boundsRange = boundsRange;
+            return this;
+        }
+
+        public NonGradientOptimizerBuilder optimizerBounds(OptimizerBounds optimizerBounds) {
+            this.optimizerBounds = optimizerBounds;
+            return this;
+        }
+
+        public NonGradientOptimizerBuilder initialTrustRegionRadius(double initialTrustRegionRadius) {
+            this.initialTrustRegionRadius = initialTrustRegionRadius;
+            return this;
+        }
+
+        public NonGradientOptimizerBuilder stoppingTrustRegionRadius(double stoppingTrustRegionRadius) {
+            this.stoppingTrustRegionRadius = stoppingTrustRegionRadius;
+            return this;
+        }
+
+        public NonGradientOptimizer build() {
+            return new NonGradientOptimizer(
+                probabilisticGraph,
+                maxEvaluations,
+                boundsRange,
+                optimizerBounds,
+                initialTrustRegionRadius,
+                stoppingTrustRegionRadius
+            );
+        }
+
+        public String toString() {
+            return "NonGradientOptimizer.NonGradientOptimizerBuilder(probabilisticGraph=" + this.probabilisticGraph + ", maxEvaluations=" + this.maxEvaluations + ", boundsRange=" + this.boundsRange + ", optimizerBounds=" + this.optimizerBounds + ", initialTrustRegionRadius=" + this.initialTrustRegionRadius + ", stoppingTrustRegionRadius=" + this.stoppingTrustRegionRadius + ")";
+        }
+    }
 }

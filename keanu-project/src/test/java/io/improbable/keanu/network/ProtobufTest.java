@@ -169,7 +169,7 @@ public class ProtobufTest {
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
             .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
                 .setIntVal(KeanuSavedBayesNet.IntegerTensor.newBuilder()
-                    .addAllShape(Longs.asList(1, 1)).addValues(1).build()
+                    .addAllShape(Longs.asList()).addValues(1).build()
                 ).build())
             .build();
 

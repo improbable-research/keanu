@@ -2,15 +2,13 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
-import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.backend.keanu.KeanuProbabilisticWithGradientGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -28,10 +26,14 @@ import java.util.function.BiConsumer;
 
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
-@Builder
+@AllArgsConstructor
 public class GradientOptimizer implements Optimizer {
 
     private static final double FLAT_GRADIENT = 1e-16;
+
+    public static GradientOptimizerBuilder builder() {
+        return new GradientOptimizerBuilder();
+    }
 
     public enum UpdateFormula {
         POLAK_RIBIERE(NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE),
@@ -63,7 +65,7 @@ public class GradientOptimizer implements Optimizer {
         bayesNet.cascadeObservations();
 
         return GradientOptimizer.builder()
-            .probabilisticWithGradientGraph(new KeanuProbabilisticWithGradientGraph(bayesNet))
+            .bayesianNetwork(bayesNet)
             .build();
     }
 
@@ -91,27 +93,22 @@ public class GradientOptimizer implements Optimizer {
         return of(vertexFromNetwork.getConnectedGraph());
     }
 
-    @Getter
     private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
 
     /**
      * maxEvaluations the maximum number of objective function evaluations before throwing an exception
      * indicating convergence failure.
      */
-    @Builder.Default
-    private int maxEvaluations = Integer.MAX_VALUE;
+    private int maxEvaluations;
 
-    @Builder.Default
-    private double relativeThreshold = 1e-8;
+    private double relativeThreshold;
 
-    @Builder.Default
-    private double absoluteThreshold = 1e-8;
+    private double absoluteThreshold;
 
     /**
      * Specifies what formula to use to update the Beta parameter of the Nonlinear conjugate gradient method optimizer.
      */
-    @Builder.Default
-    private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
+    private UpdateFormula updateFormula;
 
     private final List<BiConsumer<double[], double[]>> onGradientCalculations = new ArrayList<>();
     private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
@@ -241,4 +238,62 @@ public class GradientOptimizer implements Optimizer {
         }
     }
 
+    public static class GradientOptimizerBuilder {
+
+        private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+        private int maxEvaluations= Integer.MAX_VALUE;
+        private double relativeThreshold= 1e-8;
+        private double absoluteThreshold= 1e-8;
+        private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;;
+
+        GradientOptimizerBuilder() {
+        }
+
+        public GradientOptimizerBuilder bayesianNetwork(BayesianNetwork bayesianNetwork) {
+            return bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork));
+        }
+
+        public GradientOptimizerBuilder bayesianNetwork(Collection<? extends Vertex> vertices) {
+            return bayesianNetwork(new BayesianNetwork(vertices));
+        }
+
+        public GradientOptimizerBuilder bayesianNetwork(ProbabilisticWithGradientGraph probabilisticWithGradientGraph) {
+            this.probabilisticWithGradientGraph = probabilisticWithGradientGraph;
+            return this;
+        }
+
+        public GradientOptimizerBuilder maxEvaluations(int maxEvaluations) {
+            this.maxEvaluations = maxEvaluations;
+            return this;
+        }
+
+        public GradientOptimizerBuilder relativeThreshold(double relativeThreshold) {
+            this.relativeThreshold = relativeThreshold;
+            return this;
+        }
+
+        public GradientOptimizerBuilder absoluteThreshold(double absoluteThreshold) {
+            this.absoluteThreshold = absoluteThreshold;
+            return this;
+        }
+
+        public GradientOptimizerBuilder updateFormula(UpdateFormula updateFormula) {
+            this.updateFormula = updateFormula;
+            return this;
+        }
+
+        public GradientOptimizer build() {
+            return new GradientOptimizer(
+                probabilisticWithGradientGraph,
+                maxEvaluations,
+                relativeThreshold,
+                absoluteThreshold,
+                updateFormula
+            );
+        }
+
+        public String toString() {
+            return "GradientOptimizer.GradientOptimizerBuilder(probabilisticWithGradientGraph=" + this.probabilisticWithGradientGraph + ", maxEvaluations=" + this.maxEvaluations + ", relativeThreshold=" + this.relativeThreshold + ", absoluteThreshold=" + this.absoluteThreshold + ", updateFormula=" + this.updateFormula + ")";
+        }
+    }
 }

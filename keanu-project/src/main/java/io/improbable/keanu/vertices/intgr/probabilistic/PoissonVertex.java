@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
@@ -37,7 +37,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
      */
     public PoissonVertex(long[] shape, DoubleVertex mu) {
         super(shape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, mu.getShape());
 
         this.mu = mu;
         setParents(mu);

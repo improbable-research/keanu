@@ -26,4 +26,4 @@ class CoalMining():
         return m
 
     def training_data(self):
-        return self._data.values
+        return self._data.values[:, 0]

@@ -1,9 +1,7 @@
 package io.improbable.keanu.backend.keanu;
 
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
 
-import java.util.Set;
 
 public class KeanuGraphConverter {
 

@@ -93,7 +93,7 @@ public class KeanuRandom {
     public double nextDoubleNonZero() {
         double randomValue;
 
-        while ((randomValue = nextDouble()) == 0.0);
+        while ((randomValue = nextDouble()) == 0.0) ;
 
         return randomValue;
     }

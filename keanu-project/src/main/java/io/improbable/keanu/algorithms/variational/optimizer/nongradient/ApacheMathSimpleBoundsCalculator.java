@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -50,7 +49,7 @@ class ApacheMathSimpleBoundsCalculator {
                 validateBoundsForVariable(variable, variableShape);
                 addBoundsForVariable(variable, variableShape, minBounds, maxBounds);
             } else {
-                int length = Ints.checkedCast(TensorShape.getLength(variableShape));
+                int length = TensorShape.getLengthAsInt(variableShape);
                 int startIndex = minBounds.size();
                 for (int i = 0; i < length; i++) {
                     minBounds.add(startPoint[i + startIndex] - boundsRange);
