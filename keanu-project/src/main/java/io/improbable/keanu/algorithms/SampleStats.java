@@ -23,20 +23,24 @@ public class SampleStats {
         double[] demean = Arrays.stream(samples).map(x -> x - mean).toArray();
         int n = demean.length;
 
-        // Zero padding needed to stop mxing of convolution results
+        // Zero padding needed to stop mixing of convolution results
         // See last paragraph of https://dsp.stackexchange.com/a/745
         int fftSize = nextPowerOfTwo(2 * n + 1);
         double[] demeanPaddedWithZeros = Arrays.copyOf(demean, fftSize);
 
-        FastFourierTransformer ffTransformer = new FastFourierTransformer(DftNormalization.STANDARD);
-        Complex fftData[] = ffTransformer.transform(demeanPaddedWithZeros, TransformType.FORWARD);
-        Complex fftMultipliedWithConj[] = multiplyWithConjugate(fftData);
-        Complex ifft[] = ffTransformer.transform(fftMultipliedWithConj, TransformType.INVERSE);
-        Complex truncated[] = Arrays.copyOf(ifft, n);
-        double realResult[] = getRealParts(truncated);
+        Complex ifft[] = fftCrossCorrelationWitSelf(demeanPaddedWithZeros);
+        double realResult[] = getRealPartsTruncated(ifft, n);
 
         realResult = Arrays.stream(realResult).map(x -> x/n).toArray();
         return realResult;
+    }
+
+    private static Complex[] fftCrossCorrelationWitSelf(double[] values) {
+        FastFourierTransformer ffTransformer = new FastFourierTransformer(DftNormalization.STANDARD);
+        Complex fftData[] = ffTransformer.transform(values, TransformType.FORWARD);
+        Complex fftMultipliedWithConj[] = multiplyWithConjugateInPlace(fftData);
+        Complex ifft[] = ffTransformer.transform(fftMultipliedWithConj, TransformType.INVERSE);
+        return  ifft;
     }
 
 
@@ -54,19 +58,18 @@ public class SampleStats {
 
     }
 
-    private static double[] getRealParts(Complex[] complexNumbers) {
-        double[] reals = new double[complexNumbers.length];
-        for (int i = 0; i < complexNumbers.length; i++) {
+    private static double[] getRealPartsTruncated(Complex[] complexNumbers, int newLength) {
+        double[] reals = new double[newLength];
+        for (int i = 0; i < newLength; i++) {
             reals[i] = complexNumbers[i].getReal();
         }
         return reals;
     }
 
-    private static Complex[] multiplyWithConjugate(Complex[] complexNumbers) {
-        Complex[] result = new Complex[complexNumbers.length];
+    private static Complex[] multiplyWithConjugateInPlace(Complex[] complexNumbers) {
         for (int i = 0; i < complexNumbers.length; i++) {
-            result[i] = complexNumbers[i].multiply(complexNumbers[i].conjugate());
+            complexNumbers[i] = complexNumbers[i].multiply(complexNumbers[i].conjugate());
         }
-        return result;
+        return complexNumbers;
     }
 }
