@@ -19,7 +19,7 @@ public class VertexId implements Comparable<VertexId> {
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
     private static final int TOP_LEVEL_ARRAY_SIZE = 1;
 
-    long[] idValues = new long[TOP_LEVEL_ARRAY_SIZE];
+    private long[] idValues = new long[TOP_LEVEL_ARRAY_SIZE];
 
     public VertexId() {
         idValues[0] = ID_GENERATOR.getAndIncrement();

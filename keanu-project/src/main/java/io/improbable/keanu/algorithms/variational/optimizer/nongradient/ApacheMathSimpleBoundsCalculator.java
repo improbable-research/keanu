@@ -28,12 +28,12 @@ class ApacheMathSimpleBoundsCalculator {
     SimpleBounds getBounds(List<? extends Vertex> latentVertices, double[] startPoint) {
 
         List<String> latentVertexNames = latentVertices.stream()
-            .map(Vertex::getUniqueStringReference)
+            .map(KeanuProbabilisticGraph::getUniqueStringReference)
             .collect(toList());
 
         Map<String, long[]> latentVertexShapes = latentVertices.stream()
             .collect(toMap(
-                Vertex::getUniqueStringReference,
+                KeanuProbabilisticGraph::getUniqueStringReference,
                 Vertex::getShape
             ));
 

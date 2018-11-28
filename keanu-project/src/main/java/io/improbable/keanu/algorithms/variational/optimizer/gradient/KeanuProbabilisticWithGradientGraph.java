@@ -26,7 +26,7 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
         this.idToLabelLookup = continuousLatentVertices.stream()
             .collect(toMap(
                 Vertex::getId,
-                Vertex::getUniqueStringReference
+                KeanuProbabilisticGraph::getUniqueStringReference
                 )
             );
 

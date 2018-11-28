@@ -7,6 +7,8 @@ import lombok.Value;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.algorithms.variational.optimizer.nongradient.KeanuProbabilisticGraph.getUniqueStringReference;
+
 public class OptimizerBounds {
 
     @Value
@@ -53,35 +55,35 @@ public class OptimizerBounds {
     }
 
     public OptimizerBounds addBound(Vertex<?> variable, DoubleTensor min, DoubleTensor max) {
-        addBound(variable.getUniqueStringReference(), min, max);
+        addBound(getUniqueStringReference(variable), min, max);
         return this;
     }
 
     public OptimizerBounds addBound(Vertex<?> variable, double min, DoubleTensor max) {
-        addBound(variable.getUniqueStringReference(), DoubleTensor.scalar(min), max);
+        addBound(getUniqueStringReference(variable), DoubleTensor.scalar(min), max);
         return this;
     }
 
     public OptimizerBounds addBound(Vertex<?> variable, DoubleTensor min, double max) {
-        addBound(variable.getUniqueStringReference(), min, DoubleTensor.scalar(max));
+        addBound(getUniqueStringReference(variable), min, DoubleTensor.scalar(max));
         return this;
     }
 
     public OptimizerBounds addBound(Vertex<?> variable, double min, double max) {
-        addBound(variable.getUniqueStringReference(), DoubleTensor.scalar(min), DoubleTensor.scalar(max));
+        addBound(getUniqueStringReference(variable), DoubleTensor.scalar(min), DoubleTensor.scalar(max));
         return this;
     }
 
     public boolean hasBound(Vertex<?> variable) {
-        return hasBound(variable.getUniqueStringReference());
+        return hasBound(getUniqueStringReference(variable));
     }
 
     public DoubleTensor getLower(Vertex<?> variable) {
-        return getLower(variable.getUniqueStringReference());
+        return getLower(getUniqueStringReference(variable));
     }
 
     public DoubleTensor getUpper(Vertex<?> variable) {
-        return getUpper(variable.getUniqueStringReference());
+        return getUpper(getUniqueStringReference(variable));
     }
 
 }

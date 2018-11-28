@@ -9,8 +9,10 @@ import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
@@ -31,7 +33,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
 
         this.vertexLookup = bayesianNetwork.getLatentVertices().stream()
-            .collect(toMap(Vertex::getUniqueStringReference, v -> v));
+            .collect(toMap(KeanuProbabilisticGraph::getUniqueStringReference, v -> v));
 
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
@@ -54,7 +56,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     public List<String> getLatentVariables() {
         return ImmutableList.copyOf(
             this.latentVertices.stream()
-                .map(Vertex::getUniqueStringReference)
+                .map(KeanuProbabilisticGraph::getUniqueStringReference)
                 .collect(Collectors.toList())
         );
     }
@@ -63,7 +65,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     public Map<String, ?> getLatentVariablesValues() {
         return latentVertices.stream()
             .collect(toMap(
-                Vertex::getUniqueStringReference,
+                KeanuProbabilisticGraph::getUniqueStringReference,
                 Vertex::getValue)
             );
     }
@@ -93,6 +95,21 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
         }
 
         VertexValuePropagation.cascadeUpdate(updatedVertices);
+    }
+
+    /**
+     * @param vertex to get unique string for
+     * @return A string that is unique to this vertex within any graph that this
+     * vertex is a member of.
+     */
+    public static String getUniqueStringReference(Vertex vertex) {
+        if (vertex.getLabel() != null) {
+            return vertex.getLabel().toString();
+        } else {
+            return Arrays.stream(vertex.getId().getValue()).boxed()
+                .map(Objects::toString)
+                .collect(Collectors.joining("_"));
+        }
     }
 
 }
