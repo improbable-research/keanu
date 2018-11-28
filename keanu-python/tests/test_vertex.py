@@ -88,12 +88,6 @@ def test_cannot_pass_generic_to_vertex(jvm_view: JVMView) -> None:
     assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(GenericExampleClass)
 
 
-def test_you_can_set_and_get_a_value(jvm_view: JVMView) -> None:
-    gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
-    gaussian.set_value(4.)
-    assert gaussian.get_value() == 4.
-
-
 def test_you_can_cascade_a_value(jvm_view: JVMView) -> None:
     gaussian1 = Vertex(jvm_view.GaussianVertex, 0., 1.)
     gaussian2 = Vertex(jvm_view.GaussianVertex, 0., 1.)
