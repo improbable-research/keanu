@@ -11,11 +11,11 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.model.LambdaModelV
 
 class LambdaModel(Vertex):
 
-    def __init__(self, inputs, executor, update_value=None):
+    def __init__(self, inputs, executor, update_values=None):
         self.vertices_wrapped = inputs
         vertex_map = LambdaModel.__to_java_map(inputs)
         self.executor = executor
-        self.update_value = update_value or (lambda: self.vertices_wrapped)
+        self.update_values = update_values or (lambda: self.vertices_wrapped)
 
         vertex = context.jvm_view().LambdaModelVertex(vertex_map, Consumer(self.__execute),
                                                       Supplier(lambda: self.__update_value()))
@@ -27,7 +27,7 @@ class LambdaModel(Vertex):
         LambdaModel.__unwrap(self.vertices_wrapped, vertices_unwrapped)
 
     def __update_value(self):
-        values = self.update_value()
+        values = self.update_values()
         return LambdaModel.__to_java_map(values)
 
     @staticmethod
