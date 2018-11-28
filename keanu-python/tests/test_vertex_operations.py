@@ -176,7 +176,8 @@ def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
     (Const(np.array([3., 2.])),                 5.       , np.array([[15], [10]])),
 ])
 # yapf: enable
-def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
+                               expected_result: numpy_types) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs * rhs
     assert isinstance(result, Vertex)
     assert (result.get_value() == expected_result).all()

@@ -24,7 +24,8 @@ def test_construct_bayes_net() -> None:
                           ("get_observed_vertices", False, True, True, True),
                           ("get_continuous_latent_vertices", True, False, True, False),
                           ("get_discrete_latent_vertices", True, False, False, True)])
-def test_can_get_vertices_from_bayes_net(get_method: str, latent: bool, observed: bool, continuous: bool, discrete: bool) -> None:
+def test_can_get_vertices_from_bayes_net(get_method: str, latent: bool, observed: bool, continuous: bool,
+                                         discrete: bool) -> None:
     gamma = Gamma(1., 1.)
     gamma.observe(0.5)
 

@@ -30,8 +30,7 @@ def test_num_passed_to_Tensor_creates_scalar_tensor(num: Union[primitive_types, 
 @pytest.mark.parametrize("data, expected_java_class", [([[1, 2], [3, 4]], "Nd4jIntegerTensor"),
                                                        ([[1., 2.], [3., 4.]], "Nd4jDoubleTensor"),
                                                        ([[True, False], [True, False]], "SimpleBooleanTensor")])
-def test_dataframe_passed_to_Tensor_creates_tensor(data: List[List[primitive_types]],
-                                                   expected_java_class: str) -> None:
+def test_dataframe_passed_to_Tensor_creates_tensor(data: List[List[primitive_types]], expected_java_class: str) -> None:
     dataframe = pd.DataFrame(columns=['A', 'B'], data=data)
     t = Tensor(dataframe)
 
@@ -72,8 +71,7 @@ def test_cannot_pass_generic_to_Tensor(generic) -> None:
 
 @pytest.mark.parametrize("arr, expected_java_class", [([1, 2], "Nd4jIntegerTensor"), ([3.4, 2.], "Nd4jDoubleTensor"),
                                                       ([True, False], "SimpleBooleanTensor")])
-def test_ndarray_passed_to_Tensor_creates_nonscalar_tensor(arr: primitive_types,
-                                                           expected_java_class: str) -> None:
+def test_ndarray_passed_to_Tensor_creates_nonscalar_tensor(arr: primitive_types, expected_java_class: str) -> None:
     ndarray = np.array(arr)
     t = Tensor(ndarray)
     assert_java_class(t, expected_java_class)
