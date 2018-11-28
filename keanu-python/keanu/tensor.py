@@ -38,14 +38,11 @@ class Tensor(JavaObjectWrapper):
 
     @staticmethod
     def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> Any:
-        if len(ndarray) == 0:
-            raise ValueError("Cannot infer type because the ndarray is empty")
-
-        if isinstance(ndarray.item(0), runtime_bool_types):
+        if ndarray.dtype in runtime_bool_types:
             return k.jvm_view().BooleanTensor.create
-        elif isinstance(ndarray.item(0), runtime_int_types):
+        elif ndarray.dtype in runtime_int_types:
             return k.jvm_view().IntegerTensor.create
-        elif isinstance(ndarray.item(0), runtime_float_types):
+        elif ndarray.dtype in runtime_float_types:
             return k.jvm_view().DoubleTensor.create
         else:
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(
@@ -65,6 +62,6 @@ class Tensor(JavaObjectWrapper):
     @staticmethod
     def _to_ndarray(java_tensor: Any) -> numpy_types:
         if java_tensor.getRank() == 0:
-            return java_tensor.scalar()
+            return np.array(java_tensor.scalar())
         else:
             return np.array(list(java_tensor.asFlatArray())).reshape(java_tensor.getShape())
