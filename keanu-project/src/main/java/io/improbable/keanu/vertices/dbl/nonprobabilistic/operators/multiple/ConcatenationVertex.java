@@ -50,13 +50,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     private static DoubleVertex[] convertFromVertexToDoubleVertex(Vertex[] operands) {
-        DoubleVertex[] newArray = new DoubleVertex[operands.length];
-
-        for (int i = 0; i < operands.length; i++) {
-            newArray[i] = (DoubleVertex)operands[i];
-        }
-
-        return newArray;
+        return Arrays.stream(operands).toArray(DoubleVertex[]::new);
     }
 
     @Override

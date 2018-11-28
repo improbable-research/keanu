@@ -104,17 +104,17 @@ public class ProtobufSaver implements NetworkSaver {
             return getParam(paramName, (BooleanTensor) param);
         } else if (double.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (double) param);
-        } else if (int.class.isAssignableFrom(param.getClass())) {
+        } else if (Integer.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (int) param);
-        } else if (long.class.isAssignableFrom(param.getClass())) {
+        } else if (Long.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (long) param);
         } else if (String.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (String) param);
-        } else if (long[].class.isAssignableFrom(param.getClass())) {
+        } else if (Long[].class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (long[]) param);
         } else if (Vertex[].class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (Vertex[]) param);
-        } else if (int[].class.isAssignableFrom(param.getClass())) {
+        } else if (Integer[].class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (int[]) param);
         } else {
             throw new IllegalArgumentException("Unknown Parameter Type to Save: " + param.getClass().toString());

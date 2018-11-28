@@ -4,6 +4,7 @@ import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.gson.internal.Primitives;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -197,11 +198,11 @@ public class ProtobufLoader implements NetworkLoader {
             }
 
             Class argumentClass = arguments[i].getClass();
-            Class parameterClass = constructorParameters[i].getType();
+            Class parameterClass = Primitives.wrap(constructorParameters[i].getType());
 
             if (!parameterClass.isAssignableFrom(argumentClass)) {
                 throw new IllegalArgumentException("Incorrect Parameter Type specified.  Got: "
-                    + arguments[i].getClass() + ", Expected: " + constructorParameters[i].getType());
+                    + argumentClass + ", Expected: " + parameterClass);
             }
         }
 
@@ -256,10 +257,10 @@ public class ProtobufLoader implements NetworkLoader {
                 return parameter.getDoubleParam();
 
             case INTPARAM:
-                return parameter.getIntParam();
+                return (int)parameter.getIntParam();
 
             case LONGPARAM:
-                return parameter.getLongParam();
+                return (long)parameter.getLongParam();
 
             case STRINGPARAM:
                 return parameter.getStringParam();

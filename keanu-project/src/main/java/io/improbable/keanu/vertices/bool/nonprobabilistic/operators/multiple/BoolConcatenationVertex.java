@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
@@ -35,17 +36,11 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
 
     public BoolConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
                                    @LoadVertexParam(INPUT_NAME) Vertex[] input) {
-        this(dimension, convertVertexArraytoBoolVertex(input));
+        this(dimension, convertVertexArrayToBoolVertex(input));
     }
 
-    private static BoolVertex[] convertVertexArraytoBoolVertex(Vertex[] input) {
-        BoolVertex[] newArray = new BoolVertex[input.length];
-
-        for (int i = 0; i < input.length; i++) {
-            newArray[i] = (BoolVertex)input[i];
-        }
-
-        return newArray;
+    private static BoolVertex[] convertVertexArrayToBoolVertex(Vertex[] input) {
+        return Arrays.stream(input).toArray(BoolVertex[]::new);
     }
 
     @Override

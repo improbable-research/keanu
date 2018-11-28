@@ -4,6 +4,7 @@ import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonSaveableVertex;
@@ -16,10 +17,12 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.reflections.Reflections;
 
@@ -64,7 +67,10 @@ public class ProtobufTest {
     @Test
     public void youCanSaveAndLoadANetworkWithValues() throws IOException {
         final String gaussianLabel = "Gaussian";
-        DoubleVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
+        DoubleVertex mu1 = new ConstantDoubleVertex(new double[]{3.0, 1.0});
+        DoubleVertex mu2 = new ConstantDoubleVertex(new double[]{5.0, 6.0});
+        DoubleVertex finalMu = new ConcatenationVertex(0, mu1, mu2);
+        DoubleVertex gaussianVertex = new GaussianVertex(finalMu, 1.0);
         gaussianVertex.setLabel(gaussianLabel);
         BayesianNetwork net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -82,7 +88,8 @@ public class ProtobufTest {
         GaussianVertex latentGaussianVertex = (GaussianVertex)readNet.getLatentVertices().get(0);
         GaussianVertex labelGaussianVerted = (GaussianVertex)readNet.getVertexByLabel(new VertexLabel(gaussianLabel));
         assertThat(latentGaussianVertex, equalTo(labelGaussianVerted));
-        assertThat(latentGaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
+        assertThat(latentGaussianVertex.getMu().getValue(0), closeTo(3.0, 1e-10));
+        assertThat(labelGaussianVerted.getMu().getValue(2), closeTo(5.0, 1e-10));
         assertThat(latentGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         latentGaussianVertex.sample();
     }
@@ -382,6 +389,7 @@ public class ProtobufTest {
         testVertex.save(protobufSaver);
     }
 
+    @Category(Slow.class)
     @Test
     public void allSaveableVerticesHaveCorrectAnnotations() {
         Reflections reflections = new Reflections("io.improbable.keanu.vertices");

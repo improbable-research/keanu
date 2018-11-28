@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
@@ -40,13 +41,7 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
     }
 
     private static IntegerVertex[] convertVertexArrayToIntegerVertex(Vertex[] input) {
-        IntegerVertex[] newArray = new IntegerVertex[input.length];
-
-        for (int i = 0; i < input.length; i++) {
-            newArray[i] = (IntegerVertex)input[i];
-        }
-
-        return newArray;
+        return Arrays.stream(input).toArray(IntegerVertex[]::new);
     }
 
     @Override
