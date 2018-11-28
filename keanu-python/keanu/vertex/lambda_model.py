@@ -24,7 +24,7 @@ class LambdaModel(Vertex):
     def __execute(self, vertices_unwrapped):
         self.vertices_wrapped = LambdaModel.__wrap(vertices_unwrapped)
         self.executor(self.vertices_wrapped)
-        LambdaModel.__unwrap(self.vertices_wrapped, vertices_unwrapped)
+        LambdaModel.__update_unwrapped_vertices(self.vertices_wrapped, vertices_unwrapped)
 
     def __update_value(self):
         values = self.update_values()
@@ -40,7 +40,7 @@ class LambdaModel(Vertex):
         return {k.getUnqualifiedName(): Vertex(v) for k, v in vertices.items()}
 
     @staticmethod
-    def __unwrap(vertices_wrapped, vertices_unwrapped):
+    def __update_unwrapped_vertices(vertices_wrapped, vertices_unwrapped):
         for k, v in vertices_wrapped.items():
             vertices_unwrapped[VertexLabel(k).unwrap()] = v.unwrap()
 
