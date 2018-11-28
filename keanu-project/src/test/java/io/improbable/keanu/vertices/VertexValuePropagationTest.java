@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -12,6 +12,7 @@ import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
 import static io.improbable.keanu.vertices.TestGraphGenerator.passThroughVertex;
 import static io.improbable.keanu.vertices.TestGraphGenerator.sumVertex;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @Slf4j
 public class VertexValuePropagationTest {
@@ -80,6 +81,22 @@ public class VertexValuePropagationTest {
 
         //Does the right amount of work
         assertEquals(6, n.get());
+    }
+
+    @Test
+    public void canInvalidateDownstreamVertices() {
+        GaussianVertex A = new GaussianVertex(0, 1);
+        AbsVertex absA = A.abs();
+
+        A.setValue(2.0);
+
+        assertEquals(2.0, absA.getValue().scalar(), 1e-5);
+
+        A.setValue(-3.0);
+
+        assertFalse(absA.hasValue());
+
+        assertEquals(3.0, absA.getValue().scalar(), 1e-5);
     }
 
 }

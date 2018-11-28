@@ -1,7 +1,4 @@
-package io.improbable.keanu.algorithms.graphtraversal;
-
-import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.Vertex;
+package io.improbable.keanu.vertices;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -10,8 +7,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * This class enables efficient propagation of vertex updates.
@@ -35,25 +35,57 @@ public class VertexValuePropagation {
      * @param cascadeFrom A collection that contains the vertices that have been updated.
      */
     public static void cascadeUpdate(Collection<? extends Vertex> cascadeFrom) {
+        visitDownStream(cascadeFrom, VertexValuePropagation::updateVertexValue);
+    }
+
+    /**
+     * @param from uninitialize all non-probabilistic vertices down stream of these. The uninitialized
+     *             vertices will need to be either be calculated by a set and cascade OR by lazy eval.
+     */
+    public static void uninitializeDownStream(Vertex from) {
+        uninitializeDownStream(Arrays.asList(from));
+    }
+
+    public static void uninitializeDownStream(Collection<? extends Vertex> from) {
+        visitDownStream(from, Vertex::uninitializeValue);
+    }
+
+    private static void visitDownStream(Collection<? extends Vertex> roots, Consumer<Vertex> visitor) {
 
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
-        priorityQueue.addAll(cascadeFrom);
+        priorityQueue.addAll(getChildren(roots));
 
-        HashSet<Vertex> alreadyQueued = new HashSet<>(cascadeFrom);
+        HashSet<Vertex> alreadyQueued = new HashSet<>(priorityQueue);
 
         while (!priorityQueue.isEmpty()) {
             Vertex<?> visiting = priorityQueue.poll();
 
-            updateVertexValue(visiting);
+            visitor.accept(visiting);
 
             for (Vertex<?> child : visiting.getChildren()) {
 
-                if (!child.isProbabilistic() && !alreadyQueued.contains(child)) {
+                if (isDeterministic(child) && !alreadyQueued.contains(child)) {
                     priorityQueue.offer(child);
                     alreadyQueued.add(child);
                 }
             }
         }
+    }
+
+    private static Set<Vertex> getChildren(Collection<? extends Vertex> roots) {
+        Set<Vertex> children = new HashSet<>();
+        for (Vertex vertex : roots) {
+            List<Vertex<?>> vChildren = ((Set<Vertex<?>>) (vertex.getChildren())).stream()
+                .filter(VertexValuePropagation::isDeterministic)
+                .collect(Collectors.toList());
+
+            children.addAll(vChildren);
+        }
+        return children;
+    }
+
+    private static boolean isDeterministic(Vertex v){
+        return !v.isProbabilistic() && !v.isObserved();
     }
 
     public static void eval(Vertex... vertices) {
@@ -146,11 +178,11 @@ public class VertexValuePropagation {
     private static <T> void updateVertexValue(Vertex<T> vertex) {
         if (vertex.isProbabilistic()) {
             if (!vertex.hasValue()) {
-                vertex.setValue(vertex.sample());
+                vertex.setValue(vertex.sample(), false);
             }
         } else {
             if (!vertex.isObserved()) {
-                vertex.setValue(((NonProbabilistic<T>) vertex).calculate());
+                vertex.setValue(((NonProbabilistic<T>) vertex).calculate(), false);
             }
         }
     }

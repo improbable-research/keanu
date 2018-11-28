@@ -91,6 +91,11 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     }
 
     @Override
+    public void uninitializeValue(){
+        this.hasValue = false;
+    }
+
+    @Override
     public DoubleTensor sample(KeanuRandom random) {
         for (Vertex<? extends Tensor> input : inputs.values()) {
             input.sample();

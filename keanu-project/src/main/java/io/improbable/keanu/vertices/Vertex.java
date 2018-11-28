@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices;
 
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
@@ -100,8 +99,17 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
      * @param value the observed value
      */
     public void setValue(T value) {
+        setValue(value, true);
+    }
+
+    void setValue(T value, boolean uninitializeDownStream) {
         if (!observation.isObserved()) {
+            if (uninitializeDownStream) {
+                VertexValuePropagation.uninitializeDownStream(this);
+            }
             this.value = value;
+        } else {
+            throw new IllegalStateException("Cannot set value of observed vertex");
         }
     }
 
@@ -118,6 +126,14 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
             return !((Tensor) value).isShapePlaceholder();
         } else {
             return value != null;
+        }
+    }
+
+    public void uninitializeValue() {
+        if (!isObserved()) {
+            this.value = null;
+        } else {
+            throw new IllegalStateException("Observed values cannot be uninitialized");
         }
     }
 
@@ -138,7 +154,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
      * @param value The new value at this vertex
      */
     public void setAndCascade(T value) {
-        setValue(value);
+        setValue(value, false);
         VertexValuePropagation.cascadeUpdate(this);
     }
 
@@ -153,6 +169,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
      */
     @Override
     public void observe(T value) {
+        VertexValuePropagation.uninitializeDownStream(this);
         this.value = value;
         observation.observe(value);
     }
@@ -260,6 +277,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     }
 
     public void loadValue(NetworkLoader loader) {
-       loader.loadValue(this);
+        loader.loadValue(this);
     }
 }
