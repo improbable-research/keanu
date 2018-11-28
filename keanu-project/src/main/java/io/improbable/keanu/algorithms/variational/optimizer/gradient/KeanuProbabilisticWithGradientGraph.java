@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.KeanuProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
