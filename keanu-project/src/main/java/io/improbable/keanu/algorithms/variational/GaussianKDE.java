@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.variational;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.VertexSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;

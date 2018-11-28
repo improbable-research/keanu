@@ -8,6 +8,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -24,9 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class GradientOptimizer implements Optimizer {
 
     private static final double FLAT_GRADIENT = 1e-16;
@@ -54,16 +56,6 @@ public class GradientOptimizer implements Optimizer {
      * @return a {@link GradientOptimizer}
      */
     public static GradientOptimizer of(BayesianNetwork bayesNet) {
-        List<Vertex> discreteLatentVertices = bayesNet.getDiscreteLatentVertices();
-        boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
-
-        if (containsDiscreteLatents) {
-            throw new UnsupportedOperationException("Gradient Optimization unsupported on Networks containing " +
-                "Discrete Latents (" + discreteLatentVertices.size() + " found)");
-        }
-
-        bayesNet.cascadeObservations();
-
         return GradientOptimizer.builder()
             .bayesianNetwork(bayesNet)
             .build();
@@ -199,7 +191,7 @@ public class GradientOptimizer implements Optimizer {
 
         double[] startingPoint = Optimizer.convertToPoint(
             probabilisticWithGradientGraph.getLatentVariables(),
-            (Map<String, ? extends NumberTensor>) probabilisticWithGradientGraph.getLatentVariablesValues(),
+            getLatentsAsNumberTensors(),
             probabilisticWithGradientGraph.getLatentVariablesShapes()
         );
 
@@ -231,6 +223,23 @@ public class GradientOptimizer implements Optimizer {
         return pointValuePair.getValue();
     }
 
+    private Map<String, ? extends NumberTensor> getLatentsAsNumberTensors() {
+        return probabilisticWithGradientGraph.getLatentVariablesValues().entrySet().stream()
+            .collect(toMap(
+                e -> e.getKey(),
+                e -> {
+                    Object value = e.getValue();
+                    if (value instanceof NumberTensor) {
+                        return (NumberTensor) e.getValue();
+                    } else {
+                        throw new UnsupportedOperationException(
+                            "Gradient optimization unsupported on networks containing discrete latents. " +
+                                "Discrete latent : " + e.getKey() + " found.");
+                    }
+                }
+            ));
+    }
+
     private static void warnIfGradientIsFlat(double[] gradient) {
         double maxGradient = Arrays.stream(gradient).max().orElseThrow(IllegalArgumentException::new);
         if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
@@ -241,16 +250,17 @@ public class GradientOptimizer implements Optimizer {
     public static class GradientOptimizerBuilder {
 
         private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
-        private int maxEvaluations= Integer.MAX_VALUE;
-        private double relativeThreshold= 1e-8;
-        private double absoluteThreshold= 1e-8;
-        private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;;
+        private int maxEvaluations = Integer.MAX_VALUE;
+        private double relativeThreshold = 1e-8;
+        private double absoluteThreshold = 1e-8;
+        private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
 
         GradientOptimizerBuilder() {
         }
 
-        public GradientOptimizerBuilder bayesianNetwork(BayesianNetwork bayesianNetwork) {
-            return bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork));
+        public GradientOptimizerBuilder bayesianNetwork(BayesianNetwork network) {
+            Optimizer.initializeNetworkForOptimization(network);
+            return bayesianNetwork(new KeanuProbabilisticWithGradientGraph(network));
         }
 
         public GradientOptimizerBuilder bayesianNetwork(Collection<? extends Vertex> vertices) {
@@ -283,6 +293,9 @@ public class GradientOptimizer implements Optimizer {
         }
 
         public GradientOptimizer build() {
+            if (probabilisticWithGradientGraph == null) {
+                throw new IllegalStateException("Cannot build optimizer without specifying network to optimize.");
+            }
             return new GradientOptimizer(
                 probabilisticWithGradientGraph,
                 maxEvaluations,

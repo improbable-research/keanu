@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class GradientOptimizerTest {
@@ -31,5 +32,26 @@ public class GradientOptimizerTest {
         PoissonVertex v2 = new PoissonVertex(v1);
 
         GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(v1);
+    }
+
+    @Test
+    public void shouldAllowObservationChange() {
+
+        GaussianVertex A = new GaussianVertex(0, 1);
+        GaussianVertex B = new GaussianVertex(A.abs(), 1);
+        A.observe(2.0);
+
+        GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(B);
+        optimizer.maxAPosteriori();
+
+        assertEquals(2.0, B.getValue().scalar(), 1e-5);
+
+        A.observe(3.0);
+
+        GradientOptimizer optimizerAfterObserve = GradientOptimizer.ofConnectedGraph(B);
+        optimizerAfterObserve.maxAPosteriori();
+
+        assertEquals(3.0, B.getValue().scalar(), 1e-5);
+
     }
 }

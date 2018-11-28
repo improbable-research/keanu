@@ -146,6 +146,19 @@ public interface Optimizer {
         return TensorShape.getLength(shape);
     }
 
+    static void initializeNetworkForOptimization(BayesianNetwork bayesianNetwork){
+        List<Vertex> discreteLatentVertices = bayesianNetwork.getDiscreteLatentVertices();
+        boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
+
+        if (containsDiscreteLatents) {
+            throw new UnsupportedOperationException(
+                "Gradient optimization unsupported on networks containing discrete latents. " +
+                    "Found " + discreteLatentVertices.size() + " discrete latents.");
+        }
+
+        bayesianNetwork.cascadeObservations();
+    }
+
     static ProgressBar createFitnessProgressBar(final Optimizer optimizerThatNeedsProgressBar) {
         AtomicInteger evalCount = new AtomicInteger(0);
         ProgressBar progressBar = new ProgressBar();

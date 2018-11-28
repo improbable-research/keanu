@@ -7,6 +7,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -29,7 +30,7 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
  *
  * @see <a href="http://www.damtp.cam.ac.uk/user/na/NA_papers/NA2009_06.pdf">BOBYQA Optimizer</a>
  */
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class NonGradientOptimizer implements Optimizer {
 
     /**
@@ -204,8 +205,9 @@ public class NonGradientOptimizer implements Optimizer {
             return bayesianNetwork(new BayesianNetwork(vertices));
         }
 
-        public NonGradientOptimizerBuilder bayesianNetwork(BayesianNetwork bayesianNetwork) {
-            return bayesianNetwork(new KeanuProbabilisticGraph(bayesianNetwork));
+        public NonGradientOptimizerBuilder bayesianNetwork(BayesianNetwork network) {
+            Optimizer.initializeNetworkForOptimization(network);
+            return bayesianNetwork(new KeanuProbabilisticGraph(network));
         }
 
         public NonGradientOptimizerBuilder bayesianNetwork(ProbabilisticGraph probabilisticGraph) {
@@ -239,6 +241,9 @@ public class NonGradientOptimizer implements Optimizer {
         }
 
         public NonGradientOptimizer build() {
+            if (probabilisticGraph == null) {
+                throw new IllegalStateException("Cannot build optimizer without specifying network to optimize.");
+            }
             return new NonGradientOptimizer(
                 probabilisticGraph,
                 maxEvaluations,

@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * This class creates an Apache math commons simple bounds object for a given collection of
@@ -27,10 +29,10 @@ class ApacheMathSimpleBoundsCalculator {
 
         List<String> latentVertexNames = latentVertices.stream()
             .map(Vertex::getUniqueStringReference)
-            .collect(Collectors.toList());
+            .collect(toList());
 
-        Map<String, long[]> latentVertexShapes = latentVertices.stream().collect(Collectors.
-            toMap(
+        Map<String, long[]> latentVertexShapes = latentVertices.stream()
+            .collect(toMap(
                 Vertex::getUniqueStringReference,
                 Vertex::getShape
             ));
