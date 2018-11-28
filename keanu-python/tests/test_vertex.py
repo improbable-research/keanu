@@ -3,9 +3,9 @@ from typing import Type, Callable, Tuple, Union
 import numpy as np
 import pandas as pd
 import pytest
+from py4j.java_gateway import JVMView
 
 from keanu.context import KeanuContext
-from keanu.stubs.py4j.java_gateway import JVMView
 from keanu.vartypes import tensor_arg_types, primitive_types, numpy_types, pandas_types
 from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli
 from keanu.vertex.base import Vertex
