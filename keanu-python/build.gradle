@@ -111,7 +111,6 @@ task populateExclusionPaths {
 }
 
 task formatApply {
-    dependsOn preparePythonEnvironment
     dependsOn populateExclusionPaths
     doLast {
         exec {
@@ -123,7 +122,6 @@ task formatApply {
 
 
 task formatCheck {
-    dependsOn preparePythonEnvironment
     dependsOn populateExclusionPaths
     doLast { 
         exec {
