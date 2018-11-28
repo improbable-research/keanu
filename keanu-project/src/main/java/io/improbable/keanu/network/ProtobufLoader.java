@@ -257,10 +257,10 @@ public class ProtobufLoader implements NetworkLoader {
                 return parameter.getDoubleParam();
 
             case INTPARAM:
-                return (int)parameter.getIntParam();
+                return parameter.getIntParam();
 
             case LONGPARAM:
-                return (long)parameter.getLongParam();
+                return parameter.getLongParam();
 
             case STRINGPARAM:
                 return parameter.getStringParam();
