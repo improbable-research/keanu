@@ -40,7 +40,18 @@ task installDependencies {
         }
     }
 }
+
+task preparePythonEnvironment {
+    dependsOn(installPipenv)
+    dependsOn(pythonVersionInfo)
+    dependsOn(installDependencies)
+    dependsOn(":keanu-project:preparePythonClasspath")
+    dependsOn(":codegen:runCodeGeneration")
+}
+
 task pytest {
+    mustRunAfter preparePythonEnvironment // this is a dependency but only needs to be run once
+
     doLast {
         exec {
             commandLine 'pipenv', 'run', 'mypy', '--ignore-missing-imports', '--disallow-untyped-calls', 'keanu', 'tests', 'examples'
@@ -90,14 +101,6 @@ task generateDocumentation {
     }
 }
 
-task preparePythonEnvironment {
-    dependsOn(installPipenv)
-    dependsOn(pythonVersionInfo)
-    dependsOn(installDependencies)
-    dependsOn(":keanu-project:preparePythonClasspath")
-    dependsOn(":codegen:runCodeGeneration")
-}
-
 def keanuVertexGeneratedPath
 def keanuVertexInitPath
 
@@ -111,8 +114,9 @@ task populateExclusionPaths {
 }
 
 task formatApply {
-    dependsOn installPipenv
+    mustRunAfter preparePythonEnvironment // this is a dependency but only needs to be run once
     dependsOn populateExclusionPaths
+
     doLast {
         exec {
             commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel',
@@ -121,11 +125,11 @@ task formatApply {
     }
 }
 
-
 task formatCheck {
-    dependsOn installPipenv
+    mustRunAfter preparePythonEnvironment // this is a dependency but only needs to be run once
     dependsOn populateExclusionPaths
-    doLast { 
+
+    doLast {
         exec {
             commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel',
             '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
@@ -133,11 +137,10 @@ task formatCheck {
     }
 }
 
-
 pythonVersionInfo.mustRunAfter(installPipenv)
-installDependencies.mustRunAfter(pythonVersionInfo)
+installDependencies.dependsOn(installPipenv)
 generateDocumentation.dependsOn(preparePythonEnvironment)
-pytest.dependsOn(preparePythonEnvironment)
+test.dependsOn(preparePythonEnvironment)
 test.dependsOn(formatCheck)
 test.dependsOn(pytest)
 
