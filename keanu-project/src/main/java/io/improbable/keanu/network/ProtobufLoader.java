@@ -167,7 +167,7 @@ public class ProtobufLoader implements NetworkLoader {
             throw new IllegalArgumentException("Unknown Vertex Type Specified: " + vertex.getVertexType(), e);
         }
 
-        Map<String, Object> parameterMap = getParamMap(vertex, existingVertices);
+        Map<String, Object> parameterMap = getParameterMap(vertex, existingVertices);
         Vertex newVertex = instantiateVertex(vertexClass, parameterMap);
 
         if (!vertex.getLabel().isEmpty()) {
@@ -227,15 +227,15 @@ public class ProtobufLoader implements NetworkLoader {
         throw new IllegalArgumentException("No Annotated Load Constructor for Vertex of type: " + vertexClass);
     }
 
-    private Map<String, Object> getParamMap(KeanuSavedBayesNet.Vertex vertex,
-                                            Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
-        Map<String, Object> parentsMap = new HashMap<>();
+    private Map<String, Object> getParameterMap(KeanuSavedBayesNet.Vertex vertex,
+                                                Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+        Map<String, Object> parameterMap = new HashMap<>();
 
         for (KeanuSavedBayesNet.NamedParam parameter : vertex.getParametersList()) {
-            parentsMap.put(parameter.getName(), getDecodedParam(parameter, existingVertices));
+            parameterMap.put(parameter.getName(), getDecodedParam(parameter, existingVertices));
         }
 
-        return parentsMap;
+        return parameterMap;
     }
 
     private Object getDecodedParam(KeanuSavedBayesNet.NamedParam parameter,
