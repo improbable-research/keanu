@@ -1,4 +1,4 @@
-package io.improbable.keanu.backend.keanu;
+package io.improbable.keanu.algorithms.variational.optimizer;
 
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
 import io.improbable.keanu.network.BayesianNetwork;

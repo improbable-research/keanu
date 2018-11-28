@@ -1,4 +1,4 @@
-package io.improbable.keanu.backend.keanu;
+package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import static junit.framework.TestCase.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ProbabilisticGraphTest {
+public class KeanuProbabilisticGraphTest {
 
     private GaussianVertex A;
     private GaussianVertex B;
@@ -43,7 +43,7 @@ public class ProbabilisticGraphTest {
         });
     }
 
-    public ProbabilisticGraphTest(DoubleTensor initialA, DoubleTensor initialB, DoubleTensor observationD) {
+    public KeanuProbabilisticGraphTest(DoubleTensor initialA, DoubleTensor initialB, DoubleTensor observationD) {
 
         this.initialA = initialA;
         this.initialB = initialB;
