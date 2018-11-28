@@ -23,7 +23,7 @@ def test_to_bayes_net() -> None:
 
 def test_to_bayes_net_excludes_non_vertices() -> None:
     with Model() as m:
-        m.not_a_vertex = 1  # type: ignore # because Model#__set_attr__ expects Vertex
+        m.not_a_vertex = 1
         m.vertex = Gamma(0.5, 0.1)
 
     net = m.to_bayes_net()
