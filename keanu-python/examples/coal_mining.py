@@ -28,4 +28,4 @@ class CoalMining():
         return m
 
     def training_data(self) -> numpy_types:
-        return self._data.values
+        return self._data.values[:, 0]

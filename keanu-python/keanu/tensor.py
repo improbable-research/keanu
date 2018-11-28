@@ -1,12 +1,12 @@
+from typing import Any
+
 import numpy as np
 from py4j.java_gateway import java_import, JavaObject, JavaMember
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
-from typing import Any
 from .vartypes import (numpy_types, tensor_arg_types, primitive_types, runtime_int_types, runtime_float_types,
-                       runtime_bool_types, runtime_primitive_types, runtime_numpy_types, runtime_pandas_types,
-                       runtime_primitive_types)
+                       runtime_bool_types, runtime_numpy_types, runtime_pandas_types, runtime_primitive_types)
 
 k = KeanuContext()
 
@@ -29,20 +29,12 @@ class Tensor(JavaObjectWrapper):
 
     @staticmethod
     def __get_tensor_from_ndarray(ndarray: numpy_types) -> JavaObject:
-        normalized_ndarray = Tensor.__ensure_rank_is_atleast_two(ndarray)
 
-        ctor = Tensor.__infer_tensor_ctor_from_ndarray(normalized_ndarray)
-        values = k.to_java_array(normalized_ndarray.flatten().tolist())
-        shape = k.to_java_long_array(normalized_ndarray.shape)
+        ctor = Tensor.__infer_tensor_ctor_from_ndarray(ndarray)
+        values = k.to_java_array(ndarray.flatten().tolist())
+        shape = k.to_java_long_array(ndarray.shape)
 
         return ctor(values, shape)
-
-    @staticmethod
-    def __ensure_rank_is_atleast_two(ndarray: numpy_types) -> numpy_types:
-        if len(ndarray.shape) == 1:
-            return ndarray[..., None]
-        else:
-            return ndarray
 
     @staticmethod
     def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> JavaMember:
@@ -72,5 +64,7 @@ class Tensor(JavaObjectWrapper):
 
     @staticmethod
     def _to_ndarray(java_tensor: JavaObject) -> numpy_types:
-        np_array = np.array(list(java_tensor.asFlatArray()))
-        return np_array.reshape(java_tensor.getShape())
+        if java_tensor.getRank() == 0:
+            return java_tensor.scalar()
+        else:
+            return np.array(list(java_tensor.asFlatArray())).reshape(java_tensor.getShape())

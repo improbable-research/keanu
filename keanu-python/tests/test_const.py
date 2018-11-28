@@ -38,7 +38,7 @@ def test_const_takes_panda_series(data: List[primitive_types], expected_java_cla
     series_value = series.values
 
     assert len(vertex_value) == len(series_value)
-    assert vertex_value.shape == (2, 1)
+    assert vertex_value.shape == (2,)
     assert series_value.shape == (2,)
 
     assert np.array_equal(vertex_value.flatten(), series_value.flatten())
@@ -103,7 +103,7 @@ def test_const_takes_ndarray_of_rank_one() -> None:
     v = Const(ndarray)
 
     assert ndarray.shape == (2,)
-    assert v.get_value().shape == (2, 1)
+    assert v.get_value().shape == (2,)
 
     assert np.array_equal(v.get_value().flatten(), ndarray.flatten())
 
