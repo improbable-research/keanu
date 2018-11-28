@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
-import io.improbable.keanu.vertices.VertexValuePropagation;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -9,6 +8,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexValuePropagation;
 
 import java.util.Collection;
 import java.util.List;

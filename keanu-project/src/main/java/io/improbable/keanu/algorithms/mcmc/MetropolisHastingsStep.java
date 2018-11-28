@@ -1,12 +1,12 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.vertices.VertexValuePropagation;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.network.NetworkSnapshot;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexValuePropagation;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;

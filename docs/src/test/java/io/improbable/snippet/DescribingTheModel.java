@@ -1,9 +1,9 @@
 package io.improbable.snippet;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.vertices.VertexValuePropagation;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.VertexValuePropagation;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
