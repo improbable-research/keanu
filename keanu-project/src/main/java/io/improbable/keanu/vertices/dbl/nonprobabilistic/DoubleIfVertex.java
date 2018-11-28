@@ -44,12 +44,12 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
 
     @SaveVertexParam(THEN_NAME)
     public DoubleVertex getThn() {
-        return els;
+        return thn;
     }
 
     @SaveVertexParam(ELSE_NAME)
     public DoubleVertex getEls() {
-        return thn;
+        return els;
     }
 
     @Override

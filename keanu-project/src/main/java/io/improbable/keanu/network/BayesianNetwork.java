@@ -27,7 +27,7 @@ public class BayesianNetwork {
 
     private final List<? extends Vertex> vertices;
     private final Map<VertexLabel, Vertex> vertexLabels;
-    private final int TOP_LEVEL_INDENTATION = 1;
+    private static final int TOP_LEVEL_INDENTATION = 1;
     private int indentation = TOP_LEVEL_INDENTATION;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {

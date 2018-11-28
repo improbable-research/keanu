@@ -2,16 +2,22 @@ package io.improbable.keanu.network;
 
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -42,12 +48,15 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 
 public class ProtobufTest {
 
-    private final String GAUSS_LABEL = "GAUSSIAN VERTEX";
-    private final String GAUSS_ID = "1.1";
-    private final Double GAUSS_VALUE = 1.75;
+    private final static String GAUSS_LABEL = "GAUSSIAN VERTEX";
+    private final static String GAUSS_ID = "1.1";
+    private final static Double GAUSS_VALUE = 1.75;
+    private final static String OUTPUT_NAME = "Output";
+    private final static String INPUT_NAME = "Input";
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -76,6 +85,44 @@ public class ProtobufTest {
         assertThat(latentGaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
         assertThat(latentGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         latentGaussianVertex.sample();
+    }
+
+    @Test
+    public void saveLoadGradientTest() throws IOException {
+        BayesianNetwork complexNet = createComplexNet();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ProtobufSaver saver = new ProtobufSaver(complexNet);
+        saver.save(outputStream, true);
+        DoubleIfVertex outputVertex = (DoubleIfVertex)complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        DoubleVertex inputVertex = (DoubleVertex)complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+
+        ByteArrayInputStream input = new ByteArrayInputStream(outputStream.toByteArray());
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork loadedNet = loader.loadNetwork(input);
+        DoubleIfVertex outputVertex2 = (DoubleIfVertex)loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        DoubleVertex inputVertex2 = (DoubleVertex)loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+
+        DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(outputVertex).withRespectTo(inputVertex);
+        DoubleTensor dOutputAfter = Differentiator.forwardModeAutoDiff(outputVertex2).withRespectTo(inputVertex2);
+
+        assertEquals(dOutputBefore, dOutputAfter);
+    }
+
+    private BayesianNetwork createComplexNet() {
+        DoubleVertex A = new GaussianVertex(new long[]{2, 2}, 0, 1).setLabel(INPUT_NAME);
+        A.setValue(DoubleTensor.create(3.0, new long[]{2, 2}));
+        DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 0, 1);
+        B.setValue(DoubleTensor.create(5.0, new long[]{2, 2}));
+        DoubleVertex D = A.times(B);
+        DoubleVertex C = A.sin();
+        DoubleVertex E = C.times(D);
+        DoubleVertex G = E.log();
+        DoubleVertex F = D.plus(B);
+
+        BoolVertex predicate = ConstantVertex.of(BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2}));
+        DoubleVertex H = If.isTrue(predicate).then(G).orElse(F).setLabel(OUTPUT_NAME);
+
+        return new BayesianNetwork(H.getConnectedGraph());
     }
 
     @Test
@@ -344,9 +391,6 @@ public class ProtobufTest {
             .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
             .filter(v -> !Modifier.isAbstract(v.getModifiers()))
             .forEach(this::checkSaveableVertex);
-        vertices.stream()
-            .filter(v -> NonSaveableVertex.class.isAssignableFrom(v))
-            .forEach(v -> System.out.println(v));
     }
 
     private void checkSaveableVertex(Class<? extends Vertex> vertexClass) {
