@@ -31,7 +31,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
 
-        this.vertexLookup = bayesianNetwork.getVertices().stream()
+        this.vertexLookup = bayesianNetwork.getLatentVertices().stream()
             .collect(toMap(Vertex::getUniqueStringReference, v -> v));
 
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
@@ -79,15 +79,16 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
             );
     }
 
-    public Vertex getVertex(String vertexName){
-        return vertexLookup.get(vertexName);
-    }
-
     public void cascadeUpdate(Map<String, ?> inputs) {
 
         List<Vertex> updatedVertices = new ArrayList<>();
         for (Map.Entry<String, ?> input : inputs.entrySet()) {
             Vertex updatingVertex = vertexLookup.get(input.getKey());
+
+            if (updatingVertex == null) {
+                throw new IllegalArgumentException("Cannot cascade update for input: " + input.getKey());
+            }
+
             updatingVertex.setValue(input.getValue());
             updatedVertices.add(updatingVertex);
         }
