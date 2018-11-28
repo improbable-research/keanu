@@ -1,4 +1,4 @@
-package io.improbable.keanu.backend;
+package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import java.util.Collections;
 import java.util.List;

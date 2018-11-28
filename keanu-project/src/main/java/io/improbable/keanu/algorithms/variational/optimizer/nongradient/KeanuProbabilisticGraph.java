@@ -1,8 +1,8 @@
-package io.improbable.keanu.backend.keanu;
+package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.backend.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;

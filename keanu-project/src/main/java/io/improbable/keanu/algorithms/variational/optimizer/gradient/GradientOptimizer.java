@@ -2,8 +2,6 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
-import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
-import io.improbable.keanu.backend.keanu.KeanuProbabilisticWithGradientGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.util.ProgressBar;

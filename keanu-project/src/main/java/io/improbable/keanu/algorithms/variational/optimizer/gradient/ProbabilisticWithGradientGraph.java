@@ -1,5 +1,6 @@
-package io.improbable.keanu.backend;
+package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.ProbabilisticGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Map;
