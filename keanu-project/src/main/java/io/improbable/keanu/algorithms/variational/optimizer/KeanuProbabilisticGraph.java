@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
+package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;

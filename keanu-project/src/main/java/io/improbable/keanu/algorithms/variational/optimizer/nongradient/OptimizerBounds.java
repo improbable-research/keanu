@@ -7,7 +7,7 @@ import lombok.Value;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.variational.optimizer.nongradient.KeanuProbabilisticGraph.getUniqueStringReference;
+import static io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph.getUniqueStringReference;
 
 public class OptimizerBounds {
 

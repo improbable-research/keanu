@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
