@@ -5,6 +5,7 @@ from keanu.vertex.base import Vertex
 from keanu.net import BayesNet
 from typing import Any, Iterable, Dict, List, Tuple, Generator
 from keanu.vartypes import sample_types, sample_generator_types
+from keanu.plots import traceplot
 
 k = KeanuContext()
 
@@ -43,21 +44,39 @@ def generate_samples(net: BayesNet,
                      sample_from: Iterable[Vertex],
                      algo: str = 'metropolis',
                      drop: int = 0,
-                     down_sample_interval: int = 1) -> sample_generator_types:
+                     down_sample_interval: int = 1,
+                     live_plot: bool = False,
+                     refresh_every: int = 100) -> sample_generator_types:
     vertices_unwrapped = k.to_java_object_list(sample_from)
 
     sample_iterator = algorithms[algo].withDefaultConfig().generatePosteriorSamples(net.unwrap(), vertices_unwrapped)
     sample_iterator = sample_iterator.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator = sample_iterator.stream().iterator()
 
-    return _samples_generator(sample_iterator, vertices_unwrapped)
+    return _samples_generator(sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every)
 
 
-def _samples_generator(sample_iterator: Any, vertices_unwrapped: Any) -> sample_generator_types:
+def _samples_generator(sample_iterator: Any,
+                       vertices_unwrapped: Any,
+                       live_plot: bool = False,
+                       refresh_every: int = 100) -> sample_generator_types:
+    trace = {}
+    size = 0
     while (True):
         network_sample = sample_iterator.next()
         sample = {
             Vertex._get_python_id(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped))
             for vertex_unwrapped in vertices_unwrapped
         }
+
+        if live_plot:
+            size += 1
+            if size % refresh_every == 0:
+                traceplot(trace)
+                size = 0
+                trace = {}
+            else:
+                for k, v in sample.items():
+                    trace.setdefault(k, []).append(v)
+
         yield sample
