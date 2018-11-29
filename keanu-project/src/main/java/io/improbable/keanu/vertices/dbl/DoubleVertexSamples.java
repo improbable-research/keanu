@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbl;
 
+import io.improbable.keanu.algorithms.SampleStats;
 import io.improbable.keanu.algorithms.VertexSamples;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.List;
@@ -36,7 +38,23 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
             .divInPlace(samples.size())
             .minusInPlace(getAverages().pow(2))
             .timesInPlace(samples.size())
-            .divInPlace(samples.size()-1);
+            .divInPlace(samples.size() - 1);
+    }
+
+    public DoubleTensor getAutocorrelation(long... index) {
+        if (samples.isEmpty()) {
+            throw new IllegalStateException("No samples exist for averaging.");
+        }
+
+        long[] shape = samples.iterator().next().getShape();
+
+        TensorShapeValidation.checkIndexIsValid(shape, index);
+
+        double[] sampleValuesAtIndex = samples.stream()
+            .mapToDouble(x -> x.getValue(index)).toArray();
+
+        double[] autocorr = SampleStats.acf(sampleValuesAtIndex);
+        return DoubleTensor.create(autocorr);
     }
 
 }
