@@ -38,11 +38,11 @@ class Tensor(JavaObjectWrapper):
 
     @staticmethod
     def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> Any:
-        if ndarray.dtype == np.bool_:
+        if np.issubdtype(ndarray.dtype, np.bool_):
             return k.jvm_view().BooleanTensor.create
-        elif ndarray.dtype == np.integer:
+        elif np.issubdtype(ndarray.dtype, np.integer):
             return k.jvm_view().IntegerTensor.create
-        elif ndarray.dtype == np.floating:
+        elif np.issubdtype(ndarray.dtype, np.floating):
             return k.jvm_view().DoubleTensor.create
         else:
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(
