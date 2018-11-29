@@ -257,7 +257,12 @@ public class TensorflowGraphConverter {
     }
 
     private static Shape toShape(long[] shape) {
-        return Shape.make(shape[0], Arrays.copyOfRange(shape, 1, shape.length));
+
+        if (shape.length == 0) {
+            return Shape.scalar();
+        } else {
+            return Shape.make(shape[0], Arrays.copyOfRange(shape, 1, shape.length));
+        }
     }
 
     private static String getTensorflowOpName(Vertex vertex) {
