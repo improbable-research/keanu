@@ -67,6 +67,7 @@ def _samples_generator(sample_iterator: Any,
     trace = {}
     size = 0
     ax = None
+
     while (True):
         network_sample = sample_iterator.next()
         sample = {

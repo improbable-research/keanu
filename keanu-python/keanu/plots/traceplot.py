@@ -1,15 +1,9 @@
-#try:
 import matplotlib
-matplotlib.use('PS') # without gui
+matplotlib.use('PS') # backend without gui, see: https://stackoverflow.com/a/50200567
 import matplotlib.pyplot as plt
-#except ImportError:
-#    matplotlib = None
-    # matplotlib is optional. see: https://github.com/scikit-optimize/scikit-optimize/issues/637#issuecomment-371909456
 
 
 def traceplot(trace, ax=None):
-    vertex_ids = trace.keys()
-
     if ax is None:
         _, ax = plt.subplots(len(vertex_ids), 1, squeeze=False)
 
