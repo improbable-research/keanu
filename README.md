@@ -74,7 +74,7 @@ For IntelliJ:
 
 #### Formatting
 
-We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) and [yapf](https://github.com/google/yapf) to automatically enforce some basic code style checks. If your build fails due to a formatting issue, simply run `./gradlew formatApply` and commit the changes. You need to have run `./gralew build` or `test` at least once before running `formatApply`, as this installs yapf in your virtual environment.
+We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) and [yapf](https://github.com/google/yapf) to automatically enforce some basic code style checks. If your build fails due to a formatting issue, simply run `./gradlew formatApply` and commit the changes. You need to have run `./gradlew build` or `test` at least once before running `formatApply`, as this installs yapf in your virtual environment.
 
 #### Python Code Generation
 
