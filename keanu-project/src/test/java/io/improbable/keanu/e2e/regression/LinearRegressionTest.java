@@ -72,8 +72,8 @@ public class LinearRegressionTest {
         DoubleVertex w1 = new GaussianVertex(0.0, 10.0);
         DoubleVertex w2 = new GaussianVertex(0.0, 10.0);
         DoubleVertex b = new GaussianVertex(0.0, 10.0);
-        DoubleVertex x1 = ConstantVertex.of(data.xTrain.slice(0, 0));
-        DoubleVertex x2 = ConstantVertex.of(data.xTrain.slice(0, 1));
+        DoubleVertex x1 = ConstantVertex.of(data.xTrain.slice(1, 0).reshape(100000, 1));
+        DoubleVertex x2 = ConstantVertex.of(data.xTrain.slice(1, 1).reshape(100000, 1));
         DoubleVertex y = new GaussianVertex(x1.multiply(w1).plus(x2.multiply(w2)).plus(b), 5.0);
         y.observe(data.yTrain);
 
@@ -108,10 +108,10 @@ public class LinearRegressionTest {
     public void manuallyBuiltGraphFindsParamsForManyWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataUniformWeights(40);
 
-        DoubleVertex weights = new GaussianVertex(new long[]{1, 40}, 0, 1);
+        DoubleVertex weights = new GaussianVertex(new long[]{40, 1}, 0, 1);
         DoubleVertex intercept = new GaussianVertex(0, 1);
         DoubleVertex x = ConstantVertex.of(data.xTrain);
-        DoubleVertex y = new GaussianVertex(weights.matrixMultiply(x).plus(intercept), 1);
+        DoubleVertex y = new GaussianVertex(x.matrixMultiply(weights).plus(intercept), 1);
         y.observe(data.yTrain);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());

@@ -1,7 +1,7 @@
 from typing import Any
 
 import numpy as np
-from py4j.java_gateway import java_import
+from py4j.java_gateway import java_import, JavaObject, JavaMember
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
@@ -32,7 +32,7 @@ class Tensor(JavaObjectWrapper):
         return self.unwrap().apply(Function(lambda_function))
 
     @staticmethod
-    def __get_tensor_from_ndarray(ndarray: numpy_types) -> Any:
+    def __get_tensor_from_ndarray(ndarray: numpy_types) -> JavaObject:
 
         ctor = Tensor.__infer_tensor_ctor_from_ndarray(ndarray)
         values = k.to_java_array(ndarray.flatten().tolist())
@@ -41,22 +41,19 @@ class Tensor(JavaObjectWrapper):
         return ctor(values, shape)
 
     @staticmethod
-    def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> Any:
-        if len(ndarray) == 0:
-            raise ValueError("Cannot infer type because the ndarray is empty")
-
-        if isinstance(ndarray.item(0), runtime_bool_types):
+    def __infer_tensor_ctor_from_ndarray(ndarray: numpy_types) -> JavaMember:
+        if np.issubdtype(ndarray.dtype, np.bool_):
             return k.jvm_view().BooleanTensor.create
-        elif isinstance(ndarray.item(0), runtime_int_types):
+        elif np.issubdtype(ndarray.dtype, np.integer):
             return k.jvm_view().IntegerTensor.create
-        elif isinstance(ndarray.item(0), runtime_float_types):
+        elif np.issubdtype(ndarray.dtype, np.floating):
             return k.jvm_view().DoubleTensor.create
         else:
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(
-                type(ndarray.item(0))))
+                ndarray.dtype))
 
     @staticmethod
-    def __get_tensor_from_scalar(scalar: primitive_types) -> Any:
+    def __get_tensor_from_scalar(scalar: primitive_types) -> JavaObject:
         if isinstance(scalar, runtime_bool_types):
             return k.jvm_view().BooleanTensor.scalar(bool(scalar))
         elif isinstance(scalar, runtime_int_types):
@@ -67,8 +64,8 @@ class Tensor(JavaObjectWrapper):
             raise NotImplementedError("Generic types in a ndarray are not supported. Was given {}".format(type(scalar)))
 
     @staticmethod
-    def _to_ndarray(java_tensor: Any) -> numpy_types:
+    def _to_ndarray(java_tensor: JavaObject) -> numpy_types:
         if java_tensor.getRank() == 0:
-            return java_tensor.scalar()
+            return np.array(java_tensor.scalar())
         else:
             return np.array(list(java_tensor.asFlatArray())).reshape(java_tensor.getShape())
