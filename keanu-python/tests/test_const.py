@@ -72,7 +72,7 @@ def test_const_does_not_take_generic_ndarray(generic):
     with pytest.raises(NotImplementedError) as excinfo:
         Const(ndarray)
 
-    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
+    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given object"
 
 
 def test_const_does_not_take_generic(generic):
@@ -90,7 +90,7 @@ def test_const_does_not_take_empty_ndarray():
     with pytest.raises(ValueError) as excinfo:
         Const(ndarray)
 
-    assert str(excinfo.value) == "Cannot infer type because the ndarray is empty"
+    assert str(excinfo.value) == "Cannot infer type because array is empty"
 
 
 def test_const_takes_ndarray_of_rank_one():
