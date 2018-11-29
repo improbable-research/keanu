@@ -24,15 +24,11 @@ import java.util.function.Function;
  */
 public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
     private static final double DEFAULT_OBSERVATION_SIGMA = 1.0;
-    private final DoubleTensor inputTrainingData;
-    private final OUTPUT outputTrainingData;
     private final ModelFitter<DoubleTensor, OUTPUT> fitter;
     private final LinearRegressionGraph<OUTPUT> modelGraph;
 
-    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph, DoubleTensor inputTrainingData, OUTPUT outputTrainingData, ModelFitter<DoubleTensor, OUTPUT> fitter) {
+    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph, ModelFitter<DoubleTensor, OUTPUT> fitter) {
         this.modelGraph = modelGraph;
-        this.inputTrainingData = inputTrainingData;
-        this.outputTrainingData = outputTrainingData;
         this.fitter = fitter;
     }
 
@@ -85,14 +81,11 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
     }
 
     public VertexId getWeightsVertexId() {
-        return modelGraph.getWeightsVertexId();
+        return modelGraph.getWeightVertexId();
     }
 
     public void fit() {
-        fitter.fit(inputTrainingData, outputTrainingData);
+        fitter.fit();
     }
 
-    public void observe() {
-        fitter.observe(inputTrainingData, outputTrainingData);
-    }
 }

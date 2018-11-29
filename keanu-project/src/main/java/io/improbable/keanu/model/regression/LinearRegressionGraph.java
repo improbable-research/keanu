@@ -75,7 +75,7 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
         return interceptVertex.getId();
     }
 
-    public VertexId getWeightsVertexId() {
+    public VertexId getWeightVertexId() {
         return weightsVertex.getId();
     }
 

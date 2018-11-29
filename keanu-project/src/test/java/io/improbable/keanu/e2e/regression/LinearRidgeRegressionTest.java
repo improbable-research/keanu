@@ -35,7 +35,6 @@ public class LinearRidgeRegressionTest {
             .withPriorOnIntercept(0, 40)
             .build();
 
-        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -54,7 +53,6 @@ public class LinearRidgeRegressionTest {
             .withPriorOnIntercept(0, 40)
             .build();
 
-        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -73,7 +71,6 @@ public class LinearRidgeRegressionTest {
             .withPriorOnIntercept(0, 40)
             .build();
 
-        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -97,10 +94,8 @@ public class LinearRidgeRegressionTest {
             .withPriorOnWeightsAndIntercept(0, 0.00001)
             .build();
 
-        linearRegressionModelWide.observe();
         linearRegressionModelWide.fit();
 
-        linearRegressionModelNarrow.observe();
         linearRegressionModelNarrow.fit();
 
         assertThat(linearRegressionModelNarrow.getWeights().pow(2).sum(), lessThan(linearRegressionModelWide.getWeights().pow(2).sum()));
@@ -133,7 +128,6 @@ public class LinearRidgeRegressionTest {
             .withSampling(sampling)
             .build();
 
-        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);

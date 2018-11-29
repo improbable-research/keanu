@@ -57,7 +57,6 @@ public class LinearRegressionTest {
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .build();
 
-        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -99,7 +98,6 @@ public class LinearRegressionTest {
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .build();
 
-        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -138,7 +136,6 @@ public class LinearRegressionTest {
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .build();
 
-        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
@@ -173,7 +170,6 @@ public class LinearRegressionTest {
             .withSampling(sampling)
             .build();
 
-        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);

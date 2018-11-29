@@ -59,7 +59,6 @@ public class DiabetesLinearRegression {
             .withPriorOnWeightsAndIntercept(0, 100)
             .build();
 
-        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         assertThat(linearRegressionModel.getWeight(0), closeTo(938.2378, 0.5));
@@ -83,7 +82,6 @@ public class DiabetesLinearRegression {
         RegressionModel<DoubleTensor> linearRegressionModel = RegressionModel.withTrainingData(xTrainingData, yTrainingData)
             .build();
 
-        linearRegressionModel.observe();
         linearRegressionModel.fit();
 
         double accuracyOnTestData = ModelScoring.coefficientOfDetermination(linearRegressionModel.predict(xTestData), yTestData);

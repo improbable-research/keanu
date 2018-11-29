@@ -90,6 +90,10 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
         return this;
     }
 
+    public RegressionModelBuilder withPriorOnIntercept(DoubleTensor mean, DoubleTensor scaleParameter) {
+        return withPriorOnIntercept(ConstantVertex.of(mean), ConstantVertex.of(scaleParameter));
+    }
+
     public RegressionModelBuilder withPriorOnIntercept(double mean, double scaleParameter) {
         return withPriorOnIntercept(ConstantVertex.of(mean), ConstantVertex.of(scaleParameter));
     }
@@ -136,7 +140,8 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
             this.regularization.createFitterForGraph(regressionGraph) :
             samplingAlgorithm.createFitterForGraph(regressionGraph);
 
-        return new RegressionModel<>(regressionGraph, inputTrainingData, outputTrainingData, fitter);
+        regressionGraph.observeValues(inputTrainingData, outputTrainingData);
+        return new RegressionModel<>(regressionGraph, fitter);
     }
 
     private void checkVariablesAreCorrectlyInitialised() {

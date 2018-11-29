@@ -1,5 +1,10 @@
 package io.improbable.keanu.e2e.regression;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
+
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.regression.RegressionModel;
@@ -20,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class RadonHeirarchicalRegression {
+public class RadonHierarchicalRegression {
 
     @Rule
     public DeterministicRule rule = new DeterministicRule();
@@ -37,28 +42,28 @@ public class RadonHeirarchicalRegression {
     @Test
     public void canPerformSimpleLinearRegression() {
         RegressionModel model = linearRegression(radonData);
-        Assert.assertTrue(model.getWeight(0) > -0.7 && model.getWeight(0) < -0.4);
-        Assert.assertTrue(model.getIntercept() > 1.2 && model.getIntercept() < 1.5);
+        assertThat(model.getWeightVertex().getValue().scalar(), both(greaterThan(-0.7)).and(lessThan(-0.4)));
+        assertThat(model.getIntercept(), both(greaterThan(1.2)).and(lessThan(1.5)));
     }
 
     @Test
-    public void canPerformRegressionWithOneHeirarchy() {
-        buildHeirarchicalNetwork(radonData, 1);
+    public void canPerformRegressionWithOneHierarchy() {
+        buildAndRunHeirarchicalNetwork(radonData, 1);
     }
 
     @Test
-    public void canPerformRegressionWithTwoHeirarchies() {
-        buildHeirarchicalNetwork(radonData, 2);
+    public void canPerformRegressionWithTwoHierarchies() {
+        buildAndRunHeirarchicalNetwork(radonData, 2);
     }
 
     @Test
-    public void canPerformRegressionWithFourHeirarchies() {
-        buildHeirarchicalNetwork(radonData, 4);
+    public void canPerformRegressionWithFourHierarchies() {
+        buildAndRunHeirarchicalNetwork(radonData, 4);
     }
 
     @Test
-    public void canPerformRegressionWithTenHeirarchies() {
-        buildHeirarchicalNetwork(radonData, 10);
+    public void canPerformRegressionWithTenHierarchies() {
+        buildAndRunHeirarchicalNetwork(radonData, 10);
     }
 
     private RegressionModel linearRegression(List<Data> data) {
@@ -74,13 +79,12 @@ public class RadonHeirarchicalRegression {
             withPriorOnIntercept(0., 5.).
             build();
 
-        model.observe();
         model.fit();
 
         return model;
     }
 
-    private void buildHeirarchicalNetwork(List<Data> radonData, int numberOfModels) {
+    private void buildAndRunHeirarchicalNetwork(List<Data> radonData, int numberOfModels) {
         GaussianVertex muAlpha = new GaussianVertex(new long[]{1, 1}, 0, 100).setLabel("MuIntercept");
         GaussianVertex muBeta = new GaussianVertex(new long[]{1, 1}, 0, 100).setLabel("MuGradient");
 
@@ -132,8 +136,6 @@ public class RadonHeirarchicalRegression {
             withPriorOnWeights(muGradient, sigmaGradient).
             withPriorOnIntercept(muIntercept, sigmaIntercept).
             build();
-
-        model.observe();
 
         return model;
     }

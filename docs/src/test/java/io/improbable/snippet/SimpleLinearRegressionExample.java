@@ -34,6 +34,8 @@ RegressionModel regressionModel = RegressionModel.withTrainingData(xData, yData)
     .withRegularization(RegressionRegularization.NONE)
     .build();
 
+regressionModel.fit();
+
 //It is now possible to use regressionModel.predict(value) to get a prediction of the output given an input value.
 //%%SNIPPET_END%% SimpleLinearRegressionExample
     }

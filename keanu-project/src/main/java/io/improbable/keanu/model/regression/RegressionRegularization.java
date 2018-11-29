@@ -23,8 +23,8 @@ public enum RegressionRegularization {
         }
     },
     LASSO {
-        public DoubleVertex getWeightsVertex(long featureCount, DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnInterceptScaleParameter) {
-            return new LaplaceVertex(new long[]{1, featureCount}, priorOnWeightsMeans, priorOnInterceptScaleParameter);
+        public DoubleVertex getWeightsVertex(long featureCount, DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnWeightsScaleParameter) {
+            return new LaplaceVertex(new long[]{1, featureCount}, priorOnWeightsMeans, priorOnWeightsScaleParameter);
         }
 
         public DoubleVertex getInterceptVertex(DoubleVertex priorOnInterceptMean, DoubleVertex priorOnInterceptScaleParameter) {
@@ -49,7 +49,7 @@ public enum RegressionRegularization {
         }
     };
 
-    public abstract DoubleVertex getWeightsVertex(long featureCount,  DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnInterceptScaleParameter);
+    public abstract DoubleVertex getWeightsVertex(long featureCount,  DoubleVertex priorOnWeightsMeans, DoubleVertex priorOnWeightsScaleParameter);
 
     public abstract DoubleVertex getInterceptVertex(DoubleVertex priorOnInterceptMean, DoubleVertex priorOnInterceptScaleParameter);
 

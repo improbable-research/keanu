@@ -27,24 +27,17 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
     }
 
     /**
-     * Uses a posterior sampling algorithm (e.g. Metropolis Hastings) to fit the model graph to a given set of input and output data.
+     * Uses a posterior sampling algorithm (e.g. Metropolis Hastings) to fit the model graph to the input and output data.
      * This will mutate the graph which can then be used to construct a graph-backed model like, for instance, a
      * {@link io.improbable.keanu.model.regression.RegressionModel RegressionModel}
      *
-     * @param input  The input data to your model graph
-     * @param output The output data to your model graph
      */
     @Override
-    public void fit(INPUT input, OUTPUT output) {
+    public void fit() {
         posteriorSamples = samplingAlgorithm
             .getPosteriorSamples(modelGraph.getBayesianNetwork(), sampleCount);
         NetworkState mostProbableState = posteriorSamples.getMostProbableState();
         modelGraph.getBayesianNetwork().setState(mostProbableState);
-    }
-
-    @Override
-    public void observe(INPUT input, OUTPUT output) {
-        modelGraph.observeValues(input, output);
     }
 
     public NetworkSamples getNetworkSamples() {
