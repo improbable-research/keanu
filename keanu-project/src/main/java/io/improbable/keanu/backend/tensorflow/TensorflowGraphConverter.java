@@ -191,8 +191,16 @@ public class TensorflowGraphConverter {
         Output<?> input = lookup.get(summationVertex.getInput());
         String name = getTensorflowOpName(vertex);
 
-        int dims = summationVertex.getOverDimensions().length;
-        Output<Integer> overDimensions = graphBuilder.constant(summationVertex.getOverDimensions(), new long[]{dims});
+        int[] summingOverDimensions = summationVertex.getOverDimensions();
+        Output<Integer> overDimensions;
+
+        if (summingOverDimensions == null) {
+            int inputRank = summationVertex.getInput().getShape().length;
+            overDimensions = graphBuilder.constant(TensorShape.dimensionRange(0, inputRank), new long[]{inputRank});
+        } else {
+            int dims = summationVertex.getOverDimensions().length;
+            overDimensions = graphBuilder.constant(summationVertex.getOverDimensions(), new long[]{dims});
+        }
 
         return graphBuilder.binaryOp(OpType.SUM, name, input, overDimensions);
     }
@@ -257,7 +265,6 @@ public class TensorflowGraphConverter {
     }
 
     private static Shape toShape(long[] shape) {
-
         if (shape.length == 0) {
             return Shape.scalar();
         } else {

@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
@@ -42,7 +43,8 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable, No
      */
     @ExportVertexToPythonBindings
     public SumVertex(DoubleVertex inputVertex) {
-        this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getShape().length));
+        super(Tensor.SCALAR_SHAPE, inputVertex);
+        this.overDimensions = null;
     }
 
     private static long[] getSummationResultShape(long[] inputShape, int[] sumOverDimensions) {
@@ -56,7 +58,11 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable, No
 
     @Override
     protected DoubleTensor op(DoubleTensor value) {
-        return value.sum(overDimensions);
+        if (overDimensions == null) {
+            return DoubleTensor.scalar(value.sum());
+        } else {
+            return value.sum(overDimensions);
+        }
     }
 
     @Override
@@ -64,7 +70,8 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable, No
         PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
         DoubleTensor sumResult = this.getValue();
         int operandRank = inputVertex.getValue().getRank();
-        return derivativeOfParentWithRespectToInputs.sumOverOfDimensions(overDimensions, sumResult.getShape(), operandRank);
+        int[] dimensionsToSum = overDimensions == null ? TensorShape.dimensionRange(0, operandRank) : overDimensions;
+        return derivativeOfParentWithRespectToInputs.sumOverOfDimensions(dimensionsToSum, sumResult.getShape(), operandRank);
     }
 
     @Override
@@ -102,9 +109,15 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable, No
 
     private static long[] summedOverShapeWithoutRankLoss(long[] shape, int[] sumOverDimensions) {
         long[] shapeCopy = Arrays.copyOf(shape, shape.length);
-        for (int sumOverDimension : sumOverDimensions) {
-            shapeCopy[sumOverDimension] = 1;
+
+        if (sumOverDimensions == null) {
+            Arrays.fill(shapeCopy, 1L);
+        } else {
+            for (int sumOverDimension : sumOverDimensions) {
+                shapeCopy[sumOverDimension] = 1L;
+            }
         }
+
         return shapeCopy;
     }
 }
