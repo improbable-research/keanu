@@ -28,11 +28,11 @@ def Const(t: tensor_arg_types) -> Vertex:
 
 
 def __infer_const_ctor_from_ndarray(ndarray: numpy_types) -> Callable:
-    if ndarray.dtype in runtime_bool_types:
+    if ndarray.dtype == np.bool_:
         return ConstantBool
-    elif ndarray.dtype in runtime_int_types:
+    elif ndarray.dtype == np.integer:
         return ConstantInteger
-    elif ndarray.dtype in runtime_float_types:
+    elif ndarray.dtype == np.floating:
         return ConstantDouble
     else:
         raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(ndarray.dtype))
