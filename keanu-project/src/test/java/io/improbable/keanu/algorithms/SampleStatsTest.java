@@ -8,20 +8,35 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class SampleStatsTest {
     @Test
-    public void randomlyGeneratedSamplesHaveCloseToZeroAutocorrelationAtLowLags() {
+    public void autocorrAtLagZeroIsOne() {
+        double[] samples = generateUniformRandomArray(20);
+        double[] autocorr = SampleStats.acf(samples);
+        assertEquals(autocorr[0], 1.0, 0.001);
+    }
+
+    private double[] generateUniformRandomArray(int length) {
         ContinuousDistribution uniform = Uniform.withParameters(DoubleTensor.ZERO_SCALAR, DoubleTensor.scalar(1000));
-        uniform.sample(new long[]{500}, KeanuRandom.getDefaultRandom());
-        double samples[] = new double[500];
-        for (int i = 0; i < 500; i++) {
+        uniform.sample(new long[]{length}, KeanuRandom.getDefaultRandom());
+        double samples[] = new double[length];
+        for (int i = 0; i < length; i++) {
             samples[i] = uniform.sample(new long[]{1}, KeanuRandom.getDefaultRandom()).scalar();
         }
+        return samples;
+    }
+
+    @Test
+    public void randomlyGeneratedSamplesHaveCloseToZeroAutocorrelationAtLowLags() {
+        double[] samples = generateUniformRandomArray(500);
         double[] autocorr = SampleStats.acf(samples);
 
-        assertThat(autocorr[80], lessThan(0.1));
+        for (int lag = 1; lag < 10; lag++) {
+            assertThat(autocorr[lag], lessThan(0.1));
+        }
     }
 
     /*
