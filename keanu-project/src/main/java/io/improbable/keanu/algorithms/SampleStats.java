@@ -12,8 +12,8 @@ public class SampleStats {
     public static double[] acf(double[] samples) {
         double[] acovResult = acov(samples);
         double variance = acovResult[0];
-        double[] autocor = Arrays.stream(acovResult).map(x -> x / variance).toArray();
-        return autocor;
+        double[] autocorr = Arrays.stream(acovResult).map(x -> x / variance).toArray();
+        return autocorr;
     }
 
     public static double[] acov(double[] samples) {
