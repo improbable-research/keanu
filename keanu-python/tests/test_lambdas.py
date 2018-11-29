@@ -1,4 +1,6 @@
-from keanu.vertex import Gaussian, LambdaModel, Const
+from typing import Dict, Any
+
+from keanu.vertex import Gaussian, LambdaModel, Const, Vertex
 
 
 def plus_one(vertices):
@@ -7,34 +9,34 @@ def plus_one(vertices):
 
 class BlackBoxProcess:
 
-    def __init__(self, dir):
+    def __init__(self, dir: Any) -> None:
         self.out_file = dir.join("out.txt")
 
-    def run(self, vertices):
+    def run(self, vertices: Dict[str, Vertex]) -> None:
         out = vertices["in"].get_value() + 1.
         self.out_file.write(out)
 
-    def extract_values(self):
+    def extract_values(self) -> Dict[str, Vertex]:
         value = float(self.out_file.read())
         return {"out": Const(value)}
 
 
-def test_you_can_create_a_lambda_model_vertex():
-    v_in = Gaussian(1., 1.)
+def test_you_can_create_a_lambda_model_vertex() -> None:
+    v_in: Vertex = Gaussian(1., 1.)
     model = LambdaModel({"in": v_in}, plus_one)
     run(model, v_in)
 
 
-def test_you_can_create_a_process_model_vertex(tmpdir):
+def test_you_can_create_a_process_model_vertex(tmpdir) -> None:
     dir = tmpdir.mkdir("black_box")
     process = BlackBoxProcess(dir)
-    v_in = Gaussian(1., 1.)
+    v_in: Vertex = Gaussian(1., 1.)
     model = LambdaModel({"in": v_in}, process.run, process.extract_values)
     run(model, v_in)
 
 
-def run(model, v_in):
-    v_out = model.get_double_model_output_vertex("out")
+def run(model: LambdaModel, v_in: Vertex) -> None:
+    v_out: Vertex = model.get_double_model_output_vertex("out")
 
     v_in.set_value(1.)
     v_out.eval()
