@@ -62,6 +62,7 @@ def _samples_generator(sample_iterator: Any,
                        refresh_every: int = 100) -> sample_generator_types:
     trace = {}
     size = 0
+    ax = None
     while (True):
         network_sample = sample_iterator.next()
         sample = {
@@ -72,7 +73,10 @@ def _samples_generator(sample_iterator: Any,
         if live_plot:
             size += 1
             if size % refresh_every == 0:
-                traceplot(trace)
+                if ax is None:
+                    ax = traceplot(trace)
+                else:
+                    traceplot(trace, ax=ax)
                 size = 0
                 trace = {}
             else:
