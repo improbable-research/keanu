@@ -20,7 +20,7 @@ public class IntegerReshapeVertex extends IntegerUnaryOpVertex {
     }
 
     @SaveVertexParam(SHAPE_NAME)
-    public long[] getShapeParam() {
+    public long[] getProposedShape() {
         return getShape();
     }
 }

@@ -41,12 +41,12 @@ public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
     }
 
     @SaveVertexParam(DIMENSION_NAME)
-    public int getDimensionParam() {
+    public int getDimension() {
         return dimension;
     }
 
     @SaveVertexParam(INDEX_NAME)
-    public int getIndexParam() {
+    public int getIndex() {
         return index;
     }
 }

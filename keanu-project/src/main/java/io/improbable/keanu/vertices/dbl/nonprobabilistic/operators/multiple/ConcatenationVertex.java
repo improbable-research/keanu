@@ -199,7 +199,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     @SaveVertexParam(DIMENSION_NAME)
-    public int getDimensionParam() {
+    public int getDimension() {
         return dimension;
     }
 }

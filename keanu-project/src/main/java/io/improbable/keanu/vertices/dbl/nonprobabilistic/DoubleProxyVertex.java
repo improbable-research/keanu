@@ -78,7 +78,7 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
     }
 
     @SaveVertexParam(LABEL_PARAM_NAME)
-    public String getLabelParamName() {
+    public String getLabelParameter() {
         return getLabel().toString();
     }
 

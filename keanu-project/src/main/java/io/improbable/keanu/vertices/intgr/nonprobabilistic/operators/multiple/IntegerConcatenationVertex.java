@@ -67,7 +67,7 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
     }
 
     @SaveVertexParam(DIMENSION_NAME)
-    public int getDimensionParam() {
+    public int getDimension() {
         return dimension;
     }
 

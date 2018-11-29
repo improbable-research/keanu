@@ -66,12 +66,12 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
     }
 
     @SaveVertexParam(DIMENSION_NAME)
-    public int getDimensionParam() {
+    public int getDimension() {
         return dimension;
     }
 
     @SaveVertexParam(INPUT_NAME)
-    public BoolVertex[] getInputParam() {
+    public BoolVertex[] getInput() {
         return input;
     }
 }

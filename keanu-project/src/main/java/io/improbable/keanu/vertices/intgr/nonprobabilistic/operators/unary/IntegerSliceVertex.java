@@ -36,12 +36,12 @@ public class IntegerSliceVertex extends IntegerUnaryOpVertex {
     }
 
     @SaveVertexParam(DIMENSION_NAME)
-    public int getDimensionParam() {
+    public int getDimension() {
         return dimension;
     }
 
     @SaveVertexParam(INDEX_NAME)
-    public int getIndexParam() {
+    public int getIndex() {
         return index;
     }
 }

@@ -36,7 +36,7 @@ public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
     }
 
     @SaveVertexParam(INDEX_NAME)
-    public long[] getIndexParam() {
+    public long[] getIndex() {
         return index;
     }
 }

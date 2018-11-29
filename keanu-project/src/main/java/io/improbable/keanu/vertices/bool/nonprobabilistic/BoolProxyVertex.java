@@ -62,7 +62,7 @@ public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVerte
     }
 
     @SaveVertexParam(LABEL_NAME)
-    public String getLabelParam() {
+    public String getLabelParameter() {
         return getLabel().toString();
     }
 }

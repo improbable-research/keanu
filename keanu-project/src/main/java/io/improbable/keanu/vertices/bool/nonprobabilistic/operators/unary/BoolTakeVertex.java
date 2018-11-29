@@ -31,7 +31,7 @@ public class BoolTakeVertex extends BoolUnaryOpVertex<BooleanTensor> {
     }
 
     @SaveVertexParam(INDEX_NAME)
-    public long[] getIndexParam() {
+    public long[] getIndex() {
         return index;
     }
 }

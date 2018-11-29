@@ -31,7 +31,7 @@ public class IntegerTakeVertex extends IntegerUnaryOpVertex {
     }
 
     @SaveVertexParam(INDEX_NAME)
-    public long[] getIndexParam() {
+    public long[] getIndex() {
         return index;
     }
 }

@@ -36,12 +36,12 @@ public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
     }
 
     @SaveVertexParam(DIMENSION_NAME)
-    public int getDimensionParam() {
+    public int getDimension() {
         return dimension;
     }
 
     @SaveVertexParam(INDEX_NAME)
-    public long getIndexParam() {
+    public long getIndex() {
         return index;
     }
 }

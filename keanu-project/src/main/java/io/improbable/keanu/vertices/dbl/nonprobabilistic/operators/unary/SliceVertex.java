@@ -92,7 +92,7 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @SaveVertexParam(INDEX_NAME)
-    public long getIndexParam() {
+    public long getIndex() {
         return index;
     }
 }

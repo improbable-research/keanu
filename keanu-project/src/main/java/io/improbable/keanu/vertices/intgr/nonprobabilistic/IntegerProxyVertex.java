@@ -62,7 +62,7 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
     }
 
     @SaveVertexParam(LABEL_NAME)
-    public String getLabelParam() {
+    public String getLabelParameter() {
         return getLabel().toString();
     }
 }

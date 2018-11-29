@@ -44,7 +44,7 @@ public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<T
     }
 
     @SaveVertexParam(PREDICATE_NAME)
-    public Vertex<? extends BooleanTensor> getPredicateParam() {
+    public Vertex<? extends BooleanTensor> getPredicate() {
         return predicate;
     }
 
