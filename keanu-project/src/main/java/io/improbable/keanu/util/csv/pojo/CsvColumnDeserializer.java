@@ -38,7 +38,7 @@ class CsvColumnDeserializer {
         }
 
         if (fieldType == DoubleTensor.class) {
-            return DoubleTensor.create(convertToDoubles(s), 1, s.size());
+            return DoubleTensor.create(convertToDoubles(s), convertToDoubles(s).length, 1);
         }
 
         if (fieldType == boolean[].class) {
@@ -87,5 +87,4 @@ class CsvColumnDeserializer {
 
         return ArrayUtils.toPrimitive(bools.toArray(new Boolean[data.size()]));
     }
-
 }

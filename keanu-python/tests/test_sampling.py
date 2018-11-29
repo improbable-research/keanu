@@ -35,7 +35,9 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(a
 
         assert len(vertex_samples) == draws
         assert type(vertex_samples) == list
-        assert all(type(sample) == float for sample in vertex_samples)
+        assert all(type(sample) == np.ndarray for sample in vertex_samples)
+        assert all(sample.dtype == float for sample in vertex_samples)
+        assert all(sample.shape == () for sample in vertex_samples)
 
 
 def test_dropping_samples(net: BayesNet) -> None:

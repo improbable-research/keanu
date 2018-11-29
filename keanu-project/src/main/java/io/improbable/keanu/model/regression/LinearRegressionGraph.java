@@ -25,9 +25,9 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
     private final BayesianNetwork bayesianNetwork;
 
     public LinearRegressionGraph(long[] featureShape, Function<DoubleVertex, OutputVertices<OUTPUT>> outputTransform, DoubleVertex interceptVertex, DoubleVertex weightsVertex) {
-        long featureCount = featureShape[0];
+        long featureCount = featureShape[1];
         Preconditions.checkArgument(TensorShape.isLengthOne(interceptVertex.getShape()));
-        TensorShapeValidation.checkShapesMatch(weightsVertex.getShape(), new long[]{1, featureCount});
+        TensorShapeValidation.checkShapesMatch(weightsVertex.getShape(), new long[]{featureCount, 1});
 
         this.weightsVertex = weightsVertex;
         this.interceptVertex = interceptVertex;
@@ -36,7 +36,7 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
         OutputVertices<OUTPUT> outputVertices = outputTransform.apply(
             TensorShape.isLengthOne(weightsVertex.getShape()) ?
                 weightsVertex.times(xVertex).plus(interceptVertex) :
-                weightsVertex.matrixMultiply(xVertex).plus(interceptVertex)
+                xVertex.matrixMultiply(weightsVertex).plus(interceptVertex)
         );
 
         yVertex = outputVertices.outputVertex;

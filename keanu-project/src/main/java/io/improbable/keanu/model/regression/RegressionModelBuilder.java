@@ -168,7 +168,7 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     }
 
     private long getFeatureCount() {
-        return this.inputTrainingData.getShape()[0];
+        return this.inputTrainingData.getShape()[1];
     }
 
 }

@@ -23,7 +23,7 @@ public class LogisticRegressionTest {
 
     private static final int NUM_FEATURES = 3;
     private static final double[] SIGMAS = new double[]{1.0, 1.0, 1.0};
-    private static final DoubleTensor TRUE_WEIGHTS = DoubleTensor.create(new double[]{0.5, -3.0, 1.5}, 1, 3);
+    private static final DoubleTensor TRUE_WEIGHTS = DoubleTensor.create(new double[]{0.5, -3.0, 1.5}, 3, 1);
     private static final double TRUE_INTERCEPT = 0.0;
     private static final int NUM_SAMPLES_TRAINING = 1250;
     private static final int NUM_SAMPLES_TESTING = 200;
@@ -58,13 +58,13 @@ public class LogisticRegressionTest {
     private DoubleTensor generateX(int nSamples) {
         DoubleVertex[] xVertices = new DoubleVertex[NUM_FEATURES];
         for (int i = 0; i < NUM_FEATURES; i++) {
-            xVertices[i] = new GaussianVertex(new long[]{1, nSamples}, 0.0, SIGMAS[i]);
+            xVertices[i] = new GaussianVertex(new long[]{nSamples, 1}, 0.0, SIGMAS[i]);
         }
-        return DoubleVertex.concat(0, xVertices).sample(random);
+        return DoubleVertex.concat(1, xVertices).sample(random);
     }
 
     private BooleanTensor generateY(DoubleTensor x) {
-        DoubleTensor probabilities = TRUE_WEIGHTS.matrixMultiply(x).plus(TRUE_INTERCEPT).sigmoid();
+        DoubleTensor probabilities = x.matrixMultiply(TRUE_WEIGHTS).plus(TRUE_INTERCEPT).sigmoid();
         BoolVertex yVertex = new BernoulliVertex(ConstantVertex.of(probabilities));
         return yVertex.getValue();
     }

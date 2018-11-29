@@ -1,4 +1,5 @@
-from py4j.java_gateway import java_import
+from py4j.java_gateway import java_import, JavaObject
+from py4j.java_collections import JavaList
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
@@ -53,7 +54,7 @@ def generate_samples(net: BayesNet,
     return _samples_generator(sample_iterator, vertices_unwrapped)
 
 
-def _samples_generator(sample_iterator: Any, vertices_unwrapped: Any) -> sample_generator_types:
+def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList) -> sample_generator_types:
     while (True):
         network_sample = sample_iterator.next()
         sample = {

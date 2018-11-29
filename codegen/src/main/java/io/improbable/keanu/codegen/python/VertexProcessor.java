@@ -138,7 +138,7 @@ class VertexProcessor {
 
     private static String toTypedPythonParam(Class<?> parameterType) {
         if (Vertex.class.isAssignableFrom(parameterType)) {
-            return "vertex_param_types";
+            return "vertex_constructor_param_types";
         } else if (DoubleTensor.class.isAssignableFrom(parameterType) ||
                    IntegerTensor.class.isAssignableFrom(parameterType) ||
                    BooleanTensor.class.isAssignableFrom(parameterType)) {

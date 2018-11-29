@@ -69,8 +69,8 @@ public class RadonHierarchicalRegression {
     private RegressionModel linearRegression(List<Data> data) {
         double[] radon = data.stream().mapToDouble(k -> k.log_radon).toArray();
         double[] floor = data.stream().mapToDouble(k -> k.floor).toArray();
-        DoubleTensor y = DoubleTensor.create(radon, 1, radon.length);
-        DoubleTensor x = DoubleTensor.create(floor, 1, floor.length);
+        DoubleTensor y = DoubleTensor.create(radon, radon.length, 1);
+        DoubleTensor x = DoubleTensor.create(floor, floor.length, 1);
 
         RegressionModel model = RegressionModel.
             withTrainingData(x, y).
@@ -103,6 +103,8 @@ public class RadonHierarchicalRegression {
             models.add(model);
         }
 
+        //Set the starting values of the parent random variables
+        //This is required for the optimiser to find the correct values of the sub models latents
         muAlpha.setValue(1.);
         sigmaAlpha.setValue(0.5);
 
@@ -127,8 +129,8 @@ public class RadonHierarchicalRegression {
         double[] floorForSubModel = Arrays.copyOfRange(allFloor, startIndex, endIndex);
         double[] radonForSubModel = Arrays.copyOfRange(allRadon, startIndex, endIndex);
 
-        DoubleTensor x = DoubleTensor.create(floorForSubModel, 1, floorForSubModel.length);
-        DoubleTensor y = DoubleTensor.create(radonForSubModel, 1, floorForSubModel.length);
+        DoubleTensor x = DoubleTensor.create(floorForSubModel, floorForSubModel.length, 1);
+        DoubleTensor y = DoubleTensor.create(radonForSubModel, floorForSubModel.length, 1);
 
         RegressionModel model = RegressionModel.
             withTrainingData(x, y).
