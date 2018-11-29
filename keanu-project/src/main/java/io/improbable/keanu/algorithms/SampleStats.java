@@ -9,11 +9,13 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 public class SampleStats {
+    private static final FastFourierTransformer ffTransformer = new FastFourierTransformer(DftNormalization.STANDARD);
+
     public static double[] acf(double[] samples) {
         double[] acovResult = acov(samples);
         double variance = acovResult[0];
-        double[] autocorr = Arrays.stream(acovResult).map(x -> x / variance).toArray();
-        return autocorr;
+        double[] autocor = Arrays.stream(acovResult).map(x -> x / variance).toArray();
+        return autocor;
     }
 
     public static double[] acov(double[] samples) {
@@ -35,7 +37,6 @@ public class SampleStats {
     }
 
     private static Complex[] fftCrossCorrelationWitSelf(double[] values) {
-        FastFourierTransformer ffTransformer = new FastFourierTransformer(DftNormalization.STANDARD);
         Complex fftData[] = ffTransformer.transform(values, TransformType.FORWARD);
         Complex fftMultipliedWithConj[] = multiplyWithConjugateInPlace(fftData);
         Complex ifft[] = ffTransformer.transform(fftMultipliedWithConj, TransformType.INVERSE);
