@@ -17,6 +17,7 @@ def traceplot(trace, ax=None, x0=0):
 
         # TODO: use label for title ax[index][0].set_title(vertex_id)
         ax[index][0].plot(range(x0, x0 + size), data)
+        plt.pause(0.1)
 
     return ax
 
