@@ -16,6 +16,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.function.Consumer;
 
 public class ProtobufSaver implements NetworkSaver {
     private final BayesianNetwork net;
@@ -97,19 +98,19 @@ public class ProtobufSaver implements NetworkSaver {
         if (Vertex.class.isAssignableFrom(param.getClass()))  {
             return getParam(paramName, (Vertex)param);
         } else if (DoubleTensor.class.isAssignableFrom(param.getClass())){
-            return getParam(paramName, (DoubleTensor) param);
+            return getParam(paramName, builder -> builder.setDoubleTensorParam(getTensor((DoubleTensor) param)));
         } else if (IntegerTensor.class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, (IntegerTensor) param);
+            return getParam(paramName, builder -> builder.setIntTensorParam(getTensor((IntegerTensor) param)));
         } else if (BooleanTensor.class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, (BooleanTensor) param);
-        } else if (double.class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, (double) param);
+            return getParam(paramName, builder -> builder.setBoolTensorParam(getTensor((BooleanTensor) param)));
+        } else if (Double.class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, builder -> builder.setDoubleParam((double) param));
         } else if (Integer.class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, (int) param);
+            return getParam(paramName, builder -> builder.setIntParam((int) param));
         } else if (Long.class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, (long) param);
+            return getParam(paramName, builder -> builder.setLongParam((long) param));
         } else if (String.class.isAssignableFrom(param.getClass())) {
-            return getParam(paramName, (String) param);
+            return getParam(paramName, builder -> builder.setStringParam((String) param));
         } else if (Long[].class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (long[]) param);
         } else if (Vertex[].class.isAssignableFrom(param.getClass())) {
@@ -121,108 +122,43 @@ public class ProtobufSaver implements NetworkSaver {
         }
     }
 
+    private KeanuSavedBayesNet.NamedParam getParam(String paramName,
+                                                   Consumer<KeanuSavedBayesNet.NamedParam.Builder> valueSetter) {
+        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
+
+        paramBuilder.setName(paramName);
+        valueSetter.accept(paramBuilder);
+
+        return paramBuilder.build();
+    }
+
     private KeanuSavedBayesNet.NamedParam getParam(String paramName, Vertex parent) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-        paramBuilder.setParentVertex(KeanuSavedBayesNet.VertexID.newBuilder().setId(parent.getId().toString()));
-
-        return paramBuilder.build();
-    }
-
-    private KeanuSavedBayesNet.NamedParam getParam(String paramName, DoubleTensor param) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-        paramBuilder.setDoubleTensorParam(getTensor(param));
-
-        return paramBuilder.build();
-    }
-
-    private KeanuSavedBayesNet.NamedParam getParam(String paramName, IntegerTensor param) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-        paramBuilder.setIntTensorParam(getTensor(param));
-
-        return paramBuilder.build();
-    }
-
-    private KeanuSavedBayesNet.NamedParam getParam(String paramName, BooleanTensor param) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-        paramBuilder.setBoolTensorParam(getTensor(param));
-
-        return paramBuilder.build();
-    }
-
-    private KeanuSavedBayesNet.NamedParam getParam(String paramName, double param) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-        paramBuilder.setDoubleParam(param);
-
-        return paramBuilder.build();
-    }
-
-    private KeanuSavedBayesNet.NamedParam getParam(String paramName, String param) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-        paramBuilder.setStringParam(param);
-
-        return paramBuilder.build();
-    }
-
-    private KeanuSavedBayesNet.NamedParam getParam(String paramName, int param) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-        paramBuilder.setIntParam(param);
-
-        return paramBuilder.build();
-    }
-
-    private KeanuSavedBayesNet.NamedParam getParam(String paramName, long param) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-        paramBuilder.setLongParam(param);
-
-        return paramBuilder.build();
+        return getParam(paramName,
+            builder -> builder.setParentVertex(
+                KeanuSavedBayesNet.VertexID.newBuilder().setId(parent.getId().toString())
+            )
+        );
     }
 
     private KeanuSavedBayesNet.NamedParam getParam(String paramName, long[] param) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-        paramBuilder.setLongArrayParam(KeanuSavedBayesNet.LongArray.newBuilder().addAllValues(Longs.asList(param)));
-
-        return paramBuilder.build();
+        return getParam(paramName,
+            builder -> builder.setLongArrayParam(
+                KeanuSavedBayesNet.LongArray.newBuilder().addAllValues(Longs.asList(param))));
     }
 
     private KeanuSavedBayesNet.NamedParam getParam(String paramName, int[] param) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-        paramBuilder.setIntArrayParam(KeanuSavedBayesNet.IntArray.newBuilder().addAllValues(Ints.asList(param)));
-
-        return paramBuilder.build();
+        return getParam(paramName,
+            builder -> builder.setIntArrayParam(
+                KeanuSavedBayesNet.IntArray.newBuilder().addAllValues(Ints.asList(param))));
     }
 
     private KeanuSavedBayesNet.NamedParam getParam(String paramName, Vertex[] param) {
-        KeanuSavedBayesNet.NamedParam.Builder paramBuilder = KeanuSavedBayesNet.NamedParam.newBuilder();
-
-        paramBuilder.setName(paramName);
-
         KeanuSavedBayesNet.VertexArray.Builder vertexArray = KeanuSavedBayesNet.VertexArray.newBuilder();
         for (Vertex vertex : param) {
             vertexArray.addValues(KeanuSavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()));
         }
-        paramBuilder.setVertexArrayParam(vertexArray.build());
 
-        return paramBuilder.build();
+        return getParam(paramName, builder -> builder.setVertexArrayParam(vertexArray.build()));
     }
 
     private KeanuSavedBayesNet.DoubleTensor getTensor(DoubleTensor tensor) {
