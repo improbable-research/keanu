@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 
 
 def traceplot(trace, ax=None):
+    vertex_ids = trace.keys()
+
     if ax is None:
         _, ax = plt.subplots(len(vertex_ids), 1, squeeze=False)
 
@@ -11,3 +13,7 @@ def traceplot(trace, ax=None):
         ax[index][0].plot(trace[vertex_id])
 
     return ax
+
+
+def join_dicts(dicts, keys):
+    return {k: [d[k] for d in dicts] for k in keys}

@@ -1,1 +1,1 @@
-from .traceplot import traceplot
+from .traceplot import traceplot, join_dicts
