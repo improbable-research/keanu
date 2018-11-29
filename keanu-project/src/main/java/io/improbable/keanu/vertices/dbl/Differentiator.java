@@ -23,6 +23,8 @@ public class Differentiator {
 
     public static PartialDerivatives reverseModeAutoDiff(Vertex<?> ofVertex, PartialDerivatives dWrtOfVertex, long[] dOfShape, Set<? extends Vertex<?>> wrt) {
 
+        ensureGraphValuesAndShapesAreSet(ofVertex);
+
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.<Vertex, VertexId>comparing(Vertex::getId, Comparator.naturalOrder()).reversed());
         priorityQueue.add(ofVertex);
 
@@ -59,6 +61,10 @@ public class Differentiator {
         }
 
         return wrtOfToOfWrt(wrtOf).get(ofVertex.getId());
+    }
+
+    private static void ensureGraphValuesAndShapesAreSet(Vertex<?> vertex) {
+        vertex.getValue();
     }
 
     private static void collectPartials(Map<Vertex, PartialDerivatives> partialDerivatives,

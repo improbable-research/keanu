@@ -13,9 +13,9 @@ import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 public enum RegressionRegularization {
     NONE {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new GaussianVertex(new long[]{1, featureCount},
-                ConstantVertex.of(priorOnWeightsMeans, 1, featureCount),
-                ConstantVertex.of(priorOnInterceptScaleParameter, 1, featureCount)).setLabel("weights");
+            return new GaussianVertex(new long[]{featureCount, 1},
+                ConstantVertex.of(priorOnWeightsMeans, featureCount, 1),
+                ConstantVertex.of(priorOnInterceptScaleParameter, featureCount, 1)).setLabel("weights");
         }
 
         public DoubleVertex getInterceptVertex(Double priorOnInterceptMean, Double priorOnInterceptScaleParameter) {
@@ -28,9 +28,9 @@ public enum RegressionRegularization {
     },
     LASSO {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new LaplaceVertex(new long[]{1, featureCount},
-                new ConstantDoubleVertex(priorOnWeightsMeans, new long[]{1, priorOnWeightsMeans.length}),
-                new ConstantDoubleVertex(priorOnInterceptScaleParameter, new long[]{1, priorOnInterceptScaleParameter.length})
+            return new LaplaceVertex(new long[]{featureCount, 1},
+                new ConstantDoubleVertex(priorOnWeightsMeans, new long[]{priorOnWeightsMeans.length, 1}),
+                new ConstantDoubleVertex(priorOnInterceptScaleParameter, new long[]{priorOnInterceptScaleParameter.length, 1})
             );
         }
 
@@ -44,9 +44,9 @@ public enum RegressionRegularization {
     },
     RIDGE {
         public DoubleVertex getWeightsVertex(long featureCount, double[] priorOnWeightsMeans, double[] priorOnInterceptScaleParameter) {
-            return new GaussianVertex(new long[]{1, featureCount},
-                new ConstantDoubleVertex(priorOnWeightsMeans, new long[]{1, priorOnWeightsMeans.length}),
-                new ConstantDoubleVertex(priorOnInterceptScaleParameter, new long[]{1, priorOnInterceptScaleParameter.length})
+            return new GaussianVertex(new long[]{featureCount, 1},
+                new ConstantDoubleVertex(priorOnWeightsMeans, new long[]{priorOnWeightsMeans.length, 1}),
+                new ConstantDoubleVertex(priorOnInterceptScaleParameter, new long[]{priorOnInterceptScaleParameter.length, 1})
             );
         }
 

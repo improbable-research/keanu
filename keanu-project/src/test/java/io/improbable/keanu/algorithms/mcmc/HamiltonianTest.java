@@ -33,17 +33,18 @@ public class HamiltonianTest {
     public void samplesGaussian() {
         double mu = 0.0;
         double sigma = 1.0;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, KeanuRandom.getDefaultRandom());
+        KeanuRandom random = KeanuRandom.getDefaultRandom();
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, random.nextGaussian(0, 1), random);
 
         Hamiltonian hmc = Hamiltonian.builder()
-            .leapFrogCount(10)
-            .stepSize(0.4)
+            .leapFrogCount(20)
+            .stepSize(0.05)
             .build();
 
         NetworkSamples posteriorSamples = hmc.getPosteriorSamples(
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
-            1000
+            2000
         );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
