@@ -20,7 +20,7 @@ class RegressionWeights {
     }
 
     static double[] fillPriorOnWeights(long[] featureShape, double weight) {
-        double[] priorWeights = new double[Math.toIntExact(featureShape[0])];
+        double[] priorWeights = new double[Math.toIntExact(featureShape[1])];
         Arrays.fill(priorWeights, weight);
         return priorWeights;
     }
