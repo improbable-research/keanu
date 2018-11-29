@@ -5,9 +5,9 @@ import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -48,7 +48,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
      * @param probTrue probTrue with same shape as desired Bernoulli tensor or scalar
      */
     @ExportVertexToPythonBindings
-    public BernoulliVertex(@LoadParentVertex(PROBTRUE_NAME) DoubleVertex probTrue) {
+    public BernoulliVertex(@LoadVertexParam(PROBTRUE_NAME) DoubleVertex probTrue) {
         this(probTrue.getShape(), probTrue);
     }
 
@@ -60,7 +60,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
         this(shape, new ConstantDoubleVertex(probTrue));
     }
 
-    @SaveParentVertex(PROBTRUE_NAME)
+    @SaveVertexParam(PROBTRUE_NAME)
     public DoubleVertex getProbTrue() {
         return probTrue;
     }

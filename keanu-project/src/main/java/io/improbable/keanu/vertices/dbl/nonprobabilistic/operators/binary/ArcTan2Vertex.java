@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -22,8 +22,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
      * @param y y coordinate
      */
     @ExportVertexToPythonBindings
-    public ArcTan2Vertex(@LoadParentVertex(X_NAME) DoubleVertex x,
-                         @LoadParentVertex(Y_NAME) DoubleVertex y) {
+    public ArcTan2Vertex(@LoadVertexParam(X_NAME) DoubleVertex x,
+                         @LoadVertexParam(Y_NAME) DoubleVertex y) {
         super(x, y);
     }
 
