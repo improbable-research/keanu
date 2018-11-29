@@ -1,22 +1,19 @@
 package io.improbable.keanu.algorithms;
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+
 public class SampleStats {
     public static double[] acf(double[] samples) {
-        double[] result = new double[samples.length];
         double[] acovResult = acov(samples);
-
-        for (int i = 0; i < samples.length; i++) {
-            result[i] = acovResult[i] / acovResult[0];
-        }
-        return result;
+        double variance = acovResult[0];
+        double[] autocor = Arrays.stream(acovResult).map(x -> x / variance).toArray();
+        return autocor;
     }
 
     public static double[] acov(double[] samples) {
@@ -26,14 +23,15 @@ public class SampleStats {
 
         // Zero padding needed to stop mixing of convolution results
         // See last paragraph of https://dsp.stackexchange.com/a/745
+        // FFT requires length to be power of two
         int fftSize = nextPowerOfTwo(2 * n + 1);
         double[] demeanPaddedWithZeros = Arrays.copyOf(demean, fftSize);
 
         Complex ifft[] = fftCrossCorrelationWitSelf(demeanPaddedWithZeros);
-        double realResult[] = getRealPartsTruncated(ifft, n);
+        double realParts[] = getRealPartsTruncated(ifft, n);
+        double realPartsDivN[] = Arrays.stream(realParts).map(x -> x / n).toArray();
 
-        realResult = Arrays.stream(realResult).map(x -> x / n).toArray();
-        return realResult;
+        return realPartsDivN;
     }
 
     private static Complex[] fftCrossCorrelationWitSelf(double[] values) {
