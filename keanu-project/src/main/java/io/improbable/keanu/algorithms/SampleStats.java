@@ -12,6 +12,7 @@ public class SampleStats {
     public static double[] acf(double[] samples) {
         double[] result = new double[samples.length];
         double[] acovResult = acov(samples);
+
         for (int i = 0; i < samples.length; i++) {
             result[i] = acovResult[i] / acovResult[0];
         }
@@ -31,7 +32,7 @@ public class SampleStats {
         Complex ifft[] = fftCrossCorrelationWitSelf(demeanPaddedWithZeros);
         double realResult[] = getRealPartsTruncated(ifft, n);
 
-        realResult = Arrays.stream(realResult).map(x -> x/n).toArray();
+        realResult = Arrays.stream(realResult).map(x -> x / n).toArray();
         return realResult;
     }
 
@@ -40,7 +41,7 @@ public class SampleStats {
         Complex fftData[] = ffTransformer.transform(values, TransformType.FORWARD);
         Complex fftMultipliedWithConj[] = multiplyWithConjugateInPlace(fftData);
         Complex ifft[] = ffTransformer.transform(fftMultipliedWithConj, TransformType.INVERSE);
-        return  ifft;
+        return ifft;
     }
 
 
