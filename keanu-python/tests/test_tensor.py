@@ -78,7 +78,7 @@ def test_cannot_pass_generic_ndarray_to_Tensor(generic):
     with pytest.raises(NotImplementedError) as excinfo:
         Tensor(np.array([generic, generic]))
 
-    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
+    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given object"
 
 
 def test_can_pass_empty_ndarray_to_Tensor():

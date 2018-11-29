@@ -45,8 +45,7 @@ class Tensor(JavaObjectWrapper):
         elif ndarray.dtype in runtime_float_types:
             return k.jvm_view().DoubleTensor.create
         else:
-            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(
-                type(ndarray.item(0))))
+            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(ndarray.dtype))
 
     @staticmethod
     def __get_tensor_from_scalar(scalar: primitive_types) -> Any:
