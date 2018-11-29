@@ -113,6 +113,11 @@ public class ProtobufTest {
         DoubleTensor dOutputAfter = Differentiator.forwardModeAutoDiff(outputVertex2).withRespectTo(inputVertex2);
 
         assertEquals(dOutputBefore, dOutputAfter);
+
+        dOutputBefore = Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
+        dOutputAfter = Differentiator.reverseModeAutoDiff(outputVertex2, inputVertex2).withRespectTo(inputVertex2);
+
+        assertEquals(dOutputBefore, dOutputAfter);
     }
 
     private BayesianNetwork createComplexNet() {
