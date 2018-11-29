@@ -14,7 +14,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.model.LambdaModelV
 
 class LambdaModel(Vertex):
 
-    def __init__(self, inputs: Dict[str, Vertex], executor: Callable, update_values: Callable=None) -> None:
+    def __init__(self, inputs: Dict[str, Vertex], executor: Callable, update_values: Callable = None) -> None:
         self.vertices_wrapped = inputs
         vertex_map = LambdaModel.__to_java_map(inputs)
         self.executor = executor
