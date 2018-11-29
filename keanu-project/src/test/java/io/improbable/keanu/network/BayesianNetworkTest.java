@@ -9,11 +9,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
@@ -21,6 +24,7 @@ import static org.mockito.Mockito.mock;
 public class BayesianNetworkTest {
 
     BayesianNetwork network;
+    Set<Vertex> connectedGraph;
     BoolVertex input1;
     BoolVertex input2;
     BoolVertex output;
@@ -33,8 +37,8 @@ public class BayesianNetworkTest {
         input1 = new BernoulliVertex(0.25);
         input2 = new BernoulliVertex(0.75);
         output = input1.or(input2);
-        network = new BayesianNetwork(output.getConnectedGraph());
-
+        connectedGraph = output.getConnectedGraph();
+        network = new BayesianNetwork(connectedGraph);
     }
 
     @Test
@@ -102,4 +106,20 @@ public class BayesianNetworkTest {
         NetworkSaver netSaver = mock(NetworkSaver.class);
         net.save(netSaver);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cantInstantiateEmptyBayesianNetwork() {
+        BayesianNetwork net = new BayesianNetwork(new HashSet<>());
+    }
+
+    @Test
+    public void testGetNumVertices() {
+        assertThat(network.getVertexCount(), equalTo(connectedGraph.size()));
+    }
+
+    @Test
+    public void testGetAverageVertexDegree() {
+        assertThat(network.getAverageVertexDegree(), equalTo((1. + 1. + 2. + 2. + 2.) / 5));
+    }
+
 }
