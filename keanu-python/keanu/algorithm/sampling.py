@@ -25,7 +25,8 @@ def sample(net: BayesNet,
            algo: str = 'metropolis',
            draws: int = 500,
            drop: int = 0,
-           down_sample_interval: int = 1) -> sample_types:
+           down_sample_interval: int = 1,
+           plot: bool = False) -> sample_types:
 
     vertices_unwrapped = k.to_java_object_list(sample_from)
 
@@ -36,6 +37,9 @@ def sample(net: BayesNet,
             map(Tensor._to_ndarray,
                 network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped
     }
+
+    if plot:
+        traceplot(vertex_samples)
 
     return vertex_samples
 
