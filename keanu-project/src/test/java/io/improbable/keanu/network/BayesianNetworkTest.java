@@ -114,7 +114,7 @@ public class BayesianNetworkTest {
 
     @Test
     public void testGetNumVertices() {
-        assertThat(network.getNumVertices(), equalTo(connectedGraph.size()));
+        assertThat(network.getVertexCount(), equalTo(connectedGraph.size()));
     }
 
     @Test

@@ -65,7 +65,7 @@ public class BayesianNetwork {
         return vertices;
     }
 
-    public int getNumVertices() {
+    public int getVertexCount() {
         return getVertices().size();
     }
 
