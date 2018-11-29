@@ -4,7 +4,11 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -17,13 +21,15 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble {
+public class GaussianVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
+    protected static final String MU_NAME = "mu";
+    protected static final String SIGMA_NAME = "sigma";
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -35,18 +41,18 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
     public GaussianVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
-
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
+        super(tensorShape);
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), sigma.getShape());
 
         this.mu = mu;
         this.sigma = sigma;
         setParents(mu, sigma);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     @ExportVertexToPythonBindings
-    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
+    public GaussianVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
+                          @LoadParentVertex(SIGMA_NAME) DoubleVertex sigma) {
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
     public GaussianVertex(DoubleVertex mu, double sigma) {
@@ -73,10 +79,12 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
         this(tensorShape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
 
+    @SaveParentVertex(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
+    @SaveParentVertex(SIGMA_NAME)
     public DoubleVertex getSigma() {
         return sigma;
     }
@@ -114,8 +122,8 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(shape, random);
     }
 
     @Override

@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.model;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -14,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 
-public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
+public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor>, NonSaveableVertex {
 
     private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
     private Map<VertexLabel, Tensor> outputs;
@@ -36,6 +37,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     public LambdaModelVertex(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                              Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
                              Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
+        super(Tensor.SCALAR_SHAPE);
         this.inputs = inputs;
         this.outputs = Collections.emptyMap();
         this.executor = executor;

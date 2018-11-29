@@ -16,15 +16,11 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
     }
 
     static BooleanTensor create(boolean... values) {
-        return create(values, 1, values.length);
+        return create(values, values.length);
     }
 
     static BooleanTensor scalar(boolean scalarValue) {
         return new SimpleBooleanTensor(scalarValue);
-    }
-
-    static BooleanTensor placeHolder(long[] shape) {
-        return new SimpleBooleanTensor(shape);
     }
 
     static BooleanTensor trues(long... shape) {
@@ -71,19 +67,23 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
         return this.or(BooleanTensor.scalar(that));
     }
 
+    BooleanTensor xor(BooleanTensor that);
+
     BooleanTensor not();
 
-    DoubleTensor setDoubleIf(DoubleTensor trueValue, DoubleTensor falseValue);
+    DoubleTensor doubleWhere(DoubleTensor trueValue, DoubleTensor falseValue);
 
-    IntegerTensor setIntegerIf(IntegerTensor trueValue, IntegerTensor falseValue);
+    IntegerTensor integerWhere(IntegerTensor trueValue, IntegerTensor falseValue);
 
-    BooleanTensor setBooleanIf(BooleanTensor trueValue, BooleanTensor falseValue);
+    BooleanTensor booleanWhere(BooleanTensor trueValue, BooleanTensor falseValue);
 
-    <T> Tensor<T> setIf(Tensor<T> trueValue, Tensor<T> falseValue);
+    <T, TENSOR extends Tensor<T>> TENSOR where(TENSOR trueValue, TENSOR falseValue);
 
     BooleanTensor andInPlace(BooleanTensor that);
 
     BooleanTensor orInPlace(BooleanTensor that);
+
+    BooleanTensor xorInPlace(BooleanTensor that);
 
     BooleanTensor notInPlace();
 

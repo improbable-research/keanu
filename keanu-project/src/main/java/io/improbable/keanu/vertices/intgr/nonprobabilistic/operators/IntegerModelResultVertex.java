@@ -1,7 +1,9 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -13,11 +15,12 @@ import io.improbable.keanu.vertices.model.ModelVertex;
 /**
  * A non-probabilistic integer vertex whose value is extracted from an upstream model vertex.
  */
-public class IntegerModelResultVertex extends IntegerVertex implements ModelResultProvider<IntegerTensor>, NonProbabilistic<IntegerTensor> {
+public class IntegerModelResultVertex extends IntegerVertex implements ModelResultProvider<IntegerTensor>, NonProbabilistic<IntegerTensor>, NonSaveableVertex {
 
     private final ModelResult<IntegerTensor> delegate;
 
     public IntegerModelResultVertex(ModelVertex model, VertexLabel label) {
+        super(Tensor.SCALAR_SHAPE);
         this.delegate = new ModelResult<>(model, label);
         setParents((Vertex) model);
     }

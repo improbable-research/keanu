@@ -8,8 +8,8 @@ public class UnaryOpLambda<IN, OUT> extends UnaryOpVertex<IN, OUT> {
 
     private Function<IN, OUT> op;
 
-    public UnaryOpLambda(Vertex<IN> inputVertex, Function<IN, OUT> op) {
-        super(inputVertex);
+    public UnaryOpLambda(long[] shape, Vertex<IN> inputVertex, Function<IN, OUT> op) {
+        super(shape, inputVertex);
         this.op = op;
     }
 

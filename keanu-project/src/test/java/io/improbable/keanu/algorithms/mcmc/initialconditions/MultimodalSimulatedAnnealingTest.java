@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.mcmc.initialconditions;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -14,6 +15,7 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class MultimodalSimulatedAnnealingTest {
         random = new KeanuRandom(1);
     }
 
+    @Category(Slow.class)
     @Test
     public void findsBothModesForContinuousNetwork() {
 
@@ -50,6 +53,7 @@ public class MultimodalSimulatedAnnealingTest {
         assertTrue(findsUpperMode);
     }
 
+    @Category(Slow.class)
     @Test
     public void findsModesForDiscreteContinuousHybridNetwork() {
 

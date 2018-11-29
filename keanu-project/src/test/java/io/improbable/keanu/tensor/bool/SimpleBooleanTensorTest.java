@@ -12,6 +12,7 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -36,17 +37,17 @@ public class SimpleBooleanTensorTest {
     }
 
     @Test
-    public void youCannotCreateARankZeroTensor() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Tensors must have rank >=2 : []");
-        SimpleBooleanTensor.create(new boolean[] {}, new long[] {});
+    public void youCanCreateARankZeroTensor() {
+        BooleanTensor scalarTrue = SimpleBooleanTensor.create(new boolean[]{true}, new long[]{});
+        assertTrue(scalarTrue.scalar());
+        assertEquals(0, scalarTrue.getRank());
     }
 
     @Test
-    public void youCannotCreateARankOneTensor() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Tensors must have rank >=2 : [5]");
-        SimpleBooleanTensor.create(new boolean[] {true, false, false, true, true}, new long[] {5});
+    public void youCanCreateARankOneTensor() {
+        BooleanTensor booleanVector = SimpleBooleanTensor.create(new boolean[]{true, false, false, true, true}, new long[]{5});
+        assertTrue(booleanVector.getValue(3));
+        assertEquals(1, booleanVector.getRank());
     }
 
     @Test
@@ -90,7 +91,7 @@ public class SimpleBooleanTensorTest {
         DoubleTensor trueCase = DoubleTensor.create(new double[]{1.5, 2.0, 3.3, 4.65}, new long[]{2, 2});
         DoubleTensor falseCase = DoubleTensor.create(new double[]{5.1, 7.2, 11.4, 23.22}, new long[]{2, 2});
 
-        DoubleTensor result = matrixA.setDoubleIf(trueCase, falseCase);
+        DoubleTensor result = matrixA.doubleWhere(trueCase, falseCase);
         assertArrayEquals(new double[]{1.5, 7.2, 3.3, 23.22}, result.asFlatDoubleArray(), 0.0);
     }
 
@@ -99,13 +100,13 @@ public class SimpleBooleanTensorTest {
         IntegerTensor trueCase = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         IntegerTensor falseCase = IntegerTensor.create(new int[]{5, 7, 11, 23}, new long[]{2, 2});
 
-        IntegerTensor result = matrixA.setIntegerIf(trueCase, falseCase);
+        IntegerTensor result = matrixA.integerWhere(trueCase, falseCase);
         assertArrayEquals(new int[]{1, 7, 3, 23}, result.asFlatIntegerArray());
     }
 
     @Test
     public void doesSetBooleanIf() {
-        BooleanTensor result = matrixA.setBooleanIf(matrixB, matrixC);
+        BooleanTensor result = matrixA.booleanWhere(matrixB, matrixC);
         assertArrayEquals(new Boolean[]{false, true, true, false}, result.asFlatArray());
     }
 
@@ -114,7 +115,7 @@ public class SimpleBooleanTensorTest {
     }
 
     @Test
-    public void doesSetGenericIf() {
+    public void doesWhereWithNonScalarTensors() {
 
         Tensor<Something> trueCase = new GenericTensor<>(
             new Something[]{Something.A, Something.B, Something.C, Something.D},
@@ -126,9 +127,22 @@ public class SimpleBooleanTensorTest {
             new long[]{2, 2}
         );
 
-        Tensor<Something> result = matrixA.setIf(trueCase, falseCase);
+        Tensor<Something> result = matrixA.where(trueCase, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.C, Something.A},
+            result.asFlatArray()
+        );
+    }
+
+    @Test
+    public void doesWhereWithScalarTensors() {
+
+        Tensor<Something> trueCase = GenericTensor.scalar(Something.A);
+        Tensor<Something> falseCase = GenericTensor.scalar(Something.C);
+
+        Tensor<Something> result = matrixA.where(trueCase, falseCase);
+        assertArrayEquals(
+            new Something[]{Something.A, Something.C, Something.A, Something.C},
             result.asFlatArray()
         );
     }
@@ -149,7 +163,7 @@ public class SimpleBooleanTensorTest {
     @Test
     public void canElementwiseEqualsAScalarValue() {
         boolean value = true;
-        BooleanTensor allTheSame = BooleanTensor.create(value, new long[] {2, 3});
+        BooleanTensor allTheSame = BooleanTensor.create(value, new long[]{2, 3});
         Tensor<Boolean> notAllTheSame = allTheSame.duplicate().setValue(!value, 1, 1);
 
         assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));

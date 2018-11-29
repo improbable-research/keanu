@@ -2,16 +2,14 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.Map;
 
 public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
     protected final DoubleVertex inputVertex;
+    protected static final String INPUT_VERTEX_NAME = "inputVertex";
 
     /**
      * A vertex that performs a user defined operation on a single input vertex
@@ -29,9 +27,14 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
      * @param inputVertex the input vertex
      */
     public DoubleUnaryOpVertex(long[] shape, DoubleVertex inputVertex) {
+        super(shape);
         this.inputVertex = inputVertex;
         setParents(inputVertex);
-        setValue(DoubleTensor.placeHolder(shape));
+    }
+
+    @SaveParentVertex(INPUT_VERTEX_NAME)
+    public DoubleVertex getInputVertex() {
+        return inputVertex;
     }
 
     @Override
@@ -44,16 +47,5 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
         return op(inputVertex.getValue());
     }
 
-    @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        try {
-            return forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs.get(inputVertex));
-        } catch (UnsupportedOperationException e) {
-            return super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs);
-        }
-    }
-
     protected abstract DoubleTensor op(DoubleTensor value);
-
-    protected abstract PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs);
 }

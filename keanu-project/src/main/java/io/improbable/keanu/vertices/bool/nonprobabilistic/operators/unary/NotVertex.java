@@ -1,11 +1,14 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
 import io.improbable.keanu.vertices.Vertex;
 
 public class NotVertex extends BoolUnaryOpVertex<BooleanTensor> {
 
-    public NotVertex(Vertex<BooleanTensor> a) {
+    @ExportVertexToPythonBindings
+    public NotVertex(@LoadParentVertex(INPUT_NAME) Vertex<BooleanTensor> a) {
         super(a.getShape(), a);
     }
 

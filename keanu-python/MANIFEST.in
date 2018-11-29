@@ -1,0 +1,2 @@
+include keanu/classpath/*.jar
+include LICENSE

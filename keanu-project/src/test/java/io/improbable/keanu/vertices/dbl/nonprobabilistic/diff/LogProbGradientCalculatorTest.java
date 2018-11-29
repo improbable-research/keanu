@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
@@ -113,7 +114,7 @@ public class LogProbGradientCalculatorTest {
         double expectedDLogProbWrtA = B.dLogProb(bValue, D).get(D).times(cValue).sum();
         DoubleTensor expectedDLogProbWrtC = B.dLogProb(bValue, D).get(D).times(aValue);
 
-        assertArrayEquals(new long[]{1, 1}, dBLogProbWrtAValue.getShape());
+        assertArrayEquals(new long[]{}, dBLogProbWrtAValue.getShape());
         assertThat(dBLogProbWrtAValue.scalar(), equalTo(expectedDLogProbWrtA));
         assertThat(dBLogProbWrtCValue, equalTo(expectedDLogProbWrtC));
     }
@@ -138,7 +139,7 @@ public class LogProbGradientCalculatorTest {
         DoubleVertex E = C.times(D).pow(A).acos();
         DoubleVertex G = E.log().tan().asin().atan();
         DoubleVertex F = D.plus(B).exp();
-        DoubleVertex H = G.plus(F).sum();
+        SumVertex H = G.plus(F).sum();
         GaussianVertex J = new GaussianVertex(H, 1);
         J.observe(0.5);
 
@@ -153,8 +154,8 @@ public class LogProbGradientCalculatorTest {
         DoubleTensor dHdB = dHForward.withRespectTo(B);
         DoubleTensor dJLogProbWrtH = J.dLogProbAtValue(H).get(H);
 
-        DoubleTensor expectedDJLogProbWrtAValue = dJLogProbWrtH.times(dHdA).sum(0, 1);
-        DoubleTensor expectedDJLogProbWrtBValue = dJLogProbWrtH.times(dHdB).sum(0, 1);
+        DoubleTensor expectedDJLogProbWrtAValue = dJLogProbWrtH.times(dHdA);
+        DoubleTensor expectedDJLogProbWrtBValue = dJLogProbWrtH.times(dHdB);
 
         assertEquals(expectedDJLogProbWrtAValue, dJLogProbWrtAValue);
         assertEquals(expectedDJLogProbWrtBValue, dJLogProbWrtBValue);

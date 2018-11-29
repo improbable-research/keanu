@@ -26,10 +26,10 @@ page_nav:
 
 Now that we've learnt to describe and build a model in [describing your model]({{ site.baseurl }}/docs/describing-your-model), we want to put 
 it to use! Keanu enables you to calculate the **most probable values** of components of your model given certain conditions
-or 'observations'. More formally, these are known as posterior estimates, and we are going to look at how we can obtain these
+or 'observations'. More formally, these are known as *posterior estimates*, and we are going to look at how we can obtain these
 through an optimization method called Maximum A Posteriori (MAP).
 
-Another technique for obtaining posterior estimates is through sampling, read more about that on [posterior-sampling]({{ site.baseurl }}/docs/inference-posterior-sampling).
+Another technique for obtaining posterior estimates is through sampling. Read more about that on [posterior-sampling]({{ site.baseurl }}/docs/inference-posterior-sampling).
 Sampling should be used when optimization techniques are not appropriate, e.g: you have discrete variables in your model.
 
 
@@ -47,7 +47,7 @@ on your bayesian network using [Automatic-Differentiation](http://www.columbia.e
 Automatic Differentiation may sound technical and scary, but don't worry, Keanu handles all the calculations for you! All
 you have to focus on is describing your model.
 
-"Which one do I use then?" I hear you ask. How do I know if my model can make use of gradients?
+"Which one do I use then?" I hear you ask. "How do I know if my model can make use of gradients?"
 
 Well it depends on whether your latent variables (the ones we're going to find the most probable value of) are continuous
 or discrete. Keanu does not support gradient optimisation on discrete latents. Still not sure? Don't worry, Keanu can analyse
@@ -56,7 +56,7 @@ your model and determine whether or not to use gradients for you. The next secti
 
 ### Optimizer
 
-Let's say you've described the [thermometer model]({{ site.baseurl }}/docs/thermometer-example) and want to run MAP but you're not sure
+Let's say you've described the [thermometer model]({{ site.baseurl }}/docs/examples/thermometer) and want to run MAP but you're not sure
 whether to use the Gradient or Non-Gradient Optimizer. You can use the following code to let Keanu decide which one to use.
 
 ```java

@@ -4,7 +4,11 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Cauchy;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -16,13 +20,15 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
+public class CauchyVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex location;
     private final DoubleVertex scale;
+    private static final String LOCATION_NAME = "location";
+    protected static final String SCALE_NAME = "scale";
 
     /**
      * One location or scale or both that match a proposed tensor shape of Cauchy
@@ -34,18 +40,18 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param scale       the scale of the Cauchy with either the same tensorShape as specified for this vertex or a scalar
      */
     public CauchyVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
-
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
+        super(tensorShape);
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, location.getShape(), scale.getShape());
 
         this.location = location;
         this.scale = scale;
         setParents(location, scale);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     @ExportVertexToPythonBindings
-    public CauchyVertex(DoubleVertex location, DoubleVertex scale) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
+    public CauchyVertex(@LoadParentVertex(LOCATION_NAME) DoubleVertex location,
+                        @LoadParentVertex(SCALE_NAME) DoubleVertex scale) {
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(location.getShape(), scale.getShape()), location, scale);
     }
 
     public CauchyVertex(DoubleVertex location, double scale) {
@@ -72,10 +78,12 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
         this(tensorShape, new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
+    @SaveParentVertex(LOCATION_NAME)
     public DoubleVertex getLocation() {
         return location;
     }
 
+    @SaveParentVertex(SCALE_NAME)
     public DoubleVertex getScale() {
         return scale;
     }
@@ -113,7 +121,7 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Cauchy.withParameters(location.getValue(), scale.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Cauchy.withParameters(location.getValue(), scale.getValue()).sample(shape, random);
     }
 }

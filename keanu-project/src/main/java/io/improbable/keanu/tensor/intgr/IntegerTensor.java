@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.intgr;
 
-import com.google.common.primitives.Ints;
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -35,16 +34,8 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         }
     }
 
-    static IntegerTensor create(long[] values, long... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
-            return new ScalarIntegerTensor(Ints.checkedCast(values[0]));
-        } else {
-            return Nd4jIntegerTensor.create(Arrays.stream(values).mapToInt(Ints::checkedCast).toArray(), shape);
-        }
-    }
-
     static IntegerTensor create(int... values) {
-        return create(values, 1, values.length);
+        return create(values, values.length);
     }
 
     static IntegerTensor ones(long... shape) {
@@ -75,14 +66,17 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return new ScalarIntegerTensor(scalarValue);
     }
 
-    static IntegerTensor placeHolder(long[] shape) {
-        return new ScalarIntegerTensor(shape);
+    static IntegerTensor concat(IntegerTensor... toConcat) {
+        return concat(0, toConcat);
     }
 
     static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {
             concatAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toConcat[i]).dup();
+            if (concatAsINDArray[i].shape().length == 0) {
+                concatAsINDArray[i] = concatAsINDArray[i].reshape(1);
+            }
         }
         INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
         return new Nd4jIntegerTensor(concat);

@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
@@ -19,8 +20,8 @@ public class ScalarIntegerTensorTest {
     }
 
     @Test
-    public void canArgFindMaxOfScalar() {
-        IntegerTensor tensor = IntegerTensor.scalar(1);
+    public void canArgFindMaxOfOneByOne() {
+        IntegerTensor tensor = IntegerTensor.scalar(1).reshape(1, 1);
 
         assertEquals(0, tensor.argMax());
         assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.scalar(0)));
@@ -31,5 +32,38 @@ public class ScalarIntegerTensorTest {
     public void argMaxFailsForAxisTooHigh() {
         IntegerTensor tensor = IntegerTensor.scalar(1);
         tensor.argMax(2);
+    }
+
+    @Test
+    public void comparesIntegerScalarWithTensor() {
+        IntegerTensor value = IntegerTensor.scalar(1);
+        IntegerTensor differentValue = IntegerTensor.create(1, 2, 3);
+        BooleanTensor result = value.elementwiseEquals(differentValue);
+        assertThat(result, hasValue(true, false, false));
+    }
+
+
+    @Test
+    public void doesKeepRankOnGTEq() {
+        IntegerTensor value = IntegerTensor.scalar(1).reshape(1, 1, 1);
+        assertEquals(3, value.greaterThanOrEqual(2).getRank());
+    }
+
+    @Test
+    public void doesKeepRankOnGT() {
+        IntegerTensor value = IntegerTensor.scalar(1).reshape(1, 1, 1);
+        assertEquals(3, value.greaterThan(2).getRank());
+    }
+
+    @Test
+    public void doesKeepRankOnLT() {
+        IntegerTensor value = IntegerTensor.scalar(1).reshape(1, 1, 1);
+        assertEquals(3, value.lessThan(2).getRank());
+    }
+
+    @Test
+    public void doesKeepRankOnLTEq() {
+        IntegerTensor value = IntegerTensor.scalar(1).reshape(1, 1, 1);
+        assertEquals(3, value.lessThanOrEqual(2).getRank());
     }
 }

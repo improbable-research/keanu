@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,13 +23,13 @@ public class ConcatenationVertexTest {
     @Test
     public void canConcatVectorsOfSameSize() {
         UniformVertex a = new UniformVertex(0.0, 1.0);
-        a.setValue(new double[]{1, 2, 3});
+        a.setValue(DoubleTensor.create(new double[]{1, 2, 3}, 1, 3));
 
         UniformVertex b = new UniformVertex(0.0, 1.0);
-        b.setValue(new double[]{4, 5, 6});
+        b.setValue(DoubleTensor.create(new double[]{4, 5, 6}, 1, 3));
 
         UniformVertex c = new UniformVertex(0.0, 1.0);
-        c.setValue(new double[]{7, 8, 9});
+        c.setValue(DoubleTensor.create(new double[]{7, 8, 9}, 1, 3));
 
         ConcatenationVertex concatZero = new ConcatenationVertex(0, a, b);
         ConcatenationVertex concatOne = new ConcatenationVertex(1, a, b, c);
@@ -48,9 +49,9 @@ public class ConcatenationVertexTest {
         UniformVertex b = new UniformVertex(0.0, 1.0);
         b.setValue(new double[]{4, 5, 6, 7, 8, 9});
 
-        ConcatenationVertex concatZero = new ConcatenationVertex(1, a, b);
+        ConcatenationVertex concatZero = new ConcatenationVertex(0, a, b);
 
-        Assert.assertArrayEquals(new long[]{1, 9}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{9}, concatZero.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatZero.getValue().asFlatDoubleArray(), 0.001);
     }
 
@@ -59,34 +60,34 @@ public class ConcatenationVertexTest {
         UniformVertex a = new UniformVertex(0.0, 1.0);
         a.setValue(new double[]{1, 2, 3});
 
-        DoubleVertex b = new ConstantDoubleVertex(4.0);
+        DoubleVertex b = new ConstantDoubleVertex(new double[]{4.0});
 
-        ConcatenationVertex concat = new ConcatenationVertex(1, a, b);
+        ConcatenationVertex concat = new ConcatenationVertex(0, a, b);
 
-        Assert.assertArrayEquals(new long[]{1, 4}, concat.getShape());
+        Assert.assertArrayEquals(new long[]{4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test
     public void canConcatVectorToScalar() {
-        DoubleVertex a = new ConstantDoubleVertex(1.0);
+        DoubleVertex a = new ConstantDoubleVertex(new double[]{1.0});
 
         UniformVertex b = new UniformVertex(0.0, 1.0);
         b.setValue(new double[]{2, 3, 4});
 
-        ConcatenationVertex concat = new ConcatenationVertex(1, a, b);
+        ConcatenationVertex concat = new ConcatenationVertex(0, a, b);
 
-        Assert.assertArrayEquals(new long[]{1, 4}, concat.getShape());
+        Assert.assertArrayEquals(new long[]{4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void errorThrownOnConcatOfWrongSize() {
         UniformVertex a = new UniformVertex(0.0, 1.0);
-        a.setValue(new double[]{1, 2, 3});
+        a.setValue(DoubleTensor.create(new double[]{1, 2, 3}, 1, 3));
 
         UniformVertex a1 = new UniformVertex(0.0, 1.0);
-        a1.setValue(new double[]{4, 5, 6, 7, 8, 9});
+        a1.setValue(DoubleTensor.create(new double[]{4, 5, 6, 7, 8, 9}, 1, 6));
 
         new ConcatenationVertex(0, a, a1);
     }
@@ -144,8 +145,8 @@ public class ConcatenationVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex c = a.times(b);
-        DoubleVertex d = a.plus(b);
+        MultiplicationVertex c = a.times(b);
+        AdditionVertex d = a.plus(b);
 
         ConcatenationVertex concat = new ConcatenationVertex(0, c, d);
         PartialDerivatives concatPartialForward = concat.getDerivativeWrtLatents();
@@ -182,9 +183,9 @@ public class ConcatenationVertexTest {
         DoubleVertex d = b.plus(ConstantVertex.of(DoubleTensor.linspace(1, 2, 8).reshape(2, 2, 2)));
 
         DoubleVertex concat = new ConcatenationVertex(2, c, d);
-        DoubleVertex sum = concat.sum(1);
+        SumVertex sum = concat.sum(1);
 
-        finiteDifferenceMatchesForwardAndReverseModeGradient(Arrays.asList(a,b), sum, 10.0, 1e-10);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(Arrays.asList(a, b), sum, 10.0, 1e-10);
     }
 
     @Test
@@ -308,8 +309,8 @@ public class ConcatenationVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex c = sharedMatrix.matrixMultiply(a);
-        DoubleVertex d = sharedMatrix.matrixMultiply(b);
+        MatrixMultiplicationVertex c = sharedMatrix.matrixMultiply(a);
+        MatrixMultiplicationVertex d = sharedMatrix.matrixMultiply(b);
 
         DoubleTensor dCdshared = c.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
         DoubleTensor dDdshared = d.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
@@ -356,8 +357,8 @@ public class ConcatenationVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex c = sharedMatrix.matrixMultiply(a);
-        DoubleVertex d = sharedMatrix.matrixMultiply(b);
+        MatrixMultiplicationVertex c = sharedMatrix.matrixMultiply(a);
+        MatrixMultiplicationVertex d = sharedMatrix.matrixMultiply(b);
 
         DoubleTensor dCdshared = c.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
         DoubleTensor dDdshared = d.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
@@ -408,9 +409,9 @@ public class ConcatenationVertexTest {
         DoubleVertex f = new UniformVertex(0, 10);
         f.setValue(DoubleTensor.create(new double[]{90, 91, 92, 93}, 2, 2));
 
-        DoubleVertex c = sharedMatrix.matrixMultiply(a);
-        DoubleVertex d = sharedMatrix.matrixMultiply(b);
-        DoubleVertex e = sharedMatrix.matrixMultiply(f);
+        MatrixMultiplicationVertex c = sharedMatrix.matrixMultiply(a);
+        MatrixMultiplicationVertex d = sharedMatrix.matrixMultiply(b);
+        MatrixMultiplicationVertex e = sharedMatrix.matrixMultiply(f);
 
         DoubleTensor dCdshared = c.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
         DoubleTensor dDdshared = d.getDerivativeWrtLatents().withRespectTo(sharedMatrix);
@@ -461,7 +462,7 @@ public class ConcatenationVertexTest {
         DoubleVertex inputA = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex inputB = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex inputC = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex outputVertex = new ConcatenationVertex(0, inputA, inputB, inputC);
+        ConcatenationVertex outputVertex = new ConcatenationVertex(0, inputA, inputB, inputC);
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB, inputC), outputVertex, 10.0, 1e-10);
     }
 

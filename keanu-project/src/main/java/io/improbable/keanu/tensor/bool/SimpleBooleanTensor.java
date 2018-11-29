@@ -1,11 +1,10 @@
 package io.improbable.keanu.tensor.bool;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -34,8 +33,11 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape desired shape of tensor
      */
     public SimpleBooleanTensor(boolean[] data, long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
-        this.data = new boolean[checkedCast(TensorShape.getLength(shape))];
+        Preconditions.checkArgument(
+            TensorShape.getLength(shape) == data.length,
+            "Shape " + Arrays.toString(shape) + " does not match data length " + data.length
+        );
+        this.data = new boolean[data.length];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -54,7 +56,6 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape shape to use as place holder
      */
     public SimpleBooleanTensor(long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -65,8 +66,8 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape    desired shape of tensor
      */
     public SimpleBooleanTensor(boolean constant, long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
-        this.data = new boolean[(int) TensorShape.getLength(shape)];
+        int dataLength = TensorShape.getLengthAsInt(shape);
+        this.data = new boolean[dataLength];
         Arrays.fill(this.data, constant);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -92,12 +93,17 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public BooleanTensor xor(BooleanTensor that) {
+        return duplicate().xorInPlace(that);
+    }
+
+    @Override
     public BooleanTensor not() {
         return duplicate().notInPlace();
     }
 
     @Override
-    public DoubleTensor setDoubleIf(DoubleTensor trueValue, DoubleTensor falseValue) {
+    public DoubleTensor doubleWhere(DoubleTensor trueValue, DoubleTensor falseValue) {
         double[] trueValues = trueValue.asFlatDoubleArray();
         double[] falseValues = falseValue.asFlatDoubleArray();
 
@@ -118,7 +124,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public IntegerTensor setIntegerIf(IntegerTensor trueValue, IntegerTensor falseValue) {
+    public IntegerTensor integerWhere(IntegerTensor trueValue, IntegerTensor falseValue) {
         FlattenedView<Integer> trueValuesFlattened = trueValue.getFlattenedView();
         FlattenedView<Integer> falseValuesFlattened = falseValue.getFlattenedView();
 
@@ -131,7 +137,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor setBooleanIf(BooleanTensor trueValue, BooleanTensor falseValue) {
+    public BooleanTensor booleanWhere(BooleanTensor trueValue, BooleanTensor falseValue) {
         FlattenedView<Boolean> trueValuesFlattened = trueValue.getFlattenedView();
         FlattenedView<Boolean> falseValuesFlattened = falseValue.getFlattenedView();
 
@@ -144,16 +150,24 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public <T> Tensor<T> setIf(Tensor<T> trueValue, Tensor<T> falseValue) {
-        FlattenedView<T> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<T> falseValuesFlattened = falseValue.getFlattenedView();
+    public <T, TENSOR extends Tensor<T>> TENSOR where(TENSOR trueValue, TENSOR falseValue) {
+        if (trueValue instanceof DoubleTensor && falseValue instanceof DoubleTensor) {
+            return (TENSOR) doubleWhere((DoubleTensor) trueValue, (DoubleTensor) falseValue);
+        } else if (trueValue instanceof IntegerTensor && falseValue instanceof IntegerTensor) {
+            return (TENSOR) integerWhere((IntegerTensor) trueValue, (IntegerTensor) falseValue);
+        } else if (trueValue instanceof BooleanTensor && falseValue instanceof BooleanTensor) {
+            return (TENSOR) booleanWhere((BooleanTensor) trueValue, (BooleanTensor) falseValue);
+        } else {
+            FlattenedView<T> trueValuesFlattened = trueValue.getFlattenedView();
+            FlattenedView<T> falseValuesFlattened = falseValue.getFlattenedView();
 
-        T[] result = (T[]) (new Object[data.length]);
-        for (int i = 0; i < result.length; i++) {
-            result[i] = data[i] ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
+            T[] result = (T[]) (new Object[data.length]);
+            for (int i = 0; i < result.length; i++) {
+                result[i] = data[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            }
+
+            return Tensor.create(result, copyOf(shape, shape.length));
         }
-
-        return new GenericTensor<>(result, copyOf(shape, shape.length));
     }
 
     @Override
@@ -170,6 +184,15 @@ public class SimpleBooleanTensor implements BooleanTensor {
         Boolean[] thatData = that.asFlatArray();
         for (int i = 0; i < data.length; i++) {
             data[i] = data[i] || thatData[i];
+        }
+        return this;
+    }
+
+    @Override
+    public BooleanTensor xorInPlace(BooleanTensor that) {
+        Boolean[] thatData = that.asFlatArray();
+        for (int i = 0; i < data.length; i++) {
+            data[i] = data[i] ^ thatData[i];
         }
         return this;
     }

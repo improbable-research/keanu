@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -20,7 +21,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class ConcatenationVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
+public class ConcatenationVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
     private final int dimension;
     private final DoubleVertex[] operands;
@@ -33,11 +34,10 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
      * @param operands  the operands vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... operands) {
+        super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, operands)));
         this.dimension = dimension;
         this.operands = operands;
         setParents(operands);
-        long[][] shapes = extractFromInputs(long[].class, Vertex::getShape);
-        setValue(DoubleTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 
     @Override
@@ -160,19 +160,19 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(DoubleTensor.class, Vertex::sample));
+        return op(extractFromInputs(DoubleTensor.class, Vertex::sample, operands));
     }
 
     @Override
     public DoubleTensor calculate() {
-        return op(extractFromInputs(DoubleTensor.class, Vertex::getValue));
+        return op(extractFromInputs(DoubleTensor.class, Vertex::getValue, operands));
     }
 
     protected DoubleTensor op(DoubleTensor... inputs) {
         return DoubleTensor.concat(dimension, inputs);
     }
 
-    private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor>, T> func) {
+    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor>, T> func, DoubleVertex[] operands) {
         T[] extract = (T[]) Array.newInstance(clazz, operands.length);
         for (int i = 0; i < operands.length; i++) {
             extract[i] = func.apply(operands[i]);

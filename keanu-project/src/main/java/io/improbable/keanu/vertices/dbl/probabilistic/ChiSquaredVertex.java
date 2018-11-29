@@ -1,9 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -12,11 +17,12 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDouble {
+public class ChiSquaredVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private IntegerVertex k;
+    private static final String K_NAME = "k";
 
     /**
      * One k that must match a proposed tensor shape of ChiSquared
@@ -27,11 +33,11 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
      * @param k           the number of degrees of freedom
      */
     public ChiSquaredVertex(long[] tensorShape, IntegerVertex k) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
+        super(tensorShape);
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, k.getShape());
 
         this.k = k;
         setParents(k);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public ChiSquaredVertex(long[] tensorShape, int k) {
@@ -44,7 +50,8 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
      *
      * @param k the number of degrees of freedom
      */
-    public ChiSquaredVertex(IntegerVertex k) {
+    @ExportVertexToPythonBindings
+    public ChiSquaredVertex(@LoadParentVertex(K_NAME) IntegerVertex k) {
         this(k.getShape(), k);
     }
 
@@ -52,9 +59,14 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
         this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(k));
     }
 
+    @SaveParentVertex(K_NAME)
+    public IntegerVertex getK() {
+        return k;
+    }
+
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return ChiSquared.withParameters(k.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return ChiSquared.withParameters(k.getValue()).sample(shape, random);
     }
 
     @Override

@@ -38,7 +38,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     }
 
     static DoubleTensor create(double... values) {
-        return create(values, 1, values.length);
+        return create(values, values.length);
     }
 
     static DoubleTensor ones(long... shape) {
@@ -92,14 +92,18 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new ScalarDoubleTensor(scalarValue);
     }
 
-    static DoubleTensor placeHolder(long[] shape) {
-        return new ScalarDoubleTensor(shape);
+
+    static DoubleTensor concat(DoubleTensor... toConcat) {
+        return concat(0, toConcat);
     }
 
     static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {
             concatAsINDArray[i] = Nd4jDoubleTensor.unsafeGetNd4J(toConcat[i]).dup();
+            if (concatAsINDArray[i].shape().length == 0) {
+                concatAsINDArray[i] = concatAsINDArray[i].reshape(1);
+            }
         }
         INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
         return new Nd4jDoubleTensor(concat);
@@ -306,6 +310,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     BooleanTensor notNaN();
 
-    default BooleanTensor isNaN() { return notNaN().not(); }
+    default BooleanTensor isNaN() {
+        return notNaN().not();
+    }
 
 }

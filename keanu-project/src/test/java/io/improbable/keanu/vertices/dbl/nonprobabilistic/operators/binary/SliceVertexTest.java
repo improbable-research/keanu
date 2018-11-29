@@ -29,27 +29,27 @@ public class SliceVertexTest {
         SliceVertex rowOne = new SliceVertex(matrixA, 0, 0);
 
         Assert.assertArrayEquals(new double[]{1, 2, 3}, rowOne.getValue().asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{1, 3}, rowOne.getShape());
+        Assert.assertArrayEquals(new long[]{3}, rowOne.getShape());
 
         SliceVertex rowTwo = new SliceVertex(matrixA, 0, 1);
 
         Assert.assertArrayEquals(new double[]{4, 5, 6}, rowTwo.getValue().asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{1, 3}, rowTwo.getShape());
+        Assert.assertArrayEquals(new long[]{3}, rowTwo.getShape());
 
         SliceVertex columnOne = new SliceVertex(matrixA, 1, 0);
 
         Assert.assertArrayEquals(new double[]{1, 4}, columnOne.getValue().asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{2, 1}, columnOne.getShape());
+        Assert.assertArrayEquals(new long[]{2}, columnOne.getShape());
 
         SliceVertex columnTwo = new SliceVertex(matrixA, 1, 1);
 
         Assert.assertArrayEquals(new double[]{2, 5}, columnTwo.getValue().asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{2, 1}, columnTwo.getShape());
+        Assert.assertArrayEquals(new long[]{2}, columnTwo.getShape());
 
         SliceVertex columnThree = new SliceVertex(matrixA, 1, 2);
 
         Assert.assertArrayEquals(new double[]{3, 6}, columnThree.getValue().asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{2, 1}, columnThree.getShape());
+        Assert.assertArrayEquals(new long[]{2}, columnThree.getShape());
     }
 
     @Test
@@ -65,22 +65,22 @@ public class SliceVertexTest {
 
     @Test
     public void sliceCorrectlySplitsRowOfPartialDerivativeDimZeroIndexZero() {
-        assertPartialsOfSliceWithRespectToOriginalAreCorrect(0, 0, new double[]{140, 170}, new long[]{1, 2}, new long[]{1, 2, 2, 3});
+        assertPartialsOfSliceWithRespectToOriginalAreCorrect(0, 0, new double[]{140, 170}, new long[]{2}, new long[]{2, 2, 3});
     }
 
     @Test
     public void sliceCorrectlySplitsRowOfPartialDerivativeDimZeroIndexOne() {
-        assertPartialsOfSliceWithRespectToOriginalAreCorrect(0, 1, new double[]{320, 395}, new long[]{1, 2}, new long[]{1, 2, 2, 3});
+        assertPartialsOfSliceWithRespectToOriginalAreCorrect(0, 1, new double[]{320, 395}, new long[]{2}, new long[]{2, 2, 3});
     }
 
     @Test
     public void sliceCorrectlySplitsRowOfPartialDerivativeDimOneIndexZero() {
-        assertPartialsOfSliceWithRespectToOriginalAreCorrect(1, 0, new double[]{140, 320}, new long[]{2, 1}, new long[]{2, 1, 2, 3});
+        assertPartialsOfSliceWithRespectToOriginalAreCorrect(1, 0, new double[]{140, 320}, new long[]{2}, new long[]{2, 2, 3});
     }
 
     @Test
     public void sliceCorrectlySplitsRowOfPartialDerivativeDimOneIndexOne() {
-        assertPartialsOfSliceWithRespectToOriginalAreCorrect(1, 1, new double[]{170, 395}, new long[]{2, 1}, new long[]{2, 1, 2, 3});
+        assertPartialsOfSliceWithRespectToOriginalAreCorrect(1, 1, new double[]{170, 395}, new long[]{2}, new long[]{2, 2, 3});
     }
 
     private void assertPartialsOfSliceWithRespectToOriginalAreCorrect(int dim, int ind, double[] expectedValue, long[] expectedShape, long[] expectedPartialShape) {
@@ -90,7 +90,7 @@ public class SliceVertexTest {
         DoubleVertex alpha = new UniformVertex(0, 10);
         alpha.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25, 30, 35}, 3, 2));
 
-        DoubleVertex N = m.matrixMultiply(alpha);
+        MatrixMultiplicationVertex N = m.matrixMultiply(alpha);
 
         SliceVertex sliceN = new SliceVertex(N, dim, ind);
 
@@ -117,7 +117,7 @@ public class SliceVertexTest {
         DoubleVertex alpha = new UniformVertex(0, 10);
         alpha.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex N = m.matrixMultiply(alpha);
+        MatrixMultiplicationVertex N = m.matrixMultiply(alpha);
 
         SliceVertex sliceN = new SliceVertex(N, 1, 1);
 
@@ -125,10 +125,10 @@ public class SliceVertexTest {
         DoubleTensor slicePartial = sliceN.getDerivativeWrtLatents().withRespectTo(m);
 
         Assert.assertArrayEquals(sliceN.getValue().asFlatDoubleArray(), new double[]{65, 145}, 1e-6);
-        Assert.assertArrayEquals(new long[]{2, 1}, sliceN.getShape());
+        Assert.assertArrayEquals(new long[]{2}, sliceN.getShape());
 
         Assert.assertArrayEquals(originalPartial.slice(1, 1).asFlatDoubleArray(), slicePartial.asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new long[]{2, 1, 2, 2}, slicePartial.getShape());
+        Assert.assertArrayEquals(new long[]{2, 2, 2}, slicePartial.getShape());
     }
 
     @Test

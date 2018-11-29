@@ -2,12 +2,51 @@ package io.improbable.keanu.tensor;
 
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
 public interface Tensor<T> {
+
+    static <DATA, TENSOR extends Tensor<DATA>> TENSOR scalar(DATA data) {
+        if (data instanceof Double) {
+            return (TENSOR) DoubleTensor.scalar(((Double) data).doubleValue());
+        } else if (data instanceof Integer) {
+            return (TENSOR) IntegerTensor.scalar(((Integer) data).intValue());
+        } else if (data instanceof Boolean) {
+            return (TENSOR) BooleanTensor.scalar(((Boolean) data).booleanValue());
+        } else {
+            return (TENSOR) GenericTensor.scalar(data);
+        }
+    }
+
+    static <DATA, TENSOR extends Tensor<DATA>> TENSOR createFilled(DATA data, long[] shape) {
+        if (data instanceof Double) {
+            return (TENSOR) DoubleTensor.create(((Double) data).doubleValue(), shape);
+        } else if (data instanceof Integer) {
+            return (TENSOR) IntegerTensor.create(((Integer) data).intValue(), shape);
+        } else if (data instanceof Boolean) {
+            return (TENSOR) BooleanTensor.create(((Boolean) data).booleanValue(), shape);
+        } else {
+            return (TENSOR) GenericTensor.createFilled(data, shape);
+        }
+    }
+
+    static <DATA, TENSOR extends Tensor<DATA>> TENSOR create(DATA[] data, long[] shape) {
+        if (data instanceof Double[]) {
+            return (TENSOR) DoubleTensor.create(ArrayUtils.toPrimitive((Double[]) data), shape);
+        } else if (data instanceof Integer[]) {
+            return (TENSOR) IntegerTensor.create(ArrayUtils.toPrimitive(((Integer[]) data)), shape);
+        } else if (data instanceof Boolean[]) {
+            return (TENSOR) BooleanTensor.create(ArrayUtils.toPrimitive(((Boolean[]) data)), shape);
+        } else {
+            return (TENSOR) GenericTensor.create(data, shape);
+        }
+    }
 
     static BooleanTensor elementwiseEquals(Tensor a, Tensor b) {
         if (!a.hasSameShapeAs(b)) {
@@ -30,16 +69,8 @@ public interface Tensor<T> {
         return BooleanTensor.create(equality, Arrays.copyOf(shape, shape.length));
     }
 
-    static <T> Tensor<T> scalar(T value) {
-        return new GenericTensor<>(value);
-    }
-
-    static <T> Tensor<T> placeHolder(long[] shape) {
-        return new GenericTensor<>(shape);
-    }
-
-    long[] SCALAR_SHAPE = new long[]{1, 1};
-    long[] SCALAR_STRIDE = new long[]{1};
+    long[] SCALAR_SHAPE = new long[]{};
+    long[] SCALAR_STRIDE = new long[]{};
 
     int getRank();
 
@@ -88,8 +119,12 @@ public interface Tensor<T> {
         return Arrays.asList(asFlatArray());
     }
 
-    default boolean isScalar() {
+    default boolean isLengthOne(){
         return getLength() == 1;
+    }
+
+    default boolean isScalar() {
+        return getRank() == 0;
     }
 
     /**
@@ -104,7 +139,7 @@ public interface Tensor<T> {
      * @return true if the tensor is a vector
      */
     default boolean isVector() {
-        return getRank() == 1 || (getRank() == 2 && (getShape()[0] == 1 || getShape()[1] == 1));
+        return getRank() == 1;
     }
 
     default boolean isMatrix() {

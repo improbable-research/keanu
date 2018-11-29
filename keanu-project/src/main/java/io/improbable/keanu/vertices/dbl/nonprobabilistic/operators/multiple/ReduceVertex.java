@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMatch;
 
-public class ReduceVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
+public class ReduceVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
 
     private final List<? extends Vertex<DoubleTensor>> inputs;
     private final BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction;
@@ -32,6 +33,7 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
                         Supplier<PartialDerivatives> forwardModeAutoDiffLambda,
                         Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
+        super(shape);
         if (inputs.size() < 2) {
             throw new IllegalArgumentException("ReduceVertex should have at least two input vertices, called with " + inputs.size());
         }
@@ -41,7 +43,6 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
         this.forwardModeAutoDiffLambda = forwardModeAutoDiffLambda;
         this.reverseModeAutoDiffLambda = reverseModeAutoDiffLambda;
         setParents(inputs);
-        setValue(DoubleTensor.placeHolder(shape));
     }
 
     public ReduceVertex(long[] shape, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
@@ -60,7 +61,7 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
      * Reduce vertex that assumes shape as inputs
      *
      * @param reduceFunction            reduce function
-     * @param forwardModeAutoDiffLambda        auto diff supplier
+     * @param forwardModeAutoDiffLambda auto diff supplier
      * @param reverseModeAutoDiffLambda function for returning diff
      * @param input                     input vertices to reduce
      */

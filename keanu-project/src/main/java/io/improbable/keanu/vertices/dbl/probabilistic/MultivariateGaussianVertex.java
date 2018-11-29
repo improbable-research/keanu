@@ -1,19 +1,27 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
+import io.improbable.keanu.vertices.SaveParentVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.Map;
 import java.util.Set;
 
-public class MultivariateGaussianVertex extends DoubleVertex implements ProbabilisticDouble {
+public class MultivariateGaussianVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;
+    private static final String MU_NAME = "mu";
+    private static final String COVARIANCE_NAME = "covariance";
 
     /**
      * Multivariate gaussian distribution. The shape is driven from mu, which must be a vector.
@@ -24,13 +32,12 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     public MultivariateGaussianVertex(long[] shape, DoubleVertex mu, DoubleVertex covariance) {
-
+        super(shape);
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
         this.mu = mu;
         this.covariance = covariance;
         setParents(mu, covariance);
-        setValue(DoubleTensor.placeHolder(shape));
     }
 
     /**
@@ -39,7 +46,9 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param mu         the mu of the Multivariate Gaussian
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
-    public MultivariateGaussianVertex(DoubleVertex mu, DoubleVertex covariance) {
+    @ExportVertexToPythonBindings
+    public MultivariateGaussianVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
+                                      @LoadParentVertex(COVARIANCE_NAME) DoubleVertex covariance) {
         this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
 
@@ -53,11 +62,25 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param covariance the scale of the identity matrix
      */
     public MultivariateGaussianVertex(DoubleVertex mu, double covariance) {
-        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0])).times(covariance));
+        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0]).times(covariance)));
     }
 
     public MultivariateGaussianVertex(double mu, double covariance) {
-        this(ConstantVertex.of(mu), ConstantVertex.of(covariance));
+        this(oneByOneMatrix(mu), oneByOneMatrix(covariance));
+    }
+
+    private static DoubleVertex oneByOneMatrix(double value) {
+        return new ConstantDoubleVertex(DoubleTensor.scalar(value).reshape(1, 1));
+    }
+
+    @SaveParentVertex(MU_NAME)
+    public DoubleVertex getMu() {
+        return mu;
+    }
+
+    @SaveParentVertex(COVARIANCE_NAME)
+    public DoubleVertex getCovariance() {
+        return covariance;
     }
 
     @Override
@@ -65,7 +88,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
         DoubleTensor muValues = mu.getValue();
         DoubleTensor covarianceValues = covariance.getValue();
 
-        return io.improbable.keanu.distributions.continuous.MultivariateGaussian.withParameters(muValues, covarianceValues).logProb(value).scalar();
+        return MultivariateGaussian.withParameters(muValues, covarianceValues).logProb(value).scalar();
     }
 
     @Override
@@ -74,8 +97,8 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return MultivariateGaussian.withParameters(mu.getValue(), covariance.getValue()).sample(mu.getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return MultivariateGaussian.withParameters(mu.getValue(), covariance.getValue()).sample(shape, random);
     }
 
     private static long[] checkValidMultivariateShape(long[] muShape, long[] covarianceShape) {

@@ -1,10 +1,12 @@
-test.dependsOn(":shadowJar")
-test.dependsOn(":codegen:codeGen")
+import java.nio.file.Paths
+
+import static org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
+import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
 
 task installPipenv {
     doLast {
         exec {
-            commandLine 'pip', 'install', 'pipenv'
+            commandLine 'pip', 'install', 'pipenv==2018.10.13'
         }
     }
 }
@@ -41,18 +43,101 @@ task installDependencies {
 task pytest {
     doLast {
         exec {
+            commandLine 'pipenv', 'run', 'mypy', '--ignore-missing-imports', '--disallow-untyped-calls', 'keanu', 'tests', 'examples'
+        }
+        exec {
             // workaround for bug: this hits an NSP error if it's not run first
             commandLine 'pipenv', 'run', 'pytest', 'tests/test_gradient_optimization.py'
         }
         exec {
-            commandLine 'pipenv', 'run', 'pytest', '--ignore=tests/test_gradient_optimization.py'
+            // workaround for bug: this hits an NSP error if it's not run first
+            commandLine 'pipenv', 'run', 'pytest', 'tests/test_lorenz.py'
+        }
+        exec {
+            commandLine 'pipenv', 'run', 'pytest', '--ignore=tests/test_gradient_optimization.py', '--ignore=tests/test_lorenz.py'
+        }
+        exec {
+            commandLine 'pipenv', 'run', 'pytest', '--doctest-modules', 'keanu'
         }
     }
 }
 
-test.dependsOn(pytest)
-pytest.dependsOn(installPipenv)
-pytest.dependsOn(pythonVersionInfo)
-pytest.dependsOn(installDependencies)
+task generateDocumentation {
+    group "pythonDocumentation"
+    dependsOn(":codegen:runCodeGeneration")
+    doLast {
+        exec {
+            workingDir("../docs/")
+            commandLine "rm", "-rf", "python/"
+        }
+        exec {
+            workingDir("docs/")
+            commandLine "pipenv", "run", "make", "html"
+        }
+        exec {
+            // This ensures that there are no directories prefixed with an underscore
+            // because Jekyll will ignore these directories which causes the generated docs not to be served properly
+            workingDir("docs/")
+            commandLine "pipenv", "run", 'python', 'remove_underscores.py'
+        }
+        exec {
+            commandLine 'mv', 'docs/_build/html/', '../docs/python/'
+        }
+        exec {
+            workingDir("docs/")
+            commandLine 'rm', '-rf', '_build/'
+        }
+    }
+}
+
+task preparePythonEnvironment {
+    dependsOn(installPipenv)
+    dependsOn(pythonVersionInfo)
+    dependsOn(installDependencies)
+    dependsOn(":keanu-project:preparePythonClasspath")
+    dependsOn(":codegen:runCodeGeneration")
+}
+
+def keanuVertexGeneratedPath
+def keanuVertexInitPath
+
+task populateExclusionPaths {
+    def keanuVertexPath = Paths.get("keanu", "vertex")
+    if(isFamily(FAMILY_WINDOWS)) {
+        keanuVertexPath = Paths.get(".").resolve(keanuVertexPath)
+    }
+    keanuVertexGeneratedPath = keanuVertexPath.resolve("generated.py")
+    keanuVertexInitPath = keanuVertexPath.resolve("__init__.py")
+}
+
+task formatApply {
+    dependsOn preparePythonEnvironment
+    dependsOn populateExclusionPaths
+    doLast {
+        exec {
+            commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel',
+            '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
+        }
+    }
+}
+
+
+task formatCheck {
+    dependsOn preparePythonEnvironment
+    dependsOn populateExclusionPaths
+    doLast { 
+        exec {
+            commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel',
+            '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
+        }
+    }
+}
+
+
 pythonVersionInfo.mustRunAfter(installPipenv)
 installDependencies.mustRunAfter(pythonVersionInfo)
+generateDocumentation.dependsOn(preparePythonEnvironment)
+pytest.dependsOn(preparePythonEnvironment)
+test.dependsOn(formatCheck)
+test.dependsOn(pytest)
+

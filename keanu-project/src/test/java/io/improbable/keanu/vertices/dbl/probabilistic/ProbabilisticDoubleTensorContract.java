@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -208,7 +209,7 @@ public class ProbabilisticDoubleTensorContract {
             diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
     }
 
-    public static <V extends DoubleVertex & ProbabilisticDouble>
+    public static <V extends DoubleVertex & ProbabilisticDouble & Differentiable>
     void isTreatedAsConstantWhenObserved(V vertexUnderTest) {
         vertexUnderTest.observe(DoubleTensor.ones(vertexUnderTest.getValue().getShape()));
         assertTrue(vertexUnderTest.getDerivativeWrtLatents().asMap().isEmpty());

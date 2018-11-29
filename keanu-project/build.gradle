@@ -28,7 +28,8 @@ dependencies {
     compile 'com.google.guava:guava:20.0'
     compile 'com.google.protobuf:protobuf-java:3.6.1'
     compile group: 'com.opencsv', name: 'opencsv', version: '4.2'
-    compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.10'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta2'
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.8.0-beta2'
 
     //testing
     testCompile 'junit:junit:4.12'
@@ -37,6 +38,7 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'ca.umontreal.iro.simul:ssj:3.2.1'
+    testCompile 'org.reflections:reflections:0.9.11'
 
 }
 
@@ -50,7 +52,19 @@ protobuf {
 test {
     systemProperty "io.improbable.keanu.defaultRandom.seed", '1'
     systemProperty "dtype", 'double'
+    systemProperty "io.improbable.keanu.util.ProgressBar.disableProgressBar", 'true'
+    useJUnit {
+        excludeCategories 'io.improbable.keanu.testcategory.Slow'
+    }
 }
+
+task testSlowOnes(type: Test) {
+    useJUnit {
+        includeCategories 'io.improbable.keanu.testcategory.Slow'
+    }
+}
+
+check.dependsOn(testSlowOnes)
 
 // Add default user/pass so it's not needed if only building and not publishing to Nexus
 if (!hasProperty('nexusUser')) {
@@ -135,6 +149,34 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+task deletePythonClasspath(type: Delete) {
+    delete fileTree("../keanu-python/keanu/classpath/")
+}
+
+task copyJarsIntoPythonClasspath(type: Copy) {
+    dependsOn(build)
+    dependsOn(deletePythonClasspath)
+    into "$rootDir/keanu-python/keanu/classpath/"
+    from jar
+    from configurations.compile
+}
+
+task deleteUnneededJarsFromPythonClasspath(type: Delete) {
+    mustRunAfter(copyJarsIntoPythonClasspath)
+    delete fileTree("../keanu-python/keanu/classpath/") {
+        include "*-android-*"
+        include "*-ios-*"
+        include "mkl-*"
+        include "*-x86.jar"
+        include "*-ppc64le.jar"
+        include "*-armhf.jar"
+    }
+}
+
+task preparePythonClasspath {
+    dependsOn deleteUnneededJarsFromPythonClasspath
+    dependsOn copyJarsIntoPythonClasspath
+}
 //Break build on javadoc warnings
 tasks.withType(Javadoc) {
     options.addStringOption('Xwerror', '-quiet')
