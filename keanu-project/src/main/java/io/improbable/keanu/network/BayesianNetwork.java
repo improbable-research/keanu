@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -60,6 +61,14 @@ public class BayesianNetwork {
 
     public List<? extends Vertex> getVertices() {
         return vertices;
+    }
+
+    public void setState(NetworkState state) {
+        for (VertexId vertexId : state.getVertexIds()) {
+            this.vertices.stream()
+                .filter(v -> v.getId() == vertexId)
+                .forEach(v -> v.setValue(state.get(vertexId)));
+        }
     }
 
     /**
@@ -224,10 +233,10 @@ public class BayesianNetwork {
         indentation++;
     }
 
-    public void save(NetworkWriter networkWriter) {
+    public void save(NetworkSaver networkSaver) {
         if(isSaveable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
-                vertex.save(networkWriter);
+                vertex.save(networkSaver);
             }
         }
         else {
@@ -239,9 +248,9 @@ public class BayesianNetwork {
         return vertices.stream().filter(v -> v instanceof NonSaveableVertex).count() == 0;
     }
 
-    public void saveValues(NetworkWriter networkWriter) {
+    public void saveValues(NetworkSaver networkSaver) {
         for (Vertex vertex : vertices) {
-            vertex.saveValue(networkWriter);
+            vertex.saveValue(networkSaver);
         }
     }
 

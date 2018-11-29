@@ -14,9 +14,9 @@ import static org.junit.Assert.assertTrue;
 
 public class MCMCTestDistributions {
 
-    public static BayesianNetwork createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
+    public static BayesianNetwork createSimpleGaussian(double mu, double sigma, double initialValue, KeanuRandom random) {
         GaussianVertex A = new GaussianVertex(new long[]{2, 1}, mu, sigma);
-        A.setAndCascade(A.sample(random));
+        A.setAndCascade(initialValue);
         return new BayesianNetwork(A.getConnectedGraph());
     }
 
@@ -44,7 +44,7 @@ public class MCMCTestDistributions {
         }
     }
 
-    public static BayesianNetwork createSumOfGaussianDistribution(double mu, double sigma, double observedSum) {
+    public static BayesianNetwork createSumOfGaussianDistribution(double mu, double sigma, double observedSum, double initialValue) {
 
         GaussianVertex A = new GaussianVertex(mu, sigma);
         GaussianVertex B = new GaussianVertex(mu, sigma);
@@ -52,8 +52,8 @@ public class MCMCTestDistributions {
         GaussianVertex C = new GaussianVertex(A.plus(B), 1.0);
         C.observe(observedSum);
 
-        A.setValue(mu);
-        B.setAndCascade(mu);
+        A.setValue(initialValue);
+        B.setAndCascade(initialValue);
 
         return new BayesianNetwork(A.getConnectedGraph());
     }

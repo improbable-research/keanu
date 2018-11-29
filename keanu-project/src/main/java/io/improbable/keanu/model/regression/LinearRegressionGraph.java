@@ -1,11 +1,13 @@
 package io.improbable.keanu.model.regression;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.model.ModelGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import lombok.Getter;
@@ -23,18 +25,18 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
     private final BayesianNetwork bayesianNetwork;
 
     public LinearRegressionGraph(long[] featureShape, Function<DoubleVertex, OutputVertices<OUTPUT>> outputTransform, DoubleVertex interceptVertex, DoubleVertex weightsVertex) {
-        long featureCount = featureShape[0];
-        TensorShapeValidation.checkShapesMatch(weightsVertex.getShape(), new long[]{1, featureCount});
-        TensorShapeValidation.checkShapesMatch(interceptVertex.getShape(), new long[]{1, 1});
+        long featureCount = featureShape[1];
+        Preconditions.checkArgument(TensorShape.isLengthOne(interceptVertex.getShape()));
+        TensorShapeValidation.checkShapesMatch(weightsVertex.getShape(), new long[]{featureCount, 1});
 
         this.weightsVertex = weightsVertex;
         this.interceptVertex = interceptVertex;
         xVertex = new ConstantDoubleVertex(DoubleTensor.zeros(featureShape));
 
         OutputVertices<OUTPUT> outputVertices = outputTransform.apply(
-            TensorShape.isScalar(weightsVertex.getShape()) ?
+            TensorShape.isLengthOne(weightsVertex.getShape()) ?
                 weightsVertex.times(xVertex).plus(interceptVertex) :
-                weightsVertex.matrixMultiply(xVertex).plus(interceptVertex)
+                xVertex.matrixMultiply(weightsVertex).plus(interceptVertex)
         );
 
         yVertex = outputVertices.outputVertex;
@@ -59,6 +61,14 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
 
     public double getIntercept() {
         return interceptVertex.getValue().scalar();
+    }
+
+    public VertexId getInterceptVertexId() {
+        return interceptVertex.getId();
+    }
+
+    public VertexId getWeightsVertexId() {
+        return weightsVertex.getId();
     }
 
     @Value

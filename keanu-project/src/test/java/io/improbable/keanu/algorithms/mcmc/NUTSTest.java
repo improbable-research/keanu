@@ -22,7 +22,6 @@ public class NUTSTest {
 
     @Before
     public void setup() {
-        NUTS.USE_TENSORFLOW = false;
         random = new KeanuRandom(1);
     }
 
@@ -31,17 +30,17 @@ public class NUTSTest {
     public void samplesGaussian() {
         double mu = 0.0;
         double sigma = 1.0;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
 
         NUTS nuts = NUTS.builder()
-            .adaptCount(50)
+            .adaptCount(2000)
             .random(random)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
-            1500
+            2000
         );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
@@ -52,21 +51,20 @@ public class NUTSTest {
     @Test
     public void samplesContinuousPrior() {
 
-        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.);
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 15.0);
 
-        bayesNet.getContinuousLatentVertices().get(0).setValue(DoubleTensor.scalar(21.0));
-        bayesNet.getContinuousLatentVertices().get(1).setValue(DoubleTensor.scalar(23.0));
-
+        int sampleCount = 6000;
         NUTS nuts = NUTS.builder()
-            .adaptCount(100)
+            .adaptCount(sampleCount)
+            .maxTreeHeight(4)
             .random(random)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVertices(),
-            2000
-        );
+            sampleCount
+        ).drop((int) (sampleCount * 0.25));
 
         Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
         Vertex<DoubleTensor> B = bayesNet.getContinuousLatentVertices().get(1);
@@ -80,7 +78,7 @@ public class NUTSTest {
         BayesianNetwork donutBayesNet = MCMCTestDistributions.create2DDonutDistribution();
 
         NUTS nuts = NUTS.builder()
-            .adaptCount(100)
+            .adaptCount(1000)
             .random(random)
             .build();
 

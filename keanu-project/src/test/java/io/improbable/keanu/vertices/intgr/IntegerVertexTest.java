@@ -134,7 +134,7 @@ public class IntegerVertexTest {
         IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
         int[] values = new int[]{1, 2, 3};
         binomialVertex.setValue(values);
-        assertEquals(1, (long) binomialVertex.take(0, 0).getValue().scalar());
+        assertEquals(1, (long) binomialVertex.take(0).getValue().scalar());
     }
 
     @Test

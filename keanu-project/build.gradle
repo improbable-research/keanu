@@ -33,7 +33,6 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta2'
     compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.8.0-beta2'
 
-
     //testing
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.19.1'
@@ -152,8 +151,13 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+task deletePythonClasspath(type: Delete) {
+    delete fileTree("../keanu-python/keanu/classpath/")
+}
+
 task copyJarsIntoPythonClasspath(type: Copy) {
     dependsOn(build)
+    dependsOn(deletePythonClasspath)
     into "$rootDir/keanu-python/keanu/classpath/"
     from jar
     from configurations.compile

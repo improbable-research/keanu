@@ -1,10 +1,12 @@
-import numpy as np
-from keanu.tensor import Tensor
-from .generated import ConstantBool, ConstantInteger, ConstantDouble
-from .base import Vertex
 from typing import Callable
+
+import numpy as np
+
+from keanu.tensor import Tensor
 from keanu.vartypes import (numpy_types, tensor_arg_types, runtime_numpy_types, runtime_pandas_types,
                             runtime_primitive_types, runtime_bool_types, runtime_int_types, runtime_float_types)
+from .base import Vertex
+from .generated import ConstantBool, ConstantInteger, ConstantDouble
 
 
 def Const(t: tensor_arg_types) -> Vertex:
@@ -16,7 +18,7 @@ def Const(t: tensor_arg_types) -> Vertex:
         ctor = __infer_const_ctor_from_ndarray(val)
     elif isinstance(t, runtime_primitive_types):
         ctor = __infer_const_ctor_from_scalar(t)
-        val = np.array([[t]])
+        val = t
     else:
         raise NotImplementedError(
             "Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(

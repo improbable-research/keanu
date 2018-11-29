@@ -22,8 +22,8 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class BetaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -45,7 +45,7 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
      */
     public BetaVertex(long[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, alpha.getShape(), beta.getShape());
 
         this.alpha = alpha;
         this.beta = beta;
@@ -63,7 +63,7 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
     @ExportVertexToPythonBindings
     public BetaVertex(@LoadParentVertex(ALPHA_NAME) DoubleVertex alpha,
                       @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
     public BetaVertex(DoubleVertex alpha, double beta) {

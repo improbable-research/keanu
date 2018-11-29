@@ -20,8 +20,8 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.K;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.THETA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class GammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -41,7 +41,7 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
      */
     public GammaVertex(long[] tensorShape, DoubleVertex theta, DoubleVertex k) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, theta.getShape(), k.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, theta.getShape(), k.getShape());
 
         this.theta = theta;
         this.k = k;
@@ -57,7 +57,7 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
     @ExportVertexToPythonBindings
     public GammaVertex(@LoadParentVertex(THETA_NAME) DoubleVertex theta,
                        @LoadParentVertex(K_NAME) DoubleVertex k) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(theta.getShape(), k.getShape()), theta, k);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(theta.getShape(), k.getShape()), theta, k);
     }
 
     public GammaVertex(DoubleVertex theta, double k) {

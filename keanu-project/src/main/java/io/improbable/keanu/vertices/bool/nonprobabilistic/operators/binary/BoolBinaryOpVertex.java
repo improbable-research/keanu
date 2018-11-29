@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
 public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends BoolVertex implements NonProbabilistic<BooleanTensor>, VertexBinaryOp<Vertex<A>, Vertex<B>> {
 
@@ -19,7 +19,7 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
     protected final static String B_NAME = "right";
 
     public BoolBinaryOpVertex(Vertex<A> left, Vertex<B> right) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right);
     }
 
     public BoolBinaryOpVertex(long[] shape, Vertex<A> left, Vertex<B> right) {

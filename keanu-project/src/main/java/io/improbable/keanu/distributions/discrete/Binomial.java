@@ -2,10 +2,10 @@ package io.improbable.keanu.distributions.discrete;
 
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.nd4j.linalg.util.ArrayUtil;
 
 public class Binomial implements DiscreteDistribution {
 
@@ -26,7 +26,7 @@ public class Binomial implements DiscreteDistribution {
         Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();
         Tensor.FlattenedView<Integer> nWrapped = n.getFlattenedView();
 
-        int length = ArrayUtil.prod(shape);
+        int length = TensorShape.getLengthAsInt(shape);
         int[] samples = new int[length];
         for (int i = 0; i < length; i++) {
             samples[i] = sample(pWrapped.getOrScalar(i), nWrapped.getOrScalar(i), random);

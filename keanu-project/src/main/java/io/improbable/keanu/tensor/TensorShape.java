@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor;
 
+import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
@@ -18,6 +19,10 @@ public class TensorShape {
 
     public boolean isScalar() {
         return isScalar(shape);
+    }
+
+    public boolean isLengthOne() {
+        return isLengthOne(shape);
     }
 
     @Override
@@ -41,15 +46,15 @@ public class TensorShape {
      * is the product of all ints in shape.
      */
     public static long getLength(long[] shape) {
-        if (shape.length == 0) {
-            return 0;
-        } else {
-            long length = 1;
-            for (long dim : shape) {
-                length *= dim;
-            }
-            return length;
+        long length = 1;
+        for (long dim : shape) {
+            length *= dim;
         }
+        return length;
+    }
+
+    public static int getLengthAsInt(long[] shape) {
+        return Ints.checkedCast(getLength(shape));
     }
 
     /**
@@ -60,6 +65,11 @@ public class TensorShape {
      */
     public static long[] getRowFirstStride(long[] shape) {
         long[] stride = new long[shape.length];
+
+        if (shape.length == 0) {
+            return stride;
+        }
+
         stride[stride.length - 1] = 1;
 
         int buffer = 1;
@@ -114,7 +124,11 @@ public class TensorShape {
     }
 
     public static boolean isScalar(long[] shape) {
-        return shape.length == 0 || getLength(shape) == 1;
+        return shape.length == 0;
+    }
+
+    public static boolean isLengthOne(long[] shape) {
+        return getLength(shape) == 1;
     }
 
     public static long[] concat(long[] shape1, long[] shape2) {
@@ -188,24 +202,36 @@ public class TensorShape {
     }
 
     /**
-     * Removes a dimension from a shape, guaranteeing that the resultant shape is at least rank 2. A row vector (1xN) is
-     * returned when removing a dimension would result in lower than rank 2.
+     * It's possible to express negative dimensions, which are relative to the rank of a
+     * tensor. E.g. given a rank 3 tensor, dimensions [-1, -2] would refer to the 3rd and 2nd dimension.
+     *
+     * @param rank       the rank that the dimension array is related to
+     * @param dimensions positive dimensions are absolute and negative are relative to the rank
+     * @return the dimensions converted to all absolute (positive). This mutates the passed in dimension argument.
+     */
+    public static int[] getAbsoluteDimensions(int rank, int[] dimensions) {
+        for (int i = 0; i < dimensions.length; i++) {
+            if (dimensions[i] >= rank || dimensions[i] < -rank) {
+                throw new IllegalArgumentException("Dimension " + dimensions[i] + " is invalid for rank " + rank + " tensor.");
+            }
+
+            if (dimensions[i] < 0) {
+                dimensions[i] += rank;
+            }
+        }
+        return dimensions;
+    }
+
+    /**
+     * Removes a dimension from a shape. This will lower the rank by one.
      *
      * @param dimension the dimension to remove
      * @param shape     the shape to remove the dimension from
      * @return the shape without the given dimension
+     * @throws IllegalArgumentException if the dimension does not exist
      */
-    public static long[] removeDimensionSafe(int dimension, long[] shape) {
+    public static long[] removeDimension(int dimension, long[] shape) {
         TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
-
-        if (shape.length == 1) {
-            return new long[]{1, shape[0]};
-        }
-
-        if (shape.length == 2) {
-            return new long[]{1, dimension == 1 ? shape[0] : shape[1]};
-        }
-
         return ArrayUtils.remove(shape, dimension);
     }
 

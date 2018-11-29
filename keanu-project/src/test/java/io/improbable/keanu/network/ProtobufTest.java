@@ -63,13 +63,13 @@ public class ProtobufTest {
         BayesianNetwork net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        ProtobufWriter protobufWriter = new ProtobufWriter(net);
-        protobufWriter.save(output, true);
+        ProtobufSaver protobufSaver = new ProtobufSaver(net);
+        protobufSaver.save(output, true);
         assertThat(output.size(), greaterThan(0));
         ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
 
-        ProtobufReader reader = new ProtobufReader();
-        BayesianNetwork readNet = reader.loadNetwork(input);
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork readNet = loader.loadNetwork(input);
 
         assertThat(readNet.getLatentVertices().size(), is(1));
         assertThat(readNet.getLatentVertices().get(0), instanceOf(GaussianVertex.class));
@@ -115,8 +115,8 @@ public class ProtobufTest {
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
         savedNet.writeTo(writer);
 
-        ProtobufReader reader = new ProtobufReader();
-        BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork net = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
     @Test
@@ -134,8 +134,8 @@ public class ProtobufTest {
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
         savedNet.writeTo(writer);
-        ProtobufReader reader = new ProtobufReader();
-        BayesianNetwork readNet = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork readNet = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
     @Test
@@ -153,8 +153,8 @@ public class ProtobufTest {
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
         savedNet.writeTo(writer);
-        ProtobufReader reader = new ProtobufReader();
-        BayesianNetwork readNet = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork readNet = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
     @Test
@@ -169,7 +169,7 @@ public class ProtobufTest {
             .setVertexType(ConstantDoubleVertex.class.getCanonicalName())
             .setConstantValue(KeanuSavedBayesNet.VertexValue.newBuilder()
                 .setIntVal(KeanuSavedBayesNet.IntegerTensor.newBuilder()
-                    .addAllShape(Longs.asList(1, 1)).addValues(1).build()
+                    .addAllShape(Longs.asList()).addValues(1).build()
                 ).build())
             .build();
 
@@ -178,8 +178,8 @@ public class ProtobufTest {
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
         savedNet.writeTo(writer);
-        ProtobufReader reader = new ProtobufReader();
-        BayesianNetwork readNet = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork readNet = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
     @Test
@@ -190,8 +190,8 @@ public class ProtobufTest {
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
         savedNet.writeTo(writer);
 
-        ProtobufReader reader = new ProtobufReader();
-        BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork net = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
         GaussianVertex newGauss = (GaussianVertex)net.getVertexByLabel(new VertexLabel(GAUSS_LABEL));
         assertThat(newGauss.getValue().scalar(), is(GAUSS_VALUE));
     }
@@ -209,8 +209,8 @@ public class ProtobufTest {
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
         savedNet.writeTo(writer);
 
-        ProtobufReader reader = new ProtobufReader();
-        BayesianNetwork net = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork net = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
     @Test
@@ -244,8 +244,8 @@ public class ProtobufTest {
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
         savedNet.writeTo(writer);
-        ProtobufReader reader = new ProtobufReader();
-        BayesianNetwork readNet = reader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
+        ProtobufLoader loader = new ProtobufLoader();
+        BayesianNetwork readNet = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
     private KeanuSavedBayesNet.BayesianNetwork createBasicNetworkProtobufWithValue(String labelForValue,
@@ -308,6 +308,14 @@ public class ProtobufTest {
         return savedNet;
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void nonSaveableVertexThrowsExceptionOnSave() {
+        BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
+        BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
+        ProtobufSaver protobufSaver = new ProtobufSaver(net);
+        testVertex.save(protobufSaver);
+    }
+
     @Test
     public void allSaveableVerticesHaveCorrectAnnotations() {
         Reflections reflections = new Reflections("io.improbable.keanu.vertices");
@@ -325,14 +333,6 @@ public class ProtobufTest {
         } else {
             checkNonRootVertex(vertexClass);
         }
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void nonSaveableVertexThrowsExceptionOnSave() {
-        BoolVertex testVertex = new BoolProxyVertex(new VertexLabel("test_vertex"));
-        BayesianNetwork net = new BayesianNetwork(testVertex.getConnectedGraph());
-        ProtobufWriter protobufWriter = new ProtobufWriter(net);
-        testVertex.save(protobufWriter);
     }
 
     private <A extends AnnotatedElement> List<A> filterAnnotatedObjects(A[] items, Class annotation) {

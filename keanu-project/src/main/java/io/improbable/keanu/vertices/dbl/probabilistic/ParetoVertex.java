@@ -21,8 +21,8 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class ParetoVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
@@ -42,7 +42,7 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
      */
     public ParetoVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
         super(tensorShape);
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
+        checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, location.getShape(), scale.getShape());
 
         this.scale = scale;
         this.location = location;
@@ -52,7 +52,7 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
     @ExportVertexToPythonBindings
     public ParetoVertex(@LoadParentVertex(LOCATION_NAME) DoubleVertex location,
                         @LoadParentVertex(SCALE_NAME) DoubleVertex scale) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
+        this(checkHasOneNonLengthOneShapeOrAllLengthOne(location.getShape(), scale.getShape()), location, scale);
     }
 
     public ParetoVertex(double location, DoubleVertex scale) {

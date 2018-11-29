@@ -14,7 +14,7 @@ public class TensorValidationTest {
     @Test
     public void youCanCheckTheValueOfATensor() {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
-        BooleanTensor expectedMask = BooleanTensor.create(new boolean[] {true, false, true});
+        BooleanTensor expectedMask = BooleanTensor.create(true, false, true);
 
         assertThat(TensorValidator.ZERO_CATCHER.check(containsZero), equalTo(expectedMask));
     }
