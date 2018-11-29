@@ -5,7 +5,7 @@ from keanu.vertex.base import Vertex
 from keanu.net import BayesNet
 from typing import Any, Iterable, Dict, List, Tuple, Generator
 from keanu.vartypes import sample_types, sample_generator_types
-from keanu.plots import traceplot, join_dicts
+from keanu.plots import traceplot
 
 k = KeanuContext()
 
@@ -66,6 +66,7 @@ def _samples_generator(sample_iterator: Any,
                        refresh_every: int = 100) -> sample_generator_types:
     ax = None
     traces = []
+    x0 = 0
 
     while (True):
         network_sample = sample_iterator.next()
@@ -77,11 +78,12 @@ def _samples_generator(sample_iterator: Any,
         if live_plot:
             traces.append(sample)
             if len(traces) % refresh_every == 0:
-                joined_trace = join_dicts(traces, sample.keys())
+                joined_trace = {k: [t[k] for t in traces] for k in sample.keys()}
                 if ax is None:
                     ax = traceplot(joined_trace)
                 else:
-                    traceplot(joined_trace, ax=ax)
+                    traceplot(joined_trace, ax=ax, x0=x0)
+                x0 += refresh_every
                 traces = []
 
         yield sample
