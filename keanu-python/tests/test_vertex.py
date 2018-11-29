@@ -1,9 +1,12 @@
+from typing import Type, Callable, Tuple, Union
+
 import numpy as np
 import pandas as pd
 import pytest
+from py4j.java_gateway import JVMView
 
 from keanu.context import KeanuContext
-from keanu.vartypes import numpy_types
+from keanu.vartypes import tensor_arg_types, primitive_types, numpy_types, pandas_types
 from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli
 from keanu.vertex.base import Vertex
 
@@ -16,7 +19,7 @@ def jvm_view():
     return jvm_view
 
 
-def assert_vertex_value_equals_scalar(vertex, expected_type, scalar):
+def assert_vertex_value_equals_scalar(vertex: Vertex, expected_type: Type, scalar: primitive_types) -> None:
     vertex_value = vertex.get_value()
     assert vertex_value == scalar
     assert type(vertex_value) == numpy_types
@@ -24,21 +27,21 @@ def assert_vertex_value_equals_scalar(vertex, expected_type, scalar):
     assert vertex_value.dtype == expected_type
 
 
-def assert_vertex_value_equals_ndarray(vertex, expected_type, ndarray):
+def assert_vertex_value_equals_ndarray(vertex: Vertex, expected_type: Type, ndarray: numpy_types) -> None:
     vertex_value = vertex.get_value()
     expected_value = ndarray.astype(expected_type)
     assert np.array_equal(vertex_value, expected_value)
     assert vertex_value.dtype == expected_type
 
 
-def assert_vertex_value_equals_pandas(vertex, expected_type, pandas):
+def assert_vertex_value_equals_pandas(vertex: Vertex, expected_type: Type, pandas: pandas_types) -> None:
     get_value = vertex.get_value()
     expected_value = pandas.values.astype(expected_type).reshape(get_value.shape)
     assert np.array_equal(get_value, expected_value)
     assert get_value.dtype == expected_type
 
 
-def test_can_pass_scalar_to_vertex(jvm_view):
+def test_can_pass_scalar_to_vertex(jvm_view: JVMView) -> None:
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
     sample = gaussian.sample()
 
@@ -47,14 +50,14 @@ def test_can_pass_scalar_to_vertex(jvm_view):
     assert sample.dtype == float
 
 
-def test_can_pass_ndarray_to_vertex(jvm_view):
+def test_can_pass_ndarray_to_vertex(jvm_view: JVMView) -> None:
     gaussian = Vertex(jvm_view.GaussianVertex, np.array([0.1, 0.4]), np.array([0.4, 0.5]))
     sample = gaussian.sample()
 
     assert sample.shape == (2,)
 
 
-def test_can_pass_pandas_dataframe_to_vertex(jvm_view):
+def test_can_pass_pandas_dataframe_to_vertex(jvm_view: JVMView) -> None:
     gaussian = Vertex(jvm_view.GaussianVertex, pd.DataFrame(data=[0.1, 0.4]), pd.DataFrame(data=[0.1, 0.4]))
     sample = gaussian.sample()
 
@@ -68,7 +71,7 @@ def test_can_pass_pandas_series_to_vertex(jvm_view):
     assert sample.shape == (2,)
 
 
-def test_can_pass_vertex_to_vertex(jvm_view):
+def test_can_pass_vertex_to_vertex(jvm_view: JVMView) -> None:
     mu = Vertex(jvm_view.GaussianVertex, 0., 1.)
     gaussian = Vertex(jvm_view.GaussianVertex, mu, 1.)
     sample = gaussian.sample()
@@ -78,25 +81,26 @@ def test_can_pass_vertex_to_vertex(jvm_view):
     assert sample.dtype == float
 
 
-def test_can_pass_array_to_vertex(jvm_view):
+def test_can_pass_array_to_vertex(jvm_view: JVMView) -> None:
     gaussian = Vertex(jvm_view.GaussianVertex, [3, 3], 0., 1.)
     sample = gaussian.sample()
 
     assert sample.shape == (3, 3)
 
 
-def test_cannot_pass_generic_to_vertex(jvm_view):
+def test_cannot_pass_generic_to_vertex(jvm_view: JVMView) -> None:
 
     class GenericExampleClass:
         pass
 
     with pytest.raises(ValueError) as excinfo:
-        Vertex(jvm_view.GaussianVertex, GenericExampleClass(), GenericExampleClass())
+        Vertex(  # type: ignore # this is expected to fail mypy
+            jvm_view.GaussianVertex, GenericExampleClass(), GenericExampleClass())
 
     assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(GenericExampleClass)
 
 
-def test_int_vertex_value_is_a_numpy_array():
+def test_int_vertex_value_is_a_numpy_array() -> None:
     ndarray = np.array([[1, 2], [3, 4]])
     vertex = Const(ndarray)
     value = vertex.get_value()
@@ -105,7 +109,7 @@ def test_int_vertex_value_is_a_numpy_array():
     assert (value == ndarray).all()
 
 
-def test_float_vertex_value_is_a_numpy_array():
+def test_float_vertex_value_is_a_numpy_array() -> None:
     ndarray = np.array([[1., 2.], [3., 4.]])
     vertex = Const(ndarray)
     value = vertex.get_value()
@@ -114,16 +118,16 @@ def test_float_vertex_value_is_a_numpy_array():
     assert (value == ndarray).all()
 
 
-def test_boolean_vertex_value_is_a_numpy_array():
+def test_boolean_vertex_value_is_a_numpy_array() -> None:
     ndarray = np.array([[True, True], [False, True]])
     vertex = Const(ndarray)
     value = vertex.get_value()
     assert type(value) == np.ndarray
-    assert value.dtype == np.bool
+    assert value.dtype == np.bool_
     assert (value == ndarray).all()
 
 
-def test_scalar_vertex_value_is_a_numpy_array():
+def test_scalar_vertex_value_is_a_numpy_array() -> None:
     scalar = 1.
     vertex = Const(scalar)
     value = vertex.get_value()
@@ -133,7 +137,7 @@ def test_scalar_vertex_value_is_a_numpy_array():
     assert value == scalar
 
 
-def test_vertex_sample_is_a_numpy_array():
+def test_vertex_sample_is_a_numpy_array() -> None:
     mu = np.array([[1., 2.], [3., 4.]])
     sigma = np.array([[.1, .2], [.3, .4]])
     vertex = Gaussian(mu, sigma)
@@ -143,14 +147,14 @@ def test_vertex_sample_is_a_numpy_array():
     assert value.shape == (2, 2)
 
 
-def test_get_connected_graph(jvm_view):
+def test_get_connected_graph(jvm_view: JVMView) -> None:
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
     connected_graph = set(gaussian.get_connected_graph())
 
     assert len(connected_graph) == 3
 
 
-def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view):
+def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view: JVMView) -> None:
     hyper_params = Vertex(jvm_view.GaussianVertex, 0., 1.)
     gaussian = Vertex(jvm_view.GaussianVertex, 0., hyper_params)
 
@@ -163,14 +167,14 @@ def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view):
     assert hyper_params_id < gaussian_id
 
 
-def test_construct_vertex_with_java_vertex(jvm_view):
+def test_construct_vertex_with_java_vertex(jvm_view: JVMView) -> None:
     java_vertex = Vertex(jvm_view.GaussianVertex, 0., 1.).unwrap()
     python_vertex = Vertex(java_vertex)
 
     assert tuple(java_vertex.getId().getValue()) == python_vertex.get_id()
 
 
-def test_java_collections_to_generator(jvm_view):
+def test_java_collections_to_generator(jvm_view: JVMView) -> None:
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
 
     java_collections = gaussian.unwrap().getConnectedGraph()
@@ -182,7 +186,7 @@ def test_java_collections_to_generator(jvm_view):
     assert all(type(element) == Vertex and element.get_id() in java_vertex_ids for element in python_list)
 
 
-def test_get_vertex_id(jvm_view):
+def test_get_vertex_id(jvm_view: JVMView) -> None:
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
 
     java_id = gaussian.unwrap().getId().getValue()
@@ -210,7 +214,8 @@ def test_get_vertex_id(jvm_view):
                           (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
-def test_you_can_set_value(vertex, expected_type, value, assert_vertex_value_equals):
+def test_you_can_set_value(vertex: Vertex, expected_type: Type, value: tensor_arg_types,
+                           assert_vertex_value_equals: Callable) -> None:
     vertex.set_value(value)
     assert_vertex_value_equals(vertex, expected_type, value)
 
@@ -242,7 +247,8 @@ def test_you_can_set_scalar_value(vertex, expected_type, value):
                           (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
-def test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex_value_equals):
+def test_you_can_set_and_cascade(ctor: Callable, args: Union[Tuple[float, ...], Tuple[int, ...]], expected_type: Type,
+                                 value: tensor_arg_types, assert_vertex_value_equals: Callable) -> None:
     vertex1 = ctor(*args)
     vertex2 = ctor(*args)
     equal_vertex = vertex1 == vertex2
@@ -297,7 +303,9 @@ def test_you_can_set_and_cascade_scalar(ctor, args, expected_type, value):
                           (pd.DataFrame(data=[[1, 2, 3]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[1., 2., 3.]]), assert_vertex_value_equals_pandas),
                           (pd.DataFrame(data=[[True, False, False]]), assert_vertex_value_equals_pandas)])
-def test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals):
+def test_you_can_observe(ctor: Callable, args: Union[Tuple[float, ...], Tuple[int, ...]], expected_type: Type,
+                         value: tensor_arg_types, assert_vertex_value_equals: Callable) -> None:
+
     vertex = ctor(*args)
     assert not vertex.is_observed()
     vertex.observe(value)
