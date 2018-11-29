@@ -28,10 +28,14 @@ def Const(t: tensor_arg_types) -> Vertex:
 
 
 def __infer_const_ctor_from_ndarray(ndarray: numpy_types) -> Callable:
-    if len(ndarray) == 0:
-        raise ValueError("Cannot infer type because the ndarray is empty")
-
-    return __infer_const_ctor_from_scalar(ndarray.item(0))
+    if np.issubdtype(ndarray.dtype, np.bool_):
+        return ConstantBool
+    elif np.issubdtype(ndarray.dtype, np.integer):
+        return ConstantInteger
+    elif np.issubdtype(ndarray.dtype, np.floating):
+        return ConstantDouble
+    else:
+        raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(ndarray.dtype))
 
 
 def __infer_const_ctor_from_scalar(scalar: np.generic) -> Callable:

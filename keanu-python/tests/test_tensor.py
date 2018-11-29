@@ -78,14 +78,14 @@ def test_cannot_pass_generic_ndarray_to_Tensor(generic):
     with pytest.raises(NotImplementedError) as excinfo:
         Tensor(np.array([generic, generic]))
 
-    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
+    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given object"
 
 
-def test_cannot_pass_empty_ndarray_to_Tensor():
+def test_can_pass_empty_ndarray_to_Tensor():
     with pytest.raises(ValueError) as excinfo:
         Tensor(np.array([]))
 
-    assert str(excinfo.value) == "Cannot infer type because the ndarray is empty"
+    assert str(excinfo.value) == "Cannot infer type because array is empty"
 
 
 @pytest.mark.parametrize("value", [(np.array([[1, 2], [3, 4]])), np.array([3])])

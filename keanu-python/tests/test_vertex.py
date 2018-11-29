@@ -3,6 +3,7 @@ import pandas as pd
 import pytest
 
 from keanu.context import KeanuContext
+from keanu.vartypes import numpy_types
 from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli
 from keanu.vertex.base import Vertex
 
@@ -18,7 +19,9 @@ def jvm_view():
 def assert_vertex_value_equals_scalar(vertex, expected_type, scalar):
     vertex_value = vertex.get_value()
     assert vertex_value == scalar
-    assert type(vertex_value) == expected_type
+    assert type(vertex_value) == numpy_types
+    assert vertex_value.shape == ()
+    assert vertex_value.dtype == expected_type
 
 
 def assert_vertex_value_equals_ndarray(vertex, expected_type, ndarray):
@@ -39,7 +42,9 @@ def test_can_pass_scalar_to_vertex(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, 0., 1.)
     sample = gaussian.sample()
 
-    assert type(sample) == float
+    assert type(sample) == numpy_types
+    assert sample.shape == ()
+    assert sample.dtype == float
 
 
 def test_can_pass_ndarray_to_vertex(jvm_view):
@@ -68,7 +73,9 @@ def test_can_pass_vertex_to_vertex(jvm_view):
     gaussian = Vertex(jvm_view.GaussianVertex, mu, 1.)
     sample = gaussian.sample()
 
-    assert isinstance(sample, float)
+    assert type(sample) == numpy_types
+    assert sample.shape == ()
+    assert sample.dtype == float
 
 
 def test_can_pass_array_to_vertex(jvm_view):
@@ -120,7 +127,9 @@ def test_scalar_vertex_value_is_a_numpy_array():
     scalar = 1.
     vertex = Const(scalar)
     value = vertex.get_value()
-    assert type(value) == float
+    assert type(value) == numpy_types
+    assert value.shape == ()
+    assert value.dtype == float
     assert value == scalar
 
 

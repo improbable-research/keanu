@@ -1,5 +1,6 @@
 package io.improbable.keanu.network;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
@@ -31,6 +32,7 @@ public class BayesianNetwork {
     private int indentation = TOP_LEVEL_INDENTATION;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
+        Preconditions.checkArgument(!vertices.isEmpty(), "A bayesian network must contain at least one vertex");
         this.vertices = ImmutableList.copyOf(vertices);
         this.vertexLabels = buildLabelMap(vertices);
     }
@@ -61,6 +63,14 @@ public class BayesianNetwork {
 
     List<? extends Vertex> getVertices() {
         return vertices;
+    }
+
+    public int getVertexCount() {
+        return getVertices().size();
+    }
+
+    public double getAverageVertexDegree() {
+        return getVertices().stream().mapToDouble(Vertex::getDegree).average().getAsDouble();
     }
 
     public void setState(NetworkState state) {
