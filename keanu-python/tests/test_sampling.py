@@ -69,37 +69,8 @@ def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
         proposal_distribution_sigma=np.array(1.))
 
 
-def test_can_pass_in_an_acceptance_rate_tracker(net: BayesNet) -> None:
-    acceptance_rate_tracker = AcceptanceRateTracker()
-    latents = list(net.get_latent_vertices())
-    print(latents)
-
-    samples = generate_samples(
-        net=net,
-        sample_from=latents,
-        proposal_distribution="prior",
-        proposal_listeners=[acceptance_rate_tracker],
-        drop=3)
-
-    draws = 100
-    for _ in islice(samples, draws):
-        for latent in latents:
-            rate = acceptance_rate_tracker.get_acceptance_rate([latent])
-            assert 0 <= rate <= 1
-
-
 @pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
 def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
-    draws = 10
-    samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
-    count = 0
-    for sample in islice(samples, draws):
-        count += 1
-    assert count == draws
-
-
-@pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
-def test_can_track_acceptance_rate(algo: str, net: BayesNet) -> None:
     draws = 10
     samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
     count = 0
@@ -130,3 +101,44 @@ def set_starting_state(model: Model) -> None:
     model.temperature.set_value(model.temperature.sample())
     model.thermometer_one.set_value(model.thermometer_one.sample())
     model.thermometer_two.set_value(model.thermometer_two.sample())
+
+
+def test_can_get_acceptance_rates(net: BayesNet) -> None:
+    acceptance_rate_tracker = AcceptanceRateTracker()
+    latents = list(net.get_latent_vertices())
+    print(latents)
+
+    samples = sample(
+        net=net,
+        sample_from=latents,
+        proposal_distribution="prior",
+        proposal_listeners=[acceptance_rate_tracker],
+        drop=3)
+
+    for latent in latents:
+        print(acceptance_rate_tracker.get_acceptance_rate([latent]))
+        rate = acceptance_rate_tracker.get_acceptance_rate([latent])
+        assert 0 <= rate <= 1
+
+
+def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
+    acceptance_rate_tracker = AcceptanceRateTracker()
+    latents = list(net.get_latent_vertices())
+    print(latents)
+
+    samples = generate_samples(
+        net=net,
+        sample_from=latents,
+        proposal_distribution="prior",
+        proposal_listeners=[acceptance_rate_tracker],
+        drop=3)
+
+    draws = 100
+    for _ in islice(samples, draws):
+        for latent in latents:
+            rate = acceptance_rate_tracker.get_acceptance_rate([latent])
+            assert 0 <= rate <= 1
+
+
+def test_it_throws_if_you_pass_in_a_proposal_distribution_but_the_algo_isnt_metropolis():
+    pass
