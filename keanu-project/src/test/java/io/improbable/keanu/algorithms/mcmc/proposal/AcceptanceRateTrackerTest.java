@@ -3,11 +3,14 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.vertices.Vertex;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
+
 
 public class AcceptanceRateTrackerTest {
 
@@ -16,14 +19,19 @@ public class AcceptanceRateTrackerTest {
     Proposal proposal;
     private AcceptanceRateTracker acceptanceRateTracker;
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Before
     public void createTracker() throws Exception {
         acceptanceRateTracker = new AcceptanceRateTracker();
     }
 
     @Test
-    public void theAcceptanceRateForAnUnrecognisedSetOfVerticesIsNaN() {
-        assertThat(acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex1)), equalTo(Double.NaN));
+    public void itThrowsIfYouAskForTheAcceptanceRateForAnUnrecognisedSetOfVertices() {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("No proposals have been registered for [Mock for Vertex, hashCode:");
+        acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex1));
     }
 
     @Test
@@ -51,7 +59,7 @@ public class AcceptanceRateTrackerTest {
         proposal.apply();
         proposal.reject();
         assertThat(acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex1)), equalTo(0.));
-        assertThat(acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex2)), equalTo(Double.NaN));
+        expectRateToBeMissing(vertex2);
 
         proposal = new Proposal();
         proposal.addListener(acceptanceRateTracker);
@@ -85,8 +93,8 @@ public class AcceptanceRateTrackerTest {
         proposal.apply();
         proposal.reject();
         assertThat(acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex1, vertex2)), equalTo(0.));
-        assertThat(acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex1)), equalTo(Double.NaN));
-        assertThat(acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex2)), equalTo(Double.NaN));
+        expectRateToBeMissing(vertex1);
+        expectRateToBeMissing(vertex2);
 
         proposal = new Proposal();
         proposal.addListener(acceptanceRateTracker);
@@ -94,7 +102,16 @@ public class AcceptanceRateTrackerTest {
         proposal.setProposal(vertex2, 4.);
         proposal.apply();
         assertThat(acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex1, vertex2)), equalTo(0.5));
-        assertThat(acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex1)), equalTo(Double.NaN));
-        assertThat(acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex2)), equalTo(Double.NaN));
+        expectRateToBeMissing(vertex1);
+        expectRateToBeMissing(vertex2);
+    }
+
+    private void expectRateToBeMissing(Vertex vertex) {
+        try {
+            double acceptanceRate = acceptanceRateTracker.getAcceptanceRate(ImmutableSet.of(vertex));
+            throw new RuntimeException(String.format("Expected rate for %s to be missing but got %.2f", vertex, acceptanceRate));
+        } catch (IllegalStateException e) {
+            // pass
+        }
     }
 }

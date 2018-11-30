@@ -16,13 +16,21 @@ public class AcceptanceRateTracker implements ProposalListener {
     @Override
     public void onProposalApplied(Proposal proposal) {
         Set<Vertex> key = proposal.getVerticesWithProposal();
-        log.trace(String.format(" Applied proposal: %.4f", getAcceptanceRate(key)));
-        Integer previousValue = numApplied.getOrDefault(key, 0);
+        if (numApplied.keySet().contains(key)) {
+            log.trace(String.format(" Applied proposal: %.4f for %s", getAcceptanceRate(key), proposal.getVerticesWithProposal()));
+        } else {
+            log.trace(String.format(" Applied first proposal for %s", proposal.getVerticesWithProposal()));
+            numApplied.put(key, 0);
+        }
+        Integer previousValue = numApplied.get(key);
         numApplied.put(key, previousValue + 1);
     }
 
     public double getAcceptanceRate(Set<Vertex> verticesWithProposal) {
-        return 1. - (double) numRejected.getOrDefault(verticesWithProposal, 0) / numApplied.getOrDefault(verticesWithProposal, 0);
+        if (!numApplied.keySet().contains(verticesWithProposal)) {
+            throw new IllegalStateException("No proposals have been registered for " + verticesWithProposal);
+        }
+        return 1. - (double) numRejected.getOrDefault(verticesWithProposal, 0) / numApplied.get(verticesWithProposal);
     }
 
     @Override
