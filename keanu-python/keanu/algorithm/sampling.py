@@ -1,11 +1,13 @@
 from py4j.java_gateway import java_import, JavaObject
 from py4j.java_collections import JavaList
+
+from keanu.algorithm._proposal_distribution import ProposalDistribution
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
 from keanu.net import BayesNet
 from typing import Any, Iterable, Dict, List, Tuple, Generator
-from keanu.vartypes import sample_types, sample_generator_types
+from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 
 k = KeanuContext()
 
@@ -23,11 +25,13 @@ algorithms = {
 def sample(net: BayesNet,
            sample_from: Iterable[Vertex],
            algo: str = 'metropolis',
+           proposal_distribution: str = None,
+           proposal_distribution_sigma: numpy_types = None,
            draws: int = 500,
            drop: int = 0,
            down_sample_interval: int = 1) -> sample_types:
 
-    vertices_unwrapped = k.to_java_object_list(sample_from)
+    vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
     network_samples = algorithms[algo].withDefaultConfig().getPosteriorSamples(
         net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
@@ -43,13 +47,23 @@ def sample(net: BayesNet,
 def generate_samples(net: BayesNet,
                      sample_from: Iterable[Vertex],
                      algo: str = 'metropolis',
+                     proposal_distribution: str = None,
+                     proposal_distribution_sigma: numpy_types = None,
+                     proposal_listeners=[],
                      drop: int = 0,
                      down_sample_interval: int = 1) -> sample_generator_types:
-    vertices_unwrapped = k.to_java_object_list(sample_from)
 
-    sample_iterator = algorithms[algo].withDefaultConfig().generatePosteriorSamples(net.unwrap(), vertices_unwrapped)
-    sample_iterator = sample_iterator.dropCount(drop).downSampleInterval(down_sample_interval)
-    sample_iterator = sample_iterator.stream().iterator()
+    builder: JavaObject = algorithms[algo].builder()
+    if proposal_distribution is not None:
+        proposal_distribution_object = ProposalDistribution(
+            type_=proposal_distribution, sigma=proposal_distribution_sigma, listeners=proposal_listeners)
+        builder = builder.proposalDistribution(proposal_distribution_object.unwrap())
+    sampling_algorithm: JavaObject = builder.build()
+    vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
+
+    samples: JavaObject = sampling_algorithm.generatePosteriorSamples(net.unwrap(), vertices_unwrapped)
+    samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
+    sample_iterator: JavaObject = samples.stream().iterator()
 
     return _samples_generator(sample_iterator, vertices_unwrapped)
 
