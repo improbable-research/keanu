@@ -78,6 +78,9 @@ def generate_samples(net: BayesNet,
 
 
 def build_sampling_algorithm(algo, proposal_distribution, proposal_distribution_sigma, proposal_listeners):
+    if (algo != "metropolis" and proposal_distribution is not None):
+        raise TypeError("Only Metropolis Hastings supports the proposal_distribution parameter")
+
     builder: JavaObject = algorithms[algo].builder()
     if proposal_distribution is not None:
         proposal_distribution_object = ProposalDistribution(

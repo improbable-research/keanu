@@ -140,5 +140,12 @@ def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
             assert 0 <= rate <= 1
 
 
-def test_it_throws_if_you_pass_in_a_proposal_distribution_but_the_algo_isnt_metropolis():
-    pass
+def test_it_throws_if_you_pass_in_a_proposal_distribution_but_the_algo_isnt_metropolis(net: BayesNet) -> None:
+    with pytest.raises(TypeError) as excinfo:
+        sample(
+            net=net,
+            sample_from=net.get_latent_vertices(),
+            algo="hamiltonian",
+            proposal_distribution="prior",
+            drop=3)
+    assert str(excinfo.value) == "Only Metropolis Hastings supports the proposal_distribution parameter"
