@@ -77,7 +77,6 @@ public class Differentiator {
             PartialDerivatives partialsOf = v.getValue();
             long[] wrtShape = wrtVertex.getShape();
 
-
             PartialDerivatives dwrtV;
             if (TensorShape.isLengthOne(wrtShape)) {
                 int visitingRank = visitingShape.length;
