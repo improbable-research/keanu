@@ -3,7 +3,8 @@
 layout: default
 keywords: map inference
 comments: false
-permalink: /docs/inference-map/
+version: 0.0.16
+permalink: /docs/0_0_16/inference-map/
 
 # Hero section
 title: Inference with Maximum A-Posteriori
@@ -16,20 +17,20 @@ micro_nav: true
 page_nav:
     prev:
         content: Previous page
-        url: '/docs/tensors/'
+        url: '/docs/0_0_16/tensors/'
     next:
         content: Next page
-        url: '/docs/inference-posterior-sampling'
+        url: '/docs/0_0_16/inference-posterior-sampling'
 ---
 
 ## Model Fitting
 
-Now that we've learnt to describe and build a model in [describing your model]({{ site.baseurl }}/docs/getting-started), we want to put 
+Now that we've learnt to describe and build a model in [describing your model]({{ site.baseurl }}/docs/0_0_16/describing-your-model), we want to put 
 it to use! Keanu enables you to calculate the **most probable values** of components of your model given certain conditions
 or 'observations'. More formally, these are known as *posterior estimates*, and we are going to look at how we can obtain these
 through an optimization method called Maximum A Posteriori (MAP).
 
-Another technique for obtaining posterior estimates is through sampling. Read more about that on [posterior-sampling]({{ site.baseurl }}/docs/inference-posterior-sampling).
+Another technique for obtaining posterior estimates is through sampling. Read more about that on [posterior-sampling]({{ site.baseurl }}/docs/0_0_16/inference-posterior-sampling).
 Sampling should be used when optimization techniques are not appropriate, e.g: you have discrete variables in your model.
 
 
@@ -56,7 +57,7 @@ your model and determine whether or not to use gradients for you. The next secti
 
 ### Optimizer
 
-Let's say you've described the [thermometer model]({{ site.baseurl }}/docs/examples/thermometer) and want to run MAP but you're not sure
+Let's say you've described the [thermometer model]({{ site.baseurl }}/docs/0_0_16/examples/thermometer) and want to run MAP but you're not sure
 whether to use the Gradient or Non-Gradient Optimizer. You can use the following code to let Keanu decide which one to use.
 
 ```java
