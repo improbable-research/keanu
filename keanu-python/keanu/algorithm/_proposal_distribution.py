@@ -29,6 +29,9 @@ class ProposalDistribution(JavaObjectWrapper):
             if sigma is None:
                 raise TypeError("Gaussian Proposal Distribution requires a value for sigma")
             args.append(Tensor(sigma).unwrap())
+        else:
+            if sigma is not None:
+                raise TypeError('Parameter sigma is not valid unless type is "gaussian"')
         if len(listeners) > 0:
             args.append(k.to_java_object_list(listeners))
         super(ProposalDistribution, self).__init__(ctor(*args))
