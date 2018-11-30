@@ -32,16 +32,13 @@ def sample(net: BayesNet,
            drop: int = 0,
            down_sample_interval: int = 1) -> sample_types:
 
-    sampling_algorithm: JavaObject = build_sampling_algorithm(
-        algo,
-        proposal_distribution,
-        proposal_distribution_sigma,
-        proposal_listeners
-    )
+    sampling_algorithm: JavaObject = build_sampling_algorithm(algo, proposal_distribution, proposal_distribution_sigma,
+                                                              proposal_listeners)
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
-    network_samples: JavaObject = sampling_algorithm.getPosteriorSamples(net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
+    network_samples: JavaObject = sampling_algorithm.getPosteriorSamples(
+        net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
     vertex_samples = {
         Vertex._get_python_id(vertex_unwrapped): list(
@@ -61,12 +58,8 @@ def generate_samples(net: BayesNet,
                      drop: int = 0,
                      down_sample_interval: int = 1) -> sample_generator_types:
 
-    sampling_algorithm: JavaObject = build_sampling_algorithm(
-        algo,
-        proposal_distribution,
-        proposal_distribution_sigma,
-        proposal_listeners
-    )
+    sampling_algorithm: JavaObject = build_sampling_algorithm(algo, proposal_distribution, proposal_distribution_sigma,
+                                                              proposal_listeners)
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
