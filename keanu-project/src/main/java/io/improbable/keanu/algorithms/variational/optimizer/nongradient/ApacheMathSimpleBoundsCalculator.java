@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -25,17 +26,19 @@ class ApacheMathSimpleBoundsCalculator {
     private final double boundsRange;
     private final OptimizerBounds optimizerBounds;
 
-    SimpleBounds getBounds(List<? extends Vertex> latentVertices, double[] startPoint) {
+    SimpleBounds getBounds(List<? extends Vertex<?>> latentVertices, double[] startPoint) {
 
-        List<VariableReference> latentVertexNames = new ArrayList<>(latentVertices);
+        List<VariableReference> latentVertexIds = latentVertices.stream()
+            .map(Vertex::getId)
+            .collect(Collectors.toList());
 
         Map<VariableReference, long[]> latentVertexShapes = latentVertices.stream()
             .collect(toMap(
-                v -> v,
+                Vertex::getId,
                 Vertex::getShape
             ));
 
-        return getBounds(latentVertexNames, latentVertexShapes, startPoint);
+        return getBounds(latentVertexIds, latentVertexShapes, startPoint);
     }
 
     SimpleBounds getBounds(List<VariableReference> latentVariables, Map<VariableReference, long[]> latentShapes, double[] startPoint) {

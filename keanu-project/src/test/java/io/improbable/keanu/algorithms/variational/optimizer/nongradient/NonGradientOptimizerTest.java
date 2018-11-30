@@ -29,7 +29,7 @@ public class NonGradientOptimizerTest {
         A.setValue(new double[]{0, 0});
 
         OptimizerBounds bounds = new OptimizerBounds();
-        bounds.addBound(A, DoubleTensor.create(-1, -2), 0.9);
+        bounds.addBound(A.getId(), DoubleTensor.create(-1, -2), 0.9);
 
         NonGradientOptimizer optimizer = NonGradientOptimizer.builder()
             .boundsRange(10)

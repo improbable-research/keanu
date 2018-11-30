@@ -90,8 +90,8 @@ public class KeanuProbabilisticGraphTest {
         double defaultLogProb = probabilisticGraph.logProb();
 
         double logProb = probabilisticGraph.logProb(ImmutableMap.of(
-            A, initialA,
-            B, initialB
+            A.getId(), initialA,
+            B.getId(), initialB
         ));
 
         assertEquals(defaultLogProb, logProb);
@@ -101,7 +101,7 @@ public class KeanuProbabilisticGraphTest {
 
         DoubleTensor newA = KeanuRandom.getDefaultRandom().nextDouble(initialA.getShape());
         double postUpdateLogProb = probabilisticGraph.logProb(ImmutableMap.of(
-            A, newA
+            A.getId(), newA
         ));
 
         double expectedPostUpdateLogProb = expectedLogProb(newA, initialB, observationD);

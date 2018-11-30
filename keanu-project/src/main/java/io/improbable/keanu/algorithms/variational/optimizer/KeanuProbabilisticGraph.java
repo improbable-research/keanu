@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 public class KeanuProbabilisticGraph implements ProbabilisticGraph {
@@ -33,7 +34,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
 
         this.vertexLookup = bayesianNetwork.getLatentVertices().stream()
-            .collect(toMap(v -> v, v -> v));
+            .collect(toMap(Vertex::getId, v -> v));
 
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
@@ -54,14 +55,16 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     @Override
     public List<VariableReference> getLatentVariables() {
-        return ImmutableList.copyOf(this.latentVertices);
+        return this.latentVertices.stream()
+            .map(Vertex::getId)
+            .collect(toList());
     }
 
     @Override
     public Map<VariableReference, ?> getLatentVariablesValues() {
         return latentVertices.stream()
             .collect(toMap(
-                v -> v,
+                Vertex::getId,
                 Vertex::getValue)
             );
     }

@@ -35,8 +35,8 @@ public class KeanuProbabilisticWithGradientGraphTest {
 
         Map<VariableReference, DoubleTensor> gradients = graph.logProbGradients();
 
-        DoubleTensor dLogProbWrtA = gradients.get(A);
-        DoubleTensor dLogProbWrtB = gradients.get(B);
+        DoubleTensor dLogProbWrtA = gradients.get(A.getId());
+        DoubleTensor dLogProbWrtB = gradients.get(B.getId());
 
         //logProb = log(A*B)
         //dLogProb w.r.t A = B * 1/(A*B) = 1/A

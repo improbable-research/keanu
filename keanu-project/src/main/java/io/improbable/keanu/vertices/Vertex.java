@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
@@ -14,7 +13,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class Vertex<T> implements VariableReference, Observable<T>, Samplable<T>, HasShape {
+public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
