@@ -43,7 +43,7 @@ double calculatedTemperature = temperature.getValue().scalar();
 
     private static double runNonGradientOptimizer(DoubleVertex temperature) {
 //%%SNIPPET_START%% NonGradientOptimizerMostProbable
-OptimizerBounds temperatureBounds = new OptimizerBounds().addBound(temperature, -250., 250.0);
+OptimizerBounds temperatureBounds = new OptimizerBounds().addBound(temperature.getId(), -250., 250.0);
 NonGradientOptimizer optimizer = NonGradientOptimizer.builder()
     .bayesianNetwork(temperature.getConnectedGraph())
     .maxEvaluations(5000)
