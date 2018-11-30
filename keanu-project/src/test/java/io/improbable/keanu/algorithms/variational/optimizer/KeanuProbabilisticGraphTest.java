@@ -27,11 +27,6 @@ public class KeanuProbabilisticGraphTest {
     private DoubleTensor initialB;
     private DoubleTensor observationD;
 
-    private static final String A_LABEL = "A";
-    private static final String B_LABEL = "B";
-    private static final String C_LABEL = "C";
-    private static final String D_LABEL = "D";
-
     @Parameterized.Parameters(name = "{index}: Test with A={0}, B={1}, observed sum D:{2}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -46,10 +41,10 @@ public class KeanuProbabilisticGraphTest {
         this.initialB = initialB;
         this.observationD = observationD;
 
-        A = new GaussianVertex(initialA.getShape(), 0.0, 1.0).setLabel(A_LABEL);
-        B = new GaussianVertex(initialB.getShape(), 0.0, 1.0).setLabel(B_LABEL);
-        C = A.plus(B).setLabel(C_LABEL);
-        D = new GaussianVertex(C, 1.0).setLabel(D_LABEL);
+        A = new GaussianVertex(initialA.getShape(), 0.0, 1.0);
+        B = new GaussianVertex(initialB.getShape(), 0.0, 1.0);
+        C = A.plus(B);
+        D = new GaussianVertex(C, 1.0);
 
         A.setValue(initialA);
         B.setValue(initialB);
@@ -95,8 +90,8 @@ public class KeanuProbabilisticGraphTest {
         double defaultLogProb = probabilisticGraph.logProb();
 
         double logProb = probabilisticGraph.logProb(ImmutableMap.of(
-            A_LABEL, initialA,
-            B_LABEL, initialB
+            A, initialA,
+            B, initialB
         ));
 
         assertEquals(defaultLogProb, logProb);
@@ -106,7 +101,7 @@ public class KeanuProbabilisticGraphTest {
 
         DoubleTensor newA = KeanuRandom.getDefaultRandom().nextDouble(initialA.getShape());
         double postUpdateLogProb = probabilisticGraph.logProb(ImmutableMap.of(
-            A_LABEL, newA
+            A, newA
         ));
 
         double expectedPostUpdateLogProb = expectedLogProb(newA, initialB, observationD);

@@ -10,17 +10,17 @@ public interface ProbabilisticGraph {
         return logProb(Collections.emptyMap());
     }
 
-    double logProb(Map<String, ?> inputs);
+    double logProb(Map<VariableReference, ?> inputs);
 
     default double logLikelihood() {
         return logLikelihood(Collections.emptyMap());
     }
 
-    double logLikelihood(Map<String, ?> inputs);
+    double logLikelihood(Map<VariableReference, ?> inputs);
 
-    List<String> getLatentVariables();
+    List<VariableReference> getLatentVariables();
 
-    Map<String, ?> getLatentVariablesValues();
+    Map<VariableReference, ?> getLatentVariablesValues();
 
-    Map<String, long[]> getLatentVariablesShapes();
+    Map<VariableReference, long[]> getLatentVariablesShapes();
 }

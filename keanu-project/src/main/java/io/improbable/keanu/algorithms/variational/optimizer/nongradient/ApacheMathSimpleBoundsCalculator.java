@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -28,24 +29,22 @@ class ApacheMathSimpleBoundsCalculator {
 
     SimpleBounds getBounds(List<? extends Vertex> latentVertices, double[] startPoint) {
 
-        List<String> latentVertexNames = latentVertices.stream()
-            .map(KeanuProbabilisticGraph::getUniqueStringReference)
-            .collect(toList());
+        List<VariableReference> latentVertexNames = new ArrayList<>(latentVertices);
 
-        Map<String, long[]> latentVertexShapes = latentVertices.stream()
+        Map<VariableReference, long[]> latentVertexShapes = latentVertices.stream()
             .collect(toMap(
-                KeanuProbabilisticGraph::getUniqueStringReference,
+                v -> v,
                 Vertex::getShape
             ));
 
         return getBounds(latentVertexNames, latentVertexShapes, startPoint);
     }
 
-    SimpleBounds getBounds(List<String> latentVariables, Map<String, long[]> latentShapes, double[] startPoint) {
+    SimpleBounds getBounds(List<VariableReference> latentVariables, Map<VariableReference, long[]> latentShapes, double[] startPoint) {
         List<Double> minBounds = new ArrayList<>();
         List<Double> maxBounds = new ArrayList<>();
 
-        for (String variable : latentVariables) {
+        for (VariableReference variable : latentVariables) {
 
             long[] variableShape = latentShapes.get(variable);
             if (optimizerBounds.hasBound(variable)) {
@@ -67,7 +66,7 @@ class ApacheMathSimpleBoundsCalculator {
         );
     }
 
-    private void addBoundsForVariable(String variable,
+    private void addBoundsForVariable(VariableReference variable,
                                       long[] variableShape,
                                       List<Double> minBounds,
                                       List<Double> maxBounds) {
@@ -88,7 +87,7 @@ class ApacheMathSimpleBoundsCalculator {
         }
     }
 
-    private void validateBoundsForVariable(String variable, long[] variableShape) {
+    private void validateBoundsForVariable(VariableReference variable, long[] variableShape) {
         if (!optimizerBounds.getLower(variable).isScalar() && !Arrays.equals(variableShape, optimizerBounds.getLower(variable).getShape())) {
             throw new IllegalArgumentException("Lower bounds shape does not match variable shape");
         }

@@ -3,8 +3,8 @@ package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.AccessLevel;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsNumberTensors;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 /**
@@ -126,8 +127,8 @@ public class NonGradientOptimizer implements Optimizer {
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
         double logProb = probabilisticGraph.logProb();
-        List<String> latentVariables = probabilisticGraph.getLatentVariables();
-        Map<String, long[]> latentVariablesShapes = probabilisticGraph.getLatentVariablesShapes();
+        List<VariableReference> latentVariables = probabilisticGraph.getLatentVariables();
+        Map<VariableReference, long[]> latentVariablesShapes = probabilisticGraph.getLatentVariablesShapes();
 
         if (logProb == Double.NEGATIVE_INFINITY || Double.isNaN(logProb)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
@@ -141,7 +142,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         double[] startPoint = Optimizer.convertToPoint(
             probabilisticGraph.getLatentVariables(),
-            (Map<String, NumberTensor>) probabilisticGraph.getLatentVariablesValues(),
+            getAsNumberTensors(probabilisticGraph.getLatentVariablesValues()),
             probabilisticGraph.getLatentVariablesShapes()
         );
 
@@ -166,7 +167,7 @@ public class NonGradientOptimizer implements Optimizer {
         return pointValuePair.getValue();
     }
 
-    private int getNumInterpolationPoints(Map<String, long[]> latentVariableShapes) {
+    private int getNumInterpolationPoints(Map<VariableReference, long[]> latentVariableShapes) {
         return (int) (2 * Optimizer.totalNumberOfLatentDimensions(latentVariableShapes) + 1);
     }
 

@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
@@ -14,8 +15,8 @@ public class FitnessFunction {
 
     private final ProbabilisticGraph probabilisticGraph;
     private final boolean useLikelihood;
-    private final List<String> latentVariables;
-    private final Map<String, long[]> latentShapes;
+    private final List<VariableReference> latentVariables;
+    private final Map<VariableReference, long[]> latentShapes;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
     public FitnessFunction(ProbabilisticGraph probabilisticGraph,
@@ -35,7 +36,7 @@ public class FitnessFunction {
     public MultivariateFunction fitness() {
         return point -> {
 
-            Map<String, DoubleTensor> values = convertFromPoint(
+            Map<VariableReference, DoubleTensor> values = convertFromPoint(
                 point,
                 latentVariables,
                 latentShapes

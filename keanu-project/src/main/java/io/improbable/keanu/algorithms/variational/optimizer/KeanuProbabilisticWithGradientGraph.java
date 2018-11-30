@@ -15,7 +15,7 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
 
     private LogProbGradientCalculator logProbGradientCalculator;
     private LogProbGradientCalculator logLikelihoodGradientCalculator;
-    private Map<VertexId, String> idToLabelLookup;
+    private Map<VertexId, VariableReference> idToLabelLookup;
 
     public KeanuProbabilisticWithGradientGraph(BayesianNetwork bayesianNetwork) {
         super(bayesianNetwork);
@@ -25,9 +25,8 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
         this.idToLabelLookup = continuousLatentVertices.stream()
             .collect(toMap(
                 Vertex::getId,
-                KeanuProbabilisticGraph::getUniqueStringReference
-                )
-            );
+                v -> v
+            ));
 
         this.logProbGradientCalculator = new LogProbGradientCalculator(
             bayesianNetwork.getLatentOrObservedVertices(),
@@ -41,26 +40,26 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
     }
 
     @Override
-    public Map<String, DoubleTensor> logProbGradients(Map<String, ?> inputs) {
+    public Map<VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
         return gradients(inputs, logProbGradientCalculator);
     }
 
     @Override
-    public Map<String, DoubleTensor> logProbGradients() {
+    public Map<VariableReference, DoubleTensor> logProbGradients() {
         return logProbGradients(null);
     }
 
     @Override
-    public Map<String, DoubleTensor> logLikelihoodGradients(Map<String, ?> inputs) {
+    public Map<VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
         return gradients(inputs, logLikelihoodGradientCalculator);
     }
 
     @Override
-    public Map<String, DoubleTensor> logLikelihoodGradients() {
+    public Map<VariableReference, DoubleTensor> logLikelihoodGradients() {
         return logLikelihoodGradients(null);
     }
 
-    private Map<String, DoubleTensor> gradients(Map<String, ?> inputs, LogProbGradientCalculator gradientCalculator) {
+    private Map<VariableReference, DoubleTensor> gradients(Map<VariableReference, ?> inputs, LogProbGradientCalculator gradientCalculator) {
         if (inputs != null && !inputs.isEmpty()) {
             cascadeUpdate(inputs);
         }
@@ -70,8 +69,8 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
         return gradients.entrySet().stream()
             .collect(toMap(
                 e -> idToLabelLookup.get(e.getKey()),
-                Map.Entry::getValue)
-            );
+                Map.Entry::getValue
+            ));
     }
 
 }

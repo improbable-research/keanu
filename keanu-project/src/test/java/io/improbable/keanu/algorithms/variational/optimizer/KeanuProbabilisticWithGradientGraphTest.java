@@ -16,13 +16,10 @@ public class KeanuProbabilisticWithGradientGraphTest {
     private UniformVertex A;
     private UniformVertex B;
 
-    private static final String A_LABEL = "A";
-    private static final String B_LABEL = "B";
-
     @Before
     public void setup() {
-        A = new UniformVertex(0.0, 1.0).setLabel(A_LABEL);
-        B = new UniformVertex(0.0, 1.0).setLabel(B_LABEL);
+        A = new UniformVertex(0.0, 1.0);
+        B = new UniformVertex(0.0, 1.0);
     }
 
     @Test
@@ -36,10 +33,10 @@ public class KeanuProbabilisticWithGradientGraphTest {
             new BayesianNetwork(C.getConnectedGraph())
         );
 
-        Map<String, DoubleTensor> gradients = graph.logProbGradients();
+        Map<VariableReference, DoubleTensor> gradients = graph.logProbGradients();
 
-        DoubleTensor dLogProbWrtA = gradients.get(A_LABEL);
-        DoubleTensor dLogProbWrtB = gradients.get(B_LABEL);
+        DoubleTensor dLogProbWrtA = gradients.get(A);
+        DoubleTensor dLogProbWrtB = gradients.get(B);
 
         //logProb = log(A*B)
         //dLogProb w.r.t A = B * 1/(A*B) = 1/A

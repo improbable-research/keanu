@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
@@ -39,9 +40,9 @@ public class FitnessFunctionWithGradient {
     public MultivariateVectorFunction gradient() {
         return point -> {
 
-            Map<String, DoubleTensor> values = getValues(point);
+            Map<VariableReference, DoubleTensor> values = getValues(point);
 
-            Map<String, DoubleTensor> diffs = useLikelihood ?
+            Map<VariableReference, DoubleTensor> diffs = useLikelihood ?
                 probabilisticWithGradientGraph.logLikelihoodGradients(values) :
                 probabilisticWithGradientGraph.logProbGradients(values);
 
@@ -62,7 +63,7 @@ public class FitnessFunctionWithGradient {
     public MultivariateFunction fitness() {
         return point -> {
 
-            Map<String, DoubleTensor> values = getValues(point);
+            Map<VariableReference, DoubleTensor> values = getValues(point);
 
             double logOfTotalProbability = useLikelihood ?
                 probabilisticWithGradientGraph.logLikelihood(values) :
@@ -76,7 +77,7 @@ public class FitnessFunctionWithGradient {
         };
     }
 
-    private Map<String, DoubleTensor> getValues(double[] point) {
+    private Map<VariableReference, DoubleTensor> getValues(double[] point) {
         return convertFromPoint(
             point,
             probabilisticWithGradientGraph.getLatentVariables(),
@@ -84,12 +85,12 @@ public class FitnessFunctionWithGradient {
         );
     }
 
-    private static double[] alignGradientsToAppropriateIndex(Map<String, DoubleTensor> diffs,
-                                                             List<String> latentVertices,
-                                                             Map<String, long[]> latentShapes) {
+    private static double[] alignGradientsToAppropriateIndex(Map<VariableReference, DoubleTensor> diffs,
+                                                             List<VariableReference> latentVertices,
+                                                             Map<VariableReference, long[]> latentShapes) {
 
         List<DoubleTensor> tensors = new ArrayList<>();
-        for (String vertex : latentVertices) {
+        for (VariableReference vertex : latentVertices) {
             DoubleTensor tensor = diffs.get(vertex);
             if (tensor != null) {
                 tensors.add(tensor);

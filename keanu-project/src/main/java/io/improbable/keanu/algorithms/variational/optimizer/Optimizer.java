@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
+import static java.util.stream.Collectors.toMap;
+
 public interface Optimizer {
 
     /**
@@ -93,9 +95,9 @@ public interface Optimizer {
         return of(vertexFromNetwork.getConnectedGraph());
     }
 
-    static double[] convertToPoint(List<String> latentVariables,
-                                   Map<String, ? extends NumberTensor> latentVariableValues,
-                                   Map<String, long[]> latentShapes) {
+    static double[] convertToPoint(List<VariableReference> latentVariables,
+                                   Map<VariableReference, ? extends NumberTensor> latentVariableValues,
+                                   Map<VariableReference, long[]> latentShapes) {
 
         long totalLatentDimensions = totalNumberOfLatentDimensions(latentShapes);
 
@@ -106,7 +108,7 @@ public interface Optimizer {
         int position = 0;
         double[] point = new double[(int) totalLatentDimensions];
 
-        for (String variable : latentVariables) {
+        for (VariableReference variable : latentVariables) {
             double[] values = latentVariableValues.get(variable).asFlatDoubleArray();
             System.arraycopy(values, 0, point, position, values.length);
             position += values.length;
@@ -115,13 +117,13 @@ public interface Optimizer {
         return point;
     }
 
-    static Map<String, DoubleTensor> convertFromPoint(double[] point,
-                                                      List<String> latentVariables,
-                                                      Map<String, long[]> latentShapes) {
+    static Map<VariableReference, DoubleTensor> convertFromPoint(double[] point,
+                                                                 List<VariableReference> latentVariables,
+                                                                 Map<VariableReference, long[]> latentShapes) {
 
-        Map<String, DoubleTensor> tensors = new HashMap<>();
+        Map<VariableReference, DoubleTensor> tensors = new HashMap<>();
         int position = 0;
-        for (String variable : latentVariables) {
+        for (VariableReference variable : latentVariables) {
 
             long[] latentShape = latentShapes.get(variable);
             int dimensions = Ints.checkedCast(TensorShape.getLength(latentShape));
@@ -138,7 +140,7 @@ public interface Optimizer {
         return tensors;
     }
 
-    static long totalNumberOfLatentDimensions(Map<String, long[]> continuousLatentVariableShapes) {
+    static long totalNumberOfLatentDimensions(Map<VariableReference, long[]> continuousLatentVariableShapes) {
         return continuousLatentVariableShapes.values().stream().mapToLong(Optimizer::numDimensions).sum();
     }
 
@@ -146,7 +148,7 @@ public interface Optimizer {
         return TensorShape.getLength(shape);
     }
 
-    static void initializeNetworkForOptimization(BayesianNetwork bayesianNetwork){
+    static void initializeNetworkForOptimization(BayesianNetwork bayesianNetwork) {
         List<Vertex> discreteLatentVertices = bayesianNetwork.getDiscreteLatentVertices();
         boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
 
@@ -157,6 +159,23 @@ public interface Optimizer {
         }
 
         bayesianNetwork.cascadeObservations();
+    }
+
+    static Map<VariableReference, ? extends NumberTensor> getAsNumberTensors(Map<VariableReference, ?> variableValues) {
+        return variableValues.entrySet().stream()
+            .collect(toMap(
+                Map.Entry::getKey,
+                e -> {
+                    Object value = e.getValue();
+                    if (value instanceof NumberTensor) {
+                        return (NumberTensor) e.getValue();
+                    } else {
+                        throw new UnsupportedOperationException(
+                            "Optimization unsupported on networks containing discrete latents. " +
+                                "Discrete latent : " + e.getKey() + " found.");
+                    }
+                }
+            ));
     }
 
     static ProgressBar createFitnessProgressBar(final Optimizer optimizerThatNeedsProgressBar) {

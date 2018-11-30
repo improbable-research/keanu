@@ -5,7 +5,6 @@ import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.AccessLevel;
@@ -22,10 +21,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static java.util.stream.Collectors.toMap;
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsNumberTensors;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -191,7 +189,7 @@ public class GradientOptimizer implements Optimizer {
 
         double[] startingPoint = Optimizer.convertToPoint(
             probabilisticWithGradientGraph.getLatentVariables(),
-            getLatentsAsNumberTensors(),
+            getAsNumberTensors(probabilisticWithGradientGraph.getLatentVariablesValues()),
             probabilisticWithGradientGraph.getLatentVariablesShapes()
         );
 
@@ -221,23 +219,6 @@ public class GradientOptimizer implements Optimizer {
 
         progressBar.finish();
         return pointValuePair.getValue();
-    }
-
-    private Map<String, ? extends NumberTensor> getLatentsAsNumberTensors() {
-        return probabilisticWithGradientGraph.getLatentVariablesValues().entrySet().stream()
-            .collect(toMap(
-                e -> e.getKey(),
-                e -> {
-                    Object value = e.getValue();
-                    if (value instanceof NumberTensor) {
-                        return (NumberTensor) e.getValue();
-                    } else {
-                        throw new UnsupportedOperationException(
-                            "Gradient optimization unsupported on networks containing discrete latents. " +
-                                "Discrete latent : " + e.getKey() + " found.");
-                    }
-                }
-            ));
     }
 
     private static void warnIfGradientIsFlat(double[] gradient) {
