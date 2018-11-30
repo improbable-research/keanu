@@ -23,15 +23,13 @@ def net() -> BayesNet:
 def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: str, net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
-    vertex_ids = [vertex.get_id() for vertex in sample_from]
 
     samples = sample(net=net, sample_from=sample_from, algo=algo, draws=draws)
-
-    assert len(samples) == len(vertex_ids)
+    assert len(samples) == len(sample_from)
     assert type(samples) == dict
 
-    for vertex_id, vertex_samples in samples.items():
-        assert vertex_id in vertex_ids
+    for vertex, vertex_samples in samples.items():
+        assert vertex in sample_from
 
         assert len(vertex_samples) == draws
         assert type(vertex_samples) == list
@@ -45,7 +43,7 @@ def test_dropping_samples(net: BayesNet) -> None:
     samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=draws, drop=drop)
 
     expected_num_samples = draws - drop
-    assert all(len(vertex_samples) == expected_num_samples for vertex_id, vertex_samples in samples.items())
+    assert all(len(vertex_samples) == expected_num_samples for vertex, vertex_samples in samples.items())
 
 
 def test_down_sample_interval(net: BayesNet) -> None:
@@ -56,7 +54,7 @@ def test_down_sample_interval(net: BayesNet) -> None:
         net=net, sample_from=net.get_latent_vertices(), draws=draws, down_sample_interval=down_sample_interval)
 
     expected_num_samples = draws / down_sample_interval
-    assert all(len(vertex_samples) == expected_num_samples for vertex_id, vertex_samples in samples.items())
+    assert all(len(vertex_samples) == expected_num_samples for vertex, vertex_samples in samples.items())
 
 
 @pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
@@ -82,8 +80,8 @@ def test_iter_returns_same_result_as_sample(algo: str) -> None:
     samples_dataframe = pd.DataFrame()
     [samples_dataframe.append(pd.DataFrame(list(next_sample.items()))) for next_sample in islice(iter_samples, draws)]
 
-    for vertex_id in samples_dataframe:
-        np.testing.assert_almost_equal(samples_dataframe[vertex_id].mean(), np.average(samples[vertex_id]))
+    for vertex in samples_dataframe:
+        np.testing.assert_almost_equal(samples_dataframe[vertex].mean(), np.average(samples[vertex]))
 
 
 def set_starting_state(model: Model) -> None:

@@ -62,8 +62,8 @@ def generate_samples(net: BayesNet,
 
 def _samples_generator(sample_iterator: Any,
                        vertices_unwrapped: Any,
-                       live_plot: bool = False,
-                       refresh_every: int = 100) -> sample_generator_types:
+                       live_plot: bool,
+                       refresh_every: int) -> sample_generator_types:
     ax = None
     traces = []
     x0 = 0
