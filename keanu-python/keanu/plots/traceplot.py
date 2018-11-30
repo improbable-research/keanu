@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('PS') # backend without gui, see: https://stackoverflow.com/a/50200567
+matplotlib.use('PS') # see matplotlib backends: https://stackoverflow.com/a/50200567
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -22,4 +22,6 @@ def traceplot(trace, ax=None, x0=0):
 
 def make_1d(a):
     a = np.atleast_1d(a)
-    return a.flatten()
+    # collapse array in row-major (C-style) order
+    # see: https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.flatten.html
+    return a.flatten(order='C')
