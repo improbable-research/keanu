@@ -33,7 +33,7 @@ def sample(net: BayesNet,
     network_samples = algorithms[algo].withDefaultConfig().getPosteriorSamples(
         net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
     vertex_samples = {
-        Vertex._get_python_id(vertex_unwrapped): list(
+        Vertex(vertex_unwrapped): list(
             map(Tensor._to_ndarray,
                 network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped
     }
@@ -71,7 +71,7 @@ def _samples_generator(sample_iterator: Any,
     while (True):
         network_sample = sample_iterator.next()
         sample = {
-            Vertex._get_python_id(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped))
+            Vertex(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped))
             for vertex_unwrapped in vertices_unwrapped
         }
 
@@ -80,7 +80,7 @@ def _samples_generator(sample_iterator: Any,
             if len(traces) % refresh_every == 0:
                 joined_trace = {k: [t[k] for t in traces] for k in sample.keys()}
                 if ax is None:
-                    ax = traceplot(joined_trace)
+                    ax = traceplot(joined_trace, x0=x0)
                 else:
                     traceplot(joined_trace, ax=ax, x0=x0)
                 x0 += refresh_every

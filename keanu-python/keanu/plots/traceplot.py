@@ -5,14 +5,15 @@ import numpy as np
 
 
 def traceplot(trace, ax=None, x0=0):
-    # TODO: allow user to specify vertex ids or labels or vertex
-    vertex_ids = trace.keys()
+    # TODO: allow user to specify by labels or vertex
+    vertices = trace.keys()
 
     if ax is None:
-        _, ax = plt.subplots(len(vertex_ids), 1, squeeze=False)
+        # TODO: frequency plot or sample/stream plot?
+        _, ax = plt.subplots(len(vertices), 1, squeeze=False)
 
-    for index, vertex_id in enumerate(vertex_ids):
-        data = [make_1d(v) for v in trace[vertex_id]]
+    for index, vertex in enumerate(vertices):
+        data = [make_1d(v) for v in trace[vertex]]
         size = len(data)
 
         # TODO: use label for title ax[index][0].set_title(vertex_id)
