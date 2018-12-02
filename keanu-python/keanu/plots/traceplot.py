@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('PS') # see matplotlib backends: https://stackoverflow.com/a/50200567
+matplotlib.use('TkAgg') # see matplotlib backends: https://stackoverflow.com/a/50200567
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -21,7 +21,10 @@ def traceplot(trace: sample_types,
         label = vertex.get_label()
         # Vertex#__repr__ is explicitly passed to avoid usage of overloaded operations in third party libraries
         ax[index][0].set_title(vertex.__repr__() if label is None else label)
-        ax[index][0].plot(__get_discrete_xrange(x0, len(data)), data)
+
+        x = range(x0, x0 + len(data))
+        ax[index][0].set_xticks(x)
+        ax[index][0].plot(x, data)
 
         plt.pause(0.1)
 
@@ -33,9 +36,3 @@ def make_1d(a: numpy_types) -> numpy_types:
     # collapse array in row-major (C-style) order
     # see: https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.flatten.html
     return a.flatten(order='C')
-
-
-def __get_discrete_xrange(x0: int, xn: int):
-    xint = range(x0, x0 + xn)
-    plt.xticks(xint)
-    return xint
