@@ -1,4 +1,4 @@
-from keanu.plots import traceplot, make_1d
+from keanu.plots import traceplot
 from keanu.vertex import Gamma, Gaussian
 from keanu.vartypes import sample_types
 from keanu import Model
@@ -9,13 +9,6 @@ from typing import Any
 import matplotlib
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
-
-
-def test_make_1d():
-    arr = array([[1, 2], [3, 4]])
-    arr_1d = make_1d(arr)
-
-    assert (arr_1d == [1, 2, 3, 4]).all()
 
 
 @pytest.fixture
