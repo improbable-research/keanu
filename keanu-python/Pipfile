@@ -14,6 +14,8 @@ pytest = "*"
 mypy = "*"
 sphinx = "*"
 yapf = "*"
+matplotlib = "*"
+pytest-mpl = "*"
 
 [requires]
 python_version = "3.6"
