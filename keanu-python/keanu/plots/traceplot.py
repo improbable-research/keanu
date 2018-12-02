@@ -11,17 +11,15 @@ def traceplot(trace: sample_types,
               ax: Any = None,
               x0: int = 0,
               pause_interval: int = 0.1) -> Any:
-    vertices = trace.keys()
+    labels = trace.keys()
 
     if ax is None:
-        _, ax = plt.subplots(len(vertices), 1, squeeze=False)
+        _, ax = plt.subplots(len(labels), 1, squeeze=False)
 
-    for index, vertex in enumerate(vertices):
-        data = [make_1d(v) for v in trace[vertex]]
+    for index, label in enumerate(labels):
+        data = [make_1d(v) for v in trace[label]]
 
-        label = vertex.get_label()
-        # Vertex#__repr__ is explicitly passed to avoid usage of overloaded operations in third party libraries
-        ax[index][0].set_title(vertex.__repr__() if label is None else label)
+        ax[index][0].set_title(label)
 
         x = range(x0, x0 + len(data))
         ax[index][0].set_xticks(x)

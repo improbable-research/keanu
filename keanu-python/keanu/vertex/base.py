@@ -183,6 +183,10 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def _get_python_id(java_vertex: JavaObject) -> Tuple[JavaObject, ...]:
         return tuple(java_vertex.getId().getValue())
 
+    @staticmethod
+    def _get_python_label(java_vertex: JavaObject) -> str:
+        return java_vertex.getLabel().getUnqualifiedName()
+
 
 class Double(Vertex):
 

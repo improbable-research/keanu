@@ -1,6 +1,7 @@
 from keanu.plots import traceplot, make_1d
 from keanu.vertex import Gamma, Gaussian
 from keanu.vartypes import sample_types
+from keanu import Model
 from numpy import array, array_equal
 import pytest
 from typing import Any
@@ -18,14 +19,13 @@ def test_make_1d():
 
 @pytest.fixture
 def trace() -> sample_types:
-    gamma = Gamma(array([[1., 2.], [3., 4.]]), array([[1., 2.], [3., 4.]]))
-    gaussian = Gaussian(gamma, 1.)
-
-    gamma.set_label("gamma")
+    with Model() as m:
+        m.gamma = Gamma(array([[1., 2.], [3., 4.]]), array([[1., 2.], [3., 4.]]))
+        m.gaussian = Gaussian(m.gamma, 1.)
 
     trace = {
-        gamma: [array([[1., 2.], [3., 4.]]), array([[2., 3.], [4., 5.]])],
-        gaussian: [array([[0.1, 0.2], [0.3, 0.4]]), array([[0.2, 0.3], [0.4, 0.5]])]
+        m.gamma.get_label().getUnqualifiedName(): [array([[1., 2.], [3., 4.]]), array([[2., 3.], [4., 5.]])],
+        m.gaussian.get_label().getUnqualifiedName(): [array([[0.1, 0.2], [0.3, 0.4]]), array([[0.2, 0.3], [0.4, 0.5]])]
     }
 
     return trace
@@ -38,7 +38,7 @@ def test_traceplot_returns_axeplot_with_correct_data(trace: sample_types) -> Non
     gaussian_ax = ax[1][0]
 
     assert gamma_ax.get_title() == 'gamma'
-    assert gaussian_ax.get_title() == "[GaussianVertex => <class 'keanu.vertex.base.Double'>]"
+    assert gaussian_ax.get_title() == 'gaussian'
 
     gamma_lines = gamma_ax.get_lines()
     gaussian_lines = gaussian_ax.get_lines()

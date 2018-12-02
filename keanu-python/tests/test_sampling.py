@@ -34,8 +34,6 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(a
     assert type(samples) == dict
 
     for vertex, vertex_samples in samples.items():
-        assert vertex in sample_from
-
         assert len(vertex_samples) == draws
         assert type(vertex_samples) == list
         assert all(type(sample) == np.ndarray for sample in vertex_samples)

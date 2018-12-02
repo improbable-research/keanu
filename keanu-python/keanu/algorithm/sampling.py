@@ -35,7 +35,7 @@ def sample(net: BayesNet,
     network_samples = algorithms[algo].withDefaultConfig().getPosteriorSamples(
         net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
     vertex_samples = {
-        Vertex(vertex_unwrapped): list(
+        Vertex._get_python_label(vertex_unwrapped): list(
             map(Tensor._to_ndarray,
                 network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped
     }
@@ -74,7 +74,7 @@ def _samples_generator(sample_iterator: JavaObject,
     while (True):
         network_sample = sample_iterator.next()
         sample = {
-            Vertex(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped))
+            Vertex._get_python_label(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped))
             for vertex_unwrapped in vertices_unwrapped
         }
 
