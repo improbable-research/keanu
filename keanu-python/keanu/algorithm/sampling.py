@@ -26,7 +26,8 @@ def sample(net: BayesNet,
            draws: int = 500,
            drop: int = 0,
            down_sample_interval: int = 1,
-           plot: bool = False) -> sample_types:
+           plot: bool = False,
+           ax: Any = None) -> sample_types:
 
     vertices_unwrapped = k.to_java_object_list(sample_from)
 
@@ -39,7 +40,7 @@ def sample(net: BayesNet,
     }
 
     if plot:
-        traceplot(vertex_samples)
+        traceplot(vertex_samples, ax=ax)
 
     return vertex_samples
 
@@ -50,21 +51,22 @@ def generate_samples(net: BayesNet,
                      drop: int = 0,
                      down_sample_interval: int = 1,
                      live_plot: bool = False,
-                     refresh_every: int = 100) -> sample_generator_types:
+                     refresh_every: int = 100,
+                     ax: Any = None) -> sample_generator_types:
     vertices_unwrapped = k.to_java_object_list(sample_from)
 
     sample_iterator = algorithms[algo].withDefaultConfig().generatePosteriorSamples(net.unwrap(), vertices_unwrapped)
     sample_iterator = sample_iterator.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator = sample_iterator.stream().iterator()
 
-    return _samples_generator(sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every)
+    return _samples_generator(sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax)
 
 
 def _samples_generator(sample_iterator: Any,
                        vertices_unwrapped: Any,
                        live_plot: bool,
-                       refresh_every: int) -> sample_generator_types:
-    ax = None
+                       refresh_every: int,
+                       ax: Any) -> sample_generator_types:
     traces = []
     x0 = 0
 

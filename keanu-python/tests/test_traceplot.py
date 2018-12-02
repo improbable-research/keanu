@@ -1,11 +1,12 @@
 from keanu.plots import traceplot, make_1d
-from keanu import BayesNet, Model
 from keanu.vertex import Gamma, Gaussian
-from keanu.algorithm import sample
 from keanu.vartypes import sample_types
 from numpy import array, array_equal
 import pytest
 from typing import Any
+import matplotlib
+matplotlib.use("TkAgg")
+import matplotlib.pyplot as plt
 
 
 def test_make_1d():
@@ -30,8 +31,6 @@ def trace() -> sample_types:
     return trace
 
 
-# suppress matplotlib warning of use of non-gui backend
-@pytest.mark.filterwarnings("ignore:Matplotlib")
 def test_traceplot_returns_axeplot_with_correct_data(trace: sample_types) -> None:
     ax = traceplot(trace)
 
@@ -53,9 +52,6 @@ def test_traceplot_returns_axeplot_with_correct_data(trace: sample_types) -> Non
 
 @pytest.mark.mpl_image_compare(filename='test_traceplot_generates_correct_image.png')
 def test_traceplot_generates_correct_image(trace: sample_types) -> Any:
-    import matplotlib
-    matplotlib.use("TkAgg")
-    import matplotlib.pyplot as plt
     fig, ax = plt.subplots(2, 1, squeeze=False)
     ax = traceplot(trace, ax=ax)
 

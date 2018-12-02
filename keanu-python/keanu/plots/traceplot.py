@@ -9,7 +9,8 @@ from typing import Any
 
 def traceplot(trace: sample_types,
               ax: Any = None,
-              x0: int = 0) -> Any:
+              x0: int = 0,
+              pause_interval: int = 0.1) -> Any:
     vertices = trace.keys()
 
     if ax is None:
@@ -26,7 +27,7 @@ def traceplot(trace: sample_types,
         ax[index][0].set_xticks(x)
         ax[index][0].plot(x, data)
 
-        plt.pause(0.1)
+        plt.pause(pause_interval)
 
     return ax
 
