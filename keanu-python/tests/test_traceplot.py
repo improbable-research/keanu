@@ -20,11 +20,16 @@ def test_traceplot_returns_axeplot_with_samples():
     gamma = Gamma(array([1., 2.]), array([1., 2.]))
     bernoulli = Bernoulli(gamma)
 
+    gamma.set_label("gamma")
+    bernoulli.set_label("bernoulli")
+
     net = BayesNet(bernoulli.get_connected_graph())
 
     trace = sample(net=net, sample_from=net.get_latent_vertices(), draws=2)
     ax = traceplot(trace)
 
+    assert ax[0][0].get_title() == 'gamma'
+    assert ax[1][0].get_title() == 'bernoulli'
     assert_ax_equals_trace_with_two_vertices(ax, trace[gamma], trace[bernoulli])
 
 
