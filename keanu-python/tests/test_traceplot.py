@@ -1,10 +1,11 @@
 from keanu.plots import traceplot, make_1d
 from keanu import BayesNet, Model
-from keanu.vertex import Gamma, Bernoulli
+from keanu.vertex import Gamma, Gaussian
 from keanu.algorithm import sample
-from keanu.vartypes import runtime_numpy_types
+from keanu.vartypes import sample_types
 from numpy import array, array_equal
 import pytest
+from typing import Any
 
 
 def test_make_1d():
@@ -14,30 +15,48 @@ def test_make_1d():
     assert (arr_1d == [1, 2, 3, 4]).all()
 
 
-# suppress matplotlib warning of use of PS as backend
-@pytest.mark.filterwarnings("ignore:Matplotlib")
-def test_traceplot_returns_axeplot_with_samples():
-    with Model() as m:
-        m.gamma = Gamma(array([1., 2.]), array([1., 2.]))
-        m.bernoulli = Bernoulli(m.gamma)
+@pytest.fixture
+def trace() -> sample_types:
+    gamma = Gamma(array([[1., 2.], [3., 4.]]), array([[1., 2.], [3., 4.]]))
+    gaussian = Gaussian(gamma, 1.)
 
-    net = m.to_bayes_net()
-    trace = sample(net=net, sample_from=net.get_latent_vertices(), draws=2)
+    gamma.set_label("gamma")
+
+    trace = {
+        gamma: [array([[1., 2.], [3., 4.]]), array([[2., 3.], [4., 5.]])],
+        gaussian: [array([[0.1, 0.2], [0.3, 0.4]]), array([[0.2, 0.3], [0.4, 0.5]])]
+    }
+
+    return trace
+
+
+# suppress matplotlib warning of use of non-gui backend
+@pytest.mark.filterwarnings("ignore:Matplotlib")
+def test_traceplot_returns_axeplot_with_correct_data(trace: sample_types) -> None:
     ax = traceplot(trace)
 
-    assert ax[0][0].get_title() == 'gamma'
-    assert ax[1][0].get_title() == 'bernoulli'
-    assert_ax_equals_trace_with_two_vertices(ax, trace[m.gamma], trace[m.bernoulli])
+    gamma_ax = ax[0][0]
+    gaussian_ax = ax[1][0]
+
+    assert gamma_ax.get_title() == 'gamma'
+    assert gaussian_ax.get_title() == "[GaussianVertex => <class 'keanu.vertex.base.Double'>]"
+
+    gamma_lines = gamma_ax.get_lines()
+    gaussian_lines = gaussian_ax.get_lines()
+
+    gamma_ax_data = [l.get_ydata() for l in gamma_lines]
+    gaussian_ax_data = [l.get_ydata() for l in gaussian_lines]
+
+    assert array_equal(gamma_ax_data, [array([1., 2.]), array([2., 3.]), array([3., 4.]), array([4., 5.])])
+    assert array_equal(gaussian_ax_data, [array([0.1, 0.2]), array([0.2, 0.3]), array([0.3, 0.4]), array([0.4, 0.5])])
 
 
-def assert_ax_equals_trace_with_two_vertices(ax, vertex1_trace, vertex2_trace):
-    assert len(ax) == 2
+@pytest.mark.mpl_image_compare(filename='test_traceplot_generates_correct_image.png')
+def test_traceplot_generates_correct_image(trace: sample_types) -> Any:
+    import matplotlib
+    matplotlib.use("TkAgg")
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(2, 1, squeeze=False)
+    ax = traceplot(trace, ax=ax)
 
-    # each line in a plot corresponds to an element in sample ndarray
-    lines1 = ax[0][0].get_lines()
-    lines2 = ax[1][0].get_lines()
-
-    yd1 = [array([lines1[0].get_ydata()[0], lines1[1].get_ydata()[0]]), array([lines1[0].get_ydata()[1], lines1[1].get_ydata()[1]])]
-    yd2 = [array([lines2[0].get_ydata()[0], lines2[1].get_ydata()[0]]), array([lines2[0].get_ydata()[1], lines2[1].get_ydata()[1]])]
-
-    assert (array_equal(yd1, vertex1_trace) and array_equal(yd2, vertex2_trace)) or (array_equal(yd1, vertex2_trace) and array_equal(yd2, vertex1_trace))
+    return fig
