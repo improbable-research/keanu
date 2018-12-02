@@ -1,10 +1,15 @@
 import matplotlib
 matplotlib.use('PS') # see matplotlib backends: https://stackoverflow.com/a/50200567
 import matplotlib.pyplot as plt
+
 import numpy as np
+from keanu.vartypes import sample_types, numpy_types
+from typing import Any
 
 
-def traceplot(trace, ax=None, x0=0):
+def traceplot(trace: sample_types,
+              ax: Any = None,
+              x0: int = 0) -> Any:
     vertices = trace.keys()
 
     if ax is None:
@@ -23,7 +28,7 @@ def traceplot(trace, ax=None, x0=0):
     return ax
 
 
-def make_1d(a):
+def make_1d(a: numpy_types) -> numpy_types:
     a = np.atleast_1d(a)
     # collapse array in row-major (C-style) order
     # see: https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.flatten.html
