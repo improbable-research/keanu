@@ -185,7 +185,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
     @staticmethod
     def _get_python_label(java_vertex: JavaObject) -> str:
-        return java_vertex.getLabel().getUnqualifiedName()
+        return java_vertex.getLabel().getQualifiedName()
 
 
 class Double(Vertex):

@@ -25,10 +25,10 @@ def trace() -> sample_types:
         m.gaussian = Gaussian(m.gamma, 1.)
 
     trace = {
-        m.gamma.get_label().getUnqualifiedName(): [array([[1., 2.], [3., 4.]]),
-                                                   array([[2., 3.], [4., 5.]])],
-        m.gaussian.get_label().getUnqualifiedName(): [array([[0.1, 0.2], [0.3, 0.4]]),
-                                                      array([[0.2, 0.3], [0.4, 0.5]])]
+        m.gamma.get_label().getQualifiedName(): [array([[1., 2.], [3., 4.]]),
+                                                 array([[2., 3.], [4., 5.]])],
+        m.gaussian.get_label().getQualifiedName(): [array([[0.1, 0.2], [0.3, 0.4]]),
+                                                    array([[0.2, 0.3], [0.4, 0.5]])]
     }
 
     return trace
