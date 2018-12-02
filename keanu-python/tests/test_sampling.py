@@ -28,12 +28,15 @@ def net() -> BayesNet:
 def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: str, net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
+    vertex_labels = [vertex.get_label().getUnqualifiedName() for vertex in sample_from]
 
     samples = sample(net=net, sample_from=sample_from, algo=algo, draws=draws)
     assert len(samples) == len(sample_from)
     assert type(samples) == dict
 
-    for vertex, vertex_samples in samples.items():
+    for label, vertex_samples in samples.items():
+        assert label in vertex_labels
+
         assert len(vertex_samples) == draws
         assert type(vertex_samples) == list
         assert all(type(sample) == np.ndarray for sample in vertex_samples)
@@ -48,7 +51,7 @@ def test_dropping_samples(net: BayesNet) -> None:
     samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=draws, drop=drop)
 
     expected_num_samples = draws - drop
-    assert all(len(vertex_samples) == expected_num_samples for vertex, vertex_samples in samples.items())
+    assert all(len(vertex_samples) == expected_num_samples for label, vertex_samples in samples.items())
 
 
 def test_down_sample_interval(net: BayesNet) -> None:
@@ -59,7 +62,7 @@ def test_down_sample_interval(net: BayesNet) -> None:
         net=net, sample_from=net.get_latent_vertices(), draws=draws, down_sample_interval=down_sample_interval)
 
     expected_num_samples = draws / down_sample_interval
-    assert all(len(vertex_samples) == expected_num_samples for vertex, vertex_samples in samples.items())
+    assert all(len(vertex_samples) == expected_num_samples for label, vertex_samples in samples.items())
 
 
 @pytest.mark.mpl_image_compare(filename='test_sample_with_plot.png')
@@ -77,7 +80,7 @@ def test_sample_with_plot() -> Any:
 
 @pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
 def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
-    draws = 100
+    draws = 10
     samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
     count = 0
     for sample in islice(samples, draws):
