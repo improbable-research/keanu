@@ -3,7 +3,7 @@ from .base import JavaObjectWrapper
 from .context import KeanuContext
 from .vertex.base import Vertex
 from .keanu_random import KeanuRandom
-from typing import Any, Iterator
+from typing import Any, Iterator, Iterable
 
 k = KeanuContext()
 
@@ -12,7 +12,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.network.BayesianNetwork")
 
 class BayesNet(JavaObjectWrapper):
 
-    def __init__(self, vertices: Any) -> None:
+    def __init__(self, vertices: Iterable[Any]) -> None:
         java_vertices = k.to_java_object_list(vertices)
 
         super(BayesNet, self).__init__(k.jvm_view().BayesianNetwork(java_vertices))

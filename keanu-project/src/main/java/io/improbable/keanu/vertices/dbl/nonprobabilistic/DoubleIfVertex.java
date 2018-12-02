@@ -4,9 +4,9 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -27,9 +27,9 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     protected static final String ELSE_NAME = "else";
 
     @ExportVertexToPythonBindings
-    public DoubleIfVertex(@LoadParentVertex(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
-                          @LoadParentVertex(THEN_NAME) DoubleVertex thn,
-                          @LoadParentVertex(ELSE_NAME) DoubleVertex els) {
+    public DoubleIfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
+                          @LoadVertexParam(THEN_NAME) DoubleVertex thn,
+                          @LoadVertexParam(ELSE_NAME) DoubleVertex els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
         this.predicate = predicate;
         this.thn = thn;
@@ -37,19 +37,19 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
         setParents(predicate, thn, els);
     }
 
-    @SaveParentVertex(PREDICATE_NAME)
+    @SaveVertexParam(PREDICATE_NAME)
     public Vertex<? extends BooleanTensor> getPredicate() {
         return predicate;
     }
 
-    @SaveParentVertex(THEN_NAME)
+    @SaveVertexParam(THEN_NAME)
     public DoubleVertex getThn() {
-        return els;
+        return thn;
     }
 
-    @SaveParentVertex(ELSE_NAME)
+    @SaveVertexParam(ELSE_NAME)
     public DoubleVertex getEls() {
-        return thn;
+        return els;
     }
 
     @Override

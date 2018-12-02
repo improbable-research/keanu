@@ -2,8 +2,9 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -21,7 +22,10 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class ConcatenationVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, NonSaveableVertex {
+public class ConcatenationVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
+
+    private final static String DIMENSION_NAME = "dimension";
+    private final static String OPERANDS_NAME = "operands";
 
     private final int dimension;
     private final DoubleVertex[] operands;
@@ -38,6 +42,15 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         this.dimension = dimension;
         this.operands = operands;
         setParents(operands);
+    }
+
+    public ConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
+                               @LoadVertexParam(OPERANDS_NAME) Vertex[] operands) {
+        this(dimension, convertFromVertexToDoubleVertex(operands));
+    }
+
+    private static DoubleVertex[] convertFromVertexToDoubleVertex(Vertex[] operands) {
+        return Arrays.stream(operands).toArray(DoubleVertex[]::new);
     }
 
     @Override
@@ -180,4 +193,13 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         return extract;
     }
 
+    @SaveVertexParam(OPERANDS_NAME)
+    public DoubleVertex[] getOperands() {
+        return operands;
+    }
+
+    @SaveVertexParam(DIMENSION_NAME)
+    public int getDimension() {
+        return dimension;
+    }
 }

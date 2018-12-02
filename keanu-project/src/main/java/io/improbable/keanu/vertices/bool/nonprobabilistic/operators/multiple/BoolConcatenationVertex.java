@@ -1,19 +1,23 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class BoolConcatenationVertex extends BoolVertex implements NonProbabilistic<BooleanTensor>, NonSaveableVertex {
+public class BoolConcatenationVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
+    private static final String DIMENSION_NAME = "dimension";
+    private static final String INPUT_NAME = "inputArray";
     private final int dimension;
     private final BoolVertex[] input;
 
@@ -28,6 +32,15 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
         this.dimension = dimension;
         this.input = input;
         setParents(input);
+    }
+
+    public BoolConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
+                                   @LoadVertexParam(INPUT_NAME) Vertex[] input) {
+        this(dimension, convertVertexArrayToBoolVertex(input));
+    }
+
+    private static BoolVertex[] convertVertexArrayToBoolVertex(Vertex[] input) {
+        return Arrays.stream(input).toArray(BoolVertex[]::new);
     }
 
     @Override
@@ -52,4 +65,13 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
         return extract;
     }
 
+    @SaveVertexParam(DIMENSION_NAME)
+    public int getDimension() {
+        return dimension;
+    }
+
+    @SaveVertexParam(INPUT_NAME)
+    public BoolVertex[] getInput() {
+        return input;
+    }
 }
