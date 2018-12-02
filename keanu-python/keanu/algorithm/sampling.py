@@ -60,13 +60,11 @@ def generate_samples(net: BayesNet,
     sample_iterator = sample_iterator.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator = sample_iterator.stream().iterator()
 
-    return _samples_generator(sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax)
+    return _samples_generator(
+        sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax)
 
 
-def _samples_generator(sample_iterator: JavaObject,
-                       vertices_unwrapped: JavaList,
-                       live_plot: bool,
-                       refresh_every: int,
+def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList, live_plot: bool, refresh_every: int,
                        ax: Any) -> sample_generator_types:
     traces = []
     x0 = 0

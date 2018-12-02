@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('TkAgg') # see matplotlib backends: https://stackoverflow.com/a/50200567
+matplotlib.use('TkAgg')  # see matplotlib backends: https://stackoverflow.com/a/50200567
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -7,10 +7,7 @@ from keanu.vartypes import sample_types, numpy_types
 from typing import Any
 
 
-def traceplot(trace: sample_types,
-              ax: Any = None,
-              x0: int = 0,
-              pause_interval: int = 0.1) -> Any:
+def traceplot(trace: sample_types, ax: Any = None, x0: int = 0) -> Any:
     labels = trace.keys()
 
     if ax is None:
@@ -25,7 +22,7 @@ def traceplot(trace: sample_types,
         ax[index][0].set_xticks(x)
         ax[index][0].plot(x, data)
 
-        plt.pause(pause_interval)
+        plt.pause(0.1)
 
     return ax
 

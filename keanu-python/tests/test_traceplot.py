@@ -2,7 +2,8 @@ from keanu.plots import traceplot, make_1d
 from keanu.vertex import Gamma, Gaussian
 from keanu.vartypes import sample_types
 from keanu import Model
-from numpy import array, array_equal
+from numpy import array
+from numpy.testing import assert_array_equal
 import pytest
 from typing import Any
 import matplotlib
@@ -24,8 +25,10 @@ def trace() -> sample_types:
         m.gaussian = Gaussian(m.gamma, 1.)
 
     trace = {
-        m.gamma.get_label().getUnqualifiedName(): [array([[1., 2.], [3., 4.]]), array([[2., 3.], [4., 5.]])],
-        m.gaussian.get_label().getUnqualifiedName(): [array([[0.1, 0.2], [0.3, 0.4]]), array([[0.2, 0.3], [0.4, 0.5]])]
+        m.gamma.get_label().getUnqualifiedName(): [array([[1., 2.], [3., 4.]]),
+                                                   array([[2., 3.], [4., 5.]])],
+        m.gaussian.get_label().getUnqualifiedName(): [array([[0.1, 0.2], [0.3, 0.4]]),
+                                                      array([[0.2, 0.3], [0.4, 0.5]])]
     }
 
     return trace
@@ -46,8 +49,8 @@ def test_traceplot_returns_axeplot_with_correct_data(trace: sample_types) -> Non
     gamma_ax_data = [l.get_ydata() for l in gamma_lines]
     gaussian_ax_data = [l.get_ydata() for l in gaussian_lines]
 
-    assert array_equal(gamma_ax_data, [array([1., 2.]), array([2., 3.]), array([3., 4.]), array([4., 5.])])
-    assert array_equal(gaussian_ax_data, [array([0.1, 0.2]), array([0.2, 0.3]), array([0.3, 0.4]), array([0.4, 0.5])])
+    assert_array_equal(gamma_ax_data, [array([1., 2.]), array([2., 3.]), array([3., 4.]), array([4., 5.])])
+    assert_array_equal(gaussian_ax_data, [array([0.1, 0.2]), array([0.2, 0.3]), array([0.3, 0.4]), array([0.4, 0.5])])
 
 
 @pytest.mark.mpl_image_compare(filename='test_traceplot_generates_correct_image.png')

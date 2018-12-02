@@ -25,8 +25,8 @@ shape_types = Iterable[primitive_types]
 '''
 Sample types
 '''
-sample_types = Dict[Tuple[JavaObject, ...], List[numpy_types]]
-sample_generator_types = Generator[Dict[Tuple[JavaObject, ...], numpy_types], None, None]
+sample_types = Dict[str, List[numpy_types]]
+sample_generator_types = Generator[Dict[str, numpy_types], None, None]
 '''
 Runtime types
 '''
