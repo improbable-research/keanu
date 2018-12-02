@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 from keanu.vartypes import sample_types, numpy_types
-from typing import Any
+from typing import Any, List
 
 
-def traceplot(trace: sample_types, ax: Any = None, x0: int = 0) -> Any:
-    labels = trace.keys()
+def traceplot(trace: sample_types, labels: List[str] = None, ax: Any = None, x0: int = 0) -> Any:
+    if labels is None:
+        labels = list(trace.keys())
 
     if ax is None:
         _, ax = plt.subplots(len(labels), 1, squeeze=False)

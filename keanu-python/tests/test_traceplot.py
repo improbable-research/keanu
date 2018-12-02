@@ -35,7 +35,7 @@ def trace() -> sample_types:
 
 
 def test_traceplot_returns_axeplot_with_correct_data(trace: sample_types) -> None:
-    ax = traceplot(trace)
+    ax = traceplot(trace, labels=['gamma', 'gaussian'])
 
     gamma_ax = ax[0][0]
     gaussian_ax = ax[1][0]
