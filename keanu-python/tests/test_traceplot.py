@@ -1,5 +1,5 @@
 from keanu.plots import traceplot, make_1d
-from keanu import BayesNet
+from keanu import BayesNet, Model
 from keanu.vertex import Gamma, Bernoulli
 from keanu.algorithm import sample
 from keanu.vartypes import runtime_numpy_types
@@ -17,20 +17,17 @@ def test_make_1d():
 # suppress matplotlib warning of use of PS as backend
 @pytest.mark.filterwarnings("ignore:Matplotlib")
 def test_traceplot_returns_axeplot_with_samples():
-    gamma = Gamma(array([1., 2.]), array([1., 2.]))
-    bernoulli = Bernoulli(gamma)
+    with Model() as m:
+        m.gamma = Gamma(array([1., 2.]), array([1., 2.]))
+        m.bernoulli = Bernoulli(m.gamma)
 
-    gamma.set_label("gamma")
-    bernoulli.set_label("bernoulli")
-
-    net = BayesNet(bernoulli.get_connected_graph())
-
+    net = m.to_bayes_net()
     trace = sample(net=net, sample_from=net.get_latent_vertices(), draws=2)
     ax = traceplot(trace)
 
     assert ax[0][0].get_title() == 'gamma'
     assert ax[1][0].get_title() == 'bernoulli'
-    assert_ax_equals_trace_with_two_vertices(ax, trace[gamma], trace[bernoulli])
+    assert_ax_equals_trace_with_two_vertices(ax, trace[m.gamma], trace[m.bernoulli])
 
 
 def assert_ax_equals_trace_with_two_vertices(ax, vertex1_trace, vertex2_trace):

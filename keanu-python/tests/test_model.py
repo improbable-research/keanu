@@ -20,6 +20,10 @@ def test_to_bayes_net():
     assert m.sigma.get_id() in net_vertex_ids
     assert m.gaussian.get_id() in net_vertex_ids
 
+    assert m.mu.get_label().getUnqualifiedName() == "mu"
+    assert m.sigma.get_label().getUnqualifiedName() == "sigma"
+    assert m.gaussian.get_label().getUnqualifiedName() == "gaussian"
+
 
 def test_to_bayes_net_excludes_non_vertices():
     with Model() as m:

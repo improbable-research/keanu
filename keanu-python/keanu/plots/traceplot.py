@@ -14,7 +14,8 @@ def traceplot(trace, ax=None, x0=0):
         data = [make_1d(v) for v in trace[vertex]]
 
         label = vertex.get_label()
-        ax[index][0].set_title(vertex if label is None else label)
+        # Vertex#__repr__ is explicitly passed to avoid usage of overloaded operations in third party libraries
+        ax[index][0].set_title(vertex.__repr__() if label is None else label)
 
         ax[index][0].plot(range(x0, x0 + len(data)), data)
         plt.pause(0.1)

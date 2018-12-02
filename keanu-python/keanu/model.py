@@ -17,6 +17,8 @@ class Model:
             super(Model, self).__setattr__(k, v)
         else:
             self._vertices[k] = v
+            if isinstance(v, Vertex):
+                v.set_label(k)
 
     def __getattr__(self, k: str) -> Vertex:
         if k in self.__dict__:
