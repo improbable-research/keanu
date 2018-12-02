@@ -10,7 +10,7 @@ from keanu.algorithm import sample, generate_samples
 from keanu.vertex import Gamma, Exponential, Cauchy, Bernoulli
 from typing import Any
 import matplotlib
-matplotlib.use("TkAgg")
+matplotlib.use('PS')
 import matplotlib.pyplot as plt
 
 

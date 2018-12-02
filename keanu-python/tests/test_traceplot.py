@@ -7,7 +7,7 @@ from numpy.testing import assert_array_equal
 import pytest
 from typing import Any
 import matplotlib
-matplotlib.use("TkAgg")
+matplotlib.use('PS')
 import matplotlib.pyplot as plt
 
 
