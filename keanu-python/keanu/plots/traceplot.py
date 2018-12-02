@@ -58,5 +58,5 @@ def __integer_xaxis(ax: Any, x0: int, n: int) -> range:
     return x
 
 
-def __pause_for_crude_animation():
+def __pause_for_crude_animation() -> None:
     plt.pause(0.1)
