@@ -1,5 +1,5 @@
 ---
-permalink: /future
+permalink: /docs/future
 title: The future of Keanu
 ---
 
