@@ -180,7 +180,7 @@ public class ProcessModelVertexTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesianNetwork,
             inputToModel,
-            250
+            220
         );
 
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
