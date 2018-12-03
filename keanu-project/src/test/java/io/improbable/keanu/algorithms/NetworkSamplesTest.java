@@ -25,7 +25,6 @@ public class NetworkSamplesTest {
     VertexId v1 = new VertexId();
     VertexId v2 = new VertexId();
 
-
     @Before
     public void setup() {
 
