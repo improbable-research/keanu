@@ -33,7 +33,7 @@ public class KeanuProbabilisticWithGradientGraphTest {
             new BayesianNetwork(C.getConnectedGraph())
         );
 
-        Map<VariableReference, DoubleTensor> gradients = graph.logProbGradients();
+        Map<? extends VariableReference, DoubleTensor> gradients = graph.logProbGradients();
 
         DoubleTensor dLogProbWrtA = gradients.get(A.getId());
         DoubleTensor dLogProbWrtB = gradients.get(B.getId());

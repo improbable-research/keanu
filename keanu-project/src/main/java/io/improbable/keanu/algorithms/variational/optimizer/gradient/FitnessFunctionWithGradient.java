@@ -42,7 +42,7 @@ public class FitnessFunctionWithGradient {
 
             Map<VariableReference, DoubleTensor> values = getValues(point);
 
-            Map<VariableReference, DoubleTensor> diffs = useLikelihood ?
+            Map<? extends VariableReference, DoubleTensor> diffs = useLikelihood ?
                 probabilisticWithGradientGraph.logLikelihoodGradients(values) :
                 probabilisticWithGradientGraph.logProbGradients(values);
 
@@ -85,7 +85,7 @@ public class FitnessFunctionWithGradient {
         );
     }
 
-    private static double[] alignGradientsToAppropriateIndex(Map<VariableReference, DoubleTensor> diffs,
+    private static double[] alignGradientsToAppropriateIndex(Map<? extends VariableReference, DoubleTensor> diffs,
                                                              List<VariableReference> latentVertices,
                                                              Map<VariableReference, long[]> latentShapes) {
 

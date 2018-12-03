@@ -3,13 +3,10 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 
 import java.util.List;
 import java.util.Map;
-
-import static java.util.stream.Collectors.toMap;
 
 public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph implements ProbabilisticWithGradientGraph {
 
@@ -33,37 +30,31 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
     }
 
     @Override
-    public Map<VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
+    public Map<? extends VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
         return gradients(inputs, logProbGradientCalculator);
     }
 
     @Override
-    public Map<VariableReference, DoubleTensor> logProbGradients() {
+    public Map<? extends VariableReference, DoubleTensor> logProbGradients() {
         return logProbGradients(null);
     }
 
     @Override
-    public Map<VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
+    public Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
         return gradients(inputs, logLikelihoodGradientCalculator);
     }
 
     @Override
-    public Map<VariableReference, DoubleTensor> logLikelihoodGradients() {
+    public Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients() {
         return logLikelihoodGradients(null);
     }
 
-    private Map<VariableReference, DoubleTensor> gradients(Map<VariableReference, ?> inputs, LogProbGradientCalculator gradientCalculator) {
+    private Map<? extends  VariableReference, DoubleTensor> gradients(Map<VariableReference, ?> inputs, LogProbGradientCalculator gradientCalculator) {
         if (inputs != null && !inputs.isEmpty()) {
             cascadeUpdate(inputs);
         }
 
-        Map<VertexId, DoubleTensor> gradients = gradientCalculator.getJointLogProbGradientWrtLatents();
-
-        return gradients.entrySet().stream()
-            .collect(toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue
-            ));
+        return gradientCalculator.getJointLogProbGradientWrtLatents();
     }
 
 }
