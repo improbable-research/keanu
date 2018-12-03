@@ -2,6 +2,7 @@ from py4j.java_gateway import java_import, JavaObject
 from py4j.java_collections import JavaList
 
 from keanu.algorithm._proposal_distribution import ProposalDistribution
+from keanu.algorithm.proposal_listeners import proposal_listener_types
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
@@ -54,7 +55,7 @@ def generate_samples(net: BayesNet,
                      algo: str = 'metropolis',
                      proposal_distribution: str = None,
                      proposal_distribution_sigma: numpy_types = None,
-                     proposal_listeners=[],
+                     proposal_listeners: Iterable[proposal_listener_types] = [],
                      drop: int = 0,
                      down_sample_interval: int = 1) -> sample_generator_types:
 
@@ -70,11 +71,15 @@ def generate_samples(net: BayesNet,
     return _samples_generator(sample_iterator, vertices_unwrapped)
 
 
-def build_sampling_algorithm(algo, proposal_distribution, proposal_distribution_sigma, proposal_listeners):
+def build_sampling_algorithm(algo, proposal_distribution: str, proposal_distribution_sigma: numpy_types, proposal_listeners: Iterable[proposal_listener_types]):
     if (algo != "metropolis" and proposal_distribution is not None):
         raise TypeError("Only Metropolis Hastings supports the proposal_distribution parameter")
 
+    if (proposal_distribution is None and len(proposal_listeners) > 0):
+        proposal_distribution = "prior"
+        
     builder: JavaObject = algorithms[algo].builder()
+
     if proposal_distribution is not None:
         proposal_distribution_object = ProposalDistribution(
             type_=proposal_distribution, sigma=proposal_distribution_sigma, listeners=proposal_listeners)

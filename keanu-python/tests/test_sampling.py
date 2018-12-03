@@ -111,7 +111,6 @@ def test_can_get_acceptance_rates(net: BayesNet) -> None:
     samples = sample(
         net=net,
         sample_from=latents,
-        proposal_distribution="prior",
         proposal_listeners=[acceptance_rate_tracker],
         drop=3)
 
@@ -129,7 +128,6 @@ def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
     samples = generate_samples(
         net=net,
         sample_from=latents,
-        proposal_distribution="prior",
         proposal_listeners=[acceptance_rate_tracker],
         drop=3)
 

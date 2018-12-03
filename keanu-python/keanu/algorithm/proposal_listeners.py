@@ -1,4 +1,4 @@
-from typing import Set, Iterable
+from typing import Set, Iterable, Union
 
 from py4j.java_gateway import java_import
 
@@ -9,6 +9,9 @@ from keanu.vertex import Vertex
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.proposal.AcceptanceRateTracker")
+
+
+proposal_listener_types = Union['AcceptanceRateTracker']
 
 
 class AcceptanceRateTracker(JavaObjectWrapper):
