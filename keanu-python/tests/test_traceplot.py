@@ -5,7 +5,7 @@ from numpy.testing import assert_array_equal
 import pytest
 from typing import Any
 import matplotlib
-matplotlib.use('Cairo')
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
 
