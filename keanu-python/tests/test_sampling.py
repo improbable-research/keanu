@@ -65,7 +65,7 @@ def test_down_sample_interval(net: BayesNet) -> None:
     assert all(len(vertex_samples) == expected_num_samples for label, vertex_samples in samples.items())
 
 
-@pytest.mark.mpl_image_compare(filename='test_sample_with_plot.png')
+@pytest.mark.mpl_image_compare(filename='test_sample_with_plot.png', tolerance=20)
 def test_sample_with_plot() -> Any:
     with Model() as m:
         m.exp = Exponential(np.ones((2, 2)))
@@ -105,7 +105,7 @@ def test_iter_returns_same_result_as_sample(algo: str) -> None:
         np.testing.assert_almost_equal(samples_dataframe[vertex].mean(), np.average(samples[vertex]))
 
 
-@pytest.mark.mpl_image_compare(filename='test_iter_with_live_plot.png')
+@pytest.mark.mpl_image_compare(filename='test_iter_with_live_plot.png', tolerance=20)
 def test_iter_with_live_plot() -> Any:
     with Model() as m:
         m.exp = Exponential(np.ones((2, 2)))
