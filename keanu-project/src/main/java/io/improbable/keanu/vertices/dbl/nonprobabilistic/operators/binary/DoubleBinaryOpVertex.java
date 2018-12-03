@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -57,12 +57,12 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Diffe
         return op(left.getValue(), right.getValue());
     }
 
-    @SaveParentVertex(LEFT_NAME)
+    @SaveVertexParam(LEFT_NAME)
     public DoubleVertex getLeft() {
         return left;
     }
 
-    @SaveParentVertex(RIGHT_NAME)
+    @SaveVertexParam(RIGHT_NAME)
     public DoubleVertex getRight() {
         return right;
     }

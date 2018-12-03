@@ -1,10 +1,13 @@
+from typing import List
+
 import numpy as np
 from examples import CoalMining
 from keanu import BayesNet, KeanuRandom
 from keanu.algorithm import sample
+from keanu.vartypes import numpy_types, primitive_types
 
 
-def test_coalmining():
+def test_coalmining() -> None:
     KeanuRandom.set_default_random_seed(1)
     coal_mining = CoalMining()
     model = coal_mining.model()
@@ -14,8 +17,11 @@ def test_coalmining():
     net = BayesNet(model.switchpoint.get_connected_graph())
     samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=50000, drop=10000, down_sample_interval=5)
 
-    vertex_samples = samples[model.switchpoint.get_id()]
+    vertex_samples: List[numpy_types] = samples[model.switchpoint.get_id()]
+    vertex_samples_primitive: List[List[primitive_types]] = list(map(
+        lambda a: a.tolist(), vertex_samples))  # because you can't concatenate 0-d arrays
+    vertex_samples_concatentated: np.ndarray = np.array(vertex_samples_primitive)
 
-    switch_year = np.argmax(np.bincount(vertex_samples))
+    switch_year = np.argmax(np.bincount(vertex_samples_concatentated))
 
     assert switch_year == 1890
