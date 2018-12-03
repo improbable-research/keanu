@@ -94,10 +94,11 @@ def test_iter_returns_same_result_as_sample(algo: str) -> None:
     iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo)
 
     samples_dataframe = pd.DataFrame()
-    [samples_dataframe.append(pd.DataFrame(list(next_sample.items()))) for next_sample in islice(iter_samples, draws)]
+    for iter_sample in islice(iter_samples, draws):
+        samples_dataframe = samples_dataframe.append(iter_sample, ignore_index=True)
 
-    for vertex in samples_dataframe:
-        np.testing.assert_almost_equal(samples_dataframe[vertex].mean(), np.average(samples[vertex]))
+    for vertex_label in samples_dataframe:
+        np.testing.assert_almost_equal(samples_dataframe[vertex_label].mean(), np.average(samples[vertex_label]))
 
 
 @pytest.mark.mpl_image_compare(filename='test_sampling.png', tolerance=20)
