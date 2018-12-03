@@ -7,7 +7,7 @@ from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
 from keanu.net import BayesNet
-from typing import Any, Iterable, Dict, List, Tuple, Generator
+from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 
 k = KeanuContext()
@@ -55,7 +55,7 @@ def generate_samples(net: BayesNet,
                      algo: str = 'metropolis',
                      proposal_distribution: str = None,
                      proposal_distribution_sigma: numpy_types = None,
-                     proposal_listeners: Iterable[proposal_listener_types] = [],
+                     proposal_listeners: List[proposal_listener_types] = [],
                      drop: int = 0,
                      down_sample_interval: int = 1) -> sample_generator_types:
 
@@ -71,8 +71,9 @@ def generate_samples(net: BayesNet,
     return _samples_generator(sample_iterator, vertices_unwrapped)
 
 
-def build_sampling_algorithm(algo, proposal_distribution: str, proposal_distribution_sigma: numpy_types,
-                             proposal_listeners: Iterable[proposal_listener_types]):
+def build_sampling_algorithm(algo, proposal_distribution: Optional[str],
+                             proposal_distribution_sigma: Optional[numpy_types],
+                             proposal_listeners: List[proposal_listener_types]):
     if algo != "metropolis":
         if proposal_distribution is not None:
             raise TypeError("Only Metropolis Hastings supports the proposal_distribution parameter")
