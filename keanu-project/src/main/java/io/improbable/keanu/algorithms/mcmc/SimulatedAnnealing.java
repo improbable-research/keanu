@@ -115,7 +115,7 @@ public class SimulatedAnnealing {
             }
         }
 
-        return new SimpleNetworkState(maxSamplesByVertex);
+        return new SimpleNetworkState(maxSamplesByVertex, logProbabilityBeforeStep);
     }
 
     private static void setSamplesAsMax(Map<VertexId, ?> samples, List<? extends Vertex> fromVertices) {

@@ -80,7 +80,7 @@ public class HamiltonianSampler implements SamplingAlgorithm {
     @Override
     public NetworkState sample() {
         step();
-        return new SimpleNetworkState(acceptOrReject());
+        return new SimpleNetworkState(acceptOrReject(),logOfMasterPBeforeLeapfrog);
     }
 
     private Map<VertexId, ?> acceptOrReject() {

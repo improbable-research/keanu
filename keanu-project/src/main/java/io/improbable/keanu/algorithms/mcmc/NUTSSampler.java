@@ -89,7 +89,7 @@ public class NUTSSampler implements SamplingAlgorithm {
     @Override
     public NetworkState sample() {
         step();
-        return new SimpleNetworkState(tree.sampleAtAcceptedPosition);
+        return new SimpleNetworkState(tree.sampleAtAcceptedPosition, tree.logOfMasterPAtAcceptedPosition);
     }
 
     @Override
