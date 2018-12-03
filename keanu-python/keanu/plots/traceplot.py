@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('agg')  # see: https://matplotlib.org/faq/usage_faq.html#what-is-a-backend
+matplotlib.use('PS')  # see: https://matplotlib.org/faq/usage_faq.html#what-is-a-backend
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
