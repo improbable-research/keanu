@@ -60,6 +60,16 @@ public class DoubleVertexSamplesTest {
         assertThat(variances, allCloseTo(1e-8, expectedValues));
     }
 
+    /*
+      import statsmodels.api as sm
+      import numpy as np
+      x0 = np.array([0, -4, 8, 4])
+      x1 = np.array([16, -8, -4, 4])
+      x2 = np.array([4, 4, 12, 8])
+      print(sm.tsa.stattools.acf(x0))
+      print(sm.tsa.stattools.acf(x1))
+      print(sm.tsa.stattools.acf(x2))
+     */
     @Test
     public void doesCalculateAutocorrelation() {
         List<DoubleTensor> expectedAutocorrelations = ImmutableList.of(
