@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('AGG')  # see: https://matplotlib.org/faq/usage_faq.html#what-is-a-backend
+matplotlib.use('Cairo')  # see: https://matplotlib.org/faq/usage_faq.html#what-is-a-backend
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
