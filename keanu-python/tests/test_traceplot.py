@@ -1,6 +1,5 @@
 from keanu.plots import traceplot
 from keanu.vartypes import sample_types
-from keanu import Model
 from numpy import array
 from numpy.testing import assert_array_equal
 import pytest
@@ -12,13 +11,10 @@ import matplotlib.pyplot as plt
 
 @pytest.fixture
 def trace() -> sample_types:
-    with Model() as m:
-        trace = {
-            "gamma": [array([[1., 2.], [3., 4.]]), array([[2., 3.], [4., 5.]])],
-            "gaussian": [array([[0.1, 0.2], [0.3, 0.4]]), array([[0.2, 0.3], [0.4, 0.5]])]
-        }
-
-    return trace
+    return {
+        "gamma": [array([[1., 2.], [3., 4.]]), array([[2., 3.], [4., 5.]])],
+        "gaussian": [array([[0.1, 0.2], [0.3, 0.4]]), array([[0.2, 0.3], [0.4, 0.5]])]
+    }
 
 
 def test_traceplot_returns_axeplot_with_correct_data(trace: sample_types) -> None:
