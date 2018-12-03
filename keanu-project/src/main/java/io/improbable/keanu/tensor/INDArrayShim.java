@@ -2,14 +2,22 @@ package io.improbable.keanu.tensor;
 
 import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.ArrayUtils;
+import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.api.shape.Shape;
 import org.nd4j.linalg.factory.Broadcast;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.ops.transforms.Transforms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 
 /**
  * This class provides shim methods for the ND4J INDArray class.
@@ -26,6 +34,8 @@ import java.util.List;
  * A / B != B / A.
  */
 public class INDArrayShim {
+
+    private static final DataBuffer.Type BUFFER_TYPE = DataBuffer.Type.DOUBLE;
 
     /*
      * We need to load ND4J in a separate thread as on load it sets the FTZ and DAZ flags in the processor for the
@@ -163,6 +173,238 @@ public class INDArrayShim {
             INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
             return Broadcast.sub(a, b, result, broadcastDimensions);
         }
+    }
+
+    public static INDArray pow(INDArray left, INDArray right) {
+        if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result;
+            if (left.length() == 1) {
+                result = Transforms.pow(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right, false);
+            } else {
+                result = Transforms.pow(left, right.getDouble(0), false);
+            }
+            return result.reshape(resultShape);
+        }
+        return Transforms.pow(left, right, false);
+    }
+
+    public static INDArray max(INDArray left, INDArray right) {
+        if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result;
+            if (left.length() == 1) {
+                result = Transforms.max(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right, false);
+            } else {
+                result = Transforms.max(left, right.getDouble(0), false);
+            }
+            return result.reshape(resultShape);
+        }
+        return Transforms.max(left, right, false);
+    }
+
+    public static INDArray min(INDArray left, INDArray right) {
+        if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result;
+            if (left.length() == 1) {
+                result = Transforms.min(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right, false);
+            } else {
+                result = Transforms.min(left, right.getDouble(0), false);
+            }
+            return result.reshape(resultShape);
+        }
+        return Transforms.min(left, right, false);
+    }
+
+    public static INDArray lt(INDArray left, INDArray right) {
+        if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result;
+            if (left.length() == 1) {
+                result = Nd4j.valueArrayOf(right.shape(), left.getDouble(0)).lt(right);
+            } else {
+                result = left.lt(right.getDouble(0));
+            }
+            return result.reshape(resultShape);
+        }
+        return left.lt(right);
+    }
+
+    public static INDArray gt(INDArray left, INDArray right) {
+        if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result;
+            if (left.length() == 1) {
+                result = Nd4j.valueArrayOf(right.shape(), left.getDouble(0)).gt(right);
+            } else {
+                result = left.gt(right.getDouble(0));
+            }
+            return result.reshape(resultShape);
+        }
+        return left.gt(right);
+    }
+
+    public static INDArray lessThanOrEqual(INDArray left, INDArray right) {
+        if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result;
+            if (left.length() == 1) {
+                left = Nd4j.valueArrayOf(right.shape(), left.getDouble(0));
+                Nd4j.getExecutioner().exec(new OldLessThanOrEqual(left, right, left, left.length()));
+                result = left;
+            } else {
+                result = left.lte(right.getDouble(0));
+            }
+            return result.reshape(resultShape);
+        }
+        Nd4j.getExecutioner().exec(new OldLessThanOrEqual(left, right, left, left.length()));
+        return left;
+    }
+
+    public static INDArray greaterThanOrEqual(INDArray left, INDArray right) {
+        if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result;
+            if (left.length() == 1) {
+                left = Nd4j.valueArrayOf(right.shape(), left.getDouble(0));
+                Nd4j.getExecutioner().exec(new OldGreaterThanOrEqual(left, right, left, left.length()));
+                result = left;
+            } else {
+                result = left.gte(right.getDouble(0));
+            }
+            return result.reshape(resultShape);
+        }
+        Nd4j.getExecutioner().exec(new OldGreaterThanOrEqual(left, right, left, left.length()));
+        return left;
+    }
+
+    public static INDArray eq(INDArray left, INDArray right) {
+        if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result;
+            if (left.length() == 1) {
+                result = Nd4j.valueArrayOf(right.shape(), left.getDouble(0)).eq(right);
+            } else {
+                result = left.eq(right.getDouble(0));
+            }
+            return result.reshape(resultShape);
+        }
+        return left.eq(right);
+    }
+
+    public static INDArray atan2(INDArray left, INDArray right, DataBuffer.Type bufferType) {
+        if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result;
+            if (left.length() == 1) {
+                result = Transforms.atan2(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right);
+            } else {
+                result = Transforms.atan2(left, valueArrayOf(resultShape, right.getDouble(0), bufferType));
+            }
+            return result.reshape(resultShape);
+        }
+        return Transforms.atan2(left, right);
+    }
+
+    public static INDArray getGreaterThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
+        if (mask.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
+            if (mask.length() == 1) {
+                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
+                Nd4j.getExecutioner().exec(
+                    new OldGreaterThan(mask, right, mask, mask.length())
+                );
+            } else {
+                Nd4j.getExecutioner().exec(
+                    new OldGreaterThan(mask,
+                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
+                        mask,
+                        mask.length()
+                    )
+                );
+            }
+            return mask.reshape(resultShape);
+        }
+        Nd4j.getExecutioner().exec(
+            new OldGreaterThan(mask, right, mask, mask.length())
+        );
+        return mask;
+    }
+
+    public static INDArray getGreaterThanOrEqualToMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
+        if (mask.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
+            if (mask.length() == 1) {
+                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
+                Nd4j.getExecutioner().exec(
+                    new OldGreaterThanOrEqual(mask, right, mask, mask.length())
+                );
+            } else {
+                Nd4j.getExecutioner().exec(
+                    new OldGreaterThanOrEqual(mask,
+                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
+                        mask,
+                        mask.length()
+                    )
+                );
+            }
+            return mask.reshape(resultShape);
+        }
+        Nd4j.getExecutioner().exec(
+            new OldGreaterThanOrEqual(mask, right, mask, mask.length())
+        );
+        return mask;
+    }
+
+    public static INDArray getLessThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
+        if (mask.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
+            if (mask.length() == 1) {
+                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
+                Nd4j.getExecutioner().exec(
+                    new OldLessThan(mask, right, mask, mask.length())
+                );
+            } else {
+                Nd4j.getExecutioner().exec(
+                    new OldLessThan(mask,
+                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
+                        mask,
+                        mask.length()
+                    )
+                );
+            }
+            return mask.reshape(resultShape);
+        }
+        Nd4j.getExecutioner().exec(
+            new OldLessThan(mask, right, mask, mask.length())
+        );
+        return mask;
+    }
+
+    public static INDArray getLessThanOrEqualToMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
+        if (mask.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
+            if (mask.length() == 1) {
+                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
+                Nd4j.getExecutioner().exec(
+                    new OldLessThanOrEqual(mask, right, mask, mask.length())
+                );
+            } else {
+                Nd4j.getExecutioner().exec(
+                    new OldLessThanOrEqual(mask,
+                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
+                        mask,
+                        mask.length()
+                    )
+                );
+            }
+            return mask.reshape(resultShape);
+        }
+        Nd4j.getExecutioner().exec(
+            new OldLessThanOrEqual(mask, right, mask, mask.length())
+        );
+        return mask;
     }
 
     private static boolean shapeAIsSmallerThanShapeB(long[] shapeA, long[] shapeB) {
