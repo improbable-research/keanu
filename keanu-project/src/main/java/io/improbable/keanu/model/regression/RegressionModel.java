@@ -24,10 +24,10 @@ import java.util.function.Function;
  */
 public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
     private static final double DEFAULT_OBSERVATION_SIGMA = 1.0;
-    private final ModelFitter<DoubleTensor, OUTPUT> fitter;
+    private final ModelFitter fitter;
     private final LinearRegressionGraph<OUTPUT> modelGraph;
 
-    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph, ModelFitter<DoubleTensor, OUTPUT> fitter) {
+    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph, ModelFitter fitter) {
         this.modelGraph = modelGraph;
         this.fitter = fitter;
     }
@@ -51,18 +51,6 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
         };
     }
 
-    public DoubleTensor getWeights() {
-        return modelGraph.getWeights();
-    }
-
-    public double getIntercept() {
-        return modelGraph.getIntercept();
-    }
-
-    public double getWeight(int index) {
-        return getWeights().getFlattenedView().getOrScalar(index);
-    }
-
     public DoubleVertex getInterceptVertex() {
         return modelGraph.getInterceptVertex();
     }
@@ -76,16 +64,8 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
         return modelGraph.predict(tensor);
     }
 
-    public VertexId getInterceptVertexId() {
-        return modelGraph.getInterceptVertexId();
-    }
-
-    public VertexId getWeightsVertexId() {
-        return modelGraph.getWeightVertexId();
-    }
-
     public void fit() {
-        fitter.fit();
+        fitter.fit(modelGraph);
     }
 
 }

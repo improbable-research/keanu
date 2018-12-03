@@ -52,7 +52,7 @@ public class LogisticRegressionTest {
         model.fit();
         double accuracy = ModelScoring.accuracy(model.predict(xTest), yTest);
         Assert.assertTrue(accuracy > 0.75);
-        assertWeightsAreCalculated(model.getWeights());
+        assertWeightsAreCalculated(model.getWeightVertex());
     }
 
     private DoubleTensor generateX(int nSamples) {
@@ -69,8 +69,8 @@ public class LogisticRegressionTest {
         return yVertex.getValue();
     }
 
-    private void assertWeightsAreCalculated(DoubleTensor weights) {
-        assertThat(weights, allCloseTo(0.15, TRUE_WEIGHTS));
+    private void assertWeightsAreCalculated(DoubleVertex weights) {
+        assertThat(weights.getValue(), allCloseTo(0.15, TRUE_WEIGHTS));
     }
 
 }

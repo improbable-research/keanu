@@ -43,7 +43,7 @@ public class RadonHierarchicalRegression {
     public void canPerformSimpleLinearRegression() {
         RegressionModel model = linearRegression(radonData);
         assertThat(model.getWeightVertex().getValue().scalar(), both(greaterThan(-0.7)).and(lessThan(-0.4)));
-        assertThat(model.getIntercept(), both(greaterThan(1.2)).and(lessThan(1.5)));
+        assertThat(model.getInterceptVertex().getValue().scalar(), both(greaterThan(1.2)).and(lessThan(1.5)));
     }
 
     @Test

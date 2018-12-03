@@ -4,9 +4,8 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.network.NetworkState;
 
-public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OUTPUT> {
+public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter {
 
-    private final ModelGraph<INPUT, OUTPUT> modelGraph;
     private final PosteriorSamplingAlgorithm samplingAlgorithm;
     private final int sampleCount;
     private NetworkSamples posteriorSamples;
@@ -16,12 +15,10 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
      *
      * The model's latent vertices will have their values set to the average over the samples.
      *
-     * @param modelGraph The graph to fit
      * @param samplingAlgorithm The algorithm to use, e.g. {@link io.improbable.keanu.algorithms.mcmc.MetropolisHastings}
      * @param sampleCount The number of sample points to take.
      */
-    public SamplingModelFitter(ModelGraph<INPUT, OUTPUT> modelGraph, PosteriorSamplingAlgorithm samplingAlgorithm, int sampleCount) {
-        this.modelGraph = modelGraph;
+    public SamplingModelFitter(PosteriorSamplingAlgorithm samplingAlgorithm, int sampleCount) {
         this.samplingAlgorithm = samplingAlgorithm;
         this.sampleCount = sampleCount;
     }
@@ -33,7 +30,7 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
      *
      */
     @Override
-    public void fit() {
+    public void fit(ModelGraph modelGraph) {
         posteriorSamples = samplingAlgorithm
             .getPosteriorSamples(modelGraph.getBayesianNetwork(), sampleCount);
         NetworkState mostProbableState = posteriorSamples.getMostProbableState();
@@ -43,4 +40,5 @@ public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OU
     public NetworkSamples getNetworkSamples() {
         return posteriorSamples;
     }
+
 }

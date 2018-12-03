@@ -61,8 +61,8 @@ public class DiabetesLinearRegression {
 
         linearRegressionModel.fit();
 
-        assertThat(linearRegressionModel.getWeight(0), closeTo(938.2378, 0.5));
-        assertThat(linearRegressionModel.getIntercept(), closeTo(152.9189,0.5));
+        assertThat(linearRegressionModel.getWeightVertex().getValue().scalar(), closeTo(938.2378, 0.5));
+        assertThat(linearRegressionModel.getInterceptVertex().getValue().scalar(), closeTo(152.9189,0.5));
     }
 
     @Test

@@ -55,28 +55,12 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
         yObservationVertex.observe(output);
     }
 
-    public DoubleTensor getWeights() {
-        return weightsVertex.getValue();
-    }
-
     public DoubleVertex getInterceptVertex() {
         return interceptVertex;
     }
 
     public DoubleVertex getWeightVertex() {
         return weightsVertex;
-    }
-
-    public double getIntercept() {
-        return interceptVertex.getValue().scalar();
-    }
-
-    public VertexId getInterceptVertexId() {
-        return interceptVertex.getId();
-    }
-
-    public VertexId getWeightVertexId() {
-        return weightsVertex.getId();
     }
 
     @Value

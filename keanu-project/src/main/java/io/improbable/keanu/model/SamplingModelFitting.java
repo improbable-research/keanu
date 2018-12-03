@@ -15,8 +15,8 @@ public class SamplingModelFitting<OUTPUT> {
         this.samplingCount = samplingCount;
     }
 
-    public ModelFitter<DoubleTensor,OUTPUT> createFitterForGraph(LinearRegressionGraph<OUTPUT> regressionGraph) {
-        fitter = new SamplingModelFitter<>(regressionGraph, samplingAlgorithm, samplingCount);
+    public ModelFitter createFitterForGraph() {
+        fitter = new SamplingModelFitter(samplingAlgorithm, samplingCount);
         return fitter;
     }
 

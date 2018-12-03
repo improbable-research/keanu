@@ -38,8 +38,8 @@ public class LinearRidgeRegressionTest {
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -56,8 +56,8 @@ public class LinearRidgeRegressionTest {
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -74,8 +74,8 @@ public class LinearRidgeRegressionTest {
         linearRegressionModel.fit();
 
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -98,7 +98,7 @@ public class LinearRidgeRegressionTest {
 
         linearRegressionModelNarrow.fit();
 
-        assertThat(linearRegressionModelNarrow.getWeights().pow(2).sum(), lessThan(linearRegressionModelWide.getWeights().pow(2).sum()));
+        assertThat(linearRegressionModelNarrow.getWeightVertex().getValue().pow(2).sum(), lessThan(linearRegressionModelWide.getWeightVertex().getValue().pow(2).sum()));
 
     }
 
@@ -133,8 +133,8 @@ public class LinearRidgeRegressionTest {
         NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
 
         assertSampledWeightsAndInterceptMatchTestData(
-            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightsVertexId()),
-            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertexId()),
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightVertex().getId()),
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertex().getId()),
             data);
     }
 }

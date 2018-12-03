@@ -18,8 +18,8 @@ public enum RegressionRegularization {
             return new GaussianVertex(priorOnInterceptMean, priorOnInterceptScaleParameter).setLabel("intercept");
         }
 
-        public <INPUT, OUTPUT> ModelFitter<INPUT, OUTPUT> createFitterForGraph(ModelGraph<INPUT, OUTPUT> graph) {
-            return new MaximumLikelihoodModelFitter<>(graph);
+        public ModelFitter createFitterForGraph() {
+            return new MaximumLikelihoodModelFitter();
         }
     },
     LASSO {
@@ -31,8 +31,8 @@ public enum RegressionRegularization {
             return new LaplaceVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
         }
 
-        public <INPUT, OUTPUT> ModelFitter<INPUT, OUTPUT> createFitterForGraph(ModelGraph<INPUT, OUTPUT> graph) {
-            return new MAPModelFitter<>(graph);
+        public ModelFitter createFitterForGraph() {
+            return new MAPModelFitter();
         }
     },
     RIDGE {
@@ -44,8 +44,8 @@ public enum RegressionRegularization {
             return new GaussianVertex(priorOnInterceptMean, priorOnInterceptScaleParameter);
         }
 
-        public <INPUT, OUTPUT> ModelFitter<INPUT, OUTPUT> createFitterForGraph(ModelGraph<INPUT, OUTPUT> graph) {
-            return new MAPModelFitter<>(graph);
+        public ModelFitter createFitterForGraph() {
+            return new MAPModelFitter();
         }
     };
 
@@ -53,5 +53,5 @@ public enum RegressionRegularization {
 
     public abstract DoubleVertex getInterceptVertex(DoubleVertex priorOnInterceptMean, DoubleVertex priorOnInterceptScaleParameter);
 
-    public abstract <INPUT, OUTPUT> ModelFitter<INPUT, OUTPUT> createFitterForGraph(ModelGraph<INPUT, OUTPUT> graph);
+    public abstract ModelFitter createFitterForGraph();
 }

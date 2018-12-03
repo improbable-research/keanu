@@ -136,12 +136,12 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
             getWeightsVertex()
         );
 
-        ModelFitter<DoubleTensor, OUTPUT> fitter = samplingAlgorithm == null ?
-            this.regularization.createFitterForGraph(regressionGraph) :
-            samplingAlgorithm.createFitterForGraph(regressionGraph);
+        ModelFitter fitter = samplingAlgorithm == null ?
+            this.regularization.createFitterForGraph() :
+            samplingAlgorithm.createFitterForGraph();
 
         regressionGraph.observeValues(inputTrainingData, outputTrainingData);
-        return new RegressionModel<>(regressionGraph, fitter);
+        return new RegressionModel(regressionGraph, fitter);
     }
 
     private void checkVariablesAreCorrectlyInitialised() {
