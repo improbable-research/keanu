@@ -10,7 +10,6 @@ k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.proposal.AcceptanceRateTracker")
 
-
 proposal_listener_types = Union['AcceptanceRateTracker']
 
 

@@ -71,7 +71,8 @@ def generate_samples(net: BayesNet,
     return _samples_generator(sample_iterator, vertices_unwrapped)
 
 
-def build_sampling_algorithm(algo, proposal_distribution: str, proposal_distribution_sigma: numpy_types, proposal_listeners: Iterable[proposal_listener_types]):
+def build_sampling_algorithm(algo, proposal_distribution: str, proposal_distribution_sigma: numpy_types,
+                             proposal_listeners: Iterable[proposal_listener_types]):
     if algo != "metropolis":
         if proposal_distribution is not None:
             raise TypeError("Only Metropolis Hastings supports the proposal_distribution parameter")
