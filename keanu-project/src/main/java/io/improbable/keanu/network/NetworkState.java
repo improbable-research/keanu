@@ -19,4 +19,6 @@ public interface NetworkState {
     <T> T get(VertexId vertexId);
 
     Set<VertexId> getVertexIds();
+
+    double getLogOfMasterP();
 }

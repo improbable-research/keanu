@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,7 @@ public class NetworkSamples {
     }
 
     public NetworkState getNetworkState(int sample) {
-        return new SamplesBackedNetworkState(samplesByVertex, sample);
+        return new SamplesBackedNetworkState(samplesByVertex, logOfMasterPForEachSample, sample);
     }
 
     public double getLogOfMasterP(int sample) {
@@ -131,7 +132,7 @@ public class NetworkSamples {
     public List<NetworkState> toNetworkStates() {
         List<NetworkState> states = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            states.add(new SamplesBackedNetworkState(samplesByVertex, i));
+            states.add(getNetworkState(i));
         }
         return states;
     }
@@ -149,10 +150,12 @@ public class NetworkSamples {
     private static class SamplesBackedNetworkState implements NetworkState {
 
         private final Map<VertexId, ? extends List> samplesByVertex;
+        private final List<Double> logOfMasterPForEachSample;
         private final int index;
 
-        public SamplesBackedNetworkState(Map<VertexId, ? extends List> samplesByVertex, int index) {
+        public SamplesBackedNetworkState(Map<VertexId, ? extends List> samplesByVertex, List<Double> logOfMasterPForEachSample, int index)  {
             this.samplesByVertex = samplesByVertex;
+            this.logOfMasterPForEachSample = logOfMasterPForEachSample;
             this.index = index;
         }
 
@@ -169,6 +172,11 @@ public class NetworkSamples {
         @Override
         public Set<VertexId> getVertexIds() {
             return new HashSet<>(samplesByVertex.keySet());
+        }
+
+        @Override
+        public double getLogOfMasterP() {
+            return logOfMasterPForEachSample.get(index);
         }
     }
 
