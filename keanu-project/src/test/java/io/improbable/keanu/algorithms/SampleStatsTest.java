@@ -15,7 +15,7 @@ public class SampleStatsTest {
     @Test
     public void autocorrAtLagZeroIsOne() {
         double[] samples = generateUniformRandomArray(20);
-        double[] autocorr = SampleStats.acf(samples);
+        double[] autocorr = SampleStats.autocorrelation(samples);
         assertEquals(autocorr[0], 1.0, 0.001);
     }
 
@@ -32,7 +32,7 @@ public class SampleStatsTest {
     @Test
     public void randomlyGeneratedSamplesHaveCloseToZeroAutocorrelationAtLowLags() {
         double[] samples = generateUniformRandomArray(500);
-        double[] autocorr = SampleStats.acf(samples);
+        double[] autocorr = SampleStats.autocorrelation(samples);
 
         for (int lag = 1; lag < 10; lag++) {
             assertThat(autocorr[lag], lessThan(0.1));
@@ -48,7 +48,7 @@ public class SampleStatsTest {
     @Test
     public void increasingSequenceReturnsCorrectAutocorr() {
         double[] samples = {1, 2, 3, 4, 5, 6, 7, 8};
-        double[] autocorr = SampleStats.acf(samples);
+        double[] autocorr = SampleStats.autocorrelation(samples);
         double[] expected = {1., 0.625, 0.27380952, -0.0297619, -0.26190476,
             -0.39880952, -0.41666667, -0.29166667};
         assertArrayEquals(expected, autocorr, 0.0001);

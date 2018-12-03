@@ -58,7 +58,7 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
         double[] sampleValuesAtIndex = samples.stream()
             .mapToDouble(x -> x.getValue(index)).toArray();
 
-        double[] autocorr = SampleStats.acf(sampleValuesAtIndex);
+        double[] autocorr = SampleStats.autocorrelation(sampleValuesAtIndex);
         return DoubleTensor.create(autocorr);
     }
 

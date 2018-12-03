@@ -8,17 +8,17 @@ import org.apache.commons.math3.transform.TransformType;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
-public class SampleStats {
+public final class SampleStats {
     private static final FastFourierTransformer ffTransformer = new FastFourierTransformer(DftNormalization.STANDARD);
 
-    public static double[] acf(double[] samples) {
-        double[] acovResult = acov(samples);
+    public static double[] autocorrelation(double[] samples) {
+        double[] acovResult = autocovariance(samples);
         double variance = acovResult[0];
-        double[] autocor = Arrays.stream(acovResult).map(x -> x / variance).toArray();
-        return autocor;
+        double[] autocorr = Arrays.stream(acovResult).map(x -> x / variance).toArray();
+        return autocorr;
     }
 
-    public static double[] acov(double[] samples) {
+    private static double[] autocovariance(double[] samples) {
         double mean = Arrays.stream(samples).average().orElseThrow(NoSuchElementException::new);
         double[] demean = Arrays.stream(samples).map(x -> x - mean).toArray();
         int n = demean.length;
@@ -32,8 +32,15 @@ public class SampleStats {
         Complex ifft[] = fftCrossCorrelationWitSelf(demeanPaddedWithZeros);
         double realParts[] = getRealPartsTruncated(ifft, n);
         double realPartsDivN[] = Arrays.stream(realParts).map(x -> x / n).toArray();
-
         return realPartsDivN;
+    }
+
+    private static int nextPowerOfTwo(int x) {
+        int highestOneBit = Integer.highestOneBit(x);
+        if (x == highestOneBit) {
+            return x;
+        }
+        return highestOneBit << 1;
     }
 
     private static Complex[] fftCrossCorrelationWitSelf(double[] values) {
@@ -43,14 +50,11 @@ public class SampleStats {
         return ifft;
     }
 
-
-    private static int nextPowerOfTwo(int x) {
-        int highestOneBit = Integer.highestOneBit(x);
-        if (x == highestOneBit) {
-            return x;
+    private static Complex[] multiplyWithConjugateInPlace(Complex[] complexNumbers) {
+        for (int i = 0; i < complexNumbers.length; i++) {
+            complexNumbers[i] = complexNumbers[i].multiply(complexNumbers[i].conjugate());
         }
-        return highestOneBit << 1;
-
+        return complexNumbers;
     }
 
     private static double[] getRealPartsTruncated(Complex[] complexNumbers, int newLength) {
@@ -59,12 +63,5 @@ public class SampleStats {
             reals[i] = complexNumbers[i].getReal();
         }
         return reals;
-    }
-
-    private static Complex[] multiplyWithConjugateInPlace(Complex[] complexNumbers) {
-        for (int i = 0; i < complexNumbers.length; i++) {
-            complexNumbers[i] = complexNumbers[i].multiply(complexNumbers[i].conjugate());
-        }
-        return complexNumbers;
     }
 }
