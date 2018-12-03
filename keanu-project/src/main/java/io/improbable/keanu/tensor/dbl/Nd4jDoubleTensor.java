@@ -100,7 +100,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     static INDArray unsafeGetNd4J(DoubleTensor that) {
-        if (that.isScalar()) {
+        if (that.isScalar() || that instanceof ScalarDoubleTensor) {
             return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
         }
         return ((Nd4jDoubleTensor) that).tensor;
@@ -402,7 +402,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return that.unaryMinus().plusInPlace(this);
         } else {
-            return this.duplicate().minusInPlace(that);
+            return this.duplicate().minusInPlace(that.duplicate());
         }
     }
 
@@ -413,7 +413,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return that.plus(this.scalar());
         } else {
-            return this.duplicate().plusInPlace(that);
+            return this.duplicate().plusInPlace(that.duplicate());
         }
     }
 
@@ -424,7 +424,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return that.times(this.scalar());
         } else {
-            return this.duplicate().timesInPlace(that);
+            return this.duplicate().timesInPlace(that.duplicate());
         }
     }
 
@@ -435,7 +435,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return that.reciprocal().timesInPlace(this);
         } else {
-            return this.duplicate().divInPlace(that);
+            return this.duplicate().divInPlace(that.duplicate());
         }
     }
 

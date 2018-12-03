@@ -158,20 +158,20 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor matrixMultiply(IntegerTensor value) {
-        if (value.isLengthOne()) {
-            return value.times(value);
+    public IntegerTensor matrixMultiply(IntegerTensor integerTensor) {
+        if (integerTensor.isLengthOne()) {
+            return integerTensor.times(value);
         }
         throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
     }
 
     @Override
-    public IntegerTensor tensorMultiply(IntegerTensor value, int[] dimsLeft, int[] dimsRight) {
-        if (value.isLengthOne()) {
+    public IntegerTensor tensorMultiply(IntegerTensor integerTensor, int[] dimsLeft, int[] dimsRight) {
+        if (integerTensor.isLengthOne()) {
             if (dimsLeft.length > 1 || dimsRight.length > 1 || dimsLeft[0] != 0 || dimsRight[0] != 0) {
                 throw new IllegalArgumentException("Tensor multiply sum dimensions out of bounds for scalar");
             }
-            return value.times(value);
+            return integerTensor.times(value);
         }
         throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
     }
@@ -193,7 +193,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor getGreaterThanMask(IntegerTensor greaterThanThis) {
-        if (greaterThanThis.isLengthOne()) {
+        if (greaterThanThis.isScalar()) {
             return new ScalarIntegerTensor(value > greaterThanThis.scalar() ? 1 : 0, shape);
         } else {
             return IntegerTensor.create(value, greaterThanThis.getShape())
@@ -203,7 +203,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanOrEqualToThis) {
-        if (greaterThanOrEqualToThis.isLengthOne()) {
+        if (greaterThanOrEqualToThis.isScalar()) {
             return new ScalarIntegerTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0, shape);
         } else {
             return IntegerTensor.create(value, greaterThanOrEqualToThis.getShape())
@@ -213,7 +213,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor getLessThanMask(IntegerTensor lessThanThis) {
-        if (lessThanThis.isLengthOne()) {
+        if (lessThanThis.isScalar()) {
             return new ScalarIntegerTensor(value < lessThanThis.scalar() ? 1 : 0, shape);
         } else {
             return IntegerTensor.create(value, lessThanThis.getShape())
@@ -223,7 +223,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor getLessThanOrEqualToMask(IntegerTensor lessThanOrEqualsThis) {
-        if (lessThanOrEqualsThis.isLengthOne()) {
+        if (lessThanOrEqualsThis.isScalar()) {
             return new ScalarIntegerTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0, shape);
         } else {
             return IntegerTensor.create(value, lessThanOrEqualsThis.getShape())
@@ -233,7 +233,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor setWithMaskInPlace(IntegerTensor withMask, Integer valueToApply) {
-        if (withMask.isLengthOne()) {
+        if (withMask.isScalar()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
             return IntegerTensor.create(value, withMask.getShape())
@@ -287,7 +287,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor powInPlace(IntegerTensor exponent) {
-        if (exponent.isLengthOne()) {
+        if (exponent.isScalar()) {
             powInPlace(exponent.scalar());
         } else {
             return IntegerTensor.create(value, exponent.getShape())
@@ -304,7 +304,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor minusInPlace(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             minusInPlace(that.scalar());
         } else {
             return IntegerTensor.create(value, that.getShape())
@@ -315,7 +315,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor plusInPlace(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             plusInPlace(that.scalar());
         } else {
             return IntegerTensor.create(value, that.getShape())
@@ -326,7 +326,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor timesInPlace(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             timesInPlace(that.scalar());
         } else {
             return IntegerTensor.create(value, that.getShape())
@@ -337,7 +337,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor divInPlace(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             divInPlace(that.scalar());
         } else {
             return IntegerTensor.create(value, that.getShape())
@@ -376,7 +376,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public BooleanTensor lessThan(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             return lessThan(that.scalar());
         } else {
             return that.greaterThan(value);
@@ -385,7 +385,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public BooleanTensor lessThanOrEqual(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             return lessThanOrEqual(that.scalar());
         } else {
             return that.greaterThanOrEqual(value);
@@ -404,7 +404,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor minInPlace(IntegerTensor min) {
-        if (min.isLengthOne()) {
+        if (min.isScalar()) {
             return new ScalarIntegerTensor(Math.min(value, min.scalar()), shape);
         } else {
             return min.duplicate().minInPlace(this);
@@ -413,7 +413,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor maxInPlace(IntegerTensor max) {
-        if (max.isLengthOne()) {
+        if (max.isScalar()) {
             return new ScalarIntegerTensor(Math.max(value, max.scalar()), shape);
         } else {
             return max.duplicate().maxInPlace(this);
@@ -443,7 +443,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public BooleanTensor greaterThan(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             return greaterThan(that.scalar());
         } else {
             return that.lessThan(value);
@@ -452,7 +452,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public BooleanTensor greaterThanOrEqual(IntegerTensor that) {
-        if (that.isLengthOne()) {
+        if (that.isScalar()) {
             return greaterThanOrEqual(that.scalar());
         } else {
             return that.lessThanOrEqual(value);
@@ -486,7 +486,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof IntegerTensor) {
             IntegerTensor thatAsInteger = (IntegerTensor) that;
-            if (that.isLengthOne()) {
+            if (that.isScalar()) {
                 return BooleanTensor.create(value.equals(thatAsInteger.scalar()), shape);
             } else {
                 return thatAsInteger.elementwiseEquals(value);

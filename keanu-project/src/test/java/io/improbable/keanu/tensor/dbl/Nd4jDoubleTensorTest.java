@@ -613,7 +613,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canFindMinAndMaxFromScalarToTensor() {
         DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
-        DoubleTensor b = DoubleTensor.create(3.);
+        DoubleTensor b = DoubleTensor.scalar(3.);
 
         DoubleTensor min = DoubleTensor.min(a, b);
         DoubleTensor max = DoubleTensor.max(a, b);
@@ -625,7 +625,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canFindMinFromScalarToTensorInPlace() {
         DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
-        DoubleTensor b = DoubleTensor.create(3.);
+        DoubleTensor b = DoubleTensor.scalar(3.);
 
         a.minInPlace(b);
 
@@ -635,7 +635,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canFindMaxFromScalarToTensorInPlace() {
         DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
-        DoubleTensor b = DoubleTensor.create(3.);
+        DoubleTensor b = DoubleTensor.scalar(3.);
 
         a.maxInPlace(b);
 
@@ -838,14 +838,6 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor value = DoubleTensor.create(1., 2., 3.);
         DoubleTensor differentValue = DoubleTensor.scalar(1.);
         BooleanTensor result = value.elementwiseEquals(differentValue);
-        assertThat(result, hasValue(true, false, false));
-    }
-
-    @Test
-    public void comparesDoubleTensorWithLength1Vector() {
-        DoubleTensor value = DoubleTensor.create(new double[]{1.}, 1);
-        DoubleTensor vector = DoubleTensor.create(1., 2., 3.);
-        BooleanTensor result = value.elementwiseEquals(vector);
         assertThat(result, hasValue(true, false, false));
     }
 
