@@ -52,12 +52,10 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
         }
 
         long[] shape = samples.iterator().next().getShape();
-
         TensorShapeValidation.checkIndexIsValid(shape, index);
 
         double[] sampleValuesAtIndex = samples.stream()
             .mapToDouble(x -> x.getValue(index)).toArray();
-
         double[] autocorr = SampleStats.autocorrelation(sampleValuesAtIndex);
         return DoubleTensor.create(autocorr);
     }
