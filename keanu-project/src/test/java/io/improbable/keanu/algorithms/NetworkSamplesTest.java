@@ -1,12 +1,14 @@
 package io.improbable.keanu.algorithms;
 
 import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.VertexId;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +24,7 @@ public class NetworkSamplesTest {
     NetworkSamples samples;
     VertexId v1 = new VertexId();
     VertexId v2 = new VertexId();
+
 
     @Before
     public void setup() {
@@ -96,5 +99,40 @@ public class NetworkSamplesTest {
         NetworkState mostProbableState = samples.getMostProbableState();
         assertThat(mostProbableState.get(v1), equalTo(10));
         assertThat(mostProbableState.get(v2), equalTo(0));
+    }
+
+    @Test
+    public void canBeConstructedFromListOfNetworkStates() {
+        List<Double> v1Samples = Arrays.asList(33.2, 3.9);
+        List<Double> v2Samples = Arrays.asList(109.4, 3.55);
+        final List<Double> logOfMasterPBySample = Arrays.asList(9.4, 12.7);
+        Map<VertexId, Double> vertexValsFirstSample = new HashMap<>();
+        Map<VertexId, Double> vertexValsSecondSample = new HashMap<>();
+
+        vertexValsFirstSample.put(v1, v1Samples.get(0));
+        vertexValsFirstSample.put(v2, v2Samples.get(0));
+        vertexValsSecondSample.put(v1, v1Samples.get(1));
+        vertexValsSecondSample.put(v2, v2Samples.get(1));
+
+        List<NetworkState> networkStateList = new ArrayList<>();
+        networkStateList.add(new SimpleNetworkState(vertexValsFirstSample, logOfMasterPBySample.get(0)));
+        networkStateList.add(new SimpleNetworkState(vertexValsSecondSample, logOfMasterPBySample.get(1)));
+
+
+        NetworkSamples networkSamples = NetworkSamples.from(networkStateList);
+        assertEquals(v1Samples, networkSamples.get(v1).asList());
+        assertEquals(v2Samples, networkSamples.get(v2).asList());
+        assertEquals(logOfMasterPBySample.get(0), networkSamples.getLogOfMasterP(0));
+        assertEquals(logOfMasterPBySample.get(1), networkSamples.getLogOfMasterP(1));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesCatchConstructionFromNetworkStatesWithoutMasterLogP() {
+        Map<VertexId, Double> vertexVals = new HashMap<>();
+        vertexVals.put(v1, 29.3);
+        List<NetworkState> networkStateList = new ArrayList<>();
+        networkStateList.add(new SimpleNetworkState(vertexVals));
+
+        NetworkSamples networkSamples = NetworkSamples.from(networkStateList);
     }
 }

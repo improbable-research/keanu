@@ -39,6 +39,27 @@ public class NetworkSamples {
         this.size = size;
     }
 
+    public static NetworkSamples from(List<NetworkState> networkStates) {
+        final int size = networkStates.size();
+        Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
+        List<Double> logOfMasterPForEachSample = new ArrayList<>();
+
+        networkStates.forEach(networkState -> addSamplesForNetworkState(networkState,samplesByVertex));
+        networkStates.forEach(networkState -> logOfMasterPForEachSample.add(networkState.getLogOfMasterP()));
+        return new NetworkSamples(samplesByVertex,logOfMasterPForEachSample, size);
+    }
+
+    private static void addSamplesForNetworkState(NetworkState networkState, Map<VertexId, List<?>> samplesByVertex) {
+        for(VertexId vertexId:networkState.getVertexIds()) {
+            addSampleForVertex(vertexId,networkState.get(vertexId), samplesByVertex);
+        }
+    }
+
+    private static <T> void addSampleForVertex(VertexId vertexId, T value, Map<VertexId, List<?>> samples) {
+        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertexId, v -> new ArrayList<T>());
+        samplesForVertex.add(value);
+    }
+
     public int size() {
         return this.size;
     }
