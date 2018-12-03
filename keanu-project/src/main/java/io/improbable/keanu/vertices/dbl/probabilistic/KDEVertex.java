@@ -3,8 +3,9 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Samplable;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -15,12 +16,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class KDEVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, Samplable<DoubleTensor>, NonSaveableVertex {
+public class KDEVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, Samplable<DoubleTensor> {
 
     private final double bandwidth;
     private DoubleTensor samples;
+    private static final String BANDWIDTH_NAME = "bandwidth";
+    private static final String SAMPLES_NAME = "samples";
 
-    public KDEVertex(DoubleTensor samples, double bandwidth) {
+    public KDEVertex(@LoadVertexParam(SAMPLES_NAME) DoubleTensor samples, @LoadVertexParam(BANDWIDTH_NAME) double bandwidth) {
         super(Tensor.SCALAR_SHAPE);
         if (samples.getLength() == 0) {
             throw new IllegalStateException("The provided tensor of samples is empty!");
@@ -43,6 +46,16 @@ public class KDEVertex extends DoubleVertex implements Differentiable, Probabili
         this(DoubleTensor.create(samples.stream()
             .mapToDouble(Double::doubleValue)
             .toArray()), bandwidth);
+    }
+
+    @SaveVertexParam(BANDWIDTH_NAME)
+    public double getBandwidth() {
+        return bandwidth;
+    }
+
+    @SaveVertexParam(SAMPLES_NAME)
+    public DoubleTensor getInputSamples() {
+        return samples;
     }
 
     private DoubleTensor getDiffs(DoubleTensor x) {
