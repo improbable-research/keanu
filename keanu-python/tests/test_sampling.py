@@ -65,16 +65,11 @@ def test_down_sample_interval(net: BayesNet) -> None:
     assert all(len(vertex_samples) == expected_num_samples for label, vertex_samples in samples.items())
 
 
-@pytest.mark.mpl_image_compare(filename='test_sample_with_plot.png', tolerance=20)
-def test_sample_with_plot() -> Any:
-    with Model() as m:
-        m.exp = Exponential(np.ones((2, 2)))
-        m.exp.observe(np.array([[3., 2.], [0., 1.]]))
-        m.bernoulli = Bernoulli(m.exp)
-    net = m.to_bayes_net()
-
-    fig, ax = plt.subplots(1, 1, squeeze=False)
-    sample(net=net, sample_from=net.get_observed_vertices(), draws=5, plot=True, ax=ax)
+@pytest.mark.mpl_image_compare(filename='test_sampling.png', tolerance=20)
+def test_sample_with_plot(net: BayesNet) -> Any:
+    KeanuRandom.set_default_random_seed(1)
+    fig, ax = plt.subplots(3, 1, squeeze=False)
+    sample(net=net, sample_from=net.get_latent_vertices(), draws=5, plot=True, ax=ax)
     return fig
 
 
@@ -105,16 +100,11 @@ def test_iter_returns_same_result_as_sample(algo: str) -> None:
         np.testing.assert_almost_equal(samples_dataframe[vertex].mean(), np.average(samples[vertex]))
 
 
-@pytest.mark.mpl_image_compare(filename='test_iter_with_live_plot.png', tolerance=20)
-def test_iter_with_live_plot() -> Any:
-    with Model() as m:
-        m.exp = Exponential(np.ones((2, 2)))
-        m.exp.observe(np.array([[3., 2.], [0., 1.]]))
-        m.bernoulli = Bernoulli(m.exp)
-    net = m.to_bayes_net()
-
-    fig, ax = plt.subplots(1, 1, squeeze=False)
-    samples = generate_samples(net=net, sample_from=net.get_observed_vertices(), live_plot=True, refresh_every=5, ax=ax)
+@pytest.mark.mpl_image_compare(filename='test_sampling.png', tolerance=20)
+def test_iter_with_live_plot(net: BayesNet) -> Any:
+    KeanuRandom.set_default_random_seed(1)
+    fig, ax = plt.subplots(3, 1, squeeze=False)
+    samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), live_plot=True, refresh_every=5, ax=ax)
 
     for sample in islice(samples, 5):
         pass
