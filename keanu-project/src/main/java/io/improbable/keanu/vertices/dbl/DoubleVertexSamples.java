@@ -41,6 +41,11 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
             .divInPlace(samples.size() - 1);
     }
 
+    /**
+     * Calculates the autocorrelation or samples across a specified tensor index.
+     * @param index The tensor index to calculate autocorrelation across.
+     * @return A tensor of autocorrelation at different lags.
+     */
     public DoubleTensor getAutocorrelation(long... index) {
         if (samples.isEmpty()) {
             throw new IllegalStateException("No samples exist for averaging.");
