@@ -19,28 +19,34 @@ public final class SampleStats {
     }
 
     private static double[] autocovariance(double[] samples) {
-        double mean = Arrays.stream(samples).average().orElseThrow(NoSuchElementException::new);
-        double[] demean = Arrays.stream(samples).map(x -> x - mean).toArray();
-        int n = demean.length;
-
-        // Zero padding needed to stop mixing of convolution results
-        // See last paragraph of https://dsp.stackexchange.com/a/745
-        // FFT requires length to be power of two
-        int fftSize = nextPowerOfTwo(2 * n + 1);
-        double[] demeanPaddedWithZeros = Arrays.copyOf(demean, fftSize);
-
+        final int n = samples.length;
+        double[] demeanPaddedWithZeros = calculatePaddedDemean(samples);
         Complex ifft[] = fftCrossCorrelationWitSelf(demeanPaddedWithZeros);
         double realParts[] = getRealPartsTruncated(ifft, n);
         double realPartsDivN[] = Arrays.stream(realParts).map(x -> x / n).toArray();
         return realPartsDivN;
     }
 
+    private static double[] calculatePaddedDemean(double[] samples) {
+        double[] demean = demean(samples);
+
+        // Zero padding needed to stop mixing of convolution results
+        // See last paragraph of https://dsp.stackexchange.com/a/745
+        // FFT requires length to be power of two
+        int fftSize = nextPowerOfTwo(2 * samples.length + 1);
+        double[] demeanPaddedWithZeros = Arrays.copyOf(demean, fftSize);
+        return demeanPaddedWithZeros;
+    }
+
+    private static double[] demean(double[] samples) {
+        double mean = Arrays.stream(samples).average().orElseThrow(NoSuchElementException::new);
+        double demean[] = Arrays.stream(samples).map(x -> x - mean).toArray();
+        return demean;
+    }
+
     private static int nextPowerOfTwo(int x) {
         int highestOneBit = Integer.highestOneBit(x);
-        if (x == highestOneBit) {
-            return x;
-        }
-        return highestOneBit << 1;
+        return (x == highestOneBit) ? x : highestOneBit << 1;
     }
 
     private static Complex[] fftCrossCorrelationWitSelf(double[] values) {
