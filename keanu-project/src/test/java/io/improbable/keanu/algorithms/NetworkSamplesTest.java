@@ -7,8 +7,10 @@ import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.VertexId;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,6 +23,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertTrue;
 
 public class NetworkSamplesTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     NetworkSamples samples;
     VertexId v1 = new VertexId();
@@ -124,8 +129,10 @@ public class NetworkSamplesTest {
         assertEquals(logOfMasterPBySample.get(1), networkSamples.getLogOfMasterP(1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void doesCatchConstructionFromNetworkStatesWithoutMasterLogP() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Network state doesn't have LogOfMasterP.");
         Map<VertexId, Double> vertexVals = new HashMap<>();
         vertexVals.put(v1, 29.3);
         List<NetworkState> networkStateList = ImmutableList.of(

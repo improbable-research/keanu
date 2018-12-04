@@ -2,7 +2,9 @@ package io.improbable.keanu.network;
 
 import io.improbable.keanu.vertices.VertexId;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +12,10 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 public class SimpleNetworkStateTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     Map<VertexId, Double> sampleMap = new HashMap<>();
 
     @Before
@@ -25,8 +31,9 @@ public class SimpleNetworkStateTest {
         assertEquals(expectedLogOfMasterP, networkState.getLogOfMasterP(), 0.01);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void getLogOfMasterPThrowsExceptionWhenNotPresent() {
+        thrown.expect(IllegalArgumentException.class);
         NetworkState networkState = new SimpleNetworkState(sampleMap);
         networkState.getLogOfMasterP();
     }
