@@ -104,8 +104,7 @@ public interface Optimizer {
         return variables.stream()
             .map(
                 v -> {
-                    Object value = v.getValue();
-                    if (value instanceof NumberTensor) {
+                    if (v.getValue() instanceof NumberTensor) {
                         return (Variable<NumberTensor>) v;
                     } else {
                         throw new UnsupportedOperationException(

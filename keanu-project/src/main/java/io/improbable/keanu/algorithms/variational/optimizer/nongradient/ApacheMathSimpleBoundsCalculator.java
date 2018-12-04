@@ -27,12 +27,11 @@ class ApacheMathSimpleBoundsCalculator {
 
         for (Variable variable : latentVariables) {
 
-            long[] variableShape = variable.getShape();
             if (optimizerBounds.hasBound(variable.getReference())) {
                 validateBoundsForVariable(variable);
                 addBoundsForVariable(variable, minBounds, maxBounds);
             } else {
-                int length = TensorShape.getLengthAsInt(variableShape);
+                int length = TensorShape.getLengthAsInt(variable.getShape());
                 int startIndex = minBounds.size();
                 for (int i = 0; i < length; i++) {
                     minBounds.add(startPoint[i + startIndex] - boundsRange);
