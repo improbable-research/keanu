@@ -21,12 +21,7 @@ public class SampleStatsTest {
 
     private double[] generateUniformRandomArray(int length) {
         ContinuousDistribution uniform = Uniform.withParameters(DoubleTensor.ZERO_SCALAR, DoubleTensor.scalar(1000));
-        uniform.sample(new long[]{length}, KeanuRandom.getDefaultRandom());
-        double samples[] = new double[length];
-        for (int i = 0; i < length; i++) {
-            samples[i] = uniform.sample(new long[]{1}, KeanuRandom.getDefaultRandom()).scalar();
-        }
-        return samples;
+        return uniform.sample(new long[]{length}, KeanuRandom.getDefaultRandom()).asFlatDoubleArray();
     }
 
     @Test
