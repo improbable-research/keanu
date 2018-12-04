@@ -78,10 +78,7 @@ public class FitnessFunctionWithGradient {
     }
 
     private Map<VariableReference, DoubleTensor> getValues(double[] point) {
-        return convertFromPoint(
-            point,
-            probabilisticWithGradientGraph.getLatentVariables()
-        );
+        return convertFromPoint(point, probabilisticWithGradientGraph.getLatentVariables());
     }
 
     private static double[] alignGradientsToAppropriateIndex(Map<? extends VariableReference, DoubleTensor> diffs,

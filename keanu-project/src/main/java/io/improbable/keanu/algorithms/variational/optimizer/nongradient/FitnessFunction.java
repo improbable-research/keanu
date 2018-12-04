@@ -35,10 +35,7 @@ public class FitnessFunction {
     public MultivariateFunction fitness() {
         return point -> {
 
-            Map<VariableReference, DoubleTensor> values = convertFromPoint(
-                point,
-                latentVariables
-            );
+            Map<VariableReference, DoubleTensor> values = convertFromPoint(point, latentVariables);
 
             double logOfTotalProbability = useLikelihood ?
                 probabilisticGraph.logLikelihood(values) :

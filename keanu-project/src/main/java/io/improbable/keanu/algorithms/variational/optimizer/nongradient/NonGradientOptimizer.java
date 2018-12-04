@@ -98,9 +98,7 @@ public class NonGradientOptimizer implements Optimizer {
             stoppingTrustRegionRadius
         );
 
-        double[] startPoint = Optimizer.convertToPoint(
-            getAsNumberTensors(probabilisticGraph.getLatentVariables())
-        );
+        double[] startPoint = Optimizer.convertToPoint(getAsNumberTensors(probabilisticGraph.getLatentVariables()));
 
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 

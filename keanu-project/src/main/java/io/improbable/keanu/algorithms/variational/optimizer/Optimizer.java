@@ -72,8 +72,7 @@ public interface Optimizer {
         return point;
     }
 
-    static Map<VariableReference, DoubleTensor> convertFromPoint(double[] point,
-                                                                 List<? extends Variable> latentVariables) {
+    static Map<VariableReference, DoubleTensor> convertFromPoint(double[] point, List<? extends Variable> latentVariables) {
 
         Map<VariableReference, DoubleTensor> tensors = new HashMap<>();
         int position = 0;
