@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.SampleStats;
 import io.improbable.keanu.algorithms.VertexSamples;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -14,9 +15,7 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
     }
 
     public DoubleTensor getAverages() {
-        if (samples.isEmpty()) {
-            throw new IllegalStateException("No samples exist for averaging.");
-        }
+        Preconditions.checkState(!samples.isEmpty(),"No samples exist for averaging.");
 
         long[] shape = samples.iterator().next().getShape();
 
@@ -26,9 +25,7 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
     }
 
     public DoubleTensor getVariances() {
-        if (samples.isEmpty()) {
-            throw new IllegalStateException("No samples exist for averaging.");
-        }
+        Preconditions.checkState(!samples.isEmpty(),"No samples exist for averaging.");
 
         long[] shape = samples.iterator().next().getShape();
 
@@ -47,9 +44,7 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
      * @return A tensor of autocorrelation at different lags.
      */
     public DoubleTensor getAutocorrelation(long... index) {
-        if (samples.isEmpty()) {
-            throw new IllegalStateException("No samples exist for averaging.");
-        }
+        Preconditions.checkState(!samples.isEmpty(),"No samples exist for averaging.");
 
         long[] shape = samples.iterator().next().getShape();
         TensorShapeValidation.checkIndexIsValid(shape, index);
