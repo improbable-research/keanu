@@ -65,11 +65,13 @@ def test_down_sample_interval(net: BayesNet) -> None:
     assert all(len(vertex_samples) == expected_num_samples for label, vertex_samples in samples.items())
 
 
-@pytest.mark.mpl_image_compare(filename='test_sampling.png', tolerance=29.175818635567975)
+@pytest.mark.mpl_image_compare(filename='test_sampling.png')
 def test_sample_with_plot(net: BayesNet) -> Any:
     KeanuRandom.set_default_random_seed(1)
     fig, ax = plt.subplots(3, 1, squeeze=False)
     sample(net=net, sample_from=net.get_latent_vertices(), draws=5, plot=True, ax=ax)
+
+    reorder_subplots(ax)
     return fig
 
 
@@ -101,7 +103,7 @@ def test_iter_returns_same_result_as_sample(algo: str) -> None:
         np.testing.assert_almost_equal(samples_dataframe[vertex_label].mean(), np.average(samples[vertex_label]))
 
 
-@pytest.mark.mpl_image_compare(filename='test_sampling.png', tolerance=29.175818635567975)
+@pytest.mark.mpl_image_compare(filename='test_sampling.png')
 def test_iter_with_live_plot(net: BayesNet) -> Any:
     KeanuRandom.set_default_random_seed(1)
     fig, ax = plt.subplots(3, 1, squeeze=False)
@@ -110,6 +112,7 @@ def test_iter_with_live_plot(net: BayesNet) -> Any:
     for sample in islice(samples, 5):
         pass
 
+    reorder_subplots(ax)
     return fig
 
 
@@ -118,3 +121,12 @@ def set_starting_state(model: Model) -> None:
     model.temperature.set_value(model.temperature.sample())
     model.thermometer_one.set_value(model.thermometer_one.sample())
     model.thermometer_two.set_value(model.thermometer_two.sample())
+
+
+def reorder_subplots(ax: Any) -> None:
+    sorted_titles = [plot[0].get_title() for plot in ax]
+    sorted_titles.sort()
+
+    for plot in ax:
+        new_position = ax[sorted_titles.index(plot[0].get_title())][0].get_position()
+        plot[0].set_position(new_position)

@@ -7,14 +7,15 @@ from typing import Any
 import matplotlib
 matplotlib.use('PS')
 import matplotlib.pyplot as plt
+from collections import OrderedDict
 
 
 @pytest.fixture
 def trace() -> sample_types:
-    return {
-        "gamma": [array([[1., 2.], [3., 4.]]), array([[2., 3.], [4., 5.]])],
-        "gaussian": [array([[0.1, 0.2], [0.3, 0.4]]), array([[0.2, 0.3], [0.4, 0.5]])]
-    }
+    return OrderedDict([("gamma", [array([[1., 2.], [3., 4.]]),
+                                   array([[2., 3.], [4., 5.]])]),
+                        ("gaussian", [array([[0.1, 0.2], [0.3, 0.4]]),
+                                      array([[0.2, 0.3], [0.4, 0.5]])])])
 
 
 def test_traceplot_returns_axesplot_with_correct_data(trace: sample_types) -> None:
