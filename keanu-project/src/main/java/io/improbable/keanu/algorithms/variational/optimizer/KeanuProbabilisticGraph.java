@@ -7,11 +7,8 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -68,20 +65,4 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
         VertexValuePropagation.cascadeUpdate(updatedVertices);
     }
-
-    /**
-     * @param vertex to get unique string for
-     * @return A string that is unique to this vertex within any graph that this
-     * vertex is a member of.
-     */
-    public static String getUniqueStringReference(Vertex vertex) {
-        if (vertex.getLabel() != null) {
-            return vertex.getLabel().toString();
-        } else {
-            return Arrays.stream(vertex.getId().getValue()).boxed()
-                .map(Objects::toString)
-                .collect(Collectors.joining("_"));
-        }
-    }
-
 }
