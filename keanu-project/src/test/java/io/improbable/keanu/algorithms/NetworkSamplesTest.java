@@ -1,5 +1,7 @@
 package io.improbable.keanu.algorithms;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.testcategory.Slow;
@@ -105,20 +107,23 @@ public class NetworkSamplesTest {
         List<Double> v1Samples = Arrays.asList(33.2, 3.9);
         List<Double> v2Samples = Arrays.asList(109.4, 3.55);
         final List<Double> logOfMasterPBySample = Arrays.asList(9.4, 12.7);
-        Map<VertexId, Double> vertexValsFirstSample = new HashMap<>();
-        Map<VertexId, Double> vertexValsSecondSample = new HashMap<>();
-
-        vertexValsFirstSample.put(v1, v1Samples.get(0));
-        vertexValsFirstSample.put(v2, v2Samples.get(0));
-        vertexValsSecondSample.put(v1, v1Samples.get(1));
-        vertexValsSecondSample.put(v2, v2Samples.get(1));
+        Map<VertexId, Double> vertexValsFirstSample = ImmutableMap.of(
+            v1, v1Samples.get(0),
+            v2, v2Samples.get(0)
+        );
+        Map<VertexId, Double> vertexValsSecondSample = ImmutableMap.of(
+            v1, v1Samples.get(1),
+            v2, v2Samples.get(1)
+        );
 
         List<NetworkState> networkStateList = new ArrayList<>();
         networkStateList.add(new SimpleNetworkState(vertexValsFirstSample, logOfMasterPBySample.get(0)));
         networkStateList.add(new SimpleNetworkState(vertexValsSecondSample, logOfMasterPBySample.get(1)));
 
-
-        NetworkSamples networkSamples = NetworkSamples.from(networkStateList);
+        NetworkSamples networkSamples = NetworkSamples.from(ImmutableList.of(
+            new SimpleNetworkState(vertexValsFirstSample, logOfMasterPBySample.get(0)),
+            new SimpleNetworkState(vertexValsSecondSample, logOfMasterPBySample.get(1))
+        ));
         assertEquals(v1Samples, networkSamples.get(v1).asList());
         assertEquals(v2Samples, networkSamples.get(v2).asList());
         assertEquals(logOfMasterPBySample.get(0), networkSamples.getLogOfMasterP(0));
@@ -129,9 +134,10 @@ public class NetworkSamplesTest {
     public void doesCatchConstructionFromNetworkStatesWithoutMasterLogP() {
         Map<VertexId, Double> vertexVals = new HashMap<>();
         vertexVals.put(v1, 29.3);
-        List<NetworkState> networkStateList = new ArrayList<>();
-        networkStateList.add(new SimpleNetworkState(vertexVals));
+        List<NetworkState> networkStateList = ImmutableList.of(
+            new SimpleNetworkState(vertexVals)
+        );
 
-        NetworkSamples networkSamples = NetworkSamples.from(networkStateList);
+        NetworkSamples.from(networkStateList);
     }
 }
