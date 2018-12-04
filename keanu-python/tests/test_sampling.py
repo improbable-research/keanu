@@ -110,7 +110,7 @@ def test_iter_with_live_plot(net: BayesNet) -> Any:
     samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), live_plot=True, refresh_every=5, ax=ax)
 
     for sample in islice(samples, 5):
-        print(sample)
+        pass
 
     reorder_subplots(ax)
     return fig
