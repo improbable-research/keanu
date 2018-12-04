@@ -47,10 +47,7 @@ public class FitnessFunctionWithGradient {
                 probabilisticWithGradientGraph.logLikelihoodGradients(values) :
                 probabilisticWithGradientGraph.logProbGradients(values);
 
-            double[] gradients = alignGradientsToAppropriateIndex(
-                diffs,
-                probabilisticWithGradientGraph.getLatentVariables()
-            );
+            double[] gradients = alignGradientsToAppropriateIndex(diffs, probabilisticWithGradientGraph.getLatentVariables());
 
             if (onGradientCalculation != null) {
                 onGradientCalculation.accept(point, gradients);
