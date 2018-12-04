@@ -127,6 +127,8 @@ def reorder_subplots(ax: Any) -> None:
     sorted_titles = [plot[0].get_title() for plot in ax]
     sorted_titles.sort()
 
+    positions = [plot[0].get_position() for plot in ax]
+
     for plot in ax:
-        new_position = ax[sorted_titles.index(plot[0].get_title())][0].get_position()
-        plot[0].set_position(new_position)
+        new_position_index = sorted_titles.index(plot[0].get_title())
+        plot[0].set_position(positions[new_position_index])
