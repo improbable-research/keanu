@@ -4,10 +4,10 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-public class SamplingModelFitting<OUTPUT> {
+public class SamplingModelFitting {
     private final PosteriorSamplingAlgorithm samplingAlgorithm;
     private final int samplingCount;
-    private SamplingModelFitter<DoubleTensor, OUTPUT> fitter;
+    private SamplingModelFitter fitter;
 
     public SamplingModelFitting(PosteriorSamplingAlgorithm samplingAlgorithm, int samplingCount) {
         this.samplingAlgorithm = samplingAlgorithm;
