@@ -47,7 +47,8 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
         TensorShapeValidation.checkIndexIsValid(sampleShape, index);
 
         double[] sampleValuesAtIndex = samples.stream()
-            .mapToDouble(x -> x.getValue(index)).toArray();
+            .mapToDouble(x -> x.getValue(index))
+            .toArray();
         double[] autocorr = SampleStats.autocorrelation(sampleValuesAtIndex);
         return DoubleTensor.create(autocorr);
     }
