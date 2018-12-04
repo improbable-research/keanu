@@ -82,10 +82,10 @@ public class FitnessFunctionWithGradient {
     }
 
     private static double[] alignGradientsToAppropriateIndex(Map<? extends VariableReference, DoubleTensor> diffs,
-                                                             List<? extends Variable> latentVertices) {
+                                                             List<? extends Variable> latentVariables) {
 
         List<DoubleTensor> tensors = new ArrayList<>();
-        for (Variable variable : latentVertices) {
+        for (Variable variable : latentVariables) {
             DoubleTensor tensor = diffs.get(variable.getReference());
             if (tensor != null) {
                 tensors.add(tensor);
