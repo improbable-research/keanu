@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.network.NetworkState;
 
-public class SamplingModelFitter<INPUT, OUTPUT> implements ModelFitter {
+public class SamplingModelFitter implements ModelFitter {
 
     private final PosteriorSamplingAlgorithm samplingAlgorithm;
     private final int sampleCount;
