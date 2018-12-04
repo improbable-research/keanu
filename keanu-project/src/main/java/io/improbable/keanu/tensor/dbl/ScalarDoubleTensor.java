@@ -154,20 +154,20 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor matrixMultiply(DoubleTensor doubleTensor) {
-        if (doubleTensor.isLengthOne()) {
-            return doubleTensor.times(value);
+    public DoubleTensor matrixMultiply(DoubleTensor that) {
+        if (that.isLengthOne()) {
+            return that.times(value);
         }
         throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
     }
 
     @Override
-    public DoubleTensor tensorMultiply(DoubleTensor doubleTensor, int[] dimsLeft, int[] dimsRight) {
-        if (doubleTensor.isLengthOne()) {
+    public DoubleTensor tensorMultiply(DoubleTensor that, int[] dimsLeft, int[] dimsRight) {
+        if (that.isLengthOne()) {
             if (dimsLeft.length > 1 || dimsRight.length > 1 || dimsLeft[0] != 0 || dimsRight[0] != 0) {
                 throw new IllegalArgumentException("Tensor multiply sum dimensions out of bounds for scalar");
             }
-            return doubleTensor.times(value);
+            return that.times(value);
         }
         throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
     }
