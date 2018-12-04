@@ -5,7 +5,6 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,13 +19,10 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     private final Map<VariableReference, Vertex> vertexLookup;
 
-    @Getter
     private final List<Vertex> latentVertices;
 
-    @Getter
     private final List<Vertex> observedVertices;
 
-    @Getter
     private final List<Vertex> latentOrObservedVertices;
 
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
