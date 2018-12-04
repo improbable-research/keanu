@@ -16,6 +16,7 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 
@@ -172,44 +173,30 @@ public class INDArrayShim {
 
     public static INDArray pow(INDArray left, INDArray right) {
         if (left.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
-            INDArray result;
-            if (left.length() == 1) {
-                result = Transforms.pow(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right, false);
-            } else {
-                result = Transforms.pow(left, right.getDouble(0), false);
-            }
-            return result.reshape(resultShape);
+            return performOperationWithScalarTensor(left, right, Transforms::pow);
         }
         return Transforms.pow(left, right, false);
     }
 
     public static INDArray max(INDArray left, INDArray right) {
         if (left.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
-            INDArray result;
-            if (left.length() == 1) {
-                result = Transforms.max(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right, false);
-            } else {
-                result = Transforms.max(left, right.getDouble(0), false);
-            }
-            return result.reshape(resultShape);
+            return performOperationWithScalarTensor(left, right, Transforms::max);
         }
         return Transforms.max(left, right, false);
     }
 
     public static INDArray min(INDArray left, INDArray right) {
         if (left.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
-            INDArray result;
-            if (left.length() == 1) {
-                result = Transforms.min(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right, false);
-            } else {
-                result = Transforms.min(left, right.getDouble(0), false);
-            }
-            return result.reshape(resultShape);
+            return performOperationWithScalarTensor(left, right, Transforms::min);
         }
         return Transforms.min(left, right, false);
+    }
+
+    public static INDArray atan2(INDArray left, INDArray right) {
+        if (left.length() == 1 || right.length() == 1) {
+            return performOperationWithScalarTensor(left, right, Transforms::atan2);
+        }
+        return Transforms.atan2(left, right);
     }
 
     public static INDArray lt(INDArray left, INDArray right) {
@@ -286,20 +273,6 @@ public class INDArrayShim {
             return result.reshape(resultShape);
         }
         return left.eq(right);
-    }
-
-    public static INDArray atan2(INDArray left, INDArray right, DataBuffer.Type bufferType) {
-        if (left.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
-            INDArray result;
-            if (left.length() == 1) {
-                result = Transforms.atan2(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right);
-            } else {
-                result = Transforms.atan2(left, valueArrayOf(resultShape, right.getDouble(0), bufferType));
-            }
-            return result.reshape(resultShape);
-        }
-        return Transforms.atan2(left, right);
     }
 
     public static INDArray getGreaterThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
@@ -400,6 +373,17 @@ public class INDArrayShim {
             new OldLessThanOrEqual(mask, right, mask, mask.length())
         );
         return mask;
+    }
+
+    private static INDArray performOperationWithScalarTensor(INDArray left, INDArray right, BiFunction<INDArray, INDArray, INDArray> operation) {
+        long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+        INDArray result;
+        if (left.length() == 1) {
+            result = operation.apply(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right);
+        } else {
+            result = operation.apply(left, Nd4j.valueArrayOf(left.shape(), right.getDouble(0)));
+        }
+        return result.reshape(resultShape);
     }
 
     private static boolean shapeAIsSmallerThanShapeB(long[] shapeA, long[] shapeB) {

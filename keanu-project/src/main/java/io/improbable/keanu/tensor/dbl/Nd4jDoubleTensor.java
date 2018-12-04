@@ -575,7 +575,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (y.isScalar()) {
             tensor = Transforms.atan2(tensor, valueArrayOf(this.tensor.shape(), y.scalar(), BUFFER_TYPE));
         } else {
-            tensor = INDArrayShim.atan2(tensor, unsafeGetNd4J(y), BUFFER_TYPE);
+            tensor = INDArrayShim.atan2(tensor, unsafeGetNd4J(y));
         }
         return this;
     }
