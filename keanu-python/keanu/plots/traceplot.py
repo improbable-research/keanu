@@ -1,7 +1,7 @@
 try:
     import matplotlib.pyplot as plt
     from matplotlib.ticker import MaxNLocator
-except ImportError: # mpl is optional
+except ImportError:  # mpl is optional
     pass
 
 import numpy as np
