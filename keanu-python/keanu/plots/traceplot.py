@@ -1,5 +1,8 @@
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
+try:
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import MaxNLocator
+except ImportError: # mpl is optional
+    pass
 
 import numpy as np
 from keanu.vartypes import sample_types, numpy_types
