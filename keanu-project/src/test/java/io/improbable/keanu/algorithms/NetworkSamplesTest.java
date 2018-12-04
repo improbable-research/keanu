@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -115,11 +114,6 @@ public class NetworkSamplesTest {
             v1, v1Samples.get(1),
             v2, v2Samples.get(1)
         );
-
-        List<NetworkState> networkStateList = new ArrayList<>();
-        networkStateList.add(new SimpleNetworkState(vertexValsFirstSample, logOfMasterPBySample.get(0)));
-        networkStateList.add(new SimpleNetworkState(vertexValsSecondSample, logOfMasterPBySample.get(1)));
-
         NetworkSamples networkSamples = NetworkSamples.from(ImmutableList.of(
             new SimpleNetworkState(vertexValsFirstSample, logOfMasterPBySample.get(0)),
             new SimpleNetworkState(vertexValsSecondSample, logOfMasterPBySample.get(1))
