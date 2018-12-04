@@ -45,12 +45,7 @@ public class INDArrayShim {
      * We have raised https://github.com/deeplearning4j/deeplearning4j/issues/6690 to address this
      */
     public static void startNewThreadForNd4j() {
-        Thread nd4jInitThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Nd4j.create(1);
-            }
-        });
+        Thread nd4jInitThread = new Thread(() -> Nd4j.create(1));
         nd4jInitThread.start();
         try {
             nd4jInitThread.join();
