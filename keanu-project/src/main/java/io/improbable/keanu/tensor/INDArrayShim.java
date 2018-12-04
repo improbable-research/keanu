@@ -95,7 +95,7 @@ public class INDArrayShim {
 
     private static INDArray scalarDivideWithPreservedShape(INDArray a, INDArray b) {
         if (b.length() != 1) {
-            return scalarMultiplyWithPreservedShape(b.rdiv(1.0), a);
+            return scalarMultiplyWithPreservedShape(a, b.rdiv(1.0));
         }
         INDArray result = a.divi(b.getScalar(0));
         long[] resultShape = Shape.broadcastOutputShape(a.shape(), b.shape());
@@ -406,7 +406,7 @@ public class INDArrayShim {
         if (shapeA.length != shapeB.length) {
             return shapeA.length < shapeB.length;
         }
-        for (int ind = 0; ind <shapeA.length; ind++) {
+        for (int ind = 0; ind < shapeA.length; ind++) {
             if (shapeA[ind] < shapeB[ind]) {
                 return true;
             }
