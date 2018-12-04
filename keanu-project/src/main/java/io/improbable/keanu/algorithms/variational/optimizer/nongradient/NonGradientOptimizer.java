@@ -85,7 +85,6 @@ public class NonGradientOptimizer implements Optimizer {
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
         double logProb = probabilisticGraph.logProb();
-        List<? extends Variable> latentVariables = probabilisticGraph.getLatentVariables();
 
         if (logProb == Double.NEGATIVE_INFINITY || Double.isNaN(logProb)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
