@@ -2,7 +2,6 @@ package io.improbable.keanu.model;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
-import io.improbable.keanu.model.regression.LinearRegressionGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 public class SamplingModelFitting<OUTPUT> {
