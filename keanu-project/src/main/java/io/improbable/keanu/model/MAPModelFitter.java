@@ -1,6 +1,6 @@
 package io.improbable.keanu.model;
 
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 
 public class MAPModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OUTPUT> {
 
@@ -22,6 +22,6 @@ public class MAPModelFitter<INPUT, OUTPUT> implements ModelFitter<INPUT, OUTPUT>
     @Override
     public void fit(INPUT input, OUTPUT output) {
         modelGraph.observeValues(input, output);
-        GradientOptimizer.of(modelGraph.getBayesianNetwork()).maxAPosteriori();
+        KeanuOptimizer.Gradient.of(modelGraph.getBayesianNetwork()).maxAPosteriori();
     }
 }

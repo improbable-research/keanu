@@ -1,12 +1,9 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.Vertex;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -17,7 +14,6 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -33,44 +29,6 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class NonGradientOptimizer implements Optimizer {
-
-    /**
-     * Creates a BOBYQA {@link NonGradientOptimizer} which provides methods for optimizing the values of latent variables
-     * of the Bayesian network to maximise probability.
-     *
-     * @param bayesianNetwork The Bayesian network to run optimization on.
-     * @return a {@link NonGradientOptimizer}
-     */
-    public static NonGradientOptimizer of(BayesianNetwork bayesianNetwork) {
-        bayesianNetwork.cascadeObservations();
-        return NonGradientOptimizer.builder()
-            .bayesianNetwork(bayesianNetwork)
-            .build();
-    }
-
-    /**
-     * Creates a Bayesian network from the given vertices and uses this to
-     * create a BOBYQA {@link NonGradientOptimizer}. This provides methods for optimizing the
-     * values of latent variables of the Bayesian network to maximise probability.
-     *
-     * @param vertices The vertices to create a Bayesian network from.
-     * @return a {@link NonGradientOptimizer}
-     */
-    public static NonGradientOptimizer of(Collection<? extends Vertex> vertices) {
-        return of(new BayesianNetwork(vertices));
-    }
-
-    /**
-     * Creates a Bayesian network from the graph connected to the given vertex and uses this to
-     * create a BOBYQA {@link NonGradientOptimizer}. This provides methods for optimizing the
-     * values of latent variables of the Bayesian network to maximise probability.
-     *
-     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
-     * @return a {@link NonGradientOptimizer}
-     */
-    public static NonGradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
-        return of(vertexFromNetwork.getConnectedGraph());
-    }
 
     private final ProbabilisticGraph probabilisticGraph;
 
@@ -202,14 +160,6 @@ public class NonGradientOptimizer implements Optimizer {
         NonGradientOptimizerBuilder() {
         }
 
-        public NonGradientOptimizerBuilder bayesianNetwork(Collection<? extends Vertex> vertices) {
-            return bayesianNetwork(new BayesianNetwork(vertices));
-        }
-
-        public NonGradientOptimizerBuilder bayesianNetwork(BayesianNetwork network) {
-            Optimizer.initializeNetworkForOptimization(network);
-            return bayesianNetwork(new KeanuProbabilisticGraph(network));
-        }
 
         public NonGradientOptimizerBuilder bayesianNetwork(ProbabilisticGraph probabilisticGraph) {
             this.probabilisticGraph = probabilisticGraph;

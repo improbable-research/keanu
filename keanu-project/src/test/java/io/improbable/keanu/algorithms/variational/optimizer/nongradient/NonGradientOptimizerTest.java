@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -16,7 +17,7 @@ public class NonGradientOptimizerTest {
     @Test
     public void doesCallOnFitnessHandler() {
         AtomicInteger timesCalled = new AtomicInteger(0);
-        NonGradientOptimizer optimizer = NonGradientOptimizer.ofConnectedGraph(new GaussianVertex(new GaussianVertex(0, 1), 1));
+        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.ofConnectedGraph(new GaussianVertex(new GaussianVertex(0, 1), 1));
         optimizer.addFitnessCalculationHandler((point, fitness) -> timesCalled.incrementAndGet());
         optimizer.maxAPosteriori();
         assertTrue(timesCalled.get() > 0);
@@ -31,10 +32,10 @@ public class NonGradientOptimizerTest {
         OptimizerBounds bounds = new OptimizerBounds();
         bounds.addBound(A.getId(), DoubleTensor.create(-1, -2), 0.9);
 
-        NonGradientOptimizer optimizer = NonGradientOptimizer.builder()
+        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient
+            .builderFor(A.getConnectedGraph())
             .boundsRange(10)
             .optimizerBounds(bounds)
-            .bayesianNetwork(A.getConnectedGraph())
             .build();
 
         optimizer.maxAPosteriori();

@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Test;
@@ -15,7 +16,7 @@ public class GradientOptimizerTest {
     public void doesCallOnFitnessAndOnGradientHandler() {
         AtomicInteger fitnessTimesCalled = new AtomicInteger(0);
         AtomicInteger gradientTimesCalled = new AtomicInteger(0);
-        GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(
+        GradientOptimizer optimizer = KeanuOptimizer.Gradient.ofConnectedGraph(
             new GaussianVertex(0, 1)
         );
         optimizer.addFitnessCalculationHandler((point, fitness) -> fitnessTimesCalled.incrementAndGet());
@@ -31,7 +32,7 @@ public class GradientOptimizerTest {
         PoissonVertex v1 = new PoissonVertex(15);
         PoissonVertex v2 = new PoissonVertex(v1);
 
-        GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(v1);
+        GradientOptimizer optimizer = KeanuOptimizer.Gradient.ofConnectedGraph(v1);
     }
 
     @Test
@@ -41,14 +42,14 @@ public class GradientOptimizerTest {
         GaussianVertex B = new GaussianVertex(A.abs(), 1);
         A.observe(2.0);
 
-        GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(B);
+        GradientOptimizer optimizer = KeanuOptimizer.Gradient.ofConnectedGraph(B);
         optimizer.maxAPosteriori();
 
         assertEquals(2.0, B.getValue().scalar(), 1e-5);
 
         A.observe(3.0);
 
-        GradientOptimizer optimizerAfterObserve = GradientOptimizer.ofConnectedGraph(B);
+        GradientOptimizer optimizerAfterObserve = KeanuOptimizer.Gradient.ofConnectedGraph(B);
         optimizerAfterObserve.maxAPosteriori();
 
         assertEquals(3.0, B.getValue().scalar(), 1e-5);

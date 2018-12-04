@@ -1,16 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.Vertex;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,45 +50,6 @@ public interface Optimizer {
      * @return the natural logarithm of the maximum likelihood (MLE)
      */
     double maxLikelihood();
-
-    /**
-     * Creates an {@link Optimizer} which provides methods for optimizing the values of latent variables
-     * of the Bayesian network to maximise probability.
-     *
-     * @param network The Bayesian network to run optimization on.
-     * @return an {@link Optimizer}
-     */
-    static Optimizer of(BayesianNetwork network) {
-        if (network.getDiscreteLatentVertices().isEmpty()) {
-            return GradientOptimizer.of(network);
-        } else {
-            return NonGradientOptimizer.of(network);
-        }
-    }
-
-    /**
-     * Creates a Bayesian network from the given vertices and uses this to
-     * create an {@link Optimizer}. This provides methods for optimizing the values of latent variables
-     * of the Bayesian network to maximise probability.
-     *
-     * @param vertices The vertices to create a Bayesian network from.
-     * @return an {@link Optimizer}
-     */
-    static Optimizer of(Collection<? extends Vertex> vertices) {
-        return of(new BayesianNetwork(vertices));
-    }
-
-    /**
-     * Creates a Bayesian network from the graph connected to the given vertex and uses this to
-     * create an {@link Optimizer}. This provides methods for optimizing the values of latent variables
-     * of the Bayesian network to maximise probability.
-     *
-     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
-     * @return an {@link Optimizer}
-     */
-    static Optimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
-        return of(vertexFromNetwork.getConnectedGraph());
-    }
 
     static double[] convertToPoint(List<VariableReference> latentVariables,
                                    Map<VariableReference, ? extends NumberTensor> latentVariableValues,
@@ -146,19 +102,6 @@ public interface Optimizer {
 
     static long numDimensions(long[] shape) {
         return TensorShape.getLength(shape);
-    }
-
-    static void initializeNetworkForOptimization(BayesianNetwork bayesianNetwork) {
-        List<Vertex> discreteLatentVertices = bayesianNetwork.getDiscreteLatentVertices();
-        boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
-
-        if (containsDiscreteLatents) {
-            throw new UnsupportedOperationException(
-                "Gradient optimization unsupported on networks containing discrete latents. " +
-                    "Found " + discreteLatentVertices.size() + " discrete latents.");
-        }
-
-        bayesianNetwork.cascadeObservations();
     }
 
     static Map<VariableReference, ? extends NumberTensor> getAsNumberTensors(Map<VariableReference, ?> variableValues) {

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
@@ -152,7 +153,7 @@ public class ProcessModelVertexTest {
         temperatureReadingOne.observe(3.0);
         temperatureReadingTwo.observe(60.0);
 
-        NonGradientOptimizer gradientOptimizer = NonGradientOptimizer.of(temperatureReadingTwo.getConnectedGraph());
+        NonGradientOptimizer gradientOptimizer = KeanuOptimizer.NonGradient.of(temperatureReadingTwo.getConnectedGraph());
         gradientOptimizer.maxLikelihood();
         Assert.assertEquals(30.0, inputToModel.getValue().scalar(), 0.1);
     }

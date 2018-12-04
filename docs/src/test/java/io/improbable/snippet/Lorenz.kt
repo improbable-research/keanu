@@ -1,7 +1,7 @@
 package io.improbable.snippet
 
 
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer
 import io.improbable.keanu.kotlin.times
 import io.improbable.keanu.network.BayesianNetwork
 import io.improbable.keanu.randomfactory.DoubleVertexFactory
@@ -45,7 +45,7 @@ applyObservations(graphTimeSteps, windowSize, window, lorenzCoordinates, random)
 
 //%%SNIPPET_START%% LorenzOptimise
 val net = BayesianNetwork(graphTimeSteps.first().first().connectedGraph)
-val optimiser = Optimizer.of(net)
+val optimiser = KeanuOptimizer.of(net)
 optimiser.maxAPosteriori()
 //%%SNIPPET_END%% LorenzOptimise
 
