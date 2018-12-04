@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
-
-import static java.util.stream.Collectors.toMap;
+import java.util.stream.Collectors;
 
 public interface Optimizer {
 
@@ -51,11 +50,11 @@ public interface Optimizer {
      */
     double maxLikelihood();
 
-    static double[] convertToPoint(List<VariableReference> latentVariables,
-                                   Map<VariableReference, ? extends NumberTensor> latentVariableValues,
-                                   Map<VariableReference, long[]> latentShapes) {
+    static double[] convertToPoint(List<? extends Variable<? extends NumberTensor>> latentVariables) {
 
-        long totalLatentDimensions = totalNumberOfLatentDimensions(latentShapes);
+        List<long[]> shapes = latentVariables.stream().map(Variable::getShape).collect(Collectors.toList());
+
+        long totalLatentDimensions = totalNumberOfLatentDimensions(shapes);
 
         if (totalLatentDimensions > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Greater than " + Integer.MAX_VALUE + " latent dimensions not supported");
@@ -64,8 +63,8 @@ public interface Optimizer {
         int position = 0;
         double[] point = new double[(int) totalLatentDimensions];
 
-        for (VariableReference variable : latentVariables) {
-            double[] values = latentVariableValues.get(variable).asFlatDoubleArray();
+        for (Variable<? extends NumberTensor> variable : latentVariables) {
+            double[] values = variable.getValue().asFlatDoubleArray();
             System.arraycopy(values, 0, point, position, values.length);
             position += values.length;
         }
@@ -74,51 +73,48 @@ public interface Optimizer {
     }
 
     static Map<VariableReference, DoubleTensor> convertFromPoint(double[] point,
-                                                                 List<VariableReference> latentVariables,
-                                                                 Map<VariableReference, long[]> latentShapes) {
+                                                                 List<? extends Variable> latentVariables) {
 
         Map<VariableReference, DoubleTensor> tensors = new HashMap<>();
         int position = 0;
-        for (VariableReference variable : latentVariables) {
+        for (Variable variable : latentVariables) {
 
-            long[] latentShape = latentShapes.get(variable);
-            int dimensions = Ints.checkedCast(TensorShape.getLength(latentShape));
+            int dimensions = Ints.checkedCast(TensorShape.getLength(variable.getShape()));
 
             double[] values = new double[dimensions];
             System.arraycopy(point, position, values, 0, dimensions);
 
-            DoubleTensor newTensor = DoubleTensor.create(values, latentShape);
+            DoubleTensor newTensor = DoubleTensor.create(values, variable.getShape());
 
-            tensors.put(variable, newTensor);
+            tensors.put(variable.getReference(), newTensor);
             position += dimensions;
         }
 
         return tensors;
     }
 
-    static long totalNumberOfLatentDimensions(Map<VariableReference, long[]> continuousLatentVariableShapes) {
-        return continuousLatentVariableShapes.values().stream().mapToLong(Optimizer::numDimensions).sum();
+    static long totalNumberOfLatentDimensions(List<long[]> continuousLatentVariableShapes) {
+        return continuousLatentVariableShapes.stream().mapToLong(Optimizer::numDimensions).sum();
     }
 
     static long numDimensions(long[] shape) {
         return TensorShape.getLength(shape);
     }
 
-    static Map<VariableReference, ? extends NumberTensor> getAsNumberTensors(Map<VariableReference, ?> variableValues) {
-        return variableValues.entrySet().stream()
-            .collect(toMap(
-                Map.Entry::getKey,
-                e -> {
-                    Object value = e.getValue();
+    static List<Variable<? extends NumberTensor>> getAsNumberTensors(List<? extends Variable> variables) {
+        return variables.stream()
+            .map(
+                v -> {
+                    Object value = v.getValue();
                     if (value instanceof NumberTensor) {
-                        return (NumberTensor) e.getValue();
+                        return (Variable<NumberTensor>) v;
                     } else {
                         throw new UnsupportedOperationException(
                             "Optimization unsupported on networks containing discrete latents. " +
-                                "Discrete latent : " + e.getKey() + " found.");
+                                "Discrete latent : " + v.getReference() + " found.");
                     }
                 }
-            ));
+            ).collect(Collectors.toList());
     }
 
     static ProgressBar createFitnessProgressBar(final Optimizer optimizerThatNeedsProgressBar) {

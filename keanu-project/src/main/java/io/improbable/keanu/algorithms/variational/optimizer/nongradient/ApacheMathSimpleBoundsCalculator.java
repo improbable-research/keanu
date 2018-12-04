@@ -1,19 +1,14 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.math3.optim.SimpleBounds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toMap;
 
 /**
  * This class creates an Apache math commons simple bounds object for a given collection of
@@ -26,31 +21,16 @@ class ApacheMathSimpleBoundsCalculator {
     private final double boundsRange;
     private final OptimizerBounds optimizerBounds;
 
-    SimpleBounds getBounds(List<? extends Vertex<?>> latentVertices, double[] startPoint) {
-
-        List<VariableReference> latentVertexIds = latentVertices.stream()
-            .map(Vertex::getId)
-            .collect(Collectors.toList());
-
-        Map<VariableReference, long[]> latentVertexShapes = latentVertices.stream()
-            .collect(toMap(
-                Vertex::getId,
-                Vertex::getShape
-            ));
-
-        return getBounds(latentVertexIds, latentVertexShapes, startPoint);
-    }
-
-    SimpleBounds getBounds(List<VariableReference> latentVariables, Map<VariableReference, long[]> latentShapes, double[] startPoint) {
+    SimpleBounds getBounds(List<? extends Variable> latentVariables, double[] startPoint) {
         List<Double> minBounds = new ArrayList<>();
         List<Double> maxBounds = new ArrayList<>();
 
-        for (VariableReference variable : latentVariables) {
+        for (Variable variable : latentVariables) {
 
-            long[] variableShape = latentShapes.get(variable);
-            if (optimizerBounds.hasBound(variable)) {
-                validateBoundsForVariable(variable, variableShape);
-                addBoundsForVariable(variable, variableShape, minBounds, maxBounds);
+            long[] variableShape = variable.getShape();
+            if (optimizerBounds.hasBound(variable.getReference())) {
+                validateBoundsForVariable(variable);
+                addBoundsForVariable(variable, minBounds, maxBounds);
             } else {
                 int length = TensorShape.getLengthAsInt(variableShape);
                 int startIndex = minBounds.size();
@@ -67,32 +47,31 @@ class ApacheMathSimpleBoundsCalculator {
         );
     }
 
-    private void addBoundsForVariable(VariableReference variable,
-                                      long[] variableShape,
+    private void addBoundsForVariable(Variable variable,
                                       List<Double> minBounds,
                                       List<Double> maxBounds) {
 
-        DoubleTensor lowerBound = optimizerBounds.getLower(variable);
-        DoubleTensor upperBound = optimizerBounds.getUpper(variable);
+        DoubleTensor lowerBound = optimizerBounds.getLower(variable.getReference());
+        DoubleTensor upperBound = optimizerBounds.getUpper(variable.getReference());
 
         if (lowerBound.isScalar()) {
-            minBounds.addAll(DoubleTensor.create(lowerBound.scalar(), variableShape).asFlatList());
+            minBounds.addAll(DoubleTensor.create(lowerBound.scalar(), variable.getShape()).asFlatList());
         } else {
             minBounds.addAll(lowerBound.asFlatList());
         }
 
         if (upperBound.isScalar()) {
-            maxBounds.addAll(DoubleTensor.create(upperBound.scalar(), variableShape).asFlatList());
+            maxBounds.addAll(DoubleTensor.create(upperBound.scalar(), variable.getShape()).asFlatList());
         } else {
             maxBounds.addAll(upperBound.asFlatList());
         }
     }
 
-    private void validateBoundsForVariable(VariableReference variable, long[] variableShape) {
-        if (!optimizerBounds.getLower(variable).isScalar() && !Arrays.equals(variableShape, optimizerBounds.getLower(variable).getShape())) {
+    private void validateBoundsForVariable(Variable variable) {
+        if (!optimizerBounds.getLower(variable.getReference()).isScalar() && !Arrays.equals(variable.getShape(), optimizerBounds.getLower(variable.getReference()).getShape())) {
             throw new IllegalArgumentException("Lower bounds shape does not match variable shape");
         }
-        if (!optimizerBounds.getUpper(variable).isScalar() && !Arrays.equals(variableShape, optimizerBounds.getUpper(variable).getShape())) {
+        if (!optimizerBounds.getUpper(variable.getReference()).isScalar() && !Arrays.equals(variable.getShape(), optimizerBounds.getUpper(variable.getReference()).getShape())) {
             throw new IllegalArgumentException("Upper bounds shape does not match variable shape");
         }
     }

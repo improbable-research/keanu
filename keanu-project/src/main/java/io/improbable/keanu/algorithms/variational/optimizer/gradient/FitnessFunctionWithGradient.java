@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.analysis.MultivariateFunction;
@@ -48,8 +49,7 @@ public class FitnessFunctionWithGradient {
 
             double[] gradients = alignGradientsToAppropriateIndex(
                 diffs,
-                probabilisticWithGradientGraph.getLatentVariables(),
-                probabilisticWithGradientGraph.getLatentVariablesShapes()
+                probabilisticWithGradientGraph.getLatentVariables()
             );
 
             if (onGradientCalculation != null) {
@@ -80,22 +80,20 @@ public class FitnessFunctionWithGradient {
     private Map<VariableReference, DoubleTensor> getValues(double[] point) {
         return convertFromPoint(
             point,
-            probabilisticWithGradientGraph.getLatentVariables(),
-            probabilisticWithGradientGraph.getLatentVariablesShapes()
+            probabilisticWithGradientGraph.getLatentVariables()
         );
     }
 
     private static double[] alignGradientsToAppropriateIndex(Map<? extends VariableReference, DoubleTensor> diffs,
-                                                             List<VariableReference> latentVertices,
-                                                             Map<VariableReference, long[]> latentShapes) {
+                                                             List<? extends Variable> latentVertices) {
 
         List<DoubleTensor> tensors = new ArrayList<>();
-        for (VariableReference vertex : latentVertices) {
-            DoubleTensor tensor = diffs.get(vertex);
+        for (Variable variable : latentVertices) {
+            DoubleTensor tensor = diffs.get(variable.getReference());
             if (tensor != null) {
                 tensors.add(tensor);
             } else {
-                tensors.add(DoubleTensor.zeros(latentShapes.get(vertex)));
+                tensors.add(DoubleTensor.zeros(variable.getShape()));
             }
         }
 

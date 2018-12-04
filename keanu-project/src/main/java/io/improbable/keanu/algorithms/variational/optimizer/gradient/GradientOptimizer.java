@@ -148,9 +148,7 @@ public class GradientOptimizer implements Optimizer {
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
 
         double[] startingPoint = Optimizer.convertToPoint(
-            probabilisticWithGradientGraph.getLatentVariables(),
-            getAsNumberTensors(probabilisticWithGradientGraph.getLatentVariablesValues()),
-            probabilisticWithGradientGraph.getLatentVariablesShapes()
+            getAsNumberTensors(probabilisticWithGradientGraph.getLatentVariables())
         );
 
         double initialFitness = fitness.getObjectiveFunction().value(startingPoint);

@@ -18,9 +18,5 @@ public interface ProbabilisticGraph {
 
     double logLikelihood(Map<VariableReference, ?> inputs);
 
-    List<VariableReference> getLatentVariables();
-
-    Map<VariableReference, ?> getLatentVariablesValues();
-
-    Map<VariableReference, long[]> getLatentVariablesShapes();
+    List<? extends Variable> getLatentVariables();
 }

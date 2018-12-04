@@ -3,7 +3,6 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;
@@ -15,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 public class KeanuProbabilisticGraph implements ProbabilisticGraph {
@@ -54,29 +52,8 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
-    public List<VariableReference> getLatentVariables() {
-        return this.latentVertices.stream()
-            .map(Vertex::getId)
-            .collect(toList());
-    }
-
-    @Override
-    public Map<VariableReference, ?> getLatentVariablesValues() {
-        return latentVertices.stream()
-            .collect(toMap(
-                Vertex::getId,
-                Vertex::getValue)
-            );
-    }
-
-    @Override
-    public Map<VariableReference, long[]> getLatentVariablesShapes() {
-        Map<VariableReference, ?> latentVariablesValues = getLatentVariablesValues();
-        return getLatentVariables().stream()
-            .collect(Collectors.toMap(
-                v -> v,
-                v -> ((Tensor) latentVariablesValues.get(v)).getShape())
-            );
+    public List<? extends Variable> getLatentVariables() {
+        return this.latentVertices;
     }
 
     public void cascadeUpdate(Map<VariableReference, ?> inputs) {
