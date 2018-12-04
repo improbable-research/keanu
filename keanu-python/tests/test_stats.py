@@ -6,7 +6,7 @@ from keanu.algorithm import sample
 from keanu import Model, stats
 
 
-def test_can_get_autocorrelation() -> None:
+def test_can_get_correct_autocorrelation() -> None:
     x = [1, 2, 3, 4, 5, 6, 7, 8]
     x_list = [np.array(a, float) for a in x]
     autocorr = stats.autocorrelation(x_list)
