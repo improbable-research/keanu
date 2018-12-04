@@ -56,7 +56,7 @@ You can also see our [JavaDocs](https://www.javadoc.io/doc/io.improbable/keanu) 
 
 ## Future
 
-What does the future entail for Keanu? Find out at [Future](https://improbable-research.github.io/keanu/docs/future).
+What does the future entail for Keanu? Find out at [Future](./future.md).
 
 ## Examples
 

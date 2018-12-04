@@ -1,7 +1,4 @@
----
-permalink: /docs/future
-title: The future of Keanu
----
+## Future
 
 The aim of this project is to develop a probabilistic programming environment that enables modellers to 
 perform inference and make probabilistic predictions about large, complex and multifaceted problems. 
