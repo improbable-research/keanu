@@ -1,12 +1,16 @@
+# For Mac OS X users, MacOSX mpl backend can fail with matplotlib error: Python is not installed as a framework
+# Fix is to set a different, non-interactive matplotlib backend for this module since it never displays to the screen
+# see: https://stackoverflow.com/questions/4130355/python-matplotlib-framework-under-macosx
+import matplotlib
+matplotlib.use('AGG')  # see: https://matplotlib.org/faq/usage_faq.html#what-is-a-backend
+import matplotlib.pyplot as plt
+
 from keanu.plots import traceplot
 from keanu.vartypes import sample_types
 from numpy import array
 from numpy.testing import assert_array_equal
 import pytest
 from typing import Any
-import matplotlib
-matplotlib.use('PS')
-import matplotlib.pyplot as plt
 from collections import OrderedDict
 
 
