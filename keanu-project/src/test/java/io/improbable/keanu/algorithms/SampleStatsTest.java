@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class SampleStatsTest {
+
     @Test
     public void autocorrAtLagZeroIsOne() {
         double[] samples = generateUniformRandomArray(20);

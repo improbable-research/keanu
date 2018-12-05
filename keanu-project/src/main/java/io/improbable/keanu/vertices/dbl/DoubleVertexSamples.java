@@ -18,6 +18,7 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
 
     public DoubleTensor getAverages() {
         Preconditions.checkState(!samples.isEmpty(), "No samples exist for averaging.");
+        Preconditions.checkArgument(!samples.isEmpty(), "No samples provided.");
 
         return this.samples.stream()
             .reduce(DoubleTensor.zeros(sampleShape), DoubleTensor::plusInPlace)
@@ -37,7 +38,7 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
     }
 
     /**
-     * Calculates the autocorrelation or samples across a specified tensor index.
+     * Calculates the autocorrelation of samples across a specified tensor index.
      *
      * @param index The tensor index to calculate autocorrelation across.
      * @return A tensor of autocorrelation at different lags.
