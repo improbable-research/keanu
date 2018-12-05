@@ -142,8 +142,6 @@ public class LinearLassoRegressionTest {
             .withSampling(sampling)
             .build();
 
-        linearRegressionModel.fit();
-
         NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
 
         assertSampledWeightsAndInterceptMatchTestData(
