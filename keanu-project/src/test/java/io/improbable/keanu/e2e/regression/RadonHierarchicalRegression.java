@@ -79,8 +79,6 @@ public class RadonHierarchicalRegression {
             withPriorOnIntercept(0., 5.).
             build();
 
-        model.fit();
-
         return model;
     }
 
@@ -137,7 +135,7 @@ public class RadonHierarchicalRegression {
             withRegularization(RegressionRegularization.RIDGE).
             withPriorOnWeights(muGradient, sigmaGradient).
             withPriorOnIntercept(muIntercept, sigmaIntercept).
-            build();
+            buildWithoutFitting();
 
         return model;
     }

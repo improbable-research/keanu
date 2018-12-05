@@ -82,8 +82,6 @@ public class DiabetesLinearRegression {
         RegressionModel<DoubleTensor> linearRegressionModel = RegressionModel.withTrainingData(xTrainingData, yTrainingData)
             .build();
 
-        linearRegressionModel.fit();
-
         double accuracyOnTestData = ModelScoring.coefficientOfDetermination(linearRegressionModel.predict(xTestData), yTestData);
         assertThat(accuracyOnTestData, greaterThan(0.3));
     }

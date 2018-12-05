@@ -127,6 +127,12 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
      * @return A linear regression model from the data passed to the builder
      */
     public RegressionModel<OUTPUT> build() {
+        RegressionModel<OUTPUT> model = buildWithoutFitting();
+        model.fit();
+        return model;
+    }
+
+    public RegressionModel<OUTPUT> buildWithoutFitting() {
         checkVariablesAreCorrectlyInitialised();
 
         LinearRegressionGraph<OUTPUT> regressionGraph = new LinearRegressionGraph<>(

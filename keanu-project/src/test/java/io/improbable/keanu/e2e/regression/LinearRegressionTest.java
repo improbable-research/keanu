@@ -57,8 +57,6 @@ public class LinearRegressionTest {
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .build();
 
-        linearRegressionModel.fit();
-
         assertWeightsAndInterceptMatchTestData(
             linearRegressionModel.getWeightVertex(),
             linearRegressionModel.getInterceptVertex(),
@@ -98,8 +96,6 @@ public class LinearRegressionTest {
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .build();
 
-        linearRegressionModel.fit();
-
         assertWeightsAndInterceptMatchTestData(
             linearRegressionModel.getWeightVertex(),
             linearRegressionModel.getInterceptVertex(),
@@ -136,8 +132,6 @@ public class LinearRegressionTest {
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .build();
 
-        linearRegressionModel.fit();
-
         assertWeightsAndInterceptMatchTestData(
             linearRegressionModel.getWeightVertex(),
             linearRegressionModel.getInterceptVertex(),
@@ -169,8 +163,6 @@ public class LinearRegressionTest {
             )
             .withSampling(sampling)
             .build();
-
-        linearRegressionModel.fit();
 
         NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
 

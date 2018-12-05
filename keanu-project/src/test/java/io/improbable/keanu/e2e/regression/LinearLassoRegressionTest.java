@@ -37,8 +37,6 @@ public class LinearLassoRegressionTest {
             .withPriorOnIntercept(0, 20)
             .build();
 
-        linearRegressionModel.fit();
-        
         assertWeightsAndInterceptMatchTestData(
             linearRegressionModel.getWeightVertex(),
             linearRegressionModel.getInterceptVertex(),
