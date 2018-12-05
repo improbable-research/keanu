@@ -12,9 +12,11 @@ java_import(k.jvm_view(), "io.improbable.keanu.algorithms.SampleStats")
 
 
 def autocorrelation(arg: List[numpy_types]) -> ndarray:
-    if not issubdtype(arg[0].dtype, floating):
+    all_floats = all(issubdtype(elem.dtype, floating) for elem in arg)
+    if not all_floats:
         raise ValueError('Autocorrelation must be run on a list of numpy floating types.')
-    if not arg[0].shape == ():
+    all_shape_scalar = all(elem.shape == () for elem in arg)
+    if not all_shape_scalar:
         raise ValueError("Autocorrelation must be run on a list of single element ndarrays.")
     arg_array = hstack(arg)
     autocorr = k.jvm_view().SampleStats.autocorrelation(k.to_java_array(arg_array))
