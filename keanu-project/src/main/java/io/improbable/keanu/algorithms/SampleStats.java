@@ -34,14 +34,12 @@ public final class SampleStats {
         // See last paragraph of https://dsp.stackexchange.com/a/745
         // FFT requires length to be power of two
         int fftSize = nextPowerOfTwo(2 * samples.length + 1);
-        double[] demeanPaddedWithZeros = Arrays.copyOf(demean, fftSize);
-        return demeanPaddedWithZeros;
+        return Arrays.copyOf(demean, fftSize);
     }
 
     private static double[] demean(double[] samples) {
         double mean = Arrays.stream(samples).average().orElseThrow(NoSuchElementException::new);
-        double demean[] = Arrays.stream(samples).map(x -> x - mean).toArray();
-        return demean;
+        return Arrays.stream(samples).map(x -> x - mean).toArray();
     }
 
     private static int nextPowerOfTwo(int x) {
