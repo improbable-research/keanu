@@ -492,7 +492,10 @@ def hstack(tup: List[ndarray[Any]]) -> ndarray: ...
 #
 
 class testing:
+    @staticmethod
     def assert_almost_equal(actual : Any, desired : Any, decimal : int=7, err_msg : str='', verbose : bool=True): ...
+    @staticmethod
+    def assert_array_equal(actual : _ArrayLike[Any], desired : _ArrayLike[Any], decimal : int=7, err_msg : str='', verbose : bool=True) -> None: ...
 
 # Specific values
 inf: float

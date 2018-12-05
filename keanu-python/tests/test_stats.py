@@ -1,9 +1,11 @@
 import numpy as np
 import pytest
 
+from itertools import islice
+from keanu import Model, stats, KeanuRandom
+from keanu.algorithm import sample, generate_samples
 from keanu.vertex import Uniform
-from keanu.algorithm import sample
-from keanu import Model, stats
+import pandas as pd
 
 
 def test_can_get_correct_autocorrelation() -> None:
@@ -18,7 +20,7 @@ def test_can_get_autocorrelation_for_samples() -> None:
     with Model() as m:
         m.uniform = Uniform(0, 1000)
     net = m.to_bayes_net()
-    samples = sample(net=net, sample_from=list(net.get_latent_vertices()), algo="metropolis", draws=1000)
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), algo="metropolis", draws=1000)
     valid_key = list(samples.keys())[0]
     autocorr = stats.autocorrelation(samples.get(valid_key))  # type: ignore
 
@@ -41,3 +43,28 @@ def test_cant_get_autocorrelation_of_non_scalar_arrays() -> None:
     x_list = [np.array([22.4, 33.3]), np.array([15.4, 11.3])]
     with pytest.raises(ValueError, match="Autocorrelation must be run on a list of single element ndarrays."):
         stats.autocorrelation(x_list)
+
+
+def test_autocorrelation_same_for_streaming_as_batch() -> None:
+    with Model() as model:
+        model.uniform = Uniform(0, 1000)
+    net = model.to_bayes_net()
+    draws = 15
+    set_starting_state(model)
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), algo="metropolis", draws=draws)
+    set_starting_state(model)
+    iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo="metropolis")
+
+    samples_dataframe = pd.DataFrame()
+    for next_sample in islice(iter_samples, draws):
+        samples_dataframe = samples_dataframe.append(next_sample, ignore_index=True)
+
+    for vertex_id in samples_dataframe:
+        autocorr_streaming = stats.autocorrelation(list(samples_dataframe[vertex_id].values))
+        autocorr_batch = stats.autocorrelation(samples[vertex_id])
+        np.testing.assert_array_equal(autocorr_batch, autocorr_streaming)
+
+
+def set_starting_state(model: Model) -> None:
+    KeanuRandom.set_default_random_seed(1)
+    model.uniform.set_value(model.uniform.sample())
