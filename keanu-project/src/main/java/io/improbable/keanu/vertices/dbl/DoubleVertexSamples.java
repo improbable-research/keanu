@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl;
 
-import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.SampleStats;
 import io.improbable.keanu.algorithms.VertexSamples;
 import io.improbable.keanu.tensor.TensorShapeValidation;
