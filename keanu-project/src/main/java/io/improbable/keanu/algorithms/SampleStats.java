@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms;
 
+import lombok.experimental.UtilityClass;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
@@ -8,7 +9,8 @@ import org.apache.commons.math3.transform.TransformType;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
-public final class SampleStats {
+@UtilityClass
+public class SampleStats {
     private static final FastFourierTransformer ffTransformer = new FastFourierTransformer(DftNormalization.STANDARD);
 
     public static double[] autocorrelation(double[] samples) {
