@@ -20,7 +20,7 @@ def test_can_get_autocorrelation_for_samples() -> None:
     net = m.to_bayes_net()
     samples = sample(net=net, sample_from=list(net.get_latent_vertices()), algo="metropolis", draws=1000)
     valid_key = list(samples.keys())[0]
-    autocorr = stats.autocorrelation(samples.get(valid_key)) # type: ignore
+    autocorr = stats.autocorrelation(samples.get(valid_key))  # type: ignore
 
 
 def test_cant_get_autocorrelation_of_np_bools() -> None:
