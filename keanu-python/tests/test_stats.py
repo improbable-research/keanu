@@ -16,7 +16,7 @@ def test_can_get_correct_autocorrelation() -> None:
 
 def test_can_get_autocorrelation_for_samples() -> None:
     with Model() as m:
-        m.gaussian = Uniform(0, 1000)
+        m.uniform = Uniform(0, 1000)
     net = m.to_bayes_net()
     samples = sample(net=net, sample_from=list(net.get_latent_vertices()), algo="metropolis", draws=1000)
     valid_key = list(samples.keys())[0]
