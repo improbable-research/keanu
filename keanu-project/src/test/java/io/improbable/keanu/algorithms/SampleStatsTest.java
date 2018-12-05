@@ -17,7 +17,7 @@ public class SampleStatsTest {
     public void autocorrAtLagZeroIsOne() {
         double[] samples = generateUniformRandomArray(20);
         double[] autocorr = SampleStats.autocorrelation(samples);
-        assertEquals(autocorr[0], 1.0, 0.001);
+        assertEquals(autocorr[0], 1.0, 0.0);
     }
 
     private double[] generateUniformRandomArray(int length) {
