@@ -43,14 +43,14 @@ public class NetworkSamples {
         Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
         List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
-        networkStates.forEach(networkState -> addSamplesForNetworkState(networkState,samplesByVertex));
+        networkStates.forEach(networkState -> addSamplesForNetworkState(networkState, samplesByVertex));
         networkStates.forEach(networkState -> logOfMasterPForEachSample.add(networkState.getLogOfMasterP()));
-        return new NetworkSamples(samplesByVertex,logOfMasterPForEachSample, networkStates.size());
+        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, networkStates.size());
     }
 
     private static void addSamplesForNetworkState(NetworkState networkState, Map<VertexId, List<?>> samplesByVertex) {
-        for(VertexId vertexId:networkState.getVertexIds()) {
-            addSampleForVertex(vertexId,networkState.get(vertexId), samplesByVertex);
+        for (VertexId vertexId : networkState.getVertexIds()) {
+            addSampleForVertex(vertexId, networkState.get(vertexId), samplesByVertex);
         }
     }
 
@@ -173,7 +173,7 @@ public class NetworkSamples {
         private final List<Double> logOfMasterPForEachSample;
         private final int index;
 
-        public SamplesBackedNetworkState(Map<VertexId, ? extends List> samplesByVertex, List<Double> logOfMasterPForEachSample, int index)  {
+        public SamplesBackedNetworkState(Map<VertexId, ? extends List> samplesByVertex, List<Double> logOfMasterPForEachSample, int index) {
             this.samplesByVertex = samplesByVertex;
             this.logOfMasterPForEachSample = logOfMasterPForEachSample;
             this.index = index;
