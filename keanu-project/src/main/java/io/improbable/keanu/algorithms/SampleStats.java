@@ -21,9 +21,9 @@ public final class SampleStats {
     private static double[] autocovariance(double[] samples) {
         final int n = samples.length;
         double[] demeanPaddedWithZeros = calculatePaddedDemean(samples);
-        Complex ifft[] = fftCrossCorrelationWitSelf(demeanPaddedWithZeros);
-        double realParts[] = getRealPartsTruncated(ifft, n);
-        double realPartsDivN[] = Arrays.stream(realParts).map(x -> x / n).toArray();
+        Complex[] ifft = fftCrossCorrelationWitSelf(demeanPaddedWithZeros);
+        double[] realParts = getRealPartsTruncated(ifft, n);
+        double[] realPartsDivN = Arrays.stream(realParts).map(x -> x / n).toArray();
         return realPartsDivN;
     }
 
@@ -48,9 +48,9 @@ public final class SampleStats {
     }
 
     private static Complex[] fftCrossCorrelationWitSelf(double[] values) {
-        Complex fftData[] = ffTransformer.transform(values, TransformType.FORWARD);
+        Complex[] fftData = ffTransformer.transform(values, TransformType.FORWARD);
         Complex fftMultipliedWithConj[] = multiplyWithConjugateInPlace(fftData);
-        Complex ifft[] = ffTransformer.transform(fftMultipliedWithConj, TransformType.INVERSE);
+        Complex[] ifft = ffTransformer.transform(fftMultipliedWithConj, TransformType.INVERSE);
         return ifft;
     }
 
