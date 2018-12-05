@@ -107,9 +107,9 @@ class LinearRegressionTestUtils {
         return new TestData(weights, expectedB, xData, yData);
     }
 
-    static void assertWeightsAndInterceptMatchTestData(DoubleTensor weights, double intercept, TestData testData) {
-        assertThat("Intercept", testData.intercept, closeTo(intercept, 0.5));
-        assertThat("Weights", weights, allCloseTo(0.05, testData.weights));
+    static void assertWeightsAndInterceptMatchTestData(DoubleVertex weights, DoubleVertex intercept, TestData testData) {
+        assertThat("Intercept", testData.intercept, closeTo(intercept.getValue().scalar(), 0.5));
+        assertThat("Weights", weights.getValue(), allCloseTo(0.05, testData.weights));
     }
 
     static void assertSampledWeightsAndInterceptMatchTestData(DoubleVertexSamples gradient, DoubleVertexSamples intercept, TestData testData) {
