@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
@@ -52,6 +53,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ProtobufTest {
 
@@ -92,6 +94,33 @@ public class ProtobufTest {
         assertThat(labelGaussianVerted.getMu().getValue(2), closeTo(5.0, 1e-10));
         assertThat(latentGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         latentGaussianVertex.sample();
+    }
+
+    @Test
+    public void youCanSaveNetworkWithHyperparameters() throws IOException {
+        DoubleVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
+        BayesianNetwork net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        Map<String, String> someMetadata = new HashMap<>();
+        someMetadata.put("Author", "Some Author");
+        someMetadata.put("Tag", "MyBayesNet");
+
+        KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
+
+        for (Map.Entry<String, String> entry : someMetadata.entrySet()) {
+            KeanuSavedBayesNet.MetadataInfo.Builder metadataInfoBuilder = KeanuSavedBayesNet.MetadataInfo.newBuilder()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue());
+            metadataBuilder.addMetadataInfo(metadataInfoBuilder);
+        }
+
+        ProtobufSaver protobufSaver = new ProtobufSaver(net, someMetadata);
+        protobufSaver.save(output, false);
+
+        KeanuSavedBayesNet.Model parsedModel = KeanuSavedBayesNet.Model.parseFrom(output.toByteArray());
+        assertTrue(parsedModel.hasMetadata());
+        assertThat(parsedModel.getMetadata().getMetadataInfoList(), containsInAnyOrder(metadataBuilder.getMetadataInfoList().toArray()));
     }
 
     @Test
@@ -169,8 +198,12 @@ public class ProtobufTest {
             .addVertices(muVertex)
             .addVertices(gaussianVertex).build();
 
+        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
+            .setNetwork(savedNet)
+            .build();
+
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
-        savedNet.writeTo(writer);
+        savedModel.writeTo(writer);
 
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork net = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
@@ -189,8 +222,12 @@ public class ProtobufTest {
         KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
             .addVertices(constantVertex).build();
 
+        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
+            .setNetwork(savedNet)
+            .build();
+
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
-        savedNet.writeTo(writer);
+        savedModel.writeTo(writer);
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork readNet = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
@@ -208,8 +245,12 @@ public class ProtobufTest {
         KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
             .addVertices(constantVertex).build();
 
+        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
+            .setNetwork(savedNet)
+            .build();
+
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
-        savedNet.writeTo(writer);
+        savedModel.writeTo(writer);
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork readNet = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
@@ -234,19 +275,23 @@ public class ProtobufTest {
         KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
             .addVertices(constantVertex).build();
 
+        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
+            .setNetwork(savedNet)
+            .build();
+
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
-        savedNet.writeTo(writer);
+        savedModel.writeTo(writer);
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork readNet = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
     @Test
     public void canLoadWithLabelRatherThanId() throws IOException {
-        KeanuSavedBayesNet.BayesianNetwork savedNet = createBasicNetworkProtobufWithValue(
+        KeanuSavedBayesNet.Model savedModel = createBasicNetworkProtobufWithValue(
             GAUSS_LABEL, GAUSS_ID, GAUSS_VALUE);
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
-        savedNet.writeTo(writer);
+        savedModel.writeTo(writer);
 
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork net = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
@@ -260,12 +305,12 @@ public class ProtobufTest {
         expectedException.expectMessage("Label and VertexID don't refer to same Vertex: (sigmaVertex) " +
             "(id: \"1.1\"\n)");
 
-        KeanuSavedBayesNet.BayesianNetwork savedNet = createBasicNetworkProtobufWithValue(
+        KeanuSavedBayesNet.Model savedModel = createBasicNetworkProtobufWithValue(
             "sigmaVertex", GAUSS_ID, 2.1
         );
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
-        savedNet.writeTo(writer);
+        savedModel.writeTo(writer);
 
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork net = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
@@ -298,16 +343,24 @@ public class ProtobufTest {
 
         KeanuSavedBayesNet.BayesianNetwork savedNet = KeanuSavedBayesNet.BayesianNetwork.newBuilder()
             .addVertices(constantVertex)
+            .build();
+
+        KeanuSavedBayesNet.BayesianNetworkState savedNetState = KeanuSavedBayesNet.BayesianNetworkState.newBuilder()
             .addDefaultState(constantValue)
             .build();
 
+        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
+            .setNetwork(savedNet)
+            .setNetworkState(savedNetState)
+            .build();
+
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
-        savedNet.writeTo(writer);
+        savedModel.writeTo(writer);
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork readNet = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
     }
 
-    private KeanuSavedBayesNet.BayesianNetwork createBasicNetworkProtobufWithValue(String labelForValue,
+    private KeanuSavedBayesNet.Model createBasicNetworkProtobufWithValue(String labelForValue,
                                                                                    String idForValue,
                                                                                    Double valueToStore) {
 
@@ -363,10 +416,18 @@ public class ProtobufTest {
             .addVertices(muVertex)
             .addVertices(sigmaVertex)
             .addVertices(gaussianVertex)
+            .build();
+
+        KeanuSavedBayesNet.BayesianNetworkState savedNetState = KeanuSavedBayesNet.BayesianNetworkState.newBuilder()
             .addDefaultState(gaussianValue)
             .build();
 
-        return savedNet;
+        KeanuSavedBayesNet.Model savedModel = KeanuSavedBayesNet.Model.newBuilder()
+            .setNetwork(savedNet)
+            .setNetworkState(savedNetState)
+            .build();
+
+        return savedModel;
     }
 
     private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {

@@ -30,7 +30,6 @@ public class BayesianNetwork {
     private final Map<VertexLabel, Vertex> vertexLabels;
     private static final int TOP_LEVEL_INDENTATION = 1;
     private int indentation = TOP_LEVEL_INDENTATION;
-    private Map<String, String> metadata = new HashMap<>();
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
         Preconditions.checkArgument(!vertices.isEmpty(), "A bayesian network must contain at least one vertex");
@@ -296,20 +295,5 @@ public class BayesianNetwork {
         }
 
         return subgraphVertices;
-    }
-
-    public void addMetadata(String key, String value) {
-        metadata.put(key, value);
-    }
-
-    public void addMetadata(Map<String, String> metadata) {
-        if (metadata == null) {
-            return;
-        }
-        this.metadata.putAll(metadata);
-    }
-
-    public Map<String, String> getMetadata() {
-        return Collections.unmodifiableMap(metadata);
     }
 }

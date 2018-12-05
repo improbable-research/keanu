@@ -38,16 +38,16 @@ public class ProtobufLoader implements NetworkLoader {
 
     public BayesianNetwork loadNetwork(InputStream input) throws IOException {
         Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
-        KeanuSavedBayesNet.BayesianNetwork parsedNet = KeanuSavedBayesNet.BayesianNetwork.parseFrom(input);
+        KeanuSavedBayesNet.Model parsedModel = KeanuSavedBayesNet.Model.parseFrom(input);
 
-        for (KeanuSavedBayesNet.Vertex vertex : parsedNet.getVerticesList()) {
+        for (KeanuSavedBayesNet.Vertex vertex : parsedModel.getNetwork().getVerticesList()) {
             Vertex newVertex = createVertexFromProtoBuf(vertex, instantiatedVertices);
             instantiatedVertices.put(vertex.getId(), newVertex);
         }
 
         BayesianNetwork bayesNet = new BayesianNetwork(instantiatedVertices.values());
 
-        loadDefaultValues(parsedNet, instantiatedVertices, bayesNet);
+        loadDefaultValues(parsedModel.getNetworkState(), instantiatedVertices, bayesNet);
 
         return bayesNet;
     }
@@ -67,10 +67,10 @@ public class ProtobufLoader implements NetworkLoader {
         }
     }
 
-    private void loadDefaultValues(KeanuSavedBayesNet.BayesianNetwork parsedNet,
+    private void loadDefaultValues(KeanuSavedBayesNet.BayesianNetworkState parsedNetworkState,
                                    Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices,
                                    BayesianNetwork bayesNet) {
-        for (KeanuSavedBayesNet.StoredValue value : parsedNet.getDefaultStateList()) {
+        for (KeanuSavedBayesNet.StoredValue value : parsedNetworkState.getDefaultStateList()) {
             Vertex targetVertex = getTargetVertex(value, instantiatedVertices, bayesNet);
 
             savedValues.put(targetVertex, value.getValue());
