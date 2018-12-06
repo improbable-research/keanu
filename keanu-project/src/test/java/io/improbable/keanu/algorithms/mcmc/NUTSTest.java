@@ -74,7 +74,8 @@ public class NUTSTest {
         int sampleCount = 6000;
         NUTS nuts = NUTS.builder()
             .adaptCount(sampleCount)
-            .maxTreeHeight(4)
+            .adaptEnabled(true)
+            .maxTreeHeight(8)
             .random(random)
             .build();
 

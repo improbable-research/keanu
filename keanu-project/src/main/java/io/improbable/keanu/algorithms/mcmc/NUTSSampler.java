@@ -92,12 +92,12 @@ public class NUTSSampler implements SamplingAlgorithm {
         int treeHeight = 0;
         tree.shouldContinueFlag = true;
         tree.acceptedLeapfrogCount = 1;
+        System.out.println("Step: " + stepsize.stepsize);
 
         while (tree.shouldContinueFlag && treeHeight < maxTreeHeight) {
 
             //build tree direction -1 = backwards OR 1 = forwards
             int buildDirection = random.nextBoolean() ? 1 : -1;
-
             TreeBuilder otherHalfTree = TreeBuilder.buildOtherHalfOfTree(
                 tree,
                 latentVertices,
@@ -139,6 +139,7 @@ public class NUTSSampler implements SamplingAlgorithm {
 
         if (this.adaptEnabled) {
             stepsize.adaptStepSize(tree, sampleNum);
+            System.out.println("Step: " + stepsize.stepsize);
         }
 
         tree.leapfrogForward.position = tree.acceptedPosition;

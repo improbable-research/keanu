@@ -43,7 +43,6 @@ public class Leapfrog {
                 plusInPlace(
                     position.get(latent.getId())
                 );
-            System.out.println(nextPositionForLatent.scalar());
             nextPosition.put(latent.getId(), nextPositionForLatent);
             latent.setValue(nextPositionForLatent);
         }
