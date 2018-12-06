@@ -167,28 +167,28 @@ public class INDArrayShim {
 
     public static INDArray pow(INDArray left, INDArray right) {
         if (left.length() == 1 || right.length() == 1) {
-            return performOperationWithScalarTensor(left, right, Transforms::pow);
+            return performOperationWithScalarTensorPreservingShape(left, right, Transforms::pow);
         }
         return Transforms.pow(left, right, false);
     }
 
     public static INDArray max(INDArray left, INDArray right) {
         if (left.length() == 1 || right.length() == 1) {
-            return performOperationWithScalarTensor(left, right, Transforms::max);
+            return performOperationWithScalarTensorPreservingShape(left, right, Transforms::max);
         }
         return Transforms.max(left, right, false);
     }
 
     public static INDArray min(INDArray left, INDArray right) {
         if (left.length() == 1 || right.length() == 1) {
-            return performOperationWithScalarTensor(left, right, Transforms::min);
+            return performOperationWithScalarTensorPreservingShape(left, right, Transforms::min);
         }
         return Transforms.min(left, right, false);
     }
 
     public static INDArray atan2(INDArray left, INDArray right) {
         if (left.length() == 1 || right.length() == 1) {
-            return performOperationWithScalarTensor(left, right, Transforms::atan2);
+            return performOperationWithScalarTensorPreservingShape(left, right, Transforms::atan2);
         }
         return Transforms.atan2(left, right);
     }
@@ -369,7 +369,7 @@ public class INDArrayShim {
         return mask;
     }
 
-    private static INDArray performOperationWithScalarTensor(INDArray left, INDArray right, BiFunction<INDArray, INDArray, INDArray> operation) {
+    private static INDArray performOperationWithScalarTensorPreservingShape(INDArray left, INDArray right, BiFunction<INDArray, INDArray, INDArray> operation) {
         long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
         INDArray result;
         if (left.length() == 1) {
