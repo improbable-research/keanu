@@ -18,18 +18,18 @@ public class AcceptanceRateTracker implements ProposalListener {
         }
     }
 
-    public double getAcceptanceRate(VertexId vertexId) {
-        if (!numApplied.keySet().contains(vertexId)) {
-            throw new IllegalStateException("No proposals have been registered for " + vertexId);
-        }
-        return 1. - (double) numRejected.getOrDefault(vertexId, new Counter()).getValue() / numApplied.get(vertexId).getValue();
-    }
-
     @Override
     public void onProposalRejected(Proposal proposal) {
         for (Vertex vertex : proposal.getVerticesWithProposal()) {
             numRejected.computeIfAbsent(vertex.getId(), i -> new Counter()).increment();
         }
+    }
+
+    public double getAcceptanceRate(VertexId vertexId) {
+        if (!numApplied.keySet().contains(vertexId)) {
+            throw new IllegalStateException("No proposals have been registered for " + vertexId);
+        }
+        return 1. - (double) numRejected.getOrDefault(vertexId, new Counter()).getValue() / numApplied.get(vertexId).getValue();
     }
 
     private class Counter {
