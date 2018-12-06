@@ -27,7 +27,7 @@ def test_it_throws_if_you_specify_sigma_but_the_type_isnt_gaussian():
 
 
 def test_it_throws_if_it_doesnt_recognise_the_type():
-    with pytest.raises(TypeError) as excinfo:
+    with pytest.raises(KeyError) as excinfo:
         ProposalDistribution("foo")
 
-    assert str(excinfo.value) == "Unknown Proposal Distribution type foo"
+    assert str(excinfo.value) == "'foo'"

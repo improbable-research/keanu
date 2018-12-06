@@ -21,8 +21,6 @@ proposal_distribution_types: Dict[str, Callable] = {
 class ProposalDistribution(JavaObjectWrapper):
 
     def __init__(self, type_: str, sigma: numpy_types = None, listeners: List[Any] = []) -> None:
-        if type_ not in proposal_distribution_types.keys():
-            raise TypeError("Unknown Proposal Distribution type %s" % type_)
         ctor = proposal_distribution_types[type_]
         args = []
         if type_ == "gaussian":
