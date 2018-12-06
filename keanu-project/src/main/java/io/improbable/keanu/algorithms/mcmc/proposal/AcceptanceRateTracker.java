@@ -2,33 +2,35 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import com.google.common.collect.Maps;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 
 import java.util.Map;
-import java.util.Set;
 
 public class AcceptanceRateTracker implements ProposalListener {
 
-    private Map<Set<Vertex>, Integer> numApplied = Maps.newHashMap();
-    private Map<Set<Vertex>, Integer> numRejected = Maps.newHashMap();
+    private Map<VertexId, Integer> numApplied = Maps.newHashMap();
+    private Map<VertexId, Integer> numRejected = Maps.newHashMap();
 
     @Override
     public void onProposalApplied(Proposal proposal) {
-        Set<Vertex> key = proposal.getVerticesWithProposal();
-        Integer previousValue = numApplied.getOrDefault(key, 0);
-        numApplied.put(key, previousValue + 1);
+        for (Vertex vertex : proposal.getVerticesWithProposal()) {
+            Integer previousValue = numApplied.getOrDefault(vertex.getId(), 0);
+            numApplied.put(vertex.getId(), previousValue + 1);
+        }
     }
 
-    public double getAcceptanceRate(Set<Vertex> verticesWithProposal) {
-        if (!numApplied.keySet().contains(verticesWithProposal)) {
-            throw new IllegalStateException("No proposals have been registered for " + verticesWithProposal);
+    public double getAcceptanceRate(VertexId vertexId) {
+        if (!numApplied.keySet().contains(vertexId)) {
+            throw new IllegalStateException("No proposals have been registered for " + vertexId);
         }
-        return 1. - (double) numRejected.getOrDefault(verticesWithProposal, 0) / numApplied.get(verticesWithProposal);
+        return 1. - (double) numRejected.getOrDefault(vertexId, 0) / numApplied.get(vertexId);
     }
 
     @Override
     public void onProposalRejected(Proposal proposal) {
-        Set<Vertex> key = proposal.getVerticesWithProposal();
-        Integer previousValue = numRejected.getOrDefault(key, 0);
-        numRejected.put(key, previousValue + 1);
+        for (Vertex vertex : proposal.getVerticesWithProposal()) {
+            Integer previousValue = numRejected.getOrDefault(vertex.getId(), 0);
+            numRejected.put(vertex.getId(), previousValue + 1);
+        }
     }
 }
