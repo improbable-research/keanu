@@ -40,7 +40,6 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
     }
 
     public DoubleTensor asTensor() {
-        DoubleTensor[] array = new DoubleTensor[samples.size()];
-        return DoubleTensor.concat(samples.toArray(array));
+        return DoubleTensor.concat(samples.toArray(new DoubleTensor[0]));
     }
 }

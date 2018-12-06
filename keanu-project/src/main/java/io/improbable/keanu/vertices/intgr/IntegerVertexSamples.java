@@ -57,7 +57,6 @@ public class IntegerVertexSamples extends VertexSamples<IntegerTensor> {
     }
 
     public IntegerTensor asTensor() {
-        IntegerTensor[] array = new IntegerTensor[samples.size()];
-        return IntegerTensor.concat(samples.toArray(array));
+        return IntegerTensor.concat(samples.toArray(new IntegerTensor[0]));
     }
 }
