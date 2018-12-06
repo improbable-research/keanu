@@ -11,6 +11,7 @@ k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.SampleStats")
 
+
 def autocorrelation(arg: List[numpy_types], index: Union[Tuple[int], Tuple] = ()) -> ndarray:
     check_all_floats(arg)
     check_all_shapes_match([elem.shape for elem in arg])

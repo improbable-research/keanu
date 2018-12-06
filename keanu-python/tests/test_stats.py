@@ -23,17 +23,12 @@ def test_can_get_correct_autocorrelation_when_nonscalar_input() -> None:
         np.array([[3., 31.5], [10., 7.8]]),
         np.array([[4., 14.3], [5., 2.1]]),
     ]
-    expected = np.array(
-        [[[1., 0.25, -0.3, -0.45],
-          [1., -0.27679699, -0.32759603, 0.10439302]],
-         [[1., -0.75, 0.5, -0.25],
-          [1., -0.40761833, -0.24778339, 0.15540172]]]
-    )
-    actual = np.array(
-        [[stats.autocorrelation(x_list, (0, 0)),
-          stats.autocorrelation(x_list, (0, 1))],
-         [stats.autocorrelation(x_list, (1, 0)),
-          stats.autocorrelation(x_list, (1, 1))]])
+    expected = np.array([[[1., 0.25, -0.3, -0.45], [1., -0.27679699, -0.32759603, 0.10439302]],
+                         [[1., -0.75, 0.5, -0.25], [1., -0.40761833, -0.24778339, 0.15540172]]])
+    actual = np.array([[stats.autocorrelation(x_list, (0, 0)),
+                        stats.autocorrelation(x_list, (0, 1))],
+                       [stats.autocorrelation(x_list, (1, 0)),
+                        stats.autocorrelation(x_list, (1, 1))]])
     np.testing.assert_almost_equal(actual, expected)
 
 
