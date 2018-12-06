@@ -14,10 +14,10 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class DoubleVertexSamplesTest {
     List<DoubleTensor> values = ImmutableList.of(
-        DoubleTensor.create(new double[]{0, 16, 4}, new long[]{1, 3}),
-        DoubleTensor.create(new double[]{-4, -8, 4}, new long[]{1, 3}),
-        DoubleTensor.create(new double[]{8, -4, 12}, new long[]{1, 3}),
-        DoubleTensor.create(new double[]{4, 4, 8}, new long[]{1, 3})
+        DoubleTensor.create(new double[]{0, 16, 4}, 1, 3),
+        DoubleTensor.create(new double[]{-4, -8, 4}, 1, 3),
+        DoubleTensor.create(new double[]{8, -4, 12}, 1, 3),
+        DoubleTensor.create(new double[]{4, 4, 8}, 1, 3)
     );
     final DoubleVertexSamples samples = new DoubleVertexSamples(values);
 
@@ -44,8 +44,6 @@ public class DoubleVertexSamplesTest {
         double[] expectedValues = stats.stream().mapToDouble(SummaryStatistics::getMean).toArray();
         assertThat(averages.asFlatDoubleArray(), equalTo(expectedValues));
         assertThat(averages.asFlatDoubleArray(), equalTo(new double[]{2.0, 2.0, 7.0}));
-
-
     }
 
     @Test
@@ -58,4 +56,20 @@ public class DoubleVertexSamplesTest {
         );
         assertThat(variances, allCloseTo(1e-8, expectedValues));
     }
+
+    @Test
+    public void canGetSamplesAsTensor() {
+        List<DoubleTensor> samplesAsList = samples.asList();
+
+        DoubleTensor samplesAsTensor = samples.asTensor();
+        List<DoubleTensor> samplesAsTensorSliced = samplesAsTensor.sliceAlongDimension(0, 0, samplesAsTensor.getShape()[0]);
+
+        for (int i = 0; i < samplesAsList.size(); i++) {
+            DoubleTensor sampleFromList = samplesAsList.get(i);
+            DoubleTensor sampleFromTensor = samplesAsTensorSliced.get(i);
+
+            assertThat(sampleFromList.asFlatDoubleArray(), equalTo(sampleFromTensor.asFlatDoubleArray()));
+        }
+    }
+
 }

@@ -7,7 +7,6 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -226,16 +225,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor slice(int dimension, long index);
 
     List<DoubleTensor> split(int dimension, long... splitAtIndices);
-
-    default List<DoubleTensor> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {
-        List<DoubleTensor> slicedTensors = new ArrayList<>();
-
-        for (long i = indexStart; i < indexEnd; i++) {
-            slicedTensors.add(slice(dimension, i));
-        }
-
-        return slicedTensors;
-    }
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 

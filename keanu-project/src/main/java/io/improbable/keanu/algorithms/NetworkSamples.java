@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
-import io.improbable.keanu.vertices.intgr.IntegerTensorVertexSamples;
+import io.improbable.keanu.vertices.intgr.IntegerVertexSamples;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -58,12 +58,12 @@ public class NetworkSamples {
         return new DoubleVertexSamples(samplesByVertex.get(vertexId));
     }
 
-    public IntegerTensorVertexSamples getIntegerTensorSamples(Vertex<IntegerTensor> vertex) {
+    public IntegerVertexSamples getIntegerTensorSamples(Vertex<IntegerTensor> vertex) {
         return getIntegerTensorSamples(vertex.getId());
     }
 
-    public IntegerTensorVertexSamples getIntegerTensorSamples(VertexId vertexId) {
-        return new IntegerTensorVertexSamples(samplesByVertex.get(vertexId));
+    public IntegerVertexSamples getIntegerTensorSamples(VertexId vertexId) {
+        return new IntegerVertexSamples(samplesByVertex.get(vertexId));
     }
 
     public NetworkSamples drop(int dropCount) {
