@@ -16,6 +16,27 @@ def test_can_get_correct_autocorrelation() -> None:
     np.testing.assert_almost_equal(autocorr, expected)
 
 
+def test_can_get_correct_autocorrelation_when_nonscalar_input() -> None:
+    x_list = [
+        np.array([[1., 27.2], [10., 3.2]]),
+        np.array([[2., 99.4], [5., 4.6]]),
+        np.array([[3., 31.5], [10., 7.8]]),
+        np.array([[4., 14.3], [5., 2.1]]),
+    ]
+    expected = np.array(
+        [[[1., 0.25, -0.3, -0.45],
+          [1., -0.27679699, -0.32759603, 0.10439302]],
+         [[1., -0.75, 0.5, -0.25],
+          [1., -0.40761833, -0.24778339, 0.15540172]]]
+    )
+    actual = np.array(
+        [[stats.autocorrelation(x_list, (0, 0)),
+          stats.autocorrelation(x_list, (0, 1))],
+         [stats.autocorrelation(x_list, (1, 0)),
+          stats.autocorrelation(x_list, (1, 1))]])
+    np.testing.assert_almost_equal(actual, expected)
+
+
 def test_can_get_autocorrelation_for_samples() -> None:
     with Model() as m:
         m.uniform = Uniform(0, 1000)
@@ -36,12 +57,6 @@ def test_cant_get_autocorrelation_of_np_ints() -> None:
     x = [1, 2, 3]
     x_list = [np.array(a, int) for a in x]
     with pytest.raises(ValueError, match="Autocorrelation must be run on a list of numpy floating types."):
-        stats.autocorrelation(x_list)
-
-
-def test_cant_get_autocorrelation_of_non_scalar_arrays() -> None:
-    x_list = [np.array([22.4, 33.3]), np.array([15.4, 11.3])]
-    with pytest.raises(ValueError, match="Autocorrelation must be run on a list of single element ndarrays."):
         stats.autocorrelation(x_list)
 
 
