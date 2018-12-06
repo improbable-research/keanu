@@ -131,29 +131,13 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             random
         ) : initialStepSize;
 
-        NUTSSampler.AutoTune autoTune = new NUTSSampler.AutoTune(
-            stepSize,
-            targetAcceptanceProb,
+        AutoTune autoTune = new AutoTune(
             Math.log(stepSize),
+            targetAcceptanceProb,
             adaptCount
         );
 
-        NUTSSampler.BuiltTree tree = new NUTSSampler.BuiltTree(
-            position,
-            gradient,
-            momentum,
-            position,
-            gradient,
-            momentum,
-            position,
-            gradient,
-            initialLogOfMasterP,
-            takeSample(sampleFromVertices),
-            1,
-            true,
-            0,
-            1
-        );
+        TreeBuilder tree = TreeBuilder.createBasicTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
 
         return new NUTSSampler(
             sampleFromVertices,

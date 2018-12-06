@@ -4,9 +4,16 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.vis.Vizer;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -15,6 +22,11 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class NUTSTest {
 
@@ -45,7 +57,13 @@ public class NUTSTest {
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
 
-        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
+        Vizer.histogram(posteriorSamples.get(vertex).asList());
+
+        while(true) {
+
+        }
+
+//        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
     }
 
     @Test
@@ -92,6 +110,58 @@ public class NUTSTest {
         Vertex<DoubleTensor> B = donutBayesNet.getContinuousLatentVertices().get(1);
 
         MCMCTestDistributions.samplesMatch2DDonut(samples.get(A).asList(), samples.get(B).asList());
+    }
+
+    @Test
+    public void canFindSmallStartingStepsizeForSmallSpace() {
+        DoubleVertex vertex = new GaussianVertex(0, 0.05);
+        List<DoubleVertex> vertices = Arrays.asList(vertex);
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(vertex.getConnectedGraph());
+
+        VertexId vertexId = vertex.getId();
+
+        LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesianNetwork.getLatentOrObservedVertices(), vertices);
+        vertex.setValue(DoubleTensor.scalar(1.));
+        Map<VertexId, DoubleTensor> position = Collections.singletonMap(vertexId, vertex.getValue());
+        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+
+        double startingStepsize = NUTSSampler.findStartingStepSize(
+            position,
+            gradient,
+            Arrays.asList(vertex),
+            bayesianNetwork.getLatentVertices(),
+            logProbGradientCalculator,
+            ProbabilityCalculator.calculateLogProbFor(vertices),
+            random
+        );
+
+        double startingEpsilon = 1.0;
+        Assert.assertTrue(startingStepsize < startingEpsilon);
+    }
+
+    @Test
+    public void canFindLargeStartingStepsizeForLargeSpace() {
+        DoubleVertex vertex = new GaussianVertex(0, 500.);
+        List<DoubleVertex> vertices = Arrays.asList(vertex);
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(vertex.getConnectedGraph());
+
+        VertexId vertexId = vertex.getId();
+
+        LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesianNetwork.getLatentOrObservedVertices(), vertices);
+        Map<VertexId, DoubleTensor> position = Collections.singletonMap(vertexId, vertex.sample(random));
+        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+
+        double startingStepsize = NUTSSampler.findStartingStepSize(
+            position,
+            gradient,
+            Arrays.asList(vertex),
+            bayesianNetwork.getLatentVertices(),
+            logProbGradientCalculator,
+            ProbabilityCalculator.calculateLogProbFor(vertices),
+            random
+        );
+
+        Assert.assertTrue(startingStepsize > 64);
     }
 
     @Test

@@ -16,17 +16,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
 public class Vizer {
 
     enum PlotType {
         SCATTER, AREA_CHART
     }
 
-    private static JFreeChart createHistogram(List<Double> samples) {
+    private static JFreeChart createHistogram(List<DoubleTensor> samples) {
 
         double[] data = new double[samples.size()];
         for (int i = 0; i < samples.size(); i++) {
-            data[i] = samples.get(i);
+            data[i] = samples.get(i).scalar();
         }
 
         // int number = data.length;
@@ -100,11 +102,11 @@ public class Vizer {
         return createPlot(x, y, PlotType.AREA_CHART);
     }
 
-    public static void histogram(List<Double> samples) {
+    public static void histogram(List<DoubleTensor> samples) {
         histogram(samples, "Vizer");
     }
 
-    public static void histogram(List<Double> samples, String title) {
+    public static void histogram(List<DoubleTensor> samples, String title) {
         display(createHistogram(samples), title);
     }
 
