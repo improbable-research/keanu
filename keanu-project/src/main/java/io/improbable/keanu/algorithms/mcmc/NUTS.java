@@ -29,7 +29,7 @@ import java.util.Map;
 public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static final int DEFAULT_ADAPT_COUNT = 1000;
-    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.65;
+    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.8;
 
     public static NUTS withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
@@ -122,7 +122,9 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         double initialLogOfMasterP = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
 
-        double stepSize = (initialStepSize == null) ? NUTSSampler.findStartingStepSize(position,
+
+
+        double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(position,
             gradient,
             latentVertices,
             probabilisticVertices,
@@ -131,8 +133,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             random
         ) : initialStepSize;
 
-        AutoTune autoTune = new AutoTune(
-            Math.log(stepSize),
+        Stepsize stepsize = new Stepsize(
+            startingStepSize,
             targetAcceptanceProb,
             adaptCount
         );
@@ -145,9 +147,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             probabilisticVertices,
             logProbGradientCalculator,
             adaptEnabled,
-            autoTune,
+            stepsize,
             tree,
-            stepSize,
             maxTreeHeight,
             random
         );

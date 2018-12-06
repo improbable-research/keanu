@@ -1,14 +1,12 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -27,11 +25,10 @@ public class NUTSSampler implements SamplingAlgorithm {
     private final List<Vertex> probabilisticVertices;
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
-    private final AutoTune autoTune;
+    private final Stepsize stepsize;
     private final TreeBuilder tree;
     private final LogProbGradientCalculator logProbGradientCalculator;
 
-    private Double stepSize;
     private int sampleNum;
 
     /**
@@ -40,10 +37,8 @@ public class NUTSSampler implements SamplingAlgorithm {
      * @param probabilisticVertices     vertices that contribute to total log probability (i.e. latent + observed)
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
      * @param adaptEnabled              enable the NUTS step size adaptation
-     * @param autoTune                  configuration for tuning the stepsize, if adaptEnabled
+     * @param stepsize                  configuration for tuning the stepsize, if adaptEnabled
      * @param tree                      initial tree that will contain the state of the tree build
-     * @param stepSize                  The initial step size. A heuristic will be used to determine a suitable initial stepsize if none
-     *                                  is given.
      * @param maxTreeHeight             The largest tree height before stopping the hamilitonian process
      * @param random                    the source of randomness
      */
@@ -52,9 +47,8 @@ public class NUTSSampler implements SamplingAlgorithm {
                        List<Vertex> probabilisticVertices,
                        LogProbGradientCalculator logProbGradientCalculator,
                        boolean adaptEnabled,
-                       AutoTune autoTune,
+                       Stepsize stepsize,
                        TreeBuilder tree,
-                       Double stepSize,
                        int maxTreeHeight,
                        KeanuRandom random) {
 
@@ -64,9 +58,8 @@ public class NUTSSampler implements SamplingAlgorithm {
         this.logProbGradientCalculator = logProbGradientCalculator;
 
         this.sampleNum = 1;
-        this.stepSize = stepSize;
         this.tree = tree;
-        this.autoTune = autoTune;
+        this.stepsize = stepsize;
         this.maxTreeHeight = maxTreeHeight;
         this.adaptEnabled = adaptEnabled;
 
@@ -114,7 +107,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                 logU,
                 buildDirection,
                 treeHeight,
-                stepSize,
+                stepsize.stepsize,
                 logOfMasterPMinusMomentumBeforeLeapfrog,
                 random
             );
@@ -145,7 +138,7 @@ public class NUTSSampler implements SamplingAlgorithm {
         }
 
         if (this.adaptEnabled) {
-            stepSize = autoTune.adaptStepSize(tree, sampleNum);
+            stepsize.adaptStepSize(tree, sampleNum);
         }
 
         tree.leapfrogForward.position = tree.acceptedPosition;
@@ -178,10 +171,6 @@ public class NUTSSampler implements SamplingAlgorithm {
         return dotProduct;
     }
 
-    private static <T> void putValue(Vertex<T> vertex, Map<VertexId, ?> target) {
-        ((Map<VertexId, T>) target).put(vertex.getId(), vertex.getValue());
-    }
-
     /**
      * This is used to save of the sample from the uniformly chosen acceptedPosition position
      *
@@ -197,44 +186,6 @@ public class NUTSSampler implements SamplingAlgorithm {
     private static <T> void addSampleForVertex(VertexId id, T value, Map<VertexId, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(id, v -> new ArrayList<T>());
         samplesForVertex.add(value);
-    }
-
-    /**
-     * Taken from algorithm 4 in https://arxiv.org/pdf/1111.4246.pdf.
-     */
-    static double findStartingStepSize(Map<VertexId, DoubleTensor> position,
-                                       Map<VertexId, DoubleTensor> gradient,
-                                       List<Vertex<DoubleTensor>> vertices,
-                                       List<Vertex> probabilisticVertices,
-                                       LogProbGradientCalculator logProbGradientCalculator,
-                                       double initialLogOfMasterP,
-                                       KeanuRandom random) {
-        double stepsize = 1;
-        Map<VertexId, DoubleTensor> momentums = new HashMap<>();
-        initializeMomentumForEachVertex(vertices, momentums, random);
-
-        Leapfrog leapfrog = new Leapfrog(position, momentums, gradient);
-        double pThetaR = initialLogOfMasterP - leapfrog.halfDotProductMomentum();
-
-        Leapfrog delta = leapfrog.step(vertices, logProbGradientCalculator, stepsize);
-
-        double probAfterLeapfrog = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
-        double pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
-
-        double logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
-        double scalingFactor = logLikelihoodRatio > Math.log(0.5) ? 1 : -1;
-
-        while (scalingFactor * logLikelihoodRatio > -scalingFactor * Math.log(2)) {
-            stepsize = stepsize * Math.pow(2, scalingFactor);
-
-            delta = leapfrog.step(vertices, logProbGradientCalculator, stepsize);
-            probAfterLeapfrog = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
-            pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
-
-            logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
-        }
-
-        return stepsize;
     }
 
 }

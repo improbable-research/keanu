@@ -113,58 +113,6 @@ public class NUTSTest {
     }
 
     @Test
-    public void canFindSmallStartingStepsizeForSmallSpace() {
-        DoubleVertex vertex = new GaussianVertex(0, 0.05);
-        List<DoubleVertex> vertices = Arrays.asList(vertex);
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(vertex.getConnectedGraph());
-
-        VertexId vertexId = vertex.getId();
-
-        LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesianNetwork.getLatentOrObservedVertices(), vertices);
-        vertex.setValue(DoubleTensor.scalar(1.));
-        Map<VertexId, DoubleTensor> position = Collections.singletonMap(vertexId, vertex.getValue());
-        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
-
-        double startingStepsize = NUTSSampler.findStartingStepSize(
-            position,
-            gradient,
-            Arrays.asList(vertex),
-            bayesianNetwork.getLatentVertices(),
-            logProbGradientCalculator,
-            ProbabilityCalculator.calculateLogProbFor(vertices),
-            random
-        );
-
-        double startingEpsilon = 1.0;
-        Assert.assertTrue(startingStepsize < startingEpsilon);
-    }
-
-    @Test
-    public void canFindLargeStartingStepsizeForLargeSpace() {
-        DoubleVertex vertex = new GaussianVertex(0, 500.);
-        List<DoubleVertex> vertices = Arrays.asList(vertex);
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(vertex.getConnectedGraph());
-
-        VertexId vertexId = vertex.getId();
-
-        LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesianNetwork.getLatentOrObservedVertices(), vertices);
-        Map<VertexId, DoubleTensor> position = Collections.singletonMap(vertexId, vertex.sample(random));
-        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
-
-        double startingStepsize = NUTSSampler.findStartingStepSize(
-            position,
-            gradient,
-            Arrays.asList(vertex),
-            bayesianNetwork.getLatentVertices(),
-            logProbGradientCalculator,
-            ProbabilityCalculator.calculateLogProbFor(vertices),
-            random
-        );
-
-        Assert.assertTrue(startingStepsize > 64);
-    }
-
-    @Test
     public void canDefaultToSettingsInBuilderAndIsConfigurableAfterBuilding() {
 
         GaussianVertex A = new GaussianVertex(0.0, 1.0);
