@@ -1,27 +1,21 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.dbl;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.Tensor;
 import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.api.shape.Shape;
 
 import static org.junit.Assert.assertArrayEquals;
 
-public class ScalarTensorShapePreservationTest {
+public class DoubleScalarTensorShapePreservationTest {
 
     private static DoubleTensor doubleTensor;
     private static DoubleTensor scalarDoubleTensor;
-    private static IntegerTensor intTensor;
-    private static IntegerTensor scalarIntTensor;
 
     @Before
     public void setup() {
         doubleTensor = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, new long[]{2, 3});
         scalarDoubleTensor = DoubleTensor.create(1.0, new long[]{1, 1, 1, 1});
-
-        intTensor = IntegerTensor.create(new int[]{5, 6, 7, 8, 9, 10}, new long[]{3, 2});
-        scalarIntTensor = IntegerTensor.create(1, new long[]{1, 1, 1});
     }
 
     @Test
@@ -49,27 +43,27 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarMultiplicationPreservesShape() {
-        Tensor multiplicationResult = scalarIntTensor.times(intTensor);
-        resultShapeMatchesBroadcastShape(multiplicationResult, intTensor, scalarIntTensor);
+    public void doubleScalarMultiplicationPreservesShapeReverse() {
+        Tensor multiplicationResult = scalarDoubleTensor.times(doubleTensor);
+        resultShapeMatchesBroadcastShape(multiplicationResult, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
-    public void intScalarAdditionPreservesShape() {
-        Tensor additionResult = scalarIntTensor.plus(intTensor);
-        resultShapeMatchesBroadcastShape(additionResult, intTensor, scalarIntTensor);
+    public void doubleScalarAdditionPreservesShapeReverse() {
+        Tensor additionResult = scalarDoubleTensor.plus(doubleTensor);
+        resultShapeMatchesBroadcastShape(additionResult, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
-    public void intScalarDivisionPreservesShape() {
-        Tensor divisionResult = scalarIntTensor.div(intTensor);
-        resultShapeMatchesBroadcastShape(divisionResult, intTensor, scalarIntTensor);
+    public void doubleScalarDivisionPreservesShapeReverse() {
+        Tensor divisionResult = scalarDoubleTensor.div(doubleTensor);
+        resultShapeMatchesBroadcastShape(divisionResult, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
-    public void intScalarSubtractionPreservesShape() {
-        Tensor subtractionResult = scalarIntTensor.minus(intTensor);
-        resultShapeMatchesBroadcastShape(subtractionResult, intTensor, scalarIntTensor);
+    public void doubleScalarSubtractionPreservesShapeReverse() {
+        Tensor subtractionResult = scalarDoubleTensor.minus(doubleTensor);
+        resultShapeMatchesBroadcastShape(subtractionResult, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -79,9 +73,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarPowerPreservesShape() {
-        Tensor powerResult = scalarIntTensor.pow(intTensor);
-        resultShapeMatchesBroadcastShape(powerResult, intTensor, scalarIntTensor);
+    public void doubleScalarPowerPreservesShapeReverse() {
+        Tensor powerResult = scalarDoubleTensor.pow(doubleTensor);
+        resultShapeMatchesBroadcastShape(powerResult, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -103,9 +97,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarGetGreaterThanMaskPreservesShape() {
-        Tensor result = scalarIntTensor.getGreaterThanMask(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarGetGreaterThanMaskPreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.getGreaterThanMask(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -115,9 +109,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarGetGreaterThanOrEqualToMaskPreservesShape() {
-        Tensor result = scalarIntTensor.getGreaterThanOrEqualToMask(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarGetGreaterThanOrEqualToMaskPreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.getGreaterThanOrEqualToMask(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -127,9 +121,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarGetLessThanMaskPreservesShape() {
-        Tensor result = scalarIntTensor.getLessThanMask(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarGetLessThanMaskPreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.getLessThanMask(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -139,9 +133,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarGetLessThanOrEqualToMaskPreservesShape() {
-        Tensor result = scalarIntTensor.getLessThanOrEqualToMask(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarGetLessThanOrEqualToMaskPreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.getLessThanOrEqualToMask(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -151,9 +145,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarMaxInPlacePreservesShape() {
-        Tensor result = scalarIntTensor.maxInPlace(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarMaxInPlacePreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.maxInPlace(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -163,9 +157,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarMinInPlacePreservesShape() {
-        Tensor result = scalarIntTensor.minInPlace(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarMinInPlacePreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.minInPlace(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -175,9 +169,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarLessThanPreservesShape() {
-        Tensor result = scalarIntTensor.lessThan(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarLessThanPreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.lessThan(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -187,9 +181,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarLessThanOrEqualPreservesShape() {
-        Tensor result = scalarIntTensor.lessThanOrEqual(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarLessThanOrEqualPreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.lessThanOrEqual(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -199,9 +193,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarGreaterThanPreservesShape() {
-        Tensor result = scalarIntTensor.greaterThan(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarGreaterThanPreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.greaterThan(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -211,9 +205,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarGreaterThanOrEqualPreservesShape() {
-        Tensor result = scalarIntTensor.greaterThan(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarGreaterThanOrEqualPreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.greaterThan(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     @Test
@@ -223,9 +217,9 @@ public class ScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void intScalarElementwiseEqualsPreservesShape() {
-        Tensor result = scalarIntTensor.elementwiseEquals(intTensor);
-        resultShapeMatchesBroadcastShape(result, intTensor, scalarIntTensor);
+    public void doubleScalarElementwiseEqualsPreservesShapeReverse() {
+        Tensor result = scalarDoubleTensor.elementwiseEquals(doubleTensor);
+        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
     }
 
     private static void resultShapeMatchesBroadcastShape(Tensor result, Tensor input1, Tensor input2) {
