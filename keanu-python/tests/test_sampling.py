@@ -106,12 +106,10 @@ def set_starting_state(model: Model) -> None:
 def test_can_get_acceptance_rates(net: BayesNet) -> None:
     acceptance_rate_tracker = AcceptanceRateTracker()
     latents = list(net.get_latent_vertices())
-    print(latents)
 
     samples = sample(net=net, sample_from=latents, proposal_listeners=[acceptance_rate_tracker], drop=3)
 
     for latent in latents:
-        print(acceptance_rate_tracker.get_acceptance_rate([latent]))
         rate = acceptance_rate_tracker.get_acceptance_rate([latent])
         assert 0 <= rate <= 1
 
@@ -119,7 +117,6 @@ def test_can_get_acceptance_rates(net: BayesNet) -> None:
 def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
     acceptance_rate_tracker = AcceptanceRateTracker()
     latents = list(net.get_latent_vertices())
-    print(latents)
 
     samples = generate_samples(net=net, sample_from=latents, proposal_listeners=[acceptance_rate_tracker], drop=3)
 
