@@ -44,7 +44,6 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
@@ -53,7 +52,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ProtobufTest {
 
@@ -94,33 +92,6 @@ public class ProtobufTest {
         assertThat(labelGaussianVerted.getMu().getValue(2), closeTo(5.0, 1e-10));
         assertThat(latentGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         latentGaussianVertex.sample();
-    }
-
-    @Test
-    public void youCanSaveNetworkWithHyperparameters() throws IOException {
-        DoubleVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
-        BayesianNetwork net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-        Map<String, String> someMetadata = new HashMap<>();
-        someMetadata.put("Author", "Some Author");
-        someMetadata.put("Tag", "MyBayesNet");
-
-        KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
-
-        for (Map.Entry<String, String> entry : someMetadata.entrySet()) {
-            KeanuSavedBayesNet.MetadataInfo.Builder metadataInfoBuilder = KeanuSavedBayesNet.MetadataInfo.newBuilder()
-            .setKey(entry.getKey())
-            .setValue(entry.getValue());
-            metadataBuilder.addMetadataInfo(metadataInfoBuilder);
-        }
-
-        ProtobufSaver protobufSaver = new ProtobufSaver(net, someMetadata);
-        protobufSaver.save(output, false);
-
-        KeanuSavedBayesNet.Model parsedModel = KeanuSavedBayesNet.Model.parseFrom(output.toByteArray());
-        assertTrue(parsedModel.hasMetadata());
-        assertThat(parsedModel.getMetadata().getMetadataInfoList(), containsInAnyOrder(metadataBuilder.getMetadataInfoList().toArray()));
     }
 
     @Test

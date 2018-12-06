@@ -37,8 +37,14 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     public BayesianNetwork loadNetwork(InputStream input) throws IOException {
-        Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
         KeanuSavedBayesNet.Model parsedModel = KeanuSavedBayesNet.Model.parseFrom(input);
+        BayesianNetwork bayesNet = loadNetwork(parsedModel);
+
+        return bayesNet;
+    }
+
+    protected BayesianNetwork loadNetwork(KeanuSavedBayesNet.Model parsedModel) {
+        Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
 
         for (KeanuSavedBayesNet.Vertex vertex : parsedModel.getNetwork().getVerticesList()) {
             Vertex newVertex = createVertexFromProtoBuf(vertex, instantiatedVertices);

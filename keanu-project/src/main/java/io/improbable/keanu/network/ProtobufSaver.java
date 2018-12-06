@@ -16,28 +16,20 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public class ProtobufSaver implements NetworkSaver {
-    private final BayesianNetwork net;
-    private final Map<String, String> metadata;
-    private KeanuSavedBayesNet.Model.Builder modelBuilder = null;
+    protected final BayesianNetwork net;
+    protected KeanuSavedBayesNet.Model.Builder modelBuilder = null;
 
     public ProtobufSaver(BayesianNetwork net) {
-        this(net, null);
-    }
-
-    public ProtobufSaver(BayesianNetwork net, Map<String, String> metadata) {
         this.net = net;
-        this.metadata = metadata;
     }
 
     @Override
     public void save(OutputStream output, boolean saveValues) throws IOException {
         modelBuilder = KeanuSavedBayesNet.Model.newBuilder();
 
-        saveMetadata();
         net.save(this);
 
         if (saveValues) {
@@ -46,19 +38,6 @@ public class ProtobufSaver implements NetworkSaver {
 
         modelBuilder.build().writeTo(output);
         modelBuilder = null;
-    }
-
-    private void saveMetadata() {
-        if (metadata != null) {
-            KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
-            for (Map.Entry<String, String> entry : metadata.entrySet()) {
-                KeanuSavedBayesNet.MetadataInfo.Builder metadataInfoBuilder = KeanuSavedBayesNet.MetadataInfo.newBuilder()
-                    .setKey(entry.getKey())
-                    .setValue(entry.getValue());
-                metadataBuilder.addMetadataInfo(metadataInfoBuilder);
-            }
-            modelBuilder.setMetadata(metadataBuilder);
-        }
     }
 
     @Override

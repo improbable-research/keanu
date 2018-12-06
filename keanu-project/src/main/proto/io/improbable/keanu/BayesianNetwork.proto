@@ -95,10 +95,5 @@ message VertexValue {
 }
 
 message Metadata {
-    repeated MetadataInfo metadataInfo = 1;
-}
-
-message MetadataInfo {
-    string key = 1;
-    string value = 2;
+    map<string, string> metadataInfo = 1;
 }
