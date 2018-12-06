@@ -36,8 +36,6 @@ import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
  */
 public class INDArrayShim {
 
-    private static final DataBuffer.Type BUFFER_TYPE = DataBuffer.Type.DOUBLE;
-
     /*
      * We need to load ND4J in a separate thread as on load it sets the FTZ and DAZ flags in the processor for the
      * thread that does the load.  This causes issues with Apache Math that makes use of Sub-normal values (in
@@ -58,17 +56,16 @@ public class INDArrayShim {
     public static INDArray muli(INDArray left, INDArray right) {
         if (Arrays.equals(left.shape(), right.shape())) {
             return left.muli(right);
-        } else if (left.length() == 1 || right.length() == 1) {
+        } else if (left.length() == 1) {
             return scalarMultiplyWithPreservedShape(left, right);
+        } else if (right.length() == 1) {
+            return scalarMultiplyWithPreservedShape(right, left);
         } else {
             return broadcastMultiply(left, right);
         }
     }
 
     private static INDArray scalarMultiplyWithPreservedShape(INDArray a, INDArray b) {
-        if (a.length() != 1) {
-            return scalarMultiplyWithPreservedShape(b, a);
-        }
         INDArray result = b.muli(a.getScalar(0));
         long[] resultShape = Shape.broadcastOutputShape(a.shape(), b.shape());
         return result.reshape(resultShape);
@@ -76,7 +73,7 @@ public class INDArrayShim {
 
     private static INDArray broadcastMultiply(INDArray a, INDArray b) {
         if (shapeAIsSmallerThanShapeB(a.shape(), b.shape())) {
-                return broadcastMultiply(b, a);
+            return broadcastMultiply(b, a);
         } else {
             int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
             INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
@@ -87,17 +84,16 @@ public class INDArrayShim {
     public static INDArray divi(INDArray left, INDArray right) {
         if (Arrays.equals(left.shape(), right.shape())) {
             return left.divi(right);
-        }  else if (left.length() == 1 || right.length() == 1) {
-        return scalarDivideWithPreservedShape(left, right);
-    } else {
-        return broadcastDivide(left, right);
+        } else if (right.length() == 1) {
+            return scalarDivideWithPreservedShape(left, right);
+        } else if (left.length() == 1) {
+            return scalarMultiplyWithPreservedShape(left, right.rdiv(1.0));
+        } else {
+            return broadcastDivide(left, right);
+        }
     }
-}
 
     private static INDArray scalarDivideWithPreservedShape(INDArray a, INDArray b) {
-        if (b.length() != 1) {
-            return scalarMultiplyWithPreservedShape(a, b.rdiv(1.0));
-        }
         INDArray result = a.divi(b.getScalar(0));
         long[] resultShape = Shape.broadcastOutputShape(a.shape(), b.shape());
         return result.reshape(resultShape);
@@ -116,17 +112,16 @@ public class INDArrayShim {
     public static INDArray addi(INDArray left, INDArray right) {
         if (Arrays.equals(left.shape(), right.shape())) {
             return left.addi(right);
-        } else if (left.length() == 1 || right.length() == 1) {
-        return scalarAdditionWithPreservedShape(left, right);
-    } else {
-        return broadcastPlus(left, right);
+        } else if (left.length() == 1) {
+            return scalarAdditionWithPreservedShape(left, right);
+        } else if (right.length() == 1) {
+            return scalarAdditionWithPreservedShape(right, left);
+        } else {
+            return broadcastPlus(left, right);
+        }
     }
-}
 
     private static INDArray scalarAdditionWithPreservedShape(INDArray a, INDArray b) {
-        if (a.length() != 1) {
-            return scalarAdditionWithPreservedShape(b, a);
-        }
         INDArray result = b.addi(a.getScalar(0));
         long[] resultShape = Shape.broadcastOutputShape(a.shape(), b.shape());
         return result.reshape(resultShape);
@@ -145,17 +140,16 @@ public class INDArrayShim {
     public static INDArray subi(INDArray left, INDArray right) {
         if (Arrays.equals(left.shape(), right.shape())) {
             return left.subi(right);
-        } else if (left.length() == 1 || right.length() == 1) {
+        } else if (right.length() == 1) {
             return scalarSubtractionWithPreservedShape(left, right);
+        } else if (left.length() == 1) {
+            return scalarAdditionWithPreservedShape(left, right.neg());
         } else {
             return broadcastMinus(left, right);
         }
     }
 
     private static INDArray scalarSubtractionWithPreservedShape(INDArray a, INDArray b) {
-        if (b.length() != 1) {
-            return scalarAdditionWithPreservedShape(a, b.neg());
-        }
         INDArray result = a.subi(b.getScalar(0));
         long[] resultShape = Shape.broadcastOutputShape(a.shape(), b.shape());
         return result.reshape(resultShape);
