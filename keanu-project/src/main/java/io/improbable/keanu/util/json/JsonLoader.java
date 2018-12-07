@@ -17,7 +17,6 @@ public class JsonLoader extends ProtobufLoader {
         String jsonInput = IOUtils.toString(input, StandardCharsets.UTF_8);
         KeanuSavedBayesNet.Model.Builder modelBuilder = KeanuSavedBayesNet.Model.newBuilder();
         JsonFormat.parser().merge(jsonInput, modelBuilder);
-        BayesianNetwork bayesNet = super.loadNetwork(modelBuilder.build());
-        return bayesNet;
+        return super.loadNetwork(modelBuilder.build());
     }
 }
