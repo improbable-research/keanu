@@ -115,7 +115,7 @@ def test_can_get_acceptance_rates(net: BayesNet) -> None:
         drop=3)
 
     for latent in latents:
-        rate = acceptance_rate_tracker.get_acceptance_rate([latent])
+        rate = acceptance_rate_tracker.get_acceptance_rate(latent)
         assert 0 <= rate <= 1
 
 
@@ -133,7 +133,7 @@ def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
     draws = 100
     for _ in islice(samples, draws):
         for latent in latents:
-            rate = acceptance_rate_tracker.get_acceptance_rate([latent])
+            rate = acceptance_rate_tracker.get_acceptance_rate(latent)
             assert 0 <= rate <= 1
 
 

@@ -18,5 +18,5 @@ class AcceptanceRateTracker(JavaObjectWrapper):
     def __init__(self) -> None:
         super(AcceptanceRateTracker, self).__init__(k.jvm_view().AcceptanceRateTracker())
 
-    def get_acceptance_rate(self, vertices: Iterable[Vertex]) -> float:
-        return self.unwrap().getAcceptanceRate(k.to_java_object_set(vertices))
+    def get_acceptance_rate(self, vertex: Vertex) -> float:
+        return self.unwrap().getAcceptanceRate(vertex.unwrap().getId())
