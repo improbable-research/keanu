@@ -40,9 +40,7 @@ public class OptimizerTest {
     }
 
     private Function<BayesianNetwork, Optimizer> getGradientOptimizer() {
-        return (bayesNet) -> GradientOptimizer.builder()
-            .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesNet))
-            .build();
+        return (bayesNet) -> KeanuOptimizer.Gradient.of(bayesNet);
     }
 
     private Function<BayesianNetwork, Optimizer> getNonGradientOptimizer() {
