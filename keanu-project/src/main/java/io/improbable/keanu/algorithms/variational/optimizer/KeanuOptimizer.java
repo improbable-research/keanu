@@ -45,7 +45,7 @@ public class KeanuOptimizer {
      * create an {@link Optimizer}. This provides methods for optimizing the values of latent variables
      * of the Bayesian network to maximise probability.
      *
-     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
+     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from.
      * @return an {@link Optimizer}
      */
     public static Optimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
