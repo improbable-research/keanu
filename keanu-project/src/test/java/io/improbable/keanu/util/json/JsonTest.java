@@ -6,6 +6,7 @@ import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.BeforeClass;
@@ -36,6 +37,8 @@ public class JsonTest {
 
     @BeforeClass
     public static void setup() throws IOException {
+        VertexId.ID_GENERATOR.set(0);
+        
         DoubleVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
         gaussianVertex.observe(0.5);
         gaussianVertex.setLabel("GaussianVertex");
