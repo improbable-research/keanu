@@ -21,7 +21,7 @@ public class KeanuOptimizer {
      * @param vertices The vertices to create a Bayesian network from.
      * @return an {@link Optimizer}
      */
-    public static Optimizer of(Collection<? extends Vertex> vertices) {
+    public Optimizer of(Collection<? extends Vertex> vertices) {
         return of(new BayesianNetwork(vertices));
     }
 
@@ -32,7 +32,7 @@ public class KeanuOptimizer {
      * @param network The Bayesian network to run optimization on.
      * @return an {@link Optimizer}
      */
-    public static Optimizer of(BayesianNetwork network) {
+    public Optimizer of(BayesianNetwork network) {
         if (network.getDiscreteLatentVertices().isEmpty()) {
             return Gradient.of(network);
         } else {
@@ -48,12 +48,12 @@ public class KeanuOptimizer {
      * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from.
      * @return an {@link Optimizer}
      */
-    public static Optimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+    public Optimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
         return of(vertexFromNetwork.getConnectedGraph());
     }
 
     @UtilityClass
-    public static class NonGradient {
+    public class NonGradient {
 
         /**
          * Creates a BOBYQA {@link NonGradientOptimizer} which provides methods for optimizing the values of latent variables
@@ -62,7 +62,7 @@ public class KeanuOptimizer {
          * @param bayesNet The Bayesian network to run optimization on.
          * @return a {@link NonGradientOptimizer}
          */
-        public static NonGradientOptimizer of(BayesianNetwork bayesNet) {
+        public NonGradientOptimizer of(BayesianNetwork bayesNet) {
             bayesNet.cascadeObservations();
             return builderFor(bayesNet).build();
         }
@@ -75,7 +75,7 @@ public class KeanuOptimizer {
          * @param vertices The vertices to create a Bayesian network from.
          * @return a {@link NonGradientOptimizer}
          */
-        public static NonGradientOptimizer of(Collection<? extends Vertex> vertices) {
+        public NonGradientOptimizer of(Collection<? extends Vertex> vertices) {
             return of(new BayesianNetwork(vertices));
         }
 
@@ -87,7 +87,7 @@ public class KeanuOptimizer {
          * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
          * @return a {@link NonGradientOptimizer}
          */
-        public static NonGradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+        public NonGradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
             return of(vertexFromNetwork.getConnectedGraph());
         }
 
@@ -103,7 +103,8 @@ public class KeanuOptimizer {
     }
 
     @UtilityClass
-    public static class Gradient {
+    public class Gradient {
+
         /**
          * Creates a {@link GradientOptimizer} which provides methods for optimizing the values of latent variables
          * of the Bayesian network to maximise probability.
@@ -111,7 +112,7 @@ public class KeanuOptimizer {
          * @param bayesNet The Bayesian network to run optimization on.
          * @return a {@link GradientOptimizer}
          */
-        public static GradientOptimizer of(BayesianNetwork bayesNet) {
+        public GradientOptimizer of(BayesianNetwork bayesNet) {
             return builderFor(bayesNet).build();
         }
 
@@ -123,7 +124,7 @@ public class KeanuOptimizer {
          * @param vertices The vertices to create a Bayesian network from.
          * @return a {@link GradientOptimizer}
          */
-        public static GradientOptimizer of(Collection<? extends Vertex> vertices) {
+        public GradientOptimizer of(Collection<? extends Vertex> vertices) {
             return of(new BayesianNetwork(vertices));
         }
 
@@ -136,22 +137,22 @@ public class KeanuOptimizer {
          * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
          * @return a {@link GradientOptimizer}
          */
-        public static GradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+        public GradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
             return of(vertexFromNetwork.getConnectedGraph());
         }
 
-        public static GradientOptimizer.GradientOptimizerBuilder builderFor(Set<Vertex> connectedGraph) {
+        public GradientOptimizer.GradientOptimizerBuilder builderFor(Set<Vertex> connectedGraph) {
             return builderFor(new BayesianNetwork(connectedGraph));
         }
 
-        public static GradientOptimizer.GradientOptimizerBuilder builderFor(BayesianNetwork network) {
+        public GradientOptimizer.GradientOptimizerBuilder builderFor(BayesianNetwork network) {
             initializeNetworkForOptimization(network);
             return GradientOptimizer.builder().bayesianNetwork(new KeanuProbabilisticWithGradientGraph(network));
         }
     }
 
 
-    static void initializeNetworkForOptimization(BayesianNetwork bayesianNetwork) {
+    void initializeNetworkForOptimization(BayesianNetwork bayesianNetwork) {
         List<Vertex> discreteLatentVertices = bayesianNetwork.getDiscreteLatentVertices();
         boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
 
