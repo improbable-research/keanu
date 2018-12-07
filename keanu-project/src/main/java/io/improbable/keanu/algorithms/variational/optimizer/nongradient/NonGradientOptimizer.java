@@ -86,7 +86,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         double logProb = probabilisticGraph.logProb();
 
-        if (logProb == Double.NEGATIVE_INFINITY || Double.isNaN(logProb)) {
+        if (ProbabilisticGraph.isImpossible(logProb)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
@@ -101,7 +101,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
-        if (FitnessFunction.isValidInitialFitness(initialFitness)) {
+        if (ProbabilisticGraph.isImpossible(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 

@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.mcmc;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.network.NetworkSnapshot;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -19,8 +20,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 class MetropolisHastingsStep {
-
-    private static final double LOG_ZERO_PROBABILITY = Double.NEGATIVE_INFINITY;
 
     //Temperature for standard MH step accept/reject calculation
     private static final double DEFAULT_TEMPERATURE = 1.0;
@@ -83,7 +82,7 @@ class MetropolisHastingsStep {
 
         final double affectedVerticesLogProbNew = sumLogProbabilityOfAffected(chosenVertices, affectedVerticesCache);
 
-        if (affectedVerticesLogProbNew != LOG_ZERO_PROBABILITY) {
+        if (!ProbabilisticGraph.isImpossible(affectedVerticesLogProbNew)) {
 
             final double logProbabilityDelta = affectedVerticesLogProbNew - affectedVerticesLogProbOld;
             final double logProbabilityAfterStep = logProbabilityBeforeStep + logProbabilityDelta;

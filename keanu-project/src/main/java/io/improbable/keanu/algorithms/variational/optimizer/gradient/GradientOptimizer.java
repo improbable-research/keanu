@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
 import io.improbable.keanu.util.ProgressBar;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -152,7 +152,7 @@ public class GradientOptimizer implements Optimizer {
         double initialFitness = fitness.getObjectiveFunction().value(startingPoint);
         double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
 
-        if (FitnessFunction.isValidInitialFitness(initialFitness)) {
+        if (ProbabilisticGraph.isImpossible(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
