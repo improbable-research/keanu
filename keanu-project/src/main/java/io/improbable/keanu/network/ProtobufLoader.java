@@ -38,9 +38,7 @@ public class ProtobufLoader implements NetworkLoader {
 
     public BayesianNetwork loadNetwork(InputStream input) throws IOException {
         KeanuSavedBayesNet.Model parsedModel = KeanuSavedBayesNet.Model.parseFrom(input);
-        BayesianNetwork bayesNet = loadNetwork(parsedModel);
-
-        return bayesNet;
+        return loadNetwork(parsedModel);
     }
 
     protected BayesianNetwork loadNetwork(KeanuSavedBayesNet.Model parsedModel) {
