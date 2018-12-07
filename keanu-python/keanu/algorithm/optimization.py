@@ -24,14 +24,14 @@ class Optimizer:
         return self.optimizer.maxLikelihood()
 
     @staticmethod
-    def _build_bayes_net(factoryClass: JavaClass,
+    def _build_bayes_net(factory_class: JavaClass,
                          net: Union[BayesNet, Vertex]) -> Tuple[JavaObject, Union[BayesNet, Vertex]]:
 
         if not (isinstance(net, BayesNet) or isinstance(net, Vertex)):
             raise TypeError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))
         elif isinstance(net, Vertex):
             net = BayesNet(net.get_connected_graph())
-        return factoryClass.builderFor(net.unwrap()), net
+        return factory_class.builderFor(net.unwrap()), net
 
 
 class GradientOptimizer(Optimizer):
