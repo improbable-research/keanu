@@ -1,6 +1,7 @@
 package io.improbable.keanu.util.json;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.improbable.keanu.KeanuSavedBayesNet;
@@ -16,7 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,7 +32,7 @@ public class JsonTest {
 
     private static BayesianNetwork net;
     private static Map<String, String> someMetadata;
-    private static ByteArrayOutputStream output;
+    private static ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     @BeforeClass
     public static void setup() throws IOException {
@@ -41,14 +41,9 @@ public class JsonTest {
         gaussianVertex.setLabel("GaussianVertex");
         net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
 
-        output = new ByteArrayOutputStream();
-
-        someMetadata = new HashMap<>();
-        someMetadata.put("Author", "Some Author");
-        someMetadata.put("Tag", "MyBayesNet");
-
+        someMetadata = ImmutableMap.of( "Author", "Some Author", "Tag", "MyBayesNet" );
         JsonSaver jsonSaver = new JsonSaver(net, someMetadata);
-        jsonSaver.save(output, true);
+        jsonSaver.save(outputStream, true);
     }
 
     @Test
@@ -57,7 +52,7 @@ public class JsonTest {
         String expectedOutput = Resources.toString(url, Charsets.UTF_8);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode expectedJsonObject = mapper.readTree(expectedOutput);
-        JsonNode actualJsonObject = mapper.readTree(output.toString());
+        JsonNode actualJsonObject = mapper.readTree(outputStream.toString());
         assertEquals(expectedJsonObject, actualJsonObject);
     }
 
@@ -68,7 +63,7 @@ public class JsonTest {
             metadataBuilder.putMetadataInfo(entry.getKey(), entry.getValue());
         }
         KeanuSavedBayesNet.Model.Builder modelBuilder = KeanuSavedBayesNet.Model.newBuilder();
-        JsonFormat.parser().merge(output.toString(), modelBuilder);
+        JsonFormat.parser().merge(outputStream.toString(), modelBuilder);
         KeanuSavedBayesNet.Model parsedModel = modelBuilder.build();
 
         assertTrue(parsedModel.hasMetadata());
@@ -78,7 +73,7 @@ public class JsonTest {
 
     @Test
     public void modelCanBeLoadedFromJson() throws IOException {
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+        ByteArrayInputStream input = new ByteArrayInputStream(outputStream.toByteArray());
         JsonLoader jsonLoader = new JsonLoader();
         BayesianNetwork loadedNetwork = jsonLoader.loadNetwork(input);
 
