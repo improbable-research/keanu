@@ -81,7 +81,7 @@ def build_sampling_algorithm(algo, proposal_distribution: Optional[str],
             raise TypeError("Only Metropolis Hastings supports the proposal_listeners parameter")
 
     if (proposal_distribution is None and len(proposal_listeners) > 0):
-        proposal_distribution = "prior"
+        raise TypeError("If you pass in proposal_listeners you must also specify proposal_distribution")
 
     builder: JavaObject = algorithms[algo].builder()
 
