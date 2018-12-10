@@ -1,6 +1,7 @@
 package io.improbable.keanu.e2e.foodpoisoning;
 
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -15,6 +16,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -30,6 +32,9 @@ public class FoodPoisoningTest {
     private BernoulliVertex infectedLamb;
     private BernoulliVertex infectedToilet;
 
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
+
     @Before
     public void setup() {
         random = new KeanuRandom(1);
@@ -41,10 +46,10 @@ public class FoodPoisoningTest {
     @Category(Slow.class)
     @Test
     public void oystersAreInfected() {
-        generateSurveyData(50, true, false, false);
+        generateSurveyData(30, true, false, false);
 
-        int dropCount = 10000;
-        NetworkSamples samples = sample(15000).drop(dropCount);
+        int dropCount = 2000;
+        NetworkSamples samples = sample(5000).drop(dropCount);
 
         assertEquals(1.0, samples.get(infectedOysters).probability(v -> v.scalar()), 0.01);
         assertEquals(0.0, samples.get(infectedLamb).probability(v -> v.scalar()), 0.01);
@@ -54,10 +59,11 @@ public class FoodPoisoningTest {
     @Category(Slow.class)
     @Test
     public void lambAndOystersAreInfected() {
-        generateSurveyData(50, true, true, false);
-        NetworkSamples samples = sample(15000);
+        generateSurveyData(30, true, true, false);
 
-        int dropCount = 10000;
+        int dropCount = 2000;
+        NetworkSamples samples = sample(5000).drop(dropCount);
+
         assertEquals(1.0, samples.get(infectedOysters).probability(v -> v.scalar()), 0.01);
         assertEquals(1.0, samples.get(infectedLamb).probability(v -> v.scalar()), 0.01);
         assertEquals(0.0, samples.get(infectedToilet).probability(v -> v.scalar()), 0.01);
@@ -66,10 +72,11 @@ public class FoodPoisoningTest {
     @Category(Slow.class)
     @Test
     public void nothingIsInfected() {
-        generateSurveyData(50, false, false, false);
-        NetworkSamples samples = sample(15000);
+        generateSurveyData(30, false, false, false);
 
-        int dropCount = 10000;
+        int dropCount = 2000;
+        NetworkSamples samples = sample(5000).drop(dropCount);
+
         assertEquals(0.0, samples.get(infectedOysters).probability(v -> v.scalar()), 0.01);
         assertEquals(0.0, samples.get(infectedLamb).probability(v -> v.scalar()), 0.01);
         assertEquals(0.0, samples.get(infectedToilet).probability(v -> v.scalar()), 0.01);
@@ -118,8 +125,6 @@ public class FoodPoisoningTest {
         infectedOysters.observe(oystersAreInfected);
         infectedLamb.observe(lambIsInfected);
         infectedToilet.observe(toiletIsInfected);
-
-        sample(10000);
 
         personPlates.forEach(plate -> {
             plate.get(didEatOystersLabel).observeOwnValue();

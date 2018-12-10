@@ -96,7 +96,7 @@ public class LinearRidgeRegressionTest {
     @Test
     public void youCanChooseSamplingInsteadOfGradientOptimization() {
         final int smallRawDataSize = 20;
-        final int samplingCount = 30000;
+        final int samplingCount = 6000;
 
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData(smallRawDataSize);
 
@@ -118,7 +118,7 @@ public class LinearRidgeRegressionTest {
             .withSampling(sampling)
             .build();
 
-        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
+        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount / 10).downSample(2);
 
         assertSampledWeightsAndInterceptMatchTestData(
             networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightVertex().getId()),
