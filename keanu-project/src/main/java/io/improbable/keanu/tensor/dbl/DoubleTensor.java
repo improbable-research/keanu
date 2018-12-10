@@ -92,6 +92,10 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new ScalarDoubleTensor(scalarValue);
     }
 
+    /**
+     * @param toPile    an array of DoubleTensor
+     * @return  a DoubleTensor with toPile joined along a new dimension 0
+     */
     static DoubleTensor pile(DoubleTensor... toPile) {
         INDArray[] pileAsINDArray = new INDArray[toPile.length];
         for (int i = 0; i < toPile.length; i++) {

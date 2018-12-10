@@ -67,6 +67,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return new ScalarIntegerTensor(scalarValue);
     }
 
+    /**
+     * @param toPile    an array of IntegerTensor
+     * @return  an IntegerTensor with toPile joined along a new dimension 0
+     */
     static IntegerTensor pile(IntegerTensor... toPile) {
         INDArray[] pileAsINDArray = new INDArray[toPile.length];
         for (int i = 0; i < toPile.length; i++) {
