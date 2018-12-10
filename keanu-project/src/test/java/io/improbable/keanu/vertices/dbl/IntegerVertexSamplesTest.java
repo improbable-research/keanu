@@ -67,14 +67,16 @@ public class IntegerVertexSamplesTest {
     @Test
     public void canGetSamplesAsTensor() {
         List<IntegerTensor> samplesAsList = samples.asList();
-
         IntegerTensor samplesAsTensor = samples.asTensor();
-        List<IntegerTensor> samplesAsTensorSliced = samplesAsTensor.sliceAlongDimension(0, 0, samplesAsTensor.getShape()[0]);
 
+        assertThat(samplesAsTensor.getShape(), equalTo(new long[] {4, 1, 3}));
+
+        List<IntegerTensor> samplesAsTensorSliced = samplesAsTensor.sliceAlongDimension(0, 0, samplesAsTensor.getShape()[0]);
         for (int i = 0; i < samplesAsList.size(); i++) {
             IntegerTensor sampleFromList = samplesAsList.get(i);
             IntegerTensor sampleFromTensor = samplesAsTensorSliced.get(i);
 
+            assertThat(sampleFromList.getShape(), equalTo(sampleFromTensor.getShape()));
             assertThat(sampleFromList.asFlatDoubleArray(), equalTo(sampleFromTensor.asFlatDoubleArray()));
         }
     }

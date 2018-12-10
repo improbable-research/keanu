@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.intgr;
 
 import io.improbable.keanu.kotlin.IntegerOperators;
+import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -64,6 +65,18 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     static IntegerTensor scalar(int scalarValue) {
         return new ScalarIntegerTensor(scalarValue);
+    }
+
+    static IntegerTensor pile(IntegerTensor... toPile) {
+        INDArray[] pileAsINDArray = new INDArray[toPile.length];
+        for (int i = 0; i < toPile.length; i++) {
+            pileAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toPile[i]).dup();
+            if (pileAsINDArray[i].shape().length == 0) {
+                pileAsINDArray[i] = pileAsINDArray[i].reshape(1);
+            }
+        }
+        INDArray pile = INDArrayShim.pile(pileAsINDArray);
+        return new Nd4jIntegerTensor(pile);
     }
 
     static IntegerTensor concat(IntegerTensor... toConcat) {

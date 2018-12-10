@@ -694,6 +694,33 @@ public class Nd4jIntegerTensorTest {
         assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(2, 2), concat);
     }
 
+    @Test
+    public void canPileScalars() {
+        IntegerTensor x = IntegerTensor.scalar(2);
+        IntegerTensor y = IntegerTensor.scalar(3);
+
+        IntegerTensor pile = IntegerTensor.pile(x, y);
+        assertEquals(IntegerTensor.create(2, 3).reshape(2, 1), pile);
+    }
+
+    @Test
+    public void canPileVectors() {
+        IntegerTensor x = IntegerTensor.create(2, 3);
+        IntegerTensor y = IntegerTensor.create(4, 5);
+
+        IntegerTensor pile = IntegerTensor.pile(x, y);
+        assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(2, 2), pile);
+    }
+
+    @Test
+    public void canPileMatrices() {
+        IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
+        IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
+
+        IntegerTensor pile = IntegerTensor.pile(x, y);
+        assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(2, 1, 2), pile);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void throwsWhenNeedsDimensionSpecifiedForConcat() {
         IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);

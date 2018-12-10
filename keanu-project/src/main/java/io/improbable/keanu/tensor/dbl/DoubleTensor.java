@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -91,6 +92,17 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new ScalarDoubleTensor(scalarValue);
     }
 
+    static DoubleTensor pile(DoubleTensor... toPile) {
+        INDArray[] pileAsINDArray = new INDArray[toPile.length];
+        for (int i = 0; i < toPile.length; i++) {
+            pileAsINDArray[i] = Nd4jDoubleTensor.unsafeGetNd4J(toPile[i]).dup();
+            if (pileAsINDArray[i].shape().length == 0) {
+                pileAsINDArray[i] = pileAsINDArray[i].reshape(1);
+            }
+        }
+        INDArray pile = INDArrayShim.pile(pileAsINDArray);
+        return new Nd4jDoubleTensor(pile);
+    }
 
     static DoubleTensor concat(DoubleTensor... toConcat) {
         return concat(0, toConcat);

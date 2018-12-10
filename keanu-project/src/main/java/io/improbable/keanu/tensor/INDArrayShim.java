@@ -140,4 +140,16 @@ public class INDArrayShim {
         }
 
     }
+
+    public static INDArray pile(INDArray... arrays) {
+        long[] shape = arrays[0].shape();
+        long[] newShape = ArrayUtils.add(shape, 0, 1);
+
+        List<INDArray> reshaped = new ArrayList<>();
+        for (INDArray array: arrays) {
+            reshaped.add(array.reshape(array.ordering(), newShape));
+        }
+
+        return Nd4j.vstack(reshaped);
+    }
 }

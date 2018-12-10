@@ -60,14 +60,16 @@ public class DoubleVertexSamplesTest {
     @Test
     public void canGetSamplesAsTensor() {
         List<DoubleTensor> samplesAsList = samples.asList();
-
         DoubleTensor samplesAsTensor = samples.asTensor();
-        List<DoubleTensor> samplesAsTensorSliced = samplesAsTensor.sliceAlongDimension(0, 0, samplesAsTensor.getShape()[0]);
 
+        assertThat(samplesAsTensor.getShape(), equalTo(new long[] {4, 1, 3}));
+
+        List<DoubleTensor> samplesAsTensorSliced = samplesAsTensor.sliceAlongDimension(0, 0, samplesAsTensor.getShape()[0]);
         for (int i = 0; i < samplesAsList.size(); i++) {
             DoubleTensor sampleFromList = samplesAsList.get(i);
             DoubleTensor sampleFromTensor = samplesAsTensorSliced.get(i);
 
+            assertThat(sampleFromList.getShape(), equalTo(sampleFromTensor.getShape()));
             assertThat(sampleFromList.asFlatDoubleArray(), equalTo(sampleFromTensor.asFlatDoubleArray()));
         }
     }
