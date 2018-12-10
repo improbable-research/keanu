@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -22,8 +22,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
      * @param exponent the exponent vertex
      */
     @ExportVertexToPythonBindings
-    public PowerVertex(@LoadParentVertex(BASE_NAME) DoubleVertex base,
-                       @LoadParentVertex(EXPONENT_NAME) DoubleVertex exponent) {
+    public PowerVertex(@LoadVertexParam(BASE_NAME) DoubleVertex base,
+                       @LoadVertexParam(EXPONENT_NAME) DoubleVertex exponent) {
         super(base, exponent);
     }
 

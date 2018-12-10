@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -53,14 +53,14 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
 
     protected abstract IntegerTensor op(IntegerTensor l, IntegerTensor r);
 
-    @SaveParentVertex(LEFT_NAME)
     @Override
+    @SaveVertexParam(LEFT_NAME)
     public IntegerVertex getLeft() {
         return left;
     }
 
-    @SaveParentVertex(RIGHT_NAME)
     @Override
+    @SaveVertexParam(RIGHT_NAME)
     public IntegerVertex getRight() {
         return right;
     }

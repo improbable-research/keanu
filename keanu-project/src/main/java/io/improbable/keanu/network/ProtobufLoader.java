@@ -4,13 +4,12 @@ import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.gson.internal.Primitives;
 import io.improbable.keanu.KeanuSavedBayesNet;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
-import io.improbable.keanu.vertices.LoadVertexValue;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -64,9 +63,7 @@ public class ProtobufLoader implements NetworkLoader {
         if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
             throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
         } else {
-            return DoubleTensor.create(
-                Doubles.toArray(value.getDoubleVal().getValuesList()),
-                Longs.toArray(value.getDoubleVal().getShapeList()));
+            return extractDoubleTensor(value.getDoubleVal());
         }
     }
 
@@ -142,9 +139,7 @@ public class ProtobufLoader implements NetworkLoader {
         if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.BOOLVAL) {
             throw new IllegalArgumentException("Non Boolean Value specified for Boolean Vertex");
         } else {
-            return BooleanTensor.create(
-                Booleans.toArray(value.getBoolVal().getValuesList()),
-                Longs.toArray(value.getBoolVal().getShapeList()));
+            return extractBoolTensor(value.getBoolVal());
         }
     }
 
@@ -159,9 +154,7 @@ public class ProtobufLoader implements NetworkLoader {
         if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.INTVAL) {
             throw new IllegalArgumentException("Non Int Value specified for Int Vertex");
         } else {
-            return IntegerTensor.create(
-                Ints.toArray(value.getIntVal().getValuesList()),
-                Longs.toArray(value.getIntVal().getShapeList()));
+            return extractIntTensor(value.getIntVal());
         }
     }
 
@@ -174,8 +167,8 @@ public class ProtobufLoader implements NetworkLoader {
             throw new IllegalArgumentException("Unknown Vertex Type Specified: " + vertex.getVertexType(), e);
         }
 
-        Map<String, Vertex> parentsMap = getParentsMap(vertex, existingVertices);
-        Vertex newVertex = instantiateVertex(vertexClass, parentsMap, vertex.getConstantValue());
+        Map<String, Object> parameterMap = getParameterMap(vertex, existingVertices);
+        Vertex newVertex = instantiateVertex(vertexClass, parameterMap);
 
         if (!vertex.getLabel().isEmpty()) {
             newVertex.setLabel(vertex.getLabel());
@@ -185,40 +178,31 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private Vertex instantiateVertex(Class vertexClass,
-                                     Map<String, Vertex> parentsMap,
-                                     KeanuSavedBayesNet.VertexValue value) {
+                                     Map<String, Object> paramMap) {
         Constructor<Vertex> loadConstructor = getAnnotatedConstructor(vertexClass);
         Parameter[] constructorParameters = loadConstructor.getParameters();
         Object[] arguments = new Object[constructorParameters.length];
 
         for (int i = 0; i < constructorParameters.length; i++) {
-            LoadParentVertex parentVertexAnnotation = constructorParameters[i].getAnnotation(LoadParentVertex.class);
-            LoadVertexValue vertexValueAnnotation = constructorParameters[i].getAnnotation(LoadVertexValue.class);
+            LoadVertexParam paramAnnotation = constructorParameters[i].getAnnotation(LoadVertexParam.class);
 
-            if (parentVertexAnnotation != null) {
-                Vertex parentVertex = parentsMap.get(parentVertexAnnotation.value());
-                if (parentVertex == null) {
+            if (paramAnnotation != null) {
+                Object parameter = paramMap.get(paramAnnotation.value());
+                if (parameter == null) {
                     throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
-                        + parentVertexAnnotation.value());
+                        + paramAnnotation.value());
                 }
-                arguments[i] = parentVertex;
-            } else if (vertexValueAnnotation != null) {
-                Tensor initialValue = extractInitialValue(value);
-                if (initialValue == null) {
-                    throw new IllegalArgumentException("Failed to create vertex as required initial value not present: "
-                        + value);
-                }
-                arguments[i] = initialValue;
+                arguments[i] = parameter;
             } else {
                 throw new IllegalArgumentException("Cannot create Vertex due to unannotated parameter in constructor");
             }
 
             Class argumentClass = arguments[i].getClass();
-            Class parameterClass = constructorParameters[i].getType();
+            Class parameterClass = Primitives.wrap(constructorParameters[i].getType());
 
             if (!parameterClass.isAssignableFrom(argumentClass)) {
                 throw new IllegalArgumentException("Incorrect Parameter Type specified.  Got: "
-                    + arguments[i].getClass() + ", Expected: " + constructorParameters[i].getType());
+                    + argumentClass + ", Expected: " + parameterClass);
             }
         }
 
@@ -229,31 +213,13 @@ public class ProtobufLoader implements NetworkLoader {
         }
     }
 
-    private Tensor extractInitialValue(KeanuSavedBayesNet.VertexValue value) {
-        switch (value.getValueTypeCase()) {
-            case INTVAL:
-                return extractIntValue(value);
-
-            case BOOLVAL:
-                return extractBoolValue(value);
-
-            case DOUBLEVAL:
-                return extractDoubleValue(value);
-
-            default:
-                return null;
-        }
-    }
-
     private Constructor getAnnotatedConstructor(Class vertexClass) {
         Constructor[] constructors = vertexClass.getConstructors();
 
         for (Constructor constructor : constructors) {
             Parameter[] parameters = constructor.getParameters();
 
-            if (parameters.length > 0 &&
-                (parameters[0].isAnnotationPresent(LoadVertexValue.class) ||
-                 parameters[0].isAnnotationPresent(LoadParentVertex.class))) {
+            if (parameters.length > 0 && parameters[0].isAnnotationPresent(LoadVertexParam.class)) {
                 return constructor;
             }
         }
@@ -261,19 +227,93 @@ public class ProtobufLoader implements NetworkLoader {
         throw new IllegalArgumentException("No Annotated Load Constructor for Vertex of type: " + vertexClass);
     }
 
-    private Map<String, Vertex> getParentsMap(KeanuSavedBayesNet.Vertex vertex,
-                                                     Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
-        Map<String, Vertex> parentsMap = new HashMap<>();
+    private Map<String, Object> getParameterMap(KeanuSavedBayesNet.Vertex vertex,
+                                                Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+        Map<String, Object> parameterMap = new HashMap<>();
 
-        for (KeanuSavedBayesNet.NamedParent namedParent : vertex.getParentsList()) {
-            Vertex existingParent = existingVertices.get(namedParent.getId());
-            if (existingParent == null) {
-                throw new IllegalArgumentException("Parent named in vertex hasn't been instantiated: " + namedParent);
-            }
-
-            parentsMap.put(namedParent.getName(), existingParent);
+        for (KeanuSavedBayesNet.NamedParam parameter : vertex.getParametersList()) {
+            parameterMap.put(parameter.getName(), getDecodedParam(parameter, existingVertices));
         }
 
-        return parentsMap;
+        return parameterMap;
+    }
+
+    private Object getDecodedParam(KeanuSavedBayesNet.NamedParam parameter,
+                                   Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+        switch (parameter.getParamCase()) {
+            case PARENTVERTEX:
+                return existingVertices.get(parameter.getParentVertex());
+
+            case DOUBLETENSORPARAM:
+                return extractDoubleTensor(parameter.getDoubleTensorParam());
+
+            case INTTENSORPARAM:
+                return extractIntTensor(parameter.getIntTensorParam());
+
+            case BOOLTENSORPARAM:
+                return extractBoolTensor(parameter.getBoolTensorParam());
+
+            case DOUBLEPARAM:
+                return parameter.getDoubleParam();
+
+            case INTPARAM:
+                return parameter.getIntParam();
+
+            case LONGPARAM:
+                return parameter.getLongParam();
+
+            case STRINGPARAM:
+                return parameter.getStringParam();
+
+            case LONGARRAYPARAM:
+                return Longs.toArray(parameter.getLongArrayParam().getValuesList());
+
+            case INTARRAYPARAM:
+                return Ints.toArray(parameter.getIntArrayParam().getValuesList());
+
+            case VERTEXARRAYPARAM:
+                return extractVertexArray(parameter, existingVertices);
+
+            default:
+                throw new IllegalArgumentException("Unknown Param Type Received: "
+                    + parameter.getParamCase().toString());
+        }
+    }
+
+    private Vertex[] extractVertexArray(KeanuSavedBayesNet.NamedParam param,
+                                        Map<KeanuSavedBayesNet.VertexID, Vertex> existingVertices) {
+        Vertex[] newVertexArray = new Vertex[param.getVertexArrayParam().getValuesCount()];
+
+        for (int i = 0; i < newVertexArray.length; i++) {
+            KeanuSavedBayesNet.VertexID parentId = param.getVertexArrayParam().getValues(i);
+            Vertex parentVertex = existingVertices.get(parentId);
+
+            if (parentVertex == null) {
+                throw new IllegalArgumentException("Saved Structure references unknown Parent: "
+                    + parentId.toString());
+            }
+
+            newVertexArray[i] = parentVertex;
+        }
+
+        return newVertexArray;
+    }
+
+    private DoubleTensor extractDoubleTensor(KeanuSavedBayesNet.DoubleTensor tensor) {
+        return DoubleTensor.create(
+            Doubles.toArray(tensor.getValuesList()),
+            Longs.toArray(tensor.getShapeList()));
+    }
+
+    private IntegerTensor extractIntTensor(KeanuSavedBayesNet.IntegerTensor tensor) {
+        return IntegerTensor.create(
+            Ints.toArray(tensor.getValuesList()),
+            Longs.toArray(tensor.getShapeList()));
+    }
+
+    private BooleanTensor extractBoolTensor(KeanuSavedBayesNet.BooleanTensor tensor) {
+        return BooleanTensor.create(
+            Booleans.toArray(tensor.getValuesList()),
+            Longs.toArray(tensor.getShapeList()));
     }
 }

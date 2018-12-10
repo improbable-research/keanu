@@ -5,13 +5,13 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
@@ -20,9 +20,10 @@ import java.util.Map;
 
 import static java.util.Collections.singletonMap;
 
-public class SumVertex extends DoubleUnaryOpVertex implements Differentiable, NonSaveableVertex {
+public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
 
-    @Getter
+    private static final String DIMENSIONS_NAME = "overDimensions";
+
     private final int[] overDimensions;
 
     /**
@@ -31,7 +32,8 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable, No
      * @param inputVertex    the vertex to have its values summed
      * @param overDimensions dimensions to sum over
      */
-    public SumVertex(DoubleVertex inputVertex, int[] overDimensions) {
+    public SumVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
+                     @LoadVertexParam(DIMENSIONS_NAME) int[] overDimensions) {
         super(getSummationResultShape(inputVertex.getShape(), overDimensions), inputVertex);
         this.overDimensions = overDimensions;
     }
@@ -119,5 +121,10 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable, No
         }
 
         return shapeCopy;
+    }
+
+    @SaveVertexParam(DIMENSIONS_NAME)
+    public int[] getOverDimensions() {
+        return overDimensions;
     }
 }

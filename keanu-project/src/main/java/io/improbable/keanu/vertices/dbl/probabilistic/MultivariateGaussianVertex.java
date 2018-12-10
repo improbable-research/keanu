@@ -4,9 +4,9 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -47,8 +47,8 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     @ExportVertexToPythonBindings
-    public MultivariateGaussianVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
-                                      @LoadParentVertex(COVARIANCE_NAME) DoubleVertex covariance) {
+    public MultivariateGaussianVertex(@LoadVertexParam(MU_NAME) DoubleVertex mu,
+                                      @LoadVertexParam(COVARIANCE_NAME) DoubleVertex covariance) {
         this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
 
@@ -73,12 +73,12 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
         return new ConstantDoubleVertex(DoubleTensor.scalar(value).reshape(1, 1));
     }
 
-    @SaveParentVertex(MU_NAME)
+    @SaveVertexParam(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
-    @SaveParentVertex(COVARIANCE_NAME)
+    @SaveVertexParam(COVARIANCE_NAME)
     public DoubleVertex getCovariance() {
         return covariance;
     }

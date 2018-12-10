@@ -5,10 +5,10 @@ import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -61,8 +61,8 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
      * @param beta  the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public BetaVertex(@LoadParentVertex(ALPHA_NAME) DoubleVertex alpha,
-                      @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
+    public BetaVertex(@LoadVertexParam(ALPHA_NAME) DoubleVertex alpha,
+                      @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
@@ -90,12 +90,12 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
         this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
-    @SaveParentVertex(ALPHA_NAME)
+    @SaveVertexParam(ALPHA_NAME)
     public DoubleVertex getAlpha() {
         return alpha;
     }
 
-    @SaveParentVertex(BETA_NAME)
+    @SaveVertexParam(BETA_NAME)
     public DoubleVertex getBeta() {
         return beta;
     }
