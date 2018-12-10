@@ -11,6 +11,7 @@ from keanu import BayesNet, KeanuRandom, Model
 from keanu.algorithm import sample, generate_samples
 from keanu.vertex import Gamma, Exponential, Cauchy, Bernoulli
 from typing import Any
+import os
 
 
 @pytest.fixture
@@ -64,7 +65,7 @@ def test_down_sample_interval(net: BayesNet) -> None:
     assert all(len(vertex_samples) == expected_num_samples for label, vertex_samples in samples.items())
 
 
-@pytest.mark.mpl_image_compare(filename='test_sampling.png', tolerance=11.328646396046912)
+@pytest.mark.mpl_image_compare(filename='test_sampling_windows.png' if os.name == 'nt' else 'test_sampling_linux.png')
 def test_sample_with_plot(net: BayesNet) -> Any:
     KeanuRandom.set_default_random_seed(1)
     fig, ax = plt.subplots(3, 1, squeeze=False)
@@ -102,7 +103,7 @@ def test_iter_returns_same_result_as_sample(algo: str) -> None:
         np.testing.assert_almost_equal(samples_dataframe[vertex_label].mean(), np.average(samples[vertex_label]))
 
 
-@pytest.mark.mpl_image_compare(filename='test_sampling.png', tolerance=11.328646396046912)
+@pytest.mark.mpl_image_compare(filename='test_sampling_windows.png' if os.name == 'nt' else 'test_sampling_linux.png')
 def test_iter_with_live_plot(net: BayesNet) -> Any:
     KeanuRandom.set_default_random_seed(1)
     fig, ax = plt.subplots(3, 1, squeeze=False)
