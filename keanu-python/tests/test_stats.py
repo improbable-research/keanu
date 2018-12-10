@@ -32,13 +32,15 @@ def test_can_get_correct_autocorrelation_when_nonscalar_input() -> None:
     np.testing.assert_almost_equal(actual, expected)
 
 
-def test_can_get_autocorrelation_for_samples() -> None:
+def test_autocorr_returns_ndarray_of_correct_dtype() -> None:
     with Model() as m:
         m.uniform = Uniform(0, 1000)
     net = m.to_bayes_net()
     samples = sample(net=net, sample_from=net.get_latent_vertices(), algo="metropolis", draws=1000)
     valid_key = list(samples.keys())[0]
     autocorr = stats.autocorrelation(samples.get(valid_key))  # type: ignore
+    assert type(autocorr) == np.ndarray
+    assert autocorr.dtype == samples.get(valid_key)[0].dtype
 
 
 def test_cant_get_autocorrelation_of_np_bools() -> None:
