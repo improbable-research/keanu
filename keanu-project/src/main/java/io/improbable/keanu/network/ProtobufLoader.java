@@ -36,12 +36,13 @@ public class ProtobufLoader implements NetworkLoader {
         throw new IllegalArgumentException("Cannot Load value for Untyped Vertex");
     }
 
+    @Override
     public BayesianNetwork loadNetwork(InputStream input) throws IOException {
         KeanuSavedBayesNet.Model parsedModel = KeanuSavedBayesNet.Model.parseFrom(input);
         return loadNetwork(parsedModel);
     }
 
-    protected BayesianNetwork loadNetwork(KeanuSavedBayesNet.Model parsedModel) {
+    public BayesianNetwork loadNetwork(KeanuSavedBayesNet.Model parsedModel) {
         Map<KeanuSavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
 
         for (KeanuSavedBayesNet.Vertex vertex : parsedModel.getNetwork().getVerticesList()) {
