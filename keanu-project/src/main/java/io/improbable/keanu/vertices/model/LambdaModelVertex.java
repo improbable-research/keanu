@@ -28,7 +28,8 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
      * It is able to execute a lambda and is able to parse the result.
      * It stores multiple output values in a map.
      * Use a ModelResultVertex to extract a value by label from this vertex.
-     *  @param inputs       input vertices to the model
+     *
+     * @param inputs       input vertices to the model
      * @param executor     the operation to perform
      * @param updateValues a function to extract the output values (once the operation has been performed) and update
      *                     the models output values.
