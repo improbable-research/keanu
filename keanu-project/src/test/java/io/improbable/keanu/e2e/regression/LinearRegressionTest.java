@@ -43,8 +43,8 @@ public class LinearRegressionTest {
         optimizer.maxLikelihood();
 
         assertWeightsAndInterceptMatchTestData(
-            weight.getValue(),
-            intercept.getValue().scalar(),
+            weight,
+            intercept,
             data
         );
     }
@@ -58,8 +58,8 @@ public class LinearRegressionTest {
             .build();
 
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -83,8 +83,8 @@ public class LinearRegressionTest {
         optimizer.maxLikelihood();
 
         assertWeightsAndInterceptMatchTestData(
-            DoubleTensor.concat(0, w1.getValue(), w2.getValue()),
-            b.getValue().scalar(),
+            ConstantVertex.of(DoubleTensor.concat(0, w1.getValue(), w2.getValue())),
+            b,
             data
         );
     }
@@ -97,8 +97,8 @@ public class LinearRegressionTest {
             .build();
 
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -119,8 +119,8 @@ public class LinearRegressionTest {
         optimizer.maxLikelihood();
 
         assertWeightsAndInterceptMatchTestData(
-            weights.getValue(),
-            intercept.getValue().scalar(),
+            weights,
+            intercept,
             data
         );
     }
@@ -133,8 +133,8 @@ public class LinearRegressionTest {
             .build();
 
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -158,8 +158,8 @@ public class LinearRegressionTest {
         RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.xTrain, data.yTrain)
             .withPriorOnIntercept(0, data.intercept)
             .withPriorOnWeights(
-                DoubleTensor.create(0., data.weights.getShape()).asFlatDoubleArray(),
-                data.weights.asFlatDoubleArray()
+                DoubleTensor.create(0., data.weights.getShape()),
+                data.weights
             )
             .withSampling(sampling)
             .build();
@@ -167,8 +167,8 @@ public class LinearRegressionTest {
         NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
 
         assertSampledWeightsAndInterceptMatchTestData(
-            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightsVertexId()),
-            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertexId()),
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightVertex().getId()),
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertex().getId()),
             data);
     }
 }
