@@ -34,9 +34,15 @@ public class Differentiator {
         Map<Vertex, PartialDerivatives> dwrtOf = new HashMap<>();
         collectPartials(singletonMap(ofVertex, dWrtOfVertex), dwrtOf, dOfShape);
 
+        Map<VertexId, PartialDerivatives> wrtOf = new HashMap<>();
 
         Vertex<?> visiting;
         while ((visiting = priorityQueue.poll()) != null) {
+
+            if (wrt.contains(visiting)) {
+                wrtOf.put(visiting.getId(), dwrtOf.get(visiting));
+                continue;
+            }
 
             if (visiting instanceof Differentiable) {
                 Differentiable visitingDifferentiable = ((Differentiable) visiting);
@@ -51,13 +57,6 @@ public class Differentiator {
                         alreadyQueued.add(parent);
                     }
                 }
-            }
-        }
-
-        Map<VertexId, PartialDerivatives> wrtOf = new HashMap<>();
-        for (Vertex vertex : wrt) {
-            if (dwrtOf.containsKey(vertex)) {
-                wrtOf.put(vertex.getId(), dwrtOf.get(vertex));
             }
         }
 
