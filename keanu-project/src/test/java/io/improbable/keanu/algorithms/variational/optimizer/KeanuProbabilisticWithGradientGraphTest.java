@@ -2,46 +2,75 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
 public class KeanuProbabilisticWithGradientGraphTest {
 
-    private UniformVertex A;
-    private UniformVertex B;
+    GaussianVertex A;
+    GaussianVertex B;
+    BernoulliVertex C;
+
+    KeanuProbabilisticWithGradientGraph graph;
 
     @Before
     public void setup() {
-        A = new UniformVertex(0.0, 1.0);
-        B = new UniformVertex(0.0, 1.0);
+        A = new GaussianVertex(0.0, 1.0);
+        B = new GaussianVertex(0.0, 1.0);
+
+        A.setValue(0.5);
+        B.setValue(0.25);
+        C = new BernoulliVertex(A.times(B));
+        C.observe(true);
+
+        graph = new KeanuProbabilisticWithGradientGraph(
+            new BayesianNetwork(C.getConnectedGraph())
+        );
     }
 
     @Test
-    public void canCalculateGradient() {
-        A.setValue(0.5);
-        B.setValue(0.25);
-        BernoulliVertex C = new BernoulliVertex(A.times(B));
-        C.observe(true);
+    public void canCalculateLogProbGradient() {
 
-        KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(
-            new BayesianNetwork(C.getConnectedGraph())
+        Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients = graph.logLikelihoodGradients();
+
+        LogProbGradientCalculator logLikelihoodGradientCalculator = new LogProbGradientCalculator(
+            Collections.singletonList(C), Arrays.asList(A, B)
         );
 
-        Map<? extends VariableReference, DoubleTensor> gradients = graph.logProbGradients();
-
-        DoubleTensor dLogProbWrtA = gradients.get(A.getId());
-        DoubleTensor dLogProbWrtB = gradients.get(B.getId());
-
-        //logProb = log(A*B)
-        //dLogProb w.r.t A = B * 1/(A*B) = 1/A
-        //dLogProb w.r.t B = A * 1/(A*B) = 1/B
-        assertEquals(DoubleTensor.scalar(2.0), dLogProbWrtA);
-        assertEquals(DoubleTensor.scalar(4.0), dLogProbWrtB);
+        canCalculateLogProbGradient(logLikelihoodGradientCalculator, logLikelihoodGradients);
     }
+
+    @Test
+    public void canCalculateLogLikelihoodGradient() {
+
+        Map<? extends VariableReference, DoubleTensor> logProbGradients = graph.logProbGradients();
+        LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(
+            Arrays.asList(C, A, B), Arrays.asList(A, B)
+        );
+
+        canCalculateLogProbGradient(logProbGradientCalculator, logProbGradients);
+    }
+
+    public void canCalculateLogProbGradient(LogProbGradientCalculator gradientCalculator,
+                                            Map<? extends VariableReference, DoubleTensor> actualGradients) {
+
+        Map<VertexId, DoubleTensor> expectedGradients = gradientCalculator.getJointLogProbGradientWrtLatents();
+
+        DoubleTensor dLogProbWrtA = actualGradients.get(A.getId());
+        DoubleTensor dLogProbWrtB = actualGradients.get(B.getId());
+
+        assertEquals(expectedGradients.get(A.getId()), dLogProbWrtA);
+        assertEquals(expectedGradients.get(B.getId()), dLogProbWrtB);
+    }
+
 }

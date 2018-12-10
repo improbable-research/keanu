@@ -1,12 +1,13 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -63,26 +64,16 @@ public class KeanuProbabilisticGraphTest {
         canCalculateLogProb(probabilisticGraph);
     }
 
-    private double expectedLogProb(DoubleTensor a, DoubleTensor b, DoubleTensor d) {
-        NormalDistribution latents = new NormalDistribution(0.0, 1.0);
+    @Test
+    public void canCalculateLogLikelihoodOnKeanuProbabilisticGraph() {
+        ProbabilisticGraph probabilisticGraph = new KeanuProbabilisticGraph(new BayesianNetwork(D.getConnectedGraph()));
+        canCalculateLogLikelihood(probabilisticGraph);
+    }
 
-        double aLogProb = Arrays.stream(a.asFlatDoubleArray())
-            .map(latents::logDensity)
-            .sum();
-
-        double bLogProb = Arrays.stream(b.asFlatDoubleArray())
-            .map(latents::logDensity)
-            .sum();
-
-        double[] abSum = a.plus(b).asFlatDoubleArray();
-        double[] dFlat = d.asFlatDoubleArray();
-
-        double dLogProb = 0;
-        for (int i = 0; i < dFlat.length; i++) {
-            dLogProb += new NormalDistribution(abSum[i], 1.0).logDensity(dFlat[i]);
-        }
-
-        return aLogProb + bLogProb + dLogProb;
+    @Test
+    public void canCalculateLogLikelihoodOnKeanuProbabilisticWithGradientGraph() {
+        ProbabilisticGraph probabilisticGraph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(D.getConnectedGraph()));
+        canCalculateLogLikelihood(probabilisticGraph);
     }
 
     public void canCalculateLogProb(ProbabilisticGraph probabilisticGraph) {
@@ -96,7 +87,7 @@ public class KeanuProbabilisticGraphTest {
 
         assertEquals(defaultLogProb, logProb);
 
-        double expectedInitialLogProb = expectedLogProb(initialA, initialB, observationD);
+        double expectedInitialLogProb = expectedLogProb();
         assertEquals(expectedInitialLogProb, logProb, 1e-5);
 
         DoubleTensor newA = KeanuRandom.getDefaultRandom().nextDouble(initialA.getShape());
@@ -104,9 +95,41 @@ public class KeanuProbabilisticGraphTest {
             A.getId(), newA
         ));
 
-        double expectedPostUpdateLogProb = expectedLogProb(newA, initialB, observationD);
+        double expectedPostUpdateLogProb = expectedLogProb();
 
         assertEquals(expectedPostUpdateLogProb, postUpdateLogProb, 1e-5);
+    }
+
+    public void canCalculateLogLikelihood(ProbabilisticGraph probabilisticGraph) {
+
+        double defaultLogProb = probabilisticGraph.logLikelihood();
+
+        double logProb = probabilisticGraph.logLikelihood(ImmutableMap.of(
+            A.getId(), initialA,
+            B.getId(), initialB
+        ));
+
+        assertEquals(defaultLogProb, logProb);
+
+        double expectedInitialLogProb = expectedLogLikelihood();
+        assertEquals(expectedInitialLogProb, logProb, 1e-5);
+
+        DoubleTensor newA = KeanuRandom.getDefaultRandom().nextDouble(initialA.getShape());
+        double postUpdateLogProb = probabilisticGraph.logLikelihood(ImmutableMap.of(
+            A.getId(), newA
+        ));
+
+        double expectedPostUpdateLogProb = expectedLogLikelihood();
+
+        assertEquals(expectedPostUpdateLogProb, postUpdateLogProb, 1e-5);
+    }
+
+    private double expectedLogLikelihood() {
+        return ProbabilityCalculator.calculateLogProbFor(ImmutableList.of(D));
+    }
+
+    private double expectedLogProb() {
+        return ProbabilityCalculator.calculateLogProbFor(ImmutableList.of(D, A, B));
     }
 
 }
