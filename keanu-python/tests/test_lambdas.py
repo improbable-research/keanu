@@ -24,7 +24,7 @@ class BlackBoxProcess:
 def test_you_can_create_a_lambda_model_vertex() -> None:
     v_in: Vertex = Gaussian(1., 1.)
     model = LambdaModel({"in": v_in}, plus_one)
-    run(model, v_in)
+    evaluate_and_check_for_increment(model, v_in)
 
 
 def test_you_can_create_a_process_model_vertex(tmpdir) -> None:
@@ -32,10 +32,10 @@ def test_you_can_create_a_process_model_vertex(tmpdir) -> None:
     process = BlackBoxProcess(dir)
     v_in: Vertex = Gaussian(1., 1.)
     model = LambdaModel({"in": v_in}, process.run, process.extract_values)
-    run(model, v_in)
+    evaluate_and_check_for_increment(model, v_in)
 
 
-def run(model: LambdaModel, v_in: Vertex) -> None:
+def evaluate_and_check_for_increment(model: LambdaModel, v_in: Vertex) -> None:
     v_out: Vertex = model.get_double_model_output_vertex("out")
 
     v_in.set_value(1.)
