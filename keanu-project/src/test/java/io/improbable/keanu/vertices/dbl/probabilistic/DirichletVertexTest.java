@@ -76,7 +76,7 @@ public class DirichletVertexTest {
     @Test
     public void canSplitManyStringsOfVaryingSizeWithKnownMean() {
         DirichletVertex dirichlet = new DirichletVertex(10, 5, 3);
-        int numSamples = 50000;
+        int numSamples = 30000;
         DoubleTensor samples = Nd4jDoubleTensor.zeros(new long[]{numSamples, 3});
 
         for (int i = 0; i < numSamples; i++) {

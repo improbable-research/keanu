@@ -168,7 +168,7 @@ public class LambdaModelVertexTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(
             bayesianNetwork,
             inputToModel,
-            2500
+            200
         );
 
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();

@@ -3,8 +3,8 @@ import io
 import os
 import logging
 from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView
-from py4j.java_collections import JavaList, JavaArray
-from typing import Dict, Any, Iterable, List, Collection
+from py4j.java_collections import JavaList, JavaArray, JavaSet
+from typing import Dict, Any, Iterable, List, Collection, Set
 from _io import TextIOWrapper
 
 PATH = os.path.abspath(os.path.dirname(__file__))
@@ -69,6 +69,14 @@ class KeanuContext(metaclass=Singleton):
             lst.add(o.unwrap())
 
         return lst
+
+    def to_java_object_set(self, l: Iterable[Any]) -> JavaSet:
+        set_ = self._gateway.jvm.java.util.HashSet()
+
+        for o in l:
+            set_.add(o.unwrap())
+
+        return set_
 
     def to_java_array(self, l: Collection[Any], klass: JavaClass = None) -> JavaArray:
         if klass is None:
