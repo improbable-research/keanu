@@ -40,7 +40,7 @@ public class NUTSTest {
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
-            2000
+            1000
         );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
@@ -53,7 +53,7 @@ public class NUTSTest {
 
         BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 15.0);
 
-        int sampleCount = 6000;
+        int sampleCount = 5000;
         NUTS nuts = NUTS.builder()
             .adaptCount(sampleCount)
             .maxTreeHeight(4)

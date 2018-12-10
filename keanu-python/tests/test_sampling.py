@@ -8,8 +8,8 @@ import pytest
 
 from examples import thermometers
 from keanu import BayesNet, KeanuRandom, Model
-from keanu.algorithm import sample, generate_samples
-from keanu.vertex import Gamma, Exponential, Cauchy, Bernoulli
+from keanu.algorithm import sample, generate_samples, AcceptanceRateTracker
+from keanu.vertex import Gamma, Exponential, Cauchy, KeanuContext, Bernoulli
 from typing import Any
 import os
 
@@ -75,6 +75,14 @@ def test_sample_with_plot(net: BayesNet) -> Any:
     return fig
 
 
+def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
+    generate_samples(
+        net=net,
+        sample_from=net.get_latent_vertices(),
+        proposal_distribution="gaussian",
+        proposal_distribution_sigma=np.array(1.))
+
+
 @pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
 def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
     draws = 10
@@ -114,6 +122,64 @@ def test_iter_with_live_plot(net: BayesNet) -> Any:
 
     reorder_subplots(ax)
     return fig
+
+
+def test_can_get_acceptance_rates(net: BayesNet) -> None:
+    acceptance_rate_tracker = AcceptanceRateTracker()
+    latents = list(net.get_latent_vertices())
+
+    samples = sample(
+        net=net,
+        sample_from=latents,
+        proposal_distribution='prior',
+        proposal_listeners=[acceptance_rate_tracker],
+        drop=3)
+
+    for latent in latents:
+        rate = acceptance_rate_tracker.get_acceptance_rate(latent)
+        assert 0 <= rate <= 1
+
+
+def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
+    acceptance_rate_tracker = AcceptanceRateTracker()
+    latents = list(net.get_latent_vertices())
+
+    samples = generate_samples(
+        net=net,
+        sample_from=latents,
+        proposal_distribution='prior',
+        proposal_listeners=[acceptance_rate_tracker],
+        drop=3)
+
+    draws = 100
+    for _ in islice(samples, draws):
+        for latent in latents:
+            rate = acceptance_rate_tracker.get_acceptance_rate(latent)
+            assert 0 <= rate <= 1
+
+
+def test_it_throws_if_you_pass_in_a_proposal_distribution_but_the_algo_isnt_metropolis(net: BayesNet) -> None:
+    with pytest.raises(TypeError) as excinfo:
+        sample(
+            net=net, sample_from=net.get_latent_vertices(), algo="hamiltonian", proposal_distribution="prior", drop=3)
+    assert str(excinfo.value) == "Only Metropolis Hastings supports the proposal_distribution parameter"
+
+
+def test_it_throws_if_you_pass_in_a_proposal_listener_but_the_algo_isnt_metropolis(net: BayesNet) -> None:
+    with pytest.raises(TypeError) as excinfo:
+        sample(
+            net=net,
+            sample_from=net.get_latent_vertices(),
+            algo="hamiltonian",
+            proposal_listeners=[AcceptanceRateTracker()],
+            drop=3)
+    assert str(excinfo.value) == "Only Metropolis Hastings supports the proposal_listeners parameter"
+
+
+def test_it_throws_if_you_pass_in_a_proposal_listener_but_you_didnt_specify_the_proposal_type(net: BayesNet) -> None:
+    with pytest.raises(TypeError) as excinfo:
+        sample(net=net, sample_from=net.get_latent_vertices(), proposal_listeners=[AcceptanceRateTracker()], drop=3)
+    assert str(excinfo.value) == "If you pass in proposal_listeners you must also specify proposal_distribution"
 
 
 def set_starting_state(model: Model) -> None:
