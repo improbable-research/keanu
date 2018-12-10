@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsNumberTensors;
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsDoubleTensors;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 /**
@@ -97,7 +97,7 @@ public class NonGradientOptimizer implements Optimizer {
             stoppingTrustRegionRadius
         );
 
-        double[] startPoint = Optimizer.convertToPoint(getAsNumberTensors(probabilisticGraph.getLatentVariables()));
+        double[] startPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticGraph.getLatentVariables()));
 
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 

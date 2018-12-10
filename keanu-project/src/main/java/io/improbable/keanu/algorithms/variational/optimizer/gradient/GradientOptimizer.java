@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsNumberTensors;
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsDoubleTensors;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -147,7 +147,7 @@ public class GradientOptimizer implements Optimizer {
         ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
 
-        double[] startingPoint = Optimizer.convertToPoint(getAsNumberTensors(probabilisticWithGradientGraph.getLatentVariables()));
+        double[] startingPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticWithGradientGraph.getLatentVariables()));
 
         double initialFitness = fitness.getObjectiveFunction().value(startingPoint);
         double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);

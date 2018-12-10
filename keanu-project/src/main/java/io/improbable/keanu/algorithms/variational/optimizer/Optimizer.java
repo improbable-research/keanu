@@ -100,12 +100,12 @@ public interface Optimizer {
         return TensorShape.getLength(shape);
     }
 
-    static List<Variable<? extends NumberTensor>> getAsNumberTensors(List<? extends Variable> variables) {
+    static List<Variable<? extends DoubleTensor>> getAsDoubleTensors(List<? extends Variable> variables) {
         return variables.stream()
             .map(
                 v -> {
-                    if (v.getValue() instanceof NumberTensor) {
-                        return (Variable<NumberTensor>) v;
+                    if (v.getValue() instanceof DoubleTensor) {
+                        return (Variable<DoubleTensor>) v;
                     } else {
                         throw new UnsupportedOperationException(
                             "Optimization unsupported on networks containing discrete latents. " +
