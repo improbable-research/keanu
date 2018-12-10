@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import shutil
 
 
-def readme():
+def readme() -> str:
     with open('README.rst', "r") as f:
         return f.read()
 

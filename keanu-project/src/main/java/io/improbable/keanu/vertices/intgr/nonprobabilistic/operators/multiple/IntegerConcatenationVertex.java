@@ -1,18 +1,23 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class IntegerConcatenationVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public class IntegerConcatenationVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
+
+    private final static String DIMENSION_NAME = "dimension";
+    private final static String INPUT_ARRAY_NAME = "inputArray";
 
     private final int dimension;
     private final IntegerVertex[] input;
@@ -28,6 +33,15 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
         this.dimension = dimension;
         this.input = input;
         setParents(input);
+    }
+
+    public IntegerConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
+                                      @LoadVertexParam(INPUT_ARRAY_NAME) Vertex[] input) {
+        this(dimension, convertVertexArrayToIntegerVertex(input));
+    }
+
+    private static IntegerVertex[] convertVertexArrayToIntegerVertex(Vertex[] input) {
+        return Arrays.stream(input).toArray(IntegerVertex[]::new);
     }
 
     @Override
@@ -52,4 +66,13 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
         return extract;
     }
 
+    @SaveVertexParam(DIMENSION_NAME)
+    public int getDimension() {
+        return dimension;
+    }
+
+    @SaveVertexParam(INPUT_ARRAY_NAME)
+    public IntegerVertex[] getInputArray() {
+        return input;
+    }
 }

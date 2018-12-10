@@ -2,7 +2,7 @@ from keanu import Model, BayesNet
 from keanu.vertex import Exponential, Gamma, Gaussian
 
 
-def test_to_bayes_net():
+def test_to_bayes_net() -> None:
     with Model() as m:
         m.mu = Exponential(1.)
         m.sigma = Gamma(0.5, 0.1)
@@ -21,7 +21,7 @@ def test_to_bayes_net():
     assert m.gaussian.get_id() in net_vertex_ids
 
 
-def test_to_bayes_net_excludes_non_vertices():
+def test_to_bayes_net_excludes_non_vertices() -> None:
     with Model() as m:
         m.not_a_vertex = 1
         m.vertex = Gamma(0.5, 0.1)

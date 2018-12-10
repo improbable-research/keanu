@@ -30,17 +30,22 @@ import java.util.regex.Pattern;
 public class ProcessModelVertexTest {
 
     /*
-    The model we are mimicking here is a python script, model.py.
+      The model we are mimicking here is a python script, model.py.
 
-    It takes one input, Temperature, and produces two outputs of type double, Chance of Rain & Humidity. These outputs
-    are written to file.
+      It takes one input, Temperature, and produces two outputs of type double, Chance of Rain & Humidity. These outputs
+      are written to file.
 
-    It also produces one integer output and one boolean output. Suggested Factor of Suncream and 'is it sunny'. These
-    are also written to file.
+      It also produces one integer output and one boolean output. Suggested Factor of Suncream and 'is it sunny'. These
+      are also written to file.
+
+      This test provides an example of how to make use of a model implemented in an external application.  At the moment
+      though we just simulate this and the model is actually run in Java code, with our external application just being
+      chosen for speed of execution.
      */
 
     private DoubleVertex inputToModel;
     private SimpleWeatherModel weatherModel;
+    private static final String COMMAND = "echo";
 
     @Rule
     public DeterministicRule rule = new DeterministicRule();
@@ -56,6 +61,7 @@ public class ProcessModelVertexTest {
         weatherModel.setInputToModel(inputToModel);
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
+        // An example of what running a real Python model would look like
         String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
 
@@ -75,8 +81,7 @@ public class ProcessModelVertexTest {
         weatherModel.setInputToModel(inputToModel);
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
         
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
@@ -97,8 +102,7 @@ public class ProcessModelVertexTest {
         weatherModel.setInputToModel(inputToModel);
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValuesMultipleTypes);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValuesMultipleTypes);
 
         IntegerVertex suggestedFactorSuncream = model.getIntegerModelOutputVertex(new VertexLabel("suggestedFactorSuncream"));
         BoolVertex isSunny = model.getBoolModelOutputVertex(new VertexLabel("isSunny"));
@@ -117,8 +121,7 @@ public class ProcessModelVertexTest {
         weatherModel.setInputToModel(inputToModel);
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
 
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
@@ -141,9 +144,8 @@ public class ProcessModelVertexTest {
         weatherModel.setInputToModel(inputToModel);
 
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
-        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
 
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -164,8 +166,7 @@ public class ProcessModelVertexTest {
         weatherModel.setInputToModel(inputToModel);
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
         
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
@@ -180,7 +181,7 @@ public class ProcessModelVertexTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesianNetwork,
             inputToModel,
-            250
+            220
         );
 
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();

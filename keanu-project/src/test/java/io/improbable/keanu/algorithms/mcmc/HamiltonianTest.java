@@ -33,17 +33,18 @@ public class HamiltonianTest {
     public void samplesGaussian() {
         double mu = 0.0;
         double sigma = 1.0;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, KeanuRandom.getDefaultRandom());
+        KeanuRandom random = KeanuRandom.getDefaultRandom();
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, random.nextGaussian(0, 1), random);
 
         Hamiltonian hmc = Hamiltonian.builder()
-            .leapFrogCount(10)
-            .stepSize(0.4)
+            .leapFrogCount(20)
+            .stepSize(0.05)
             .build();
 
         NetworkSamples posteriorSamples = hmc.getPosteriorSamples(
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
-            1000
+            2000
         );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
@@ -64,7 +65,7 @@ public class HamiltonianTest {
         NetworkSamples posteriorSamples = hmc.getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVertices(),
-            2000
+            600
         );
 
         Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
@@ -90,7 +91,7 @@ public class HamiltonianTest {
 
         hmc.generatePosteriorSamples(donutBayesNet, donutBayesNet.getLatentVertices())
             .stream()
-            .limit(2500)
+            .limit(350)
             .forEach(x -> {
                 samples.computeIfAbsent(A, k -> new ArrayList<>()).add(x.get(A));
                 samples.computeIfAbsent(B, k -> new ArrayList<>()).add(x.get(B));

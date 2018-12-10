@@ -4,6 +4,7 @@ import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.function.Function;
@@ -14,17 +15,19 @@ import java.util.function.Function;
  * @see RegressionModel
  */
 public class RegressionModelBuilder<OUTPUT extends Tensor> {
+
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SCALE_PARAMETER = 1.0;
 
-    private RegressionRegularization regularization = RegressionRegularization.NONE;
-    private double[] priorOnWeightsScaleParameters;
-    private double[] priorOnWeightsMeans;
-    private Double priorOnInterceptScaleParameter;
-    private Double priorOnInterceptMean;
     private final DoubleTensor inputTrainingData;
     private final OUTPUT outputTrainingData;
     private final Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform;
+
+    private RegressionRegularization regularization = RegressionRegularization.NONE;
+    private DoubleVertex priorOnWeightsScaleParameters;
+    private DoubleVertex priorOnWeightsMeans;
+    private DoubleVertex priorOnInterceptScaleParameter;
+    private DoubleVertex priorOnInterceptMean;
     private SamplingModelFitting samplingAlgorithm = null;
 
     public RegressionModelBuilder(DoubleTensor inputTrainingData, OUTPUT outputTrainingData, Function<DoubleVertex, LinearRegressionGraph.OutputVertices<OUTPUT>> outputTransform) {
@@ -56,14 +59,21 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
      *                        This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return this
      */
-    public RegressionModelBuilder withPriorOnWeights(double[] means, double[] scaleParameters) {
-        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(means, getFeatureCount());
-        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(scaleParameters, getFeatureCount());
-
+    public RegressionModelBuilder withPriorOnWeights(DoubleVertex means, DoubleVertex scaleParameters) {
         this.priorOnWeightsMeans = means;
         this.priorOnWeightsScaleParameters = scaleParameters;
-
         return this;
+    }
+
+    public RegressionModelBuilder withPriorOnWeights(DoubleTensor means, DoubleTensor scaleParameters) {
+        return withPriorOnWeights(ConstantVertex.of(means), ConstantVertex.of(scaleParameters));
+    }
+
+    public RegressionModelBuilder withPriorOnWeights(double means, double scaleParameters) {
+        return withPriorOnWeights(
+            DoubleTensor.create(new double[]{means}, 1, 1),
+            DoubleTensor.create(new double[]{scaleParameters}, 1, 1)
+        );
     }
 
     /**
@@ -74,10 +84,18 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return this
      */
-    public RegressionModelBuilder withPriorOnIntercept(double mean, double scaleParameter) {
+    public RegressionModelBuilder withPriorOnIntercept(DoubleVertex mean, DoubleVertex scaleParameter) {
         this.priorOnInterceptMean = mean;
         this.priorOnInterceptScaleParameter = scaleParameter;
         return this;
+    }
+
+    public RegressionModelBuilder withPriorOnIntercept(DoubleTensor mean, DoubleTensor scaleParameter) {
+        return withPriorOnIntercept(ConstantVertex.of(mean), ConstantVertex.of(scaleParameter));
+    }
+
+    public RegressionModelBuilder withPriorOnIntercept(double mean, double scaleParameter) {
+        return withPriorOnIntercept(ConstantVertex.of(mean), ConstantVertex.of(scaleParameter));
     }
 
     /**
@@ -89,7 +107,7 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
      * @return this
      */
     public RegressionModelBuilder withPriorOnWeightsAndIntercept(double mean, double scaleParameter) {
-        withPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), mean), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), scaleParameter));
+        withPriorOnWeights(mean, scaleParameter);
         withPriorOnIntercept(mean, scaleParameter);
         return this;
     }
@@ -109,6 +127,12 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
      * @return A linear regression model from the data passed to the builder
      */
     public RegressionModel<OUTPUT> build() {
+        RegressionModel<OUTPUT> model = buildWithoutFitting();
+        model.fit();
+        return model;
+    }
+
+    public RegressionModel<OUTPUT> buildWithoutFitting() {
         checkVariablesAreCorrectlyInitialised();
 
         LinearRegressionGraph<OUTPUT> regressionGraph = new LinearRegressionGraph<>(
@@ -118,8 +142,12 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
             getWeightsVertex()
         );
 
-        performDataFitting(regressionGraph, outputTrainingData);
-        return new RegressionModel<>(regressionGraph);
+        ModelFitter fitter = samplingAlgorithm == null ?
+            this.regularization.createFitterForGraph() :
+            samplingAlgorithm.createFitterForGraph();
+
+        regressionGraph.observeValues(inputTrainingData, outputTrainingData);
+        return new RegressionModel(regressionGraph, fitter);
     }
 
     private void checkVariablesAreCorrectlyInitialised() {
@@ -130,7 +158,7 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
             throw new IllegalArgumentException("You have not provided output training data");
         }
         if (priorOnWeightsMeans == null || priorOnWeightsScaleParameters == null) {
-            withPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), DEFAULT_MU), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), DEFAULT_SCALE_PARAMETER));
+            withPriorOnWeights(DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
         }
         if (priorOnInterceptMean == null || priorOnInterceptScaleParameter == null) {
             withPriorOnIntercept(DEFAULT_MU, DEFAULT_SCALE_PARAMETER);
@@ -145,16 +173,8 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
         return this.regularization.getWeightsVertex(getFeatureCount(), priorOnWeightsMeans, priorOnWeightsScaleParameters);
     }
 
-    private void performDataFitting(LinearRegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
-        ModelFitter<DoubleTensor, OUTPUT> fitter = samplingAlgorithm == null ?
-            this.regularization.createFitterForGraph(regressionGraph) :
-            samplingAlgorithm.createFitterForGraph(regressionGraph);
-
-        fitter.fit(inputTrainingData, outputTrainingData);
-    }
-
     private long getFeatureCount() {
-        return this.inputTrainingData.getShape()[0];
+        return this.inputTrainingData.getShape()[1];
     }
 
 }

@@ -40,7 +40,7 @@ public class FitnessFunctionWithGradientTest {
         assert2DGradientEqualsApproxGradient(
             new double[]{5, 5},
             new double[]{0, 0},
-            0.1,
+            0.2,
             Arrays.asList(A, B, cObservation, dObservation),
             Arrays.asList(A, B)
         );
@@ -68,7 +68,7 @@ public class FitnessFunctionWithGradientTest {
         assert2DGradientEqualsApproxGradient(
             new double[]{10, 10},
             new double[]{2, 2},
-            0.1,
+            0.2,
             Arrays.asList(A, B, cObservation, dObservation),
             Arrays.asList(A, B)
         );
@@ -99,7 +99,7 @@ public class FitnessFunctionWithGradientTest {
         assert2DGradientEqualsApproxGradient(
             new double[]{5, 5},
             new double[]{0.1, 0.1},
-            0.1,
+            0.2,
             Arrays.asList(A, B, eObservation, fObservation),
             Arrays.asList(A, B)
         );

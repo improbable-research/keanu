@@ -3,9 +3,9 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -16,13 +16,13 @@ public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<D
     private static final String INPUT_VERTEX_NAME = "inputVertex";
 
     @ExportVertexToPythonBindings
-    public CastDoubleVertex(@LoadParentVertex(INPUT_VERTEX_NAME) Vertex<? extends NumberTensor> inputVertex) {
+    public CastDoubleVertex(@LoadVertexParam(INPUT_VERTEX_NAME) Vertex<? extends NumberTensor> inputVertex) {
         super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
 
-    @SaveParentVertex(INPUT_VERTEX_NAME)
+    @SaveVertexParam(INPUT_VERTEX_NAME)
     public Vertex<? extends NumberTensor> getInputVertex() {
         return inputVertex;
     }

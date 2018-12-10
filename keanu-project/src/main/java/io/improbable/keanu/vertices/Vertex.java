@@ -234,6 +234,10 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         return parents;
     }
 
+    public int getDegree() {
+        return children.size() + parents.size();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

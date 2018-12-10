@@ -3,11 +3,14 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.generic.GenericTensor;
+import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
 
+    private static final String INDEX_NAME = "index";
     private final long[] index;
 
     /**
@@ -16,7 +19,8 @@ public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
      * @param inputVertex the input vertex
      * @param index       the index of extraction
      */
-    public GenericTakeVertex(Vertex<Tensor<T>> inputVertex, long... index) {
+    public GenericTakeVertex(@LoadVertexParam(INPUT_NAME) Vertex<Tensor<T>> inputVertex,
+                             @LoadVertexParam(INDEX_NAME) long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;
@@ -31,4 +35,8 @@ public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
         return GenericTensor.scalar(input.getValue(index));
     }
 
+    @SaveVertexParam(INDEX_NAME)
+    public long[] getIndex() {
+        return index;
+    }
 }

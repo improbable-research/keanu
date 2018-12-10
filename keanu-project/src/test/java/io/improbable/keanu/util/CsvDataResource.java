@@ -12,6 +12,7 @@ public class CsvDataResource<T> extends ExternalResource {
             .asVectorizedColumnsDefinedBy(clazz)
             .load(true);
     }
+
     public T getData() {
         return this.data;
     }
