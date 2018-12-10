@@ -16,18 +16,37 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class ProtobufSaver implements NetworkSaver {
-    protected final BayesianNetwork net;
-    protected KeanuSavedBayesNet.Model.Builder modelBuilder = null;
+    private final BayesianNetwork net;
+    private KeanuSavedBayesNet.Model.Builder modelBuilder = null;
 
     public ProtobufSaver(BayesianNetwork net) {
         this.net = net;
     }
 
+    public KeanuSavedBayesNet.Model getModel(boolean withSavedValues, Map<String, String> metadata) {
+        createProtobufModel(withSavedValues, metadata);
+        return modelBuilder.build();
+    }
+
+    @Override
+    public void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException {
+        createProtobufModel(saveValues, metadata);
+        modelBuilder.build().writeTo(output);
+        modelBuilder = null;
+    }
+
     @Override
     public void save(OutputStream output, boolean saveValues) throws IOException {
+        createProtobufModel(saveValues, null);
+        modelBuilder.build().writeTo(output);
+        modelBuilder = null;
+    }
+
+    private void createProtobufModel(boolean saveValues, Map<String, String> metadata) {
         modelBuilder = KeanuSavedBayesNet.Model.newBuilder();
 
         net.save(this);
@@ -35,9 +54,17 @@ public class ProtobufSaver implements NetworkSaver {
         if (saveValues) {
             net.saveValues(this);
         }
+        saveMetadata(metadata);
+    }
 
-        modelBuilder.build().writeTo(output);
-        modelBuilder = null;
+    private void saveMetadata(Map<String, String> metadata) {
+        if (metadata != null) {
+            KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
+            for (Map.Entry<String, String> entry : metadata.entrySet()) {
+                metadataBuilder.putMetadataInfo(entry.getKey(), entry.getValue());
+            }
+            modelBuilder.setMetadata(metadataBuilder).build();
+        }
     }
 
     @Override

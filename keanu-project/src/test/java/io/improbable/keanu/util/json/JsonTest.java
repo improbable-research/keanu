@@ -38,15 +38,15 @@ public class JsonTest {
     @BeforeClass
     public static void setup() throws IOException {
         VertexId.ID_GENERATOR.set(0);
-        
+
         DoubleVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
         gaussianVertex.observe(0.5);
         gaussianVertex.setLabel("GaussianVertex");
         net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
 
         someMetadata = ImmutableMap.of( "Author", "Some Author", "Tag", "MyBayesNet" );
-        JsonSaver jsonSaver = new JsonSaver(net, someMetadata);
-        jsonSaver.save(outputStream, true);
+        JsonSaver jsonSaver = new JsonSaver(net);
+        jsonSaver.save(outputStream, true, someMetadata);
     }
 
     @Test
