@@ -53,12 +53,16 @@ public class DiabetesLinearRegression {
     public void doesLinearRegressionOnBMIAsModel() {
         Data data = csvDataResource.getData();
 
-        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.bmi, data.y)
+        RegressionModel linearRegressionModel = RegressionModel
+            .withTrainingData(data.bmi, data.y)
             .withRegularization(RegressionRegularization.RIDGE)
             .withPriorOnWeightsAndIntercept(0, 100)
             .build();
-        assertThat(linearRegressionModel.getWeight(0), closeTo(938.2378, 0.5));
-        assertThat(linearRegressionModel.getIntercept(), closeTo(152.9189,0.5));
+
+        linearRegressionModel.fit();
+
+        assertThat(linearRegressionModel.getWeightVertex().getValue().scalar(), closeTo(938.2378, 0.5));
+        assertThat(linearRegressionModel.getInterceptVertex().getValue().scalar(), closeTo(152.9189,0.5));
     }
 
     @Test
