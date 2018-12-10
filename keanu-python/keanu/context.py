@@ -66,7 +66,7 @@ class KeanuContext(metaclass=Singleton):
         m = self._gateway.jvm.java.util.HashMap()
 
         for (k, v) in python_map.items():
-            m.put(k, v.unwrap())
+            m.put(k.unwrap(), v.unwrap())
 
         return m
 

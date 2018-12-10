@@ -35,8 +35,8 @@ class LambdaModel(Vertex):
 
     @staticmethod
     def __to_java_map(inputs: Dict[str, Vertex]) -> JavaMap:
-        unwrapped_inputs = {VertexLabel(k).unwrap(): v for k, v in inputs.items()}
-        return context.to_java_map(unwrapped_inputs)
+        inputs_with_wrapped_keys = {VertexLabel(k): v for k, v in inputs.items()}
+        return context.to_java_map(inputs_with_wrapped_keys)
 
     @staticmethod
     def __wrap(vertices: JavaMap) -> Dict[str, Vertex]:
