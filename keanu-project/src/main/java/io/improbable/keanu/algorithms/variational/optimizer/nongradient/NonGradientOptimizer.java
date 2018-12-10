@@ -4,6 +4,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -86,7 +87,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         double logProb = probabilisticGraph.logProb();
 
-        if (ProbabilisticGraph.isImpossible(logProb)) {
+        if (ProbabilityCalculator.isImpossibleLogProb(logProb)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
@@ -101,7 +102,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
-        if (ProbabilisticGraph.isImpossible(initialFitness)) {
+        if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 

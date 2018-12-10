@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -204,7 +203,7 @@ public class BayesianNetwork {
     }
 
     public boolean isInImpossibleState() {
-        return ProbabilisticGraph.isImpossible(getLogOfMasterP());
+        return ProbabilityCalculator.isImpossibleLogProb(getLogOfMasterP());
     }
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {

@@ -2,8 +2,8 @@ package io.improbable.keanu.algorithms.variational;
 
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 
@@ -36,8 +36,8 @@ public class KLDivergence {
             NetworkState state = samples.getNetworkState(i);
             double qLogProb = qLogProbCalculator.apply(state);
 
-            if (!ProbabilisticGraph.isImpossible(pLogProb)) {
-                if (ProbabilisticGraph.isImpossible(qLogProb)) {
+            if (!ProbabilityCalculator.isImpossibleLogProb(pLogProb)) {
+                if (ProbabilityCalculator.isImpossibleLogProb(qLogProb)) {
                     throw new IllegalArgumentException("Q cannot have smaller support than P.");
                 }
                 divergence += (pLogProb - qLogProb) * Math.exp(pLogProb);
