@@ -13,6 +13,12 @@ import java.util.NoSuchElementException;
 public class SampleStats {
     private static final FastFourierTransformer ffTransformer = new FastFourierTransformer(DftNormalization.STANDARD);
 
+    /**
+     * Calculates the autocorrelation of an array of doubles.
+     *
+     * @param samples the values to calculate autocorrelation on.
+     * @return An array of autocorrelations at different lags.
+     */
     public static double[] autocorrelation(double[] samples) {
         double[] acovResult = autocovariance(samples);
         double variance = acovResult[0];
@@ -24,7 +30,7 @@ public class SampleStats {
         final int length = samples.length;
         double[] demeanPaddedWithZeros = calculatePaddedDemean(samples);
         Complex[] ifft = fftCrossCorrelationWithSelf(demeanPaddedWithZeros);
-        double[] realParts = getRealPartsTruncated(ifft, length);
+        double[] realParts = getRealPartsAndTruncate(ifft, length);
         double[] realPartsDivN = Arrays.stream(realParts).map(x -> x / length).toArray();
         return realPartsDivN;
     }
@@ -63,7 +69,7 @@ public class SampleStats {
         return complexNumbers;
     }
 
-    private static double[] getRealPartsTruncated(Complex[] complexNumbers, int newLength) {
+    private static double[] getRealPartsAndTruncate(Complex[] complexNumbers, int newLength) {
         double[] reals = new double[newLength];
         for (int i = 0; i < newLength; i++) {
             reals[i] = complexNumbers[i].getReal();
