@@ -102,7 +102,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         setValue(value, true);
     }
 
-    void setValue(T value, boolean uninitializeDownStream) {
+    public void setValue(T value, boolean uninitializeDownStream) {
         if (!observation.isObserved()) {
             if (uninitializeDownStream) {
                 VertexValuePropagation.uninitializeDownStream(this);

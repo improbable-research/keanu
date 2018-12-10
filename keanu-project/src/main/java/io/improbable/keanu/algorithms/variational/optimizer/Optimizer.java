@@ -120,7 +120,7 @@ public interface Optimizer {
             System.arraycopy(point, position, values, 0, dimensions);
 
             DoubleTensor newTensor = DoubleTensor.create(values, vertex.getValue().getShape());
-            vertex.setValue(newTensor);
+            vertex.setValue(newTensor, false);
 
             position += dimensions;
         }

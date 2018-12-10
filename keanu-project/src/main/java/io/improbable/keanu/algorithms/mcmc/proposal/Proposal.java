@@ -47,7 +47,7 @@ public class Proposal {
     public void apply() {
         Set<Vertex> vertices = perVertexProposalTo.keySet();
         for (Vertex v : vertices) {
-            v.setValue(getProposalTo(v));
+            v.setValue(getProposalTo(v), false);
         }
         for (ProposalListener listener : listeners) {
             listener.onProposalApplied(this);
@@ -57,7 +57,7 @@ public class Proposal {
     public void reject() {
         Set<Vertex> vertices = perVertexProposalTo.keySet();
         for (Vertex v : vertices) {
-            v.setValue(getProposalFrom(v));
+            v.setValue(getProposalFrom(v), false);
         }
         for (ProposalListener listener : listeners) {
             listener.onProposalRejected(this);

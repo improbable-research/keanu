@@ -441,7 +441,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                     position.get(latent.getId())
                 );
             nextPosition.put(latent.getId(), nextPositionForLatent);
-            latent.setValue(nextPositionForLatent);
+            latent.setValue(nextPositionForLatent, false);
         }
 
         VertexValuePropagation.cascadeUpdate(latentVertices);

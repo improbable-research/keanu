@@ -36,7 +36,7 @@ public class NetworkSnapshot {
                 v.observe(values.get(v));
             } else {
                 v.unobserve();
-                v.setValue(values.get(v));
+                v.setValue(values.get(v), false);
             }
 
         }

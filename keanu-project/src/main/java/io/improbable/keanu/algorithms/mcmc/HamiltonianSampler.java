@@ -151,7 +151,7 @@ public class HamiltonianSampler implements SamplingAlgorithm {
         for (Vertex<DoubleTensor> latent : latentVertices) {
             final DoubleTensor nextPosition = momentumsAtHalfTimeStep.get(latent.getId()).times(halfTimeStep).plusInPlace(during.position.get(latent.getId()));
             during.position.put(latent.getId(), nextPosition);
-            latent.setValue(nextPosition);
+            latent.setValue(nextPosition, false);
         }
 
         VertexValuePropagation.cascadeUpdate(latentVertices);
