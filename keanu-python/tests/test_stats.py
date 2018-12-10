@@ -40,7 +40,7 @@ def test_autocorr_returns_ndarray_of_correct_dtype() -> None:
     valid_key = list(samples.keys())[0]
     autocorr = stats.autocorrelation(samples.get(valid_key))  # type: ignore
     assert type(autocorr) == np.ndarray
-    assert autocorr.dtype == samples.get(valid_key)[0].dtype
+    assert autocorr.dtype == samples.get(valid_key)[0].dtype  # type: ignore
 
 
 def test_cant_get_autocorrelation_of_np_bools() -> None:
