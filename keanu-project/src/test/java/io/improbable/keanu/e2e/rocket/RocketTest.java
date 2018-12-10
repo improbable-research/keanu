@@ -57,7 +57,7 @@ public class RocketTest {
             Arrays.asList(oRingFailure, residualFuel, alarm1FalsePositive)
         ).stream();
 
-        long sampleCount = 100000;
+        long sampleCount = 10000;
         EventCounts eventCounts = networkSamples
             .limit(sampleCount)
             .map(state -> new EventCounts(

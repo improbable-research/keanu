@@ -1,8 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
+import com.google.common.collect.Lists;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,6 +12,7 @@ public class Proposal {
 
     private final Map<Vertex, Object> perVertexProposalTo;
     private final Map<Vertex, Object> perVertexProposalFrom;
+    private final List<ProposalListener> listeners = Lists.newArrayList();
 
     public Proposal() {
         this.perVertexProposalTo = new HashMap<>();
@@ -19,6 +22,14 @@ public class Proposal {
     public <T> void setProposal(Vertex<T> vertex, T to) {
         perVertexProposalFrom.put(vertex, vertex.getValue());
         perVertexProposalTo.put(vertex, to);
+    }
+
+    public void addListener(ProposalListener listener) {
+        this.listeners.add(listener);
+    }
+
+    public void addListeners(List<ProposalListener> listeners) {
+        this.listeners.addAll(listeners);
     }
 
     public <T> T getProposalTo(Vertex<T> vertex) {
@@ -38,12 +49,18 @@ public class Proposal {
         for (Vertex v : vertices) {
             v.setValue(getProposalTo(v));
         }
+        for (ProposalListener listener : listeners) {
+            listener.onProposalApplied(this);
+        }
     }
 
     public void reject() {
         Set<Vertex> vertices = perVertexProposalTo.keySet();
         for (Vertex v : vertices) {
             v.setValue(getProposalFrom(v));
+        }
+        for (ProposalListener listener : listeners) {
+            listener.onProposalRejected(this);
         }
     }
 

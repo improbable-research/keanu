@@ -4,9 +4,9 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -68,8 +68,8 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
      * @param beta the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public LaplaceVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
-                         @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
+    public LaplaceVertex(@LoadVertexParam(MU_NAME) DoubleVertex mu,
+                         @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), beta.getShape()), mu, beta);
     }
 
@@ -85,12 +85,12 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
         this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta));
     }
 
-    @SaveParentVertex(MU_NAME)
+    @SaveVertexParam(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
-    @SaveParentVertex(BETA_NAME)
+    @SaveVertexParam(BETA_NAME)
     public DoubleVertex getBeta() {
         return beta;
     }

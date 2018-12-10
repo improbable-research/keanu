@@ -124,7 +124,7 @@ public class BoolVertexTest {
 
         double pV3True = orProbability(pV1, pV2);
 
-        assertEquals(priorProbabilityTrue(v3, 30000, random), pV3True, 0.01);
+        assertEquals(priorProbabilityTrue(v3, 10000, random), pV3True, 0.01);
     }
 
     @Test

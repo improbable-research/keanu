@@ -143,7 +143,7 @@ public class BetaVertexTest {
     @Test
     public void betaSampleMethodMatchesLogProbMethodForAlphaGreaterThanBeta() {
 
-        int sampleCount = 1000000;
+        int sampleCount = 500000;
         BetaVertex vertex = new BetaVertex(
             new long[]{sampleCount, 1},
             5.0,
@@ -161,7 +161,7 @@ public class BetaVertexTest {
     @Test
     public void betaSampleMethodMatchesLogProbMethodForAlphaLessThanBeta() {
 
-        int sampleCount = 1100000;
+        int sampleCount = 400000;
         BetaVertex vertex = new BetaVertex(
             new long[]{sampleCount, 1},
             2.0,
