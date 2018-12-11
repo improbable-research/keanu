@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
 import com.google.common.collect.ImmutableList;
-import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
@@ -10,6 +9,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
