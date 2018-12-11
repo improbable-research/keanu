@@ -60,7 +60,6 @@ public class Leapfrog {
             nextMomentum.put(nextMomentumForLatent.getKey(), nextNextMomentumForLatent);
         }
 
-
         return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient);
     }
 

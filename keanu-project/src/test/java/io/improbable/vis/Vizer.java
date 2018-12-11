@@ -1,6 +1,10 @@
 package io.improbable.vis;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import java.awt.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -12,22 +16,17 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
-import java.awt.*;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 public class Vizer {
 
     enum PlotType {
         SCATTER, AREA_CHART
     }
 
-    private static JFreeChart createHistogram(List<DoubleTensor> samples) {
+    private static JFreeChart createHistogram(List<Double> samples) {
 
         double[] data = new double[samples.size()];
         for (int i = 0; i < samples.size(); i++) {
-            data[i] = samples.get(i).scalar();
+            data[i] = samples.get(i);
         }
 
         // int number = data.length;
@@ -101,11 +100,11 @@ public class Vizer {
         return createPlot(x, y, PlotType.AREA_CHART);
     }
 
-    public static void histogram(List<DoubleTensor> samples) {
+    public static void histogram(List<Double> samples) {
         histogram(samples, "Vizer");
     }
 
-    public static void histogram(List<DoubleTensor> samples, String title) {
+    public static void histogram(List<Double> samples, String title) {
         display(createHistogram(samples), title);
     }
 

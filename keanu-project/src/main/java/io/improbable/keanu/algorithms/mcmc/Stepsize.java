@@ -71,7 +71,6 @@ public class Stepsize {
             logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
         }
 
-
         return stepsize;
     }
 

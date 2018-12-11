@@ -164,7 +164,7 @@ public class TreeBuilder {
 
             //Base case-take one leapfrog step in the build direction
 
-            return TreeBuilderBaseCase(latentVertices,
+            return treeBuilderBaseCase(latentVertices,
                 probabilisticVertices,
                 logProbGradientCalculator,
                 sampleFromVertices,
@@ -218,12 +218,7 @@ public class TreeBuilder {
                     random
                 );
 
-                tree.shouldContinueFlag = otherHalfTree.shouldContinueFlag && isNotUTurning(
-                    tree.leapfrogForward.getPosition(),
-                    tree.leapfrogBackward.getPosition(),
-                    tree.leapfrogForward.getMomentum(),
-                    tree.leapfrogBackward.getMomentum()
-                );
+                tree.continueIfNotUTurning(otherHalfTree);
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
                 tree.deltaLikelihoodOfLeapfrog += otherHalfTree.deltaLikelihoodOfLeapfrog;
@@ -235,7 +230,7 @@ public class TreeBuilder {
 
     }
 
-    public static TreeBuilder TreeBuilderBaseCase(List<Vertex<DoubleTensor>> latentVertices,
+    public static TreeBuilder treeBuilderBaseCase(List<Vertex<DoubleTensor>> latentVertices,
                                                   List<Vertex> probabilisticVertices,
                                                   LogProbGradientCalculator logProbGradientCalculator,
                                                   final List<? extends Vertex> sampleFromVertices,
@@ -326,6 +321,15 @@ public class TreeBuilder {
 
     private static <T> void putValue(Vertex<T> vertex, Map<VertexId, ?> target) {
         ((Map<VertexId, T>) target).put(vertex.getId(), vertex.getValue());
+    }
+
+    public void continueIfNotUTurning(TreeBuilder otherHalfTree) {
+        setShouldContinueFlag(otherHalfTree.getShouldContinueFlag() && TreeBuilder.isNotUTurning(
+            getForwardPosition(),
+            getBackwardPosition(),
+            getForwardMomentum(),
+            getBackwardMomentum()
+        ));
     }
 
     public boolean getShouldContinueFlag() {

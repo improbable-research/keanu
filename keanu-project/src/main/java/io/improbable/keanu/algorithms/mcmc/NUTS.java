@@ -30,7 +30,7 @@ import java.util.Map;
 public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static final int DEFAULT_ADAPT_COUNT = 1000;
-    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.6;
+    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.65;
     private static Statistics STATISTICS = new Statistics(Arrays.asList(
         "stepSize",
         "logProb",
@@ -88,7 +88,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     private int maxTreeHeight = 10;
 
     //Sets whether or not to save debug STATISTICS. The STATISTICS available are: Step size, Log Prob, Mean Tree Acceptance Prob, Tree Size.
-
     @Getter
     @Setter
     @Builder.Default
