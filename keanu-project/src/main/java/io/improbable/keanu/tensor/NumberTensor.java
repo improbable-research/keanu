@@ -5,8 +5,6 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> extends Tensor<N>, NumberOperators<T> {
