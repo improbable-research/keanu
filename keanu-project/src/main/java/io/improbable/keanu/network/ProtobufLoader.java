@@ -6,6 +6,7 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.gson.internal.Primitives;
 import io.improbable.keanu.KeanuSavedBayesNet;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -22,7 +23,6 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ProtobufLoader implements NetworkLoader {
@@ -170,7 +170,7 @@ public class ProtobufLoader implements NetworkLoader {
         }
 
         Map<String, Object> parameterMap = getParameterMap(vertex, existingVertices);
-        Vertex newVertex = instantiateVertex(vertexClass, parameterMap, vertex.getShapeList());
+        Vertex newVertex = instantiateVertex(vertexClass, parameterMap, vertex);
 
         if (!vertex.getLabel().isEmpty()) {
             newVertex.setLabel(vertex.getLabel());
@@ -181,13 +181,13 @@ public class ProtobufLoader implements NetworkLoader {
 
     private Vertex instantiateVertex(Class vertexClass,
                                      Map<String, Object> paramMap,
-                                     List<Long> shape) {
+                                     KeanuSavedBayesNet.Vertex vertex) {
         Constructor<Vertex> loadConstructor = getAnnotatedConstructor(vertexClass);
         Parameter[] constructorParameters = loadConstructor.getParameters();
         Object[] arguments = new Object[constructorParameters.length];
 
         for (int i = 0; i < constructorParameters.length; i++) {
-            arguments[i] = getParameter(constructorParameters[i], paramMap, shape);
+            arguments[i] = getParameter(constructorParameters[i], paramMap, vertex);
 
             Class argumentClass = arguments[i].getClass();
             Class parameterClass = Primitives.wrap(constructorParameters[i].getType());
@@ -205,7 +205,9 @@ public class ProtobufLoader implements NetworkLoader {
         }
     }
 
-    private Object getParameter(Parameter methodParameter, Map<String, Object> paramMap, List<Long> shape) {
+    private Object getParameter(Parameter methodParameter,
+                                Map<String, Object> paramMap,
+                                KeanuSavedBayesNet.Vertex vertex) {
         LoadVertexParam paramAnnotation;
         LoadShape shapeAnnotation;
 
@@ -217,7 +219,11 @@ public class ProtobufLoader implements NetworkLoader {
             }
             return parameter;
         } else if ((shapeAnnotation = methodParameter.getAnnotation(LoadShape.class)) != null) {
-            return Longs.toArray(shape);
+            if (vertex.getShapeCount() == 0) {
+                return Tensor.SCALAR_SHAPE;
+            } else {
+                return Longs.toArray(vertex.getShapeList());
+            }
         } else {
             throw new IllegalArgumentException("Cannot create Vertex due to unannotated parameter in constructor");
         }
