@@ -16,6 +16,8 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -60,10 +62,12 @@ public class ProtobufSaver implements NetworkSaver {
     private void saveMetadata(Map<String, String> metadata) {
         if (metadata != null) {
             KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
-            for (Map.Entry<String, String> entry : metadata.entrySet()) {
-                metadataBuilder.putMetadataInfo(entry.getKey(), entry.getValue());
+            String[] metadataKeys = metadata.keySet().toArray(new String[metadata.size()]);
+            Arrays.sort(metadataKeys);
+            for (String metadataKey : metadataKeys) {
+                metadataBuilder.putMetadataInfo(metadataKey, metadata.get(metadataKey));
             }
-            modelBuilder.setMetadata(metadataBuilder).build();
+            modelBuilder.setMetadata(metadataBuilder);
         }
     }
 
@@ -95,13 +99,20 @@ public class ProtobufSaver implements NetworkSaver {
                             Vertex vertex) {
         Class vertexClass = vertex.getClass();
         Method[] methods = vertexClass.getMethods();
+        Map<String, Method> parentMethodMap = new HashMap<>();
 
         for (Method method : methods) {
             SaveVertexParam vertexAnnotation = method.getAnnotation(SaveVertexParam.class);
             if (vertexAnnotation != null) {
                 String parentName = vertexAnnotation.value();
-                vertexBuilder.addParameters(getEncodedParam(vertex, parentName, method));
+                parentMethodMap.put(parentName, method);
             }
+        }
+
+        String[] parentNames = parentMethodMap.keySet().toArray(new String[parentMethodMap.size()]);
+        Arrays.sort(parentNames);
+        for (String parentName : parentNames) {
+            vertexBuilder.addParameters(getEncodedParam(vertex, parentName, parentMethodMap.get(parentName)));
         }
     }
 
