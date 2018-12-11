@@ -46,11 +46,10 @@ public class ProtobufSaver implements NetworkSaver {
             throw new IllegalArgumentException("Trying to save a vertex that isn't Saveable");
         }
 
-        KeanuSavedBayesNet.Vertex.Builder vertexBuilder = buildVertex(vertex);
-        bayesNetBuilder.addVertices(vertexBuilder.build());
+        bayesNetBuilder.addVertices(buildVertex(vertex));
     }
 
-    private KeanuSavedBayesNet.Vertex.Builder buildVertex(Vertex vertex) {
+    private KeanuSavedBayesNet.Vertex buildVertex(Vertex vertex) {
         KeanuSavedBayesNet.Vertex.Builder vertexBuilder = KeanuSavedBayesNet.Vertex.newBuilder();
 
         if (vertex.getLabel() != null) {
@@ -59,9 +58,10 @@ public class ProtobufSaver implements NetworkSaver {
 
         vertexBuilder = vertexBuilder.setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()));
         vertexBuilder = vertexBuilder.setVertexType(vertex.getClass().getCanonicalName());
+        vertexBuilder = vertexBuilder.addAllShape(Longs.asList(vertex.getShape()));
         saveParams(vertexBuilder, vertex);
 
-        return vertexBuilder;
+        return vertexBuilder.build();
     }
 
     private void saveParams(KeanuSavedBayesNet.Vertex.Builder vertexBuilder,
