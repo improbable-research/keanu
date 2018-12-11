@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
@@ -154,9 +155,10 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         }
 
         @Override
-        public NetworkState sample() {
+        public NetworkSample sample() {
             step();
-            return new SimpleNetworkState(takeSample(verticesToSampleFrom), logProbabilityBeforeStep);
+            NetworkState networkState = new SimpleNetworkState(takeSample(verticesToSampleFrom), logProbabilityBeforeStep);
+            return new NetworkSample(networkState,logProbabilityBeforeStep);
         }
     }
 

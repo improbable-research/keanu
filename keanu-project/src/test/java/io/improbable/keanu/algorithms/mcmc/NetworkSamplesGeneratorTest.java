@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
@@ -115,7 +116,7 @@ public class NetworkSamplesGeneratorTest {
     public void doesUpdateProgressAndFinishProgressWhenStreaming() {
         ProgressBar progressBar = mock(ProgressBar.class);
         TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(new AtomicInteger(0), new AtomicInteger(0));
-        Stream<NetworkState> sampleStream = new NetworkSamplesGenerator(algorithm, () -> progressBar).stream();
+        Stream<NetworkSample> sampleStream = new NetworkSamplesGenerator(algorithm, () -> progressBar).stream();
         sampleStream.limit(10).count();
         sampleStream.close();
 
@@ -161,9 +162,10 @@ public class NetworkSamplesGeneratorTest {
         }
 
         @Override
-        public NetworkState sample() {
+        public NetworkSample sample() {
             sampleCount.incrementAndGet();
-            return new SimpleNetworkState(Collections.emptyMap());
+            NetworkState networkState = new SimpleNetworkState(Collections.emptyMap());
+            return new NetworkSample(networkState, 0.0);
         }
     }
 }
