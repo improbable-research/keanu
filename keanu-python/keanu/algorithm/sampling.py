@@ -9,6 +9,7 @@ from keanu.vertex.base import Vertex
 from keanu.net import BayesNet
 from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types
+from keanu.plots import traceplot
 
 k = KeanuContext()
 
@@ -31,7 +32,9 @@ def sample(net: BayesNet,
            proposal_listeners=[],
            draws: int = 500,
            drop: int = 0,
-           down_sample_interval: int = 1) -> sample_types:
+           down_sample_interval: int = 1,
+           plot: bool = False,
+           ax: Any = None) -> sample_types:
 
     sampling_algorithm: JavaObject = build_sampling_algorithm(algo, proposal_distribution, proposal_distribution_sigma,
                                                               proposal_listeners)
@@ -42,10 +45,13 @@ def sample(net: BayesNet,
         net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
     vertex_samples = {
-        Vertex._get_python_id(vertex_unwrapped): list(
+        Vertex._get_python_label(vertex_unwrapped): list(
             map(Tensor._to_ndarray,
                 network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped
     }
+
+    if plot:
+        traceplot(vertex_samples, ax=ax)
 
     return vertex_samples
 
@@ -57,7 +63,10 @@ def generate_samples(net: BayesNet,
                      proposal_distribution_sigma: numpy_types = None,
                      proposal_listeners: List[proposal_listener_types] = [],
                      drop: int = 0,
-                     down_sample_interval: int = 1) -> sample_generator_types:
+                     down_sample_interval: int = 1,
+                     live_plot: bool = False,
+                     refresh_every: int = 100,
+                     ax: Any = None) -> sample_generator_types:
 
     sampling_algorithm: JavaObject = build_sampling_algorithm(algo, proposal_distribution, proposal_distribution_sigma,
                                                               proposal_listeners)
@@ -68,7 +77,8 @@ def generate_samples(net: BayesNet,
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
 
-    return _samples_generator(sample_iterator, vertices_unwrapped)
+    return _samples_generator(
+        sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax)
 
 
 def build_sampling_algorithm(algo, proposal_distribution: Optional[str],
@@ -93,11 +103,26 @@ def build_sampling_algorithm(algo, proposal_distribution: Optional[str],
     return sampling_algorithm
 
 
-def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList) -> sample_generator_types:
+def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList, live_plot: bool, refresh_every: int,
+                       ax: Any) -> sample_generator_types:
+    traces = []
+    x0 = 0
     while (True):
         network_sample = sample_iterator.next()
         sample = {
-            Vertex._get_python_id(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped))
+            Vertex._get_python_label(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped))
             for vertex_unwrapped in vertices_unwrapped
         }
+
+        if live_plot:
+            traces.append(sample)
+            if len(traces) % refresh_every == 0:
+                joined_trace = {k: [t[k] for t in traces] for k in sample.keys()}
+                if ax is None:
+                    ax = traceplot(joined_trace, x0=x0)
+                else:
+                    traceplot(joined_trace, ax=ax, x0=x0)
+                x0 += refresh_every
+                traces = []
+
         yield sample

@@ -57,6 +57,9 @@ task pytest {
             commandLine 'pipenv', 'run', 'mypy', '--ignore-missing-imports', '--disallow-untyped-calls', 'keanu', 'tests', 'examples'
         }
         exec {
+            commandLine 'pipenv', 'run', 'pytest', '--doctest-modules', 'keanu'
+        }
+        exec {
             // workaround for bug: this hits an NSP error if it's not run first
             commandLine 'pipenv', 'run', 'pytest', 'tests/test_gradient_optimization.py'
         }
@@ -66,9 +69,6 @@ task pytest {
         }
         exec {
             commandLine 'pipenv', 'run', 'pytest', '--ignore=tests/test_gradient_optimization.py', '--ignore=tests/test_lorenz.py'
-        }
-        exec {
-            commandLine 'pipenv', 'run', 'pytest', '--doctest-modules', 'keanu'
         }
     }
 }
