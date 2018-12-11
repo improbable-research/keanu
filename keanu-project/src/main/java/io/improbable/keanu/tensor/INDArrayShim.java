@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -141,15 +142,20 @@ public class INDArrayShim {
 
     }
 
-    public static INDArray pile(INDArray... arrays) {
-        long[] shape = arrays[0].shape();
-        long[] newShape = ArrayUtils.add(shape, 0, 1);
+    public static INDArray stack(int dimension, INDArray... arrays) {
+        int max_dimension = arrays.length;
+        int min_dimension = -1 + max_dimension * -1;
+        Preconditions.checkArgument(dimension <= max_dimension && dimension >= min_dimension, "dimension %s is out of bounds for stacking %s tensors", dimension, max_dimension);
 
-        List<INDArray> reshaped = new ArrayList<>();
-        for (INDArray array: arrays) {
-            reshaped.add(array.reshape(array.ordering(), newShape));
+        int positive_dimension = dimension >= 0 ? dimension : dimension + max_dimension + 1;
+        long[] shape = arrays[0].shape();
+        long[] newShape = ArrayUtils.insert(positive_dimension, shape, 1);
+
+        INDArray[] reshaped = new INDArray[max_dimension];
+        for (int i = 0; i < max_dimension; i++) {
+            reshaped[i] = arrays[i].reshape(arrays[i].ordering(), newShape);
         }
 
-        return Nd4j.vstack(reshaped);
+        return Nd4j.concat(positive_dimension, reshaped);
     }
 }

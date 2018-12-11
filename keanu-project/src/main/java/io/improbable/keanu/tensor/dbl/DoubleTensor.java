@@ -94,23 +94,30 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     }
 
     /**
-     * @param toPile    an array of DoubleTensor
-     * @return  a DoubleTensor with toPile joined along a new dimension 0
+     * @param dimension the dimension in the result tensor which toStack are stacked
+     * @param toStack    an array of DoubleTensor
+     * @return  a DoubleTensor with toStack joined along a new dimension
      * <p>
      * e.g. A, B, C = DoubleTensor.ones(4, 2)
      * <p>
-     * DoubleTensor.pile(A, B, C) gives DoubleTensor.ones(3, 4, 2)
+     * DoubleTensor.stack(0, A, B, C) gives DoubleTensor.ones(3, 4, 2)
+     * <p>
+     * DoubleTensor.stack(1, A, B, C) gives DoubleTensor.ones(4, 3, 2)
+     * <p>
+     * DoubleTensor.stack(2, A, B, C) gives DoubleTensor.ones(4, 2, 3)
+     * <p>
+     * DoubleTensor.stack(-1, A, B, C) gives DoubleTensor.ones(4, 2, 3)
      */
-    static DoubleTensor pile(DoubleTensor... toPile) {
-        INDArray[] pileAsINDArray = new INDArray[toPile.length];
-        for (int i = 0; i < toPile.length; i++) {
-            pileAsINDArray[i] = Nd4jDoubleTensor.unsafeGetNd4J(toPile[i]).dup();
-            if (pileAsINDArray[i].shape().length == 0) {
-                pileAsINDArray[i] = pileAsINDArray[i].reshape(1);
+    static DoubleTensor stack(int dimension, DoubleTensor... toStack) {
+        INDArray[] stackAsINDArray = new INDArray[toStack.length];
+        for (int i = 0; i < toStack.length; i++) {
+            stackAsINDArray[i] = Nd4jDoubleTensor.unsafeGetNd4J(toStack[i]).dup();
+            if (stackAsINDArray[i].shape().length == 0) {
+                stackAsINDArray[i] = stackAsINDArray[i].reshape(1);
             }
         }
-        INDArray pile = INDArrayShim.pile(pileAsINDArray);
-        return new Nd4jDoubleTensor(pile);
+        INDArray stack = INDArrayShim.stack(dimension, stackAsINDArray);
+        return new Nd4jDoubleTensor(stack);
     }
 
     static DoubleTensor concat(DoubleTensor... toConcat) {

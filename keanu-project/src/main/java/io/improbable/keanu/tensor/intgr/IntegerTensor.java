@@ -68,23 +68,30 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     /**
-     * @param toPile    an array of IntegerTensor
-     * @return  an IntegerTensor with toPile joined along a new dimension 0
+     * @param dimension the dimension in the result tensor which toStack are stacked
+     * @param toStack    an array of IntegerTensor
+     * @return  an IntegerTensor with toStack joined along a new dimension
      * <p>
      * e.g. A, B, C = IntegerTensor.ones(4, 2)
      * <p>
-     * IntegerTensor.pile(A, B, C) gives IntegerTensor.ones(3, 4, 2)
+     * IntegerTensor.stack(0, A, B, C) gives IntegerTensor.ones(3, 4, 2)
+     * <p>
+     * IntegerTensor.stack(1, A, B, C) gives IntegerTensor.ones(4, 3, 2)
+     * <p>
+     * IntegerTensor.stack(2, A, B, C) gives IntegerTensor.ones(4, 2, 3)
+     * <p>
+     * IntegerTensor.stack(-1, A, B, C) gives IntegerTensor.ones(4, 2, 3)
      */
-    static IntegerTensor pile(IntegerTensor... toPile) {
-        INDArray[] pileAsINDArray = new INDArray[toPile.length];
-        for (int i = 0; i < toPile.length; i++) {
-            pileAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toPile[i]).dup();
-            if (pileAsINDArray[i].shape().length == 0) {
-                pileAsINDArray[i] = pileAsINDArray[i].reshape(1);
+    static IntegerTensor stack(int dimension, IntegerTensor... toStack) {
+        INDArray[] stackAsINDArray = new INDArray[toStack.length];
+        for (int i = 0; i < toStack.length; i++) {
+            stackAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toStack[i]).dup();
+            if (stackAsINDArray[i].shape().length == 0) {
+                stackAsINDArray[i] = stackAsINDArray[i].reshape(1);
             }
         }
-        INDArray pile = INDArrayShim.pile(pileAsINDArray);
-        return new Nd4jIntegerTensor(pile);
+        INDArray stack = INDArrayShim.stack(dimension, stackAsINDArray);
+        return new Nd4jIntegerTensor(stack);
     }
 
     static IntegerTensor concat(IntegerTensor... toConcat) {

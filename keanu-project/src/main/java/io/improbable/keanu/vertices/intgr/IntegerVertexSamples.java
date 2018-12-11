@@ -57,6 +57,6 @@ public class IntegerVertexSamples extends VertexSamples<IntegerTensor> {
     }
 
     public IntegerTensor asTensor() {
-        return IntegerTensor.pile(samples.toArray(new IntegerTensor[0]));
+        return IntegerTensor.stack(0, samples.toArray(new IntegerTensor[0]));
     }
 }
