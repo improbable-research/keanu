@@ -709,7 +709,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor y = IntegerTensor.create(4, 5);
 
         assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(2, 2), IntegerTensor.stack(0, x, y));
-        assertEquals(IntegerTensor.create(2, 3, 4, 5).reshape(2, 2), IntegerTensor.stack(1, x, y));
+        assertEquals(IntegerTensor.create(2, 4, 3, 5).reshape(2, 2), IntegerTensor.stack(1, x, y));
     }
 
     @Test
