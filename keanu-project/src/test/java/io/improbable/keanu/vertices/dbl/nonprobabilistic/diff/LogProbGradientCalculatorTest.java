@@ -7,6 +7,7 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -128,7 +129,7 @@ public class LogProbGradientCalculatorTest {
     }
 
     @Test
-    public void doesMatchForwardAutodiffWithManyOps() {
+    public void doesMatchReverseAutoDiffWithManyOps() {
         long[] shape = new long[]{2, 2};
         DoubleVertex A = new GaussianVertex(shape, 0, 1);
         A.setValue(DoubleTensor.linspace(0.1, 2, 4).reshape(shape));
@@ -148,7 +149,7 @@ public class LogProbGradientCalculatorTest {
         DoubleTensor dJLogProbWrtAValue = gradient.get(A.getId());
         DoubleTensor dJLogProbWrtBValue = gradient.get(B.getId());
 
-        PartialDerivatives dHForward = H.getDerivativeWrtLatents();
+        PartialDerivatives dHForward = Differentiator.reverseModeAutoDiff(H, A, B);
 
         DoubleTensor dHdA = dHForward.withRespectTo(A);
         DoubleTensor dHdB = dHForward.withRespectTo(B);

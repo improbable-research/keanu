@@ -57,7 +57,7 @@ public class ArcCosVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -0.25, 0.25);
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -0.25, 0.25);
         ArcCosVertex outputVertex = inputVertex.times(3).acos();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-4);

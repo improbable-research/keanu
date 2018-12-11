@@ -35,6 +35,9 @@ public class PartialDerivatives {
 
     public PartialDerivatives(Map<VertexId, DoubleTensor> derivativeWithRespectTo) {
         this.derivativeWithRespectTo = derivativeWithRespectTo;
+        if (derivativeWithRespectTo.size() > 1) {
+            //throw new IllegalStateException();
+        }
     }
 
     public DoubleTensor withRespectTo(Vertex vertex) {
@@ -55,6 +58,9 @@ public class PartialDerivatives {
 
     public void putWithRespectTo(VertexId id, DoubleTensor value) {
         derivativeWithRespectTo.put(id, value);
+        if (derivativeWithRespectTo.size() > 1) {
+            //throw new IllegalStateException();
+        }
     }
 
     /**

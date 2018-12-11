@@ -51,13 +51,13 @@ public class MatrixInverseVertexTest {
 
     @Test
     public void canCalculateDiffCorrectly() {
-        DoubleVertex matrix = new UniformVertex(1.0, 100.0);
+        UniformVertex matrix = new UniformVertex(1.0, 100.0);
         matrix.setValue(DoubleTensor.arange(1, 5).reshape(2, 2));
         MatrixInverseVertex inverse = matrix.matrixInverse();
 
         inverse.lazyEval();
 
-        DoubleTensor inverseWrtMatrix = inverse.getDerivativeWrtLatents().withRespectTo(matrix);
+        DoubleTensor inverseWrtMatrix = Differentiator.forwardModeAutoDiff(matrix, inverse).of(inverse).withRespectTo(matrix);
         DoubleTensor reverseInverseWrtMatrix = Differentiator.reverseModeAutoDiff(inverse, matrix).withRespectTo(matrix);
 
         DoubleTensor expectedInverseWrtMatrix = DoubleTensor.create(new double[]{
@@ -78,7 +78,7 @@ public class MatrixInverseVertexTest {
 
     @Test
     public void inverseMultipliedEqualsIdentity() {
-        DoubleVertex inputVertex = new UniformVertex(new long[]{4, 4}, -20.0, 20.0);
+        UniformVertex inputVertex = new UniformVertex(new long[]{4, 4}, -20.0, 20.0);
         DoubleVertex inverseVertex = inputVertex.matrixInverse();
         MatrixMultiplicationVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
 
@@ -88,10 +88,8 @@ public class MatrixInverseVertexTest {
 
             assertEquals(result, DoubleTensor.eye(4));
 
-            DoubleTensor changeInMultipliedWrtInput =
-                multiplied.getDerivativeWrtLatents().withRespectTo(inputVertex);
-            DoubleTensor reverseOutputWrtInput =
-                Differentiator.reverseModeAutoDiff(multiplied, inputVertex).withRespectTo(inputVertex);
+            DoubleTensor changeInMultipliedWrtInput = Differentiator.forwardModeAutoDiff(inputVertex, multiplied).of(multiplied).withRespectTo(inputVertex);
+            DoubleTensor reverseOutputWrtInput = Differentiator.reverseModeAutoDiff(multiplied, inputVertex).withRespectTo(inputVertex);
             assertEquals(changeInMultipliedWrtInput.pow(2.0).sum(), 0.0, 1e-10);
             assertEquals(reverseOutputWrtInput.pow(2.0).sum(), 0.0, 1e-10);
         }
@@ -110,7 +108,7 @@ public class MatrixInverseVertexTest {
 
     @Test
     public void inverseDifferenceMatchesGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new long[]{3, 3}, 1.0, 25.0);
+        UniformVertex inputVertex = new UniformVertex(new long[]{3, 3}, 1.0, 25.0);
         MatrixInverseVertex invertVertex = inputVertex.matrixInverse();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(

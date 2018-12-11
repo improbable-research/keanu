@@ -35,7 +35,7 @@ public class UnaryOperationTestHelpers {
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
         T output = op.apply(A);
 
-        DoubleTensor wrtAForward = output.getDerivativeWrtLatents().withRespectTo(A);
+        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output).withRespectTo(A);
         assertEquals(
             expectedGradientWrtA,
             wrtAForward.scalar(),
@@ -77,7 +77,7 @@ public class UnaryOperationTestHelpers {
 
         T output = op.apply(A);
 
-        PartialDerivatives result = output.getDerivativeWrtLatents();
+        PartialDerivatives result = Differentiator.forwardModeAutoDiff(A, output).of(output);
         DoubleTensor wrtAForward = result.withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA, wrtAForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedShape, wrtAForward.getShape());

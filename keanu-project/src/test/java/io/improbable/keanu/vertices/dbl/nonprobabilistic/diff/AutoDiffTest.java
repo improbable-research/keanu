@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -69,7 +70,7 @@ public class AutoDiffTest {
         vB.setValue(B);
         vC.eval();
 
-        PartialDerivatives dcdx = vC.getDerivativeWrtLatents();
+        PartialDerivatives dcdx = Differentiator.reverseModeAutoDiff(vC, vA, vB);
 
         DoubleTensor C = vC.getValue();
         Map<VertexId, DoubleTensor> dcdxMap = dcdx.asMap();

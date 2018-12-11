@@ -6,13 +6,17 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.TestGraphGenerator;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Test;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
@@ -22,14 +26,12 @@ public class DifferentiatorTest {
     @Test
     public void canForwardAutoDiffOfSingleOuputWithRespectToMany() {
 
-        DoubleVertex A = new GaussianVertex(0, 1);
-        DoubleVertex B = new GaussianVertex(0, 1);
+        GaussianVertex A = new GaussianVertex(0, 1);
+        GaussianVertex B = new GaussianVertex(0, 1);
         MultiplicationVertex C = A.times(B);
 
-        PartialDerivatives dC = C.getDerivativeWrtLatents();
-
-        DoubleTensor dCdA = dC.withRespectTo(A);
-        DoubleTensor dCdB = dC.withRespectTo(B);
+        DoubleTensor dCdA = Differentiator.forwardModeAutoDiff(A, C).of(C).withRespectTo(A);
+        DoubleTensor dCdB = Differentiator.forwardModeAutoDiff(B, C).of(C).withRespectTo(B);
 
         assertEquals(A.getValue(), dCdB);
         assertEquals(B.getValue(), dCdA);
@@ -76,9 +78,9 @@ public class DifferentiatorTest {
     public void reverseAutoDiffMatchesForwardWithSingleOutputWithRespectToMany() {
 
         long[] shape = new long[]{2, 2};
-        DoubleVertex A = new GaussianVertex(shape, 0, 1);
+        GaussianVertex A = new GaussianVertex(shape, 0, 1);
         A.setValue(DoubleTensor.linspace(0.1, 2, 4).reshape(shape));
-        DoubleVertex B = new GaussianVertex(shape, 0, 1);
+        GaussianVertex B = new GaussianVertex(shape, 0, 1);
         B.setValue(DoubleTensor.linspace(0.2, 1, 4).reshape(shape));
         DoubleVertex D = A.atan2(B).sigmoid().times(B);
         DoubleVertex C = A.sin().cos().div(D);
@@ -88,13 +90,12 @@ public class DifferentiatorTest {
         SumVertex H = G.plus(F).sum();
 
         PartialDerivatives dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
-        PartialDerivatives dHForward = H.getDerivativeWrtLatents();
 
         DoubleTensor dHdAReverse = dHReverse.withRespectTo(A);
         DoubleTensor dHdBReverse = dHReverse.withRespectTo(B);
 
-        DoubleTensor dHdAForward = dHForward.withRespectTo(A);
-        DoubleTensor dHdBForward = dHForward.withRespectTo(B);
+        DoubleTensor dHdAForward = Differentiator.forwardModeAutoDiff(A, H).of(H).withRespectTo(A);
+        DoubleTensor dHdBForward = Differentiator.forwardModeAutoDiff(B, H).of(H).withRespectTo(B);
 
         assertEquals(dHdAReverse, dHdAForward);
         assertEquals(dHdBReverse, dHdBForward);
@@ -104,12 +105,12 @@ public class DifferentiatorTest {
     public void reverseAutoDiffOfRank3MatchesForwardWithSingleOutputWithRespectToMany() {
 
         long[] shape = new long[]{2, 2, 2};
-        DoubleVertex A = new GaussianVertex(shape, 0, 1);
+        GaussianVertex A = new GaussianVertex(shape, 0, 1);
         A.setValue(DoubleTensor.linspace(0.1, 2, (int) TensorShape.getLength(shape)).reshape(shape));
-        DoubleVertex B = new GaussianVertex(shape, 0, 1);
+        GaussianVertex B = new GaussianVertex(shape, 0, 1);
         B.setValue(DoubleTensor.linspace(0.2, 1, (int) TensorShape.getLength(shape)).reshape(shape));
 
-        DoubleVertex C = new GaussianVertex(shape, 0, 1);
+        GaussianVertex C = new GaussianVertex(shape, 0, 1);
         C.setValue(DoubleTensor.linspace(0.2, 0.8, (int) TensorShape.getLength(shape)).reshape(shape));
 
         DoubleVertex D = A.atan2(B).sigmoid().times(B);
@@ -155,5 +156,35 @@ public class DifferentiatorTest {
 
         assertEquals(expecteddHdA, dHdA);
         assertEquals(expecteddHdB, dHdB);
+    }
+
+    @Test
+    public void doesNotPerformUnnecessaryReverseModeAutoDiffCalculations() {
+        AtomicInteger n = new AtomicInteger(0);
+        AtomicInteger m = new AtomicInteger(0);
+        UniformVertex start = new UniformVertex(0, 1);
+
+        int links = 20;
+        TestGraphGenerator.SumVertex end = TestGraphGenerator.addLinks(start, n, m, links);
+
+        Differentiator.reverseModeAutoDiff(end, start);
+
+        //Does the right amount of work
+        assertEquals(3 * links, m.get());
+    }
+
+    @Test
+    public void doesNotPerformUnnecessaryForwardModeAutoDiffCalculations() {
+        AtomicInteger n = new AtomicInteger(0);
+        AtomicInteger m = new AtomicInteger(0);
+        UniformVertex start = new UniformVertex(0, 1);
+
+        int links = 20;
+        TestGraphGenerator.SumVertex end = TestGraphGenerator.addLinks(start, n, m, links);
+
+        Differentiator.forwardModeAutoDiff(start, end);
+
+        //Does the right amount of work
+        assertEquals(3 * links, m.get());
     }
 }

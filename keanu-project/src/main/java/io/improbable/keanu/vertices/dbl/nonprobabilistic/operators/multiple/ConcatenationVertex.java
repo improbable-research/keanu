@@ -59,7 +59,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         List<DoubleTensor> inputValues = new ArrayList<>();
 
         for (DoubleVertex operand : operands) {
-            partialsOfInputs.add(derivativeOfParentsWithRespectToInputs.get(operand));
+            partialsOfInputs.add(derivativeOfParentsWithRespectToInputs.getOrDefault(operand, PartialDerivatives.OF_CONSTANT));
             inputValues.add(operand.getValue());
         }
 

@@ -71,7 +71,10 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Diffe
     @Override
     public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         try {
-            return forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs.get(left), derivativeOfParentsWithRespectToInputs.get(right));
+            return forwardModeAutoDifferentiation(
+                derivativeOfParentsWithRespectToInputs.getOrDefault(left, PartialDerivatives.OF_CONSTANT),
+                derivativeOfParentsWithRespectToInputs.getOrDefault(right, PartialDerivatives.OF_CONSTANT)
+            );
         } catch (UnsupportedOperationException e) {
             return Differentiable.super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs);
         }
