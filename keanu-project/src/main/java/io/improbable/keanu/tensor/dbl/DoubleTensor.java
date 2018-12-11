@@ -245,15 +245,17 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     default List<DoubleTensor> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {
         List<DoubleTensor> slicedTensors = new ArrayList<>();
+
         for (long i = indexStart; i < indexEnd; i++) {
             slicedTensors.add(slice(dimension, i));
         }
+
         return slicedTensors;
     }
 
+    //In place Ops and Transforms. These mutate the source vertex (i.e. this).
     @Override
     DoubleTensor setWithMask(DoubleTensor mask, Double value);
-//In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();
 
