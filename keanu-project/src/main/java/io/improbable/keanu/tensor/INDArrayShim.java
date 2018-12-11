@@ -143,6 +143,8 @@ public class INDArrayShim {
     }
 
     public static INDArray stack(int dimension, INDArray... arrays) {
+        Preconditions.checkArgument(arrays.length > 0, "Need at least one tensor to stack.");
+
         int maxDimension = arrays[0].rank();
         int minDimension = -1 + maxDimension * -1;
         Preconditions.checkArgument(dimension <= maxDimension && dimension >= minDimension, "dimension %s is out of bounds for stacking %s tensors", dimension, maxDimension);
