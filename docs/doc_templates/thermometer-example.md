@@ -16,7 +16,7 @@ micro_nav: true
 page_nav:
     prev:
         content: Previous page
-        url: '/docs/plates/'
+        url: '/docs/autocorrelation/'
     next:
         content: Next page
         url: '/docs/examples/lorenz/'
