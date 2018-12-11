@@ -12,9 +12,9 @@ import java.util.Map;
 
 public class Leapfrog {
 
-    Map<VertexId, DoubleTensor> position;
-    Map<VertexId, DoubleTensor> momentum;
-    Map<VertexId, DoubleTensor> gradient;
+    private Map<VertexId, DoubleTensor> position;
+    private Map<VertexId, DoubleTensor> momentum;
+    private Map<VertexId, DoubleTensor> gradient;
 
     Leapfrog(Map<VertexId, DoubleTensor> position,
              Map<VertexId, DoubleTensor> momentum,
@@ -66,6 +66,30 @@ public class Leapfrog {
 
     public double halfDotProductMomentum() {
         return 0.5 * dotProduct(momentum);
+    }
+
+    public Map<VertexId, DoubleTensor> getPosition() {
+        return position;
+    }
+
+    public Map<VertexId, DoubleTensor> getMomentum() {
+        return momentum;
+    }
+
+    public Map<VertexId, DoubleTensor> getGradient() {
+        return gradient;
+    }
+
+    public void setPosition(Map<VertexId, DoubleTensor> position) {
+        this.position = position;
+    }
+
+    public void setMomentum(Map<VertexId, DoubleTensor> momentum) {
+        this.momentum = momentum;
+    }
+
+    public void setGradient(Map<VertexId, DoubleTensor> gradient) {
+        this.gradient = gradient;
     }
 
     private static double dotProduct(Map<VertexId, DoubleTensor> momentums) {

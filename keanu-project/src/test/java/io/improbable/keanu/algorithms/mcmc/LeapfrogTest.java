@@ -20,8 +20,8 @@ import static org.mockito.Mockito.when;
 
 public class LeapfrogTest {
 
-    private DoubleVertex A;
-    private DoubleVertex B;
+    private DoubleVertex vertexA;
+    private DoubleVertex vertexB;
 
     private VertexId aID;
     private VertexId bID;
@@ -40,13 +40,13 @@ public class LeapfrogTest {
 
     @Before
     public void setupGraphForLeapfrog() {
-        A = new GaussianVertex(0, 1);
-        B = new GaussianVertex(0, 1);
+        vertexA = new GaussianVertex(0, 1);
+        vertexB = new GaussianVertex(0, 1);
 
-        vertices = Arrays.asList(A, B);
+        vertices = Arrays.asList(vertexA, vertexB);
 
-        aID = A.getId();
-        bID = B.getId();
+        aID = vertexA.getId();
+        bID = vertexB.getId();
 
         ids = Arrays.asList(aID, bID);
 
@@ -84,14 +84,14 @@ public class LeapfrogTest {
         Leapfrog start = new Leapfrog(position, momentum, gradient);
         Leapfrog leap = start.step(vertices, mockedGradientCalculator, epsilon);
 
-        Assert.assertEquals(1.0, leap.position.get(aID).scalar(), 1e-6);
-        Assert.assertEquals(1.0, leap.position.get(bID).scalar(), 1e-6);
+        Assert.assertEquals(1.0, leap.getPosition().get(aID).scalar(), 1e-6);
+        Assert.assertEquals(1.0, leap.getPosition().get(bID).scalar(), 1e-6);
 
-        Assert.assertEquals(2.5, leap.momentum.get(aID).scalar(), 1e-6);
-        Assert.assertEquals(1.5, leap.momentum.get(bID).scalar(), 1e-6);
+        Assert.assertEquals(2.5, leap.getMomentum().get(aID).scalar(), 1e-6);
+        Assert.assertEquals(1.5, leap.getMomentum().get(bID).scalar(), 1e-6);
 
-        Assert.assertEquals(1.0, leap.gradient.get(aID).scalar(), 1e-6);
-        Assert.assertEquals(-1.0, leap.gradient.get(bID).scalar(), 1e-6);
+        Assert.assertEquals(1.0, leap.getGradient().get(aID).scalar(), 1e-6);
+        Assert.assertEquals(-1.0, leap.getGradient().get(bID).scalar(), 1e-6);
     }
 
     @Test
@@ -99,15 +99,15 @@ public class LeapfrogTest {
         Leapfrog start = new Leapfrog(position, momentum, gradient);
         Leapfrog leapForward = start.step(vertices, mockedGradientCalculator, epsilon);
 
-        Map<VertexId, DoubleTensor> momentum = new HashMap<>(leapForward.momentum);
+        Map<VertexId, DoubleTensor> momentum = new HashMap<>(leapForward.getMomentum());
 
-        fillMap(leapForward.momentum, DoubleTensor.scalar(-1.0));
-        fillMap(leapForward.gradient, DoubleTensor.scalar(-2.0));
+        fillMap(leapForward.getMomentum(), DoubleTensor.scalar(-1.0));
+        fillMap(leapForward.getGradient(), DoubleTensor.scalar(-2.0));
 
         Leapfrog leapBackToStart = leapForward.step(vertices, mockedReverseGradientCalculator, epsilon);
 
-        assertMapsAreEqual(start.position, leapBackToStart.position);
-        assertMapsAreEqual(momentum, revertDirectionOfMap(leapBackToStart.momentum));
+        assertMapsAreEqual(start.getPosition(), leapBackToStart.getPosition());
+        assertMapsAreEqual(momentum, revertDirectionOfMap(leapBackToStart.getMomentum()));
     }
 
     private void fillMap(Map<VertexId, DoubleTensor> map, DoubleTensor value) {

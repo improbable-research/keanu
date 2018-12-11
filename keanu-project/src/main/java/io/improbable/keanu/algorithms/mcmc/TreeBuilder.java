@@ -219,10 +219,10 @@ public class TreeBuilder {
                 );
 
                 tree.shouldContinueFlag = otherHalfTree.shouldContinueFlag && isNotUTurning(
-                    tree.leapfrogForward.position,
-                    tree.leapfrogBackward.position,
-                    tree.leapfrogForward.momentum,
-                    tree.leapfrogBackward.momentum
+                    tree.leapfrogForward.getPosition(),
+                    tree.leapfrogBackward.getPosition(),
+                    tree.leapfrogForward.getMomentum(),
+                    tree.leapfrogBackward.getMomentum()
                 );
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
@@ -263,8 +263,8 @@ public class TreeBuilder {
         return new TreeBuilder(
             leapfrog,
             leapfrog,
-            leapfrog.position,
-            leapfrog.gradient,
+            leapfrog.getPosition(),
+            leapfrog.getGradient(),
             logOfMasterPAfterLeapfrog,
             sampleAtAcceptedPosition,
             acceptedLeapfrogCount,
@@ -374,27 +374,27 @@ public class TreeBuilder {
     }
 
     public Map<VertexId, DoubleTensor> getForwardPosition() {
-        return leapfrogForward.position;
+        return leapfrogForward.getPosition();
     }
 
     public Map<VertexId, DoubleTensor> getBackwardPosition() {
-        return leapfrogBackward.position;
+        return leapfrogBackward.getPosition();
     }
 
     public Map<VertexId, DoubleTensor> getForwardGradient() {
-        return leapfrogForward.gradient;
+        return leapfrogForward.getGradient();
     }
 
     public Map<VertexId, DoubleTensor> getBackwardGradient() {
-        return leapfrogBackward.gradient;
+        return leapfrogBackward.getGradient();
     }
 
     public Map<VertexId, DoubleTensor> getForwardMomentum() {
-        return leapfrogForward.momentum;
+        return leapfrogForward.getMomentum();
     }
 
     public Map<VertexId, DoubleTensor> getBackwardMomentum() {
-        return leapfrogBackward.momentum;
+        return leapfrogBackward.getMomentum();
     }
 
     public void acceptPositionAndGradient() {
@@ -405,19 +405,19 @@ public class TreeBuilder {
     }
 
     private void setForwardPosition(Map<VertexId, DoubleTensor> forwardPosition) {
-        leapfrogForward.position = forwardPosition;
+        leapfrogForward.setPosition(forwardPosition);
     }
 
     private void setBackwardPosition(Map<VertexId, DoubleTensor> backwardPosition) {
-        leapfrogBackward.position = backwardPosition;
+        leapfrogBackward.setPosition(backwardPosition);
     }
 
     private void setForwardGradient(Map<VertexId, DoubleTensor> forwardGradient) {
-        leapfrogForward.gradient = forwardGradient;
+        leapfrogForward.setGradient(forwardGradient);
     }
 
     private void setBackwardGradient(Map<VertexId, DoubleTensor> backwardGradient) {
-        leapfrogBackward.gradient = backwardGradient;
+        leapfrogBackward.setGradient(backwardGradient);
     }
 
 }
