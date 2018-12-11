@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Pareto;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -40,7 +41,9 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
      * @param location    the location value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
      * @param scale       the scale value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
      */
-    public ParetoVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
+    public ParetoVertex(@LoadShape long[] tensorShape,
+                        @LoadVertexParam(LOCATION_NAME) DoubleVertex location,
+                        @LoadVertexParam(SCALE_NAME) DoubleVertex scale) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, location.getShape(), scale.getShape());
 
@@ -50,8 +53,7 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
     }
 
     @ExportVertexToPythonBindings
-    public ParetoVertex(@LoadVertexParam(LOCATION_NAME) DoubleVertex location,
-                        @LoadVertexParam(SCALE_NAME) DoubleVertex scale) {
+    public ParetoVertex(DoubleVertex location, DoubleVertex scale) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(location.getShape(), scale.getShape()), location, scale);
     }
 

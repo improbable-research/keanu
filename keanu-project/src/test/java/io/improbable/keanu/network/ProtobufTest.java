@@ -466,6 +466,8 @@ public class ProtobufTest {
                 assertThat("Annotation can only be used once for class: " + vertexClass, requiredParameters,
                     not(hasKey(parameterAnnotation.value())));
                 requiredParameters.put(parameterAnnotation.value(), parameter.getType());
+            } else {
+                parameter.getType().isAssignableFrom(Long[].class);
             }
         }
 

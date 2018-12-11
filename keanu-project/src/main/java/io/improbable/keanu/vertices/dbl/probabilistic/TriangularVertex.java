@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -37,7 +38,10 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
      * @param xMax        the xMax of the Triangular with either the same shape as specified for this vertex or a scalar
      * @param c           the center of the Triangular with either the same shape as specified for this vertex or a scalar
      */
-    public TriangularVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
+    public TriangularVertex(@LoadShape long[] tensorShape,
+                            @LoadVertexParam(X_MIN_NAME) DoubleVertex xMin,
+                            @LoadVertexParam(X_MAX_NAME) DoubleVertex xMax,
+                            @LoadVertexParam(C_NAME) DoubleVertex c) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape(), c.getShape());
 
@@ -79,9 +83,7 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
      * @param c    the c of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public TriangularVertex(@LoadVertexParam(X_MIN_NAME) DoubleVertex xMin,
-                            @LoadVertexParam(X_MAX_NAME) DoubleVertex xMax,
-                            @LoadVertexParam(C_NAME) DoubleVertex c) {
+    public TriangularVertex(DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(xMin.getShape(), xMax.getShape(), c.getShape()), xMin, xMax, c);
     }
 
