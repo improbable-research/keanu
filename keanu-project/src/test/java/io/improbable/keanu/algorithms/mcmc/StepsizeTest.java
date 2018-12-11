@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 
 public class StepsizeTest {
 
-
     private KeanuRandom random = new KeanuRandom(1);
 
     @Test

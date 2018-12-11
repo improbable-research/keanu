@@ -95,9 +95,9 @@ public class NUTSTest {
     @Test
     public void samplesContinuousPrior() {
 
-        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 24.0);
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 15.0);
 
-        int sampleCount = 2000;
+        int sampleCount = 5000;
         NUTS nuts = NUTS.builder()
             .adaptCount(sampleCount)
             .maxTreeHeight(10)
