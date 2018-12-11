@@ -27,7 +27,7 @@ def net() -> BayesNet:
 def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: str, net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
-    vertex_labels = [vertex.get_label().getQualifiedName() for vertex in sample_from]
+    vertex_labels = [vertex.get_label() for vertex in sample_from]
 
     samples = sample(net=net, sample_from=sample_from, algo=algo, draws=draws)
     assert len(samples) == len(sample_from)
