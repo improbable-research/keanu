@@ -39,9 +39,10 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
      */
     public DoubleTensor getAutocorrelation(long... index) {
         TensorShapeValidation.checkIndexIsValid(sampleShape, index);
-
+        // For when the samples are scalar
+        long[] indexToGet = sampleShape.length == 0 ? new long[] {0} : index;
         double[] sampleValuesAtIndex = samples.stream()
-            .mapToDouble(x -> x.getValue(index))
+            .mapToDouble(x -> x.getValue(indexToGet))
             .toArray();
         double[] autocorr = Autocorrelation.calculate(sampleValuesAtIndex);
         return DoubleTensor.create(autocorr);
