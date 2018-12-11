@@ -5,4 +5,5 @@ __all__ = [${exportedMethods}]
 
 from .generated import *
 from .const import Const
+from .lambda_model import LambdaModel
 from . import generated, const

@@ -3,7 +3,7 @@ import io
 import os
 import logging
 from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView
-from py4j.java_collections import JavaList, JavaArray, JavaSet
+from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
 from typing import Dict, Any, Iterable, List, Collection, Set
 from _io import TextIOWrapper
 
@@ -61,6 +61,14 @@ class KeanuContext(metaclass=Singleton):
 
     def jvm_view(self) -> JVMView:
         return self.__jvm_view
+
+    def to_java_map(self, python_map: Dict[Any, Any]) -> JavaMap:
+        m = self._gateway.jvm.java.util.HashMap()
+
+        for (k, v) in python_map.items():
+            m.put(k.unwrap(), v.unwrap())
+
+        return m
 
     def to_java_object_list(self, l: Iterable[Any]) -> JavaList:
         lst = self._gateway.jvm.java.util.ArrayList()
