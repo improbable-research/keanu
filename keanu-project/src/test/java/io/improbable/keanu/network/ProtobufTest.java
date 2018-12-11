@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -46,6 +47,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -456,14 +458,20 @@ public class ProtobufTest {
             LoadVertexParam.class);
         assertThat("Need Constructor for Class: " + vertexClass, parentConstructor.size(), is(1));
         Map<String, Class> requiredParameters = new HashMap<>();
+        Object checkArray[] = new Object[2];
 
         for (Parameter parameter : parentConstructor.get(0).getParameters()) {
-            LoadVertexParam annotation = parameter.getAnnotation(LoadVertexParam.class);
-            assertThat("Annotation has to be present on all params for class: " + vertexClass, annotation,
-                is(notNullValue()));
-            assertThat("Annotation can only be used once for class: " + vertexClass, requiredParameters,
-                not(hasKey(annotation.value())));
-            requiredParameters.put(annotation.value(), parameter.getType());
+            LoadVertexParam parameterAnnotation = parameter.getAnnotation(LoadVertexParam.class);
+            checkArray[0] = parameterAnnotation;
+            LoadShape shapeAnnotation = parameter.getAnnotation(LoadShape.class);
+            checkArray[1] = shapeAnnotation;
+            assertThat("Annotation has to be present on all params for class: " + vertexClass, checkArray,
+                hasItemInArray(notNullValue()));
+            if (parameterAnnotation != null) {
+                assertThat("Annotation can only be used once for class: " + vertexClass, requiredParameters,
+                    not(hasKey(parameterAnnotation.value())));
+                requiredParameters.put(parameterAnnotation.value(), parameter.getType());
+            }
         }
 
         return requiredParameters;

@@ -9,6 +9,7 @@ import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -21,6 +22,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ProtobufLoader implements NetworkLoader {
@@ -168,7 +170,7 @@ public class ProtobufLoader implements NetworkLoader {
         }
 
         Map<String, Object> parameterMap = getParameterMap(vertex, existingVertices);
-        Vertex newVertex = instantiateVertex(vertexClass, parameterMap);
+        Vertex newVertex = instantiateVertex(vertexClass, parameterMap, vertex.getShapeList());
 
         if (!vertex.getLabel().isEmpty()) {
             newVertex.setLabel(vertex.getLabel());
@@ -178,24 +180,14 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private Vertex instantiateVertex(Class vertexClass,
-                                     Map<String, Object> paramMap) {
+                                     Map<String, Object> paramMap,
+                                     List<Long> shape) {
         Constructor<Vertex> loadConstructor = getAnnotatedConstructor(vertexClass);
         Parameter[] constructorParameters = loadConstructor.getParameters();
         Object[] arguments = new Object[constructorParameters.length];
 
         for (int i = 0; i < constructorParameters.length; i++) {
-            LoadVertexParam paramAnnotation = constructorParameters[i].getAnnotation(LoadVertexParam.class);
-
-            if (paramAnnotation != null) {
-                Object parameter = paramMap.get(paramAnnotation.value());
-                if (parameter == null) {
-                    throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
-                        + paramAnnotation.value());
-                }
-                arguments[i] = parameter;
-            } else {
-                throw new IllegalArgumentException("Cannot create Vertex due to unannotated parameter in constructor");
-            }
+            arguments[i] = getParameter(constructorParameters[i], paramMap, shape);
 
             Class argumentClass = arguments[i].getClass();
             Class parameterClass = Primitives.wrap(constructorParameters[i].getType());
@@ -213,13 +205,33 @@ public class ProtobufLoader implements NetworkLoader {
         }
     }
 
+    private Object getParameter(Parameter methodParameter, Map<String, Object> paramMap, List<Long> shape) {
+        LoadVertexParam paramAnnotation = methodParameter.getAnnotation(LoadVertexParam.class);
+        LoadShape shapeAnnotation;
+
+        if (paramAnnotation != null) {
+            Object parameter = paramMap.get(paramAnnotation.value());
+            if (parameter == null) {
+                throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
+                    + paramAnnotation.value());
+            }
+            return parameter;
+        } else if ((shapeAnnotation = methodParameter.getAnnotation(LoadShape.class)) != null) {
+            return Longs.toArray(shape);
+        } else {
+            throw new IllegalArgumentException("Cannot create Vertex due to unannotated parameter in constructor");
+        }
+    }
+
     private Constructor getAnnotatedConstructor(Class vertexClass) {
         Constructor[] constructors = vertexClass.getConstructors();
 
         for (Constructor constructor : constructors) {
             Parameter[] parameters = constructor.getParameters();
 
-            if (parameters.length > 0 && parameters[0].isAnnotationPresent(LoadVertexParam.class)) {
+            if (parameters.length > 0 &&
+                (parameters[0].isAnnotationPresent(LoadVertexParam.class)
+                    || parameters[0].isAnnotationPresent(LoadShape.class))) {
                 return constructor;
             }
         }
