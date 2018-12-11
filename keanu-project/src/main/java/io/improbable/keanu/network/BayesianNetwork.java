@@ -259,7 +259,7 @@ public class BayesianNetwork {
     }
 
     public void saveValues(NetworkSaver networkSaver) {
-        for (Vertex vertex : vertices) {
+        for (Vertex vertex : TopologicalSort.sort(vertices)) {
             vertex.saveValue(networkSaver);
         }
     }
