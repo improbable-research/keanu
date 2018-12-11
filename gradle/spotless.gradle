@@ -10,6 +10,6 @@ spotless {
     format 'python', {
         target '**/*.py'
 
-        replaceRegex 'loggers may not use root context', /logging.warning/, 'logging.getLogger("keanu").warning'
+        replaceRegex 'loggers may not use root context', /logging.(debug|info|warning|error|critical|exception|log)/, 'logging.getLogger("keanu").$1'
     }
 }
