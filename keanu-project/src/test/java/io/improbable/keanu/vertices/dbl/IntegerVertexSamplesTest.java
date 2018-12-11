@@ -8,6 +8,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -71,7 +72,11 @@ public class IntegerVertexSamplesTest {
 
         assertThat(samplesAsTensor.getShape(), equalTo(new long[] {4, 1, 3}));
 
-        List<IntegerTensor> samplesAsTensorSliced = samplesAsTensor.sliceAlongDimension(0, 0, samplesAsTensor.getShape()[0]);
+        List<IntegerTensor> samplesAsTensorSliced = new ArrayList<>();
+        for (long i = 0; i < samplesAsTensor.getShape()[0]; i++) {
+            samplesAsTensorSliced.add(samplesAsTensor.slice(0, i));
+        }
+
         for (int i = 0; i < samplesAsList.size(); i++) {
             IntegerTensor sampleFromList = samplesAsList.get(i);
             IntegerTensor sampleFromTensor = samplesAsTensorSliced.get(i);

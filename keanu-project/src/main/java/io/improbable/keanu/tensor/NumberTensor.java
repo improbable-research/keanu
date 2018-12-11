@@ -80,16 +80,6 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
 
     T apply(Function<N, N> function);
 
-    default List<T> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {
-        List<T> slicedTensors = new ArrayList<>();
-
-        for (long i = indexStart; i < indexEnd; i++) {
-            slicedTensors.add((T) slice(dimension, i));
-        }
-
-        return slicedTensors;
-    }
-    
     // In Place
 
     T minusInPlace(T that);
