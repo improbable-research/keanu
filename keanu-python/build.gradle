@@ -68,7 +68,7 @@ task pytest {
             commandLine 'pipenv', 'run', 'pytest', 'tests/test_lorenz.py'
         }
         exec {
-            commandLine 'pipenv', 'run', 'pytest', '--mpl', '--mpl-baseline-path=tests/baseline', '-p', 'no:warnings', '--ignore=tests/test_gradient_optimization.py', '--ignore=tests/test_lorenz.py'
+            commandLine 'pipenv', 'run', 'pytest', '-p', 'no:warnings', '--ignore=tests/test_gradient_optimization.py', '--ignore=tests/test_lorenz.py'
         }
     }
 }

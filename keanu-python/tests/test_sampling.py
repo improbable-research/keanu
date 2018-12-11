@@ -11,7 +11,6 @@ from keanu import BayesNet, KeanuRandom, Model
 from keanu.algorithm import sample, generate_samples, AcceptanceRateTracker
 from keanu.vertex import Gamma, Exponential, Cauchy, KeanuContext, Bernoulli
 from typing import Any
-import os
 
 
 @pytest.fixture
@@ -65,14 +64,16 @@ def test_down_sample_interval(net: BayesNet) -> None:
     assert all(len(vertex_samples) == expected_num_samples for label, vertex_samples in samples.items())
 
 
-@pytest.mark.mpl_image_compare(filename='test_sampling_windows.png' if os.name == 'nt' else 'test_sampling_linux.png')
-def test_sample_with_plot(net: BayesNet) -> Any:
+def test_sample_with_plot(net: BayesNet) -> None:
     KeanuRandom.set_default_random_seed(1)
-    fig, ax = plt.subplots(3, 1, squeeze=False)
+    _, ax = plt.subplots(3, 1, squeeze=False)
     sample(net=net, sample_from=net.get_latent_vertices(), draws=5, plot=True, ax=ax)
 
     reorder_subplots(ax)
-    return fig
+
+    assert np.allclose(ax[0][0].get_lines()[0].get_ydata(), [0.49147822, 0.49147822, 0.49147822, 0.20033212, 0.20033212])
+    assert np.allclose(ax[1][0].get_lines()[0].get_ydata(), [0.87268333, 1.10409369, 1.10409369, 1.10409369, 0.69098161])
+    assert np.allclose(ax[2][0].get_lines()[0].get_ydata(), [-14.46166855, -14.46166855, 0.32305686, 0.32305686, 0.32305686])
 
 
 def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
@@ -111,17 +112,19 @@ def test_iter_returns_same_result_as_sample(algo: str) -> None:
         np.testing.assert_almost_equal(samples_dataframe[vertex_label].mean(), np.average(samples[vertex_label]))
 
 
-@pytest.mark.mpl_image_compare(filename='test_sampling_windows.png' if os.name == 'nt' else 'test_sampling_linux.png')
-def test_iter_with_live_plot(net: BayesNet) -> Any:
+def test_iter_with_live_plot(net: BayesNet) -> None:
     KeanuRandom.set_default_random_seed(1)
-    fig, ax = plt.subplots(3, 1, squeeze=False)
+    _, ax = plt.subplots(3, 1, squeeze=False)
     samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), live_plot=True, refresh_every=5, ax=ax)
 
     for sample in islice(samples, 5):
         pass
 
     reorder_subplots(ax)
-    return fig
+
+    assert np.allclose(ax[0][0].get_lines()[0].get_ydata(), [0.49147822, 0.49147822, 0.49147822, 0.20033212, 0.20033212])
+    assert np.allclose(ax[1][0].get_lines()[0].get_ydata(), [0.87268333, 1.10409369, 1.10409369, 1.10409369, 0.69098161])
+    assert np.allclose(ax[2][0].get_lines()[0].get_ydata(), [-14.46166855, -14.46166855,  0.32305686, 0.32305686, 0.32305686])
 
 
 def test_can_get_acceptance_rates(net: BayesNet) -> None:
