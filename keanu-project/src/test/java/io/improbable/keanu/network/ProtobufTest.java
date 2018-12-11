@@ -47,12 +47,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 
 public class ProtobufTest {
@@ -458,15 +456,12 @@ public class ProtobufTest {
             LoadVertexParam.class);
         assertThat("Need Constructor for Class: " + vertexClass, parentConstructor.size(), is(1));
         Map<String, Class> requiredParameters = new HashMap<>();
-        Object checkArray[] = new Object[2];
 
         for (Parameter parameter : parentConstructor.get(0).getParameters()) {
             LoadVertexParam parameterAnnotation = parameter.getAnnotation(LoadVertexParam.class);
-            checkArray[0] = parameterAnnotation;
             LoadShape shapeAnnotation = parameter.getAnnotation(LoadShape.class);
-            checkArray[1] = shapeAnnotation;
-            assertThat("Annotation has to be present on all params for class: " + vertexClass, checkArray,
-                hasItemInArray(notNullValue()));
+            assertThat("Annotation has to be present on all Constructor params for class: " + vertexClass,
+                parameterAnnotation != null || shapeAnnotation != null);
             if (parameterAnnotation != null) {
                 assertThat("Annotation can only be used once for class: " + vertexClass, requiredParameters,
                     not(hasKey(parameterAnnotation.value())));

@@ -206,10 +206,10 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private Object getParameter(Parameter methodParameter, Map<String, Object> paramMap, List<Long> shape) {
-        LoadVertexParam paramAnnotation = methodParameter.getAnnotation(LoadVertexParam.class);
+        LoadVertexParam paramAnnotation;
         LoadShape shapeAnnotation;
 
-        if (paramAnnotation != null) {
+        if ((paramAnnotation = methodParameter.getAnnotation(LoadVertexParam.class)) != null) {
             Object parameter = paramMap.get(paramAnnotation.value());
             if (parameter == null) {
                 throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
