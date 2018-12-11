@@ -143,7 +143,7 @@ public class INDArrayShim {
     }
 
     public static INDArray stack(int dimension, INDArray... arrays) {
-        int maxDimension = arrays.length;
+        int maxDimension = arrays[0].rank();
         int minDimension = -1 + maxDimension * -1;
         Preconditions.checkArgument(dimension <= maxDimension && dimension >= minDimension, "dimension %s is out of bounds for stacking %s tensors", dimension, maxDimension);
 
@@ -151,8 +151,8 @@ public class INDArrayShim {
         long[] shape = arrays[0].shape();
         long[] newShape = ArrayUtils.insert(positive_dimension, shape, 1);
 
-        INDArray[] reshaped = new INDArray[maxDimension];
-        for (int i = 0; i < maxDimension; i++) {
+        INDArray[] reshaped = new INDArray[arrays.length];
+        for (int i = 0; i < arrays.length; i++) {
             reshaped[i] = arrays[i].reshape(arrays[i].ordering(), newShape);
         }
 
