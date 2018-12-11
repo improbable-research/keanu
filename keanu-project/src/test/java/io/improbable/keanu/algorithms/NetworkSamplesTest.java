@@ -3,7 +3,6 @@ package io.improbable.keanu.algorithms;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.VertexId;
 import org.junit.Before;
@@ -119,11 +118,9 @@ public class NetworkSamplesTest {
             v1, v1Samples.get(1),
             v2, v2Samples.get(1)
         );
-        NetworkState firstNetworkState = new SimpleNetworkState(vertexValsFirstSample);
-        NetworkState secondNetworkState = new SimpleNetworkState(vertexValsSecondSample);
         NetworkSamples networkSamples = NetworkSamples.from(ImmutableList.of(
-            new NetworkSample(firstNetworkState, logOfMasterPBySample.get(0)),
-            new NetworkSample(secondNetworkState, logOfMasterPBySample.get(1))
+            new NetworkSample(vertexValsFirstSample, logOfMasterPBySample.get(0)),
+            new NetworkSample(vertexValsSecondSample, logOfMasterPBySample.get(1))
         ));
         assertEquals(v1Samples, networkSamples.get(v1).asList());
         assertEquals(v2Samples, networkSamples.get(v2).asList());

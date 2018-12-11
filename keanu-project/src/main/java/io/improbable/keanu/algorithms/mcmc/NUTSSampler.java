@@ -2,8 +2,6 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
@@ -90,8 +88,7 @@ public class NUTSSampler implements SamplingAlgorithm {
     @Override
     public NetworkSample sample() {
         step();
-        NetworkState networkState = new SimpleNetworkState(tree.sampleAtAcceptedPosition);
-        return new NetworkSample(networkState,tree.logOfMasterPAtAcceptedPosition);
+        return new NetworkSample(tree.sampleAtAcceptedPosition,tree.logOfMasterPAtAcceptedPosition);
     }
 
     @Override

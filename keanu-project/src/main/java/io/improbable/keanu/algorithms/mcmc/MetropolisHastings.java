@@ -6,8 +6,6 @@ import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -123,10 +121,10 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         private int sampleNum;
 
         public MetropolisHastingsSampler(List<Vertex> latentVertices,
-                       List<? extends Vertex> verticesToSampleFrom,
-                       MetropolisHastingsStep mhStep,
-                       MHStepVariableSelector variableSelector,
-                       double logProbabilityBeforeStep) {
+                                         List<? extends Vertex> verticesToSampleFrom,
+                                         MetropolisHastingsStep mhStep,
+                                         MHStepVariableSelector variableSelector,
+                                         double logProbabilityBeforeStep) {
             this.latentVertices = latentVertices;
             this.verticesToSampleFrom = verticesToSampleFrom;
             this.mhStep = mhStep;
@@ -157,8 +155,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         @Override
         public NetworkSample sample() {
             step();
-            NetworkState networkState = new SimpleNetworkState(takeSample(verticesToSampleFrom));
-            return new NetworkSample(networkState,logProbabilityBeforeStep);
+            return new NetworkSample(takeSample(verticesToSampleFrom), logProbabilityBeforeStep);
         }
     }
 

@@ -2,8 +2,6 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.VertexId;
 import lombok.Value;
@@ -164,8 +162,7 @@ public class NetworkSamplesGeneratorTest {
         @Override
         public NetworkSample sample() {
             sampleCount.incrementAndGet();
-            NetworkState networkState = new SimpleNetworkState(Collections.emptyMap());
-            return new NetworkSample(networkState, 0.0);
+            return new NetworkSample(Collections.emptyMap(), 0.0);
         }
     }
 }
