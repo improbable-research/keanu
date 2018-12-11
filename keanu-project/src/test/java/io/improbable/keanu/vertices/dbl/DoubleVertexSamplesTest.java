@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl;
 
 import com.google.common.collect.ImmutableList;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
@@ -68,9 +69,7 @@ public class DoubleVertexSamplesTest {
         for (int i = 0; i < samplesAsList.size(); i++) {
             DoubleTensor sampleFromList = samplesAsList.get(i);
             DoubleTensor sampleFromTensor = samplesAsTensorSliced.get(i);
-
-            assertThat(sampleFromList.getShape(), equalTo(sampleFromTensor.getShape()));
-            assertThat(sampleFromList.asFlatDoubleArray(), equalTo(sampleFromTensor.asFlatDoubleArray()));
+            assertThat(sampleFromList, valuesAndShapesMatch(sampleFromTensor));
         }
     }
 
