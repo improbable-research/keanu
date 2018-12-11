@@ -6,4 +6,10 @@ spotless {
         removeUnusedImports()
         importOrder '', 'javax', 'java', 'static '
     }
+
+    format 'python', {
+        target '**/*.py'
+
+        replaceRegex 'loggers may not use root context', /logging.warning/, 'logging.getLogger("keanu").warning'
+    }
 }
