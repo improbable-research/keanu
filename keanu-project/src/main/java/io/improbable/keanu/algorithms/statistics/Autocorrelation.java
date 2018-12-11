@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms;
+package io.improbable.keanu.algorithms.statistics;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.math3.complex.Complex;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 @UtilityClass
-public class SampleStats {
+public class Autocorrelation {
     private static final FastFourierTransformer ffTransformer = new FastFourierTransformer(DftNormalization.STANDARD);
 
     /**
@@ -19,7 +19,7 @@ public class SampleStats {
      * @param samples the values to calculate autocorrelation on.
      * @return An array of autocorrelations at different lags.
      */
-    public static double[] autocorrelation(double[] samples) {
+    public static double[] calculate(double[] samples) {
         double[] acovResult = autocovariance(samples);
         double variance = acovResult[0];
         double[] autocorr = Arrays.stream(acovResult).map(x -> x / variance).toArray();

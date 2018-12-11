@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
-import io.improbable.keanu.algorithms.SampleStats;
+import io.improbable.keanu.algorithms.statistics.Autocorrelation;
 import io.improbable.keanu.algorithms.VertexSamples;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -43,7 +43,7 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
         double[] sampleValuesAtIndex = samples.stream()
             .mapToDouble(x -> x.getValue(index))
             .toArray();
-        double[] autocorr = SampleStats.autocorrelation(sampleValuesAtIndex);
+        double[] autocorr = Autocorrelation.calculate(sampleValuesAtIndex);
         return DoubleTensor.create(autocorr);
     }
 
