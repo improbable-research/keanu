@@ -1,5 +1,6 @@
 package io.improbable.keanu.network;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -20,6 +21,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -268,6 +270,27 @@ public class ProtobufTest {
         BayesianNetwork net = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
         GaussianVertex newGauss = (GaussianVertex)net.getVertexByLabel(new VertexLabel(GAUSS_LABEL));
         assertThat(newGauss.getValue().scalar(), is(GAUSS_VALUE));
+    }
+
+    @Test
+    public void metadataCanBeSavedToProtobuf() throws IOException {
+        Vertex vertex = new ConstantIntegerVertex(1);
+        BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
+        Map<String, String> metadata = ImmutableMap.of( "Author", "Some Author", "Tag", "MyBayesNet" );
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+        ProtobufSaver protobufSaver = new ProtobufSaver(net);
+        protobufSaver.save(writer, true, metadata);
+        KeanuSavedBayesNet.Model parsedModel = KeanuSavedBayesNet.Model.parseFrom(writer.toByteArray());
+
+        KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
+        String[] metadataKeys = metadata.keySet().toArray(new String[metadata.size()]);
+        Arrays.sort(metadataKeys);
+        for (String metadataKey : metadataKeys) {
+            metadataBuilder.putMetadataInfo(metadataKey, metadata.get(metadataKey));
+        }
+
+        assertEquals(parsedModel.getMetadata().getMetadataInfoMap(), metadataBuilder.getMetadataInfoMap());
     }
 
     @Test
