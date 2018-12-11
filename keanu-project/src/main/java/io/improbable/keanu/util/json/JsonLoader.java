@@ -15,9 +15,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Utility class for parsing a network from JSON format to a BayesianNetwork object.
+ *
+ * Usage:
+ * Create jsonLoader: JsonLoader jsonLoader = new JsonLoader();
+ * Loading in a network: BayesianNetwork net = jsonLoader.loadNetwork(inputStream);
+ * where inputStream is a stream of network in JSON format.
+ */
 public class JsonLoader implements NetworkLoader {
 
-    ProtobufLoader protobufLoader = new ProtobufLoader();
+    private ProtobufLoader protobufLoader = new ProtobufLoader();
 
     @Override
     public BayesianNetwork loadNetwork(InputStream input) throws IOException {

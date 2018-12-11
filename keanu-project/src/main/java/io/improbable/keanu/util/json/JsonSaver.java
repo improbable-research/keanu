@@ -54,10 +54,6 @@ public class JsonSaver implements NetworkSaver{
         outputWriter.close();
     }
 
-    public void save(OutputStream output, boolean saveValues) throws IOException {
-        save(output, saveValues, null);
-    }
-
     @Override
     public void save(Vertex vertex) {
         protobufSaver.save(vertex);

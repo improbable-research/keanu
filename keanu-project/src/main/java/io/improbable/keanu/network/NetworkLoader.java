@@ -11,6 +11,7 @@ import java.io.InputStream;
 public interface NetworkLoader {
 
     BayesianNetwork loadNetwork(InputStream input) throws IOException;
+
     void loadValue(DoubleVertex vertex);
     void loadValue(BoolVertex vertex);
     void loadValue(IntegerVertex vertex);

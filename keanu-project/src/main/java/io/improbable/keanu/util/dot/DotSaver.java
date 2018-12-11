@@ -23,7 +23,7 @@ import java.util.Set;
 
 
 /**
- * Utility class for outputting a network to a DOT file that can then be used by a range of graph visualisers.
+ * Utility class for outputting a network to a DOT file that can then be used by a range of graph visualizers.
  * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
  * <p>
  * Usage:
@@ -48,20 +48,7 @@ public class DotSaver implements NetworkSaver {
     }
 
     /**
-     * Outputs the network to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
-     * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
-     *
-     * @param output     output stream to use for writing
-     * @param saveValues specify whether you want to output values of non-constant scalar vertices
-     * @throws IOException Any errors that occur during saving to the output stream
-     */
-    @Override
-    public void save(OutputStream output, boolean saveValues) throws IOException {
-        save(output, saveValues, null);
-    }
-
-    /**
-     * Outputs the network to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
+     * Outputs the network to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
      * @param output     output stream to use for writing
@@ -77,12 +64,12 @@ public class DotSaver implements NetworkSaver {
     }
 
     /**
-     * Outputs a subgraph around the specified vertex to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
+     * Outputs a subgraph around the specified vertex to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
      * @param output     output stream to use for writing
      * @param vertex     vertex around which the subgraph will be centered
-     * @param degree     degree of connections to be visualised; for instance, if the degree is 1,
+     * @param degree     degree of connections to be visualized; for instance, if the degree is 1,
      *                   only connections between the vertex and its parents and children will be written out to the DOT file.
      * @param saveValues specify whether you want to output values of non-constant scalar vertices
      * @throws IOException Any errors that occur during saving to the output stream
@@ -92,12 +79,12 @@ public class DotSaver implements NetworkSaver {
     }
 
     /**
-     * Outputs a subgraph around the specified vertex to a DOT file which can be used by various graph visualisers to generate a visual representation of the graph.
+     * Outputs a subgraph around the specified vertex to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
      * @param output     output stream to use for writing
      * @param vertex     vertex around which the subgraph will be centered
-     * @param degree     degree of connections to be visualised; for instance, if the degree is 1,
+     * @param degree     degree of connections to be visualized; for instance, if the degree is 1,
      *                   only connections between the vertex and its parents and children will be written out to the DOT file.
      * @param saveValues specify whether you want to output values of non-constant scalar vertices
      * @param metadata   metadata to be added to the output as comments

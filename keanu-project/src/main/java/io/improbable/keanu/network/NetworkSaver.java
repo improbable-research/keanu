@@ -16,9 +16,11 @@ import java.util.Map;
 public interface NetworkSaver {
 
     void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException;
+
     default void save(OutputStream output, boolean saveValues) throws IOException {
         save(output, saveValues, null);
     }
+
     void save(Vertex vertex);
 
     default void save(ConstantVertex vertex) {

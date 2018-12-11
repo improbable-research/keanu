@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class ProtobufSaver implements NetworkSaver {
+
     private final BayesianNetwork net;
     private KeanuSavedBayesNet.Model.Builder modelBuilder = null;
 
@@ -36,15 +37,8 @@ public class ProtobufSaver implements NetworkSaver {
 
     @Override
     public void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException {
-        createProtobufModel(saveValues, metadata);
-        modelBuilder.build().writeTo(output);
-        modelBuilder = null;
-    }
-
-    @Override
-    public void save(OutputStream output, boolean saveValues) throws IOException {
-        createProtobufModel(saveValues, null);
-        modelBuilder.build().writeTo(output);
+        KeanuSavedBayesNet.Model protobufModel = getModel(saveValues, metadata);
+        protobufModel.writeTo(output);
         modelBuilder = null;
     }
 
