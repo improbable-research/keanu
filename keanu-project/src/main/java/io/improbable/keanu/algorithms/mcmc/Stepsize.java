@@ -38,6 +38,16 @@ public class Stepsize {
 
     /**
      * Taken from algorithm 4 in https://arxiv.org/pdf/1111.4246.pdf.
+     *
+     * @param position                      the starting position
+     * @param gradient                      the gradient at the starting position
+     * @param vertices                      the vertices
+     * @param probabilisticVertices         the probabilistic vertices
+     * @param logProbGradientCalculator     the log prob gradient calculator
+     * @param initialLogOfMasterP           the initial master log prob
+     * @param random                        the source of randomness
+     *
+     * @return a starting step size
      */
     public static double findStartingStepSize(Map<VertexId, DoubleTensor> position,
                                        Map<VertexId, DoubleTensor> gradient,
