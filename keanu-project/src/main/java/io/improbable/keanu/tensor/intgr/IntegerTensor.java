@@ -68,7 +68,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     /**
-     * @param dimension the dimension in the result tensor which toStack are stacked
+     * @param dimension the dimension along which toStack are stacked
      * @param toStack    an array of IntegerTensor
      * @return  an IntegerTensor with toStack joined along a new dimension
      * <p>

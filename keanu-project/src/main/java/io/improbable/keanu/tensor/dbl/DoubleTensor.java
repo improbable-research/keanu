@@ -94,7 +94,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     }
 
     /**
-     * @param dimension the dimension in the result tensor which toStack are stacked
+     * @param dimension the dimension along which toStack are stacked
      * @param toStack    an array of DoubleTensor
      * @return  a DoubleTensor with toStack joined along a new dimension
      * <p>
@@ -127,7 +127,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
      /**
      * @param dimension the dimension along which the tensors will be joined
      * @param toConcat  an array of DoubleTensor
-     * @return  an DoubleTensor with toConcat joined along existing dimension
+     * @return  a DoubleTensor with toConcat joined along an existing dimension
      * <p>
      * e.g. A, B, C = DoubleTensor.ones(4, 2)
      * <p>
