@@ -10,12 +10,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Leapfrog performs a movement through physical space with the introduction of a momentum variable.
+ * This is required for sampling in Hamiltonian and NUTS.
+ */
 public class Leapfrog {
 
     private Map<VertexId, DoubleTensor> position;
     private Map<VertexId, DoubleTensor> momentum;
     private Map<VertexId, DoubleTensor> gradient;
 
+    /**
+     * @param position the position of the vertices
+     * @param momentum the momentum of the vertices
+     * @param gradient the gradient of the vertices
+     */
     Leapfrog(Map<VertexId, DoubleTensor> position,
              Map<VertexId, DoubleTensor> momentum,
              Map<VertexId, DoubleTensor> gradient) {
@@ -24,6 +33,15 @@ public class Leapfrog {
         this.gradient = gradient;
     }
 
+    /**
+     * Performs one leapfrog of the vertices with a time delta as defined by epsilon
+     *
+     * @param latentVertices                the latent vertices
+     * @param logProbGradientCalculator     the calculator for the log prob gradient
+     * @param epsilon                       the time delta
+
+     * @return a new leapfrog having taken one step through space
+     */
     public Leapfrog step(final List<Vertex<DoubleTensor>> latentVertices,
                          final LogProbGradientCalculator logProbGradientCalculator,
                          final double epsilon) {

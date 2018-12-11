@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Used by NUTS as an epsilon for the leap frog
+ */
 public class Stepsize {
 
     private static final double STABILISER = 10;
@@ -26,6 +29,11 @@ public class Stepsize {
     private double adaptCount;
     private double shrinkageTarget;
 
+    /**
+     * @param stepsize                  the step size
+     * @param targetAcceptanceProb      the target acceptance probability (lower target equates to a higher step size when tuning)
+     * @param adaptCount                the number of samples to adapt for
+     */
     Stepsize(double stepsize, double targetAcceptanceProb, int adaptCount) {
         this.averageAcceptanceProb = 0.;
         this.targetAcceptanceProb = targetAcceptanceProb;
@@ -84,6 +92,14 @@ public class Stepsize {
         return stepsize;
     }
 
+    /**
+     * Adapts the step size based on the state of the tree and network after computing a sample
+     *
+     * @param tree          the balanced binary tree
+     * @param sampleNum     the number of samples that have been taken
+     *
+     * @return a new step size
+     */
     public double adaptStepSize(TreeBuilder tree, int sampleNum) {
 
         if (sampleNum < adaptCount) {

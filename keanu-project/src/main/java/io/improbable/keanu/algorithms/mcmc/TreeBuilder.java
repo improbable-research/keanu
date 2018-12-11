@@ -11,6 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Used by NUTS as a balanced binary tree to compute and store information
+ * about leapfrogs that are taken forwards and backwards in space.
+ *
+ * The tree is reset for each sample.
+ */
 public class TreeBuilder {
 
     private static final double DELTA_MAX = 1000.0;
