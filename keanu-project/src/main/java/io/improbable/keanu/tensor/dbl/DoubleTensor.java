@@ -254,8 +254,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     }
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
-    @Override
-    DoubleTensor setWithMask(DoubleTensor mask, Double value);
 
     DoubleTensor reciprocalInPlace();
 
