@@ -157,7 +157,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         @Override
         public NetworkSample sample() {
             step();
-            NetworkState networkState = new SimpleNetworkState(takeSample(verticesToSampleFrom), logProbabilityBeforeStep);
+            NetworkState networkState = new SimpleNetworkState(takeSample(verticesToSampleFrom));
             return new NetworkSample(networkState,logProbabilityBeforeStep);
         }
     }

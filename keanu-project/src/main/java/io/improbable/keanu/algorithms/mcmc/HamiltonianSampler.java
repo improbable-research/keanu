@@ -81,7 +81,7 @@ public class HamiltonianSampler implements SamplingAlgorithm {
     @Override
     public NetworkSample sample() {
         step();
-        NetworkState networkState = new SimpleNetworkState(acceptOrReject(),logOfMasterPBeforeLeapfrog);
+        NetworkState networkState = new SimpleNetworkState(acceptOrReject());
         return new NetworkSample(networkState,logOfMasterPBeforeLeapfrog);
     }
 

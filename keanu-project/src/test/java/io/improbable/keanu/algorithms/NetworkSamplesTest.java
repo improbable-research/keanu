@@ -107,7 +107,7 @@ public class NetworkSamplesTest {
     }
 
     @Test
-    public void canBeConstructedFromListOfNetworkStates() {
+    public void canBeConstructedFromListOfNetworkSample() {
         List<Double> v1Samples = Arrays.asList(33.2, 3.9);
         List<Double> v2Samples = Arrays.asList(109.4, 3.55);
         final List<Double> logOfMasterPBySample = Arrays.asList(9.4, 12.7);
@@ -119,26 +119,15 @@ public class NetworkSamplesTest {
             v1, v1Samples.get(1),
             v2, v2Samples.get(1)
         );
+        NetworkState firstNetworkState = new SimpleNetworkState(vertexValsFirstSample);
+        NetworkState secondNetworkState = new SimpleNetworkState(vertexValsSecondSample);
         NetworkSamples networkSamples = NetworkSamples.from(ImmutableList.of(
-            new SimpleNetworkState(vertexValsFirstSample, logOfMasterPBySample.get(0)),
-            new SimpleNetworkState(vertexValsSecondSample, logOfMasterPBySample.get(1))
+            new NetworkSample(firstNetworkState, logOfMasterPBySample.get(0)),
+            new NetworkSample(secondNetworkState, logOfMasterPBySample.get(1))
         ));
         assertEquals(v1Samples, networkSamples.get(v1).asList());
         assertEquals(v2Samples, networkSamples.get(v2).asList());
         assertEquals(logOfMasterPBySample.get(0), networkSamples.getLogOfMasterP(0));
         assertEquals(logOfMasterPBySample.get(1), networkSamples.getLogOfMasterP(1));
-    }
-
-    @Test
-    public void doesCatchConstructionFromNetworkStatesWithoutMasterLogP() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Network state doesn't have LogOfMasterP.");
-        Map<VertexId, Double> vertexVals = new HashMap<>();
-        vertexVals.put(v1, 29.3);
-        List<NetworkState> networkStateList = ImmutableList.of(
-            new SimpleNetworkState(vertexVals)
-        );
-
-        NetworkSamples.from(networkStateList);
     }
 }

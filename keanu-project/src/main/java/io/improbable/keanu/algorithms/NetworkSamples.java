@@ -39,18 +39,18 @@ public class NetworkSamples {
         this.size = size;
     }
 
-    public static NetworkSamples from(List<NetworkState> networkStates) {
+    public static NetworkSamples from(List<NetworkSample> networkSamples) {
         Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
         List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
-        networkStates.forEach(networkState -> addSamplesForNetworkState(networkState, samplesByVertex));
-        networkStates.forEach(networkState -> logOfMasterPForEachSample.add(networkState.getLogOfMasterP()));
-        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, networkStates.size());
+        networkSamples.forEach(networkSample -> addSamplesForNetworkState(networkSample, samplesByVertex));
+        networkSamples.forEach(networkSample -> logOfMasterPForEachSample.add(networkSample.getLogOfMasterP()));
+        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, networkSamples.size());
     }
 
-    private static void addSamplesForNetworkState(NetworkState networkState, Map<VertexId, List<?>> samplesByVertex) {
-        for (VertexId vertexId : networkState.getVertexIds()) {
-            addSampleForVertex(vertexId, networkState.get(vertexId), samplesByVertex);
+    private static void addSamplesForNetworkState(NetworkSample networkSample, Map<VertexId, List<?>> samplesByVertex) {
+        for (VertexId vertexId : networkSample.getVertexIds()) {
+            addSampleForVertex(vertexId, networkSample.get(vertexId), samplesByVertex);
         }
     }
 
@@ -142,7 +142,7 @@ public class NetworkSamples {
     }
 
     public NetworkState getNetworkState(int sample) {
-        return new SamplesBackedNetworkState(samplesByVertex, logOfMasterPForEachSample, sample);
+        return new SamplesBackedNetworkState(samplesByVertex, sample);
     }
 
     public double getLogOfMasterP(int sample) {
@@ -170,12 +170,10 @@ public class NetworkSamples {
     private static class SamplesBackedNetworkState implements NetworkState {
 
         private final Map<VertexId, ? extends List> samplesByVertex;
-        private final List<Double> logOfMasterPForEachSample;
         private final int index;
 
-        public SamplesBackedNetworkState(Map<VertexId, ? extends List> samplesByVertex, List<Double> logOfMasterPForEachSample, int index) {
+        public SamplesBackedNetworkState(Map<VertexId, ? extends List> samplesByVertex, int index) {
             this.samplesByVertex = samplesByVertex;
-            this.logOfMasterPForEachSample = logOfMasterPForEachSample;
             this.index = index;
         }
 
@@ -193,11 +191,5 @@ public class NetworkSamples {
         public Set<VertexId> getVertexIds() {
             return new HashSet<>(samplesByVertex.keySet());
         }
-
-        @Override
-        public double getLogOfMasterP() {
-            return logOfMasterPForEachSample.get(index);
-        }
     }
-
 }
