@@ -7,11 +7,9 @@ import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsWithRespectTo;
 
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -168,41 +166,5 @@ public class Differentiator {
         }
 
         return new PartialsWithRespectTo(wrt, ofWrt);
-    }
-
-    public static <V extends Vertex & Differentiable> PartialDerivatives forwardModeAutoDiff(V vertex) {
-        Map<Vertex, PartialDerivatives> partialsOf = new HashMap<>();
-        Deque<V> stack = new ArrayDeque<>();
-        stack.push(vertex);
-
-        while (!stack.isEmpty()) {
-
-            V head = stack.peek();
-            Set<Vertex> parentsThatPartialIsNotCalculated = parentsThatPartialIsNotCalculated(partialsOf, head.getParents());
-
-            if (parentsThatPartialIsNotCalculated.isEmpty()) {
-                V top = stack.pop();
-                PartialDerivatives dTopWrtInputs = top.forwardModeAutoDifferentiation(partialsOf);
-                partialsOf.put(top, dTopWrtInputs);
-            } else {
-                for (Vertex parent : parentsThatPartialIsNotCalculated) {
-                    if (parent instanceof Differentiable) {
-                        stack.push((V) parent);
-                    }
-                }
-            }
-        }
-
-        return partialsOf.get(vertex);
-    }
-
-    private static Set<Vertex> parentsThatPartialIsNotCalculated(Map<Vertex, PartialDerivatives> partialsOf, Collection<? extends Vertex> parents) {
-        Set<Vertex> notCalculatedParents = new HashSet<>();
-        for (Vertex next : parents) {
-            if (!partialsOf.containsKey(next) && next instanceof Differentiable) {
-                notCalculatedParents.add(next);
-            }
-        }
-        return notCalculatedParents;
     }
 }

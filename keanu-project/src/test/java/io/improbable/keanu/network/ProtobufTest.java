@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -85,8 +86,8 @@ public class ProtobufTest {
 
         assertThat(readNet.getLatentVertices().size(), is(1));
         assertThat(readNet.getLatentVertices().get(0), instanceOf(GaussianVertex.class));
-        GaussianVertex latentGaussianVertex = (GaussianVertex)readNet.getLatentVertices().get(0);
-        GaussianVertex labelGaussianVerted = (GaussianVertex)readNet.getVertexByLabel(new VertexLabel(gaussianLabel));
+        GaussianVertex latentGaussianVertex = (GaussianVertex) readNet.getLatentVertices().get(0);
+        GaussianVertex labelGaussianVerted = (GaussianVertex) readNet.getVertexByLabel(new VertexLabel(gaussianLabel));
         assertThat(latentGaussianVertex, equalTo(labelGaussianVerted));
         assertThat(latentGaussianVertex.getMu().getValue(0), closeTo(3.0, 1e-10));
         assertThat(labelGaussianVerted.getMu().getValue(2), closeTo(5.0, 1e-10));
@@ -100,17 +101,24 @@ public class ProtobufTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ProtobufSaver saver = new ProtobufSaver(complexNet);
         saver.save(outputStream, true);
-        DoubleIfVertex outputVertex = (DoubleIfVertex)complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        DoubleVertex inputVertex = (DoubleVertex)complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        DoubleIfVertex outputVertex = (DoubleIfVertex) complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        DoubleVertex inputVertex = (DoubleVertex) complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         ByteArrayInputStream input = new ByteArrayInputStream(outputStream.toByteArray());
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork loadedNet = loader.loadNetwork(input);
-        DoubleIfVertex outputVertex2 = (DoubleIfVertex)loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        DoubleVertex inputVertex2 = (DoubleVertex)loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        DoubleIfVertex outputVertex2 = (DoubleIfVertex) loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        DoubleVertex inputVertex2 = (DoubleVertex) loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
-        DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(outputVertex).withRespectTo(inputVertex);
-        DoubleTensor dOutputAfter = Differentiator.forwardModeAutoDiff(outputVertex2).withRespectTo(inputVertex2);
+        DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(
+            (Vertex & Differentiable) inputVertex,
+            outputVertex
+        ).of(outputVertex).withRespectTo(inputVertex);
+
+        DoubleTensor dOutputAfter = Differentiator.forwardModeAutoDiff(
+            (Vertex & Differentiable) inputVertex2,
+            outputVertex2
+        ).of(outputVertex2).withRespectTo(inputVertex2);
 
         assertEquals(dOutputBefore, dOutputAfter);
 
@@ -250,7 +258,7 @@ public class ProtobufTest {
 
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork net = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
-        GaussianVertex newGauss = (GaussianVertex)net.getVertexByLabel(new VertexLabel(GAUSS_LABEL));
+        GaussianVertex newGauss = (GaussianVertex) net.getVertexByLabel(new VertexLabel(GAUSS_LABEL));
         assertThat(newGauss.getValue().scalar(), is(GAUSS_VALUE));
     }
 
@@ -428,7 +436,7 @@ public class ProtobufTest {
 
         Arrays.stream(items)
             .filter(item -> item.isAnnotationPresent(annotation))
-            .forEach(item -> filteredList.add((A)item));
+            .forEach(item -> filteredList.add((A) item));
 
         return filteredList;
     }
