@@ -91,6 +91,15 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return concat(0, toConcat);
     }
 
+    /**
+     * @param dimension the dimension along which the tensors will be joined
+     * @param toConcat  an array of IntegerTensor
+     * @return  an IntegerTensor with toConcat joined along existing dimension
+     * <p>
+     * e.g. A, B, C = IntegerTensor.ones(4, 2)
+     * <p>
+     * IntegerTensor.concat(0, A, B, C) gives IntegerTensor.ones(12, 2)
+     */
     static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {

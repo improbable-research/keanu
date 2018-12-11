@@ -117,6 +117,15 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return concat(0, toConcat);
     }
 
+     /**
+     * @param dimension the dimension along which the tensors will be joined
+     * @param toConcat  an array of DoubleTensor
+     * @return  an DoubleTensor with toConcat joined along existing dimension
+     * <p>
+     * e.g. A, B, C = DoubleTensor.ones(4, 2)
+     * <p>
+     * DoubleTensor.concat(0, A, B, C) gives DoubleTensor.ones(12, 2)
+     */
     static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {
