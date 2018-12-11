@@ -57,25 +57,27 @@ public class NUTSTest {
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
 
-        Vizer.histogram(posteriorSamples.get(vertex).asList());
+        Statistics s = nuts.getStatistics();
 
-        while(true) {
+//        Vizer.histogram(posteriorSamples.get(vertex).asList());
+//
+//        while(true) {
+//
+//        }
 
-        }
-
-//        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
+        MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
     }
 
     @Test
     public void samplesContinuousPrior() {
 
-        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 15.0);
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 35.0);
 
-        int sampleCount = 6000;
+        int sampleCount = 10000;
         NUTS nuts = NUTS.builder()
             .adaptCount(sampleCount)
-            .adaptEnabled(true)
-            .maxTreeHeight(8)
+            .maxTreeHeight(10)
+            .targetAcceptanceProb(0.6)
             .random(random)
             .build();
 
@@ -83,10 +85,18 @@ public class NUTSTest {
             bayesNet,
             bayesNet.getLatentVertices(),
             sampleCount
-        ).drop((int) (sampleCount * 0.25));
+        ).drop((int) (8000));
 
         Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
         Vertex<DoubleTensor> B = bayesNet.getContinuousLatentVertices().get(1);
+
+        Statistics s = nuts.getStatistics();
+
+//        Vizer.histogram(posteriorSamples.get(A).asList());
+//
+//        while(true) {
+//
+//        }
 
         MCMCTestDistributions.samplesMatchesSumOfGaussians(44.0, posteriorSamples.get(A).asList(), posteriorSamples.get(B).asList());
     }

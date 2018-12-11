@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +80,16 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     @Builder.Default
     private int maxTreeHeight = 10;
 
+    @Getter
+    @Builder.Default
+    private Statistics statistics = new Statistics(Arrays.asList(
+        "mean_tree_accept",
+        "depth",
+        "tree_size",
+        "step_size",
+        "log_p"
+    ));
+
     /**
      * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
      *
@@ -122,8 +133,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         double initialLogOfMasterP = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
 
-
-
         double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(position,
             gradient,
             latentVertices,
@@ -150,7 +159,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             stepsize,
             tree,
             maxTreeHeight,
-            random
+            random,
+            statistics
         );
     }
 

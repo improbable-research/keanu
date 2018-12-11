@@ -19,6 +19,7 @@ public class Stepsize {
     private static final double STARTING_STEPSIZE = 1;
 
     public double stepsize;
+    public double averageTreeAcceptanceProb;
 
     private double averageAcceptanceProb;
     private double targetAcceptanceProb;
@@ -27,12 +28,13 @@ public class Stepsize {
     private double shrinkageTarget;
 
     Stepsize(double stepsize, double targetAcceptanceProb, int adaptCount) {
-        this.averageAcceptanceProb = 0;
+        this.averageAcceptanceProb = 0.;
         this.targetAcceptanceProb = targetAcceptanceProb;
-        this.stepsize = STARTING_STEPSIZE;
+        this.stepsize = stepsize;
         this.logStepSizeFrozen = Math.log(stepsize);
         this.adaptCount = adaptCount;
         this.shrinkageTarget = Math.log(10 * stepsize);
+        this.averageTreeAcceptanceProb = 0.;
     }
 
     /**
@@ -85,10 +87,11 @@ public class Stepsize {
             double proportionalAcceptanceProb = (1 - percentageLeftToTune) * averageAcceptanceProb;
 
             //alpha/nu_alpha
-            double averageDeltaLikelihoodLeapfrog = tree.deltaLikelihoodOfLeapfrog / tree.treeSize;
+            double averageAcceptanceProbability = tree.deltaLikelihoodOfLeapfrog / tree.treeSize;
+            averageTreeAcceptanceProb = averageAcceptanceProbability;
 
             //delta - alpha/nu_alpha
-            double acceptanceProb = targetAcceptanceProb - averageDeltaLikelihoodLeapfrog;
+            double acceptanceProb = targetAcceptanceProb - averageAcceptanceProbability;
 
             //Hm = (1-1/(m+t0)) * Hm-1 + (1/(m+t0)) * (delta - (alpha/nu_alpha))
             double updatedAverageAcceptanceProb = proportionalAcceptanceProb + (percentageLeftToTune * acceptanceProb);

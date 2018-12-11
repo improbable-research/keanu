@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class NUTSSampler implements SamplingAlgorithm {
     private final Stepsize stepsize;
     private final TreeBuilder tree;
     private final LogProbGradientCalculator logProbGradientCalculator;
-
+    private final Statistics statistics;
     private int sampleNum;
 
     /**
@@ -50,7 +51,8 @@ public class NUTSSampler implements SamplingAlgorithm {
                        Stepsize stepsize,
                        TreeBuilder tree,
                        int maxTreeHeight,
-                       KeanuRandom random) {
+                       KeanuRandom random,
+                       Statistics statistics) {
 
         this.sampleFromVertices = sampleFromVertices;
         this.probabilisticVertices = probabilisticVertices;
@@ -64,6 +66,7 @@ public class NUTSSampler implements SamplingAlgorithm {
         this.adaptEnabled = adaptEnabled;
 
         this.random = random;
+        this.statistics = statistics;
     }
 
     @Override
@@ -92,7 +95,6 @@ public class NUTSSampler implements SamplingAlgorithm {
         int treeHeight = 0;
         tree.shouldContinueFlag = true;
         tree.acceptedLeapfrogCount = 1;
-        System.out.println("Step: " + stepsize.stepsize);
 
         while (tree.shouldContinueFlag && treeHeight < maxTreeHeight) {
 
@@ -117,7 +119,8 @@ public class NUTSSampler implements SamplingAlgorithm {
 
                 TreeBuilder.acceptOtherPositionWithProbability(
                     acceptanceProb,
-                    tree, otherHalfTree,
+                    tree,
+                    otherHalfTree,
                     random
                 );
             }
@@ -137,9 +140,14 @@ public class NUTSSampler implements SamplingAlgorithm {
             treeHeight++;
         }
 
+        statistics.store("step_size", stepsize.stepsize);
+        statistics.store("log_p", tree.logOfMasterPAtAcceptedPosition);
+        statistics.store("depth", stepsize.averageTreeAcceptanceProb);
+        statistics.store("tree_size", tree.treeSize);
+        statistics.store("mean_tree_accept", stepsize.averageTreeAcceptanceProb);
+
         if (this.adaptEnabled) {
             stepsize.adaptStepSize(tree, sampleNum);
-            System.out.println("Step: " + stepsize.stepsize);
         }
 
         tree.leapfrogForward.position = tree.acceptedPosition;
