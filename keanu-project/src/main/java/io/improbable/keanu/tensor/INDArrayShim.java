@@ -57,17 +57,17 @@ public class INDArrayShim {
         if (Arrays.equals(left.shape(), right.shape())) {
             return left.muli(right);
         } else if (left.length() == 1) {
-            return scalarMultiplyWithPreservedShape(left, right);
+            return multiplyScalarByTensorWithPreservedShape(left, right);
         } else if (right.length() == 1) {
-            return scalarMultiplyWithPreservedShape(right, left);
+            return multiplyScalarByTensorWithPreservedShape(right, left);
         } else {
             return broadcastMultiply(left, right);
         }
     }
 
-    private static INDArray scalarMultiplyWithPreservedShape(INDArray a, INDArray b) {
-        INDArray result = b.muli(a.getScalar(0));
-        long[] resultShape = Shape.broadcastOutputShape(a.shape(), b.shape());
+    private static INDArray multiplyScalarByTensorWithPreservedShape(INDArray scalarTensor, INDArray tensor) {
+        INDArray result = tensor.muli(scalarTensor.getScalar(0));
+        long[] resultShape = Shape.broadcastOutputShape(scalarTensor.shape(), tensor.shape());
         return result.reshape(resultShape);
     }
 
@@ -85,17 +85,17 @@ public class INDArrayShim {
         if (Arrays.equals(left.shape(), right.shape())) {
             return left.divi(right);
         } else if (right.length() == 1) {
-            return scalarDivideWithPreservedShape(left, right);
+            return divideScalarByTensorWithPreservedShape(right, left);
         } else if (left.length() == 1) {
-            return scalarMultiplyWithPreservedShape(left, right.rdiv(1.0));
+            return multiplyScalarByTensorWithPreservedShape(left, right.rdiv(1.0));
         } else {
             return broadcastDivide(left, right);
         }
     }
 
-    private static INDArray scalarDivideWithPreservedShape(INDArray a, INDArray b) {
-        INDArray result = a.divi(b.getScalar(0));
-        long[] resultShape = Shape.broadcastOutputShape(a.shape(), b.shape());
+    private static INDArray divideScalarByTensorWithPreservedShape(INDArray scalarTensor, INDArray tensor) {
+        INDArray result = tensor.divi(scalarTensor.getScalar(0));
+        long[] resultShape = Shape.broadcastOutputShape(tensor.shape(), scalarTensor.shape());
         return result.reshape(resultShape);
     }
 
@@ -113,17 +113,17 @@ public class INDArrayShim {
         if (Arrays.equals(left.shape(), right.shape())) {
             return left.addi(right);
         } else if (left.length() == 1) {
-            return scalarAdditionWithPreservedShape(left, right);
+            return addScalarToTensorWithPreservedShape(left, right);
         } else if (right.length() == 1) {
-            return scalarAdditionWithPreservedShape(right, left);
+            return addScalarToTensorWithPreservedShape(right, left);
         } else {
             return broadcastPlus(left, right);
         }
     }
 
-    private static INDArray scalarAdditionWithPreservedShape(INDArray a, INDArray b) {
-        INDArray result = b.addi(a.getScalar(0));
-        long[] resultShape = Shape.broadcastOutputShape(a.shape(), b.shape());
+    private static INDArray addScalarToTensorWithPreservedShape(INDArray scalarTensor, INDArray tensor) {
+        INDArray result = tensor.addi(scalarTensor.getScalar(0));
+        long[] resultShape = Shape.broadcastOutputShape(scalarTensor.shape(), tensor.shape());
         return result.reshape(resultShape);
     }
 
@@ -141,17 +141,17 @@ public class INDArrayShim {
         if (Arrays.equals(left.shape(), right.shape())) {
             return left.subi(right);
         } else if (right.length() == 1) {
-            return scalarSubtractionWithPreservedShape(left, right);
+            return subtractScalarFromTensorWithPreservedShape(right, left);
         } else if (left.length() == 1) {
-            return scalarAdditionWithPreservedShape(left, right.neg());
+            return addScalarToTensorWithPreservedShape(left, right.neg());
         } else {
             return broadcastMinus(left, right);
         }
     }
 
-    private static INDArray scalarSubtractionWithPreservedShape(INDArray a, INDArray b) {
-        INDArray result = a.subi(b.getScalar(0));
-        long[] resultShape = Shape.broadcastOutputShape(a.shape(), b.shape());
+    private static INDArray subtractScalarFromTensorWithPreservedShape(INDArray scalarTensor, INDArray tensor) {
+        INDArray result = tensor.subi(scalarTensor.getScalar(0));
+        long[] resultShape = Shape.broadcastOutputShape(tensor.shape(), scalarTensor.shape());
         return result.reshape(resultShape);
     }
 
@@ -226,9 +226,8 @@ public class INDArrayShim {
             long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
             INDArray result;
             if (left.length() == 1) {
-                left = Nd4j.valueArrayOf(right.shape(), left.getDouble(0));
-                Nd4j.getExecutioner().exec(new OldLessThanOrEqual(left, right, left, left.length()));
-                result = left;
+                result = Nd4j.valueArrayOf(right.shape(), left.getDouble(0));
+                Nd4j.getExecutioner().exec(new OldLessThanOrEqual(result, right, result, result.length()));
             } else {
                 result = left.lte(right.getDouble(0));
             }
@@ -243,9 +242,8 @@ public class INDArrayShim {
             long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
             INDArray result;
             if (left.length() == 1) {
-                left = Nd4j.valueArrayOf(right.shape(), left.getDouble(0));
-                Nd4j.getExecutioner().exec(new OldGreaterThanOrEqual(left, right, left, left.length()));
-                result = left;
+                result = Nd4j.valueArrayOf(right.shape(), left.getDouble(0));
+                Nd4j.getExecutioner().exec(new OldGreaterThanOrEqual(result, right, result, result.length()));
             } else {
                 result = left.gte(right.getDouble(0));
             }
