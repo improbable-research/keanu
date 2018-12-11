@@ -1,7 +1,7 @@
 from typing import Tuple, List, Union
 
 
-def check_index_is_valid(shape: Tuple[int, ...], index: Union[Tuple[int], Tuple]) -> None:
+def check_index_is_valid(shape: Tuple[int, ...], index: Tuple[int, ...]) -> None:
     if len(shape) != len(index):
         raise ValueError("Length of desired index {} must match the length of the shape {}.".format(index, shape))
     for i in range(len(index)):
