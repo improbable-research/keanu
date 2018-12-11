@@ -1,15 +1,15 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Stepsize {
 
@@ -18,9 +18,8 @@ public class Stepsize {
     private static final double TEND_TO_ZERO_EXPONENT = 0.75;
     private static final double STARTING_STEPSIZE = 1;
 
-    public double stepsize;
-    public double averageTreeAcceptanceProb;
-
+    private double stepsize;
+    private double averageTreeAcceptanceProb;
     private double averageAcceptanceProb;
     private double targetAcceptanceProb;
     private double logStepSizeFrozen;
@@ -87,11 +86,10 @@ public class Stepsize {
             double proportionalAcceptanceProb = (1 - percentageLeftToTune) * averageAcceptanceProb;
 
             //alpha/nu_alpha
-            double averageAcceptanceProbability = tree.deltaLikelihoodOfLeapfrog / tree.treeSize;
-            averageTreeAcceptanceProb = averageAcceptanceProbability;
+            averageTreeAcceptanceProb = tree.getDeltaLikelihoodOfLeapfrog() / tree.getTreeSize();
 
             //delta - alpha/nu_alpha
-            double acceptanceProb = targetAcceptanceProb - averageAcceptanceProbability;
+            double acceptanceProb = targetAcceptanceProb - averageTreeAcceptanceProb;
 
             //Hm = (1-1/(m+t0)) * Hm-1 + (1/(m+t0)) * (delta - (alpha/nu_alpha))
             double updatedAverageAcceptanceProb = proportionalAcceptanceProb + (percentageLeftToTune * acceptanceProb);
@@ -123,6 +121,14 @@ public class Stepsize {
         }
     }
 
+    public double getStepsize() {
+        return stepsize;
+    }
+
+    public double getAverageAcceptanceProb() {
+        return averageAcceptanceProb;
+    }
+
     private static void initializeMomentumForEachVertex(List<Vertex<DoubleTensor>> vertices,
                                                         Map<VertexId, DoubleTensor> momentums,
                                                         KeanuRandom random) {
@@ -132,4 +138,3 @@ public class Stepsize {
     }
 
 }
-

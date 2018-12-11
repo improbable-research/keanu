@@ -19,16 +19,16 @@ public class TreeBuilder {
     private static final double STARTING_DELTA_LIKELIHOOD = 0.;
     private static final int STARTING_TREE_SIZE = 1;
 
-     Leapfrog leapfrogForward;
-     Leapfrog leapfrogBackward;
-     Map<VertexId, DoubleTensor> acceptedPosition;
-     Map<VertexId, DoubleTensor> gradientAtAcceptedPosition;
-     double logOfMasterPAtAcceptedPosition;
-     Map<VertexId, ?> sampleAtAcceptedPosition;
-     int acceptedLeapfrogCount;
-     boolean shouldContinueFlag;
-     double deltaLikelihoodOfLeapfrog;
-     double treeSize;
+    private Leapfrog leapfrogForward;
+    private Leapfrog leapfrogBackward;
+    private Map<VertexId, DoubleTensor> acceptedPosition;
+    private Map<VertexId, DoubleTensor> gradientAtAcceptedPosition;
+    private double logOfMasterPAtAcceptedPosition;
+    private Map<VertexId, ?> sampleAtAcceptedPosition;
+    private int acceptedLeapfrogCount;
+    private boolean shouldContinueFlag;
+    private double deltaLikelihoodOfLeapfrog;
+    private double treeSize;
 
     /**
      * @param leapfrogForward            The result of the forward leapfrog
@@ -270,7 +270,7 @@ public class TreeBuilder {
             acceptedLeapfrogCount,
             shouldContinueFlag,
             deltaLikelihoodOfLeapfrog,
-            1
+            STARTING_TREE_SIZE
         );
     }
 
@@ -417,7 +417,7 @@ public class TreeBuilder {
     }
 
     private void setBackwardGradient(Map<VertexId, DoubleTensor> backwardGradient) {
-        leapfrogForward.gradient = backwardGradient;
+        leapfrogBackward.gradient = backwardGradient;
     }
 
 }

@@ -1,13 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -16,6 +8,16 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class StepsizeTest {
 
@@ -84,19 +86,17 @@ public class StepsizeTest {
             50
         );
 
-        TreeBuilder treeLessLikely = TreeBuilder.createBasicTree(Collections.EMPTY_MAP, Collections.EMPTY_MAP, Collections.EMPTY_MAP, 0., Collections.EMPTY_MAP);
-        treeLessLikely.deltaLikelihoodOfLeapfrog = -50.;
-        treeLessLikely.treeSize = 8.;
-
-        double adaptedStepSizeLessLikely = tune.adaptStepSize(treeLessLikely, 1);
+        TreeBuilder mockedLessLikelyTree = mock(TreeBuilder.class);
+        when(mockedLessLikelyTree.getDeltaLikelihoodOfLeapfrog()).thenAnswer(i -> -50.);
+        when(mockedLessLikelyTree.getTreeSize()).thenAnswer(i -> 8.);
+        double adaptedStepSizeLessLikely = tune.adaptStepSize(mockedLessLikelyTree, 1);
 
         Assert.assertTrue(adaptedStepSizeLessLikely < startingStepsize);
 
-        TreeBuilder treeMoreLikely = TreeBuilder.createBasicTree(Collections.EMPTY_MAP, Collections.EMPTY_MAP, Collections.EMPTY_MAP, 0., Collections.EMPTY_MAP);
-        treeMoreLikely.deltaLikelihoodOfLeapfrog = 50.;
-        treeMoreLikely.treeSize = 8.;
-
-        double adaptedStepSizeMoreLikely = tune.adaptStepSize(treeMoreLikely, 1);
+        TreeBuilder mockedLikelyTree = mock(TreeBuilder.class);
+        when(mockedLikelyTree.getDeltaLikelihoodOfLeapfrog()).thenAnswer(i -> 50.);
+        when(mockedLikelyTree.getTreeSize()).thenAnswer(i -> 8.);
+        double adaptedStepSizeMoreLikely = tune.adaptStepSize(mockedLikelyTree, 1);
 
         Assert.assertTrue(adaptedStepSizeMoreLikely > startingStepsize);
     }

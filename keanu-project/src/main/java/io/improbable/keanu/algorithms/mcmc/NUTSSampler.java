@@ -1,10 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -12,6 +7,10 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
@@ -63,7 +62,6 @@ public class NUTSSampler implements SamplingAlgorithm {
         this.latentVertices = latentVertices;
         this.logProbGradientCalculator = logProbGradientCalculator;
 
-        this.sampleNum = 1;
         this.tree = tree;
         this.stepsize = stepsize;
         this.maxTreeHeight = maxTreeHeight;
@@ -72,39 +70,41 @@ public class NUTSSampler implements SamplingAlgorithm {
         this.random = random;
         this.statistics = statistics;
         this.saveStatistics = saveStatistics;
+
+        this.sampleNum = 1;
     }
 
     @Override
     public void sample(Map<VertexId, List<?>> samples, List<Double> logOfMasterPForEachSample) {
         step();
-        addSampleFromCache(samples, tree.sampleAtAcceptedPosition);
-        logOfMasterPForEachSample.add(tree.logOfMasterPAtAcceptedPosition);
+        addSampleFromCache(samples, tree.getSampleAtAcceptedPosition());
+        logOfMasterPForEachSample.add(tree.getLogOfMasterPAtAcceptedPosition());
     }
 
     @Override
     public NetworkState sample() {
         step();
-        return new SimpleNetworkState(tree.sampleAtAcceptedPosition);
+        return new SimpleNetworkState(tree.getSampleAtAcceptedPosition());
     }
 
     @Override
     public void step() {
 
-        initializeMomentumForEachVertex(latentVertices, tree.leapfrogForward.momentum, random);
-        cache(tree.leapfrogForward.momentum, tree.leapfrogBackward.momentum);
+        initializeMomentumForEachVertex(latentVertices, tree.getForwardMomentum(), random);
+        cache(tree.getForwardMomentum(), tree.getBackwardMomentum());
 
-        double logOfMasterPMinusMomentumBeforeLeapfrog = tree.logOfMasterPAtAcceptedPosition - 0.5 * dotProduct(tree.leapfrogForward.momentum);
+        double logOfMasterPMinusMomentumBeforeLeapfrog = tree.getLogOfMasterPAtAcceptedPosition() - 0.5 * dotProduct(tree.getForwardMomentum());
 
         double logU = Math.log(random.nextDouble()) + logOfMasterPMinusMomentumBeforeLeapfrog;
 
         int treeHeight = 0;
-        tree.shouldContinueFlag = true;
-        tree.acceptedLeapfrogCount = 1;
+        tree.resetTreeBeforeSample();
 
-        while (tree.shouldContinueFlag && treeHeight < maxTreeHeight) {
+        while (tree.getShouldContinueFlag() && treeHeight < maxTreeHeight) {
 
             //build tree direction -1 = backwards OR 1 = forwards
             int buildDirection = random.nextBoolean() ? 1 : -1;
+
             TreeBuilder otherHalfTree = TreeBuilder.buildOtherHalfOfTree(
                 tree,
                 latentVertices,
@@ -114,13 +114,13 @@ public class NUTSSampler implements SamplingAlgorithm {
                 logU,
                 buildDirection,
                 treeHeight,
-                stepsize.stepsize,
+                stepsize.getStepsize(),
                 logOfMasterPMinusMomentumBeforeLeapfrog,
                 random
             );
 
-            if (otherHalfTree.shouldContinueFlag) {
-                final double acceptanceProb = (double) otherHalfTree.acceptedLeapfrogCount / tree.acceptedLeapfrogCount;
+            if (otherHalfTree.getShouldContinueFlag()) {
+                final double acceptanceProb = (double) otherHalfTree.getAcceptedLeapfrogCount() / tree.getAcceptedLeapfrogCount();
 
                 TreeBuilder.acceptOtherPositionWithProbability(
                     acceptanceProb,
@@ -130,17 +130,17 @@ public class NUTSSampler implements SamplingAlgorithm {
                 );
             }
 
-            tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
+            tree.incrementLeapfrogCount(otherHalfTree.getAcceptedLeapfrogCount());
 
-            tree.deltaLikelihoodOfLeapfrog = otherHalfTree.deltaLikelihoodOfLeapfrog;
-            tree.treeSize = otherHalfTree.treeSize;
+            tree.setDeltaLikelihoodOfLeapfrog(otherHalfTree.getDeltaLikelihoodOfLeapfrog());
+            tree.setTreeSize(otherHalfTree.getTreeSize());
 
-            tree.shouldContinueFlag = otherHalfTree.shouldContinueFlag && TreeBuilder.isNotUTurning(
-                tree.leapfrogForward.position,
-                tree.leapfrogBackward.position,
-                tree.leapfrogForward.momentum,
-                tree.leapfrogBackward.momentum
-            );
+            tree.setShouldContinueFlag(otherHalfTree.getShouldContinueFlag() && TreeBuilder.isNotUTurning(
+                tree.getForwardPosition(),
+                tree.getBackwardPosition(),
+                tree.getForwardMomentum(),
+                tree.getBackwardMomentum()
+            ));
 
             treeHeight++;
         }
@@ -153,19 +153,15 @@ public class NUTSSampler implements SamplingAlgorithm {
             stepsize.adaptStepSize(tree, sampleNum);
         }
 
-        tree.leapfrogForward.position = tree.acceptedPosition;
-        tree.leapfrogForward.gradient = tree.gradientAtAcceptedPosition;
-        tree.leapfrogBackward.position = tree.acceptedPosition;
-        tree.leapfrogBackward.gradient = tree.gradientAtAcceptedPosition;
-
+        tree.acceptPositionAndGradient();
         sampleNum++;
     }
 
     private void recordSamplerStatistics() {
-        statistics.store("stepSize", stepsize.stepsize);
-        statistics.store("logProb", tree.logOfMasterPAtAcceptedPosition);
-        statistics.store("treeSize", tree.treeSize);
-        statistics.store("meanTreeAccept", stepsize.averageTreeAcceptanceProb);
+        statistics.store("stepSize", stepsize.getStepsize());
+        statistics.store("logProb", tree.getLogOfMasterPAtAcceptedPosition());
+        statistics.store("treeSize", tree.getTreeSize());
+        statistics.store("meanTreeAccept", stepsize.getAverageAcceptanceProb());
     }
 
     private static void initializeMomentumForEachVertex(List<Vertex<DoubleTensor>> vertices,

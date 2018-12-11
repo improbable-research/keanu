@@ -1,5 +1,6 @@
 package io.improbable.vis;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -15,8 +16,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 public class Vizer {
 
