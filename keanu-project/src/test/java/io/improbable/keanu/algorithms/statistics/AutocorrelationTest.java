@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.statistics;
 
-import io.improbable.keanu.algorithms.statistics.Autocorrelation;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

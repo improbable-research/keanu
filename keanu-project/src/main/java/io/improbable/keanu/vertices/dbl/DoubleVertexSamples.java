@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl;
 
-import io.improbable.keanu.algorithms.statistics.Autocorrelation;
 import io.improbable.keanu.algorithms.VertexSamples;
+import io.improbable.keanu.algorithms.statistics.Autocorrelation;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
