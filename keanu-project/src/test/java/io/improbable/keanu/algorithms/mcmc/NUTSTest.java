@@ -39,6 +39,46 @@ public class NUTSTest {
 
     @Category(Slow.class)
     @Test
+    public void canRecordStatisticsFromSamples() {
+        double mu = 0.0;
+        double sigma = 1.0;
+        double initStepSize = 1;
+        int maxTreeHeight = 4;
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
+
+        NUTS nuts = NUTS.builder()
+            .adaptEnabled(false)
+            .initialStepSize(initStepSize)
+            .random(random)
+            .maxTreeHeight(maxTreeHeight)
+            .saveStatistics(true)
+            .build();
+
+        nuts.getPosteriorSamples(
+            simpleGaussian,
+            simpleGaussian.getLatentVertices(),
+            2
+        );
+
+        Statistics statistics = nuts.getStatistics();
+
+        List<Double> stepSize = statistics.get("stepSize");
+        List<Double> logProb = statistics.get("logProb");
+        List<Double> meanTreeAccept = statistics.get("meanTreeAccept");
+        List<Double> treeSize = statistics.get("treeSize");
+
+        Assert.assertTrue(stepSize.get(0) == initStepSize);
+        Assert.assertTrue(stepSize.get(1) == initStepSize);
+        Assert.assertTrue(logProb.get(0) < 0);
+        Assert.assertTrue(logProb.get(1) < 0);
+        Assert.assertTrue(meanTreeAccept.get(0) >= 0 && meanTreeAccept.get(0) <= 1);
+        Assert.assertTrue(meanTreeAccept.get(1) >= 0 && meanTreeAccept.get(1) <= 1);
+        Assert.assertTrue(treeSize.get(0) < Math.pow(2, maxTreeHeight));
+        Assert.assertTrue(treeSize.get(1) < Math.pow(2, maxTreeHeight));
+    }
+
+    @Category(Slow.class)
+    @Test
     public void samplesGaussian() {
         double mu = 0.0;
         double sigma = 1.0;
@@ -47,6 +87,7 @@ public class NUTSTest {
         NUTS nuts = NUTS.builder()
             .adaptCount(2000)
             .random(random)
+            .targetAcceptanceProb(0.65)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
@@ -57,23 +98,15 @@ public class NUTSTest {
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
 
-        Statistics s = nuts.getStatistics();
-
-//        Vizer.histogram(posteriorSamples.get(vertex).asList());
-//
-//        while(true) {
-//
-//        }
-
         MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
     }
 
     @Test
     public void samplesContinuousPrior() {
 
-        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 35.0);
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 24.0);
 
-        int sampleCount = 10000;
+        int sampleCount = 2000;
         NUTS nuts = NUTS.builder()
             .adaptCount(sampleCount)
             .maxTreeHeight(10)
@@ -85,18 +118,10 @@ public class NUTSTest {
             bayesNet,
             bayesNet.getLatentVertices(),
             sampleCount
-        ).drop((int) (8000));
+        ).drop(sampleCount / 4);
 
         Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
         Vertex<DoubleTensor> B = bayesNet.getContinuousLatentVertices().get(1);
-
-        Statistics s = nuts.getStatistics();
-
-//        Vizer.histogram(posteriorSamples.get(A).asList());
-//
-//        while(true) {
-//
-//        }
 
         MCMCTestDistributions.samplesMatchesSumOfGaussians(44.0, posteriorSamples.get(A).asList(), posteriorSamples.get(B).asList());
     }

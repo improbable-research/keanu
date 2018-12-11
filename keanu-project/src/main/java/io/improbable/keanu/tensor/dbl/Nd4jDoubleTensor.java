@@ -825,7 +825,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor minInPlace(DoubleTensor min) {
-        tensor.isScalar()
         if (min.isLengthOne()) {
             Transforms.min(tensor, min.scalar(), false);
         } else {

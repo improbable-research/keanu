@@ -30,7 +30,14 @@ import java.util.Map;
 public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static final int DEFAULT_ADAPT_COUNT = 1000;
-    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.8;
+    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.6;
+    private static Statistics STATISTICS = new Statistics(Arrays.asList(
+        "stepSize",
+        "logProb",
+        "meanTreeAccept",
+        "treeSize"
+    ));
+
 
     public static NUTS withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
@@ -80,15 +87,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     @Builder.Default
     private int maxTreeHeight = 10;
 
+    //Sets whether or not to save debug STATISTICS. The STATISTICS available are: Step size, Log Prob, Mean Tree Acceptance Prob, Tree Size.
+
     @Getter
+    @Setter
     @Builder.Default
-    private Statistics statistics = new Statistics(Arrays.asList(
-        "mean_tree_accept",
-        "depth",
-        "tree_size",
-        "step_size",
-        "log_p"
-    ));
+    private boolean saveStatistics = false;
 
     /**
      * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
@@ -160,8 +164,13 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             tree,
             maxTreeHeight,
             random,
-            statistics
+            STATISTICS,
+            saveStatistics
         );
+    }
+
+    public Statistics getStatistics() {
+        return STATISTICS;
     }
 
     private static void cachePosition(List<Vertex<DoubleTensor>> latentVertices, Map<VertexId, DoubleTensor> position) {

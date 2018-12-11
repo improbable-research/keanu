@@ -30,6 +30,7 @@ public class NUTSSampler implements SamplingAlgorithm {
     private final TreeBuilder tree;
     private final LogProbGradientCalculator logProbGradientCalculator;
     private final Statistics statistics;
+    private final boolean saveStatistics;
     private int sampleNum;
 
     /**
@@ -42,6 +43,8 @@ public class NUTSSampler implements SamplingAlgorithm {
      * @param tree                      initial tree that will contain the state of the tree build
      * @param maxTreeHeight             The largest tree height before stopping the hamilitonian process
      * @param random                    the source of randomness
+     * @param statistics                the NUTS sampler statistics
+     * @param saveStatistics            whether to record statistics
      */
     public NUTSSampler(List<? extends Vertex> sampleFromVertices,
                        List<Vertex<DoubleTensor>> latentVertices,
@@ -52,7 +55,8 @@ public class NUTSSampler implements SamplingAlgorithm {
                        TreeBuilder tree,
                        int maxTreeHeight,
                        KeanuRandom random,
-                       Statistics statistics) {
+                       Statistics statistics,
+                       boolean saveStatistics) {
 
         this.sampleFromVertices = sampleFromVertices;
         this.probabilisticVertices = probabilisticVertices;
@@ -67,6 +71,7 @@ public class NUTSSampler implements SamplingAlgorithm {
 
         this.random = random;
         this.statistics = statistics;
+        this.saveStatistics = saveStatistics;
     }
 
     @Override
@@ -140,11 +145,9 @@ public class NUTSSampler implements SamplingAlgorithm {
             treeHeight++;
         }
 
-        statistics.store("step_size", stepsize.stepsize);
-        statistics.store("log_p", tree.logOfMasterPAtAcceptedPosition);
-        statistics.store("depth", stepsize.averageTreeAcceptanceProb);
-        statistics.store("tree_size", tree.treeSize);
-        statistics.store("mean_tree_accept", stepsize.averageTreeAcceptanceProb);
+        if (saveStatistics) {
+            recordSamplerStatistics();
+        }
 
         if (this.adaptEnabled) {
             stepsize.adaptStepSize(tree, sampleNum);
@@ -156,6 +159,13 @@ public class NUTSSampler implements SamplingAlgorithm {
         tree.leapfrogBackward.gradient = tree.gradientAtAcceptedPosition;
 
         sampleNum++;
+    }
+
+    private void recordSamplerStatistics() {
+        statistics.store("stepSize", stepsize.stepsize);
+        statistics.store("logProb", tree.logOfMasterPAtAcceptedPosition);
+        statistics.store("treeSize", tree.treeSize);
+        statistics.store("meanTreeAccept", stepsize.averageTreeAcceptanceProb);
     }
 
     private static void initializeMomentumForEachVertex(List<Vertex<DoubleTensor>> vertices,
