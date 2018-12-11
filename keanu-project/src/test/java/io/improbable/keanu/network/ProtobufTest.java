@@ -95,6 +95,23 @@ public class ProtobufTest {
     }
 
     @Test
+    public void shapeIsCorrectlySavedAndLoaded() throws IOException {
+        DoubleVertex gaussianVertex1 = new GaussianVertex(new long[] {2, 3},0.0, 1.0);
+        DoubleVertex gaussianVertex2 = new GaussianVertex(new long[] {3, 2}, 0.0, 1.0);
+        DoubleVertex output = gaussianVertex1.matrixMultiply(gaussianVertex2);
+        BayesianNetwork bayesNet = new BayesianNetwork(output.getConnectedGraph());
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ProtobufSaver saver = new ProtobufSaver(bayesNet);
+        saver.save(outputStream, false);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        ProtobufLoader loader = new ProtobufLoader();
+
+        BayesianNetwork readNet = loader.loadNetwork(inputStream);
+    }
+
+    @Test
     public void saveLoadGradientTest() throws IOException {
         BayesianNetwork complexNet = createComplexNet();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
