@@ -1,6 +1,6 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.intgr;
 
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.Tensor;
 import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.api.shape.Shape;

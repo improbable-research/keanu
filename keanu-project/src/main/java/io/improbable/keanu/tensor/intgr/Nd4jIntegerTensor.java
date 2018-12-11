@@ -87,8 +87,8 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     static INDArray unsafeGetNd4J(IntegerTensor that) {
-        if (that.isScalar() || that instanceof ScalarIntegerTensor) {
-            return TypedINDArrayFactory.scalar(that.scalar().doubleValue(), BUFFER_TYPE).reshape(that.getShape());
+        if (that.isScalar() || that.isLengthOne()) {
+            return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
         }
         return ((Nd4jIntegerTensor) that).tensor;
     }
@@ -587,7 +587,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public Integer scalar() {
-        return tensor.getInt(0);
+        return (int) tensor.getDouble(0);
     }
 
     @Override
