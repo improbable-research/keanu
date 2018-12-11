@@ -96,6 +96,10 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     /**
      * @param toPile    an array of DoubleTensor
      * @return  a DoubleTensor with toPile joined along a new dimension 0
+     * <p>
+     * e.g. A, B, C = DoubleTensor.ones(4, 2)
+     * <p>
+     * DoubleTensor.pile(A, B, C) gives DoubleTensor.ones(3, 4, 2)
      */
     static DoubleTensor pile(DoubleTensor... toPile) {
         INDArray[] pileAsINDArray = new INDArray[toPile.length];

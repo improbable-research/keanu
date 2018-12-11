@@ -70,6 +70,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     /**
      * @param toPile    an array of IntegerTensor
      * @return  an IntegerTensor with toPile joined along a new dimension 0
+     * <p>
+     * e.g. A, B, C = IntegerTensor.ones(4, 2)
+     * <p>
+     * IntegerTensor.pile(A, B, C) gives IntegerTensor.ones(3, 4, 2)
      */
     static IntegerTensor pile(IntegerTensor... toPile) {
         INDArray[] pileAsINDArray = new INDArray[toPile.length];
