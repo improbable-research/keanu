@@ -484,7 +484,7 @@ public class ProtobufTest {
                     not(hasKey(parameterAnnotation.value())));
                 requiredParameters.put(parameterAnnotation.value(), parameter.getType());
             } else {
-                parameter.getType().isAssignableFrom(Long[].class);
+                assertThat("Shape Arguments must be long[]", parameter.getType().isAssignableFrom(long[].class));
             }
         }
 
