@@ -163,10 +163,11 @@ public class HalfCauchyVertexTest {
 
     @Test
     public void outOfBoundsGradientCalculation() {
-        HalfCauchyVertex cauchyVertex = new HalfCauchyVertex(5);
-        double outOfBoundsValue = -1.0;
-        Map<Vertex, DoubleTensor> actualDerivatives = cauchyVertex.dLogPdf(outOfBoundsValue, cauchyVertex);
+        HalfCauchyVertex cauchyVertex = new HalfCauchyVertex(new long[]{2}, 5);
+        DoubleTensor value = DoubleTensor.create(-5.0, 5.0);
+        Map<Vertex, DoubleTensor> actualDerivatives = cauchyVertex.dLogPdf(value, cauchyVertex);
         DoubleTensor derivative = actualDerivatives.get(cauchyVertex);
-        Assert.assertEquals(0.0, derivative.scalar(), 1e-6);
+        Assert.assertEquals(0.0, derivative.getValue(0), 1e-6);
+        Assert.assertTrue(derivative.getValue(1) != 0.);
     }
 }

@@ -165,10 +165,11 @@ public class HalfGaussianVertexTest {
 
     @Test
     public void outOfBoundsGradientCalculation() {
-        HalfGaussianVertex gaussianVertex = new HalfGaussianVertex(5);
-        double outOfBoundsValue = -1.0;
-        Map<Vertex, DoubleTensor> actualDerivatives = gaussianVertex.dLogPdf(outOfBoundsValue, gaussianVertex);
+        HalfGaussianVertex gaussianVertex = new HalfGaussianVertex(new long[]{2}, 5);
+        DoubleTensor value = DoubleTensor.create(-5.0, 5.0);
+        Map<Vertex, DoubleTensor> actualDerivatives = gaussianVertex.dLogPdf(value, gaussianVertex);
         DoubleTensor derivative = actualDerivatives.get(gaussianVertex);
-        Assert.assertEquals(0.0, derivative.scalar(), 1e-6);
+        Assert.assertEquals(0.0, derivative.getValue(0), 1e-6);
+        Assert.assertTrue(derivative.getValue(1) != 0.);
     }
 }
