@@ -16,6 +16,7 @@ import java.util.Set;
 public class NetworkSample {
 
     private final Map<VertexId, ?> vertexValues;
+
     @Getter
     private final double logOfMasterP;
 
