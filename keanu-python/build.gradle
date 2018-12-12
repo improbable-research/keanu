@@ -115,6 +115,7 @@ task populateExclusionPaths {
 
 task formatApply {
     mustRunAfter preparePythonEnvironment // this is a dependency but only needs to be run once
+    mustRunAfter ':spotlessPythonApply'   // spotless does some checks of the python code too
     dependsOn populateExclusionPaths
 
     doLast {
@@ -127,6 +128,7 @@ task formatApply {
 
 task formatCheck {
     mustRunAfter preparePythonEnvironment // this is a dependency but only needs to be run once
+    mustRunAfter ':spotlessPythonCheck'   // spotless does some checks of the python code too
     dependsOn populateExclusionPaths
 
     doLast {
