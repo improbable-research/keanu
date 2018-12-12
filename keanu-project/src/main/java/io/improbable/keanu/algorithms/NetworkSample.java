@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms;
 
+import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.Set;
  * a given point in time.
  */
 @AllArgsConstructor
-public class NetworkSample {
+public class NetworkSample implements NetworkState {
 
     private final Map<VertexId, ?> vertexValues;
 
@@ -25,6 +26,7 @@ public class NetworkSample {
      * @param <T>    the type of the values that the vertex contains
      * @return the values of the specified vertex
      */
+    @Override
     public <T> T get(Vertex<T> vertex) {
         return (T) vertexValues.get(vertex.getId());
     }
@@ -34,10 +36,12 @@ public class NetworkSample {
      * @param <T>      the type of the values that the vertex contains
      * @return the values of the specified vertex
      */
+    @Override
     public <T> T get(VertexId vertexId) {
         return (T) vertexValues.get(vertexId);
     }
 
+    @Override
     public Set<VertexId> getVertexIds() {
         return vertexValues.keySet();
     }
