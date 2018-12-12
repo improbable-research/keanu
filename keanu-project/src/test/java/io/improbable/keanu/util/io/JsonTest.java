@@ -1,4 +1,4 @@
-package io.improbable.keanu.util.json;
+package io.improbable.keanu.util.io;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;

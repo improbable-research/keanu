@@ -1,4 +1,4 @@
-package io.improbable.keanu.util.dot;
+package io.improbable.keanu.util.io;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.network.BayesianNetwork;

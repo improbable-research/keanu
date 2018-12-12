@@ -1,8 +1,10 @@
-package io.improbable.keanu.network;
+package io.improbable.keanu.util.io;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuSavedBayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -30,7 +32,7 @@ public class ProtobufSaver implements NetworkSaver {
         this.net = net;
     }
 
-    public KeanuSavedBayesNet.Model getModel(boolean withSavedValues, Map<String, String> metadata) {
+    protected KeanuSavedBayesNet.Model getModel(boolean withSavedValues, Map<String, String> metadata) {
         createProtobufModel(withSavedValues, metadata);
         return modelBuilder.build();
     }

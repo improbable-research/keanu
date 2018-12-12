@@ -1,10 +1,9 @@
-package io.improbable.keanu.util.json;
+package io.improbable.keanu.util.io;
 
 import com.google.protobuf.util.JsonFormat;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkLoader;
-import io.improbable.keanu.network.ProtobufLoader;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
