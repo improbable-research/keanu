@@ -4,6 +4,7 @@
             "id": {
                 "id": "[0]"
             },
+            "label": "SomeLabel",
             "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
             "parameters": [{
                 "name": "constant",
@@ -27,7 +28,6 @@
             "id": {
                 "id": "[2]"
             },
-            "label": "GaussianVertex",
             "vertexType": "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex",
             "parameters": [{
                 "name": "mu",
@@ -46,37 +46,13 @@
         "defaultState": [{
             "value": {
                 "doubleVal": {
-                    "values": [0.0]
-                }
-            },
-            "id": {
-                "id": "[0]"
-            }
-        }, {
-            "value": {
-                "doubleVal": {
-                    "shape": ["2"],
-                    "values": [3.0, 4.0]
-                }
-            },
-            "id": {
-                "id": "[1]"
-            }
-        }, {
-            "value": {
-                "doubleVal": {
                     "values": [0.5]
                 }
             },
+            "vertexLabel": "SomeLabel",
             "id": {
                 "id": "[2]"
             }
         }]
-    },
-    "metadata": {
-        "metadataInfo": {
-            "Author": "Some Author",
-            "Tag": "MyBayesNet"
-        }
     }
 }

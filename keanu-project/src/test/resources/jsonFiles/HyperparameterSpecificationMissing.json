@@ -30,53 +30,11 @@
             "label": "GaussianVertex",
             "vertexType": "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex",
             "parameters": [{
-                "name": "mu",
-                "parentVertex": {
-                    "id": "[0]"
-                }
-            }, {
                 "name": "sigma",
                 "parentVertex": {
                     "id": "[1]"
                 }
             }]
         }]
-    },
-    "networkState": {
-        "defaultState": [{
-            "value": {
-                "doubleVal": {
-                    "values": [0.0]
-                }
-            },
-            "id": {
-                "id": "[0]"
-            }
-        }, {
-            "value": {
-                "doubleVal": {
-                    "shape": ["2"],
-                    "values": [3.0, 4.0]
-                }
-            },
-            "id": {
-                "id": "[1]"
-            }
-        }, {
-            "value": {
-                "doubleVal": {
-                    "values": [0.5]
-                }
-            },
-            "id": {
-                "id": "[2]"
-            }
-        }]
-    },
-    "metadata": {
-        "metadataInfo": {
-            "Author": "Some Author",
-            "Tag": "MyBayesNet"
-        }
     }
 }
