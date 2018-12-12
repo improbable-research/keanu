@@ -440,7 +440,7 @@ public class ProtobufTest {
          * all the necessary Params for that constructor
          */
         Map<String, Class> storedParams = getSavedParams(vertexClass);
-        Map<String, Class> requiredParams = getRequiredParamsAndCheckOnlyUsedOnce(vertexClass);
+        Map<String, Class> requiredParams = checkConstructorParamValidityAndGetRequiredSaves(vertexClass);
 
         for (Map.Entry<String, Class> param : requiredParams.entrySet()) {
             assertThat("Class must save all required params: " + vertexClass,
@@ -479,7 +479,7 @@ public class ProtobufTest {
         return savedParams;
     }
 
-    private Map<String, Class> getRequiredParamsAndCheckOnlyUsedOnce(Class<? extends Vertex> vertexClass) {
+    private Map<String, Class> checkConstructorParamValidityAndGetRequiredSaves(Class<? extends Vertex> vertexClass) {
         List<Constructor> parentConstructor = getConstructorsWithAnnotatedParameters(vertexClass,
             LoadVertexParam.class);
         assertThat("Need Constructor for Class: " + vertexClass, parentConstructor.size(), is(1));
@@ -501,4 +501,5 @@ public class ProtobufTest {
 
         return requiredParameters;
     }
+
 }
