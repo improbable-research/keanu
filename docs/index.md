@@ -64,6 +64,10 @@ grid_navigation:
       excerpt: Learn how to use plates to describe repeating subgraphs in Keanu or to do time series modelling.
       cta: Read more
       url: /docs/plates/
+    - title: Autocorrelation
+      excerpt: Learn how to calculate autocorrelation on your samples.
+      cta: Read more
+      url: /docs/autocorrelation/
     - title: Tutorial - Two thermometers
       excerpt: Learn from a real-world example.
       cta: Read more

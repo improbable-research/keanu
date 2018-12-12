@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms;
+package io.improbable.keanu.algorithms.statistics;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Uniform;
@@ -11,28 +11,24 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-public class SampleStatsTest {
+public class AutocorrelationTest {
+
     @Test
     public void autocorrAtLagZeroIsOne() {
         double[] samples = generateUniformRandomArray(20);
-        double[] autocorr = SampleStats.autocorrelation(samples);
-        assertEquals(autocorr[0], 1.0, 0.001);
+        double[] autocorr = Autocorrelation.calculate(samples);
+        assertEquals(autocorr[0], 1.0, 0.0);
     }
 
     private double[] generateUniformRandomArray(int length) {
         ContinuousDistribution uniform = Uniform.withParameters(DoubleTensor.ZERO_SCALAR, DoubleTensor.scalar(1000));
-        uniform.sample(new long[]{length}, KeanuRandom.getDefaultRandom());
-        double samples[] = new double[length];
-        for (int i = 0; i < length; i++) {
-            samples[i] = uniform.sample(new long[]{1}, KeanuRandom.getDefaultRandom()).scalar();
-        }
-        return samples;
+        return uniform.sample(new long[]{length}, KeanuRandom.getDefaultRandom()).asFlatDoubleArray();
     }
 
     @Test
     public void randomlyGeneratedSamplesHaveCloseToZeroAutocorrelationAtLowLags() {
         double[] samples = generateUniformRandomArray(500);
-        double[] autocorr = SampleStats.autocorrelation(samples);
+        double[] autocorr = Autocorrelation.calculate(samples);
 
         for (int lag = 1; lag < 10; lag++) {
             assertThat(autocorr[lag], lessThan(0.1));
@@ -48,7 +44,7 @@ public class SampleStatsTest {
     @Test
     public void increasingSequenceReturnsCorrectAutocorr() {
         double[] samples = {1, 2, 3, 4, 5, 6, 7, 8};
-        double[] autocorr = SampleStats.autocorrelation(samples);
+        double[] autocorr = Autocorrelation.calculate(samples);
         double[] expected = {1., 0.625, 0.27380952, -0.0297619, -0.26190476,
             -0.39880952, -0.41666667, -0.29166667};
         assertArrayEquals(expected, autocorr, 0.0001);
