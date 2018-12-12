@@ -96,7 +96,7 @@ public class ProtobufTest {
 
     @Test
     public void shapeIsCorrectlySavedAndLoaded() throws IOException {
-        DoubleVertex gaussianVertex1 = new GaussianVertex(new long[] {2, 3},0.0, 1.0);
+        DoubleVertex gaussianVertex1 = new GaussianVertex(new long[] {2, 3}, 0.0, 1.0);
         DoubleVertex gaussianVertex2 = new GaussianVertex(new long[] {3, 2}, 0.0, 1.0);
         DoubleVertex output = gaussianVertex1.matrixMultiply(gaussianVertex2);
         BayesianNetwork bayesNet = new BayesianNetwork(output.getConnectedGraph());
