@@ -14,39 +14,39 @@ public class AutocorrelationExample {
     }
 
     private static void scalarAutocorrelationExample() {
-        DoubleVertex A = new GaussianVertex(20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(20.0, 1.0);
-        DoubleVertex C = new GaussianVertex(A.plus(B), 1.0);
-        C.observe(43.0);
-        A.setValue(20.0);
-        B.setValue(20.0);
-        BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
+DoubleVertex A = new GaussianVertex(20.0, 1.0);
+DoubleVertex B = new GaussianVertex(20.0, 1.0);
+DoubleVertex C = new GaussianVertex(A.plus(B), 1.0);
+C.observe(43.0);
+A.setValue(20.0);
+B.setValue(20.0);
+BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
 
-        //%%SNIPPET_START%% ScalarAutocorrelation
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
-            100
-        );
-        DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation();
-        //%%SNIPPET_END%% ScalarAutocorrelation
+//%%SNIPPET_START%% ScalarAutocorrelation
+NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+    bayesNet,
+    bayesNet.getLatentVertices(),
+    100
+);
+DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation();
+//%%SNIPPET_END%% ScalarAutocorrelation
     }
 
     private static void tensorAutocorrelationExample() {
-        DoubleVertex A = new GaussianVertex(new long[]{1, 5},20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(new long[]{1, 5}, 20.0, 1.0);
-        DoubleVertex C = new GaussianVertex(A.plus(B), 1.0);
-        BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
-        C.observe(new double[]{1, 4, 5, 7, 8});
-        bayesNet.probeForNonZeroProbability(100);
+DoubleVertex A = new GaussianVertex(new long[]{1, 5},20.0, 1.0);
+DoubleVertex B = new GaussianVertex(new long[]{1, 5}, 20.0, 1.0);
+DoubleVertex C = new GaussianVertex(A.plus(B), 1.0);
+BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
+C.observe(new double[]{1, 4, 5, 7, 8});
+bayesNet.probeForNonZeroProbability(100);
 
-        //%%SNIPPET_START%% TensorAutocorrelation
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
-            100
-        );
-        DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation(0,1);
-        //%%SNIPPET_END%% TensorAutocorrelation
+//%%SNIPPET_START%% TensorAutocorrelation
+NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+    bayesNet,
+    bayesNet.getLatentVertices(),
+    100
+);
+DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation(0,1);
+//%%SNIPPET_END%% TensorAutocorrelation
     }
 }

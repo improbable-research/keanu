@@ -33,21 +33,21 @@ calculating autocorrelation on samples.
 With a network defined, we can get the autocorrelation vertex A. The result is 
 a tensor containing the autocorrelation at varying lags.
 ```java
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
-            100
-        );
-        DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation();
+NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+    bayesNet,
+    bayesNet.getLatentVertices(),
+    100
+);
+DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation();
 ```
 
 When the samples are tensors, we need to specify the tensor index on which to calculate the autocorrelation.
 For example, if the sample shape is `[1,5]` we can evaluate the autocorrelation at index `[0,1]`.
 ```java
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
-            100
-        );
-        DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation(0,1);
+NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+    bayesNet,
+    bayesNet.getLatentVertices(),
+    100
+);
+DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation(0,1);
 ```
