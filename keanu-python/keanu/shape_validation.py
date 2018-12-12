@@ -1,4 +1,4 @@
-from typing import Tuple, List, Union
+from typing import Tuple, Sequence
 
 
 def check_index_is_valid(shape: Tuple[int, ...], index: Tuple[int, ...]) -> None:
@@ -9,6 +9,6 @@ def check_index_is_valid(shape: Tuple[int, ...], index: Tuple[int, ...]) -> None
             raise ValueError("Invalid index {} for shape {}".format(index, shape))
 
 
-def check_all_shapes_match(shapes: List[Tuple[int, ...]]) -> None:
+def check_all_shapes_match(shapes: Sequence[Tuple[int, ...]]) -> None:
     if not len(set(shapes)) == 1:
         raise ValueError("Shapes must match")
