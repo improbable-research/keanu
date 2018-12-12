@@ -235,4 +235,19 @@ public class TensorShape {
         return ArrayUtils.remove(shape, dimension);
     }
 
+    /**
+     * Finds the absolute dimension for a shape
+     *
+     * @param dimension the negative or positive dimension to find the absolute of
+     * @param rank      the rank
+     *
+     * @return an absolute dimension from a shape
+     */
+    public static int getAbsoluteDimension(int dimension, int rank) {
+        if (dimension < 0) {
+            dimension += rank;
+        }
+        return dimension;
+    }
+
 }

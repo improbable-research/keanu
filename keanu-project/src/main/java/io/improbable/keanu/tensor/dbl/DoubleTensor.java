@@ -1,16 +1,22 @@
 package io.improbable.keanu.tensor.dbl;
 
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
+
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.google.common.base.Preconditions;
 
 public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
@@ -109,15 +115,16 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
      * DoubleTensor.stack(-1, A, B, C) gives DoubleTensor.ones(4, 2, 3)
      */
     static DoubleTensor stack(int dimension, DoubleTensor... toStack) {
-        INDArray[] stackAsINDArray = new INDArray[toStack.length];
+        long[] shape = toStack[0].getShape();
+        int absoluteDimension = getAbsoluteDimension(dimension, shape.length + 1);
+        long[] stackedShape = ArrayUtils.insert(absoluteDimension, shape, 1);
+
+        DoubleTensor[] reshaped = new DoubleTensor[toStack.length];
         for (int i = 0; i < toStack.length; i++) {
-            stackAsINDArray[i] = Nd4jDoubleTensor.unsafeGetNd4J(toStack[i]).dup();
-            if (stackAsINDArray[i].shape().length == 0) {
-                stackAsINDArray[i] = stackAsINDArray[i].reshape(1);
-            }
+            reshaped[i] = toStack[i].reshape(stackedShape);
         }
-        INDArray stack = INDArrayShim.stack(dimension, stackAsINDArray);
-        return new Nd4jDoubleTensor(stack);
+
+        return concat(absoluteDimension, reshaped);
     }
 
     static DoubleTensor concat(DoubleTensor... toConcat) {

@@ -1,10 +1,15 @@
 package io.improbable.keanu.tensor.intgr;
 
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
+
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -68,7 +73,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     /**
-     * @param dimension the dimension along which toStack are stacked
+     * @param dimension  the dimension along which toStack are stacked
      * @param toStack    an array of IntegerTensor
      * @return  an IntegerTensor with toStack joined along a new dimension
      * <p>
@@ -83,15 +88,16 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
      * IntegerTensor.stack(-1, A, B, C) gives IntegerTensor.ones(4, 2, 3)
      */
     static IntegerTensor stack(int dimension, IntegerTensor... toStack) {
-        INDArray[] stackAsINDArray = new INDArray[toStack.length];
+        long[] shape = toStack[0].getShape();
+        int absoluteDimension = getAbsoluteDimension(dimension, shape.length + 1);
+        long[] stackedShape = ArrayUtils.insert(absoluteDimension, shape, 1);
+
+        IntegerTensor[] reshaped = new IntegerTensor[toStack.length];
         for (int i = 0; i < toStack.length; i++) {
-            stackAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toStack[i]).dup();
-            if (stackAsINDArray[i].shape().length == 0) {
-                stackAsINDArray[i] = stackAsINDArray[i].reshape(1);
-            }
+            reshaped[i] = toStack[i].reshape(stackedShape);
         }
-        INDArray stack = INDArrayShim.stack(dimension, stackAsINDArray);
-        return new Nd4jIntegerTensor(stack);
+
+        return concat(absoluteDimension, reshaped);
     }
 
     static IntegerTensor concat(IntegerTensor... toConcat) {

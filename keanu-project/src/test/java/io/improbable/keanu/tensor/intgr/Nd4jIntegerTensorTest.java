@@ -1,7 +1,9 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorTestHelper;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 import junit.framework.TestCase;
@@ -699,8 +701,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor x = IntegerTensor.scalar(2);
         IntegerTensor y = IntegerTensor.scalar(3);
 
-        assertEquals(IntegerTensor.create(2, 3).reshape(2, 1), IntegerTensor.stack(0, x, y));
-        assertEquals(IntegerTensor.create(2, 3).reshape(1, 2), IntegerTensor.stack(1, x, y));
+        assertThat(IntegerTensor.create(2, 3).reshape(2), TensorMatchers.valuesAndShapesMatch(IntegerTensor.stack(0, x, y)));
     }
 
     @Test
@@ -742,14 +743,14 @@ public class Nd4jIntegerTensorTest {
         assertThat(IntegerTensor.create(2, 4, 3, 5).reshape(1, 2, 2), valuesAndShapesMatch(IntegerTensor.stack(-1, x, y)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void cannotStackIfPositiveDimensionIsOutOfBounds() {
         IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
         IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
         IntegerTensor.stack(3, x, y);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void cannotStackIfNegativeDimensionIsOutOfBounds() {
         IntegerTensor x = IntegerTensor.create(2, 3).reshape(1, 2);
         IntegerTensor y = IntegerTensor.create(4, 5).reshape(1, 2);
