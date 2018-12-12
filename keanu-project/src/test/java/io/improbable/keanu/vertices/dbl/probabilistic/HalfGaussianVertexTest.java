@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -160,5 +161,14 @@ public class HalfGaussianVertexTest {
             latentSigmaList,
             random
         );
+    }
+
+    @Test
+    public void outOfBoundsGradientCalculation() {
+        HalfGaussianVertex gaussianVertex = new HalfGaussianVertex(5);
+        double outOfBoundsValue = -1.0;
+        Map<Vertex, DoubleTensor> actualDerivatives = gaussianVertex.dLogPdf(outOfBoundsValue, gaussianVertex);
+        DoubleTensor derivative = actualDerivatives.get(gaussianVertex);
+        Assert.assertEquals(0.0, derivative.scalar(), 1e-6);
     }
 }
