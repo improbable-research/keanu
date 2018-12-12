@@ -96,8 +96,15 @@ public class ProtobufTest {
 
     @Test
     public void shapeIsCorrectlySavedAndLoaded() throws IOException {
-        DoubleVertex gaussianVertex1 = new GaussianVertex(new long[] {2, 3}, 0.0, 1.0);
-        DoubleVertex gaussianVertex2 = new GaussianVertex(new long[] {3, 2}, 0.0, 1.0);
+        long[] shape1 = new long[] {2, 3};
+        long[] shape2 = new long[] {3, 2};
+        final VertexLabel LABEL_ONE = new VertexLabel("Vertex1");
+        final VertexLabel LABEL_TWO = new VertexLabel("Vertex2");
+
+        DoubleVertex gaussianVertex1 = new GaussianVertex(shape1, 0.0, 1.0);
+        gaussianVertex1.setLabel(LABEL_ONE);
+        DoubleVertex gaussianVertex2 = new GaussianVertex(shape2, 0.0, 1.0);
+        gaussianVertex2.setLabel(LABEL_TWO);
         DoubleVertex output = gaussianVertex1.matrixMultiply(gaussianVertex2);
         BayesianNetwork bayesNet = new BayesianNetwork(output.getConnectedGraph());
 
@@ -109,6 +116,10 @@ public class ProtobufTest {
         ProtobufLoader loader = new ProtobufLoader();
 
         BayesianNetwork readNet = loader.loadNetwork(inputStream);
+        Vertex vertexToShapeCheck = readNet.getVertexByLabel(LABEL_ONE);
+        assertThat(vertexToShapeCheck.getShape(), is(shape1));
+        vertexToShapeCheck = readNet.getVertexByLabel(LABEL_TWO);
+        assertThat(vertexToShapeCheck.getShape(), is(shape2));
     }
 
     @Test
