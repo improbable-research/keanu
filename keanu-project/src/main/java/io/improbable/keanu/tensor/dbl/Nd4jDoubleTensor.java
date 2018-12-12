@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.google.common.primitives.Ints.checkedCast;
-
 import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 import static java.util.Arrays.copyOf;

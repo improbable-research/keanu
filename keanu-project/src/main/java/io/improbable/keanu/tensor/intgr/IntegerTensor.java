@@ -1,20 +1,17 @@
 package io.improbable.keanu.tensor.intgr;
 
-import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
-
 import io.improbable.keanu.kotlin.IntegerOperators;
-import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.Arrays;
 import java.util.function.Function;
+
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
