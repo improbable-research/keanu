@@ -20,7 +20,7 @@ import java.io.Writer;
 import java.util.Map;
 
 /**
- * Utility class for outputting a network to a JSON file.
+ * A class for outputting a network to a JSON file.
  * JSON output file contains information about the network (vertices, their types and connections),
  * network state (values for constant and observed vertices, if saveValues parameter is set to true),
  * as well as metadata (string key - value pairs, if metadata is passed in).

@@ -58,7 +58,7 @@ public class ProtobufSaver implements NetworkSaver {
     private void saveMetadata(Map<String, String> metadata) {
         if (metadata != null) {
             KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
-            String[] metadataKeys = metadata.keySet().toArray(new String[metadata.size()]);
+            String[] metadataKeys = metadata.keySet().toArray(new String[0]);
             Arrays.sort(metadataKeys);
             for (String metadataKey : metadataKeys) {
                 metadataBuilder.putMetadataInfo(metadataKey, metadata.get(metadataKey));
@@ -93,23 +93,29 @@ public class ProtobufSaver implements NetworkSaver {
 
     private void saveParams(KeanuSavedBayesNet.Vertex.Builder vertexBuilder,
                             Vertex vertex) {
+        Map<String, Method> parentRetrievalMethodMap = getParentRetrievalMethodMap(vertex);
+
+        String[] parentNames = parentRetrievalMethodMap.keySet().toArray(new String[0]);
+        Arrays.sort(parentNames);
+        for (String parentName : parentNames) {
+            vertexBuilder.addParameters(getEncodedParam(vertex, parentName, parentRetrievalMethodMap.get(parentName)));
+        }
+    }
+
+    private Map<String, Method> getParentRetrievalMethodMap(Vertex vertex) {
         Class vertexClass = vertex.getClass();
         Method[] methods = vertexClass.getMethods();
-        Map<String, Method> parentMethodMap = new HashMap<>();
+        Map<String, Method> parentRetrievalMethodMap = new HashMap<>();
 
         for (Method method : methods) {
             SaveVertexParam vertexAnnotation = method.getAnnotation(SaveVertexParam.class);
             if (vertexAnnotation != null) {
                 String parentName = vertexAnnotation.value();
-                parentMethodMap.put(parentName, method);
+                parentRetrievalMethodMap.put(parentName, method);
             }
         }
 
-        String[] parentNames = parentMethodMap.keySet().toArray(new String[parentMethodMap.size()]);
-        Arrays.sort(parentNames);
-        for (String parentName : parentNames) {
-            vertexBuilder.addParameters(getEncodedParam(vertex, parentName, parentMethodMap.get(parentName)));
-        }
+        return parentRetrievalMethodMap;
     }
 
     private KeanuSavedBayesNet.NamedParam getEncodedParam(Vertex vertex, String paramName, Method getParamMethod) {

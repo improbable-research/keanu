@@ -277,7 +277,7 @@ public class ProtobufTest {
     public void metadataCanBeSavedToProtobuf() throws IOException {
         Vertex vertex = new ConstantIntegerVertex(1);
         BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
-        Map<String, String> metadata = ImmutableMap.of( "Author", "Some Author", "Tag", "MyBayesNet" );
+        Map<String, String> metadata = ImmutableMap.of("Author", "Some Author", "Tag", "MyBayesNet");
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
         ProtobufSaver protobufSaver = new ProtobufSaver(net);
@@ -285,7 +285,7 @@ public class ProtobufTest {
         KeanuSavedBayesNet.Model parsedModel = KeanuSavedBayesNet.Model.parseFrom(writer.toByteArray());
 
         KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
-        String[] metadataKeys = metadata.keySet().toArray(new String[metadata.size()]);
+        String[] metadataKeys = metadata.keySet().toArray(new String[0]);
         Arrays.sort(metadataKeys);
         for (String metadataKey : metadataKeys) {
             metadataBuilder.putMetadataInfo(metadataKey, metadata.get(metadataKey));
