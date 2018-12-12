@@ -70,7 +70,8 @@
             },
             "id": {
                 "id": "[2]"
-            }
+            },
+            "isObserved": true
         }]
     },
     "metadata": {

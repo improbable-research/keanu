@@ -83,6 +83,7 @@ message StoredValue {
     VertexValue value = 1;
     string vertexLabel = 2;
     VertexID id = 3;
+    bool isObserved = 4;
 }
 
 message VertexValue {

@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class ProtobufLoader implements NetworkLoader {
 
-    private final Map<Vertex, KeanuSavedBayesNet.VertexValue> savedValues;
+    private final Map<Vertex, KeanuSavedBayesNet.StoredValue> savedValues;
 
     public ProtobufLoader() {
         savedValues = new HashMap<>();
@@ -59,9 +59,14 @@ public class ProtobufLoader implements NetworkLoader {
 
     @Override
     public void loadValue(DoubleVertex vertex) {
-        KeanuSavedBayesNet.VertexValue value = savedValues.get(vertex);
+        KeanuSavedBayesNet.StoredValue valueInformation = savedValues.get(vertex);
+        KeanuSavedBayesNet.VertexValue value = valueInformation.getValue();
         DoubleTensor tensor = extractDoubleValue(value);
-        vertex.setValue(tensor);
+        if (valueInformation.getIsObserved()) {
+            vertex.observe(tensor);
+        } else {
+            vertex.setValue(tensor);
+        }
     }
 
     private DoubleTensor extractDoubleValue(KeanuSavedBayesNet.VertexValue value) {
@@ -78,7 +83,7 @@ public class ProtobufLoader implements NetworkLoader {
         for (KeanuSavedBayesNet.StoredValue value : parsedNetworkState.getDefaultStateList()) {
             Vertex targetVertex = getTargetVertex(value, instantiatedVertices, bayesNet);
 
-            savedValues.put(targetVertex, value.getValue());
+            savedValues.put(targetVertex, value);
             targetVertex.loadValue(this);
         }
     }
@@ -135,9 +140,14 @@ public class ProtobufLoader implements NetworkLoader {
 
     @Override
     public void loadValue(BoolVertex vertex) {
-        KeanuSavedBayesNet.VertexValue value = savedValues.get(vertex);
+        KeanuSavedBayesNet.StoredValue valueInformation = savedValues.get(vertex);
+        KeanuSavedBayesNet.VertexValue value = valueInformation.getValue();
         BooleanTensor tensor = extractBoolValue(value);
-        vertex.setValue(tensor);
+        if (valueInformation.getIsObserved()) {
+            vertex.observe(tensor);
+        } else {
+            vertex.setValue(tensor);
+        }
     }
 
     private BooleanTensor extractBoolValue(KeanuSavedBayesNet.VertexValue value) {
@@ -150,9 +160,14 @@ public class ProtobufLoader implements NetworkLoader {
 
     @Override
     public void loadValue(IntegerVertex vertex) {
-        KeanuSavedBayesNet.VertexValue value = savedValues.get(vertex);
+        KeanuSavedBayesNet.StoredValue valueInformation = savedValues.get(vertex);
+        KeanuSavedBayesNet.VertexValue value = valueInformation.getValue();
         IntegerTensor tensor = extractIntValue(value);
-        vertex.setValue(tensor);
+        if (valueInformation.getIsObserved()) {
+            vertex.observe(tensor);
+        } else {
+            vertex.setValue(tensor);
+        }
     }
 
     private IntegerTensor extractIntValue(KeanuSavedBayesNet.VertexValue value) {

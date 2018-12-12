@@ -294,6 +294,7 @@ public class ProtobufSaver implements NetworkSaver {
         return KeanuSavedBayesNet.StoredValue.newBuilder()
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId(vertex.getId().toString()).build())
             .setValue(value)
+            .setIsObserved(vertex.isObserved())
             .build();
     }
 }

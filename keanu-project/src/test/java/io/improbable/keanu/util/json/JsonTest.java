@@ -98,10 +98,11 @@ public class JsonTest {
         assertEquals(net.getAllVertices().size(), loadedNetwork.getAllVertices().size());
         assertEquals(net.getLatentVertices().size(), loadedNetwork.getLatentVertices().size());
         assertEquals(net.getObservedVertices().size(), loadedNetwork.getObservedVertices().size());
-        assertThat(net.getLatentVertices().get(0), instanceOf(GaussianVertex.class));
-        GaussianVertex gaussianVertex = (GaussianVertex)loadedNetwork.getLatentVertices().get(0);
+        assertThat(net.getObservedVertices().get(0), instanceOf(GaussianVertex.class));
+        GaussianVertex gaussianVertex = (GaussianVertex)loadedNetwork.getObservedVertices().get(0);
         assertThat(gaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
-        assertThat(gaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
+        assertThat(gaussianVertex.getSigma().getValue(0), closeTo(3.0, 1e-10));
+        assertThat(gaussianVertex.getSigma().getValue(1), closeTo(4.0, 1e-10));
         assertThat(gaussianVertex.getValue().scalar(), closeTo(0.5, 1e-10));
     }
 
