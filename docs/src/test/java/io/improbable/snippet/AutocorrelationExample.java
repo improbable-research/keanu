@@ -33,7 +33,7 @@ DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAut
     }
 
     private static void tensorAutocorrelationExample() {
-DoubleVertex A = new GaussianVertex(new long[]{1, 5},20.0, 1.0);
+DoubleVertex A = new GaussianVertex(new long[]{1, 5}, 20.0, 1.0);
 DoubleVertex B = new GaussianVertex(new long[]{1, 5}, 20.0, 1.0);
 DoubleVertex C = new GaussianVertex(A.plus(B), 1.0);
 BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
