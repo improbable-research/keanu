@@ -44,10 +44,14 @@ public class VertexLabel {
         return name;
     }
 
-    @Override
-    public String toString() {
+    public String getQualifiedName() {
         ImmutableList<String> names = ImmutableList.<String>builder().add(name).addAll(namespace).build();
         return Joiner.on(NAMESPACE_SEPARATOR).join(Lists.reverse(names));
+    }
+
+    @Override
+    public String toString() {
+        return getQualifiedName();
     }
 
     @Override

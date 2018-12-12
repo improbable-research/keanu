@@ -36,8 +36,8 @@ public class LinearRidgeRegressionTest {
             .build();
 
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -52,8 +52,8 @@ public class LinearRidgeRegressionTest {
             .build();
 
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -68,8 +68,8 @@ public class LinearRidgeRegressionTest {
             .build();
 
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -88,7 +88,7 @@ public class LinearRidgeRegressionTest {
             .withPriorOnWeightsAndIntercept(0, 0.00001)
             .build();
 
-        assertThat(linearRegressionModelNarrow.getWeights().pow(2).sum(), lessThan(linearRegressionModelWide.getWeights().pow(2).sum()));
+        assertThat(linearRegressionModelNarrow.getWeightVertex().getValue().pow(2).sum(), lessThan(linearRegressionModelWide.getWeightVertex().getValue().pow(2).sum()));
 
     }
 
@@ -96,7 +96,7 @@ public class LinearRidgeRegressionTest {
     @Test
     public void youCanChooseSamplingInsteadOfGradientOptimization() {
         final int smallRawDataSize = 20;
-        final int samplingCount = 30000;
+        final int samplingCount = 6000;
 
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData(smallRawDataSize);
 
@@ -112,17 +112,17 @@ public class LinearRidgeRegressionTest {
             .withRegularization(RegressionRegularization.RIDGE)
             .withPriorOnIntercept(0, data.intercept)
             .withPriorOnWeights(
-                DoubleTensor.create(0., data.weights.getShape()).asFlatDoubleArray(),
-                data.weights.asFlatDoubleArray()
+                DoubleTensor.create(0., data.weights.getShape()),
+                data.weights
             )
             .withSampling(sampling)
             .build();
 
-        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
+        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount / 10).downSample(2);
 
         assertSampledWeightsAndInterceptMatchTestData(
-            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightsVertexId()),
-            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertexId()),
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightVertex().getId()),
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertex().getId()),
             data);
     }
 }

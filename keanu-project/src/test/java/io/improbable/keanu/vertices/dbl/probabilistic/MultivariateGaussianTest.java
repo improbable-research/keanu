@@ -33,9 +33,9 @@ public class MultivariateGaussianTest {
 
         double from = -2.;
         double to = 2.;
-        double bucketSize = 0.05;
+        double bucketSize = 0.1;
 
-        sampleUnivariateMethodMatchesLogProbMethod(mvg, from, to, bucketSize, 1e-2, random, 1000000);
+        sampleUnivariateMethodMatchesLogProbMethod(mvg, from, to, bucketSize, 1e-2, random, 300000);
     }
 
     @Test

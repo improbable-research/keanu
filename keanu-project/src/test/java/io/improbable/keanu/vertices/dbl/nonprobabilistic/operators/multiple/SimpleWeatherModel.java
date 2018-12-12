@@ -1,9 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -62,14 +60,14 @@ public class SimpleWeatherModel {
         }
     }
 
-    public Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
+    public Map<VertexLabel, Vertex<? extends Tensor>> updateValues() {
+        Map<VertexLabel, Vertex<? extends Tensor>> modelOutput = new HashMap<>();
 
         try {
             double chanceOfRainResult = Double.parseDouble(getRainReader().readLine());
-            modelOutput.put(new VertexLabel("ChanceOfRain"), DoubleTensor.scalar(chanceOfRainResult));
+            modelOutput.put(new VertexLabel("ChanceOfRain"), ConstantVertex.of(chanceOfRainResult));
             double humidityResult = Double.parseDouble(getHumidityReader().readLine());
-            modelOutput.put(new VertexLabel("Humidity"), DoubleTensor.scalar(humidityResult));
+            modelOutput.put(new VertexLabel("Humidity"), ConstantVertex.of(humidityResult));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,14 +75,14 @@ public class SimpleWeatherModel {
         return modelOutput;
     }
 
-    public Map<VertexLabel, Tensor> updateValuesMultipleTypes(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
+    public Map<VertexLabel, Vertex<? extends Tensor>> updateValuesMultipleTypes() {
+        Map<VertexLabel, Vertex<? extends Tensor>> modelOutput = new HashMap<>();
 
         try {
             int chanceOfRainResult = (int) Double.parseDouble(getSuggestedFactorSuncreamReader().readLine());
-            modelOutput.put(new VertexLabel("suggestedFactorSuncream"), IntegerTensor.scalar(chanceOfRainResult));
+            modelOutput.put(new VertexLabel("suggestedFactorSuncream"), ConstantVertex.of(chanceOfRainResult));
             boolean humidityResult = Boolean.parseBoolean(getIsSunnyReader().readLine());
-            modelOutput.put(new VertexLabel("isSunny"), BooleanTensor.scalar(humidityResult));
+            modelOutput.put(new VertexLabel("isSunny"), ConstantVertex.of(humidityResult));
         } catch (IOException e) {
             e.printStackTrace();
         }

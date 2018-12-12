@@ -1,10 +1,8 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -17,6 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,10 +33,13 @@ public class KDEApproximationTest {
 
     public DoubleVertexSamples generateGaussianSamples(double mu, double sigma, int nSamples) {
         DoubleVertex gaussian = new GaussianVertex(mu, sigma);
-        BayesianNetwork network = new BayesianNetwork(gaussian.getConnectedGraph());
-        return MetropolisHastings.withDefaultConfig()
-            .getPosteriorSamples(network, Collections.singletonList(gaussian), nSamples)
-            .getDoubleTensorSamples(gaussian);
+        List<DoubleTensor> samples = new ArrayList<>(nSamples);
+
+        for (int i = 0; i < nSamples; i++) {
+            samples.add(gaussian.sample());
+        }
+
+        return new DoubleVertexSamples(samples);
     }
 
     public static void isCloseMostOfTheTime(DoubleTensor expected, DoubleTensor approximated, double correctPercentage, double delta) {
@@ -49,7 +51,7 @@ public class KDEApproximationTest {
                 nCorrect++;
             }
         }
-        assertTrue(String.format("Only %f out of %d correct!", nCorrect, expected.asFlatList().size()), nCorrect / expected.asFlatList().size() > correctPercentage);
+        assertTrue(String.format("Only %f out of %d correct!", nCorrect, expected.asFlatList().size()), nCorrect / expected.asFlatList().size() >= correctPercentage);
     }
 
     @Category(Slow.class)
@@ -60,7 +62,7 @@ public class KDEApproximationTest {
         double correctPercentage = 0.8;
         double delta = 0.1;
 
-        DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 100000);
+        DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 50000);
 
         KDEVertex KDE = GaussianKDE.approximate(samples);
 
@@ -83,7 +85,7 @@ public class KDEApproximationTest {
         double sigma = 1.;
         double correctPercentage = 0.9;
 
-        DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 1000000);
+        DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 10000);
 
         KDEVertex KDE = GaussianKDE.approximate(samples);
 
@@ -104,9 +106,9 @@ public class KDEApproximationTest {
         double mu = 0.;
         double sigma = 1.;
         double DELTA = 0.1;
-        double correctPercentage = 0.8;
+        double correctPercentage = 0.9;
 
-        DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 100000);
+        DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 10000);
         GaussianVertex gaussian = new GaussianVertex(mu, sigma);
 
         KDEVertex KDE = GaussianKDE.approximate(samples);

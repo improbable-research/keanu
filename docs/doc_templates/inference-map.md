@@ -24,7 +24,7 @@ page_nav:
 
 ## Model Fitting
 
-Now that we've learnt to describe and build a model in [describing your model]({{ site.baseurl }}/docs/describing-your-model), we want to put 
+Now that we've learnt to describe and build a model in [describing your model]({{ site.baseurl }}/docs/getting-started), we want to put 
 it to use! Keanu enables you to calculate the **most probable values** of components of your model given certain conditions
 or 'observations'. More formally, these are known as *posterior estimates*, and we are going to look at how we can obtain these
 through an optimization method called Maximum A Posteriori (MAP).
