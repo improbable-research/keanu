@@ -7,9 +7,13 @@ import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -23,6 +27,33 @@ public class NUTSTest {
     @Before
     public void setup() {
         random = new KeanuRandom(1);
+    }
+
+    @Category(Slow.class)
+    @Test
+    public void samplesHalfGaussian() {
+        double sigma = 1.0;
+        HalfGaussianVertex A = new HalfGaussianVertex(new long[]{1, 1}, sigma);
+        A.setAndCascade(0.5);
+        BayesianNetwork b = new BayesianNetwork(A.getConnectedGraph());
+
+        NUTS nuts = NUTS.builder()
+            .adaptCount(500)
+            .random(random)
+            .targetAcceptanceProb(0.65)
+            .build();
+
+        NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
+            b,
+            b.getLatentVertices(),
+            500
+        );
+
+        List<DoubleTensor> samples = posteriorSamples.get(A).asList();
+
+        for (DoubleTensor sample : samples) {
+            Assert.assertTrue(sample.scalar() > 0.);
+        }
     }
 
     @Category(Slow.class)

@@ -1,5 +1,7 @@
 package io.improbable.keanu.algorithms;
 
+import com.google.common.base.Preconditions;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ public class VertexSamples<T> {
     protected final List<T> samples;
 
     public VertexSamples(List<T> samples) {
+        Preconditions.checkArgument(!samples.isEmpty(), "No samples provided.");
         this.samples = samples;
     }
 

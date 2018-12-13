@@ -1,9 +1,8 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -78,9 +77,9 @@ public class HamiltonianSampler implements SamplingAlgorithm {
     }
 
     @Override
-    public NetworkState sample() {
+    public NetworkSample sample() {
         step();
-        return new SimpleNetworkState(acceptOrReject());
+        return new NetworkSample(acceptOrReject(), logOfMasterPBeforeLeapfrog);
     }
 
     private Map<VertexId, ?> acceptOrReject() {
