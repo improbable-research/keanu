@@ -8,7 +8,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.TestGraphGenerator;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -44,10 +44,10 @@ public class DifferentiatorTest {
         DoubleVertex B = new GaussianVertex(0, 1);
         DoubleVertex C = A.times(B);
 
-        PartialDerivatives dC = Differentiator.reverseModeAutoDiff(C, ImmutableSet.of(A, B));
+        PartialsOf dC = Differentiator.reverseModeAutoDiff(C, ImmutableSet.of(A, B));
 
-        DoubleTensor dCdA = dC.withRespectTo(A);
-        DoubleTensor dCdB = dC.withRespectTo(B);
+        DoubleTensor dCdA = dC.withRespectTo(A).getValue();
+        DoubleTensor dCdB = dC.withRespectTo(B).getValue();
 
         assertEquals(A.getValue().scalar(), dCdB.scalar(), 1e-5);
         assertEquals(B.getValue().scalar(), dCdA.scalar(), 1e-5);
@@ -65,10 +65,10 @@ public class DifferentiatorTest {
         DoubleVertex E = C.times(2);
         DoubleVertex Y = E.log();
 
-        PartialDerivatives dY = Differentiator.reverseModeAutoDiff(Y, ImmutableSet.of(A, B));
+        PartialsOf dY = Differentiator.reverseModeAutoDiff(Y, ImmutableSet.of(A, B));
 
-        DoubleTensor dYdA = dY.withRespectTo(A);
-        DoubleTensor dYdB = dY.withRespectTo(B);
+        DoubleTensor dYdA = dY.withRespectTo(A).getValue();
+        DoubleTensor dYdB = dY.withRespectTo(B).getValue();
 
         assertEquals(A.getValue().reciprocal().scalar(), dYdA.scalar(), 1e-5);
         assertEquals(B.getValue().reciprocal().scalar(), dYdB.scalar(), 1e-5);
@@ -89,10 +89,10 @@ public class DifferentiatorTest {
         DoubleVertex F = D.plus(B).exp();
         SumVertex H = G.plus(F).sum();
 
-        PartialDerivatives dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
+        PartialsOf dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
 
-        DoubleTensor dHdAReverse = dHReverse.withRespectTo(A);
-        DoubleTensor dHdBReverse = dHReverse.withRespectTo(B);
+        DoubleTensor dHdAReverse = dHReverse.withRespectTo(A).getValue();
+        DoubleTensor dHdBReverse = dHReverse.withRespectTo(B).getValue();
 
         DoubleTensor dHdAForward = Differentiator.forwardModeAutoDiff(A, H).of(H).withRespectTo(A);
         DoubleTensor dHdBForward = Differentiator.forwardModeAutoDiff(B, H).of(H).withRespectTo(B);
@@ -139,10 +139,10 @@ public class DifferentiatorTest {
         BoolVertex predicate = ConstantVertex.of(BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2}));
         DoubleVertex H = If.isTrue(predicate).then(G).orElse(F);
 
-        PartialDerivatives dH = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
+        PartialsOf dH = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
 
-        DoubleTensor dHdA = dH.withRespectTo(A);
-        DoubleTensor dHdB = dH.withRespectTo(B);
+        DoubleTensor dHdA = dH.withRespectTo(A).getValue();
+        DoubleTensor dHdB = dH.withRespectTo(B).getValue();
 
         DoubleTensor predicateTrueMask = predicate.getValue().toDoubleMask();
         DoubleTensor predicateFalseMask = predicate.getValue().not().toDoubleMask();

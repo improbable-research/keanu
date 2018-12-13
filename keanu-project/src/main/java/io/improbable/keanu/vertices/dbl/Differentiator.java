@@ -5,10 +5,12 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsWithRespectTo;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +22,7 @@ import static java.util.Collections.singletonMap;
 
 public class Differentiator {
 
-    public static PartialDerivatives reverseModeAutoDiff(Vertex<?> ofVertex, PartialDerivatives dWrtOfVertex, long[] dOfShape, Set<? extends Vertex<?>> wrt) {
+    public static PartialsOf reverseModeAutoDiff(Vertex<?> ofVertex, PartialDerivatives dWrtOfVertex, long[] dOfShape, Set<? extends Vertex<?>> wrt) {
 
         ensureGraphValuesAndShapesAreSet(ofVertex);
 
@@ -60,7 +62,7 @@ public class Differentiator {
             }
         }
 
-        return wrtOfToOfWrt(wrtOf).get(ofVertex.getId());
+        return new PartialsOf(ofVertex, wrtOf);
     }
 
     private static void ensureGraphValuesAndShapesAreSet(Vertex<?> vertex) {
@@ -93,15 +95,15 @@ public class Differentiator {
         }
     }
 
-    public static PartialDerivatives reverseModeAutoDiff(Vertex ofVertex, Set<DoubleVertex> wrt) {
+    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Set<DoubleVertex> wrt) {
         if (ofVertex.isObserved()) {
-            return PartialDerivatives.OF_CONSTANT;
+            return new PartialsOf(ofVertex, Collections.emptyMap());
         } else {
             return reverseModeAutoDiff(ofVertex, PartialDerivatives.withRespectToSelf(ofVertex.getId(), ofVertex.getShape()), ofVertex.getShape(), wrt);
         }
     }
 
-    public static PartialDerivatives reverseModeAutoDiff(Vertex ofVertex, DoubleVertex... wrt) {
+    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, DoubleVertex... wrt) {
         return reverseModeAutoDiff(ofVertex, new HashSet<>(Arrays.asList(wrt)));
     }
 

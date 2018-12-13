@@ -70,7 +70,7 @@ public class AutoDiffTest {
         vB.setValue(B);
         vC.eval();
 
-        PartialDerivatives dcdx = Differentiator.reverseModeAutoDiff(vC, vA, vB);
+        PartialsOf dcdx = Differentiator.reverseModeAutoDiff(vC, vA, vB);
 
         DoubleTensor C = vC.getValue();
         Map<VertexId, DoubleTensor> dcdxMap = dcdx.asMap();

@@ -36,10 +36,10 @@ public class LogProbGradientCalculator {
      * @return the partial derivatives with respect to a given set of latent vertices
      */
     public Map<VertexId, DoubleTensor> getJointLogProbGradientWrtLatents() {
-        PartialDerivatives diffOfLogWrt = new PartialDerivatives(new HashMap<>());
+        PartialsOf diffOfLogWrt = new PartialsOf(null, new HashMap<>());
 
         for (final Vertex<?> ofVertex : logProbOfVertices) {
-            diffOfLogWrt = diffOfLogWrt.add(reverseModeLogProbGradientWrtLatents(ofVertex));
+            diffOfLogWrt = diffOfLogWrt.add(reverseModeLogProbGradientWrtLatents(ofVertex), null);
         }
 
         return diffOfLogWrt.asMap();
@@ -116,7 +116,7 @@ public class LogProbGradientCalculator {
      * @param ofVertex the vertex we are taking the derivative of
      * @return partial derivatives of the "ofVertex" wrt to any "this.wrtVertices" that it descends.
      */
-    private PartialDerivatives reverseModeLogProbGradientWrtLatents(final Vertex ofVertex) {
+    private PartialsOf reverseModeLogProbGradientWrtLatents(final Vertex ofVertex) {
         Preconditions.checkArgument(
             ofVertex instanceof Probabilistic<?>,
             "Cannot get logProb gradient on non-probabilistic vertex %s", ofVertex
@@ -125,7 +125,7 @@ public class LogProbGradientCalculator {
         Set<DoubleVertex> verticesWithNonzeroDiff = verticesWithNonzeroDiffWrtLatent.get(ofVertex);
         final Map<Vertex, DoubleTensor> dlogProbOfVertexWrtVertices = ((Probabilistic<?>) ofVertex).dLogProbAtValue(verticesWithNonzeroDiff);
 
-        PartialDerivatives dOfWrtLatentsAccumulated = new PartialDerivatives(new HashMap<>());
+        PartialsOf dOfWrtLatentsAccumulated = new PartialsOf(null, new HashMap<>());
 
         for (Map.Entry<Vertex, DoubleTensor> dlogProbWrtVertex : dlogProbOfVertexWrtVertices.entrySet()) {
 
@@ -134,13 +134,13 @@ public class LogProbGradientCalculator {
 
             if (vertexWithDiff.equals(ofVertex)) {
 
-                dOfWrtLatentsAccumulated.putWithRespectTo(vertexWithDiff.getId(), dLogProbOfWrtVertexWithDiff);
+                dOfWrtLatentsAccumulated.putWithRespectTo(vertexWithDiff.getId(), new PartialDerivatives(vertexWithDiff.getId(), dLogProbOfWrtVertexWithDiff));
             } else {
 
                 PartialDerivatives partialWrtVertexWithDiff = new PartialDerivatives(new HashMap<>());
                 partialWrtVertexWithDiff.putWithRespectTo(vertexWithDiff.getId(), dLogProbOfWrtVertexWithDiff);
 
-                PartialDerivatives dOfWrtLatentsContributionFromParent = Differentiator
+                PartialsOf dOfWrtLatentsContributionFromParent = Differentiator
                     .reverseModeAutoDiff(
                         vertexWithDiff,
                         partialWrtVertexWithDiff,
@@ -148,7 +148,7 @@ public class LogProbGradientCalculator {
                         this.parentToLatentLookup.get(vertexWithDiff)
                     );
 
-                dOfWrtLatentsAccumulated = dOfWrtLatentsAccumulated.add(dOfWrtLatentsContributionFromParent);
+                dOfWrtLatentsAccumulated = dOfWrtLatentsAccumulated.add(dOfWrtLatentsContributionFromParent, null);
             }
 
         }

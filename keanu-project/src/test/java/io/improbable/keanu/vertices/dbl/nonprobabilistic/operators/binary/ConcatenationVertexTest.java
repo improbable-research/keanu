@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsWithRespectTo;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
@@ -174,7 +174,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        PartialDerivatives concatPartialReverse = Differentiator.reverseModeAutoDiff(concat, a, b);
+        PartialsOf concatPartialReverse = Differentiator.reverseModeAutoDiff(concat, a, b);
 
         assertEquals(dConcatWrtA, concatPartialReverse.withRespectTo(a));
         assertEquals(dConcatWrtB, concatPartialReverse.withRespectTo(b));
@@ -216,17 +216,17 @@ public class ConcatenationVertexTest {
 
         ConcatenationVertex concat = new ConcatenationVertex(1, e, f);
 
-        PartialDerivatives reverse = Differentiator.reverseModeAutoDiff(concat, a, b, c, d);
+        PartialsOf reverse = Differentiator.reverseModeAutoDiff(concat, a, b, c, d);
 
-        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, Differentiator.forwardModeAutoDiff(a, concat).of(concat).withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, Differentiator.forwardModeAutoDiff(b, concat).of(concat).withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, Differentiator.forwardModeAutoDiff(c, concat).of(concat).withRespectTo(c).getShape());
-        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, Differentiator.forwardModeAutoDiff(d, concat).of(concat).withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, Differentiator.forwardModeAutoDiff(a, concat).of(concat).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, Differentiator.forwardModeAutoDiff(b, concat).of(concat).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, Differentiator.forwardModeAutoDiff(c, concat).of(concat).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, Differentiator.forwardModeAutoDiff(d, concat).of(concat).getValue().getShape());
 
-        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(c).getShape());
-        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(a).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(b).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(c).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(d).getValue().getShape());
     }
 
     @Test
@@ -245,15 +245,15 @@ public class ConcatenationVertexTest {
 
         ConcatenationVertex concat = new ConcatenationVertex(0, e, f);
 
-        PartialDerivatives reverse = Differentiator.reverseModeAutoDiff(concat, a, b, d);
+        PartialsOf reverse = Differentiator.reverseModeAutoDiff(concat, a, b, d);
 
-        Assert.assertArrayEquals(new long[]{4, 2, 1, 1}, Differentiator.forwardModeAutoDiff(a, concat).of(concat).withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, Differentiator.forwardModeAutoDiff(b, concat).of(concat).withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, Differentiator.forwardModeAutoDiff(d, concat).of(concat).withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 1, 1}, Differentiator.forwardModeAutoDiff(a, concat).of(concat).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, Differentiator.forwardModeAutoDiff(b, concat).of(concat).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, Differentiator.forwardModeAutoDiff(d, concat).of(concat).getValue().getShape());
 
-        Assert.assertArrayEquals(new long[]{4, 2, 1, 1}, reverse.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, reverse.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, reverse.withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 1, 1}, reverse.withRespectTo(a).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, reverse.withRespectTo(b).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, reverse.withRespectTo(d).getValue().getShape());
     }
 
     @Test
@@ -272,15 +272,15 @@ public class ConcatenationVertexTest {
 
         ConcatenationVertex concat = new ConcatenationVertex(1, e, f);
 
-        PartialDerivatives reverse = Differentiator.reverseModeAutoDiff(concat, a, b, d);
+        PartialsOf reverse = Differentiator.reverseModeAutoDiff(concat, a, b, d);
 
-        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, Differentiator.forwardModeAutoDiff(a, concat).of(concat).withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, Differentiator.forwardModeAutoDiff(b, concat).of(concat).withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new long[]{2, 5, 3, 2}, Differentiator.forwardModeAutoDiff(d, concat).of(concat).withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, Differentiator.forwardModeAutoDiff(a, concat).of(concat).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, Differentiator.forwardModeAutoDiff(b, concat).of(concat).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 3, 2}, Differentiator.forwardModeAutoDiff(d, concat).of(concat).getValue().getShape());
 
-        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, reverse.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, reverse.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new long[]{2, 5, 3, 2}, reverse.withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, reverse.withRespectTo(a).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, reverse.withRespectTo(b).getValue().getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 3, 2}, reverse.withRespectTo(d).getValue().getShape());
     }
 
     @Test
@@ -327,7 +327,7 @@ public class ConcatenationVertexTest {
         DoubleTensor dConcatWrtSharedMatrixForward = Differentiator.forwardModeAutoDiff(sharedMatrix, concat).of(concat).withRespectTo(sharedMatrix);
         DoubleTensor dConcatWrtBForward = Differentiator.forwardModeAutoDiff(b, concat).of(concat).withRespectTo(b);
 
-        PartialDerivatives concatPartialReverse = Differentiator.reverseModeAutoDiff(concat, sharedMatrix, a, b);
+        PartialsOf concatPartialReverse = Differentiator.reverseModeAutoDiff(concat, sharedMatrix, a, b);
 
         Assert.assertArrayEquals(
             DoubleTensor.concat(0, dCdshared, dDdshared).asFlatDoubleArray(),
@@ -335,7 +335,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        assertEquals(dConcatWrtSharedMatrixForward, concatPartialReverse.withRespectTo(sharedMatrix));
+        assertEquals(dConcatWrtSharedMatrixForward, concatPartialReverse.withRespectTo(sharedMatrix).getValue());
 
         DoubleTensor cwrtA = Differentiator.forwardModeAutoDiff(a, c).of(c).withRespectTo(a);
         Assert.assertArrayEquals(
@@ -344,7 +344,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        assertEquals(dConcatWrtAForward, concatPartialReverse.withRespectTo(a));
+        assertEquals(dConcatWrtAForward, concatPartialReverse.withRespectTo(a).getValue());
 
         DoubleTensor dwrtB = Differentiator.forwardModeAutoDiff(b, d).of(d).withRespectTo(b);
         Assert.assertArrayEquals(
@@ -353,7 +353,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        assertEquals(dConcatWrtBForward, concatPartialReverse.withRespectTo(b));
+        assertEquals(dConcatWrtBForward, concatPartialReverse.withRespectTo(b).getValue());
     }
 
     @Test
@@ -379,7 +379,7 @@ public class ConcatenationVertexTest {
         DoubleTensor dConcatWrtAForward = Differentiator.forwardModeAutoDiff(a, concat).of(concat).withRespectTo(a);
         DoubleTensor dConcatWrtBForward = Differentiator.forwardModeAutoDiff(b, concat).of(concat).withRespectTo(b);
 
-        PartialDerivatives concatPartialReverse = Differentiator.reverseModeAutoDiff(concat, sharedMatrix, a, b);
+        PartialsOf concatPartialReverse = Differentiator.reverseModeAutoDiff(concat, sharedMatrix, a, b);
 
         Assert.assertArrayEquals(
             DoubleTensor.concat(1, dCdshared, dDdshared).asFlatDoubleArray(),
@@ -387,7 +387,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        assertEquals(dConcatWrtSharedMatrixForward, concatPartialReverse.withRespectTo(sharedMatrix));
+        assertEquals(dConcatWrtSharedMatrixForward, concatPartialReverse.withRespectTo(sharedMatrix).getValue());
 
         DoubleTensor cwrtA = Differentiator.forwardModeAutoDiff(a, c).of(c).withRespectTo(a);
         Assert.assertArrayEquals(
@@ -396,7 +396,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        assertEquals(dConcatWrtAForward, concatPartialReverse.withRespectTo(a));
+        assertEquals(dConcatWrtAForward, concatPartialReverse.withRespectTo(a).getValue());
 
         DoubleTensor dwrtB = Differentiator.forwardModeAutoDiff(b, d).of(d).withRespectTo(b);
         Assert.assertArrayEquals(
@@ -405,7 +405,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        assertEquals(dConcatWrtBForward, concatPartialReverse.withRespectTo(b));
+        assertEquals(dConcatWrtBForward, concatPartialReverse.withRespectTo(b).getValue());
     }
 
     @Test
@@ -431,7 +431,7 @@ public class ConcatenationVertexTest {
         DoubleTensor dEdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, e).of(e).withRespectTo(sharedMatrix);
 
         ConcatenationVertex concat = new ConcatenationVertex(0, c, d, e);
-        PartialDerivatives concatPartialReverse = Differentiator.reverseModeAutoDiff(concat, sharedMatrix, a, b, f);
+        PartialsOf concatPartialReverse = Differentiator.reverseModeAutoDiff(concat, sharedMatrix, a, b, f);
 
         DoubleTensor dConcatWrtSharedMatrixForward = Differentiator.forwardModeAutoDiff(sharedMatrix, concat).of(concat).withRespectTo(sharedMatrix);
         DoubleTensor dConcatWrtAForward = Differentiator.forwardModeAutoDiff(a, concat).of(concat).withRespectTo(a);
@@ -444,7 +444,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        assertEquals(dConcatWrtSharedMatrixForward, concatPartialReverse.withRespectTo(sharedMatrix));
+        assertEquals(dConcatWrtSharedMatrixForward, concatPartialReverse.withRespectTo(sharedMatrix).getValue());
 
         DoubleTensor cwrtA = Differentiator.forwardModeAutoDiff(a, c).of(c).withRespectTo(a);
         Assert.assertArrayEquals(
@@ -453,7 +453,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        assertEquals(dConcatWrtAForward, concatPartialReverse.withRespectTo(a));
+        assertEquals(dConcatWrtAForward, concatPartialReverse.withRespectTo(a).getValue());
 
         DoubleTensor dwrtB = Differentiator.forwardModeAutoDiff(b, d).of(d).withRespectTo(b);
         Assert.assertArrayEquals(
@@ -462,7 +462,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        assertEquals(dConcatWrtBForward, concatPartialReverse.withRespectTo(b));
+        assertEquals(dConcatWrtBForward, concatPartialReverse.withRespectTo(b).getValue());
 
         DoubleTensor ewrtC = Differentiator.forwardModeAutoDiff(f, e).of(e).withRespectTo(f);
         Assert.assertArrayEquals(
@@ -471,7 +471,7 @@ public class ConcatenationVertexTest {
             0.0001
         );
 
-        assertEquals(dConcatWrtFForward, concatPartialReverse.withRespectTo(f));
+        assertEquals(dConcatWrtFForward, concatPartialReverse.withRespectTo(f).getValue());
     }
 
     @Test
