@@ -16,7 +16,7 @@ micro_nav: true
 page_nav:
     prev:
         content: Previous page
-        url: '/docs/autocorrelation/'
+        url: '/docs/save-and-load/'
     next:
         content: Next page
         url: '/docs/examples/lorenz/'
