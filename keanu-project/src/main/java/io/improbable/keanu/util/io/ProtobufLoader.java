@@ -8,6 +8,7 @@ import com.google.gson.internal.Primitives;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkLoader;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -64,11 +65,7 @@ public class ProtobufLoader implements NetworkLoader {
         KeanuSavedBayesNet.StoredValue valueInformation = savedValues.get(vertex);
         KeanuSavedBayesNet.VertexValue value = valueInformation.getValue();
         DoubleTensor tensor = extractDoubleValue(value);
-        if (valueInformation.getIsObserved()) {
-            vertex.observe(tensor);
-        } else {
-            vertex.setValue(tensor);
-        }
+        setOrObserveValue(vertex, tensor, valueInformation.getIsObserved());
     }
 
     private DoubleTensor extractDoubleValue(KeanuSavedBayesNet.VertexValue value) {
@@ -145,11 +142,7 @@ public class ProtobufLoader implements NetworkLoader {
         KeanuSavedBayesNet.StoredValue valueInformation = savedValues.get(vertex);
         KeanuSavedBayesNet.VertexValue value = valueInformation.getValue();
         BooleanTensor tensor = extractBoolValue(value);
-        if (valueInformation.getIsObserved()) {
-            vertex.observe(tensor);
-        } else {
-            vertex.setValue(tensor);
-        }
+        setOrObserveValue(vertex, tensor, valueInformation.getIsObserved());
     }
 
     private BooleanTensor extractBoolValue(KeanuSavedBayesNet.VertexValue value) {
@@ -165,11 +158,7 @@ public class ProtobufLoader implements NetworkLoader {
         KeanuSavedBayesNet.StoredValue valueInformation = savedValues.get(vertex);
         KeanuSavedBayesNet.VertexValue value = valueInformation.getValue();
         IntegerTensor tensor = extractIntValue(value);
-        if (valueInformation.getIsObserved()) {
-            vertex.observe(tensor);
-        } else {
-            vertex.setValue(tensor);
-        }
+        setOrObserveValue(vertex, tensor, valueInformation.getIsObserved());
     }
 
     private IntegerTensor extractIntValue(KeanuSavedBayesNet.VertexValue value) {
@@ -177,6 +166,14 @@ public class ProtobufLoader implements NetworkLoader {
             throw new IllegalArgumentException("Non Int Value specified for Int Vertex");
         } else {
             return extractIntTensor(value.getIntVal());
+        }
+    }
+
+    private void setOrObserveValue(Vertex vertex, Tensor valueTensor, boolean isObserved) {
+        if (isObserved) {
+            vertex.observe(valueTensor);
+        } else {
+            vertex.setValue(valueTensor);
         }
     }
 
