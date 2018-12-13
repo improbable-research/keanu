@@ -45,24 +45,46 @@ To save a model, a user simply has to create a NetworkSaver object and call the 
 and indicating whether they wish to save the current state of the model or to strip out all value information.  For
 example to save as a Protobuf:
 ```java
-{% snippet SaveToProtobuf %}
+public void saveNetToProtobuf(BayesianNetwork net,
+                                OutputStream outputStream,
+                                boolean saveValuesAndObservations) throws IOException {
+    NetworkSaver saver = new ProtobufSaver(net);
+    saver.save(outputStream, saveValuesAndObservations);
+}
 ```
 
 For JSON:
 ```java
-{% snippet SaveToJSON %}
+public void saveNetToJSON(BayesianNetwork net,
+                          OutputStream outputStream,
+                          boolean saveValuesAndObservations) throws IOException {
+    NetworkSaver saver = new JsonSaver(net);
+    saver.save(outputStream, saveValuesAndObservations);
+}
 ```
 
 And similarly for Dot:
 ```java
-{% snippet SaveToDot %}
+public void saveNetToDotFile(BayesianNetwork net,
+                             OutputStream outputStream,
+                             boolean saveValuesAndObservations) throws IOException {
+    NetworkSaver saver = new DotSaver(net);
+    saver.save(outputStream, saveValuesAndObservations);
+}
 ```
 
 The Dot saver also has the option to only output Vertices within a certain distance of a starting Vertex (eg if
 a user requested a distance of 1 then the Dot output would contain the Vertex itself and its direct parents and children).
 This operation is similarly simple:
 ```java
-{% snippet SavePartialToDot %}
+public void savePartialNetToDot(Vertex startingVertex,
+                                int degree,
+                                BayesianNetwork net,
+                                OutputStream outputStream,
+                                boolean saveValuesAndObservations) throws IOException {
+    DotSaver saver = new DotSaver(net);
+    saver.save(outputStream, startingVertex, degree, saveValuesAndObservations);
+}
 ```
 
 ### Loading Examples
@@ -72,9 +94,15 @@ method.  This method will create a new BayesianNetwork object containing all the
 in the stored model.  This can be achieved in a few lines of code as below:
 
 ```java
-{% snippet LoadFromProtobuf %}
+public BayesianNetwork loadNetFromProtobuf(InputStream input) throws IOException {
+    NetworkLoader loader = new ProtobufLoader();
+    return loader.loadNetwork(input);
+}
 ```
 
 ```java
-{% snippet LoadFromJSON %}
+public BayesianNetwork loadNetFromJSON(InputStream input) throws IOException {
+    NetworkLoader loader = new JsonLoader();
+    return loader.loadNetwork(input);
+}
 ```
