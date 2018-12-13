@@ -209,16 +209,16 @@ public class ProtobufLoader implements NetworkLoader {
                                 Map<String, Object> paramMap,
                                 KeanuSavedBayesNet.Vertex vertex) {
         LoadVertexParam paramAnnotation;
-        LoadShape shapeAnnotation;
 
         if ((paramAnnotation = methodParameter.getAnnotation(LoadVertexParam.class)) != null) {
             Object parameter = paramMap.get(paramAnnotation.value());
             if (parameter == null) {
                 throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
                     + paramAnnotation.value());
+            } else {
+                return parameter;
             }
-            return parameter;
-        } else if ((shapeAnnotation = methodParameter.getAnnotation(LoadShape.class)) != null) {
+        } else if (methodParameter.getAnnotation(LoadShape.class) != null) {
             if (vertex.getShapeCount() == 0) {
                 return Tensor.SCALAR_SHAPE;
             } else {
