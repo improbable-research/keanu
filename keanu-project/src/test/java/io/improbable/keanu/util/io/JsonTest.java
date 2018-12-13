@@ -151,7 +151,7 @@ public class JsonTest {
         tryLoadingNetwork(JSON_INCOMPATIBLE_VALUE_FILE);
     }
 
-    private void tryLoadingNetwork(String resourceFileName) throws IOException {
+    private static void tryLoadingNetwork(String resourceFileName) throws IOException {
         URL url = Resources.getResource(resourceFileName);
         ByteArrayInputStream input = new ByteArrayInputStream(Resources.toByteArray(url));
         JsonLoader jsonLoader = new JsonLoader();
