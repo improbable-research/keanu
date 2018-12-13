@@ -5,6 +5,7 @@ import io.improbable.keanu.distributions.discrete.UniformInt;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -31,7 +32,9 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
      * @param min   The inclusive lower bound.
      * @param max   The exclusive upper bound.
      */
-    public UniformIntVertex(long[] shape, IntegerVertex min, IntegerVertex max) {
+    public UniformIntVertex(@LoadShape long[] shape,
+                            @LoadVertexParam(MIN_NAME) IntegerVertex min,
+                            @LoadVertexParam(MAX_NAME) IntegerVertex max) {
         super(shape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, min.getShape(), max.getShape());
 
@@ -57,7 +60,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
     }
 
     @ExportVertexToPythonBindings
-    public UniformIntVertex(@LoadVertexParam(MIN_NAME) IntegerVertex min, @LoadVertexParam(MAX_NAME) IntegerVertex max) {
+    public UniformIntVertex(IntegerVertex min, IntegerVertex max) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(min.getShape(), max.getShape()), min, max);
     }
 

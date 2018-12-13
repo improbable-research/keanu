@@ -28,6 +28,7 @@ message Vertex {
     string label = 2;
     string vertexType = 3;
     repeated NamedParam parameters = 5;
+    repeated int64 shape = 6;
 }
 
 message DoubleTensor {

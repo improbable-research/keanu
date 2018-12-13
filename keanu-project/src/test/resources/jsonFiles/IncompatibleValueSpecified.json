@@ -39,7 +39,8 @@
                 "parentVertex": {
                     "id": "[1]"
                 }
-            }]
+            }],
+            "shape": ["2"]
         }]
     },
     "networkState": {

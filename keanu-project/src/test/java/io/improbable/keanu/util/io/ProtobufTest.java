@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -53,7 +54,6 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 
 public class ProtobufTest {
@@ -95,6 +95,34 @@ public class ProtobufTest {
         assertThat(labelGaussianVerted.getMu().getValue(2), closeTo(5.0, 1e-10));
         assertThat(latentGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         latentGaussianVertex.sample();
+    }
+
+    @Test
+    public void shapeIsCorrectlySavedAndLoaded() throws IOException {
+        long[] shape1 = new long[] {2, 3};
+        long[] shape2 = new long[] {3, 2};
+        final VertexLabel LABEL_ONE = new VertexLabel("Vertex1");
+        final VertexLabel LABEL_TWO = new VertexLabel("Vertex2");
+
+        DoubleVertex gaussianVertex1 = new GaussianVertex(shape1, 0.0, 1.0);
+        gaussianVertex1.setLabel(LABEL_ONE);
+        DoubleVertex gaussianVertex2 = new GaussianVertex(shape2, 0.0, 1.0);
+        gaussianVertex2.setLabel(LABEL_TWO);
+        DoubleVertex output = gaussianVertex1.matrixMultiply(gaussianVertex2);
+        BayesianNetwork bayesNet = new BayesianNetwork(output.getConnectedGraph());
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ProtobufSaver saver = new ProtobufSaver(bayesNet);
+        saver.save(outputStream, false);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        ProtobufLoader loader = new ProtobufLoader();
+
+        BayesianNetwork readNet = loader.loadNetwork(inputStream);
+        Vertex vertexToShapeCheck = readNet.getVertexByLabel(LABEL_ONE);
+        assertThat(vertexToShapeCheck.getShape(), is(shape1));
+        vertexToShapeCheck = readNet.getVertexByLabel(LABEL_TWO);
+        assertThat(vertexToShapeCheck.getShape(), is(shape2));
     }
 
     @Test
@@ -468,7 +496,7 @@ public class ProtobufTest {
          * all the necessary Params for that constructor
          */
         Map<String, Class> storedParams = getSavedParams(vertexClass);
-        Map<String, Class> requiredParams = getRequiredParamsAndCheckOnlyUsedOnce(vertexClass);
+        Map<String, Class> requiredParams = checkConstructorParamValidityAndGetRequiredSaves(vertexClass);
 
         for (Map.Entry<String, Class> param : requiredParams.entrySet()) {
             assertThat("Class must save all required params: " + vertexClass,
@@ -507,21 +535,27 @@ public class ProtobufTest {
         return savedParams;
     }
 
-    private Map<String, Class> getRequiredParamsAndCheckOnlyUsedOnce(Class<? extends Vertex> vertexClass) {
+    private Map<String, Class> checkConstructorParamValidityAndGetRequiredSaves(Class<? extends Vertex> vertexClass) {
         List<Constructor> parentConstructor = getConstructorsWithAnnotatedParameters(vertexClass,
             LoadVertexParam.class);
         assertThat("Need Constructor for Class: " + vertexClass, parentConstructor.size(), is(1));
         Map<String, Class> requiredParameters = new HashMap<>();
 
         for (Parameter parameter : parentConstructor.get(0).getParameters()) {
-            LoadVertexParam annotation = parameter.getAnnotation(LoadVertexParam.class);
-            assertThat("Annotation has to be present on all params for class: " + vertexClass, annotation,
-                is(notNullValue()));
-            assertThat("Annotation can only be used once for class: " + vertexClass, requiredParameters,
-                not(hasKey(annotation.value())));
-            requiredParameters.put(annotation.value(), parameter.getType());
+            LoadVertexParam parameterAnnotation = parameter.getAnnotation(LoadVertexParam.class);
+            LoadShape shapeAnnotation = parameter.getAnnotation(LoadShape.class);
+            assertThat("Annotation has to be present on all Constructor params for class: " + vertexClass,
+                parameterAnnotation != null || shapeAnnotation != null);
+            if (parameterAnnotation != null) {
+                assertThat("Annotation can only be used once for class: " + vertexClass, requiredParameters,
+                    not(hasKey(parameterAnnotation.value())));
+                requiredParameters.put(parameterAnnotation.value(), parameter.getType());
+            } else {
+                assertThat("Shape Arguments must be long[]", parameter.getType().isAssignableFrom(long[].class));
+            }
         }
 
         return requiredParameters;
     }
+
 }

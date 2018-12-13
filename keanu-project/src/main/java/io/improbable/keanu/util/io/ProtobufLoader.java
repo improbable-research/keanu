@@ -12,6 +12,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -187,7 +188,7 @@ public class ProtobufLoader implements NetworkLoader {
         }
 
         Map<String, Object> parameterMap = getParameterMap(vertex, existingVertices);
-        Vertex newVertex = instantiateVertex(vertexClass, parameterMap);
+        Vertex newVertex = instantiateVertex(vertexClass, parameterMap, vertex);
 
         if (!vertex.getLabel().isEmpty()) {
             newVertex.setLabel(vertex.getLabel());
@@ -197,24 +198,14 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private Vertex instantiateVertex(Class vertexClass,
-                                     Map<String, Object> paramMap) {
+                                     Map<String, Object> paramMap,
+                                     KeanuSavedBayesNet.Vertex vertex) {
         Constructor<Vertex> loadConstructor = getAnnotatedConstructor(vertexClass);
         Parameter[] constructorParameters = loadConstructor.getParameters();
         Object[] arguments = new Object[constructorParameters.length];
 
         for (int i = 0; i < constructorParameters.length; i++) {
-            LoadVertexParam paramAnnotation = constructorParameters[i].getAnnotation(LoadVertexParam.class);
-
-            if (paramAnnotation != null) {
-                Object parameter = paramMap.get(paramAnnotation.value());
-                if (parameter == null) {
-                    throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
-                        + paramAnnotation.value());
-                }
-                arguments[i] = parameter;
-            } else {
-                throw new IllegalArgumentException("Cannot create Vertex due to unannotated parameter in constructor");
-            }
+            arguments[i] = getParameter(constructorParameters[i], paramMap, vertex);
 
             Class argumentClass = arguments[i].getClass();
             Class parameterClass = Primitives.wrap(constructorParameters[i].getType());
@@ -232,13 +223,39 @@ public class ProtobufLoader implements NetworkLoader {
         }
     }
 
+    private Object getParameter(Parameter methodParameter,
+                                Map<String, Object> paramMap,
+                                KeanuSavedBayesNet.Vertex vertex) {
+        LoadVertexParam paramAnnotation;
+
+        if ((paramAnnotation = methodParameter.getAnnotation(LoadVertexParam.class)) != null) {
+            Object parameter = paramMap.get(paramAnnotation.value());
+            if (parameter == null) {
+                throw new IllegalArgumentException("Failed to create vertex due to missing parent: "
+                    + paramAnnotation.value());
+            } else {
+                return parameter;
+            }
+        } else if (methodParameter.getAnnotation(LoadShape.class) != null) {
+            if (vertex.getShapeCount() == 0) {
+                return Tensor.SCALAR_SHAPE;
+            } else {
+                return Longs.toArray(vertex.getShapeList());
+            }
+        } else {
+            throw new IllegalArgumentException("Cannot create Vertex due to unannotated parameter in constructor");
+        }
+    }
+
     private Constructor getAnnotatedConstructor(Class vertexClass) {
         Constructor[] constructors = vertexClass.getConstructors();
 
         for (Constructor constructor : constructors) {
             Parameter[] parameters = constructor.getParameters();
 
-            if (parameters.length > 0 && parameters[0].isAnnotationPresent(LoadVertexParam.class)) {
+            if (parameters.length > 0 &&
+                (parameters[0].isAnnotationPresent(LoadVertexParam.class)
+                    || parameters[0].isAnnotationPresent(LoadShape.class))) {
                 return constructor;
             }
         }

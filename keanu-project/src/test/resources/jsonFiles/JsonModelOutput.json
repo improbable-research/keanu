@@ -22,7 +22,8 @@
                     "shape": ["2"],
                     "values": [3.0, 4.0]
                 }
-            }]
+            }],
+            "shape": ["2"]
         }, {
             "id": {
                 "id": "[2]"
@@ -39,7 +40,8 @@
                 "parentVertex": {
                     "id": "[1]"
                 }
-            }]
+            }],
+            "shape": ["2"]
         }]
     },
     "networkState": {
@@ -65,7 +67,8 @@
         }, {
             "value": {
                 "doubleVal": {
-                    "values": [0.5]
+                    "shape": ["2"],
+                    "values": [1.0, 1.0]
                 }
             },
             "id": {
