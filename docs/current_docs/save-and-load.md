@@ -7,7 +7,7 @@ permalink: /docs/save-and-load/
 
 # Hero section
 title: Saving and Loading Models
-description: How to Save models out and load them back in.
+description: How to save models out and load them back in.
 
 # Micro navigation
 micro_nav: true
@@ -36,7 +36,7 @@ transmission purposes.
 
 JSON should be used where a user wants to be able to manually view/search/edit the stored model.
 
-Dot is useful when a user wishes to use existing graph visualisation tooling to inspect the underlying graph of the
+Dot is useful when a user wishes to use existing graph visualization tooling to inspect the underlying graph of the
 model.
 
 ### Saving Examples
