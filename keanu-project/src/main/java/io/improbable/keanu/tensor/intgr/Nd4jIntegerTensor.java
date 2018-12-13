@@ -157,22 +157,22 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor minus(IntegerTensor that) {
-        return duplicate().minusInPlace(that.duplicate());
+        return duplicate().minusInPlace(that);
     }
 
     @Override
     public IntegerTensor plus(IntegerTensor that) {
-        return duplicate().plusInPlace(that.duplicate());
+        return duplicate().plusInPlace(that);
     }
 
     @Override
     public IntegerTensor times(IntegerTensor that) {
-        return duplicate().timesInPlace(that.duplicate());
+        return duplicate().timesInPlace(that);
     }
 
     @Override
     public IntegerTensor div(IntegerTensor that) {
-        return duplicate().divInPlace(that.duplicate());
+        return duplicate().divInPlace(that);
     }
 
     @Override
@@ -350,7 +350,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.subi(that.scalar());
         } else {
-            INDArray result = INDArrayShim.subi(tensor, unsafeGetNd4J(that));
+            INDArray result = INDArrayShim.subi(tensor, unsafeGetNd4J(that).dup());
             if (result != tensor) {
                 return new Nd4jIntegerTensor(result);
             }
@@ -363,7 +363,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.addi(that.scalar());
         } else {
-            INDArray result = INDArrayShim.addi(tensor, unsafeGetNd4J(that));
+            INDArray result = INDArrayShim.addi(tensor, unsafeGetNd4J(that).dup());
             if (result != tensor) {
                 return new Nd4jIntegerTensor(result);
             }
@@ -376,7 +376,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.muli(that.scalar());
         } else {
-            INDArray result = INDArrayShim.muli(tensor, unsafeGetNd4J(that));
+            INDArray result = INDArrayShim.muli(tensor, unsafeGetNd4J(that).dup());
             if (result != tensor) {
                 return new Nd4jIntegerTensor(result);
             }
@@ -389,7 +389,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.divi(that.scalar());
         } else {
-            INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that));
+            INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that).dup());
             if (result != tensor) {
                 return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(result, false));
             }
