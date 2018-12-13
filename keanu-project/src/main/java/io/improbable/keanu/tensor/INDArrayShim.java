@@ -166,31 +166,34 @@ public class INDArrayShim {
     }
 
     public static INDArray pow(INDArray left, INDArray right) {
-        if (left.length() == 1 || right.length() == 1) {
-            return performOperationWithScalarTensorPreservingShape(left, right, Transforms::pow);
-        }
-        return Transforms.pow(left, right, false);
+        return performOperationWithScalarTensorPreservingShape(left, right, Transforms::pow);
     }
 
     public static INDArray max(INDArray left, INDArray right) {
-        if (left.length() == 1 || right.length() == 1) {
-            return performOperationWithScalarTensorPreservingShape(left, right, Transforms::max);
-        }
-        return Transforms.max(left, right, false);
+        return performOperationWithScalarTensorPreservingShape(left, right, Transforms::max);
     }
 
     public static INDArray min(INDArray left, INDArray right) {
-        if (left.length() == 1 || right.length() == 1) {
-            return performOperationWithScalarTensorPreservingShape(left, right, Transforms::min);
-        }
-        return Transforms.min(left, right, false);
+        return performOperationWithScalarTensorPreservingShape(left, right, Transforms::min);
     }
 
     public static INDArray atan2(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, Transforms::atan2);
+
+    }
+
+    private static INDArray performOperationWithScalarTensorPreservingShape(INDArray left, INDArray right, BiFunction<INDArray, INDArray, INDArray> operation) {
         if (left.length() == 1 || right.length() == 1) {
-            return performOperationWithScalarTensorPreservingShape(left, right, Transforms::atan2);
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result;
+            if (left.length() == 1) {
+                result = operation.apply(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right);
+            } else {
+                result = operation.apply(left, Nd4j.valueArrayOf(left.shape(), right.getDouble(0)));
+            }
+            return result.reshape(resultShape);
         }
-        return Transforms.atan2(left, right);
+        return operation.apply(left, right);
     }
 
     public static INDArray lt(INDArray left, INDArray right) {
@@ -367,27 +370,15 @@ public class INDArrayShim {
         return mask;
     }
 
-    private static INDArray performOperationWithScalarTensorPreservingShape(INDArray left, INDArray right, BiFunction<INDArray, INDArray, INDArray> operation) {
-        long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
-        INDArray result;
-        if (left.length() == 1) {
-            result = operation.apply(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right);
-        } else {
-            result = operation.apply(left, Nd4j.valueArrayOf(left.shape(), right.getDouble(0)));
-        }
-        return result.reshape(resultShape);
-    }
-
     private static boolean shapeAIsSmallerThanShapeB(long[] shapeA, long[] shapeB) {
-        if (shapeA.length != shapeB.length) {
-            return shapeA.length < shapeB.length;
-        }
-        for (int ind = 0; ind < shapeA.length; ind++) {
-            if (shapeA[ind] < shapeB[ind]) {
-                return true;
+        if (shapeA.length == shapeB.length) {
+            for (int ind = 0; ind < shapeA.length; ind++) {
+                if (shapeA[ind] < shapeB[ind]) {
+                    return true;
+                }
             }
         }
-        return false;
+        return shapeA.length < shapeB.length;
     }
 
     private static int[] getBroadcastDimensions(long[] shapeA, long[] shapeB) {
@@ -429,6 +420,5 @@ public class INDArrayShim {
                 return result;
             }
         }
-
     }
 }
