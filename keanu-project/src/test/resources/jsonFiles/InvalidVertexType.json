@@ -1,0 +1,16 @@
+{
+    "network": {
+        "vertices": [{
+            "id": {
+                "id": "[0]"
+            },
+            "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.NonExistentVertexType",
+            "parameters": [{
+                "name": "constant",
+                "doubleTensorParam": {
+                    "values": [0.0]
+                }
+            }]
+        }]
+    }
+}

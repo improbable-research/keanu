@@ -5,9 +5,18 @@ package keanu;
 option java_package = "io.improbable.keanu";
 option java_outer_classname = "KeanuSavedBayesNet";
 
+message Model {
+    BayesianNetwork network = 1;
+    BayesianNetworkState networkState = 2;
+    Metadata metadata = 3;
+}
+
+message BayesianNetworkState {
+    repeated StoredValue defaultState = 1;
+}
+
 message BayesianNetwork {
     repeated Vertex vertices = 1;
-    repeated StoredValue defaultState = 2;
 }
 
 message VertexID {
@@ -75,6 +84,7 @@ message StoredValue {
     VertexValue value = 1;
     string vertexLabel = 2;
     VertexID id = 3;
+    bool isObserved = 4;
 }
 
 message VertexValue {
@@ -84,4 +94,8 @@ message VertexValue {
         BooleanTensor boolVal = 3;
         GenericTensor genericVal = 4;
     }
+}
+
+message Metadata {
+    map<string, string> metadataInfo = 1;
 }

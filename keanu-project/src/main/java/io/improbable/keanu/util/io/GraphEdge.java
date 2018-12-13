@@ -1,4 +1,4 @@
-package io.improbable.keanu.util.dot;
+package io.improbable.keanu.util.io;
 
 import io.improbable.keanu.vertices.Vertex;
 
