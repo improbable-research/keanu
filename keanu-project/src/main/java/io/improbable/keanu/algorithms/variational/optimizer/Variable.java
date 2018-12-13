@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
-public interface Variable<T> extends HasShape {
+public interface Variable<T> {
 
     VariableReference getReference();
 
