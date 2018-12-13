@@ -6,6 +6,7 @@ import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
 import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -55,7 +56,7 @@ public class JsonTest {
         DoubleVertex mu = new ConstantDoubleVertex(0);
         DoubleVertex sigma = new ConstantDoubleVertex(new double[]{3.0, 4.0});
         DoubleVertex gaussianVertex = new GaussianVertex(mu, sigma);
-        gaussianVertex.observe(0.5);
+        gaussianVertex.observe(DoubleTensor.ones(2));
         gaussianVertex.setLabel("GaussianVertex");
         net = new BayesianNetwork(gaussianVertex.getConnectedGraph());
 
@@ -103,7 +104,7 @@ public class JsonTest {
         assertThat(gaussianVertex.getMu().getValue().scalar(), closeTo(0.0, 1e-10));
         assertThat(gaussianVertex.getSigma().getValue(0), closeTo(3.0, 1e-10));
         assertThat(gaussianVertex.getSigma().getValue(1), closeTo(4.0, 1e-10));
-        assertThat(gaussianVertex.getValue().scalar(), closeTo(0.5, 1e-10));
+        assertThat(gaussianVertex.getValue().scalar(), closeTo(1.0, 1e-10));
     }
 
     @Test
