@@ -19,7 +19,7 @@ page_nav:
         url: '/docs/plates/'
     next:
         content: Next page
-        url: '/docs/examples/save-and-load/'
+        url: '/docs/save-and-load/'
 
 ---
 
