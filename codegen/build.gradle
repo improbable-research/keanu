@@ -30,7 +30,7 @@ task saveJavadocStringsToFile(type: Javadoc) {
 task runCodeGeneration (type: JavaExec) {
     dependsOn saveJavadocStringsToFile
     classpath sourceSets.main.runtimeClasspath
-    main = mainClassName
+    main = 'io.improbable.keanu.codegen.python.Runner'
     args += project.rootDir.toString() + '/keanu-python/keanu/vertex/'
 }
 
