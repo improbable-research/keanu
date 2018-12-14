@@ -8,33 +8,33 @@ import java.util.Set;
 
 public class Statistics {
 
-    private Map<String, List<Double>> statistics;
+    private Map<Enum, List<Double>> statistics;
 
-    public Statistics(List<String> keys) {
+    public Statistics(Enum[] keys) {
         statistics = new HashMap<>();
         initialise(keys);
     }
 
-    public void store(String key, Double value) {
+    public void store(Enum key, Double value) {
         List<Double> values = statistics.get(key);
         values.add(value);
         statistics.put(key, values);
     }
 
-    public List<Double> get(String key) {
+    public List<Double> get(Enum key) {
         return statistics.get(key);
     }
 
-    public Set<String> keys() {
+    public Set<Enum> keys() {
         return statistics.keySet();
     }
 
-    public double average(String key) {
+    public double average(Enum key) {
         return statistics.get(key).stream().mapToDouble(x -> x).average().orElse(Double.NaN);
     }
 
-    private Map<String, List<Double>> initialise(List<String> keys) {
-        for (String key : keys) {
+    private Map<Enum, List<Double>> initialise(Enum[] keys) {
+        for (Enum key : keys) {
             statistics.put(key, new ArrayList<>());
         }
         return statistics;

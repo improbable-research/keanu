@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.javafx.font.Metrics;
+
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
@@ -42,7 +44,7 @@ public class NUTSSampler implements SamplingAlgorithm {
      * @param tree                      initial tree that will contain the state of the tree build
      * @param maxTreeHeight             The largest tree height before stopping the hamilitonian process
      * @param random                    the source of randomness
-     * @param statistics                the NUTS sampler statistics
+     * @param statistics                the sampler statistics
      * @param saveStatistics            whether to record statistics
      */
     public NUTSSampler(List<? extends Vertex> sampleFromVertices,
@@ -151,10 +153,8 @@ public class NUTSSampler implements SamplingAlgorithm {
     }
 
     private void recordSamplerStatistics() {
-        statistics.store("stepSize", stepsize.getStepsize());
-        statistics.store("logProb", tree.getLogOfMasterPAtAcceptedPosition());
-        statistics.store("treeSize", tree.getTreeSize());
-        statistics.store("meanTreeAccept", stepsize.getAverageAcceptanceProb());
+        stepsize.recordStatistics(statistics);
+        tree.recordStatistics(statistics);
     }
 
     private static void initializeMomentumForEachVertex(List<Vertex<DoubleTensor>> vertices,

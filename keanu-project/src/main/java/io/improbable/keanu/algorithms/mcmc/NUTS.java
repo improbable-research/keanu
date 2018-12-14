@@ -31,13 +31,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static final int DEFAULT_ADAPT_COUNT = 1000;
     private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.65;
-    private static Statistics STATISTICS = new Statistics(Arrays.asList(
-        "stepSize",
-        "logProb",
-        "meanTreeAccept",
-        "treeSize"
-    ));
 
+    enum Metrics {
+        STEPSIZE, LOGPROB, MEANTREEACCEPT, TREESIZE
+    }
+
+    private final Statistics statistics = new Statistics(Metrics.values());
 
     public static NUTS withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
@@ -163,13 +162,13 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             tree,
             maxTreeHeight,
             random,
-            STATISTICS,
+            statistics,
             saveStatistics
         );
     }
 
     public Statistics getStatistics() {
-        return STATISTICS;
+        return statistics;
     }
 
     private static void cachePosition(List<Vertex<DoubleTensor>> latentVertices, Map<VertexId, DoubleTensor> position) {

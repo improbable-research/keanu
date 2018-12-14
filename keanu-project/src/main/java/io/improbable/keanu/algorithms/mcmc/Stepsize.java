@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Used by NUTS as an epsilon for the leap frog
  */
-public class Stepsize {
+public class Stepsize implements Record {
 
     private static final double STABILISER = 10;
     private static final double SHRINKAGE_FACTOR = 0.05;
@@ -150,10 +150,6 @@ public class Stepsize {
         return stepsize;
     }
 
-    public double getAverageAcceptanceProb() {
-        return averageAcceptanceProb;
-    }
-
     private static void initializeMomentumForEachVertex(List<Vertex<DoubleTensor>> vertices,
                                                         Map<VertexId, DoubleTensor> momentums,
                                                         KeanuRandom random) {
@@ -162,4 +158,9 @@ public class Stepsize {
         }
     }
 
+    @Override
+    public void recordStatistics(Statistics statistics) {
+        statistics.store(NUTS.Metrics.STEPSIZE, stepsize);
+        statistics.store(NUTS.Metrics.MEANTREEACCEPT, averageAcceptanceProb);
+    }
 }

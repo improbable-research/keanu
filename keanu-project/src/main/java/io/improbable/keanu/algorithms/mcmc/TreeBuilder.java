@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * The tree is reset for each sample.
  */
-public class TreeBuilder {
+public class TreeBuilder implements Record {
 
     private static final double DELTA_MAX = 1000.0;
     private static final int STARTING_ACCEPTED_LEAPFROG = 1;
@@ -430,4 +430,9 @@ public class TreeBuilder {
         leapfrogBackward.setGradient(backwardGradient);
     }
 
+    @Override
+    public void recordStatistics(Statistics statistics) {
+        statistics.store(NUTS.Metrics.LOGPROB, logOfMasterPAtAcceptedPosition);
+        statistics.store(NUTS.Metrics.TREESIZE, treeSize);
+    }
 }
