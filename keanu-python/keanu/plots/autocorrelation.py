@@ -32,7 +32,7 @@ def _calc_max_lag(data_len) -> int:
     return lim
 
 
-def plot_acf(data, nlags=None) -> None:
+def plot_acf(data, nlags=None) -> Any:
     autocorr = stats.autocorrelation(data)
     fig, ax = _create_new_mpl()
     if nlags is None:
