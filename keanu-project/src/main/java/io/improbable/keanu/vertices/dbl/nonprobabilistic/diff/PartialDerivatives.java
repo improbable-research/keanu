@@ -67,9 +67,13 @@ public class PartialDerivatives {
         if (this.derivativeWithRespectTo.size() > 1) {
             throw new IllegalStateException();
         }
-        VertexId valueId = derivativeWithRespectTo.keySet().iterator().next();
+        VertexId valueId = getKey();
 
         return derivativeWithRespectTo.get(valueId);
+    }
+
+    public VertexId getKey() {
+        return derivativeWithRespectTo.keySet().iterator().next();
     }
 
     /**

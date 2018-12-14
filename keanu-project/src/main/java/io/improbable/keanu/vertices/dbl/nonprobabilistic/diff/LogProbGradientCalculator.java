@@ -39,7 +39,8 @@ public class LogProbGradientCalculator {
         PartialsOf diffOfLogWrt = new PartialsOf(null, new HashMap<>());
 
         for (final Vertex<?> ofVertex : logProbOfVertices) {
-            diffOfLogWrt = diffOfLogWrt.add(reverseModeLogProbGradientWrtLatents(ofVertex), null);
+            PartialsOf logProbOfGradient = reverseModeLogProbGradientWrtLatents(ofVertex);
+            diffOfLogWrt = diffOfLogWrt.add(logProbOfGradient, null);
         }
 
         return diffOfLogWrt.asMap();

@@ -107,32 +107,6 @@ public class Differentiator {
         return reverseModeAutoDiff(ofVertex, new HashSet<>(Arrays.asList(wrt)));
     }
 
-    /**
-     * Reorganize collection of partials to be easily used to get partial OF Y WRT X. This structure is what
-     * forward mode auto diff returns but needs to be used on reverse mode so that it is in the same form.
-     *
-     * @param wrtOf map of partials where key is wrt vertex and key in partial is key of vertex
-     * @return a reordered map with the key being the of vertex and the key in the partial being wrt vertex
-     */
-    private static Map<VertexId, PartialDerivatives> wrtOfToOfWrt(Map<VertexId, PartialDerivatives> wrtOf) {
-        Map<VertexId, PartialDerivatives> ofWrt = new HashMap<>();
-
-        for (Map.Entry<VertexId, PartialDerivatives> wrtOfEntry : wrtOf.entrySet()) {
-            Map<VertexId, DoubleTensor> ofs = wrtOfEntry.getValue().asMap();
-
-            for (Map.Entry<VertexId, DoubleTensor> ofsEntry : ofs.entrySet()) {
-
-                if (ofWrt.containsKey(ofsEntry.getKey())) {
-                    ofWrt.get(ofsEntry.getKey()).putWithRespectTo(wrtOfEntry.getKey(), ofsEntry.getValue());
-                } else {
-                    ofWrt.put(ofsEntry.getKey(), new PartialDerivatives(wrtOfEntry.getKey(), ofsEntry.getValue()));
-                }
-            }
-        }
-
-        return ofWrt;
-    }
-
     public static <V extends Vertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, V... of) {
         return forwardModeAutoDiff(wrt, new HashSet<>(Arrays.asList(of)));
     }

@@ -176,8 +176,8 @@ public class ConcatenationVertexTest {
 
         PartialsOf concatPartialReverse = Differentiator.reverseModeAutoDiff(concat, a, b);
 
-        assertEquals(dConcatWrtA, concatPartialReverse.withRespectTo(a));
-        assertEquals(dConcatWrtB, concatPartialReverse.withRespectTo(b));
+        assertEquals(dConcatWrtA, concatPartialReverse.withRespectTo(a).getValue());
+        assertEquals(dConcatWrtB, concatPartialReverse.withRespectTo(b).getValue());
     }
 
     @Test

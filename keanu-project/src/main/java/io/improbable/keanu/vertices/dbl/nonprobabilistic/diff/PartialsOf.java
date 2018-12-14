@@ -41,7 +41,10 @@ public class PartialsOf {
         for (Map.Entry<VertexId, PartialDerivatives> entry : other.partials.entrySet()) {
             VertexId id = entry.getKey();
             if (clonedPartials.containsKey(id)) {
-                clonedPartials.put(id, clonedPartials.get(entry.getKey()).add(entry.getValue()));
+
+                DoubleTensor summation = clonedPartials.get(entry.getKey()).getValue().plus(entry.getValue().getValue());
+
+                clonedPartials.put(id, new PartialDerivatives(of != null ? of.getId() : null, summation));
             } else {
                 clonedPartials.put(id, entry.getValue());
             }
