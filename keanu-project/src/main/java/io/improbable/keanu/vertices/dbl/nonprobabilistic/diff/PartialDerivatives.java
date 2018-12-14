@@ -52,10 +52,6 @@ public class PartialDerivatives {
         return derivativeWithRespectTo.isEmpty();
     }
 
-    public Map<VertexId, DoubleTensor> asMap() {
-        return derivativeWithRespectTo;
-    }
-
     public void putWithRespectTo(VertexId id, DoubleTensor value) {
         derivativeWithRespectTo.put(id, value);
         if (derivativeWithRespectTo.size() > 1) {
@@ -73,7 +69,21 @@ public class PartialDerivatives {
     }
 
     public VertexId getKey() {
+        if (derivativeWithRespectTo.isEmpty()) {
+            return null;
+        }
+
         return derivativeWithRespectTo.keySet().iterator().next();
+    }
+
+    public boolean isKey(VertexId id) {
+        VertexId key = getKey();
+
+        if (key == null) {
+            return id == null;
+        }
+
+        return key.equals(id);
     }
 
     /**

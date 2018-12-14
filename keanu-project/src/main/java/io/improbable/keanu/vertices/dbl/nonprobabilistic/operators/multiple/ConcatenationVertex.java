@@ -87,9 +87,8 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         Map<VertexId, long[]> vertexInfo = new HashMap<>();
 
         for (PartialDerivatives derivativeOfOperandWrtInputs : derivativeOfOperandsWrtInputs) {
-
-            for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOperandWrtInputs.asMap().entrySet()) {
-                vertexInfo.computeIfAbsent(entry.getKey(), (wrtId) -> entry.getValue().getShape());
+            if (!derivativeOfOperandWrtInputs.isEmpty()) {
+                vertexInfo.computeIfAbsent(derivativeOfOperandWrtInputs.getKey(), (wrtId) -> derivativeOfOperandWrtInputs.getValue().getShape());
             }
         }
 
@@ -106,8 +105,8 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
             PartialDerivatives partialOfOperand = derivativeOfOperandsWrtInputs.get(i);
             DoubleTensor operandValue = operandValues.get(i);
 
-            if (partialOfOperand.asMap().containsKey(wrtVertexId)) {
-                partialsToConcat.computeIfAbsent(wrtVertexId, k -> new ArrayList<>()).add(partialOfOperand.asMap().get(wrtVertexId));
+            if (partialOfOperand.isKey(wrtVertexId)) {
+                partialsToConcat.computeIfAbsent(wrtVertexId, k -> new ArrayList<>()).add(partialOfOperand.getValue());
             } else {
                 long[] wrtShape = Arrays.copyOfRange(partialWrtShape, operandValue.getRank(), partialWrtShape.length);
                 long[] resultShape = TensorShape.concat(operandValue.getShape(), wrtShape);
@@ -157,15 +156,12 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         int wrtStartsAt = -operandsRank;
         int wrtSplitOn = wrtStartsAt + dimension;
 
-        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            DoubleTensor partial = entry.getValue();
+        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getValue();
 
-            List<DoubleTensor> splitPartial = partial.split(wrtSplitOn, splitIndices);
+        List<DoubleTensor> splitPartial = partial.split(wrtSplitOn, splitIndices);
 
-            for (int i = 0; i < splitPartial.size(); i++) {
-                splitPartials.get(operands[i]).putWithRespectTo(entry.getKey(), splitPartial.get(i));
-            }
-
+        for (int i = 0; i < splitPartial.size(); i++) {
+            splitPartials.get(operands[i]).putWithRespectTo(derivativeOfOutputsWithRespectToSelf.getKey(), splitPartial.get(i));
         }
 
         return splitPartials;

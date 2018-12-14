@@ -7,7 +7,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -85,18 +84,17 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
 
         long[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
         PartialDerivatives reshapedDiffWrtSelf = new PartialDerivatives(new HashMap<>());
-        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            DoubleTensor partial = partialDerivative.getValue();
 
-            long[] newPartialShape = TensorShape.concat(
-                TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
-                wrtShapeWithoutRankLoss
-            );
+        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getValue();
 
-            DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
+        long[] newPartialShape = TensorShape.concat(
+            TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
+            wrtShapeWithoutRankLoss
+        );
 
-            reshapedDiffWrtSelf.putWithRespectTo(partialDerivative.getKey(), reshapedPartialDerivative);
-        }
+        DoubleTensor reshapedPartialDerivative = derivativeOfOutputsWithRespectToSelf.getValue().reshape(newPartialShape);
+
+        reshapedDiffWrtSelf.putWithRespectTo(derivativeOfOutputsWithRespectToSelf.getKey(), reshapedPartialDerivative);
 
         return reshapedDiffWrtSelf;
     }

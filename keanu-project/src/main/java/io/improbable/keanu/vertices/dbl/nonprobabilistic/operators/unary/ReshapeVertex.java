@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -37,15 +36,13 @@ public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> reshapedDerivatives = new HashMap<>();
 
-        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            DoubleTensor partial = partialDerivative.getValue();
-            long[] newPartialShape = TensorShape.concat(
-                TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
-                inputVertex.getShape()
-            );
-            DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
-            reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), reshapedPartialDerivative));
-        }
+        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getValue();
+        long[] newPartialShape = TensorShape.concat(
+            TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
+            inputVertex.getShape()
+        );
+        DoubleTensor reshapedPartialDerivative = derivativeOfOutputsWithRespectToSelf.getValue().reshape(newPartialShape);
+        reshapedDerivatives.put(inputVertex, new PartialDerivatives(derivativeOfOutputsWithRespectToSelf.getKey(), reshapedPartialDerivative));
 
         return reshapedDerivatives;
     }

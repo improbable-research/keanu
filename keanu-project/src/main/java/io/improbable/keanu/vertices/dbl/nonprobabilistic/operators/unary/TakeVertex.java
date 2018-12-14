@@ -46,13 +46,11 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
         Map<VertexId, DoubleTensor> partialsOf = new HashMap<>();
         DoubleTensor newValue = this.getValue();
 
-        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfParentWithRespectToInputs.asMap().entrySet()) {
-            DoubleTensor atIndexTensor = takeFromPartial(entry.getValue(), index);
-            int desiredRank = atIndexTensor.getShape().length + newValue.getShape().length;
-            long[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
-            atIndexTensor = atIndexTensor.reshape(paddedShape);
-            partialsOf.put(entry.getKey(), atIndexTensor);
-        }
+        DoubleTensor atIndexTensor = takeFromPartial(derivativeOfParentWithRespectToInputs.getValue(), index);
+        int desiredRank = atIndexTensor.getShape().length + newValue.getShape().length;
+        long[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
+        atIndexTensor = atIndexTensor.reshape(paddedShape);
+        partialsOf.put(derivativeOfParentWithRespectToInputs.getKey(), atIndexTensor);
 
         return new PartialDerivatives(partialsOf);
     }
@@ -73,19 +71,17 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> reshapedDerivatives = new HashMap<>();
 
-        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            DoubleTensor partial = partialDerivative.getValue();
-            long[] newPartialShape = TensorShape.concat(
-                TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
-                inputVertex.getShape()
-            );
-            DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);
-            long[] partialUpRankShape = TensorShape.shapeDesiredToRankByAppendingOnes(partial.getShape(), newPartialShape.length);
-            DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial.reshape(partialUpRankShape));
-            DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
-            DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
-            reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), highRankMask));
-        }
+        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getValue();
+        long[] newPartialShape = TensorShape.concat(
+            TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
+            inputVertex.getShape()
+        );
+        DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);
+        long[] partialUpRankShape = TensorShape.shapeDesiredToRankByAppendingOnes(partial.getShape(), newPartialShape.length);
+        DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial.reshape(partialUpRankShape));
+        DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
+        DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
+        reshapedDerivatives.put(inputVertex, new PartialDerivatives(derivativeOfOutputsWithRespectToSelf.getKey(), highRankMask));
 
         return reshapedDerivatives;
     }
