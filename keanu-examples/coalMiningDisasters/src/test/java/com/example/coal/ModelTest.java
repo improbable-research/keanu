@@ -1,10 +1,19 @@
 package com.example.coal;
 
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class ModelTest {
+
+    @Before
+    public void setup() {
+        KeanuRandom.setDefaultRandomSeed(1);
+        VertexId.ID_GENERATOR.set(1);
+    }
 
     @Test
     public void shouldFindCorrectSwitchYear() {
