@@ -50,7 +50,7 @@ public class TextMessaging {
         BayesianNetwork net = new BayesianNetwork(textsForDay.getConnectedGraph());
         net.probeForNonZeroProbability(1000);
 
-        final int numSamples = 800;
+        final int numSamples = 1000;
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig()
             .generatePosteriorSamples(net, net.getLatentVertices())
             .dropCount(numSamples / 2)
