@@ -2,7 +2,7 @@ package com.example.coal;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class ModelTest {
 
@@ -18,6 +18,6 @@ public class ModelTest {
 
         int switchYear = model.results.getIntegerTensorSamples(model.switchpoint).getScalarMode();
 
-        assertTrue(switchYear == 1890);
+        assertEquals(switchYear, 1890);
     }
 }
