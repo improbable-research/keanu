@@ -235,4 +235,8 @@ public class TensorShape {
         return ArrayUtils.remove(shape, dimension);
     }
 
+    @Override
+    public String toString() {
+        return "Shape" + Arrays.toString(shape);
+    }
 }

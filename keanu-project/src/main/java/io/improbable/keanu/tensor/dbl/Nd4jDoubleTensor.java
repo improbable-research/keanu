@@ -176,7 +176,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixInverse() {
-        return new Nd4jDoubleTensor(InvertMatrix.invert(tensor, false));
+        if (isLengthOne() && isMatrix()) {
+            return Nd4jDoubleTensor.create(1. / scalar(), getShape());
+        } else {
+            return new Nd4jDoubleTensor(InvertMatrix.invert(tensor, false));
+        }
     }
 
     @Override
@@ -198,7 +202,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public IntegerTensor argMax(int axis) {
         long[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
-        INDArray max = tensor.argMax(axis).reshape(TensorShape.removeDimension(axis, shape));
+        long[] newShape = TensorShape.removeDimension(axis, shape);
+        if (TensorShape.isLengthOne(newShape)) {
+            newShape = SCALAR_SHAPE;
+        }
+        INDArray max = tensor.argMax(axis).reshape(newShape);
         return new Nd4jIntegerTensor(max);
     }
 
@@ -876,6 +884,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public double determinant() {
+        if (isLengthOne()) {
+            return scalar();
+        }
         INDArray dup = tensor.dup();
         double[][] asMatrix = dup.toDoubleMatrix();
         RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);

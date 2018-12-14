@@ -31,7 +31,7 @@ public class IntegerTensorVertexSamples extends VertexSamples<IntegerTensor> {
     }
 
     public Integer getScalarMode() {
-        return getModeAtIndex(0, 0);
+        return getModeAtIndex(0);
     }
 
     public Integer getModeAtIndex(int... index) {

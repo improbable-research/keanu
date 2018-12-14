@@ -183,7 +183,7 @@ public class TensorShapeValidation {
             .collect(toSet());
 
         if (uniqueShapes.size() != 1) {
-            throw new IllegalArgumentException(errorMessage.orElse("Shapes must match"));
+            throw new IllegalArgumentException(errorMessage.orElse("Shapes must match: " + uniqueShapes));
         }
 
         return uniqueShapes.iterator().next().getShape();

@@ -509,7 +509,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public IntegerTensor argMax(int axis) {
         long[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
-        return new Nd4jIntegerTensor(tensor.argMax(axis).reshape(TensorShape.removeDimension(axis, shape)));
+        long[] newShape = TensorShape.removeDimension(axis, shape);
+        if (TensorShape.isLengthOne(newShape)) {
+            newShape = SCALAR_SHAPE;
+        }
+        return new Nd4jIntegerTensor(tensor.argMax(axis).reshape(newShape));
     }
 
     @Override
@@ -518,6 +522,8 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         INDArray mask;
         if (value.isLengthOne()) {
             mask = tensor.gt(value.scalar());
+        } else if (this.isLengthOne()) {
+            return value.lessThan(scalar());
         } else {
             INDArray indArray = unsafeGetNd4J(value);
             mask = tensor.gt(indArray);
@@ -578,11 +584,13 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public Integer getValue(long... index) {
+        TensorShapeValidation.checkIndexIsValid(getShape(), index);
         return (int) tensor.getDouble(index);
     }
 
     @Override
     public IntegerTensor setValue(Integer value, long... index) {
+        TensorShapeValidation.checkIndexIsValid(getShape(), index);
         tensor.putScalar(index, value);
         return this;
     }

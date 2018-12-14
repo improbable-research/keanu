@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Sequence
 
 import numpy as np
 from examples import CoalMining
@@ -15,13 +15,10 @@ def test_coalmining() -> None:
     model.disasters.observe(coal_mining.training_data())
 
     net = BayesNet(model.switchpoint.get_connected_graph())
-    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=50000, drop=10000, down_sample_interval=5)
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=500, drop=100, down_sample_interval=5)
 
-    vertex_samples: List[numpy_types] = samples["switchpoint"]
-    vertex_samples_primitive: List[List[primitive_types]] = list(map(
-        lambda a: a.tolist(), vertex_samples))  # because you can't concatenate 0-d arrays
-    vertex_samples_concatentated: np.ndarray = np.array(vertex_samples_primitive)
-
+    vertex_samples: Sequence[numpy_types] = samples["switchpoint"]
+    vertex_samples_concatentated: np.ndarray = np.concatenate(vertex_samples)
     switch_year = np.argmax(np.bincount(vertex_samples_concatentated))
 
     assert switch_year == 1890

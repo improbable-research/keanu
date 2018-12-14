@@ -38,7 +38,7 @@ public class BoolConcatenationVertexTest {
     @Test
     public void canConcatScalarToVector() {
         ConstantBoolVertex a = new ConstantBoolVertex(new boolean[]{true, true, true});
-        ConstantBoolVertex b = new ConstantBoolVertex(new boolean[]{false});
+        ConstantBoolVertex b = new ConstantBoolVertex(new boolean[]{false}, new long[] {1});
 
         BoolConcatenationVertex concat = new BoolConcatenationVertex(0, a, b);
 
@@ -48,7 +48,7 @@ public class BoolConcatenationVertexTest {
 
     @Test
     public void canConcatVectorToScalar() {
-        ConstantBoolVertex a = new ConstantBoolVertex(new boolean[]{false});
+        ConstantBoolVertex a = new ConstantBoolVertex(new boolean[]{false}, new long[] {1});
         ConstantBoolVertex b = new ConstantBoolVertex(new boolean[]{true, true, true});
 
         BoolConcatenationVertex concat = new BoolConcatenationVertex(0, a, b);

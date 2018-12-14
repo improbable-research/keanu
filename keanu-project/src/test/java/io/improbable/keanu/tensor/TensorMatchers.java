@@ -25,7 +25,7 @@ public class TensorMatchers {
         return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
             @Override
             protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
-                mismatchDescription.appendValue(item.getShape());
+                mismatchDescription.appendText("had shape ").appendValue(item.getShape());
                 return shapeMatcher.matches(item.getShape());
             }
 
