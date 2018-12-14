@@ -1,6 +1,7 @@
-package io.improbable.keanu.util.dot;
+package io.improbable.keanu.util.io;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,6 +43,7 @@ public class DotSaverTest {
     private static final String VERTEX_DEGREE1__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree1Output.dot";
     private static final String VERTEX_DEGREE2__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree2Output.dot";
     private static final String OUTPUT_WITH_VALUES_FILENAME = resourcesFolder + "/OutputValuesSetToTrueOutput.dot";
+    private static final String OUTPUT_WITH_METADATA_FILENAME = resourcesFolder + "/OutputWithMetadata.dot";
 
 
     @BeforeClass
@@ -56,7 +59,7 @@ public class DotSaverTest {
     }
 
     @Before
-    public void resetVertexIdGenerator() {
+    public void resetVertexIdsAndOutputStream() {
         VertexId.ID_GENERATOR.set(0);
         outputWriter = new ByteArrayOutputStream();
     }
@@ -137,6 +140,14 @@ public class DotSaverTest {
         dotSaver.save(outputWriter, true);
         String expectedOutputWithValues = readFileToString(OUTPUT_WITH_VALUES_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
+    }
+
+    @Test
+    public void metadataIsWrittenOut() throws IOException {
+        Map<String, String> metadata = ImmutableMap.of("Author", "Jane Doe", "Version", "V1");
+        complexNetDotSaver.save(outputWriter, false, metadata);
+        String expectedOutputWithMetadata = readFileToString(OUTPUT_WITH_METADATA_FILENAME);
+        checkDotFilesMatch(outputWriter.toString(), expectedOutputWithMetadata);
     }
 
     // Need to compare the outputs line by line, as the labels and edges are not written out in a fixed order.

@@ -18,12 +18,12 @@ import logging
 error_code = 0
 
 def record_error(output_str):
-    logging.error(output_str)
+    logging.getLogger("keanu").error(output_str)
     global error_code
     error_code = 1
 
 def printd(debug_str):
-    logging.debug(debug_str)
+    logging.getLogger("keanu").debug(debug_str)
 
 def read_file_snippets(file, snippet_store):
     """Parse a file and add all snippets to the snippet_store dictionary"""

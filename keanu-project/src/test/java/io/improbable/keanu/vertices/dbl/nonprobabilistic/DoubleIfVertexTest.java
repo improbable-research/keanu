@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -295,7 +296,7 @@ public class DoubleIfVertexTest {
         observedIf.observe(2.25);
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observedIf.getConnectedGraph());
-        GradientOptimizer gradientOptimizer = GradientOptimizer.of(bayesianNetwork);
+        GradientOptimizer gradientOptimizer = KeanuOptimizer.Gradient.of(bayesianNetwork);
 
         gradientOptimizer.maxLikelihood();
 
@@ -325,7 +326,7 @@ public class DoubleIfVertexTest {
         observedIf.observe(1.25);
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observedIf.getConnectedGraph());
-        GradientOptimizer gradientOptimizer = GradientOptimizer.of(bayesianNetwork);
+        GradientOptimizer gradientOptimizer = KeanuOptimizer.Gradient.of(bayesianNetwork);
 
         gradientOptimizer.maxLikelihood();
 

@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic;
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
@@ -32,8 +33,8 @@ public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVerte
         this.setLabel(label);
     }
 
-    public BoolProxyVertex(@LoadVertexParam(LABEL_NAME) String label) {
-        this(new VertexLabel(label));
+    public BoolProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) String label) {
+        this(shape, new VertexLabel(label));
     }
 
     @Override

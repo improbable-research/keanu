@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.math3.optim.SimpleBounds;
 
@@ -21,17 +21,17 @@ class ApacheMathSimpleBoundsCalculator {
     private final double boundsRange;
     private final OptimizerBounds optimizerBounds;
 
-    SimpleBounds getBounds(List<? extends Vertex<DoubleTensor>> latentVertices, double[] startPoint) {
+    SimpleBounds getBounds(List<? extends Variable> latentVariables, double[] startPoint) {
         List<Double> minBounds = new ArrayList<>();
         List<Double> maxBounds = new ArrayList<>();
 
-        for (Vertex<DoubleTensor> vertex : latentVertices) {
+        for (Variable variable : latentVariables) {
 
-            if (optimizerBounds.hasBound(vertex)) {
-                validateBoundsForVertex(vertex);
-                addBoundsForVertex(vertex, minBounds, maxBounds);
+            if (optimizerBounds.hasBound(variable.getReference())) {
+                validateBoundsForVariable(variable);
+                addBoundsForVariable(variable, minBounds, maxBounds);
             } else {
-                int length = TensorShape.getLengthAsInt(vertex.getShape());
+                int length = TensorShape.getLengthAsInt(variable.getShape());
                 int startIndex = minBounds.size();
                 for (int i = 0; i < length; i++) {
                     minBounds.add(startPoint[i + startIndex] - boundsRange);
@@ -46,33 +46,32 @@ class ApacheMathSimpleBoundsCalculator {
         );
     }
 
-    private void addBoundsForVertex(Vertex<DoubleTensor> vertex,
-                                    List<Double> minBounds,
-                                    List<Double> maxBounds) {
+    private void addBoundsForVariable(Variable variable,
+                                      List<Double> minBounds,
+                                      List<Double> maxBounds) {
 
-        DoubleTensor lowerBound = optimizerBounds.getLower(vertex);
-        DoubleTensor upperBound = optimizerBounds.getUpper(vertex);
+        DoubleTensor lowerBound = optimizerBounds.getLower(variable.getReference());
+        DoubleTensor upperBound = optimizerBounds.getUpper(variable.getReference());
 
         if (lowerBound.isScalar()) {
-            minBounds.addAll(DoubleTensor.create(lowerBound.scalar(), vertex.getShape()).asFlatList());
+            minBounds.addAll(DoubleTensor.create(lowerBound.scalar(), variable.getShape()).asFlatList());
         } else {
             minBounds.addAll(lowerBound.asFlatList());
         }
 
         if (upperBound.isScalar()) {
-            maxBounds.addAll(DoubleTensor.create(upperBound.scalar(), vertex.getShape()).asFlatList());
+            maxBounds.addAll(DoubleTensor.create(upperBound.scalar(), variable.getShape()).asFlatList());
         } else {
             maxBounds.addAll(upperBound.asFlatList());
         }
     }
 
-    private void validateBoundsForVertex(Vertex<DoubleTensor> vertex) {
-        long[] vertexShape = vertex.getShape();
-        if (!optimizerBounds.getLower(vertex).isScalar() && !Arrays.equals(vertexShape, optimizerBounds.getLower(vertex).getShape())) {
-            throw new IllegalArgumentException("Lower bounds shape does not match vertex shape");
+    private void validateBoundsForVariable(Variable variable) {
+        if (!optimizerBounds.getLower(variable.getReference()).isScalar() && !Arrays.equals(variable.getShape(), optimizerBounds.getLower(variable.getReference()).getShape())) {
+            throw new IllegalArgumentException("Lower bounds shape does not match variable shape");
         }
-        if (!optimizerBounds.getUpper(vertex).isScalar() && !Arrays.equals(vertexShape, optimizerBounds.getUpper(vertex).getShape())) {
-            throw new IllegalArgumentException("Upper bounds shape does not match vertex shape");
+        if (!optimizerBounds.getUpper(variable.getReference()).isScalar() && !Arrays.equals(variable.getShape(), optimizerBounds.getUpper(variable.getReference()).getShape())) {
+            throw new IllegalArgumentException("Upper bounds shape does not match variable shape");
         }
     }
 

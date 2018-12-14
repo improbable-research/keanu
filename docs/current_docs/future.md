@@ -19,7 +19,7 @@ affect modellers. We also strive to achieve this without increasing the complexi
 We already have a wide variety of probabilistic programming operators, multiple inference algorithms, 
 fast performance on the CPU, early-stage documentation and examples, and basic tooling to support 
 some modelling paradigms. However, the project is at a pre-alpha stage. There is still much work to do 
-and we are only able offer early adopters limited ad-hoc support. 
+and we are only able to offer early adopters limited ad-hoc support.
 
 Our development efforts are currently focused on:
 * API improvements
