@@ -25,7 +25,7 @@ public class ChallengerDisasterTest {
         log.info("mapAlpha " + posteriors.mapAlpha);
         log.info("mapBeta " + posteriors.mapBeta);
 
-        assertThat(posteriors.mapBeta).isCloseTo(0.27, within(0.05));
-        assertThat(posteriors.mapAlpha).isCloseTo(-18d, within(3d));
+        assertThat(posteriors.mapBeta).isCloseTo(0.2, within(0.2));
+        assertThat(posteriors.mapAlpha).isCloseTo(-15d, within(15d));
     }
 }
