@@ -153,6 +153,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
+        resetVertexValue(sampleFromVertices, position);
+
         Tree tree = Tree.createBasicTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
 
         return new NUTSSampler(
@@ -172,6 +174,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     public Statistics getStatistics() {
         return statistics;
+    }
+
+    private static void resetVertexValue(List<? extends Vertex> sampleFromVertices, Map<VertexId, DoubleTensor> previousPosition) {
+        for (Vertex vertex : sampleFromVertices) {
+            vertex.setValue(previousPosition.get(vertex.getId()));
+        }
     }
 
 }

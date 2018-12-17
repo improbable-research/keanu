@@ -35,7 +35,7 @@ public class VertexLabel {
     public Optional<String> getOuterNamespace() {
         try {
             return Optional.of(namespace.get(namespace.size() - 1));
-        } catch(IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             return Optional.empty();
         }
     }
@@ -44,10 +44,14 @@ public class VertexLabel {
         return name;
     }
 
-    @Override
-    public String toString() {
+    public String getQualifiedName() {
         ImmutableList<String> names = ImmutableList.<String>builder().add(name).addAll(namespace).build();
         return Joiner.on(NAMESPACE_SEPARATOR).join(Lists.reverse(names));
+    }
+
+    @Override
+    public String toString() {
+        return getQualifiedName();
     }
 
     @Override

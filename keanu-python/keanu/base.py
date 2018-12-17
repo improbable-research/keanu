@@ -22,8 +22,13 @@ class JavaObjectWrapper:
 
             raise AttributeError("{} has no attribute {}".format(self.__class__, k))
 
+        if python_name == "_get_object_id":
+            raise TypeError("Trying to call %s on a JavaObjectWrapper - did you forget to call %s.unwrap()?" %
+                            (python_name, self._class))
+
         java_name = _to_camel_case_name(k)
-        logging.warning("\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
+        logging.getLogger("keanu").warning(
+            "\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
         return self.unwrap().__getattr__(java_name)
 
     def unwrap(self) -> JavaObject:

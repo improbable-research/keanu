@@ -6,6 +6,7 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.SamplingModelFitting;
@@ -39,7 +40,7 @@ public class LinearRegressionTest {
         DoubleVertex y = new GaussianVertex(x.multiply(weight).plus(intercept), 5.0);
         y.observe(data.yTrain);
 
-        Optimizer optimizer = Optimizer.of(weight.getConnectedGraph());
+        Optimizer optimizer = KeanuOptimizer.of(weight.getConnectedGraph());
         optimizer.maxLikelihood();
 
         assertWeightsAndInterceptMatchTestData(
@@ -78,7 +79,7 @@ public class LinearRegressionTest {
         y.observe(data.yTrain);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
+        GradientOptimizer optimizer = KeanuOptimizer.Gradient.of(bayesNet);
 
         optimizer.maxLikelihood();
 
@@ -115,7 +116,7 @@ public class LinearRegressionTest {
         y.observe(data.yTrain);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
+        GradientOptimizer optimizer = KeanuOptimizer.Gradient.of(bayesNet);
         optimizer.maxLikelihood();
 
         assertWeightsAndInterceptMatchTestData(
@@ -143,7 +144,7 @@ public class LinearRegressionTest {
     @Test
     public void youCanChooseSamplingInsteadOfGradientOptimization() {
         final int smallRawDataSize = 20;
-        final int samplingCount = 30000;
+        final int samplingCount = 6000;
 
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData(smallRawDataSize);
 
@@ -164,7 +165,7 @@ public class LinearRegressionTest {
             .withSampling(sampling)
             .build();
 
-        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
+        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount / 10).downSample(2);
 
         assertSampledWeightsAndInterceptMatchTestData(
             networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightVertex().getId()),

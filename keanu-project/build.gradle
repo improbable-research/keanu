@@ -27,6 +27,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.google.guava:guava:20.0'
     compile 'com.google.protobuf:protobuf-java:3.6.1'
+    compile 'com.google.protobuf:protobuf-java-util:3.6.1'
     compile group: 'com.opencsv', name: 'opencsv', version: '4.2'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta2'
     compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.8.0-beta2'

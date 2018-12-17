@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices;
 
+import io.improbable.keanu.algorithms.variational.optimizer.HasShape;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
