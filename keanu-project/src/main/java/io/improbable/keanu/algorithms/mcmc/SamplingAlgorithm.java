@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -33,5 +34,5 @@ public interface SamplingAlgorithm {
      *
      * @return a network state that represents the current state of the algorithm.
      */
-    NetworkState sample();
+    NetworkSample sample();
 }
