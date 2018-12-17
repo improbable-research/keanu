@@ -58,7 +58,7 @@ def _load_network(loader, filename: str) -> BayesNet:
 
 class ProtobufLoader(JavaObjectWrapper):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(ProtobufLoader, self).__init__(k.jvm_view().ProtobufLoader())
 
     def load(self, filename: str) -> BayesNet:
@@ -67,7 +67,7 @@ class ProtobufLoader(JavaObjectWrapper):
 
 class JsonLoader(JavaObjectWrapper):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(JsonLoader, self).__init__(k.jvm_view().JsonLoader())
 
     def load(self, filename: str) -> BayesNet:

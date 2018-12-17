@@ -1,5 +1,6 @@
 from keanu.vertex import UniformInt, Gamma, Poisson, Cauchy
 from keanu import BayesNet, KeanuRandom
+from keanu.network_io import ProtobufLoader, JsonLoader, ProtobufSaver, DotSaver, JsonSaver
 import pytest
 
 
@@ -62,3 +63,32 @@ def test_probe_for_non_zero_probability_from_bayes_net() -> None:
 
     assert gamma.has_value()
     assert poisson.has_value()
+
+
+def test_can_save_and_load() -> None:
+    PROTO_FILE = "temp.proto"
+    JSON_FILE = "temp.json"
+    DOT_FILE = "temp.dot"
+    gamma = Gamma(1.0, 1.0)
+    gamma.set_value(2.5)
+    net = BayesNet(gamma.get_connected_graph())
+    metadata = {"Team": "GraphOS"}
+    protobuf_saver = ProtobufSaver(net)
+    protobuf_saver.save(PROTO_FILE, True, metadata)
+    json_saver = JsonSaver(net)
+    json_saver.save(JSON_FILE, True, metadata)
+    dot_saver = DotSaver(net)
+    dot_saver.save(DOT_FILE, True, metadata)
+
+    protobuf_loader = ProtobufLoader()
+    json_loader = JsonLoader()
+    new_net_from_proto = protobuf_loader.load(PROTO_FILE)
+    new_net_from_json = json_loader.load(JSON_FILE)
+    latents = list(new_net_from_proto.get_latent_vertices())
+    assert len(latents) == 1
+    new_gamma = latents[0]
+    assert new_gamma.get_value() == 2.5
+    latents = list(new_net_from_json.get_latent_vertices())
+    assert len(latents) == 1
+    new_gamma = latents[0]
+    assert new_gamma.get_value() == 2.5

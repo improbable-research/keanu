@@ -67,15 +67,8 @@ class KeanuContext(metaclass=Singleton):
         m = self._gateway.jvm.java.util.HashMap()
 
         for (k, v) in python_map.items():
-            if (issubclass(type(k), JavaObjectWrapper)):
-                new_k = k.unwrap()
-            else:
-                new_k = k
-
-            if (issubclass(type(v), JavaObjectWrapper)):
-                new_v = v.unwrap()
-            else:
-                new_v = v
+            new_k = k.unwrap() if isinstance(k, JavaObjectWrapper) else k
+            new_v = v.unwrap() if isinstance(v, JavaObjectWrapper) else v
 
             m.put(new_k, new_v)
 
@@ -85,7 +78,7 @@ class KeanuContext(metaclass=Singleton):
         lst = self._gateway.jvm.java.util.ArrayList()
 
         for o in l:
-            o = o.unwrap() if issubclass(type(o), JavaObjectWrapper) else o
+            o = o.unwrap() if isinstance(o, JavaObjectWrapper) else o
             lst.add(o)
 
         return lst
