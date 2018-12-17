@@ -10,7 +10,7 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 
 @State(Scope.Benchmark)
-public class Nd4jDoubleTensorTimesScalar {
+public class Nd4jDoubleTensorScalarOperations {
 
     public DoubleTensor tensor;
 
