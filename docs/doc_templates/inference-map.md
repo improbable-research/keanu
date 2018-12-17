@@ -72,6 +72,8 @@ This section will focus on the parameters available to you on the Gradient Optim
 for the Gradient Optimizer that lets you change any combination of the default parameters. The snippet below demonstrates
 how to use the builder to change all of the available parameters.
 
+#### Java
+
 ```java
 {% snippet GradientOptimizerMostProbable %}
 ```
@@ -81,6 +83,14 @@ how to use the builder to change all of the available parameters.
 * `relativeThreshold` (default: 1e-8) - If the delta in the log prob is less than the log prob times relativeThreshold, the Optimizer has converged
 * `absoluteThreshold` (default: 1e-8) - If the delta in the log prob is less than absoluteThreshold, the Optimizer has converged
 
+#### Python
+
+```python
+optimizer = GradientOptimizer(bayes_net, max_evaluations=5000,
+                              relative_threshold=1e-8, absolute_threshold=1e-8)
+optimizer.max_a_posteriori()
+calculated_temperature = model.temperature.get_value()
+```
 
 ### Non-Gradient Optimizer
 
@@ -92,6 +102,8 @@ This section will focus on the parameters available to you on the Non-Gradient O
 for the Non-Gradient Optimizer that lets you change any combination of the default parameters. The snippet below demonstrates
 how to use the builder to change all of the available parameters. 
 
+#### Java
+
 ```java
 {% snippet NonGradientOptimizerMostProbable %}
 ```
@@ -102,3 +114,12 @@ how to use the builder to change all of the available parameters.
 * `optimizerBounds` (default: no bounds) - a bounding box of 'allowed values' for a specific vertex 
 * `initialTrustRegionRadius` (default: 10) - initial trust region radius (refer to BOBYQA paper for detail)
 * `stoppingTrustRegionRadius` (default: 1e-8) - stopping trust region radius (refer to BOBYQA paper for detail) 
+
+#### Python
+
+```python
+optimizer = NonGradientOptimizer(bayes_net, max_evaluations=5000, bounds_range=100000.,
+                                 initial_trust_region_radius=5., stopping_trust_region_radius=2e-8)
+optimizer.max_a_posteriori()
+calculated_temperature = model.temperature.get_value()
+```
