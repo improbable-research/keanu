@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.mcmc;
+package io.improbable.keanu.algorithms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,10 +33,9 @@ public class Statistics {
         return statistics.get(key).stream().mapToDouble(x -> x).average().orElse(Double.NaN);
     }
 
-    private Map<Enum, List<Double>> initialise(Enum[] keys) {
+    private void initialise(Enum[] keys) {
         for (Enum key : keys) {
             statistics.put(key, new ArrayList<>());
         }
-        return statistics;
     }
 }

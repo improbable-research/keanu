@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.mcmc;
+package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -10,15 +10,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Leapfrog performs a movement through physical space with the introduction of a momentum variable.
  * This is required for sampling in Hamiltonian and NUTS.
  */
 public class Leapfrog {
 
-    private Map<VertexId, DoubleTensor> position;
-    private Map<VertexId, DoubleTensor> momentum;
-    private Map<VertexId, DoubleTensor> gradient;
+    private final Map<VertexId, DoubleTensor> position;
+    private final Map<VertexId, DoubleTensor> momentum;
+    private final Map<VertexId, DoubleTensor> gradient;
 
     /**
      * @param position the position of the vertices
@@ -48,12 +50,18 @@ public class Leapfrog {
 
         final double halfTimeStep = epsilon / 2.0;
 
-        Map<VertexId, DoubleTensor> nextMomentum = new HashMap<>();
-        for (Map.Entry<VertexId, DoubleTensor> rEntry : momentum.entrySet()) {
-            final DoubleTensor updatedMomentum = (gradient.get(rEntry.getKey()).times(halfTimeStep)).plusInPlace(rEntry.getValue());
-            nextMomentum.put(rEntry.getKey(), updatedMomentum);
-        }
+        Map<VertexId, DoubleTensor> nextMomentum = stepMomentum(halfTimeStep, momentum, gradient);
+        Map<VertexId, DoubleTensor> nextPosition = stepPosition(latentVertices, halfTimeStep, nextMomentum, position);
 
+        VertexValuePropagation.cascadeUpdate(latentVertices);
+        Map<VertexId, DoubleTensor> nextPositionGradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+
+        nextMomentum = stepMomentum(halfTimeStep, nextMomentum, nextPositionGradient);
+
+        return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient);
+    }
+
+    private Map<VertexId, DoubleTensor> stepPosition(List<Vertex<DoubleTensor>> latentVertices, double halfTimeStep, Map<VertexId, DoubleTensor> nextMomentum, Map<VertexId, DoubleTensor> position) {
         Map<VertexId, DoubleTensor> nextPosition = new HashMap<>();
         for (Vertex<DoubleTensor> latent : latentVertices) {
             final DoubleTensor nextPositionForLatent = nextMomentum.get(latent.getId()).
@@ -64,21 +72,16 @@ public class Leapfrog {
             nextPosition.put(latent.getId(), nextPositionForLatent);
             latent.setValue(nextPositionForLatent);
         }
+        return nextPosition;
+    }
 
-        VertexValuePropagation.cascadeUpdate(latentVertices);
-
-        Map<VertexId, DoubleTensor> nextPositionGradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
-
-        for (Map.Entry<VertexId, DoubleTensor> nextMomentumForLatent : nextMomentum.entrySet()) {
-            final DoubleTensor nextNextMomentumForLatent = nextPositionGradient.get(nextMomentumForLatent.getKey()).
-                times(halfTimeStep).
-                plusInPlace(
-                    nextMomentumForLatent.getValue()
-                );
-            nextMomentum.put(nextMomentumForLatent.getKey(), nextNextMomentumForLatent);
+    private Map<VertexId, DoubleTensor> stepMomentum(double halfTimeStep, Map<VertexId, DoubleTensor> momentum, Map<VertexId, DoubleTensor> gradient) {
+        Map<VertexId, DoubleTensor> nextMomentum = new HashMap<>();
+        for (Map.Entry<VertexId, DoubleTensor> rEntry : momentum.entrySet()) {
+            final DoubleTensor updatedMomentum = (gradient.get(rEntry.getKey()).times(halfTimeStep)).plusInPlace(rEntry.getValue());
+            nextMomentum.put(rEntry.getKey(), updatedMomentum);
         }
-
-        return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient);
+        return nextMomentum;
     }
 
     public double halfDotProductMomentum() {
@@ -97,16 +100,8 @@ public class Leapfrog {
         return gradient;
     }
 
-    public void setPosition(Map<VertexId, DoubleTensor> position) {
-        this.position = position;
-    }
-
-    public void setMomentum(Map<VertexId, DoubleTensor> momentum) {
-        this.momentum = momentum;
-    }
-
-    public void setGradient(Map<VertexId, DoubleTensor> gradient) {
-        this.gradient = gradient;
+    public Leapfrog makeJumpTo(Map<VertexId, DoubleTensor> position, Map<VertexId, DoubleTensor> gradient) {
+        return new Leapfrog(position, getMomentum(), gradient);
     }
 
     private static double dotProduct(Map<VertexId, DoubleTensor> momentums) {

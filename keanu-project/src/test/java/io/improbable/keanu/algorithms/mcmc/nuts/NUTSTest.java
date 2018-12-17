@@ -1,12 +1,17 @@
-package io.improbable.keanu.algorithms.mcmc;
+package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.Statistics;
+import io.improbable.keanu.algorithms.mcmc.MCMCTestDistributions;
+import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +20,14 @@ import org.junit.experimental.categories.Category;
 import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -58,14 +71,10 @@ public class NUTSTest {
         List<Double> meanTreeAccept = statistics.get(NUTS.Metrics.MEANTREEACCEPT);
         List<Double> treeSize = statistics.get(NUTS.Metrics.TREESIZE);
 
-        Assert.assertTrue(stepSize.get(0) == initStepSize);
-        Assert.assertTrue(stepSize.get(1) == initStepSize);
-        Assert.assertTrue(logProb.get(0) < 0);
-        Assert.assertTrue(logProb.get(1) < 0);
-        Assert.assertTrue(meanTreeAccept.get(0) >= 0 && meanTreeAccept.get(0) <= 1);
-        Assert.assertTrue(meanTreeAccept.get(1) >= 0 && meanTreeAccept.get(1) <= 1);
-        Assert.assertTrue(treeSize.get(0) < Math.pow(2, maxTreeHeight));
-        Assert.assertTrue(treeSize.get(1) < Math.pow(2, maxTreeHeight));
+        assertThat(stepSize, contains(initStepSize, initStepSize));
+        assertThat(logProb, everyItem(lessThan(0.)));
+        assertThat(meanTreeAccept, everyItem(both(greaterThanOrEqualTo(0.)).and(lessThanOrEqualTo(1.))));
+        assertThat(treeSize, everyItem(lessThan(Math.pow(2, maxTreeHeight))));
     }
 
     @Category(Slow.class)
@@ -95,12 +104,12 @@ public class NUTSTest {
     @Test
     public void samplesContinuousPrior() {
 
-        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 15.0);
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 18.0);
 
-        int sampleCount = 5000;
+        int sampleCount = 2000;
         NUTS nuts = NUTS.builder()
             .adaptCount(sampleCount)
-            .maxTreeHeight(10)
+            .maxTreeHeight(4)
             .targetAcceptanceProb(0.6)
             .random(random)
             .build();

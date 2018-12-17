@@ -1,5 +1,7 @@
-package io.improbable.keanu.algorithms.mcmc;
+package io.improbable.keanu.algorithms.mcmc.nuts;
 
+import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
+import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -11,8 +13,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCal
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.sun.javafx.font.Metrics;
 
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
@@ -28,7 +28,7 @@ public class NUTSSampler implements SamplingAlgorithm {
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
     private final Stepsize stepsize;
-    private final TreeBuilder tree;
+    private final Tree tree;
     private final LogProbGradientCalculator logProbGradientCalculator;
     private final Statistics statistics;
     private final boolean saveStatistics;
@@ -53,7 +53,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                        LogProbGradientCalculator logProbGradientCalculator,
                        boolean adaptEnabled,
                        Stepsize stepsize,
-                       TreeBuilder tree,
+                       Tree tree,
                        int maxTreeHeight,
                        KeanuRandom random,
                        Statistics statistics,
@@ -102,12 +102,12 @@ public class NUTSSampler implements SamplingAlgorithm {
         int treeHeight = 0;
         tree.resetTreeBeforeSample();
 
-        while (tree.getShouldContinueFlag() && treeHeight < maxTreeHeight) {
+        while (tree.shouldContinue() && treeHeight < maxTreeHeight) {
 
             //build tree direction -1 = backwards OR 1 = forwards
             int buildDirection = random.nextBoolean() ? 1 : -1;
 
-            TreeBuilder otherHalfTree = TreeBuilder.buildOtherHalfOfTree(
+            Tree otherHalfTree = Tree.buildOtherHalfOfTree(
                 tree,
                 latentVertices,
                 probabilisticVertices,
@@ -121,10 +121,10 @@ public class NUTSSampler implements SamplingAlgorithm {
                 random
             );
 
-            if (otherHalfTree.getShouldContinueFlag()) {
+            if (otherHalfTree.shouldContinue()) {
                 final double acceptanceProb = (double) otherHalfTree.getAcceptedLeapfrogCount() / tree.getAcceptedLeapfrogCount();
 
-                TreeBuilder.acceptOtherPositionWithProbability(
+                Tree.acceptOtherPositionWithProbability(
                     acceptanceProb,
                     tree,
                     otherHalfTree,

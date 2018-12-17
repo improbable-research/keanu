@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.mcmc;
+package io.improbable.keanu.algorithms;
 
 public interface Record {
 

@@ -1,5 +1,9 @@
-package io.improbable.keanu.algorithms.mcmc;
+package io.improbable.keanu.algorithms.mcmc.nuts;
 
+import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
+
+import io.improbable.keanu.algorithms.Record;
+import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
@@ -7,17 +11,19 @@ import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.sun.deploy.panel.TreeBuilder;
 
 /**
  * Used by NUTS as a balanced binary tree to compute and store information
  * about leapfrogs that are taken forwards and backwards in space.
- *
+ * <p>
  * The tree is reset for each sample.
  */
-public class TreeBuilder implements Record {
+public class Tree implements Record {
 
     private static final double DELTA_MAX = 1000.0;
     private static final int STARTING_ACCEPTED_LEAPFROG = 1;
@@ -37,32 +43,26 @@ public class TreeBuilder implements Record {
     private double treeSize;
 
     /**
-     * @param leapfrogForward            The result of the forward leapfrog
-     * @param leapfrogBackward           The result of the backward leapfrog
-     * @param acceptedPosition           The accepted position of the vertices
-     * @param gradientAtAcceptedPosition The gradient at the accepted position
-     * @param logProbAtAcceptedPosition  The log prob of the network at the accepted position
-     * @param sampleAtAcceptedPosition   The sample value at the accepted position
-     * @param acceptedLeapfrogCount      The number of accepted leapfrogs
-     * @param shouldContinueFlag         False if we are U-Turning
-     * @param deltaLikelihoodOfLeapfrog  The change in log prob as a result of the latest leapfrog
-     * @param treeSize                   The size of the tree
+     * @param leapfrog                  The result of the forward leapfrog
+     * @param logProbAtAcceptedPosition The log prob of the network at the accepted position
+     * @param sampleAtAcceptedPosition  The sample value at the accepted position
+     * @param acceptedLeapfrogCount     The number of accepted leapfrogs
+     * @param shouldContinueFlag        False if we are U-Turning
+     * @param deltaLikelihoodOfLeapfrog The change in log prob as a result of the latest leapfrog
+     * @param treeSize                  The size of the tree
      */
-    TreeBuilder(Leapfrog leapfrogForward,
-                Leapfrog leapfrogBackward,
-                Map<VertexId, DoubleTensor> acceptedPosition,
-                Map<VertexId, DoubleTensor> gradientAtAcceptedPosition,
-                double logProbAtAcceptedPosition,
-                Map<VertexId, ?> sampleAtAcceptedPosition,
-                int acceptedLeapfrogCount,
-                boolean shouldContinueFlag,
-                double deltaLikelihoodOfLeapfrog,
-                double treeSize) {
+    Tree(Leapfrog leapfrog,
+         double logProbAtAcceptedPosition,
+         Map<VertexId, ?> sampleAtAcceptedPosition,
+         int acceptedLeapfrogCount,
+         boolean shouldContinueFlag,
+         double deltaLikelihoodOfLeapfrog,
+         double treeSize) {
 
-        this.leapfrogForward = leapfrogForward;
-        this.leapfrogBackward = leapfrogBackward;
-        this.acceptedPosition = acceptedPosition;
-        this.gradientAtAcceptedPosition = gradientAtAcceptedPosition;
+        this.leapfrogForward = leapfrog;
+        this.leapfrogBackward = leapfrog;
+        this.acceptedPosition = leapfrog.getPosition();
+        this.gradientAtAcceptedPosition = leapfrog.getGradient();
         this.logOfMasterPAtAcceptedPosition = logProbAtAcceptedPosition;
         this.sampleAtAcceptedPosition = sampleAtAcceptedPosition;
         this.acceptedLeapfrogCount = acceptedLeapfrogCount;
@@ -81,17 +81,14 @@ public class TreeBuilder implements Record {
      * @param sampleAtAcceptedPosition the initial sample
      * @return a basic tree
      */
-    public static TreeBuilder createBasicTree(Map<VertexId, DoubleTensor> position,
-                                              Map<VertexId, DoubleTensor> momentum,
-                                              Map<VertexId, DoubleTensor> gradient,
-                                              double initialLogOfMasterP,
-                                              Map<VertexId, ?> sampleAtAcceptedPosition) {
+    public static Tree createBasicTree(Map<VertexId, DoubleTensor> position,
+                                       Map<VertexId, DoubleTensor> momentum,
+                                       Map<VertexId, DoubleTensor> gradient,
+                                       double initialLogOfMasterP,
+                                       Map<VertexId, ?> sampleAtAcceptedPosition) {
 
-        return new TreeBuilder(
+        return new Tree(
             new Leapfrog(position, momentum, gradient),
-            new Leapfrog(position, momentum, gradient),
-            position,
-            gradient,
             initialLogOfMasterP,
             sampleAtAcceptedPosition,
             STARTING_ACCEPTED_LEAPFROG,
@@ -101,71 +98,52 @@ public class TreeBuilder implements Record {
         );
     }
 
-    public static TreeBuilder buildOtherHalfOfTree(TreeBuilder currentTree,
-                                                   List<Vertex<DoubleTensor>> latentVertices,
-                                                   List<Vertex> probabilisticVertices,
-                                                   LogProbGradientCalculator logProbGradientCalculator,
-                                                   final List<? extends Vertex> sampleFromVertices,
-                                                   double logU,
-                                                   int buildDirection,
-                                                   int treeHeight,
-                                                   double epsilon,
-                                                   double logOfMasterPMinusMomentumBeforeLeapfrog,
-                                                   KeanuRandom random) {
+    public static Tree buildOtherHalfOfTree(Tree currentTree,
+                                            List<Vertex<DoubleTensor>> latentVertices,
+                                            List<Vertex> probabilisticVertices,
+                                            LogProbGradientCalculator logProbGradientCalculator,
+                                            final List<? extends Vertex> sampleFromVertices,
+                                            double logU,
+                                            int buildDirection,
+                                            int treeHeight,
+                                            double epsilon,
+                                            double logOfMasterPMinusMomentumBeforeLeapfrog,
+                                            KeanuRandom random) {
 
-        TreeBuilder otherHalfTree;
+        Tree otherHalfTree = buildTree(
+            latentVertices,
+            probabilisticVertices,
+            logProbGradientCalculator,
+            sampleFromVertices,
+            buildDirection == -1 ? currentTree.leapfrogBackward : currentTree.leapfrogForward,
+            logU,
+            buildDirection,
+            treeHeight,
+            epsilon,
+            logOfMasterPMinusMomentumBeforeLeapfrog,
+            random
+        );
 
         if (buildDirection == -1) {
-
-            otherHalfTree = buildTree(
-                latentVertices,
-                probabilisticVertices,
-                logProbGradientCalculator,
-                sampleFromVertices,
-                currentTree.leapfrogBackward,
-                logU,
-                buildDirection,
-                treeHeight,
-                epsilon,
-                logOfMasterPMinusMomentumBeforeLeapfrog,
-                random
-            );
-
             currentTree.leapfrogBackward = otherHalfTree.leapfrogBackward;
-
         } else {
-
-            otherHalfTree = buildTree(
-                latentVertices,
-                probabilisticVertices,
-                logProbGradientCalculator,
-                sampleFromVertices,
-                currentTree.leapfrogForward,
-                logU,
-                buildDirection,
-                treeHeight,
-                epsilon,
-                logOfMasterPMinusMomentumBeforeLeapfrog,
-                random
-            );
-
             currentTree.leapfrogForward = otherHalfTree.leapfrogForward;
         }
 
         return otherHalfTree;
     }
 
-    public static TreeBuilder buildTree(List<Vertex<DoubleTensor>> latentVertices,
-                                        List<Vertex> probabilisticVertices,
-                                        LogProbGradientCalculator logProbGradientCalculator,
-                                        final List<? extends Vertex> sampleFromVertices,
-                                        Leapfrog leapfrog,
-                                        double logU,
-                                        int buildDirection,
-                                        int treeHeight,
-                                        double epsilon,
-                                        double logOfMasterPMinusMomentumBeforeLeapfrog,
-                                        KeanuRandom random) {
+    private static Tree buildTree(List<Vertex<DoubleTensor>> latentVertices,
+                                  List<Vertex> probabilisticVertices,
+                                  LogProbGradientCalculator logProbGradientCalculator,
+                                  final List<? extends Vertex> sampleFromVertices,
+                                  Leapfrog leapfrog,
+                                  double logU,
+                                  int buildDirection,
+                                  int treeHeight,
+                                  double epsilon,
+                                  double logOfMasterPMinusMomentumBeforeLeapfrog,
+                                  KeanuRandom random) {
         if (treeHeight == 0) {
 
             //Base case-take one leapfrog step in the build direction
@@ -184,7 +162,7 @@ public class TreeBuilder implements Record {
         } else {
             //Recursion-implicitly build the left and right subtrees.
 
-            TreeBuilder tree = buildTree(
+            Tree tree = buildTree(
                 latentVertices,
                 probabilisticVertices,
                 logProbGradientCalculator,
@@ -201,7 +179,7 @@ public class TreeBuilder implements Record {
             //Should continue building other half if first half's shouldContinueFlag is true
             if (tree.shouldContinueFlag) {
 
-                TreeBuilder otherHalfTree = buildOtherHalfOfTree(
+                Tree otherHalfTree = buildOtherHalfOfTree(
                     tree,
                     latentVertices,
                     probabilisticVertices,
@@ -217,7 +195,7 @@ public class TreeBuilder implements Record {
 
                 double acceptOtherTreePositionProbability = (double) otherHalfTree.acceptedLeapfrogCount / (tree.acceptedLeapfrogCount + otherHalfTree.acceptedLeapfrogCount);
 
-                TreeBuilder.acceptOtherPositionWithProbability(
+                Tree.acceptOtherPositionWithProbability(
                     acceptOtherTreePositionProbability,
                     tree,
                     otherHalfTree,
@@ -236,15 +214,15 @@ public class TreeBuilder implements Record {
 
     }
 
-    public static TreeBuilder treeBuilderBaseCase(List<Vertex<DoubleTensor>> latentVertices,
-                                                  List<Vertex> probabilisticVertices,
-                                                  LogProbGradientCalculator logProbGradientCalculator,
-                                                  final List<? extends Vertex> sampleFromVertices,
-                                                  Leapfrog leapfrog,
-                                                  double logU,
-                                                  int buildDirection,
-                                                  double epsilon,
-                                                  double logOfMasterPMinusMomentumBeforeLeapfrog) {
+    private static Tree treeBuilderBaseCase(List<Vertex<DoubleTensor>> latentVertices,
+                                            List<Vertex> probabilisticVertices,
+                                            LogProbGradientCalculator logProbGradientCalculator,
+                                            final List<? extends Vertex> sampleFromVertices,
+                                            Leapfrog leapfrog,
+                                            double logU,
+                                            int buildDirection,
+                                            double epsilon,
+                                            double logOfMasterPMinusMomentumBeforeLeapfrog) {
 
         leapfrog = leapfrog.step(latentVertices, logProbGradientCalculator, epsilon * buildDirection);
 
@@ -261,11 +239,8 @@ public class TreeBuilder implements Record {
             Math.exp(logOfMasterPMinusMomentum - logOfMasterPMinusMomentumBeforeLeapfrog)
         );
 
-        return new TreeBuilder(
+        return new Tree(
             leapfrog,
-            leapfrog,
-            leapfrog.getPosition(),
-            leapfrog.getGradient(),
             logOfMasterPAfterLeapfrog,
             sampleAtAcceptedPosition,
             acceptedLeapfrogCount,
@@ -276,10 +251,10 @@ public class TreeBuilder implements Record {
     }
 
     public static void acceptOtherPositionWithProbability(double probability,
-                                                          TreeBuilder tree,
-                                                          TreeBuilder otherTree,
+                                                          Tree tree,
+                                                          Tree otherTree,
                                                           KeanuRandom random) {
-        if (withProbability(probability, random)) {
+        if (random.nextDouble() < probability) {
             tree.acceptedPosition = otherTree.acceptedPosition;
             tree.gradientAtAcceptedPosition = otherTree.gradientAtAcceptedPosition;
             tree.logOfMasterPAtAcceptedPosition = otherTree.logOfMasterPAtAcceptedPosition;
@@ -287,14 +262,10 @@ public class TreeBuilder implements Record {
         }
     }
 
-    private static boolean withProbability(double probability, KeanuRandom random) {
-        return random.nextDouble() < probability;
-    }
-
-    public static boolean isNotUTurning(Map<VertexId, DoubleTensor> positionForward,
-                                        Map<VertexId, DoubleTensor> positionBackward,
-                                        Map<VertexId, DoubleTensor> momentumForward,
-                                        Map<VertexId, DoubleTensor> momentumBackward) {
+    private static boolean isNotUTurning(Map<VertexId, DoubleTensor> positionForward,
+                                         Map<VertexId, DoubleTensor> positionBackward,
+                                         Map<VertexId, DoubleTensor> momentumForward,
+                                         Map<VertexId, DoubleTensor> momentumBackward) {
         double forward = 0.0;
         double backward = 0.0;
 
@@ -312,25 +283,8 @@ public class TreeBuilder implements Record {
         return (forward >= 0.0) && (backward >= 0.0);
     }
 
-    /**
-     * This is meant to be used for tracking a sample while building tree.
-     *
-     * @param sampleFromVertices take samples from these vertices
-     */
-    private static Map<VertexId, ?> takeSample(List<? extends Vertex> sampleFromVertices) {
-        Map<VertexId, ?> sample = new HashMap<>();
-        for (Vertex vertex : sampleFromVertices) {
-            putValue(vertex, sample);
-        }
-        return sample;
-    }
-
-    private static <T> void putValue(Vertex<T> vertex, Map<VertexId, ?> target) {
-        ((Map<VertexId, T>) target).put(vertex.getId(), vertex.getValue());
-    }
-
-    public void continueIfNotUTurning(TreeBuilder otherHalfTree) {
-        setShouldContinueFlag(otherHalfTree.getShouldContinueFlag() && TreeBuilder.isNotUTurning(
+    public void continueIfNotUTurning(Tree otherHalfTree) {
+        shouldContinueFlag = (otherHalfTree.shouldContinue() && Tree.isNotUTurning(
             getForwardPosition(),
             getBackwardPosition(),
             getForwardMomentum(),
@@ -338,12 +292,8 @@ public class TreeBuilder implements Record {
         ));
     }
 
-    public boolean getShouldContinueFlag() {
+    public boolean shouldContinue() {
         return shouldContinueFlag;
-    }
-
-    public void setShouldContinueFlag(boolean shouldContinueFlag) {
-        this.shouldContinueFlag = shouldContinueFlag;
     }
 
     public int getAcceptedLeapfrogCount() {
@@ -391,14 +341,6 @@ public class TreeBuilder implements Record {
         return leapfrogBackward.getPosition();
     }
 
-    public Map<VertexId, DoubleTensor> getForwardGradient() {
-        return leapfrogForward.getGradient();
-    }
-
-    public Map<VertexId, DoubleTensor> getBackwardGradient() {
-        return leapfrogBackward.getGradient();
-    }
-
     public Map<VertexId, DoubleTensor> getForwardMomentum() {
         return leapfrogForward.getMomentum();
     }
@@ -408,29 +350,10 @@ public class TreeBuilder implements Record {
     }
 
     public void acceptPositionAndGradient() {
-        setForwardPosition(acceptedPosition);
-        setBackwardPosition(acceptedPosition);
-        setForwardGradient(gradientAtAcceptedPosition);
-        setBackwardGradient(gradientAtAcceptedPosition);
+        leapfrogForward = leapfrogForward.makeJumpTo(acceptedPosition, gradientAtAcceptedPosition);
+        leapfrogBackward = leapfrogBackward.makeJumpTo(acceptedPosition, gradientAtAcceptedPosition);
     }
 
-    private void setForwardPosition(Map<VertexId, DoubleTensor> forwardPosition) {
-        leapfrogForward.setPosition(forwardPosition);
-    }
-
-    private void setBackwardPosition(Map<VertexId, DoubleTensor> backwardPosition) {
-        leapfrogBackward.setPosition(backwardPosition);
-    }
-
-    private void setForwardGradient(Map<VertexId, DoubleTensor> forwardGradient) {
-        leapfrogForward.setGradient(forwardGradient);
-    }
-
-    private void setBackwardGradient(Map<VertexId, DoubleTensor> backwardGradient) {
-        leapfrogBackward.setGradient(backwardGradient);
-    }
-
-    @Override
     public void recordStatistics(Statistics statistics) {
         statistics.store(NUTS.Metrics.LOGPROB, logOfMasterPAtAcceptedPosition);
         statistics.store(NUTS.Metrics.TREESIZE, treeSize);

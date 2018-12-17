@@ -1,8 +1,12 @@
-package io.improbable.keanu.algorithms.mcmc;
+package io.improbable.keanu.algorithms.mcmc.nuts;
+
+import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
+import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
@@ -15,11 +19,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
@@ -128,10 +132,9 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         final LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesNet.getLatentOrObservedVertices(), latentVertices);
         List<Vertex> probabilisticVertices = bayesNet.getLatentOrObservedVertices();
 
-        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+        Map<VertexId, DoubleTensor> position = latentVertices.stream().collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
         Map<VertexId, DoubleTensor> momentum = new HashMap<>();
-        Map<VertexId, DoubleTensor> position = new HashMap<>();
-        cachePosition(latentVertices, position);
+        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
         double initialLogOfMasterP = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
 
@@ -150,7 +153,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        TreeBuilder tree = TreeBuilder.createBasicTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
+        Tree tree = Tree.createBasicTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
 
         return new NUTSSampler(
             sampleFromVertices,
@@ -169,29 +172,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     public Statistics getStatistics() {
         return statistics;
-    }
-
-    private static void cachePosition(List<Vertex<DoubleTensor>> latentVertices, Map<VertexId, DoubleTensor> position) {
-        for (Vertex<DoubleTensor> vertex : latentVertices) {
-            position.put(vertex.getId(), vertex.getValue());
-        }
-    }
-
-    /**
-     * This is meant to be used for tracking a sample while building tree.
-     *
-     * @param sampleFromVertices take samples from these vertices
-     */
-    private static Map<VertexId, ?> takeSample(List<? extends Vertex> sampleFromVertices) {
-        Map<VertexId, ?> sample = new HashMap<>();
-        for (Vertex vertex : sampleFromVertices) {
-            putValue(vertex, sample);
-        }
-        return sample;
-    }
-
-    private static <T> void putValue(Vertex<T> vertex, Map<VertexId, ?> target) {
-        ((Map<VertexId, T>) target).put(vertex.getId(), vertex.getValue());
     }
 
 }
