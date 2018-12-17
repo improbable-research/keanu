@@ -47,7 +47,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         PartialDerivative partialsFromBase;
         PartialDerivative partialsFromExponent;
 
-        if (dBaseWrtInputs.isEmpty()) {
+        if (dBaseWrtInputs.isPresent()) {
             partialsFromBase = PartialDerivative.OF_CONSTANT;
         } else {
             partialsFromBase = dBaseWrtInputs.multiplyAlongOfDimensions(
@@ -56,7 +56,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
             );
         }
 
-        if (dExponentWrtInputs.isEmpty()) {
+        if (dExponentWrtInputs.isPresent()) {
             partialsFromExponent = PartialDerivative.OF_CONSTANT;
         } else {
             partialsFromExponent = dExponentWrtInputs.multiplyAlongOfDimensions(

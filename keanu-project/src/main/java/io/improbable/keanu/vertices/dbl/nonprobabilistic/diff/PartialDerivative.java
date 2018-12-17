@@ -31,7 +31,7 @@ public class PartialDerivative {
         this.partial = null;
     }
 
-    public boolean isEmpty() {
+    public boolean isPresent() {
         return partial == null;
     }
 
@@ -161,7 +161,7 @@ public class PartialDerivative {
 
     public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier, long[] ofShape) {
 
-        if (isEmpty()) {
+        if (isPresent()) {
             return duplicate();
         }
 
@@ -178,7 +178,7 @@ public class PartialDerivative {
 
     public PartialDerivative multiplyAlongWrtDimensions(DoubleTensor multiplier, long[] wrtShape) {
 
-        if (isEmpty()) {
+        if (isPresent()) {
             return duplicate();
         }
 
@@ -235,7 +235,7 @@ public class PartialDerivative {
 
     public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
-        if (partial.isEmpty()) {
+        if (partial.isPresent()) {
             partial.duplicate();
         }
 
@@ -260,7 +260,7 @@ public class PartialDerivative {
 
     public static PartialDerivative matrixMultiplyAlongWrtDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
-        if (partial.isEmpty()) {
+        if (partial.isPresent()) {
             return partial.duplicate();
         }
 
@@ -288,7 +288,7 @@ public class PartialDerivative {
 
     public PartialDerivative multiplyBy(double multiplier) {
 
-        if (isEmpty()) {
+        if (isPresent()) {
             return duplicate();
         }
 
@@ -297,7 +297,7 @@ public class PartialDerivative {
 
     public PartialDerivative divideBy(DoubleTensor divisor) {
 
-        if (isEmpty()) {
+        if (isPresent()) {
             return duplicate();
         }
 
@@ -313,7 +313,7 @@ public class PartialDerivative {
 
     public PartialDerivative reshape(int currentRank, long[] proposedShape) {
 
-        if (isEmpty()) {
+        if (isPresent()) {
             return duplicate();
         }
 
@@ -338,7 +338,7 @@ public class PartialDerivative {
      */
     public PartialDerivative slice(int dimension, long index, boolean reshape) {
 
-        if (isEmpty()) {
+        if (isPresent()) {
             return duplicate();
         }
 

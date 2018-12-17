@@ -73,7 +73,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         long[] partialWrtShape = null;
         VertexId wrtVertexId = null;
         for (PartialDerivative partial : derivativeOfOperandsWrtInputs) {
-            if (!partial.isEmpty()) {
+            if (!partial.isPresent()) {
                 partialWrtShape = partial.getPartial().getShape();
                 wrtVertexId = partial.getKey();
                 break;
