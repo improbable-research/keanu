@@ -97,10 +97,10 @@ double calculatedTemperature = temperature.getValue().scalar();
 #### Python
 
 ```python
-    optimizer = GradientOptimizer(bayes_net, max_evaluations=5000,
-                                  relative_threshold=1e-8, absolute_threshold=1e-8)
-    optimizer.max_a_posteriori()
-    calculated_temperature = model.temperature.get_value()
+optimizer = GradientOptimizer(bayes_net, max_evaluations=5000,
+                              relative_threshold=1e-8, absolute_threshold=1e-8)
+optimizer.max_a_posteriori()
+calculated_temperature = model.temperature.get_value()
 ```
 
 ### Non-Gradient Optimizer
@@ -139,8 +139,8 @@ double calculatedTemperature = temperature.getValue().scalar();
 #### Python
 
 ```python
-    optimizer = NonGradientOptimizer(bayes_net, max_evaluations=5000, bounds_range=100000.,
-                                     initial_trust_region_radius=5., stopping_trust_region_radius=2e-8)
-    optimizer.max_a_posteriori()
-    calculated_temperature = model.temperature.get_value()
+optimizer = NonGradientOptimizer(bayes_net, max_evaluations=5000, bounds_range=100000.,
+                                 initial_trust_region_radius=5., stopping_trust_region_radius=2e-8)
+optimizer.max_a_posteriori()
+calculated_temperature = model.temperature.get_value()
 ```
