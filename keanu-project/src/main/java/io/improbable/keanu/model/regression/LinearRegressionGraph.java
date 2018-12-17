@@ -62,6 +62,10 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
         return weightsVertex;
     }
 
+    public Vertex<OUTPUT> getOutputVertex() {
+        return yObservationVertex;
+    }
+
     @Value
     public static class OutputVertices<OUTPUT> {
         Vertex<OUTPUT> outputVertex;
