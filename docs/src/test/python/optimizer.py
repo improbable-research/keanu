@@ -1,5 +1,3 @@
-from keanu import BayesNet, KeanuRandom
-from keanu.algorithm import sample
 from keanu.vertex import Uniform, Gaussian
 from keanu import Model
 from keanu.algorithm import GradientOptimizer, NonGradientOptimizer
