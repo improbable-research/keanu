@@ -39,7 +39,8 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
             .divInPlace(samples.size()-1);
     }
 
+
     public DoubleTensor asTensor() {
-        return DoubleTensor.stack(0, samples.toArray(new DoubleTensor[0]));
+        return DoubleTensor.stack(0, samples.stream().toArray(DoubleTensor[]::new));
     }
 }

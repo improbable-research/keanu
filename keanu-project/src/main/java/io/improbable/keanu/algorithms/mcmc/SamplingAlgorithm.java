@@ -27,5 +27,5 @@ public interface SamplingAlgorithm {
      *
      * @return a network state that represents the current state of the algorithm.
      */
-    NetworkState sample();
+    NetworkStateDoubl sample();
 }

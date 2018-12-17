@@ -211,13 +211,7 @@ public class TensorShape {
      */
     public static int[] getAbsoluteDimensions(int rank, int[] dimensions) {
         for (int i = 0; i < dimensions.length; i++) {
-            if (dimensions[i] >= rank || dimensions[i] < -rank) {
-                throw new IllegalArgumentException("Dimension " + dimensions[i] + " is invalid for rank " + rank + " tensor.");
-            }
-
-            if (dimensions[i] < 0) {
-                dimensions[i] += rank;
-            }
+            dimensions[i] = getAbsoluteDimension(dimensions[i], rank);
         }
         return dimensions;
     }
@@ -244,6 +238,9 @@ public class TensorShape {
      * @return an absolute dimension from a shape
      */
     public static int getAbsoluteDimension(int dimension, int rank) {
+        if (dimension >= rank || dimension < -rank) {
+            throw new IllegalArgumentException("Dimension " + dimension + " is invalid for rank " + rank + " tensor.");
+        }
         if (dimension < 0) {
             dimension += rank;
         }

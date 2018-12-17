@@ -97,8 +97,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     }
 
     /**
-     * @param dimension the dimension along which toStack are stacked
-     * @param toStack    an array of DoubleTensor
+     * @param dimension  the dimension along which toStack are stacked
+     * @param toStack    an array of DoubleTensor's of the same shape
      * @return  a DoubleTensor with toStack joined along a new dimension
      * <p>
      * e.g. A, B, C = DoubleTensor.ones(4, 2)
@@ -113,7 +113,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
      */
     static DoubleTensor stack(int dimension, DoubleTensor... toStack) {
         long[] shape = toStack[0].getShape();
-        int absoluteDimension = getAbsoluteDimension(dimension, shape.length + 1);
+        int stackedRank = toStack[0].getRank() + 1;
+        int absoluteDimension = getAbsoluteDimension(dimension, stackedRank);
         long[] stackedShape = ArrayUtils.insert(absoluteDimension, shape, 1);
 
         DoubleTensor[] reshaped = new DoubleTensor[toStack.length];
