@@ -6,6 +6,7 @@ from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject,
 from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
 from typing import Dict, Any, Iterable, List, Collection, Set
 from _io import TextIOWrapper
+from .base import JavaObjectWrapper
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
@@ -66,7 +67,17 @@ class KeanuContext(metaclass=Singleton):
         m = self._gateway.jvm.java.util.HashMap()
 
         for (k, v) in python_map.items():
-            m.put(k.unwrap(), v.unwrap())
+            if (issubclass(type(k), JavaObjectWrapper)):
+                new_k = k.unwrap()
+            else:
+                new_k = k
+
+            if (issubclass(type(v), JavaObjectWrapper)):
+                new_v = v.unwrap()
+            else:
+                new_v = v
+
+            m.put(new_k, new_v)
 
         return m
 
