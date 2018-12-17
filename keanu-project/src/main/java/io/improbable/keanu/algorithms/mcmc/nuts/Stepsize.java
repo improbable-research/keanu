@@ -9,12 +9,10 @@ import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.sun.deploy.panel.TreeBuilder;
 
 /**
  * Used by NUTS as an epsilon for the leap frog

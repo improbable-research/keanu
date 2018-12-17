@@ -1,7 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
-
 import io.improbable.keanu.algorithms.Record;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -13,9 +11,9 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCal
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import com.sun.deploy.panel.TreeBuilder;
+import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
+
 
 /**
  * Used by NUTS as a balanced binary tree to compute and store information

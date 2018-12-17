@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Leapfrog performs a movement through physical space with the introduction of a momentum variable.

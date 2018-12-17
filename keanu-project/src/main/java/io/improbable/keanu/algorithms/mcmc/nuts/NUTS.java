@@ -1,12 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
-
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
-import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.algorithms.Statistics;
+import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
@@ -24,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
 
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
