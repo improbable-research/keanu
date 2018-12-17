@@ -85,7 +85,8 @@ class KeanuContext(metaclass=Singleton):
         lst = self._gateway.jvm.java.util.ArrayList()
 
         for o in l:
-            lst.add(o.unwrap())
+            o = o.unwrap() if issubclass(type(o), JavaObjectWrapper) else o
+            lst.add(o)
 
         return lst
 

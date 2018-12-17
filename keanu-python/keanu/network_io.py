@@ -9,7 +9,10 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.util.io.ProtobufSaver")
 java_import(k.jvm_view(), "io.improbable.keanu.util.io.DotSaver")
 java_import(k.jvm_view(), "io.improbable.keanu.util.io.JsonSaver")
+java_import(k.jvm_view(), "io.improbable.keanu.util.io.ProtobufLoader")
+java_import(k.jvm_view(), "io.improbable.keanu.util.io.JsonLoader")
 java_import(k.jvm_view(), "java.io.FileOutputStream")
+java_import(k.jvm_view(), "java.io.FileInputStream")
 
 
 def _save_network(saver, filename: str, save_values: bool = False, metadata: Optional[Dict[str, str]] = None):
@@ -45,3 +48,27 @@ class JsonSaver(JavaObjectWrapper):
 
     def save(self, filename: str, save_values: bool = False, metadata: Optional[Dict[str, str]] = None):
         _save_network(self, filename, save_values, metadata)
+
+
+def _load_network(loader, filename: str) -> BayesNet:
+    input_stream = k.jvm_view().FileInputStream(filename)
+    read_net = loader.unwrap().loadNetwork(input_stream)
+    return BayesNet(read_net.getAllVertices())
+
+
+class ProtobufLoader(JavaObjectWrapper):
+
+    def __init__(self):
+        super(ProtobufLoader, self).__init__(k.jvm_view().ProtobufLoader())
+
+    def load(self, filename: str) -> BayesNet:
+        return _load_network(self, filename)
+
+
+class JsonLoader(JavaObjectWrapper):
+
+    def __init__(self):
+        super(JsonLoader, self).__init__(k.jvm_view().JsonLoader())
+
+    def load(self, filename: str) -> BayesNet:
+        return _load_network(self, filename)
