@@ -9,6 +9,7 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.util.io.ProtobufSaver")
 java_import(k.jvm_view(), "java.io.FileOutputStream")
 
+
 class ProtobufSaver(JavaObjectWrapper):
 
     def __init__(self, net: BayesNet):
