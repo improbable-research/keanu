@@ -153,8 +153,8 @@ public class NUTSSampler implements SamplingAlgorithm {
     }
 
     private void recordSamplerStatistics() {
-        stepsize.recordStatistics(statistics);
-        tree.recordStatistics(statistics);
+        stepsize.save(statistics);
+        tree.save(statistics);
     }
 
     private static void initializeMomentumForEachVertex(List<Vertex<DoubleTensor>> vertices,

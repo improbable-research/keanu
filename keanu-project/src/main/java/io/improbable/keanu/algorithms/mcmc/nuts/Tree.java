@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.algorithms.Record;
+import io.improbable.keanu.algorithms.SaveStatistics;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -21,7 +21,7 @@ import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
  * <p>
  * The tree is reset for each sample.
  */
-public class Tree implements Record {
+public class Tree implements SaveStatistics {
 
     private static final double DELTA_MAX = 1000.0;
     private static final int STARTING_ACCEPTED_LEAPFROG = 1;
@@ -352,7 +352,7 @@ public class Tree implements Record {
         leapfrogBackward = leapfrogBackward.makeJumpTo(acceptedPosition, gradientAtAcceptedPosition);
     }
 
-    public void recordStatistics(Statistics statistics) {
+    public void save(Statistics statistics) {
         statistics.store(NUTS.Metrics.LOG_PROB, logOfMasterPAtAcceptedPosition);
         statistics.store(NUTS.Metrics.TREE_SIZE, treeSize);
     }

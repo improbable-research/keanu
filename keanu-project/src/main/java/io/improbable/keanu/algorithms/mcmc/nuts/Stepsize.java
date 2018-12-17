@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.algorithms.Record;
+import io.improbable.keanu.algorithms.SaveStatistics;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * Used by NUTS as an epsilon for the leap frog
  */
-class Stepsize implements Record {
+class Stepsize implements SaveStatistics {
 
     private static final double STABILISER = 10;
     private static final double SHRINKAGE_FACTOR = 0.05;
@@ -157,7 +157,7 @@ class Stepsize implements Record {
     }
 
     @Override
-    public void recordStatistics(Statistics statistics) {
+    public void save(Statistics statistics) {
         statistics.store(NUTS.Metrics.STEPSIZE, stepsize);
         statistics.store(NUTS.Metrics.MEAN_TREE_ACCEPT, averageAcceptanceProb);
     }
