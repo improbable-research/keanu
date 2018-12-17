@@ -33,7 +33,11 @@ public class PartialDerivatives {
         this.derivativeWithRespectTo.put(id, derivativeWithRespectTo);
     }
 
-    public PartialDerivatives(Map<VertexId, DoubleTensor> derivativeWithRespectTo) {
+    public PartialDerivatives() {
+        this.derivativeWithRespectTo = new HashMap<>();
+    }
+
+    private PartialDerivatives(Map<VertexId, DoubleTensor> derivativeWithRespectTo) {
         this.derivativeWithRespectTo = derivativeWithRespectTo;
         if (derivativeWithRespectTo.size() > 1) {
             throw new IllegalStateException();
@@ -52,23 +56,23 @@ public class PartialDerivatives {
         return derivativeWithRespectTo.isEmpty();
     }
 
-    public void putWithRespectTo(VertexId id, DoubleTensor value) {
-        derivativeWithRespectTo.put(id, value);
-        if (derivativeWithRespectTo.size() > 1) {
-            throw new IllegalStateException();
-        }
-    }
-
     public DoubleTensor getValue() {
+
         if (this.derivativeWithRespectTo.size() > 1) {
             throw new IllegalStateException();
         }
+
         VertexId valueId = getKey();
 
         return derivativeWithRespectTo.get(valueId);
     }
 
     public VertexId getKey() {
+
+        if (this.derivativeWithRespectTo.size() > 1) {
+            throw new IllegalStateException();
+        }
+
         if (derivativeWithRespectTo.isEmpty()) {
             return null;
         }

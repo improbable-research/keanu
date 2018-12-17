@@ -43,16 +43,14 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
     public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
 
-        Map<VertexId, DoubleTensor> partialsOf = new HashMap<>();
         DoubleTensor newValue = this.getValue();
 
         DoubleTensor atIndexTensor = takeFromPartial(derivativeOfParentWithRespectToInputs.getValue(), index);
         int desiredRank = atIndexTensor.getShape().length + newValue.getShape().length;
         long[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
         atIndexTensor = atIndexTensor.reshape(paddedShape);
-        partialsOf.put(derivativeOfParentWithRespectToInputs.getKey(), atIndexTensor);
 
-        return new PartialDerivatives(partialsOf);
+        return new PartialDerivatives(derivativeOfParentWithRespectToInputs.getKey(), atIndexTensor);
     }
 
     private DoubleTensor takeFromPartial(DoubleTensor from, long... indices) {
