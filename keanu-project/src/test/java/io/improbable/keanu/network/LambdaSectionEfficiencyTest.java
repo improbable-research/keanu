@@ -8,7 +8,6 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.Test;
 
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
