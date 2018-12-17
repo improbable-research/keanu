@@ -101,7 +101,7 @@ public class LambdaSection {
         result.add(vertex);
 
         while (!stack.isEmpty()) {
-            Vertex<?> visiting = stack.pop();
+            Vertex visiting = stack.pop();
 
             if (shouldAdd.test(visiting)) {
                 result.add(visiting);
