@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +29,8 @@ public class ArcCosVertex extends DoubleUnaryOpVertex implements Differentiable 
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
 
         DoubleTensor inputValue = inputVertex.getValue();
 
@@ -40,7 +40,7 @@ public class ArcCosVertex extends DoubleUnaryOpVertex implements Differentiable 
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
         DoubleTensor inputValue = inputVertex.getValue();
 
         //dArcCosdx = -1 / sqrt(1 - x^2)
@@ -49,7 +49,7 @@ public class ArcCosVertex extends DoubleUnaryOpVertex implements Differentiable 
             .reciprocalInPlace()
             .unaryMinusInPlace();
 
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
         partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
 
         return partials;

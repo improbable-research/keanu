@@ -25,8 +25,8 @@ public class TakeVertexTest {
         DoubleVertex N = m.multiply(alpha);
 
         TakeVertex take = new TakeVertex(N, 0, 0);
-        DoubleTensor takePartial = Differentiator.forwardModeAutoDiff(m, take).of(take).getValue();
-        DoubleTensor takePartialReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(m).getValue();
+        DoubleTensor takePartial = Differentiator.forwardModeAutoDiff(m, take).of(take).getPartial();
+        DoubleTensor takePartialReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(m).getPartial();
 
         assertEquals(N.getValue(0, 0), take.getValue().scalar(), 1e-6);
         assertArrayEquals(new long[]{1, 4}, takePartial.getShape());
@@ -35,8 +35,8 @@ public class TakeVertexTest {
         assertArrayEquals(takePartial.asFlatDoubleArray(), takePartialReverse.asFlatDoubleArray(), 1e-6);
 
         TakeVertex take2 = new TakeVertex(N, 0, 1);
-        DoubleTensor takePartial2 = Differentiator.forwardModeAutoDiff(m, take2).of(take2).getValue();
-        DoubleTensor takePartial2Reverse = Differentiator.reverseModeAutoDiff(take2, m, alpha).withRespectTo(m).getValue();
+        DoubleTensor takePartial2 = Differentiator.forwardModeAutoDiff(m, take2).of(take2).getPartial();
+        DoubleTensor takePartial2Reverse = Differentiator.reverseModeAutoDiff(take2, m, alpha).withRespectTo(m).getPartial();
 
         assertEquals(N.getValue(0, 1), take2.getValue().scalar(), 1e-6);
         assertArrayEquals(new long[]{1, 4}, takePartial2.getShape());
@@ -58,8 +58,8 @@ public class TakeVertexTest {
 
         TakeVertex take = new TakeVertex(N, 0, 0);
 
-        DoubleTensor takePartial = Differentiator.forwardModeAutoDiff(m, take).of(take).getValue();
-        DoubleTensor takePartialReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(m).getValue();
+        DoubleTensor takePartial = Differentiator.forwardModeAutoDiff(m, take).of(take).getPartial();
+        DoubleTensor takePartialReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(m).getPartial();
 
         assertArrayEquals(new long[]{2, 2}, takePartial.getShape());
         assertArrayEquals(new double[]{10, 20, 0, 0}, takePartial.asFlatDoubleArray(), 1e-6);
@@ -68,8 +68,8 @@ public class TakeVertexTest {
 
         TakeVertex take2 = new TakeVertex(N, 0, 1);
 
-        DoubleTensor takePartial2 = Differentiator.forwardModeAutoDiff(m, take2).of(take2).getValue();
-        DoubleTensor takePartial2Reverse = Differentiator.reverseModeAutoDiff(take2, m, alpha).withRespectTo(m).getValue();
+        DoubleTensor takePartial2 = Differentiator.forwardModeAutoDiff(m, take2).of(take2).getPartial();
+        DoubleTensor takePartial2Reverse = Differentiator.reverseModeAutoDiff(take2, m, alpha).withRespectTo(m).getPartial();
 
         assertArrayEquals(new long[]{2, 2}, takePartial2.getShape());
         assertArrayEquals(new double[]{15, 25, 0, 0}, takePartial2.asFlatDoubleArray(), 1e-6);
@@ -105,8 +105,8 @@ public class TakeVertexTest {
         DoubleVertex y = L.matrixMultiply(N);
 
         TakeVertex take = new TakeVertex(y, 0, 0);
-        DoubleTensor takeDiff = Differentiator.forwardModeAutoDiff(alpha, take).of(take).getValue();
-        DoubleTensor takeDiffReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(alpha).getValue();
+        DoubleTensor takeDiff = Differentiator.forwardModeAutoDiff(alpha, take).of(take).getPartial();
+        DoubleTensor takeDiffReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(alpha).getPartial();
 
         assertArrayEquals(new long[]{2, 2}, takeDiff.getShape());
         assertArrayEquals(new double[]{56, 92, 103, 174}, takeDiff.asFlatDoubleArray(), 1e-6);
@@ -131,8 +131,8 @@ public class TakeVertexTest {
 
         AdditionVertex F = D.plus(E);
 
-        DoubleTensor dFWrtAReverse = Differentiator.reverseModeAutoDiff(F, A, B).withRespectTo(A).getValue();
-        DoubleTensor dFWrtAForward = Differentiator.forwardModeAutoDiff(A, F).of(F).getValue();
+        DoubleTensor dFWrtAReverse = Differentiator.reverseModeAutoDiff(F, A, B).withRespectTo(A).getPartial();
+        DoubleTensor dFWrtAForward = Differentiator.forwardModeAutoDiff(A, F).of(F).getPartial();
 
         assertArrayEquals(new long[]{1, 4, 3, 3, 3}, dFWrtAForward.getShape());
         assertArrayEquals(dFWrtAForward.getShape(), dFWrtAReverse.getShape());

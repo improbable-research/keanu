@@ -7,36 +7,36 @@ import org.nd4j.linalg.api.shape.Shape;
 
 import java.util.Arrays;
 
-public class PartialDerivatives {
+public class PartialDerivative {
 
-    public static final PartialDerivatives OF_CONSTANT = new PartialDerivatives(null, null);
+    public static final PartialDerivative OF_CONSTANT = new PartialDerivative(null, null);
 
-    public static PartialDerivatives withRespectToSelf(VertexId withRespectTo, long[] shape) {
-        return new PartialDerivatives(
+    public static PartialDerivative withRespectToSelf(VertexId withRespectTo, long[] shape) {
+        return new PartialDerivative(
             withRespectTo,
             DoubleTensor.eye((int) TensorShape.getLength(shape)).reshape(TensorShape.concat(shape, shape))
         );
     }
 
     private final VertexId id;
-    private final DoubleTensor value;
+    private final DoubleTensor partial;
 
-    public PartialDerivatives(VertexId id, DoubleTensor derivativeWithRespectTo) {
+    public PartialDerivative(VertexId id, DoubleTensor partial) {
         this.id = id;
-        this.value = derivativeWithRespectTo;
+        this.partial = partial;
     }
 
-    public PartialDerivatives() {
+    public PartialDerivative() {
         this.id = null;
-        this.value = null;
+        this.partial = null;
     }
 
     public boolean isEmpty() {
-        return value == null;
+        return partial == null;
     }
 
-    public DoubleTensor getValue() {
-        return value;
+    public DoubleTensor getPartial() {
+        return partial;
     }
 
     public VertexId getKey() {
@@ -62,9 +62,9 @@ public class PartialDerivatives {
      * @param ofRank      the rank of the "of" part of the partials
      * @return summed and reshaped partials
      */
-    public PartialDerivatives sumOverOfDimensions(int[] dimensions, long[] resultShape, int ofRank) {
+    public PartialDerivative sumOverOfDimensions(int[] dimensions, long[] resultShape, int ofRank) {
 
-        DoubleTensor v = getValue();
+        DoubleTensor v = getPartial();
         long[] vShape = v.getShape();
         long[] wrtShape = TensorShape.selectDimensions(ofRank, vShape.length, vShape);
 
@@ -72,7 +72,7 @@ public class PartialDerivatives {
         long[] newShape = TensorShape.concat(resultShape, wrtShape);
         summedV = summedV.reshape(newShape);
 
-        return new PartialDerivatives(getKey(), summedV);
+        return new PartialDerivative(getKey(), summedV);
     }
 
     /**
@@ -84,13 +84,13 @@ public class PartialDerivatives {
      * @param wrtRank     the rank of the "wrt" part of the partials
      * @return summed and reshaped partials
      */
-    public PartialDerivatives sumOverWrtDimensions(int[] dimensions, long[] resultShape, int wrtRank) {
+    public PartialDerivative sumOverWrtDimensions(int[] dimensions, long[] resultShape, int wrtRank) {
 
         if (dimensions.length == 0) {
-            return new PartialDerivatives(getKey(), getValue());
+            return new PartialDerivative(getKey(), getPartial());
         }
 
-        DoubleTensor v = getValue();
+        DoubleTensor v = getPartial();
         long[] vShape = v.getShape();
         long[] ofShape = TensorShape.selectDimensions(0, v.getShape().length - wrtRank, vShape);
 
@@ -98,47 +98,47 @@ public class PartialDerivatives {
         long[] newShape = TensorShape.concat(ofShape, resultShape);
         summedV = summedV.reshape(newShape);
 
-        return new PartialDerivatives(getKey(), summedV);
+        return new PartialDerivative(getKey(), summedV);
     }
 
-    public PartialDerivatives add(PartialDerivatives toAdd) {
+    public PartialDerivative add(PartialDerivative toAdd) {
         return add(toAdd, false, false, null);
     }
 
-    public PartialDerivatives add(PartialDerivatives addition, boolean leftIsLengthOne, boolean rightIsLengthOne, long[] resultShape) {
+    public PartialDerivative add(PartialDerivative addition, boolean leftIsLengthOne, boolean rightIsLengthOne, long[] resultShape) {
 
-        DoubleTensor added = cloneWithCorrectShape(value, leftIsLengthOne, resultShape);
-        DoubleTensor toAdd = cloneWithCorrectShape(addition.getValue(), rightIsLengthOne, resultShape);
+        DoubleTensor added = cloneWithCorrectShape(partial, leftIsLengthOne, resultShape);
+        DoubleTensor toAdd = cloneWithCorrectShape(addition.getPartial(), rightIsLengthOne, resultShape);
 
         if (added == null && toAdd != null) {
-            return new PartialDerivatives(addition.getKey(), toAdd);
+            return new PartialDerivative(addition.getKey(), toAdd);
         } else if (added != null && toAdd == null) {
-            return new PartialDerivatives(getKey(), added);
+            return new PartialDerivative(getKey(), added);
         } else if (added != null && toAdd != null) {
-            return new PartialDerivatives(getKey(), added.plus(toAdd));
+            return new PartialDerivative(getKey(), added.plus(toAdd));
         } else {
-            return new PartialDerivatives();
+            return new PartialDerivative();
         }
 
     }
 
-    public PartialDerivatives subtract(PartialDerivatives subtraction) {
+    public PartialDerivative subtract(PartialDerivative subtraction) {
         return subtract(subtraction, false, false, null);
     }
 
-    public PartialDerivatives subtract(PartialDerivatives subtraction, boolean leftIsLengthOne, boolean rightIsLengthOne, long[] resultShape) {
+    public PartialDerivative subtract(PartialDerivative subtraction, boolean leftIsLengthOne, boolean rightIsLengthOne, long[] resultShape) {
 
-        DoubleTensor subtracted = cloneWithCorrectShape(value, leftIsLengthOne, resultShape);
-        DoubleTensor toSubtract = cloneWithCorrectShape(subtraction.getValue(), rightIsLengthOne, resultShape);
+        DoubleTensor subtracted = cloneWithCorrectShape(partial, leftIsLengthOne, resultShape);
+        DoubleTensor toSubtract = cloneWithCorrectShape(subtraction.getPartial(), rightIsLengthOne, resultShape);
 
         if (subtracted == null && toSubtract != null) {
-            return new PartialDerivatives(subtraction.getKey(), toSubtract.unaryMinus());
+            return new PartialDerivative(subtraction.getKey(), toSubtract.unaryMinus());
         } else if (subtracted != null && toSubtract == null) {
-            return new PartialDerivatives(getKey(), subtracted);
+            return new PartialDerivative(getKey(), subtracted);
         } else if (subtracted != null && toSubtract != null) {
-            return new PartialDerivatives(getKey(), subtracted.minus(toSubtract));
+            return new PartialDerivative(getKey(), subtracted.minus(toSubtract));
         } else {
-            return new PartialDerivatives();
+            return new PartialDerivative();
         }
 
     }
@@ -159,7 +159,7 @@ public class PartialDerivatives {
         return v;
     }
 
-    public PartialDerivatives multiplyAlongOfDimensions(DoubleTensor multiplier, long[] ofShape) {
+    public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier, long[] ofShape) {
 
         if (isEmpty()) {
             return clone();
@@ -168,15 +168,15 @@ public class PartialDerivatives {
         DoubleTensor result;
 
         if (multiplier.isScalar()) {
-            result = value.times(multiplier.scalar());
+            result = partial.times(multiplier.scalar());
         } else {
-            result = elementWiseMultiplyAlongOf(value, multiplier, ofShape);
+            result = elementWiseMultiplyAlongOf(partial, multiplier, ofShape);
         }
 
-        return new PartialDerivatives(id, result);
+        return new PartialDerivative(id, result);
     }
 
-    public PartialDerivatives multiplyAlongWrtDimensions(DoubleTensor multiplier, long[] wrtShape) {
+    public PartialDerivative multiplyAlongWrtDimensions(DoubleTensor multiplier, long[] wrtShape) {
 
         if (isEmpty()) {
             return clone();
@@ -184,12 +184,12 @@ public class PartialDerivatives {
 
         DoubleTensor result;
         if (multiplier.isScalar()) {
-            result = value.times(multiplier.scalar());
+            result = partial.times(multiplier.scalar());
         } else {
-            result = elementWiseMultiplyAlongWrt(value, multiplier, wrtShape);
+            result = elementWiseMultiplyAlongWrt(partial, multiplier, wrtShape);
         }
 
-        return new PartialDerivatives(id, result);
+        return new PartialDerivative(id, result);
     }
 
     private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier, long[] ofShape) {
@@ -233,94 +233,94 @@ public class PartialDerivatives {
         return partial.times(multiplierFromRight);
     }
 
-    public static PartialDerivatives matrixMultiplyAlongOfDimensions(PartialDerivatives partial, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
         if (partial.isEmpty()) {
             partial.clone();
         }
 
-        int partialRank = partial.getValue().getRank();
+        int partialRank = partial.getPartial().getRank();
 
         DoubleTensor result;
         if (partialIsLeft) {
             int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
             rearrange[0] = 0;
             rearrange[1] = partialRank - 1;
-            result = partial.getValue()
+            result = partial.getPartial()
                 .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
                 .permute(rearrange);
 
         } else {
             result = multiplier
-                .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0});
+                .tensorMultiply(partial.getPartial(), new int[]{1}, new int[]{0});
         }
 
-        return new PartialDerivatives(partial.getKey(), result);
+        return new PartialDerivative(partial.getKey(), result);
     }
 
-    public static PartialDerivatives matrixMultiplyAlongWrtDimensions(PartialDerivatives partial, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivative matrixMultiplyAlongWrtDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
         if (partial.isEmpty()) {
             return partial.clone();
         }
 
-        int partialRank = partial.getValue().getRank();
+        int partialRank = partial.getPartial().getRank();
 
         int wrtRightDimension = partialRank - 1;
         int wrtLeftDimension = partialRank - 2;
 
         DoubleTensor result;
         if (partialIsLeft) {
-            result = partial.getValue()
+            result = partial.getPartial()
                 .tensorMultiply(multiplier, new int[]{wrtRightDimension}, new int[]{1});
         } else {
             int[] transposeWrt = TensorShape.dimensionRange(0, partialRank);
             transposeWrt[wrtRightDimension] = wrtLeftDimension;
             transposeWrt[wrtLeftDimension] = wrtRightDimension;
 
-            result = partial.getValue()
+            result = partial.getPartial()
                 .tensorMultiply(multiplier, new int[]{wrtLeftDimension}, new int[]{0})
                 .permute(transposeWrt);
         }
 
-        return new PartialDerivatives(partial.getKey(), result);
+        return new PartialDerivative(partial.getKey(), result);
     }
 
-    public PartialDerivatives multiplyBy(double multiplier) {
+    public PartialDerivative multiplyBy(double multiplier) {
 
         if (isEmpty()) {
             return clone();
         }
 
-        return new PartialDerivatives(id, value.times(multiplier));
+        return new PartialDerivative(id, partial.times(multiplier));
     }
 
-    public PartialDerivatives divideBy(DoubleTensor divisor) {
+    public PartialDerivative divideBy(DoubleTensor divisor) {
 
         if (isEmpty()) {
             return clone();
         }
 
-        DoubleTensor partial = getValue();
+        DoubleTensor partial = getPartial();
         DoubleTensor result = partial.div(increaseRankByAppendingOnesToShape(divisor, partial.getRank()));
 
-        return new PartialDerivatives(id, result);
+        return new PartialDerivative(id, result);
     }
 
-    public PartialDerivatives clone() {
-        return new PartialDerivatives(id, value);
+    public PartialDerivative clone() {
+        return new PartialDerivative(id, partial);
     }
 
-    public PartialDerivatives reshape(int currentRank, long[] proposedShape) {
+    public PartialDerivative reshape(int currentRank, long[] proposedShape) {
 
         if (isEmpty()) {
             return clone();
         }
 
-        long[] wrtShape = extractWrtShape(value.getShape(), currentRank);
+        long[] wrtShape = extractWrtShape(partial.getShape(), currentRank);
         long[] newPartialShape = TensorShape.concat(proposedShape, wrtShape);
 
-        return new PartialDerivatives(id, value.reshape(newPartialShape));
+        return new PartialDerivative(id, partial.reshape(newPartialShape));
     }
 
     /**
@@ -336,21 +336,21 @@ public class PartialDerivatives {
      *                  of 3x3x3x3x3.
      * @return the sliced partials
      */
-    public PartialDerivatives slice(int dimension, long index, boolean reshape) {
+    public PartialDerivative slice(int dimension, long index, boolean reshape) {
 
         if (isEmpty()) {
             return clone();
         }
 
-        long[] partialDerivativeShape = Arrays.copyOf(value.getShape(), value.getShape().length);
+        long[] partialDerivativeShape = Arrays.copyOf(partial.getShape(), partial.getShape().length);
         partialDerivativeShape[dimension] = 1;
-        DoubleTensor slicedPartialDerivative = value.slice(dimension, index);
+        DoubleTensor slicedPartialDerivative = partial.slice(dimension, index);
 
         if (reshape) {
             slicedPartialDerivative = slicedPartialDerivative.reshape(partialDerivativeShape);
         }
 
-        return new PartialDerivatives(getKey(), slicedPartialDerivative);
+        return new PartialDerivative(getKey(), slicedPartialDerivative);
     }
 
     private long[] extractWrtShape(long[] partialDerivativeShape, int rankOfSource) {

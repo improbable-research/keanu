@@ -144,17 +144,17 @@ public class ProtobufTest {
         DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(
             (Vertex & Differentiable) inputVertex,
             outputVertex
-        ).of(outputVertex).getValue();
+        ).of(outputVertex).getPartial();
 
         DoubleTensor dOutputAfter = Differentiator.forwardModeAutoDiff(
             (Vertex & Differentiable) inputVertex2,
             outputVertex2
-        ).of(outputVertex2).getValue();
+        ).of(outputVertex2).getPartial();
 
         assertEquals(dOutputBefore, dOutputAfter);
 
-        dOutputBefore = Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex).getValue();
-        dOutputAfter = Differentiator.reverseModeAutoDiff(outputVertex2, inputVertex2).withRespectTo(inputVertex2).getValue();
+        dOutputBefore = Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex).getPartial();
+        dOutputAfter = Differentiator.reverseModeAutoDiff(outputVertex2, inputVertex2).withRespectTo(inputVertex2).getPartial();
 
         assertEquals(dOutputBefore, dOutputAfter);
     }

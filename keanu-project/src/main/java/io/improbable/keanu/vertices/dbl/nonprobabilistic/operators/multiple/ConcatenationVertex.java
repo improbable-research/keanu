@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -54,27 +54,27 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        List<PartialDerivatives> partialsOfInputs = new ArrayList<>();
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
+        List<PartialDerivative> partialsOfInputs = new ArrayList<>();
         List<DoubleTensor> inputValues = new ArrayList<>();
 
         for (DoubleVertex operand : operands) {
-            partialsOfInputs.add(derivativeOfParentsWithRespectToInputs.getOrDefault(operand, PartialDerivatives.OF_CONSTANT));
+            partialsOfInputs.add(derivativeOfParentsWithRespectToInputs.getOrDefault(operand, PartialDerivative.OF_CONSTANT));
             inputValues.add(operand.getValue());
         }
 
         return concat(partialsOfInputs, inputValues, dimension);
     }
 
-    public static PartialDerivatives concat(List<PartialDerivatives> derivativeOfOperandsWrtInputs,
-                                            List<DoubleTensor> operandValues,
-                                            int dimension) {
+    public static PartialDerivative concat(List<PartialDerivative> derivativeOfOperandsWrtInputs,
+                                           List<DoubleTensor> operandValues,
+                                           int dimension) {
 
         long[] partialWrtShape = null;
         VertexId wrtVertexId = null;
-        for (PartialDerivatives partial : derivativeOfOperandsWrtInputs) {
+        for (PartialDerivative partial : derivativeOfOperandsWrtInputs) {
             if (!partial.isEmpty()) {
-                partialWrtShape = partial.getValue().getShape();
+                partialWrtShape = partial.getPartial().getShape();
                 wrtVertexId = partial.getKey();
                 break;
             }
@@ -85,7 +85,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         return concatAll(wrtVertexId, partialsToConcat, dimension);
     }
 
-    private static List<DoubleTensor> getPartialsToConcatForInput(List<PartialDerivatives> derivativeOfOperandsWrtInputs,
+    private static List<DoubleTensor> getPartialsToConcatForInput(List<PartialDerivative> derivativeOfOperandsWrtInputs,
                                                                   List<DoubleTensor> operandValues,
                                                                   VertexId wrtVertexId,
                                                                   long[] partialWrtShape) {
@@ -93,11 +93,11 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         List<DoubleTensor> partialsToConcat = new ArrayList<>();
 
         for (int i = 0; i < operandValues.size(); i++) {
-            PartialDerivatives partialOfOperand = derivativeOfOperandsWrtInputs.get(i);
+            PartialDerivative partialOfOperand = derivativeOfOperandsWrtInputs.get(i);
             DoubleTensor operandValue = operandValues.get(i);
 
             if (partialOfOperand.isKey(wrtVertexId)) {
-                partialsToConcat.add(partialOfOperand.getValue());
+                partialsToConcat.add(partialOfOperand.getPartial());
             } else {
                 long[] wrtShape = Arrays.copyOfRange(partialWrtShape, operandValue.getRank(), partialWrtShape.length);
                 long[] resultShape = TensorShape.concat(operandValue.getShape(), wrtShape);
@@ -109,11 +109,11 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         return partialsToConcat;
     }
 
-    private static PartialDerivatives concatAll(VertexId id,
-                                                List<DoubleTensor> partialsToConcat,
-                                                int dimension) {
+    private static PartialDerivative concatAll(VertexId id,
+                                               List<DoubleTensor> partialsToConcat,
+                                               int dimension) {
 
-        return new PartialDerivatives(id, concatPartialDerivatives(dimension, partialsToConcat));
+        return new PartialDerivative(id, concatPartialDerivatives(dimension, partialsToConcat));
     }
 
     private static DoubleTensor concatPartialDerivatives(int dimension, List<DoubleTensor> partialDerivatives) {
@@ -126,8 +126,8 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> splitPartials = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> splitPartials = new HashMap<>();
 
         long currentSplitIndex = 0;
         long[] splitIndices = new long[operands.length];
@@ -135,19 +135,19 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         for (int i = 0; i < operands.length; i++) {
             splitIndices[i] = currentSplitIndex + operands[i].getShape()[dimension];
             currentSplitIndex = splitIndices[i];
-            splitPartials.put(operands[i], new PartialDerivatives());
+            splitPartials.put(operands[i], new PartialDerivative());
         }
 
         int operandsRank = operands[0].getShape().length;
         int wrtStartsAt = -operandsRank;
         int wrtSplitOn = wrtStartsAt + dimension;
 
-        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getValue();
+        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getPartial();
 
         List<DoubleTensor> splitPartial = partial.split(wrtSplitOn, splitIndices);
 
         for (int i = 0; i < splitPartial.size(); i++) {
-            splitPartials.put(operands[i], new PartialDerivatives(derivativeOfOutputsWithRespectToSelf.getKey(), splitPartial.get(i)));
+            splitPartials.put(operands[i], new PartialDerivative(derivativeOfOutputsWithRespectToSelf.getKey(), splitPartial.get(i)));
         }
 
         return splitPartials;

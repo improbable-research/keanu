@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.CPTCondition;
 
 import java.util.HashMap;
@@ -48,29 +48,29 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable, Non
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
         final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
         DoubleVertex vertex = conditions.get(condition);
         return vertex == null ? derivativeOfParentsWithRespectToInputs.get(defaultResult) : derivativeOfParentsWithRespectToInputs.get(vertex);
     }
 
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
         final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
         DoubleVertex conditionVertex = conditions.get(condition);
 
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
         for (Vertex v : conditions.values()) {
             if (v == conditionVertex) {
                 partials.put(v, derivativeOfOutputsWithRespectToSelf);
             } else {
-                partials.put(v, PartialDerivatives.OF_CONSTANT);
+                partials.put(v, PartialDerivative.OF_CONSTANT);
             }
         }
 
         if (conditionVertex == null) {
             partials.put(defaultResult, derivativeOfOutputsWithRespectToSelf);
         } else {
-            partials.put(defaultResult, PartialDerivatives.OF_CONSTANT);
+            partials.put(defaultResult, PartialDerivative.OF_CONSTANT);
         }
 
         return partials;

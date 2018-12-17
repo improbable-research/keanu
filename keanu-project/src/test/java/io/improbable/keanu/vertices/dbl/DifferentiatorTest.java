@@ -30,8 +30,8 @@ public class DifferentiatorTest {
         GaussianVertex B = new GaussianVertex(0, 1);
         MultiplicationVertex C = A.times(B);
 
-        DoubleTensor dCdA = Differentiator.forwardModeAutoDiff(A, C).of(C).getValue();
-        DoubleTensor dCdB = Differentiator.forwardModeAutoDiff(B, C).of(C).getValue();
+        DoubleTensor dCdA = Differentiator.forwardModeAutoDiff(A, C).of(C).getPartial();
+        DoubleTensor dCdB = Differentiator.forwardModeAutoDiff(B, C).of(C).getPartial();
 
         assertEquals(A.getValue(), dCdB);
         assertEquals(B.getValue(), dCdA);
@@ -46,8 +46,8 @@ public class DifferentiatorTest {
 
         PartialsOf dC = Differentiator.reverseModeAutoDiff(C, ImmutableSet.of(A, B));
 
-        DoubleTensor dCdA = dC.withRespectTo(A).getValue();
-        DoubleTensor dCdB = dC.withRespectTo(B).getValue();
+        DoubleTensor dCdA = dC.withRespectTo(A).getPartial();
+        DoubleTensor dCdB = dC.withRespectTo(B).getPartial();
 
         assertEquals(A.getValue().scalar(), dCdB.scalar(), 1e-5);
         assertEquals(B.getValue().scalar(), dCdA.scalar(), 1e-5);
@@ -67,8 +67,8 @@ public class DifferentiatorTest {
 
         PartialsOf dY = Differentiator.reverseModeAutoDiff(Y, ImmutableSet.of(A, B));
 
-        DoubleTensor dYdA = dY.withRespectTo(A).getValue();
-        DoubleTensor dYdB = dY.withRespectTo(B).getValue();
+        DoubleTensor dYdA = dY.withRespectTo(A).getPartial();
+        DoubleTensor dYdB = dY.withRespectTo(B).getPartial();
 
         assertEquals(A.getValue().reciprocal().scalar(), dYdA.scalar(), 1e-5);
         assertEquals(B.getValue().reciprocal().scalar(), dYdB.scalar(), 1e-5);
@@ -91,11 +91,11 @@ public class DifferentiatorTest {
 
         PartialsOf dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
 
-        DoubleTensor dHdAReverse = dHReverse.withRespectTo(A).getValue();
-        DoubleTensor dHdBReverse = dHReverse.withRespectTo(B).getValue();
+        DoubleTensor dHdAReverse = dHReverse.withRespectTo(A).getPartial();
+        DoubleTensor dHdBReverse = dHReverse.withRespectTo(B).getPartial();
 
-        DoubleTensor dHdAForward = Differentiator.forwardModeAutoDiff(A, H).of(H).getValue();
-        DoubleTensor dHdBForward = Differentiator.forwardModeAutoDiff(B, H).of(H).getValue();
+        DoubleTensor dHdAForward = Differentiator.forwardModeAutoDiff(A, H).of(H).getPartial();
+        DoubleTensor dHdBForward = Differentiator.forwardModeAutoDiff(B, H).of(H).getPartial();
 
         assertEquals(dHdAReverse, dHdAForward);
         assertEquals(dHdBReverse, dHdBForward);
@@ -141,8 +141,8 @@ public class DifferentiatorTest {
 
         PartialsOf dH = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
 
-        DoubleTensor dHdA = dH.withRespectTo(A).getValue();
-        DoubleTensor dHdB = dH.withRespectTo(B).getValue();
+        DoubleTensor dHdA = dH.withRespectTo(A).getPartial();
+        DoubleTensor dHdB = dH.withRespectTo(B).getPartial();
 
         DoubleTensor predicateTrueMask = predicate.getValue().toDoubleMask();
         DoubleTensor predicateFalseMask = predicate.getValue().not().toDoubleMask();

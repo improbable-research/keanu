@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,18 +33,18 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dxWrtInputs, PartialDerivatives dyWrtInputs) {
+    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dxWrtInputs, PartialDerivative dyWrtInputs) {
         DoubleTensor yValue = right.getValue();
         DoubleTensor xValue = left.getValue();
 
         DoubleTensor denominator = yValue.pow(2).plusInPlace(xValue.pow(2));
 
-        PartialDerivatives diffFromX = dxWrtInputs.multiplyAlongOfDimensions(
+        PartialDerivative diffFromX = dxWrtInputs.multiplyAlongOfDimensions(
             yValue.div(denominator).unaryMinusInPlace(),
             xValue.getShape()
         );
 
-        PartialDerivatives diffFromY = dyWrtInputs.multiplyAlongOfDimensions(
+        PartialDerivative diffFromY = dyWrtInputs.multiplyAlongOfDimensions(
             xValue.div(denominator),
             yValue.getShape()
         );
@@ -53,8 +53,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor xValue = left.getValue();
         DoubleTensor yValue = right.getValue();
 

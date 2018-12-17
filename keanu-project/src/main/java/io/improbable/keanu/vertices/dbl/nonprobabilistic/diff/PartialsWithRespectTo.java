@@ -12,9 +12,9 @@ public class PartialsWithRespectTo {
     @Getter
     private final Vertex wrt;
 
-    private final Map<Vertex, PartialDerivatives> partials;
+    private final Map<Vertex, PartialDerivative> partials;
 
-    public PartialDerivatives of(Vertex vertex) {
+    public PartialDerivative of(Vertex vertex) {
         return partials.get(vertex);
     }
 }

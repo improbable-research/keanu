@@ -30,7 +30,7 @@ public class AutoDiffTensorTest {
 
         MultiplicationVertex output = prod2.plus(5).times(2);
 
-        DoubleTensor wrtA = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).getValue();
+        DoubleTensor wrtA = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).getPartial();
 
         DoubleTensor expectedWrt = DoubleTensor.create(new double[]{4, 16, 36, 64})
             .diag()
@@ -54,7 +54,7 @@ public class AutoDiffTensorTest {
 
         MultiplicationVertex output = prod2.plus(5).times(2);
 
-        DoubleTensor wrtA = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).getValue();
+        DoubleTensor wrtA = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).getPartial();
 
         DoubleTensor expectedWrt = DoubleTensor.create(4, 16, 36, 64);
 
@@ -70,7 +70,7 @@ public class AutoDiffTensorTest {
 
         SumVertex B = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
 
-        DoubleTensor wrtA = Differentiator.reverseModeAutoDiff(B, A).withRespectTo(A).getValue();
+        DoubleTensor wrtA = Differentiator.reverseModeAutoDiff(B, A).withRespectTo(A).getPartial();
 
         //B = 1*(a00 + a01 + a10 + a11) + 2*(a00 + a01 + a10 + a11)+ 3*(a00 + a01 + a10 + a11)+ 4*(a00 + a01 + a10 + a11)
         //dBda00 = 1 + 2 + 3 + 4 = 10

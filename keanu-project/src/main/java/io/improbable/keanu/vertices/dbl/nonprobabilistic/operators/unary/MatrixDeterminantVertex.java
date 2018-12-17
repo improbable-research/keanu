@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
@@ -36,15 +36,15 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
         DoubleTensor inverseTranspose = inputVertex.getValue().transpose().matrixInverse();
 
-        PartialDerivatives derivativeOfOutputsWithRespectToInputs = derivativeOfOutputsWithRespectToSelf
+        PartialDerivative derivativeOfOutputsWithRespectToInputs = derivativeOfOutputsWithRespectToSelf
             .multiplyBy(inputVertex.getValue().determinant())
             .multiplyAlongWrtDimensions(inverseTranspose, this.getShape());
 

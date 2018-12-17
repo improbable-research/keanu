@@ -1,22 +1,22 @@
 package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
 
 public interface Differentiable {
 
-    default PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+    default PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
         if (((Vertex) this).isObserved()) {
-            return PartialDerivatives.OF_CONSTANT;
+            return PartialDerivative.OF_CONSTANT;
         } else {
-            return PartialDerivatives.withRespectToSelf(((Vertex) this).getId(), ((Vertex) this).getShape());
+            return PartialDerivative.withRespectToSelf(((Vertex) this).getId(), ((Vertex) this).getShape());
         }
     }
 
-    default Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    default Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
         return Collections.emptyMap();
     }
 }

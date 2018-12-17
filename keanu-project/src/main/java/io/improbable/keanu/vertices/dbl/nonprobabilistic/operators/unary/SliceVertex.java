@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,20 +43,20 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
         VertexId k = derivativeOfOutputsWithRespectToSelf.getKey();
-        DoubleTensor v = derivativeOfOutputsWithRespectToSelf.getValue();
+        DoubleTensor v = derivativeOfOutputsWithRespectToSelf.getPartial();
         DoubleTensor padded = padSliceWithZerosToMatchOriginalShape(v);
-        partials.put(inputVertex, new PartialDerivatives(k, padded));
+        partials.put(inputVertex, new PartialDerivative(k, padded));
 
         return partials;
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
         boolean needReshape = this.getValue().getRank() == inputVertex.getValue().getRank();
         return derivativeOfParentWithRespectToInputs.slice(dimension, index, needReshape);
     }

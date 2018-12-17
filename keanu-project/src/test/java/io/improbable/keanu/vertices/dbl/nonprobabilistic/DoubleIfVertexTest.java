@@ -36,16 +36,16 @@ public class DoubleIfVertexTest {
         DoubleVertex d = b.matrixMultiply(a);
 
         PartialsOf dC = Differentiator.reverseModeAutoDiff(c, a, b);
-        DoubleTensor dCda = dC.withRespectTo(a).getValue();
-        DoubleTensor dCdb = dC.withRespectTo(b).getValue();
+        DoubleTensor dCda = dC.withRespectTo(a).getPartial();
+        DoubleTensor dCdb = dC.withRespectTo(b).getPartial();
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
         PartialsOf dIfVertex = Differentiator.reverseModeAutoDiff(ifVertex, a, b);
-        DoubleTensor dIfdA = dIfVertex.withRespectTo(a).getValue();
-        DoubleTensor dIfdB = dIfVertex.withRespectTo(b).getValue();
+        DoubleTensor dIfdA = dIfVertex.withRespectTo(a).getPartial();
+        DoubleTensor dIfdB = dIfVertex.withRespectTo(b).getPartial();
 
         Assert.assertArrayEquals(dCda.asFlatDoubleArray(), dIfdA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(dCdb.asFlatDoubleArray(), dIfdB.asFlatDoubleArray(), 1e-6);
@@ -68,19 +68,19 @@ public class DoubleIfVertexTest {
         DoubleVertex d = b.div(a);
 
         PartialsOf dC = Differentiator.reverseModeAutoDiff(c, a, b);
-        DoubleTensor dCda = dC.withRespectTo(a).getValue();
-        DoubleTensor dCdb = dC.withRespectTo(b).getValue();
+        DoubleTensor dCda = dC.withRespectTo(a).getPartial();
+        DoubleTensor dCdb = dC.withRespectTo(b).getPartial();
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
 
-        DoubleTensor dIfdAForward = Differentiator.forwardModeAutoDiff(a, ifVertex).of(ifVertex).getValue();
-        DoubleTensor dIfdBForward = Differentiator.forwardModeAutoDiff(b, ifVertex).of(ifVertex).getValue();
+        DoubleTensor dIfdAForward = Differentiator.forwardModeAutoDiff(a, ifVertex).of(ifVertex).getPartial();
+        DoubleTensor dIfdBForward = Differentiator.forwardModeAutoDiff(b, ifVertex).of(ifVertex).getPartial();
 
-        DoubleTensor dIfdAReverse = Differentiator.reverseModeAutoDiff(ifVertex, a).withRespectTo(a).getValue();
-        DoubleTensor dIfdBReverse = Differentiator.reverseModeAutoDiff(ifVertex, b).withRespectTo(b).getValue();
+        DoubleTensor dIfdAReverse = Differentiator.reverseModeAutoDiff(ifVertex, a).withRespectTo(a).getPartial();
+        DoubleTensor dIfdBReverse = Differentiator.reverseModeAutoDiff(ifVertex, b).withRespectTo(b).getPartial();
 
         Assert.assertArrayEquals(dCda.getShape(), dIfdAForward.getShape());
         Assert.assertArrayEquals(dCdb.getShape(), dIfdBForward.getShape());
@@ -103,16 +103,16 @@ public class DoubleIfVertexTest {
         MatrixMultiplicationVertex d = b.matrixMultiply(a);
 
         PartialsOf dD = Differentiator.reverseModeAutoDiff(d, a, b);
-        DoubleTensor dDda = dD.withRespectTo(a).getValue();
-        DoubleTensor dDdb = dD.withRespectTo(b).getValue();
+        DoubleTensor dDda = dD.withRespectTo(a).getPartial();
+        DoubleTensor dDdb = dD.withRespectTo(b).getPartial();
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
         PartialsOf dIfVertex = Differentiator.reverseModeAutoDiff(ifVertex, a, b);
-        DoubleTensor dIfdA = dIfVertex.withRespectTo(a).getValue();
-        DoubleTensor dIfdB = dIfVertex.withRespectTo(b).getValue();
+        DoubleTensor dIfdA = dIfVertex.withRespectTo(a).getPartial();
+        DoubleTensor dIfdB = dIfVertex.withRespectTo(b).getPartial();
 
         Assert.assertArrayEquals(dDda.asFlatDoubleArray(), dIfdA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(dDdb.asFlatDoubleArray(), dIfdB.asFlatDoubleArray(), 1e-6);
@@ -134,14 +134,14 @@ public class DoubleIfVertexTest {
         MatrixMultiplicationVertex c = a.matrixMultiply(b);
         MatrixMultiplicationVertex d = b.matrixMultiply(a);
 
-        DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a).getValue();
-        DoubleTensor dDda = Differentiator.reverseModeAutoDiff(d, a).withRespectTo(a).getValue();
+        DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a).getPartial();
+        DoubleTensor dDda = Differentiator.reverseModeAutoDiff(d, a).withRespectTo(a).getPartial();
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
-        DoubleTensor dIfdA = Differentiator.reverseModeAutoDiff(ifVertex, a).withRespectTo(a).getValue();
+        DoubleTensor dIfdA = Differentiator.reverseModeAutoDiff(ifVertex, a).withRespectTo(a).getPartial();
 
         Assert.assertArrayEquals(new double[]{
             5, 7,
@@ -178,16 +178,16 @@ public class DoubleIfVertexTest {
 
         MatrixMultiplicationVertex f = d.matrixMultiply(e);
 
-        DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a).getValue();
-        DoubleTensor dFdd = Differentiator.reverseModeAutoDiff(f, d).withRespectTo(d).getValue();
+        DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a).getPartial();
+        DoubleTensor dFdd = Differentiator.reverseModeAutoDiff(f, d).withRespectTo(d).getPartial();
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(f);
 
         PartialsOf dIfVertex = Differentiator.reverseModeAutoDiff(ifVertex, a, d);
-        DoubleTensor dIfdA = dIfVertex.withRespectTo(a).getValue();
-        DoubleTensor dIfdD = dIfVertex.withRespectTo(d).getValue();
+        DoubleTensor dIfdA = dIfVertex.withRespectTo(a).getPartial();
+        DoubleTensor dIfdD = dIfVertex.withRespectTo(d).getPartial();
 
         Assert.assertArrayEquals(new double[]{
             5, 7,
@@ -235,16 +235,16 @@ public class DoubleIfVertexTest {
 
         AdditionVertex f = d.plus(e);
 
-        DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a).getValue();
-        DoubleTensor dFdd = Differentiator.reverseModeAutoDiff(f, d).withRespectTo(d).getValue();
+        DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a).getPartial();
+        DoubleTensor dFdd = Differentiator.reverseModeAutoDiff(f, d).withRespectTo(d).getPartial();
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(f);
 
         PartialsOf dIfVertex = Differentiator.reverseModeAutoDiff(ifVertex, a, d);
-        DoubleTensor dIfdA = dIfVertex.withRespectTo(a).getValue();
-        DoubleTensor dIfdD = dIfVertex.withRespectTo(d).getValue();
+        DoubleTensor dIfdA = dIfVertex.withRespectTo(a).getPartial();
+        DoubleTensor dIfdD = dIfVertex.withRespectTo(d).getPartial();
 
         Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
         Assert.assertArrayEquals(dFdd.getShape(), dIfdD.getShape());

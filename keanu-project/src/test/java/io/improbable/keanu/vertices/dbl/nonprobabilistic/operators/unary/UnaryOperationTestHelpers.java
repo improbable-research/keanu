@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 import java.util.function.Function;
@@ -35,14 +35,14 @@ public class UnaryOperationTestHelpers {
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
         T output = op.apply(A);
 
-        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output).getValue();
+        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output).getPartial();
         assertEquals(
             expectedGradientWrtA,
             wrtAForward.scalar(),
             1e-5
         );
 
-        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).getValue();
+        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).getPartial();
         assertEquals(
             expectedGradientWrtA,
             wrtAReverse.scalar(),
@@ -77,12 +77,12 @@ public class UnaryOperationTestHelpers {
 
         T output = op.apply(A);
 
-        PartialDerivatives result = Differentiator.forwardModeAutoDiff(A, output).of(output);
-        DoubleTensor wrtAForward = result.getValue();
+        PartialDerivative result = Differentiator.forwardModeAutoDiff(A, output).of(output);
+        DoubleTensor wrtAForward = result.getPartial();
         assertArrayEquals(expectedGradientWrtA, wrtAForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedShape, wrtAForward.getShape());
 
-        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).getValue();
+        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).getPartial();
         assertArrayEquals(expectedGradientWrtA, wrtAReverse.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedShape, wrtAReverse.getShape());
     }

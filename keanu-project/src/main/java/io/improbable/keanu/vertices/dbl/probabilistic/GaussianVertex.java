@@ -13,7 +13,7 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -129,11 +129,11 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
         if (isObserved()) {
-            return PartialDerivatives.OF_CONSTANT;
+            return PartialDerivative.OF_CONSTANT;
         } else {
-            return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
+            return PartialDerivative.withRespectToSelf(this.getId(), this.getShape());
         }
     }
 }

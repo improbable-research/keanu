@@ -6,7 +6,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,20 +34,20 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
+    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInputs, PartialDerivative dRightWrtInputs) {
 
         // dc = A * db + da * B;
-        PartialDerivatives partialsFromLeft;
-        PartialDerivatives partialsFromRight;
+        PartialDerivative partialsFromLeft;
+        PartialDerivative partialsFromRight;
 
         if (dLeftWrtInputs.isEmpty()) {
-            partialsFromLeft = PartialDerivatives.OF_CONSTANT;
+            partialsFromLeft = PartialDerivative.OF_CONSTANT;
         } else {
             partialsFromLeft = dLeftWrtInputs.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
         }
 
         if (dRightWrtInputs.isEmpty()) {
-            partialsFromRight = PartialDerivatives.OF_CONSTANT;
+            partialsFromRight = PartialDerivative.OF_CONSTANT;
         } else {
             partialsFromRight = dRightWrtInputs.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
         }
@@ -56,11 +56,11 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
-        PartialDerivatives dOutputsWrtLeft = derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(right.getValue(), this.getShape());
-        PartialDerivatives dOutputsWrtRight = derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(left.getValue(), this.getShape());
+        PartialDerivative dOutputsWrtLeft = derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(right.getValue(), this.getShape());
+        PartialDerivative dOutputsWrtRight = derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(left.getValue(), this.getShape());
 
         partials.put(left, dOutputsWrtLeft);
         partials.put(right, dOutputsWrtRight);

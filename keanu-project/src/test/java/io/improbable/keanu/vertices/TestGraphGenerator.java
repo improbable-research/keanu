@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import lombok.extern.slf4j.Slf4j;
@@ -51,14 +51,14 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-            PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+        public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
+            PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
             autoDiffCount.incrementAndGet();
             return derivativeOfParentWithRespectToInputs;
         }
 
         @Override
-        public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
             autoDiffCount.incrementAndGet();
             return Collections.singletonMap(inputVertex, derivativeOfOutputsWithRespectToSelf);
         }
@@ -98,15 +98,15 @@ public class TestGraphGenerator {
         }
 
         @Override
-        protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
+        protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative l, PartialDerivative r) {
             autoDiffCount.incrementAndGet();
             return l.add(r);
         }
 
         @Override
-        public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
             autoDiffCount.incrementAndGet();
-            Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+            Map<Vertex, PartialDerivative> partials = new HashMap<>();
             partials.put(left, derivativeOfOutputsWithRespectToSelf);
             partials.put(right, derivativeOfOutputsWithRespectToSelf);
             return partials;

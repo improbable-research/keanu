@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,13 +26,13 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
 
     private final List<? extends Vertex<DoubleTensor>> inputs;
     private final BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction;
-    private final Supplier<PartialDerivatives> forwardModeAutoDiffLambda;
-    private final Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda;
+    private final Supplier<PartialDerivative> forwardModeAutoDiffLambda;
+    private final Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda;
 
     public ReduceVertex(long[] shape, Collection<? extends Vertex<DoubleTensor>> inputs,
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
-                        Supplier<PartialDerivatives> forwardModeAutoDiffLambda,
-                        Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
+                        Supplier<PartialDerivative> forwardModeAutoDiffLambda,
+                        Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         super(shape);
         if (inputs.size() < 2) {
             throw new IllegalArgumentException("ReduceVertex should have at least two input vertices, called with " + inputs.size());
@@ -46,8 +46,8 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
     }
 
     public ReduceVertex(long[] shape, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
-                        Supplier<PartialDerivatives> forwardModeAutoDiffLambda,
-                        Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda,
+                        Supplier<PartialDerivative> forwardModeAutoDiffLambda,
+                        Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda,
                         Vertex<DoubleTensor>... input) {
         this(shape, Arrays.asList(input), reduceFunction, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
@@ -66,8 +66,8 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
      * @param input                     input vertices to reduce
      */
     public ReduceVertex(BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
-                        Supplier<PartialDerivatives> forwardModeAutoDiffLambda,
-                        Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda,
+                        Supplier<PartialDerivative> forwardModeAutoDiffLambda,
+                        Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda,
                         Vertex<DoubleTensor>... input) {
         this(checkAllShapesMatch(Arrays.stream(input).map(Vertex::getShape).collect(Collectors.toList())),
             Arrays.asList(input), reduceFunction, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
@@ -108,7 +108,7 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
         if (forwardModeAutoDiffLambda != null) {
             return forwardModeAutoDiffLambda.get();
         }
@@ -117,7 +117,7 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
         return reverseModeAutoDiffLambda.apply(derivativeOfOutputsWithRespectToSelf);
     }
 }

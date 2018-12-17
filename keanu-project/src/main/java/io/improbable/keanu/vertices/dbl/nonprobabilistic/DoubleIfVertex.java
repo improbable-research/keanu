@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,11 +58,11 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
 
         long[] ofShape = getShape();
-        PartialDerivatives thnPartial = derivativeOfParentsWithRespectToInputs.getOrDefault(thn, PartialDerivatives.OF_CONSTANT);
-        PartialDerivatives elsPartial = derivativeOfParentsWithRespectToInputs.getOrDefault(els, PartialDerivatives.OF_CONSTANT);
+        PartialDerivative thnPartial = derivativeOfParentsWithRespectToInputs.getOrDefault(thn, PartialDerivative.OF_CONSTANT);
+        PartialDerivative elsPartial = derivativeOfParentsWithRespectToInputs.getOrDefault(els, PartialDerivative.OF_CONSTANT);
         BooleanTensor predicateValue = predicate.getValue();
 
         if (predicateValue.allTrue()) {
@@ -85,8 +85,8 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
         partials.put(thn, derivativeOfOutputsWithRespectToSelf
             .multiplyAlongWrtDimensions(predicateValue.toDoubleMask(), this.getShape()));

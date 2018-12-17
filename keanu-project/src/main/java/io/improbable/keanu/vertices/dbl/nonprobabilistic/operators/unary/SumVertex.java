@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
@@ -59,40 +59,40 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
         DoubleTensor sumResult = this.getValue();
         int operandRank = inputVertex.getValue().getRank();
         return derivativeOfParentWithRespectToInputs.sumOverOfDimensions(overDimensions, sumResult.getShape(), operandRank);
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
 
         long[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
 
-        PartialDerivatives partialDueToSummationShapeChange = getPartialDueToSummationShapeChange(derivativeOfOutputsWithRespectToSelf);
+        PartialDerivative partialDueToSummationShapeChange = getPartialDueToSummationShapeChange(derivativeOfOutputsWithRespectToSelf);
 
-        PartialDerivatives derivativesWrtInput = partialDueToSummationShapeChange
+        PartialDerivative derivativesWrtInput = partialDueToSummationShapeChange
             .multiplyAlongWrtDimensions(DoubleTensor.ones(inputVertex.getShape()), wrtShapeWithoutRankLoss);
 
         return singletonMap(inputVertex, derivativesWrtInput);
     }
 
-    private PartialDerivatives getPartialDueToSummationShapeChange(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    private PartialDerivative getPartialDueToSummationShapeChange(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
 
         long[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
 
-        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getValue();
+        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getPartial();
 
         long[] newPartialShape = TensorShape.concat(
             TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
             wrtShapeWithoutRankLoss
         );
 
-        DoubleTensor reshapedPartialDerivative = derivativeOfOutputsWithRespectToSelf.getValue().reshape(newPartialShape);
+        DoubleTensor reshapedPartialDerivative = derivativeOfOutputsWithRespectToSelf.getPartial().reshape(newPartialShape);
 
-        return new PartialDerivatives(derivativeOfOutputsWithRespectToSelf.getKey(), reshapedPartialDerivative);
+        return new PartialDerivative(derivativeOfOutputsWithRespectToSelf.getKey(), reshapedPartialDerivative);
     }
 
     private static long[] summedOverShapeWithoutRankLoss(long[] shape, int[] sumOverDimensions) {

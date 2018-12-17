@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsWithRespectTo;
 
@@ -21,7 +21,7 @@ import static java.util.Collections.singletonMap;
 
 public class Differentiator {
 
-    public static PartialsOf reverseModeAutoDiff(Vertex<?> ofVertex, PartialDerivatives dWrtOfVertex, long[] dOfShape, Set<? extends Vertex<?>> wrt) {
+    public static PartialsOf reverseModeAutoDiff(Vertex<?> ofVertex, PartialDerivative dWrtOfVertex, long[] dOfShape, Set<? extends Vertex<?>> wrt) {
 
         ensureGraphValuesAndShapesAreSet(ofVertex);
 
@@ -31,10 +31,10 @@ public class Differentiator {
         HashSet<Vertex> alreadyQueued = new HashSet<>();
         alreadyQueued.add(ofVertex);
 
-        Map<Vertex, PartialDerivatives> dwrtOf = new HashMap<>();
+        Map<Vertex, PartialDerivative> dwrtOf = new HashMap<>();
         collectPartials(singletonMap(ofVertex, dWrtOfVertex), dwrtOf, dOfShape);
 
-        Map<VertexId, PartialDerivatives> wrtOf = new HashMap<>();
+        Map<VertexId, PartialDerivative> wrtOf = new HashMap<>();
 
         Vertex<?> visiting;
         while ((visiting = priorityQueue.poll()) != null) {
@@ -48,7 +48,7 @@ public class Differentiator {
 
                 if (visiting instanceof Differentiable) {
                     Differentiable visitingDifferentiable = ((Differentiable) visiting);
-                    Map<Vertex, PartialDerivatives> partialDerivatives = visitingDifferentiable.reverseModeAutoDifferentiation(dwrtOf.get(visiting));
+                    Map<Vertex, PartialDerivative> partialDerivatives = visitingDifferentiable.reverseModeAutoDifferentiation(dwrtOf.get(visiting));
                     collectPartials(partialDerivatives, dwrtOf, visiting.getShape());
                 }
 
@@ -68,17 +68,17 @@ public class Differentiator {
         vertex.getValue();
     }
 
-    private static void collectPartials(Map<Vertex, PartialDerivatives> partialDerivatives,
-                                        Map<Vertex, PartialDerivatives> dwrtOf,
+    private static void collectPartials(Map<Vertex, PartialDerivative> partialDerivatives,
+                                        Map<Vertex, PartialDerivative> dwrtOf,
                                         long[] visitingShape) {
 
-        for (Map.Entry<Vertex, PartialDerivatives> v : partialDerivatives.entrySet()) {
+        for (Map.Entry<Vertex, PartialDerivative> v : partialDerivatives.entrySet()) {
 
             Vertex wrtVertex = v.getKey();
-            PartialDerivatives partialsOf = v.getValue();
+            PartialDerivative partialsOf = v.getValue();
             long[] wrtShape = wrtVertex.getShape();
 
-            PartialDerivatives dwrtV;
+            PartialDerivative dwrtV;
             if (TensorShape.isLengthOne(wrtShape)) {
                 int visitingRank = visitingShape.length;
                 dwrtV = partialsOf.sumOverWrtDimensions(TensorShape.dimensionRange(-visitingRank, 0), wrtShape, visitingRank);
@@ -98,7 +98,7 @@ public class Differentiator {
         if (ofVertex.isObserved()) {
             return new PartialsOf(ofVertex, Collections.emptyMap());
         } else {
-            return reverseModeAutoDiff(ofVertex, PartialDerivatives.withRespectToSelf(ofVertex.getId(), ofVertex.getShape()), ofVertex.getShape(), wrt);
+            return reverseModeAutoDiff(ofVertex, PartialDerivative.withRespectToSelf(ofVertex.getId(), ofVertex.getShape()), ofVertex.getShape(), wrt);
         }
     }
 
@@ -118,13 +118,13 @@ public class Differentiator {
         HashSet<Vertex> alreadyQueued = new HashSet<>();
         alreadyQueued.add(wrt);
 
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        Map<Vertex, PartialDerivatives> ofWrt = new HashMap<>();
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+        Map<Vertex, PartialDerivative> ofWrt = new HashMap<>();
 
         while (!priorityQueue.isEmpty()) {
             V visiting = priorityQueue.poll();
 
-            PartialDerivatives partialOfVisiting = visiting.forwardModeAutoDifferentiation(partials);
+            PartialDerivative partialOfVisiting = visiting.forwardModeAutoDifferentiation(partials);
             partials.put(visiting, partialOfVisiting);
 
             if (of.contains(visiting)) {

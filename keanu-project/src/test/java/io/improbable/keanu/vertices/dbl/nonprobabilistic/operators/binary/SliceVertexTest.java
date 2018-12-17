@@ -93,11 +93,11 @@ public class SliceVertexTest {
 
         SliceVertex sliceN = new SliceVertex(N, dim, ind);
 
-        DoubleTensor dSliceNWrtmForward = Differentiator.forwardModeAutoDiff(m, sliceN).of(sliceN).getValue();
+        DoubleTensor dSliceNWrtmForward = Differentiator.forwardModeAutoDiff(m, sliceN).of(sliceN).getPartial();
 
-        DoubleTensor dSliceNWrtmReverse = Differentiator.reverseModeAutoDiff(sliceN, ImmutableSet.of(m, alpha)).withRespectTo(m).getValue();
+        DoubleTensor dSliceNWrtmReverse = Differentiator.reverseModeAutoDiff(sliceN, ImmutableSet.of(m, alpha)).withRespectTo(m).getPartial();
 
-        DoubleTensor originalPartial = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m).getValue();
+        DoubleTensor originalPartial = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m).getPartial();
 
         Assert.assertArrayEquals(sliceN.getValue().asFlatDoubleArray(), expectedValue, 1e-6);
         Assert.assertArrayEquals(expectedShape, sliceN.getShape());
@@ -121,8 +121,8 @@ public class SliceVertexTest {
 
         SliceVertex sliceN = new SliceVertex(N, 1, 1);
 
-        DoubleTensor originalPartial = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m).getValue();
-        DoubleTensor slicePartial = Differentiator.reverseModeAutoDiff(sliceN, m).withRespectTo(m).getValue();
+        DoubleTensor originalPartial = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m).getPartial();
+        DoubleTensor slicePartial = Differentiator.reverseModeAutoDiff(sliceN, m).withRespectTo(m).getPartial();
 
         Assert.assertArrayEquals(sliceN.getValue().asFlatDoubleArray(), new double[]{65, 145}, 1e-6);
         Assert.assertArrayEquals(new long[]{2}, sliceN.getShape());
