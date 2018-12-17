@@ -3,8 +3,6 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
