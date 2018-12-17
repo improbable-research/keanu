@@ -90,18 +90,18 @@ public class LambdaSection {
      * @param shouldAdd    true when a give vertex should be included in the result false otherwise
      * @return A Set of vertices that are in the direction implied by nextVertices and filtered by shouldAdd
      */
-    private static Set<Vertex> getVerticesDepthFirst(Vertex vertex,
-                                                     Function<Vertex, Collection<Vertex>> nextVertices,
-                                                     Predicate<Vertex> shouldAdd) {
+    public static Set<Vertex> getVerticesDepthFirst(Vertex vertex,
+                                                    Function<Vertex, Collection<Vertex>> nextVertices,
+                                                    Predicate<Vertex> shouldAdd) {
 
-        Set<Vertex> visited = new HashSet<>();
-        Deque<Vertex> stack = new ArrayDeque<>(nextVertices.apply(vertex));
+        Collection<Vertex> initialNext = nextVertices.apply(vertex);
+        Set<Vertex> queued = new HashSet<>(initialNext);
+        Deque<Vertex> stack = new ArrayDeque<>(initialNext);
         Set<Vertex> result = new HashSet<>();
         result.add(vertex);
 
         while (!stack.isEmpty()) {
             Vertex<?> visiting = stack.pop();
-            visited.add(visiting);
 
             if (shouldAdd.test(visiting)) {
                 result.add(visiting);
@@ -112,8 +112,9 @@ public class LambdaSection {
             }
 
             for (Vertex next : nextVertices.apply(visiting)) {
-                if (!visited.contains(next)) {
+                if (!queued.contains(next)) {
                     stack.add(next);
+                    queued.add(next);
                 }
             }
         }
