@@ -135,7 +135,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         for (int i = 0; i < operands.length; i++) {
             splitIndices[i] = currentSplitIndex + operands[i].getShape()[dimension];
             currentSplitIndex = splitIndices[i];
-            splitPartials.put(operands[i], new PartialDerivative());
+            splitPartials.put(operands[i], PartialDerivative.OF_CONSTANT);
         }
 
         int operandsRank = operands[0].getShape().length;

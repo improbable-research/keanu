@@ -26,7 +26,7 @@ public class PartialDerivative {
         this.partial = partial;
     }
 
-    public PartialDerivative() {
+    private PartialDerivative() {
         this.id = null;
         this.partial = null;
     }
