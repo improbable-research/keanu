@@ -995,14 +995,14 @@ public class Nd4jDoubleTensorTest {
         assertThat(DoubleTensor.create(2, 4, 3, 5).reshape(1, 2, 2), valuesAndShapesMatch(DoubleTensor.stack(-1, x, y)));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void cannotStackIfPositiveDimensionIsOutOfBounds() {
         DoubleTensor x = DoubleTensor.create(2, 3).reshape(1, 2);
         DoubleTensor y = DoubleTensor.create(4, 5).reshape(1, 2);
         DoubleTensor.stack(3, x, y);
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void cannotStackIfNegativeDimensionIsOutOfBounds() {
         DoubleTensor x = DoubleTensor.create(2, 3).reshape(1, 2);
         DoubleTensor y = DoubleTensor.create(4, 5).reshape(1, 2);
