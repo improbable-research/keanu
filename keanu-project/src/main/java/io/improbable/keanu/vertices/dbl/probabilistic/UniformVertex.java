@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -36,7 +37,9 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
      * @param xMin        the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
      * @param xMax        the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
-    public UniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
+    public UniformVertex(@LoadShape long[] tensorShape,
+                         @LoadVertexParam(X_MIN_NAME) DoubleVertex xMin,
+                         @LoadVertexParam(X_MAX_NAME) DoubleVertex xMax) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, xMin.getShape(), xMax.getShape());
 
@@ -53,8 +56,7 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
      * @param xMax the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public UniformVertex(@LoadVertexParam(X_MIN_NAME) DoubleVertex xMin,
-                         @LoadVertexParam(X_MAX_NAME) DoubleVertex xMax) {
+    public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }
 

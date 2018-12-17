@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -31,7 +32,9 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
      * @param mu         the mu of the Multivariate Gaussian
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
-    public MultivariateGaussianVertex(long[] shape, DoubleVertex mu, DoubleVertex covariance) {
+    public MultivariateGaussianVertex(@LoadShape long[] shape,
+                                      @LoadVertexParam(MU_NAME) DoubleVertex mu,
+                                      @LoadVertexParam(COVARIANCE_NAME) DoubleVertex covariance) {
         super(shape);
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
@@ -47,8 +50,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     @ExportVertexToPythonBindings
-    public MultivariateGaussianVertex(@LoadVertexParam(MU_NAME) DoubleVertex mu,
-                                      @LoadVertexParam(COVARIANCE_NAME) DoubleVertex covariance) {
+    public MultivariateGaussianVertex(DoubleVertex mu, DoubleVertex covariance) {
         this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
 

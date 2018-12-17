@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
@@ -8,6 +9,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
@@ -16,6 +18,9 @@ import static org.junit.Assert.assertEquals;
 public class MatrixInverseVertexTest {
 
     private static final int NUM_ITERATIONS = 10;
+
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsNonSquareInput() {

@@ -1,0 +1,34 @@
+{
+    "network": {
+        "vertices": [{
+            "id": {
+                "id": "[1]"
+            },
+            "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
+            "parameters": [{
+                "name": "constant",
+                "doubleTensorParam": {
+                    "shape": ["2"],
+                    "values": [3.0, 4.0]
+                }
+            }]
+        }, {
+            "id": {
+                "id": "[2]"
+            },
+            "label": "GaussianVertex",
+            "vertexType": "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex",
+            "parameters": [{
+                "name": "mu",
+                "parentVertex": {
+                    "id": "[0]"
+                }
+            }, {
+                "name": "sigma",
+                "parentVertex": {
+                    "id": "[1]"
+                }
+            }]
+        }]
+    }
+}

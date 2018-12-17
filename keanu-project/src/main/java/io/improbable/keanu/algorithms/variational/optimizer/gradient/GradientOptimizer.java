@@ -1,13 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.Vertex;
-import lombok.Builder;
-import lombok.Getter;
-import org.apache.commons.math3.exception.NotStrictlyPositiveException;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -18,16 +16,20 @@ import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjuga
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsDoubleTensors;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
-@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class GradientOptimizer implements Optimizer {
 
     private static final double FLAT_GRADIENT = 1e-16;
+
+    public static GradientOptimizerBuilder builder() {
+        return new GradientOptimizerBuilder();
+    }
 
     public enum UpdateFormula {
         POLAK_RIBIERE(NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE),
@@ -39,81 +41,34 @@ public class GradientOptimizer implements Optimizer {
             this.apacheMapping = apacheMapping;
         }
     }
-    /**
-     * Creates a {@link GradientOptimizer} which provides methods for optimizing the values of latent variables
-     * of the Bayesian network to maximise probability.
-     *
-     * @param bayesNet The Bayesian network to run optimization on.
-     * @return a {@link GradientOptimizer}
-     */
-    public static GradientOptimizer of(BayesianNetwork bayesNet) {
-        List<Vertex> discreteLatentVertices = bayesNet.getDiscreteLatentVertices();
-        boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
 
-        if (containsDiscreteLatents) {
-            throw new UnsupportedOperationException("Gradient Optimization unsupported on Networks containing " +
-                "Discrete Latents (" + discreteLatentVertices.size() + " found)");
-        }
 
-        return GradientOptimizer.builder()
-            .bayesianNetwork(bayesNet)
-            .build();
-    }
-
-    /**
-     * Creates a Bayesian network from the given vertices and uses this to
-     * create a {@link GradientOptimizer}. This provides methods for optimizing the values of latent variables
-     * of the Bayesian network to maximise probability.
-     *
-     * @param vertices The vertices to create a Bayesian network from.
-     * @return a {@link GradientOptimizer}
-     */
-    public static GradientOptimizer of(Collection<? extends Vertex> vertices) {
-        return of(new BayesianNetwork(vertices));
-    }
-
-    /**
-     * Creates a Bayesian network from the graph connected to the given vertex and uses this to
-     * create a {@link GradientOptimizer}. This provides methods for optimizing the values of latent variables
-     * of the Bayesian network to maximise probability.
-     *
-     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
-     * @return a {@link GradientOptimizer}
-     */
-    public static GradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
-        return of(vertexFromNetwork.getConnectedGraph());
-    }
-
-    @Getter
-    private BayesianNetwork bayesianNetwork;
+    private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
 
     /**
      * maxEvaluations the maximum number of objective function evaluations before throwing an exception
      * indicating convergence failure.
      */
-    @Builder.Default
-    private int maxEvaluations = Integer.MAX_VALUE;
+    private int maxEvaluations;
 
-    @Builder.Default
-    private double relativeThreshold = 1e-8;
+    private double relativeThreshold;
 
-    @Builder.Default
-    private double absoluteThreshold = 1e-8;
+    private double absoluteThreshold;
 
     /**
      * Specifies what formula to use to update the Beta parameter of the Nonlinear conjugate gradient method optimizer.
      */
-    @Builder.Default
-    private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
+    private UpdateFormula updateFormula;
 
     private final List<BiConsumer<double[], double[]>> onGradientCalculations = new ArrayList<>();
     private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
 
     /**
      * Adds a callback to be called whenever the optimizer evaluates the gradient at a point.
+     *
      * @param gradientCalculationHandler a function to be called whenever the optimizer evaluates the gradient at a point.
-     *                                  The double[] argument to the handler represents the point being evaluated.
-     *                                  The double[] argument to the handler represents the gradient of that point.
+     *                                   The double[] argument to the handler represents the point being evaluated.
+     *                                   The double[] argument to the handler represents the gradient of that point.
      */
     public void addGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
         this.onGradientCalculations.add(gradientCalculationHandler);
@@ -151,43 +106,53 @@ public class GradientOptimizer implements Optimizer {
         }
     }
 
+    private void assertHasLatents() {
+        if (probabilisticWithGradientGraph.getLatentVariables().isEmpty()) {
+            throw new IllegalArgumentException("Cannot find MAP of network without any latent variables");
+        }
+    }
+
     @Override
     public double maxAPosteriori() {
-        if (bayesianNetwork.getLatentOrObservedVertices().isEmpty()) {
-            throw new IllegalArgumentException("Cannot find MAP of network without any probabilistic vertices");
-        }
-        return optimize(bayesianNetwork.getLatentOrObservedVertices());
-    }
-
-    @Override
-    public double maxLikelihood() {
-        if (bayesianNetwork.getObservedVertices().isEmpty()) {
-            throw new IllegalArgumentException("Cannot find max likelihood of network without any observations");
-        }
-        return optimize(bayesianNetwork.getObservedVertices());
-    }
-
-    private double optimize(List<Vertex> outputVertices) {
-
-        ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
-
-        bayesianNetwork.cascadeObservations();
+        assertHasLatents();
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
-            outputVertices,
-            bayesianNetwork.getContinuousLatentVertices(),
+            probabilisticWithGradientGraph,
+            false,
             this::handleGradientCalculation,
             this::handleFitnessCalculation
         );
 
+        return optimize(fitnessFunction);
+    }
+
+    @Override
+    public double maxLikelihood() {
+        assertHasLatents();
+
+        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
+            probabilisticWithGradientGraph,
+            true,
+            this::handleGradientCalculation,
+            this::handleFitnessCalculation
+        );
+
+        return optimize(fitnessFunction);
+    }
+
+    private double optimize(FitnessFunctionWithGradient fitnessFunction) {
+
+        ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
+
         ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
 
-        double[] startingPoint = Optimizer.currentPoint(bayesianNetwork.getContinuousLatentVertices());
+        double[] startingPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticWithGradientGraph.getLatentVariables()));
+
         double initialFitness = fitness.getObjectiveFunction().value(startingPoint);
         double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
 
-        if (FitnessFunction.isValidInitialFitness(initialFitness)) {
+        if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
@@ -195,15 +160,10 @@ public class GradientOptimizer implements Optimizer {
 
         NonLinearConjugateGradientOptimizer optimizer;
 
-        try {
-            optimizer = new NonLinearConjugateGradientOptimizer(
-                updateFormula.apacheMapping,
-                new SimpleValueChecker(relativeThreshold, absoluteThreshold)
-            );
-        } catch (NotStrictlyPositiveException e) {
-            translateNSPExceptionToIllegalArgException(e);
-            throw e;
-        }
+        optimizer = new NonLinearConjugateGradientOptimizer(
+            updateFormula.apacheMapping,
+            new SimpleValueChecker(relativeThreshold, absoluteThreshold)
+        );
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
@@ -224,12 +184,57 @@ public class GradientOptimizer implements Optimizer {
         }
     }
 
-    private static void translateNSPExceptionToIllegalArgException(NotStrictlyPositiveException e) {
-        long bitwiseMinValue = Double.doubleToLongBits(e.getMin().doubleValue());
-        long bitwiseArgumentValue = Double.doubleToLongBits(e.getArgument().doubleValue());
+    public static class GradientOptimizerBuilder {
 
-        throw new IllegalArgumentException("Hit a NSP Error.  Min: "
-            + Long.toHexString(bitwiseMinValue)
-            + " Arg: " + Long.toHexString(bitwiseArgumentValue), e);
+        private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+        private int maxEvaluations = Integer.MAX_VALUE;
+        private double relativeThreshold = 1e-8;
+        private double absoluteThreshold = 1e-8;
+        private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
+
+        GradientOptimizerBuilder() {
+        }
+
+        public GradientOptimizerBuilder bayesianNetwork(ProbabilisticWithGradientGraph probabilisticWithGradientGraph) {
+            this.probabilisticWithGradientGraph = probabilisticWithGradientGraph;
+            return this;
+        }
+
+        public GradientOptimizerBuilder maxEvaluations(int maxEvaluations) {
+            this.maxEvaluations = maxEvaluations;
+            return this;
+        }
+
+        public GradientOptimizerBuilder relativeThreshold(double relativeThreshold) {
+            this.relativeThreshold = relativeThreshold;
+            return this;
+        }
+
+        public GradientOptimizerBuilder absoluteThreshold(double absoluteThreshold) {
+            this.absoluteThreshold = absoluteThreshold;
+            return this;
+        }
+
+        public GradientOptimizerBuilder updateFormula(UpdateFormula updateFormula) {
+            this.updateFormula = updateFormula;
+            return this;
+        }
+
+        public GradientOptimizer build() {
+            if (probabilisticWithGradientGraph == null) {
+                throw new IllegalStateException("Cannot build optimizer without specifying network to optimize.");
+            }
+            return new GradientOptimizer(
+                probabilisticWithGradientGraph,
+                maxEvaluations,
+                relativeThreshold,
+                absoluteThreshold,
+                updateFormula
+            );
+        }
+
+        public String toString() {
+            return "GradientOptimizer.GradientOptimizerBuilder(probabilisticWithGradientGraph=" + this.probabilisticWithGradientGraph + ", maxEvaluations=" + this.maxEvaluations + ", relativeThreshold=" + this.relativeThreshold + ", absoluteThreshold=" + this.absoluteThreshold + ", updateFormula=" + this.updateFormula + ")";
+        }
     }
 }

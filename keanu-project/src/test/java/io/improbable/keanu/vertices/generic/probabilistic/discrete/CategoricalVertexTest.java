@@ -81,7 +81,7 @@ public class CategoricalVertexTest {
         long[] proposalShape = new long[]{3, 5, 6};
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Proposed shape " + Arrays.toString(proposalShape) + " does not match other non length one shapes");
+        thrown.expectMessage("Proposed shape [3, 5, 6] does not match other non length one shapes [2, 2]");
 
         new CategoricalVertex<>(proposalShape, selectableValues);
     }

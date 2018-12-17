@@ -35,7 +35,7 @@ public class VertexLabel {
     public Optional<String> getOuterNamespace() {
         try {
             return Optional.of(namespace.get(namespace.size() - 1));
-        } catch(IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             return Optional.empty();
         }
     }

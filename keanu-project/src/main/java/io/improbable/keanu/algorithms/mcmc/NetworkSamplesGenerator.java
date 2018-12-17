@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.VertexId;
 
@@ -110,7 +110,7 @@ public class NetworkSamplesGenerator {
      * @return A stream of samples starting after dropping. Down-sampling is handled outside of the stream (i.e. the
      * stream will be the final result after dropping and down-sampling)
      */
-    public Stream<NetworkState> stream() {
+    public Stream<NetworkSample> stream() {
 
         ProgressBar progressBar = progressBarSupplier.get();
 
@@ -126,7 +126,7 @@ public class NetworkSamplesGenerator {
                 algorithm.step();
             }
 
-            NetworkState sample = algorithm.sample();
+            NetworkSample sample = algorithm.sample();
             progressBar.progress(String.format("Sample #%,d completed", sampleNumber.get()));
             return sample;
 

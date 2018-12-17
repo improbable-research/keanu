@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
@@ -38,8 +39,8 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
         this.setLabel(label);
     }
 
-    public DoubleProxyVertex(@LoadVertexParam(LABEL_PARAM_NAME) String label) {
-        this(new VertexLabel(label));
+    public DoubleProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_PARAM_NAME) String label) {
+        this(shape, new VertexLabel(label));
     }
 
     @Override
