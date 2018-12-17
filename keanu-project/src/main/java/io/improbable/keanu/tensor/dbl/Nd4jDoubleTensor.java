@@ -985,7 +985,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
             INDArray indArray = unsafeGetNd4J(value);
             mask = tensor.dup();
-            mask = INDArrayShim.lessThanOrEqual(mask, indArray);
+            mask = INDArrayShim.getLessThanOrEqualToMask(mask, indArray, BUFFER_TYPE);
         }
 
         return fromMask(mask, copyOf(mask.shape(), mask.shape().length));
@@ -1035,7 +1035,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else {
             INDArray indArray = unsafeGetNd4J(value);
             mask = tensor.dup();
-            mask = INDArrayShim.greaterThanOrEqual(mask, indArray);
+            mask = INDArrayShim.getGreaterThanOrEqualToMask(mask, indArray, BUFFER_TYPE);
         }
 
         return fromMask(mask, copyOf(mask.shape(), mask.shape().length));
