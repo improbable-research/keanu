@@ -164,6 +164,18 @@ public class INDArrayShim {
 
     }
 
+    public static INDArray lt(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, INDArray::lt);
+    }
+
+    public static INDArray gt(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, INDArray::gt);
+    }
+
+    public static INDArray eq(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, INDArray::eq);
+    }
+
     private static INDArray performOperationWithScalarTensorPreservingShape(INDArray left, INDArray right, BiFunction<INDArray, INDArray, INDArray> operation) {
         if (left.length() == 1 || right.length() == 1) {
             long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
@@ -176,34 +188,6 @@ public class INDArrayShim {
             return result.reshape(resultShape);
         }
         return operation.apply(left, right);
-    }
-
-    public static INDArray lt(INDArray left, INDArray right) {
-        if (left.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
-            INDArray result;
-            if (left.length() == 1) {
-                result = Nd4j.valueArrayOf(right.shape(), left.getDouble(0)).lt(right);
-            } else {
-                result = left.lt(right.getDouble(0));
-            }
-            return result.reshape(resultShape);
-        }
-        return left.lt(right);
-    }
-
-    public static INDArray gt(INDArray left, INDArray right) {
-        if (left.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
-            INDArray result;
-            if (left.length() == 1) {
-                result = Nd4j.valueArrayOf(right.shape(), left.getDouble(0)).gt(right);
-            } else {
-                result = left.gt(right.getDouble(0));
-            }
-            return result.reshape(resultShape);
-        }
-        return left.gt(right);
     }
 
     public static INDArray lessThanOrEqual(INDArray left, INDArray right) {
@@ -236,20 +220,6 @@ public class INDArrayShim {
         }
         Nd4j.getExecutioner().exec(new OldGreaterThanOrEqual(left, right, left, left.length()));
         return left;
-    }
-
-    public static INDArray eq(INDArray left, INDArray right) {
-        if (left.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
-            INDArray result;
-            if (left.length() == 1) {
-                result = Nd4j.valueArrayOf(right.shape(), left.getDouble(0)).eq(right);
-            } else {
-                result = left.eq(right.getDouble(0));
-            }
-            return result.reshape(resultShape);
-        }
-        return left.eq(right);
     }
 
     public static INDArray getGreaterThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
