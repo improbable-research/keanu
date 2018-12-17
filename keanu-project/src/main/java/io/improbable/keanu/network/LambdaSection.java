@@ -54,7 +54,7 @@ public class LambdaSection {
 
         Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
-        Set<Vertex> upstreamVertices = getVerticesDepthFirst(
+        Set<Vertex> upstreamVertices = getVertices(
             aVertex,
             Vertex::getParents,
             shouldAdd
@@ -74,7 +74,7 @@ public class LambdaSection {
 
         Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
-        Set<Vertex> downstreamVertices = getVerticesDepthFirst(
+        Set<Vertex> downstreamVertices = getVertices(
             aVertex,
             Vertex::getChildren,
             shouldAdd
@@ -87,12 +87,12 @@ public class LambdaSection {
      * @param vertex       Vertex to start propagation from
      * @param nextVertices The next vertices to move to given a current vertex. E.g getChildren for downstream or
      *                     getParents for upstream.
-     * @param shouldAdd    true when a give vertex should be included in the result false otherwise
+     * @param shouldAdd    true when a given vertex should be included in the result, false otherwise
      * @return A Set of vertices that are in the direction implied by nextVertices and filtered by shouldAdd
      */
-    public static Set<Vertex> getVerticesDepthFirst(Vertex vertex,
-                                                    Function<Vertex, Collection<Vertex>> nextVertices,
-                                                    Predicate<Vertex> shouldAdd) {
+    public static Set<Vertex> getVertices(Vertex vertex,
+                                          Function<Vertex, Collection<Vertex>> nextVertices,
+                                          Predicate<Vertex> shouldAdd) {
 
         Collection<Vertex> initialNext = nextVertices.apply(vertex);
         Set<Vertex> queued = new HashSet<>(initialNext);

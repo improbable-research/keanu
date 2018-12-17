@@ -8,6 +8,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.Test;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,11 +26,11 @@ public class LambdaSectionEfficiencyTest {
         MutableInt callsToNext = new MutableInt(0);
         MutableInt callsToPredicate = new MutableInt(0);
 
-        Set<Vertex> verticesDepthFirst = LambdaSection.getVerticesDepthFirst(A, (v) -> {
-            callsToNext.getAndIncrement();
+        Set<Vertex> verticesDepthFirst = LambdaSection.getVertices(A, (v) -> {
+            callsToNext.increment();
             return v.getChildren();
         }, (v) -> {
-            callsToPredicate.getAndIncrement();
+            callsToPredicate.increment();
             return true;
         });
 
