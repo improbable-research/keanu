@@ -13,7 +13,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Collections.singletonMap;
