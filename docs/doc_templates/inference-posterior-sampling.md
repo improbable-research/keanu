@@ -56,6 +56,8 @@ So how can we use Metropolis Hastings to sample from a distribution in Keanu?
 
 #### Example
 
+##### Java
+
 We define two normally distributed variables, A and B, that are centered around 20.0 with a sigma of 1.0.
 This is an expression of our prior belief that A and B both have values around 20.0.
 
@@ -106,6 +108,13 @@ which will tell us their 'most likely value'.
 
 As we can see, our prior belief and observations have combined and we've gained insight through sampling.
 
+##### Python
+
+We can perform the same steps in Python.
+```python
+{% snippet PythonMetropolisExample %}
+```
+
 ### Hamiltonian Monte Carlo
 
 #### Algorithm
@@ -152,8 +161,16 @@ The parameters are:
 * The vertices in the network to return samples for (latent vertices)
 * The number of samples to take
 
+##### Java
+
 ```java
 {% snippet InfHamiltonian %}
+```
+
+##### Python
+
+```python
+{% snippet PythonHamiltonianExample %}
 ```
 
 ### NUTS
@@ -166,9 +183,21 @@ a U-turn and re-exploring locations.
 Hence why it's called the 'No-U-Turn Sampler'. 
 It also attempts to calculate and auto-tune those difficult leapfrog and step size parameters we encountered in HMC.
 
+#### Example
+
+##### Java
+
 ```java
 {% snippet InfNuts %}
 ```
+
+##### Python
+
+```python
+{% snippet PythonNUTSExample %}
+```
+
+#### Parameters
 
 Let's explain the auto-tuning and target acceptance probability parameters a bit further.
 
