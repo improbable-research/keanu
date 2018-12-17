@@ -4,6 +4,7 @@ import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.BaseTransformOp;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
@@ -161,7 +162,6 @@ public class INDArrayShim {
 
     public static INDArray atan2(INDArray left, INDArray right) {
         return performOperationWithScalarTensorPreservingShape(left, right, Transforms::atan2);
-
     }
 
     public static INDArray lt(INDArray left, INDArray right) {
@@ -188,6 +188,36 @@ public class INDArrayShim {
             return result.reshape(resultShape);
         }
         return operation.apply(left, right);
+    }
+
+    @FunctionalInterface
+    interface QuadFunction<First, Second, Third, Fourth, Result> {
+        Result apply(First one, Second two, Third three, Fourth four);
+    }
+
+    public static INDArray executeNd4jTransformOpWithPreservedScalarTensorShape(INDArray mask, INDArray right, DataBuffer.Type bufferType, QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> baseTransformOpConstructor) {
+        if (mask.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
+            if (mask.length() == 1) {
+                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
+                Nd4j.getExecutioner().exec(
+                    baseTransformOpConstructor.apply(mask, right, mask, mask.length())
+                );
+            } else {
+                Nd4j.getExecutioner().exec(
+                    baseTransformOpConstructor.apply(mask,
+                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
+                        mask,
+                        mask.length()
+                    )
+                );
+            }
+            return mask.reshape(resultShape);
+        }
+        Nd4j.getExecutioner().exec(
+            baseTransformOpConstructor.apply(mask, right, mask, mask.length())
+        );
+        return mask;
     }
 
     public static INDArray lessThanOrEqual(INDArray left, INDArray right) {
@@ -223,103 +253,23 @@ public class INDArrayShim {
     }
 
     public static INDArray getGreaterThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        if (mask.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
-            if (mask.length() == 1) {
-                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
-                Nd4j.getExecutioner().exec(
-                    new OldGreaterThan(mask, right, mask, mask.length())
-                );
-            } else {
-                Nd4j.getExecutioner().exec(
-                    new OldGreaterThan(mask,
-                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
-                        mask,
-                        mask.length()
-                    )
-                );
-            }
-            return mask.reshape(resultShape);
-        }
-        Nd4j.getExecutioner().exec(
-            new OldGreaterThan(mask, right, mask, mask.length())
-        );
-        return mask;
+        QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> oldGreaterThanConstructor = OldGreaterThan::new;
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, oldGreaterThanConstructor);
     }
 
     public static INDArray getGreaterThanOrEqualToMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        if (mask.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
-            if (mask.length() == 1) {
-                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
-                Nd4j.getExecutioner().exec(
-                    new OldGreaterThanOrEqual(mask, right, mask, mask.length())
-                );
-            } else {
-                Nd4j.getExecutioner().exec(
-                    new OldGreaterThanOrEqual(mask,
-                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
-                        mask,
-                        mask.length()
-                    )
-                );
-            }
-            return mask.reshape(resultShape);
-        }
-        Nd4j.getExecutioner().exec(
-            new OldGreaterThanOrEqual(mask, right, mask, mask.length())
-        );
-        return mask;
+        QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> oldGreaterThanOrEqualConstructor = OldGreaterThanOrEqual::new;
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, oldGreaterThanOrEqualConstructor);
     }
 
     public static INDArray getLessThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        if (mask.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
-            if (mask.length() == 1) {
-                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
-                Nd4j.getExecutioner().exec(
-                    new OldLessThan(mask, right, mask, mask.length())
-                );
-            } else {
-                Nd4j.getExecutioner().exec(
-                    new OldLessThan(mask,
-                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
-                        mask,
-                        mask.length()
-                    )
-                );
-            }
-            return mask.reshape(resultShape);
-        }
-        Nd4j.getExecutioner().exec(
-            new OldLessThan(mask, right, mask, mask.length())
-        );
-        return mask;
+        QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> oldLessThanConstructor = OldLessThan::new;
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, oldLessThanConstructor);
     }
 
     public static INDArray getLessThanOrEqualToMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        if (mask.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
-            if (mask.length() == 1) {
-                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
-                Nd4j.getExecutioner().exec(
-                    new OldLessThanOrEqual(mask, right, mask, mask.length())
-                );
-            } else {
-                Nd4j.getExecutioner().exec(
-                    new OldLessThanOrEqual(mask,
-                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
-                        mask,
-                        mask.length()
-                    )
-                );
-            }
-            return mask.reshape(resultShape);
-        }
-        Nd4j.getExecutioner().exec(
-            new OldLessThanOrEqual(mask, right, mask, mask.length())
-        );
-        return mask;
+        QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> oldLessThanOrEqualConstructor = OldLessThanOrEqual::new;
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, oldLessThanOrEqualConstructor);
     }
 
     private static boolean shapeAIsSmallerThanShapeB(long[] shapeA, long[] shapeB) {
