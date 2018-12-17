@@ -131,6 +131,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             random
         ) : initialStepSize;
 
+        resetVertexValue(sampleFromVertices, position);
+
         NUTSSampler.AutoTune autoTune = new NUTSSampler.AutoTune(
             stepSize,
             targetAcceptanceProb,
@@ -190,6 +192,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static <T> void putValue(Vertex<T> vertex, Map<VertexId, ?> target) {
         ((Map<VertexId, T>) target).put(vertex.getId(), vertex.getValue());
+    }
+
+    private static void resetVertexValue(List<? extends Vertex> sampleFromVertices, Map<VertexId, DoubleTensor> previousPosition) {
+        for (Vertex vertex : sampleFromVertices) {
+            vertex.setValue(previousPosition.get(vertex.getId()));
+        }
     }
 
 }

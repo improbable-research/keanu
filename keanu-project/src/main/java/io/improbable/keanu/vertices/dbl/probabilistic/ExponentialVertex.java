@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -38,7 +39,7 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
      * @param rate        the rate of the Exponential with either be the same shape as specified for this
      *                    vertex or scalar.
      */
-    public ExponentialVertex(long[] tensorShape, DoubleVertex rate) {
+    public ExponentialVertex(@LoadShape long[] tensorShape, @LoadVertexParam(RATE_NAME) DoubleVertex rate) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, rate.getShape());
 
@@ -52,7 +53,7 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
      * @param rate the rate of the Exponential with either the same shape as specified for this vertex or scalar
      */
     @ExportVertexToPythonBindings
-    public ExponentialVertex(@LoadVertexParam(RATE_NAME) DoubleVertex rate) {
+    public ExponentialVertex(DoubleVertex rate) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(rate.getShape()), rate);
     }
 

@@ -203,8 +203,7 @@ public class BayesianNetwork {
     }
 
     public boolean isInImpossibleState() {
-        double logOfMasterP = getLogOfMasterP();
-        return logOfMasterP == Double.NEGATIVE_INFINITY || Double.isNaN(logOfMasterP);
+        return ProbabilityCalculator.isImpossibleLogProb(getLogOfMasterP());
     }
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {
@@ -259,7 +258,7 @@ public class BayesianNetwork {
     }
 
     public void saveValues(NetworkSaver networkSaver) {
-        for (Vertex vertex : vertices) {
+        for (Vertex vertex : TopologicalSort.sort(vertices)) {
             vertex.saveValue(networkSaver);
         }
     }

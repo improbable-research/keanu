@@ -1,9 +1,9 @@
 package io.improbable.snippet;
 
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.OptimizerBounds;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -28,13 +28,11 @@ public class OptimizerExample {
 
     private static double runGradientOptimizer(DoubleVertex temperature) {
 //%%SNIPPET_START%% GradientOptimizerMostProbable
-BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-GradientOptimizer optimizer = GradientOptimizer.builder().
-        bayesianNetwork(bayesNet).
-        maxEvaluations(5000).
-        relativeThreshold(1e-8).
-        absoluteThreshold(1e-8).
-        build();
+GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(temperature.getConnectedGraph())
+    .maxEvaluations(5000)
+    .relativeThreshold(1e-8)
+    .absoluteThreshold(1e-8)
+    .build();
 optimizer.maxAPosteriori();
 
 double calculatedTemperature = temperature.getValue().scalar();
@@ -45,17 +43,14 @@ double calculatedTemperature = temperature.getValue().scalar();
 
     private static double runNonGradientOptimizer(DoubleVertex temperature) {
 //%%SNIPPET_START%% NonGradientOptimizerMostProbable
-BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-OptimizerBounds temperatureBounds = new OptimizerBounds();
-temperatureBounds.addBound(temperature, -250., 250.0);
-NonGradientOptimizer optimizer = NonGradientOptimizer.builder().
-        bayesianNetwork(bayesNet).
-        maxEvaluations(5000).
-        boundsRange(100000).
-        optimizerBounds(temperatureBounds).
-        initialTrustRegionRadius(5.).
-        stoppingTrustRegionRadius(2e-8).
-        build();
+OptimizerBounds temperatureBounds = new OptimizerBounds().addBound(temperature.getId(), -250., 250.0);
+NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.builderFor(temperature.getConnectedGraph())
+    .maxEvaluations(5000)
+    .boundsRange(100000)
+    .optimizerBounds(temperatureBounds)
+    .initialTrustRegionRadius(5.)
+    .stoppingTrustRegionRadius(2e-8)
+    .build();
 optimizer.maxAPosteriori();
 
 double calculatedTemperature = temperature.getValue().scalar();

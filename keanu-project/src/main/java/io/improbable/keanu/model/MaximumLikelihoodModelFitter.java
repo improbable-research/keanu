@@ -1,6 +1,6 @@
 package io.improbable.keanu.model;
 
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 
 public class MaximumLikelihoodModelFitter implements ModelFitter {
 
@@ -13,7 +13,7 @@ public class MaximumLikelihoodModelFitter implements ModelFitter {
      */
     @Override
     public void fit(ModelGraph modelGraph) {
-        GradientOptimizer.of(modelGraph.getBayesianNetwork()).maxLikelihood();
+        KeanuOptimizer.Gradient.of(modelGraph.getBayesianNetwork()).maxLikelihood();
     }
 
 }
