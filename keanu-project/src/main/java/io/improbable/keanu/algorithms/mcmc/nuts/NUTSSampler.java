@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.network.NetworkState;
@@ -84,9 +85,9 @@ public class NUTSSampler implements SamplingAlgorithm {
     }
 
     @Override
-    public NetworkState sample() {
+    public NetworkSample sample() {
         step();
-        return new SimpleNetworkState(tree.getSampleAtAcceptedPosition());
+        return new NetworkSample(tree.getSampleAtAcceptedPosition(), tree.getLogOfMasterPAtAcceptedPosition());
     }
 
     @Override
