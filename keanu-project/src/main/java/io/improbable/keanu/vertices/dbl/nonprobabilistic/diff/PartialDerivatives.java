@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import org.nd4j.linalg.api.shape.Shape;
 
@@ -30,13 +29,6 @@ public class PartialDerivatives {
     public PartialDerivatives() {
         this.id = null;
         this.value = null;
-    }
-
-    public DoubleTensor withRespectTo(Vertex vertex) {
-        if (!vertex.getId().equals(id)) {
-            throw new IllegalStateException();
-        }
-        return value;
     }
 
     public boolean isEmpty() {

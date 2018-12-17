@@ -76,8 +76,8 @@ public class DoubleIfVertexTest {
             .orElse(d);
 
 
-        DoubleTensor dIfdAForward = Differentiator.forwardModeAutoDiff(a, ifVertex).of(ifVertex).withRespectTo(a);
-        DoubleTensor dIfdBForward = Differentiator.forwardModeAutoDiff(b, ifVertex).of(ifVertex).withRespectTo(b);
+        DoubleTensor dIfdAForward = Differentiator.forwardModeAutoDiff(a, ifVertex).of(ifVertex).getValue();
+        DoubleTensor dIfdBForward = Differentiator.forwardModeAutoDiff(b, ifVertex).of(ifVertex).getValue();
 
         DoubleTensor dIfdAReverse = Differentiator.reverseModeAutoDiff(ifVertex, a).withRespectTo(a).getValue();
         DoubleTensor dIfdBReverse = Differentiator.reverseModeAutoDiff(ifVertex, b).withRespectTo(b).getValue();

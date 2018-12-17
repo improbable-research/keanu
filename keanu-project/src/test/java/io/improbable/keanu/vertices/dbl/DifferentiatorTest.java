@@ -30,8 +30,8 @@ public class DifferentiatorTest {
         GaussianVertex B = new GaussianVertex(0, 1);
         MultiplicationVertex C = A.times(B);
 
-        DoubleTensor dCdA = Differentiator.forwardModeAutoDiff(A, C).of(C).withRespectTo(A);
-        DoubleTensor dCdB = Differentiator.forwardModeAutoDiff(B, C).of(C).withRespectTo(B);
+        DoubleTensor dCdA = Differentiator.forwardModeAutoDiff(A, C).of(C).getValue();
+        DoubleTensor dCdB = Differentiator.forwardModeAutoDiff(B, C).of(C).getValue();
 
         assertEquals(A.getValue(), dCdB);
         assertEquals(B.getValue(), dCdA);
@@ -94,8 +94,8 @@ public class DifferentiatorTest {
         DoubleTensor dHdAReverse = dHReverse.withRespectTo(A).getValue();
         DoubleTensor dHdBReverse = dHReverse.withRespectTo(B).getValue();
 
-        DoubleTensor dHdAForward = Differentiator.forwardModeAutoDiff(A, H).of(H).withRespectTo(A);
-        DoubleTensor dHdBForward = Differentiator.forwardModeAutoDiff(B, H).of(H).withRespectTo(B);
+        DoubleTensor dHdAForward = Differentiator.forwardModeAutoDiff(A, H).of(H).getValue();
+        DoubleTensor dHdBForward = Differentiator.forwardModeAutoDiff(B, H).of(H).getValue();
 
         assertEquals(dHdAReverse, dHdAForward);
         assertEquals(dHdBReverse, dHdBForward);

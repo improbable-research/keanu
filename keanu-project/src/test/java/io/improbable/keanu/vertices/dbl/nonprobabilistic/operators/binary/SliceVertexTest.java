@@ -93,7 +93,7 @@ public class SliceVertexTest {
 
         SliceVertex sliceN = new SliceVertex(N, dim, ind);
 
-        DoubleTensor dSliceNWrtmForward = Differentiator.forwardModeAutoDiff(m, sliceN).of(sliceN).withRespectTo(m);
+        DoubleTensor dSliceNWrtmForward = Differentiator.forwardModeAutoDiff(m, sliceN).of(sliceN).getValue();
 
         DoubleTensor dSliceNWrtmReverse = Differentiator.reverseModeAutoDiff(sliceN, ImmutableSet.of(m, alpha)).withRespectTo(m).getValue();
 
