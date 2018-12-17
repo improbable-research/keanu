@@ -1,5 +1,8 @@
-package io.improbable.keanu.tensor.dbl;
+package io.improbable.keanu.benchmarks;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import org.openjdk.jmh.annotations.Benchmark;
 
 public class Nd4jDoubleTensorTimesScalar {

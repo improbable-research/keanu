@@ -12,13 +12,11 @@ buildscript {
 
 plugins {
     id 'io.franzbecker.gradle-lombok' version '1.14'
-    id 'com.github.johnrengelman.shadow' version '4.0.3' apply false
     id 'maven'
     id 'jacoco'
 }
 
 apply plugin: 'com.google.protobuf'
-apply plugin: 'com.github.johnrengelman.shadow'
 
 archivesBaseName = "keanu"
 
@@ -154,20 +152,6 @@ task javadocJar(type: Jar) {
 task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
-}
-
-shadowJar {
-    configurations = [project.configurations.runtime, project.configurations.perfRuntime]
-    archiveName = 'benchmarks.jar'
-    classifier = 'benchmarks'
-    manifest.attributes('Main-Class': 'org.openjdk.jmh.Main')
-}
-
-task runBenchmarks(type: Exec) {
-    dependsOn(shadowJar)
-        commandLine 'java',
-            '-jar', 'build/libs/benchmarks.jar',
-            '-w', '1s', '-r', '1s', '-wi', '3', '-i', '5', '-f', '3'
 }
 
 task deletePythonClasspath(type: Delete) {
