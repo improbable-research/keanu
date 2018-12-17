@@ -353,7 +353,7 @@ public class Tree implements Record {
     }
 
     public void recordStatistics(Statistics statistics) {
-        statistics.store(NUTS.Metrics.LOGPROB, logOfMasterPAtAcceptedPosition);
-        statistics.store(NUTS.Metrics.TREESIZE, treeSize);
+        statistics.store(NUTS.Metrics.LOG_PROB, logOfMasterPAtAcceptedPosition);
+        statistics.store(NUTS.Metrics.TREE_SIZE, treeSize);
     }
 }

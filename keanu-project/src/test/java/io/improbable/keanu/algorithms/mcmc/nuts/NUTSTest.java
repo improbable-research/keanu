@@ -62,9 +62,9 @@ public class NUTSTest {
         Statistics statistics = nuts.getStatistics();
 
         List<Double> stepSize = statistics.get(NUTS.Metrics.STEPSIZE);
-        List<Double> logProb = statistics.get(NUTS.Metrics.LOGPROB);
-        List<Double> meanTreeAccept = statistics.get(NUTS.Metrics.MEANTREEACCEPT);
-        List<Double> treeSize = statistics.get(NUTS.Metrics.TREESIZE);
+        List<Double> logProb = statistics.get(NUTS.Metrics.LOG_PROB);
+        List<Double> meanTreeAccept = statistics.get(NUTS.Metrics.MEAN_TREE_ACCEPT);
+        List<Double> treeSize = statistics.get(NUTS.Metrics.TREE_SIZE);
 
         assertThat(stepSize, contains(initStepSize, initStepSize));
         assertThat(logProb, everyItem(lessThan(0.)));

@@ -159,6 +159,6 @@ class Stepsize implements Record {
     @Override
     public void recordStatistics(Statistics statistics) {
         statistics.store(NUTS.Metrics.STEPSIZE, stepsize);
-        statistics.store(NUTS.Metrics.MEANTREEACCEPT, averageAcceptanceProb);
+        statistics.store(NUTS.Metrics.MEAN_TREE_ACCEPT, averageAcceptanceProb);
     }
 }
