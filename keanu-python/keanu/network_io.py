@@ -17,4 +17,7 @@ class ProtobufSaver(JavaObjectWrapper):
 
     def save(self, filename: str, save_values: bool = False, metadata: Optional[Dict[str, str]] = None):
         output_stream = k.jvm_view().FileOutputStream(filename)
-        self.unwrap().save(output_stream, save_values, k.to_java_map(metadata))
+        if metadata is None:
+            self.unwrap().save(output_stream, save_values, None)
+        else:
+            self.unwrap().save(output_stream, save_values, k.to_java_map(metadata))
