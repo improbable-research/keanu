@@ -14,7 +14,7 @@ from keanu.plots import traceplot
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.MetropolisHastings")
-java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.NUTS")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.nuts.NUTS")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.Hamiltonian")
 
 algorithms = {
