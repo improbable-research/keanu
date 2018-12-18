@@ -1,24 +1,18 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from keanu import stats
-from typing import Tuple, Any
-
-
-def _import_matplotlib() -> Any:
-    try:
-        import matplotlib.pyplot as plt
-    except:
-        raise ImportError("Could not find Matplotlib")
-    return plt
-
+from typing import Tuple, Any, List
+from keanu.vartypes import numpy_types
+from math import log, floor
+from numpy import ndarray
 
 def _create_new_mpl() -> Tuple[Any, Any]:
-    plt = _import_matplotlib()
     fig = plt.figure()
     ax = fig.add_subplot(111)
     return fig, ax
 
 
-def _plot_corr(ax, acf_x, nlags, **kwargs) -> None:
+def _plot_corr(ax: Any, acf_x: ndarray, nlags: int, **kwargs: Any) -> None:
     ax.vlines(np.arange(nlags), [0], acf_x)
     kwargs.setdefault('marker', 'o')
     kwargs.setdefault('markersize', 5)
@@ -27,13 +21,13 @@ def _plot_corr(ax, acf_x, nlags, **kwargs) -> None:
     ax.plot(acf_x[:nlags], **kwargs)
 
 
-def _calc_max_lag(data_len) -> int:
-    lim = min(int(np.floor(10 * np.log10(data_len))), data_len - 1)
+def _calc_max_lag(data_len: int) -> int:
+    lim = min(int(floor(10 * log(data_len,10))), data_len - 1)
     return lim
 
 
-def plot_acf(data, nlags=None) -> Any:
-    autocorr = stats.autocorrelation(data)
+def plot_acf(data: List[numpy_types], index: Tuple[int, ...] = (), nlags: int = None) -> Any:
+    autocorr = stats.autocorrelation(data, index)
     fig, ax = _create_new_mpl()
     if nlags is None:
         nlags = _calc_max_lag(len(autocorr))
