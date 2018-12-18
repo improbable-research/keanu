@@ -117,40 +117,17 @@ public class PartialDerivative {
     }
 
     public PartialDerivative subtract(PartialDerivative subtraction) {
-        return subtract(subtraction, false, false, null);
-    }
 
-    public PartialDerivative subtract(PartialDerivative subtraction, boolean leftIsLengthOne, boolean rightIsLengthOne, long[] resultShape) {
-
-        DoubleTensor subtracted = cloneWithCorrectShape(partial, leftIsLengthOne, resultShape);
-        DoubleTensor toSubtract = cloneWithCorrectShape(subtraction.getPartial(), rightIsLengthOne, resultShape);
-
-        if (subtracted == null && toSubtract != null) {
-            return new PartialDerivative(subtraction.getKey(), toSubtract.unaryMinus());
-        } else if (subtracted != null && toSubtract == null) {
-            return new PartialDerivative(getKey(), subtracted);
-        } else if (subtracted != null && toSubtract != null) {
-            return new PartialDerivative(getKey(), subtracted.minus(toSubtract));
+        if (isPresent() && subtraction.isPresent()) {
+            return new PartialDerivative(getKey(), partial.minus(subtraction.partial));
+        } else if (isPresent() && subtraction.isEmpty()) {
+            return new PartialDerivative(getKey(), getPartial());
+        } else if (isEmpty() && subtraction.isPresent()) {
+            return new PartialDerivative(subtraction.getKey(), subtraction.partial.unaryMinus());
         } else {
             return PartialDerivative.ZERO;
         }
 
-    }
-
-    private static DoubleTensor cloneWithCorrectShape(DoubleTensor v,
-                                                      boolean ofIsLengthOne,
-                                                      long[] resultShape) {
-
-        if (v == null) {
-            //TODO: stop this from happening
-            return null;
-        }
-
-        if (ofIsLengthOne) {
-            return DoubleTensor.zeros(TensorShape.concat(resultShape, v.getShape())).plus(v);
-        }
-
-        return v;
     }
 
     public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier, long[] ofShape) {
