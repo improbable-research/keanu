@@ -107,9 +107,9 @@ We will be taking 100,000 samples from the distributions of A and B.
 
 ```java
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-        bayesNet,
-        bayesNet.getLatentVertices(),
-        100000
+    bayesNet,
+    bayesNet.getLatentVertices(),
+    100000
 );
 ```
 
@@ -196,9 +196,9 @@ The parameters are:
 
 ```java
 NetworkSamples posteriorSamples = Hamiltonian.withDefaultConfig().getPosteriorSamples(
-        bayesNet,
-        bayesNet.getLatentVertices(),
-        2000
+    bayesNet,
+    bayesNet.getLatentVertices(),
+    2000
 );
 ```
 
@@ -225,9 +225,9 @@ It also attempts to calculate and auto-tune those difficult leapfrog and step si
 
 ```java
 NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
-        bayesNet,
-        bayesNet.getLatentVertices(),
-        2000
+    bayesNet,
+    bayesNet.getLatentVertices(),
+    2000
 );
 ```
 
