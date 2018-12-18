@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ $TRAVIS_BRANCH == 'master' ]]; then
-  ./gradlew clean build -x :keanu-python:build uploadArchives -PnexusUser=$NEXUS_USER -PnexusPassword=$NEXUS_PASSWORD -Psigning.keyId=$SIGNING_KEY_ID -Psigning.password=$SIGNING_PASSWORD -Psigning.secretKeyRingFile=../deployment/secret-keys-keanu.gpg --info --stacktrace
+if [[ $TRAVIS_BRANCH != 'master' ]]; then
+  ./gradlew clean build -x :keanu-python:build publishToNexus -PnexusUser=$NEXUS_USER -PnexusPassword=$NEXUS_PASSWORD -Psigning.keyId=$SIGNING_KEY_ID -Psigning.password=$SIGNING_PASSWORD -Psigning.secretKeyRingFile=../deployment/secret-keys-keanu.gpg --info --stacktrace
 else
   ./gradlew clean build -x :keanu-python:build --info --stacktrace
 fi
