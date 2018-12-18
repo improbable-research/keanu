@@ -10,8 +10,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartialForward;
-
 public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
     private static final String X_NAME = LEFT_NAME;
@@ -67,8 +65,14 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         DoubleTensor dOutWrtX = yValue.div(denominator).unaryMinusInPlace();
         DoubleTensor dOutWrtY = xValue.div(denominator);
 
-        partials.put(left, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX, this.getShape()));
-        partials.put(right, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY, this.getShape()));
+        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX, this.getShape());
+        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY, this.getShape());
+
+        PartialDerivative toLeft = correctForScalarReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
+        PartialDerivative toRight = correctForScalarReverse(dOutputsWrtRight, this.getShape(), right.getShape());
+
+        partials.put(left, toLeft);
+        partials.put(right, toRight);
         return partials;
     }
 }

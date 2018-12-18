@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -139,11 +140,12 @@ public class LogProbGradientCalculator {
 
                 PartialDerivative partialWrtVertexWithDiff = new PartialDerivative(vertexWithDiff.getId(), dLogProbOfWrtVertexWithDiff);
 
+                PartialDerivative correctForScalarReverse = DoubleBinaryOpVertex.correctForScalarReverse(partialWrtVertexWithDiff, ofVertex.getShape(), vertexWithDiff.getShape());
+
                 PartialsOf dOfWrtLatentsContributionFromParent = Differentiator
                     .reverseModeAutoDiff(
                         vertexWithDiff,
-                        partialWrtVertexWithDiff,
-                        ofVertex.getShape(),
+                        correctForScalarReverse,
                         this.parentToLatentLookup.get(vertexWithDiff)
                     );
 

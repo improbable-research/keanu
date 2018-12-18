@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartialForward;
-import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarReverse;
 
 @DisplayInformationForOutput(displayName = "*")
 public class MultiplicationVertex extends DoubleBinaryOpVertex {
@@ -69,11 +67,11 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
             this.getShape()
         );
 
-//        PartialDerivative toRight = correctForScalarReverse(dOutputsWrtRight, this.getShape(), right.getShape());
-//        PartialDerivative toLeft = correctForScalarReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
+        PartialDerivative toLeft = correctForScalarReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
+        PartialDerivative toRight = correctForScalarReverse(dOutputsWrtRight, this.getShape(), right.getShape());
 
-        partials.put(left, dOutputsWrtLeft);
-        partials.put(right, dOutputsWrtRight);
+        partials.put(left, toLeft);
+        partials.put(right, toRight);
 
         return partials;
     }

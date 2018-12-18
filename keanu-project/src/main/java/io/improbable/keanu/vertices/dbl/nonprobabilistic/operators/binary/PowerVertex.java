@@ -10,8 +10,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartialForward;
-
 public class PowerVertex extends DoubleBinaryOpVertex {
 
     private static final String BASE_NAME = LEFT_NAME;
@@ -81,8 +79,15 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         DoubleTensor basePowExponent = getValue();
         DoubleTensor dSelfWrtBase = exponentValue.div(baseValue).timesInPlace(basePowExponent);
         DoubleTensor dSelfWrtExponent = basePowExponent.times(baseValue.log());
-        partials.put(getBase(), derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase, this.getShape()));
-        partials.put(getExponent(), derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent, this.getShape()));
+
+        PartialDerivative dOutputsWrtBase = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase, this.getShape());
+        PartialDerivative dOutputsWrtExponent = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent, this.getShape());
+
+        PartialDerivative toBase = correctForScalarReverse(dOutputsWrtBase, this.getShape(), getBase().getShape());
+        PartialDerivative toExponent = correctForScalarReverse(dOutputsWrtExponent, this.getShape(), getExponent().getShape());
+
+        partials.put(getBase(), toBase);
+        partials.put(getExponent(), toExponent);
         return partials;
     }
 }

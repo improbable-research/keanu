@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartialForward;
 
 @DisplayInformationForOutput(displayName = "/")
 public class DivisionVertex extends DoubleBinaryOpVertex {
@@ -36,8 +35,8 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
-        PartialDerivative fromLeft =  correctForScalarPartialForward(dLeftWrtInput, this.getShape(), left.getShape());
-        PartialDerivative fromRight =  correctForScalarPartialForward(dRightWrtInput, this.getShape(), right.getShape());
+        PartialDerivative fromLeft = correctForScalarPartialForward(dLeftWrtInput, this.getShape(), left.getShape());
+        PartialDerivative fromRight = correctForScalarPartialForward(dRightWrtInput, this.getShape(), right.getShape());
 
         // dc = (B * da - A * db) / B^2;
         PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(
@@ -60,10 +59,19 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         DoubleTensor rightValue = right.getValue();
         DoubleTensor dOutWrtLeft = rightValue.reciprocal();
         DoubleTensor dOutWrtRight = leftValue.div(rightValue.pow(2.0)).unaryMinusInPlace();
-        partials.put(left, derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(dOutWrtLeft, this.getShape()));
-        partials.put(right, derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(dOutWrtRight, this.getShape()));
+
+        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf
+            .multiplyAlongWrtDimensions(dOutWrtLeft, this.getShape());
+
+        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf
+            .multiplyAlongWrtDimensions(dOutWrtRight, this.getShape());
+
+        PartialDerivative toLeft = correctForScalarReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
+        PartialDerivative toRight = correctForScalarReverse(dOutputsWrtRight, this.getShape(), right.getShape());
+
+        partials.put(left, toLeft);
+        partials.put(right, toRight);
+
         return partials;
     }
 }

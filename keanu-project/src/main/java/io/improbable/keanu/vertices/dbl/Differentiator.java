@@ -21,7 +21,7 @@ import static java.util.Collections.singletonMap;
 
 public class Differentiator {
 
-    public static PartialsOf reverseModeAutoDiff(Vertex<?> ofVertex, PartialDerivative dWrtOfVertex, long[] dOfShape, Set<? extends Vertex<?>> wrt) {
+    public static PartialsOf reverseModeAutoDiff(Vertex<?> ofVertex, PartialDerivative dWrtOfVertex, Set<? extends Vertex<?>> wrt) {
 
         ensureGraphValuesAndShapesAreSet(ofVertex);
 
@@ -32,7 +32,7 @@ public class Differentiator {
         alreadyQueued.add(ofVertex);
 
         Map<Vertex, PartialDerivative> dwrtOf = new HashMap<>();
-        collectPartials(singletonMap(ofVertex, dWrtOfVertex), dwrtOf, dOfShape);
+        collectPartials(singletonMap(ofVertex, dWrtOfVertex), dwrtOf);
 
         Map<VertexId, PartialDerivative> wrtOf = new HashMap<>();
 
@@ -54,7 +54,7 @@ public class Differentiator {
                     if (derivativeOfOutputWrtVisiting != null) {
 
                         Map<Vertex, PartialDerivative> partialDerivatives = visitingDifferentiable.reverseModeAutoDifferentiation(derivativeOfOutputWrtVisiting);
-                        collectPartials(partialDerivatives, dwrtOf, visiting.getShape());
+                        collectPartials(partialDerivatives, dwrtOf);
 
                         for (Vertex parent : visiting.getParents()) {
                             if (!alreadyQueued.contains(parent) && parent instanceof Differentiable) {
@@ -77,22 +77,12 @@ public class Differentiator {
     }
 
     private static void collectPartials(Map<Vertex, PartialDerivative> partialDerivatives,
-                                        Map<Vertex, PartialDerivative> dwrtOf,
-                                        long[] visitingShape) {
+                                        Map<Vertex, PartialDerivative> dwrtOf) {
 
         for (Map.Entry<Vertex, PartialDerivative> v : partialDerivatives.entrySet()) {
 
             Vertex wrtVertex = v.getKey();
-            PartialDerivative partialsOf = v.getValue();
-            long[] wrtShape = wrtVertex.getShape();
-
-            PartialDerivative dwrtV;
-            if (TensorShape.isLengthOne(wrtShape)) {
-                int visitingRank = visitingShape.length;
-                dwrtV = partialsOf.sumOverWrtDimensions(TensorShape.dimensionRange(-visitingRank, 0), wrtShape);
-            } else {
-                dwrtV = partialsOf;
-            }
+            PartialDerivative dwrtV = v.getValue();
 
             if (dwrtOf.containsKey(wrtVertex)) {
                 dwrtOf.put(wrtVertex, dwrtOf.get(wrtVertex).add(dwrtV));
@@ -106,7 +96,7 @@ public class Differentiator {
         if (ofVertex.isObserved()) {
             return new PartialsOf(ofVertex, Collections.emptyMap());
         } else {
-            return reverseModeAutoDiff(ofVertex, Differentiable.withRespectToSelf(ofVertex.getId(), ofVertex.getShape()), ofVertex.getShape(), wrt);
+            return reverseModeAutoDiff(ofVertex, Differentiable.withRespectToSelf(ofVertex.getId(), ofVertex.getShape()), wrt);
         }
     }
 

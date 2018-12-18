@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
-import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartialForward;
 
 @DisplayInformationForOutput(displayName = "+")
 public class AdditionVertex extends DoubleBinaryOpVertex {
@@ -46,8 +45,12 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(left, derivativeOfOutputWithRespectToSelf);
-        partials.put(right, derivativeOfOutputWithRespectToSelf);
+
+        PartialDerivative toLeft = correctForScalarReverse(derivativeOfOutputWithRespectToSelf, this.getShape(), left.getShape());
+        PartialDerivative toRight = correctForScalarReverse(derivativeOfOutputWithRespectToSelf, this.getShape(), right.getShape());
+
+        partials.put(left, toLeft);
+        partials.put(right, toRight);
         return partials;
     }
 
