@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import numpy as np
 from keanu import stats
 from typing import Tuple, Any, List
@@ -14,10 +15,12 @@ def __create_new_mpl() -> Tuple[Any, Any]:
 
 def __plot_corr(ax: Any, acf_x: ndarray, nlags: int, **kwargs: Any) -> None:
     ax.vlines(np.arange(nlags), [0], acf_x)
+    ax.axhline(0,0,1, linewidth=1, color='black')
     kwargs.setdefault('marker', 'o')
     kwargs.setdefault('markersize', 5)
     kwargs.setdefault('linestyle', 'None')
     ax.set_title("Autocorrelation")
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     ax.plot(acf_x[:nlags], **kwargs)
 
 
