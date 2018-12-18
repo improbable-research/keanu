@@ -11,13 +11,6 @@ public class PartialDerivative {
 
     public static final PartialDerivative EMPTY = new PartialDerivative();
 
-    public static PartialDerivative withRespectToSelf(VertexId withRespectTo, long[] shape) {
-        return new PartialDerivative(
-            withRespectTo,
-            DoubleTensor.eye((int) TensorShape.getLength(shape)).reshape(TensorShape.concat(shape, shape))
-        );
-    }
-
     private final VertexId id;
     private final DoubleTensor partial;
 
