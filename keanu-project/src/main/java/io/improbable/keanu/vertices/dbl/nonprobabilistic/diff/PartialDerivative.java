@@ -47,16 +47,6 @@ public class PartialDerivative {
         return id;
     }
 
-    public boolean isKey(VertexId id) {
-        VertexId key = getKey();
-
-        if (key == null) {
-            return id == null;
-        }
-
-        return key.equals(id);
-    }
-
     /**
      * This will sum partial derivatives that are represented as tensors over given dimensions.
      * The dimensions that are summed over will be reshaped to the specified resultShape.

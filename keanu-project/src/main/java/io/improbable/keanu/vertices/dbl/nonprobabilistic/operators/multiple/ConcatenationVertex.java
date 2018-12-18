@@ -96,7 +96,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
             PartialDerivative partialOfOperand = derivativeOfOperandsWrtInputs.get(i);
             DoubleTensor operandValue = operandValues.get(i);
 
-            if (partialOfOperand.isKey(wrtVertexId)) {
+            if (partialOfOperand.isPresent() && partialOfOperand.getKey().equals(wrtVertexId)) {
                 partialsToConcat.add(partialOfOperand.getPartial());
             } else {
                 long[] wrtShape = Arrays.copyOfRange(partialWrtShape, operandValue.getRank(), partialWrtShape.length);
