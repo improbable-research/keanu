@@ -33,11 +33,11 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInputs, PartialDerivative dRightWrtInputs) {
+    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
         // dc = (B * da - A * db) / B^2;
-        PartialDerivative partialsFromLeft = dLeftWrtInputs.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
-        PartialDerivative partialsFromRight = dRightWrtInputs.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
+        PartialDerivative partialsFromLeft = dLeftWrtInput.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
+        PartialDerivative partialsFromRight = dRightWrtInput.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
 
         return partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().pow(2));
     }

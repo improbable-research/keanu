@@ -54,12 +54,12 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         List<PartialDerivative> partialsOfInputs = new ArrayList<>();
         List<DoubleTensor> inputValues = new ArrayList<>();
 
         for (DoubleVertex operand : operands) {
-            partialsOfInputs.add(derivativeOfParentsWithRespectToInputs.getOrDefault(operand, PartialDerivative.EMPTY));
+            partialsOfInputs.add(derivativeOfParentsWithRespectToInput.getOrDefault(operand, PartialDerivative.EMPTY));
             inputValues.add(operand.getValue());
         }
 

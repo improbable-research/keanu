@@ -69,8 +69,8 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
-        return derivativeOfParentsWithRespectToInputs.get(getParent());
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        return derivativeOfParentsWithRespectToInput.get(getParent());
     }
 
     @Override

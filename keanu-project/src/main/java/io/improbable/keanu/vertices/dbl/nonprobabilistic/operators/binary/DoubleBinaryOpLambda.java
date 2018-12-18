@@ -65,9 +65,9 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differen
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         if (forwardModeAutoDiffLambda != null) {
-            return forwardModeAutoDiffLambda.apply(derivativeOfParentsWithRespectToInputs);
+            return forwardModeAutoDiffLambda.apply(derivativeOfParentsWithRespectToInput);
         }
 
         throw new UnsupportedOperationException();

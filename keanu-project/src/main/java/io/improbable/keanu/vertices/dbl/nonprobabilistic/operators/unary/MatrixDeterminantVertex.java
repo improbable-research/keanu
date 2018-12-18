@@ -36,7 +36,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         throw new UnsupportedOperationException();
     }
 

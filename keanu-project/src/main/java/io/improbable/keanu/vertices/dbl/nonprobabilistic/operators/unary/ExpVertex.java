@@ -29,8 +29,8 @@ public class ExpVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
         return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(this.getValue(), inputVertex.getShape());
     }
 

@@ -29,8 +29,8 @@ public class SinVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
         DoubleTensor dSin = inputVertex.getValue().cos();
         return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dSin, this.getValue().getShape());
     }

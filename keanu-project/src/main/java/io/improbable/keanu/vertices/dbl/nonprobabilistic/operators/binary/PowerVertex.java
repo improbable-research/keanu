@@ -41,14 +41,14 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dBaseWrtInputs, PartialDerivative dExponentWrtInputs) {
+    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dBaseWrtInput, PartialDerivative dExponentWrtInput) {
 
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
         PartialDerivative partialsFromBase;
         PartialDerivative partialsFromExponent;
 
-        if (dBaseWrtInputs.isPresent()) {
-            partialsFromBase = dBaseWrtInputs.multiplyAlongOfDimensions(
+        if (dBaseWrtInput.isPresent()) {
+            partialsFromBase = dBaseWrtInput.multiplyAlongOfDimensions(
                 right.getValue().times(left.getValue().pow(right.getValue().minus(1))),
                 this.getValue().getShape()
             );
@@ -56,8 +56,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
             partialsFromBase = PartialDerivative.EMPTY;
         }
 
-        if (dExponentWrtInputs.isPresent()) {
-            partialsFromExponent = dExponentWrtInputs.multiplyAlongOfDimensions(
+        if (dExponentWrtInput.isPresent()) {
+            partialsFromExponent = dExponentWrtInput.multiplyAlongOfDimensions(
                 left.getValue().log().timesInPlace(this.getValue()),
                 right.getValue().getShape()
             );

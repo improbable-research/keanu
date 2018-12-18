@@ -48,10 +48,10 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable, Non
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
         DoubleVertex vertex = conditions.get(condition);
-        return vertex == null ? derivativeOfParentsWithRespectToInputs.get(defaultResult) : derivativeOfParentsWithRespectToInputs.get(vertex);
+        return vertex == null ? derivativeOfParentsWithRespectToInput.get(defaultResult) : derivativeOfParentsWithRespectToInput.get(vertex);
     }
 
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {

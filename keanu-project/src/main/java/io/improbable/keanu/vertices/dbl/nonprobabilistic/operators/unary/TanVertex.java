@@ -29,8 +29,8 @@ public class TanVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
         DoubleTensor dTan = inputVertex.getValue().cos().powInPlace(2).reciprocalInPlace();
         return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dTan, this.getValue().getShape());
     }

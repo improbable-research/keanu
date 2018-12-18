@@ -30,8 +30,8 @@ public class SigmoidVertex extends DoubleUnaryOpVertex implements Differentiable
     }
 
     @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
         DoubleTensor x = inputVertex.getValue();
         DoubleTensor xExp = x.exp();
         DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2));

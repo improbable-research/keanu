@@ -36,15 +36,15 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInputs, PartialDerivative dRightWrtInputs) {
+    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
-        boolean shouldCorrectForLeftScalar = shouldCorrectPartialForScalar(dLeftWrtInputs, left.getShape());
+        boolean shouldCorrectForLeftScalar = shouldCorrectPartialForScalar(dLeftWrtInput, left.getShape());
 
-        PartialDerivative fromLeft = shouldCorrectForLeftScalar ? correctForScalarPartial(dLeftWrtInputs) : dLeftWrtInputs;
+        PartialDerivative fromLeft = shouldCorrectForLeftScalar ? correctForScalarPartial(dLeftWrtInput) : dLeftWrtInput;
 
-        boolean shouldCorrectForRightScalar = shouldCorrectPartialForScalar(dRightWrtInputs, right.getShape());
+        boolean shouldCorrectForRightScalar = shouldCorrectPartialForScalar(dRightWrtInput, right.getShape());
 
-        PartialDerivative fromRight = shouldCorrectForRightScalar ? correctForScalarPartial(dRightWrtInputs) : dRightWrtInputs;
+        PartialDerivative fromRight = shouldCorrectForRightScalar ? correctForScalarPartial(dRightWrtInput) : dRightWrtInput;
 
         return fromLeft.add(fromRight);
     }

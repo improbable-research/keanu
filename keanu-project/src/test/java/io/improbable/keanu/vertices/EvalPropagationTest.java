@@ -122,7 +122,7 @@ public class EvalPropagationTest {
         }
 
         @Override
-        public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
+        public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
             return null;
         }
     }

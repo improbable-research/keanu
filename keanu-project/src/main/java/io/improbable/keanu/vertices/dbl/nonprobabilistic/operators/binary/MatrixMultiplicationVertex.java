@@ -56,17 +56,17 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInputs, PartialDerivative dRightWrtInputs) {
+    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
         // dc = A * db + da * B;
         PartialDerivative partialsFromLeft = PartialDerivative.matrixMultiplyAlongOfDimensions(
-            dLeftWrtInputs,
+            dLeftWrtInput,
             right.getValue(),
             true
         );
 
         PartialDerivative partialsFromRight = PartialDerivative.matrixMultiplyAlongOfDimensions(
-            dRightWrtInputs,
+            dRightWrtInput,
             left.getValue(),
             false
         );
