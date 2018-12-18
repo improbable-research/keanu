@@ -175,7 +175,7 @@ Hopefully by now the code for performing Gradient Optimisation will look familia
 
 ```kotlin
 val net = BayesianNetwork(graphTimeSteps.first().first().connectedGraph)
-val optimiser = Optimizer.of(net)
+val optimiser = KeanuOptimizer.of(net)
 optimiser.maxAPosteriori()
 ```
 
@@ -280,7 +280,7 @@ calculateLorenzTimesteps(graphTimeSteps, windowSize)
 applyObservations(graphTimeSteps, windowSize, window, lorenzCoordinates, random)
 
 val net = BayesianNetwork(graphTimeSteps.first().first().connectedGraph)
-val optimiser = Optimizer.of(net)
+val optimiser = KeanuOptimizer.of(net)
 optimiser.maxAPosteriori()
 
 val posterior = getTimestepValues(graphTimeSteps, windowSize - 1)
@@ -404,7 +404,7 @@ public class LorenzTest {
 
             BayesianNetwork net = new BayesianNetwork(xt0.getConnectedGraph());
 
-            Optimizer graphOptimizer = Optimizer.of(net);
+            Optimizer graphOptimizer = KeanuOptimizer.of(net);
 
             graphOptimizer.maxAPosteriori();
 

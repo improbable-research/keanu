@@ -1,23 +1,23 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
-import io.improbable.keanu.network.BayesianNetwork;
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.Vertex;
 
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 public interface Optimizer {
+
     /**
      * Adds a callback to be called whenever the optimizer evaluates the fitness of a point. E.g. for logging.
+     *
      * @param fitnessCalculationHandler a function to be called whenever the optimizer evaluates the fitness of a point.
      *                                  The double[] argument to the handler represents the point being evaluated.
      *                                  The Double argument to the handler represents the fitness of that point.
@@ -27,6 +27,7 @@ public interface Optimizer {
     /**
      * Removes a callback function that previously would have been called whenever the optimizer
      * evaluated the fitness of a point. If the callback is not registered then this function will do nothing.
+     *
      * @param fitnessCalculationHandler the function to be removed from the list of fitness evaluation callbacks
      */
     void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
@@ -49,49 +50,11 @@ public interface Optimizer {
      */
     double maxLikelihood();
 
-    BayesianNetwork getBayesianNetwork();
+    static double[] convertToPoint(List<? extends Variable<? extends NumberTensor>> latentVariables) {
 
-    /**
-     * Creates an {@link Optimizer} which provides methods for optimizing the values of latent variables
-     * of the Bayesian network to maximise probability.
-     *
-     * @param network The Bayesian network to run optimization on.
-     * @return an {@link Optimizer}
-     */
-    static Optimizer of(BayesianNetwork network) {
-        if (network.getDiscreteLatentVertices().isEmpty()) {
-            return GradientOptimizer.of(network);
-        } else {
-            return NonGradientOptimizer.of(network);
-        }
-    }
+        List<long[]> shapes = latentVariables.stream().map(Variable::getShape).collect(Collectors.toList());
 
-    /**
-     * Creates a Bayesian network from the given vertices and uses this to
-     * create an {@link Optimizer}. This provides methods for optimizing the values of latent variables
-     * of the Bayesian network to maximise probability.
-     *
-     * @param vertices The vertices to create a Bayesian network from.
-     * @return an {@link Optimizer}
-     */
-    static Optimizer of(Collection<? extends Vertex> vertices) {
-        return of(new BayesianNetwork(vertices));
-    }
-
-    /**
-     * Creates a Bayesian network from the graph connected to the given vertex and uses this to
-     * create an {@link Optimizer}. This provides methods for optimizing the values of latent variables
-     * of the Bayesian network to maximise probability.
-     *
-     * @param vertexFromNetwork A vertex in the graph to create the Bayesian network from
-     * @return an {@link Optimizer}
-     */
-    static Optimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
-        return of(vertexFromNetwork.getConnectedGraph());
-    }
-
-    static double[] currentPoint(List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
-        long totalLatentDimensions = totalNumberOfLatentDimensions(continuousLatentVertices);
+        long totalLatentDimensions = totalNumberOfLatentDimensions(shapes);
 
         if (totalLatentDimensions > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Greater than " + Integer.MAX_VALUE + " latent dimensions not supported");
@@ -100,8 +63,8 @@ public interface Optimizer {
         int position = 0;
         double[] point = new double[(int) totalLatentDimensions];
 
-        for (Vertex<? extends NumberTensor> vertex : continuousLatentVertices) {
-            double[] values = vertex.getValue().asFlatDoubleArray();
+        for (Variable<? extends NumberTensor> variable : latentVariables) {
+            double[] values = variable.getValue().asFlatDoubleArray();
             System.arraycopy(values, 0, point, position, values.length);
             position += values.length;
         }
@@ -109,31 +72,47 @@ public interface Optimizer {
         return point;
     }
 
-    static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices) {
+    static Map<VariableReference, DoubleTensor> convertFromPoint(double[] point, List<? extends Variable> latentVariables) {
 
+        Map<VariableReference, DoubleTensor> tensors = new HashMap<>();
         int position = 0;
-        for (Vertex<DoubleTensor> vertex : latentVertices) {
+        for (Variable variable : latentVariables) {
 
-            int dimensions = (int) Optimizer.numDimensions(vertex);
+            int dimensions = Ints.checkedCast(TensorShape.getLength(variable.getShape()));
 
             double[] values = new double[dimensions];
             System.arraycopy(point, position, values, 0, dimensions);
 
-            DoubleTensor newTensor = DoubleTensor.create(values, vertex.getValue().getShape());
-            vertex.setValue(newTensor);
+            DoubleTensor newTensor = DoubleTensor.create(values, variable.getShape());
 
+            tensors.put(variable.getReference(), newTensor);
             position += dimensions;
         }
 
-        VertexValuePropagation.cascadeUpdate(latentVertices);
+        return tensors;
     }
 
-    static long totalNumberOfLatentDimensions(List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
-        return continuousLatentVertices.stream().mapToLong(Optimizer::numDimensions).sum();
+    static long totalNumberOfLatentDimensions(List<long[]> continuousLatentVariableShapes) {
+        return continuousLatentVariableShapes.stream().mapToLong(Optimizer::numDimensions).sum();
     }
 
-    static long numDimensions(Vertex<? extends Tensor> vertex) {
-        return vertex.getValue().getLength();
+    static long numDimensions(long[] shape) {
+        return TensorShape.getLength(shape);
+    }
+
+    static List<Variable<? extends DoubleTensor>> getAsDoubleTensors(List<? extends Variable> variables) {
+        return variables.stream()
+            .map(
+                v -> {
+                    if (v.getValue() instanceof DoubleTensor) {
+                        return (Variable<DoubleTensor>) v;
+                    } else {
+                        throw new UnsupportedOperationException(
+                            "Optimization unsupported on networks containing discrete latents. " +
+                                "Discrete latent : " + v.getReference() + " found.");
+                    }
+                }
+            ).collect(Collectors.toList());
     }
 
     static ProgressBar createFitnessProgressBar(final Optimizer optimizerThatNeedsProgressBar) {

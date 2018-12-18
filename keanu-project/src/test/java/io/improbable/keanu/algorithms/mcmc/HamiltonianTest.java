@@ -65,7 +65,7 @@ public class HamiltonianTest {
         NetworkSamples posteriorSamples = hmc.getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVertices(),
-            2000
+            600
         );
 
         Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
@@ -91,7 +91,7 @@ public class HamiltonianTest {
 
         hmc.generatePosteriorSamples(donutBayesNet, donutBayesNet.getLatentVertices())
             .stream()
-            .limit(2500)
+            .limit(350)
             .forEach(x -> {
                 samples.computeIfAbsent(A, k -> new ArrayList<>()).add(x.get(A));
                 samples.computeIfAbsent(B, k -> new ArrayList<>()).add(x.get(B));

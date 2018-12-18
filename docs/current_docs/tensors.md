@@ -177,7 +177,7 @@ DoubleVertex CObservation = new GaussianVertex(C, 1);
 CObservation.observe(new double[]{6, 12});
 
 //Use algorithm to find MAP or posterior samples for A and/or B
-Optimizer optimizer = Optimizer.of(new BayesianNetwork(A.getConnectedGraph()));
+Optimizer optimizer = KeanuOptimizer.of(new BayesianNetwork(A.getConnectedGraph()));
 optimizer.maxAPosteriori();
 
 //Retrieve the most likely estimate using MAP estimation

@@ -1,10 +1,11 @@
 package io.improbable.keanu.model.regression;
 
 import io.improbable.keanu.model.Model;
+import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -23,11 +24,12 @@ import java.util.function.Function;
  */
 public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
     private static final double DEFAULT_OBSERVATION_SIGMA = 1.0;
-
+    private final ModelFitter fitter;
     private final LinearRegressionGraph<OUTPUT> modelGraph;
 
-    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph) {
+    RegressionModel(LinearRegressionGraph<OUTPUT> modelGraph, ModelFitter fitter) {
         this.modelGraph = modelGraph;
+        this.fitter = fitter;
     }
 
     public static RegressionModelBuilder<DoubleTensor> withTrainingData(DoubleTensor inputTrainingData, DoubleTensor outputTrainingData) {
@@ -49,16 +51,16 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
         };
     }
 
-    public DoubleTensor getWeights() {
-        return modelGraph.getWeights();
+    public DoubleVertex getInterceptVertex() {
+        return modelGraph.getInterceptVertex();
     }
 
-    public double getIntercept() {
-        return modelGraph.getIntercept();
+    public DoubleVertex getWeightVertex() {
+        return modelGraph.getWeightVertex();
     }
 
-    public double getWeight(int index) {
-        return getWeights().getFlattenedView().getOrScalar(index);
+    public Vertex<OUTPUT> getOutputVertex() {
+        return modelGraph.getOutputVertex();
     }
 
     @Override
@@ -66,11 +68,8 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
         return modelGraph.predict(tensor);
     }
 
-    public VertexId getInterceptVertexId() {
-        return modelGraph.getInterceptVertexId();
+    public void fit() {
+        fitter.fit(modelGraph);
     }
 
-    public VertexId getWeightsVertexId() {
-        return modelGraph.getWeightsVertexId();
-    }
 }

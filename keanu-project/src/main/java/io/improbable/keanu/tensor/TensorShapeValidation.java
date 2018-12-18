@@ -46,7 +46,10 @@ public class TensorShapeValidation {
 
             if (nonLengthOneShapeDoesNotMatchProposal) {
                 throw new IllegalArgumentException(
-                    "Proposed shape " + Arrays.toString(proposalShape) + " does not match other non length one shapes"
+                    "Proposed shape "
+                        + Arrays.toString(proposalShape)
+                        + " does not match other non length one shapes "
+                        + Arrays.toString(nonLengthOneShape)
                 );
             }
         }

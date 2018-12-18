@@ -5,4 +5,5 @@ __all__ = ["BooleanIf", "CastBool", "ConstantBool", "NumericalEquals", "AndBinar
 
 from .generated import *
 from .const import Const
+from .lambda_model import LambdaModel
 from . import generated, const
