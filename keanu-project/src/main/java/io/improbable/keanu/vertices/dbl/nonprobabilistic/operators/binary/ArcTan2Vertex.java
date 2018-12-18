@@ -10,6 +10,9 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartial;
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.shouldCorrectPartialForScalar;
+
 public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
     private static final String X_NAME = LEFT_NAME;
@@ -34,17 +37,22 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dxWrtInput, PartialDerivative dyWrtInput) {
+
         DoubleTensor yValue = right.getValue();
         DoubleTensor xValue = left.getValue();
-
         DoubleTensor denominator = yValue.pow(2).plusInPlace(xValue.pow(2));
 
-        PartialDerivative diffFromX = dxWrtInput.multiplyAlongOfDimensions(
+        boolean shouldCorrectForXScalar = shouldCorrectPartialForScalar(dxWrtInput, this.getShape(), left.getShape());
+        PartialDerivative fromX = shouldCorrectForXScalar ? correctForScalarPartial(dxWrtInput, this.getShape(), left.getShape().length) : dxWrtInput;
+        boolean shouldCorrectForYScalar = shouldCorrectPartialForScalar(dyWrtInput, this.getShape(), right.getShape());
+        PartialDerivative fromY = shouldCorrectForYScalar ? correctForScalarPartial(dyWrtInput, this.getShape(), right.getShape().length) : dyWrtInput;
+
+        PartialDerivative diffFromX = fromX.multiplyAlongOfDimensions(
             yValue.div(denominator).unaryMinusInPlace(),
             xValue.getShape()
         );
 
-        PartialDerivative diffFromY = dyWrtInput.multiplyAlongOfDimensions(
+        PartialDerivative diffFromY = fromY.multiplyAlongOfDimensions(
             xValue.div(denominator),
             yValue.getShape()
         );

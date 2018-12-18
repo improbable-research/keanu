@@ -10,6 +10,9 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartial;
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.shouldCorrectPartialForScalar;
+
 public class PowerVertex extends DoubleBinaryOpVertex {
 
     private static final String BASE_NAME = LEFT_NAME;
@@ -43,12 +46,17 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dBaseWrtInput, PartialDerivative dExponentWrtInput) {
 
+        boolean shouldCorrectForLeftScalar = shouldCorrectPartialForScalar(dBaseWrtInput, this.getShape(), left.getShape());
+        PartialDerivative fromBase = shouldCorrectForLeftScalar ? correctForScalarPartial(dBaseWrtInput, this.getShape(), left.getShape().length) : dBaseWrtInput;
+        boolean shouldCorrectForRightScalar = shouldCorrectPartialForScalar(dExponentWrtInput, this.getShape(), right.getShape());
+        PartialDerivative fromExponent = shouldCorrectForRightScalar ? correctForScalarPartial(dExponentWrtInput, this.getShape(), right.getShape().length) : dExponentWrtInput;
+
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
         PartialDerivative partialsFromBase;
         PartialDerivative partialsFromExponent;
 
-        if (dBaseWrtInput.isPresent()) {
-            partialsFromBase = dBaseWrtInput.multiplyAlongOfDimensions(
+        if (fromBase.isPresent()) {
+            partialsFromBase = fromBase.multiplyAlongOfDimensions(
                 right.getValue().times(left.getValue().pow(right.getValue().minus(1))),
                 this.getValue().getShape()
             );
@@ -56,8 +64,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
             partialsFromBase = PartialDerivative.EMPTY;
         }
 
-        if (dExponentWrtInput.isPresent()) {
-            partialsFromExponent = dExponentWrtInput.multiplyAlongOfDimensions(
+        if (fromExponent.isPresent()) {
+            partialsFromExponent = fromExponent.multiplyAlongOfDimensions(
                 left.getValue().log().timesInPlace(this.getValue()),
                 right.getValue().getShape()
             );

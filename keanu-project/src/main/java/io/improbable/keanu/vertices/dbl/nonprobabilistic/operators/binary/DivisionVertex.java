@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartial;
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.shouldCorrectPartialForScalar;
 
 @DisplayInformationForOutput(displayName = "/")
 public class DivisionVertex extends DoubleBinaryOpVertex {
@@ -35,9 +37,21 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
+        boolean shouldCorrectForLeftScalar = shouldCorrectPartialForScalar(dLeftWrtInput, this.getShape(), left.getShape());
+        PartialDerivative fromLeft = shouldCorrectForLeftScalar ? correctForScalarPartial(dLeftWrtInput, this.getShape(), left.getShape().length) : dLeftWrtInput;
+        boolean shouldCorrectForRightScalar = shouldCorrectPartialForScalar(dRightWrtInput, this.getShape(), right.getShape());
+        PartialDerivative fromRight = shouldCorrectForRightScalar ? correctForScalarPartial(dRightWrtInput, this.getShape(), right.getShape().length) : dRightWrtInput;
+
         // dc = (B * da - A * db) / B^2;
-        PartialDerivative partialsFromLeft = dLeftWrtInput.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
-        PartialDerivative partialsFromRight = dRightWrtInput.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
+        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(
+            right.getValue(),
+            left.getValue().getShape()
+        );
+
+        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(
+            left.getValue(),
+            right.getValue().getShape()
+        );
 
         return partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().pow(2));
     }

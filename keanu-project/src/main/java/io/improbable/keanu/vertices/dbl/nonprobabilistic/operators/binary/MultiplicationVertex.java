@@ -38,13 +38,18 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
+        boolean shouldCorrectForLeftScalar = shouldCorrectPartialForScalar(dLeftWrtInput, this.getShape(), left.getShape());
+        PartialDerivative fromLeft = shouldCorrectForLeftScalar ? correctForScalarPartial(dLeftWrtInput, this.getShape(), left.getShape().length) : dLeftWrtInput;
+        boolean shouldCorrectForRightScalar = shouldCorrectPartialForScalar(dRightWrtInput, this.getShape(), right.getShape());
+        PartialDerivative fromRight = shouldCorrectForRightScalar ? correctForScalarPartial(dRightWrtInput, this.getShape(), right.getShape().length) : dRightWrtInput;
+
         // dc = A * db + da * B;
-        PartialDerivative partialsFromLeft = dLeftWrtInput.multiplyAlongOfDimensions(
+        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(
             right.getValue(),
             left.getValue().getShape()
         );
 
-        PartialDerivative partialsFromRight = dRightWrtInput.multiplyAlongOfDimensions(
+        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(
             left.getValue(),
             right.getValue().getShape()
         );

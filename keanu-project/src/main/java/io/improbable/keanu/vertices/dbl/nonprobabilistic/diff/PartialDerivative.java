@@ -134,7 +134,7 @@ public class PartialDerivative {
         if (multiplier.isScalar()) {
             result = partial.times(multiplier);
         } else {
-            result = elementWiseMultiplyAlongOf(partial, multiplier, ofShape);
+            result = elementWiseMultiplyAlongOf(partial, multiplier);
         }
 
         return new PartialDerivative(id, result);
@@ -148,7 +148,7 @@ public class PartialDerivative {
 
         DoubleTensor result;
         if (multiplier.isScalar()) {
-            result = partial.times(multiplier);
+            result = partial.times(multiplier.scalar());
         } else {
             result = elementWiseMultiplyAlongWrt(partial, multiplier, wrtShape);
         }
@@ -156,22 +156,7 @@ public class PartialDerivative {
         return new PartialDerivative(id, result);
     }
 
-    private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier, long[] ofShape) {
-
-        long[] partialOfShape = extractOfShape(partial.getShape(), ofShape.length);
-
-        boolean needsBroadcast = !Arrays.equals(partialOfShape, multiplier.getShape());
-        if (needsBroadcast) {
-            long[] partialWrtShape = extractWrtShape(partial.getShape(), ofShape.length);
-            long[] broadcastedOfShape = Shape.broadcastOutputShape(multiplier.getShape(), partialOfShape);
-            long[] resultShape = TensorShape.concat(broadcastedOfShape, partialWrtShape);
-
-            DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, resultShape.length);
-            DoubleTensor appropriateShapePartial = increaseRankByPrependingOnesToShape(partial, resultShape.length);
-
-            return DoubleTensor.ones(resultShape).times(appropriateShapePartial).times(multiplierFromLeft);
-        }
-
+    private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier) {
         DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
         return partial.times(multiplierFromLeft);
     }
