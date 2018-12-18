@@ -1,6 +1,7 @@
 package io.improbable.keanu.benchmarks;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -28,23 +29,25 @@ public class ScalarDoubleOperations {
 
     @Benchmark
     public double nd4jScalars() {
-        DoubleTensor value = DoubleTensor.scalar(1.);
-        DoubleTensor operand = DoubleTensor.scalar(OPERAND);
+        final Nd4jDoubleTensor value = Nd4jDoubleTensor.scalar(1.);
+        final Nd4jDoubleTensor operand = Nd4jDoubleTensor.scalar(OPERAND);
+        DoubleTensor result = value;
 
         for (int i = 0; i < NUM_OPERATIONS; i++) {
-            value = operation.apply(value, operand);
+            result = operation.apply(result, operand);
         }
-        return value.scalar();
+        return result.scalar();
     }
 
     @Benchmark
     public double customScalarClass() {
-        DoubleTensor value = new ScalarDoubleTensor(1.);
-        DoubleTensor operand = new ScalarDoubleTensor(OPERAND);
+        final ScalarDoubleTensor value = new ScalarDoubleTensor(1.);
+        final ScalarDoubleTensor operand = new ScalarDoubleTensor(OPERAND);
+        DoubleTensor result = value;
 
         for (int i = 0; i < NUM_OPERATIONS; i++) {
-            value = operation.apply(value, operand);
+            result = operation.apply(result, operand);
         }
-        return value.scalar();
+        return result.scalar();
     }
 }
