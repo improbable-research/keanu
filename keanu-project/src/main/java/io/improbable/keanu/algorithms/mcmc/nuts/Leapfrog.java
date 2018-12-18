@@ -15,7 +15,7 @@ import java.util.Map;
  * Leapfrog performs a movement through physical space with the introduction of a momentum variable.
  * This is required for sampling in Hamiltonian and NUTS.
  */
-public class Leapfrog {
+class Leapfrog {
 
     private final Map<VertexId, DoubleTensor> position;
     private final Map<VertexId, DoubleTensor> momentum;

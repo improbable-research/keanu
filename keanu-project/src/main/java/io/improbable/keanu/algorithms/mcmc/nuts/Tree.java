@@ -21,7 +21,7 @@ import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
  * <p>
  * The tree is reset for each sample.
  */
-public class Tree implements SaveStatistics {
+class Tree implements SaveStatistics {
 
     private static final double DELTA_MAX = 1000.0;
     private static final int STARTING_ACCEPTED_LEAPFROG = 1;
