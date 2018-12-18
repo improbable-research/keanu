@@ -2,18 +2,18 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartial;
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.shouldCorrectPartialForScalar;
 
 
 @DisplayInformationForOutput(displayName = "-")
@@ -39,25 +39,12 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
-        boolean shouldCorrectForLeftScalar = shouldCorrectPartialForScalar(dLeftWrtInput, left.getShape());
-
-        PartialDerivative fromLeft = shouldCorrectForLeftScalar ? correctForScalarPartial(dLeftWrtInput) : dLeftWrtInput;
-
-        boolean shouldCorrectForRightScalar = shouldCorrectPartialForScalar(dRightWrtInput, right.getShape());
-
-        PartialDerivative fromRight = shouldCorrectForRightScalar ? correctForScalarPartial(dRightWrtInput) : dRightWrtInput;
+        boolean shouldCorrectForLeftScalar = shouldCorrectPartialForScalar(dLeftWrtInput, this.getShape(), left.getShape());
+        PartialDerivative fromLeft = shouldCorrectForLeftScalar ? correctForScalarPartial(dLeftWrtInput, this.getShape(), left.getShape().length) : dLeftWrtInput;
+        boolean shouldCorrectForRightScalar = shouldCorrectPartialForScalar(dRightWrtInput, this.getShape(), right.getShape());
+        PartialDerivative fromRight = shouldCorrectForRightScalar ? correctForScalarPartial(dRightWrtInput, this.getShape(), right.getShape().length) : dRightWrtInput;
 
         return fromLeft.subtract(fromRight);
-    }
-
-    private boolean shouldCorrectPartialForScalar(PartialDerivative dSideWrtInput, long[] sideShape) {
-        return dSideWrtInput.isPresent() && !Arrays.equals(sideShape, this.getShape());
-    }
-
-    private PartialDerivative correctForScalarPartial(PartialDerivative partialDerivative) {
-        DoubleTensor partial = partialDerivative.getPartial();
-        DoubleTensor correctedPartial = DoubleTensor.zeros(TensorShape.concat(this.getShape(), partial.getShape())).plus(partial);
-        return new PartialDerivative(partialDerivative.getKey(), correctedPartial);
     }
 
     @Override

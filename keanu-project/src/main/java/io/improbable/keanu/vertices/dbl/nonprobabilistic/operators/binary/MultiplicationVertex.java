@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartial;
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.shouldCorrectPartialForScalar;
 
 @DisplayInformationForOutput(displayName = "*")
 public class MultiplicationVertex extends DoubleBinaryOpVertex {
@@ -37,8 +39,15 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
         // dc = A * db + da * B;
-        PartialDerivative partialsFromLeft = dLeftWrtInput.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
-        PartialDerivative partialsFromRight = dRightWrtInput.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
+        PartialDerivative partialsFromLeft = dLeftWrtInput.multiplyAlongOfDimensions(
+            right.getValue(),
+            left.getValue().getShape()
+        );
+
+        PartialDerivative partialsFromRight = dRightWrtInput.multiplyAlongOfDimensions(
+            left.getValue(),
+            right.getValue().getShape()
+        );
 
         return partialsFromLeft.add(partialsFromRight);
     }
@@ -47,8 +56,15 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
-        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(right.getValue(), this.getShape());
-        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(left.getValue(), this.getShape());
+        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(
+            right.getValue(),
+            this.getShape()
+        );
+
+        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(
+            left.getValue(),
+            this.getShape()
+        );
 
         partials.put(left, dOutputsWrtLeft);
         partials.put(right, dOutputsWrtRight);
