@@ -38,14 +38,14 @@ public class ArcTanVertex extends DoubleUnaryOpVertex implements Differentiable 
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         DoubleTensor inputValue = inputVertex.getValue();
 
         //dArcTandx = 1 / (1 + x^2)
         DoubleTensor dSelfWrtInput = inputValue.pow(2).plusInPlace(1).reciprocalInPlace();
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
 
         return partials;
     }

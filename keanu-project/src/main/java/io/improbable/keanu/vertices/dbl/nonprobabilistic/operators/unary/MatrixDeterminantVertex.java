@@ -41,10 +41,10 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         DoubleTensor inverseTranspose = inputVertex.getValue().transpose().matrixInverse();
 
-        PartialDerivative derivativeOfOutputsWithRespectToInputs = derivativeOfOutputsWithRespectToSelf
+        PartialDerivative derivativeOfOutputsWithRespectToInputs = derivativeOfOutputWithRespectToSelf
             .multiplyBy(inputVertex.getValue().determinant())
             .multiplyAlongWrtDimensions(inverseTranspose, this.getShape());
 

@@ -58,9 +58,9 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
             autoDiffCount.incrementAndGet();
-            return Collections.singletonMap(inputVertex, derivativeOfOutputsWithRespectToSelf);
+            return Collections.singletonMap(inputVertex, derivativeOfOutputWithRespectToSelf);
         }
     }
 
@@ -104,11 +104,11 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
             autoDiffCount.incrementAndGet();
             Map<Vertex, PartialDerivative> partials = new HashMap<>();
-            partials.put(left, derivativeOfOutputsWithRespectToSelf);
-            partials.put(right, derivativeOfOutputsWithRespectToSelf);
+            partials.put(left, derivativeOfOutputWithRespectToSelf);
+            partials.put(right, derivativeOfOutputWithRespectToSelf);
             return partials;
         }
     }

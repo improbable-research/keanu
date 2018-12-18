@@ -35,10 +35,10 @@ public class LogGammaVertex extends DoubleUnaryOpVertex implements Differentiabl
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         PartialDerivative dOutputsWrtInputVertex =
-            derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(inputVertex.getValue().digamma(), getShape());
+            derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(inputVertex.getValue().digamma(), getShape());
         partials.put(inputVertex, dOutputsWrtInputVertex);
         return partials;
     }

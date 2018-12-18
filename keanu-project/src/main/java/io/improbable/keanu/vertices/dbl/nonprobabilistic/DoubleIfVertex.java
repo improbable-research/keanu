@@ -85,12 +85,12 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
-        partials.put(thn, derivativeOfOutputsWithRespectToSelf
+        partials.put(thn, derivativeOfOutputWithRespectToSelf
             .multiplyAlongWrtDimensions(predicateValue.toDoubleMask(), this.getShape()));
-        partials.put(els, derivativeOfOutputsWithRespectToSelf
+        partials.put(els, derivativeOfOutputWithRespectToSelf
             .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask(), this.getShape()));
         return partials;
     }

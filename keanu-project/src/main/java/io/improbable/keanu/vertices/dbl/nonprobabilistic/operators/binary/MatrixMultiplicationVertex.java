@@ -32,18 +32,18 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
 
         PartialDerivative dOutputsWrtLeft = PartialDerivative
             .matrixMultiplyAlongWrtDimensions(
-                derivativeOfOutputsWithRespectToSelf,
+                derivativeOfOutputWithRespectToSelf,
                 right.getValue(),
                 true
             );
 
         PartialDerivative dOutputsWrtRight = PartialDerivative
             .matrixMultiplyAlongWrtDimensions(
-                derivativeOfOutputsWithRespectToSelf,
+                derivativeOfOutputWithRespectToSelf,
                 left.getValue(),
                 false
             );

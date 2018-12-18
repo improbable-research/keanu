@@ -43,11 +43,11 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
-        VertexId k = derivativeOfOutputsWithRespectToSelf.getKey();
-        DoubleTensor v = derivativeOfOutputsWithRespectToSelf.getPartial();
+        VertexId k = derivativeOfOutputWithRespectToSelf.getKey();
+        DoubleTensor v = derivativeOfOutputWithRespectToSelf.getPartial();
         DoubleTensor padded = padSliceWithZerosToMatchOriginalShape(v);
         partials.put(inputVertex, new PartialDerivative(k, padded));
 

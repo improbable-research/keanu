@@ -35,13 +35,13 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex implements Differen
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor parentValue = getValue();
         DoubleTensor negativeValue = getValue().unaryMinus();
 
         PartialDerivative newPartials =
-            PartialDerivative.matrixMultiplyAlongWrtDimensions(derivativeOfOutputsWithRespectToSelf, negativeValue, false);
+            PartialDerivative.matrixMultiplyAlongWrtDimensions(derivativeOfOutputWithRespectToSelf, negativeValue, false);
         newPartials = PartialDerivative.matrixMultiplyAlongWrtDimensions(newPartials, parentValue, true);
 
         partials.put(inputVertex, newPartials);

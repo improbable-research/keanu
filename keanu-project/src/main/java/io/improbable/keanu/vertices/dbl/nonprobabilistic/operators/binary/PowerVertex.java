@@ -69,15 +69,15 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor baseValue = getBase().getValue();
         DoubleTensor exponentValue = getExponent().getValue();
         DoubleTensor basePowExponent = getValue();
         DoubleTensor dSelfWrtBase = exponentValue.div(baseValue).timesInPlace(basePowExponent);
         DoubleTensor dSelfWrtExponent = basePowExponent.times(baseValue.log());
-        partials.put(getBase(), derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase, this.getShape()));
-        partials.put(getExponent(), derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent, this.getShape()));
+        partials.put(getBase(), derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase, this.getShape()));
+        partials.put(getExponent(), derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent, this.getShape()));
         return partials;
     }
 }

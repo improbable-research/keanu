@@ -65,10 +65,10 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> reshapedDerivatives = new HashMap<>();
 
-        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getPartial();
+        DoubleTensor partial = derivativeOfOutputWithRespectToSelf.getPartial();
         long[] newPartialShape = TensorShape.concat(
             TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
             inputVertex.getShape()
@@ -78,7 +78,7 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
         DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial.reshape(partialUpRankShape));
         DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
         DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
-        reshapedDerivatives.put(inputVertex, new PartialDerivative(derivativeOfOutputsWithRespectToSelf.getKey(), highRankMask));
+        reshapedDerivatives.put(inputVertex, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getKey(), highRankMask));
 
         return reshapedDerivatives;
     }

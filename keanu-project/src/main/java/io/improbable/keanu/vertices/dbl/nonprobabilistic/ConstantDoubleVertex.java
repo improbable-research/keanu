@@ -44,7 +44,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         return Collections.emptyMap();
     }
 

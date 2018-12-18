@@ -126,7 +126,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> splitPartials = new HashMap<>();
 
         long currentSplitIndex = 0;
@@ -142,12 +142,12 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         int wrtStartsAt = -operandsRank;
         int wrtSplitOn = wrtStartsAt + dimension;
 
-        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getPartial();
+        DoubleTensor partial = derivativeOfOutputWithRespectToSelf.getPartial();
 
         List<DoubleTensor> splitPartial = partial.split(wrtSplitOn, splitIndices);
 
         for (int i = 0; i < splitPartial.size(); i++) {
-            splitPartials.put(operands[i], new PartialDerivative(derivativeOfOutputsWithRespectToSelf.getKey(), splitPartial.get(i)));
+            splitPartials.put(operands[i], new PartialDerivative(derivativeOfOutputWithRespectToSelf.getKey(), splitPartial.get(i)));
         }
 
         return splitPartials;

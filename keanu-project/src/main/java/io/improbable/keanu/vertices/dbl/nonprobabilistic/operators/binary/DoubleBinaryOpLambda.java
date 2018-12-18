@@ -74,7 +74,7 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differen
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
-        return reverseModeAutoDiffLambda.apply(derivativeOfOutputsWithRespectToSelf);
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        return reverseModeAutoDiffLambda.apply(derivativeOfOutputWithRespectToSelf);
     }
 }

@@ -33,16 +33,16 @@ public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> reshapedDerivatives = new HashMap<>();
 
-        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getPartial();
+        DoubleTensor partial = derivativeOfOutputWithRespectToSelf.getPartial();
         long[] newPartialShape = TensorShape.concat(
             TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
             inputVertex.getShape()
         );
-        DoubleTensor reshapedPartialDerivative = derivativeOfOutputsWithRespectToSelf.getPartial().reshape(newPartialShape);
-        reshapedDerivatives.put(inputVertex, new PartialDerivative(derivativeOfOutputsWithRespectToSelf.getKey(), reshapedPartialDerivative));
+        DoubleTensor reshapedPartialDerivative = derivativeOfOutputWithRespectToSelf.getPartial().reshape(newPartialShape);
+        reshapedDerivatives.put(inputVertex, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getKey(), reshapedPartialDerivative));
 
         return reshapedDerivatives;
     }

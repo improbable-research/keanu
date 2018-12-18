@@ -66,9 +66,9 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         if (reverseModeAutoDiffLambda != null) {
-            return reverseModeAutoDiffLambda.apply(derivativeOfOutputsWithRespectToSelf);
+            return reverseModeAutoDiffLambda.apply(derivativeOfOutputWithRespectToSelf);
         }
 
         throw new UnsupportedOperationException();

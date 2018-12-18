@@ -26,7 +26,7 @@ public interface Differentiable {
         );
     }
 
-    default Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    default Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         return Collections.emptyMap();
     }
 }

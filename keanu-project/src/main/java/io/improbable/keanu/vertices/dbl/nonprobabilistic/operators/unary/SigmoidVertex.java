@@ -39,13 +39,13 @@ public class SigmoidVertex extends DoubleUnaryOpVertex implements Differentiable
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         DoubleTensor sigmoidOfInput = getValue();
         //dSigmoid = sigmoid(x)*(1-sigmoid(x))
         DoubleTensor derivativeOfSigmoidWrtInput = sigmoidOfInput.minus(sigmoidOfInput.pow(2));
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(derivativeOfSigmoidWrtInput, this.getShape()));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(derivativeOfSigmoidWrtInput, this.getShape()));
         return partials;
     }
 

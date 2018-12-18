@@ -117,7 +117,7 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
-        return reverseModeAutoDiffLambda.apply(derivativeOfOutputsWithRespectToSelf);
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        return reverseModeAutoDiffLambda.apply(derivativeOfOutputWithRespectToSelf);
     }
 }

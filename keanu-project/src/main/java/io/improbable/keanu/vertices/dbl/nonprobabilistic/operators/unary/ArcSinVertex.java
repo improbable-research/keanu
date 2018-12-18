@@ -40,7 +40,7 @@ public class ArcSinVertex extends DoubleUnaryOpVertex implements Differentiable 
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         DoubleTensor inputValue = inputVertex.getValue();
 
         //dArcSindx = 1 / sqrt(1 - x^2)
@@ -49,7 +49,7 @@ public class ArcSinVertex extends DoubleUnaryOpVertex implements Differentiable 
             .reciprocalInPlace();
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
 
         return partials;
     }

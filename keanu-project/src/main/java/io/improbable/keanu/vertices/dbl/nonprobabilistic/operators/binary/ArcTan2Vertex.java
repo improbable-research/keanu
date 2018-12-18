@@ -53,7 +53,7 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor xValue = left.getValue();
         DoubleTensor yValue = right.getValue();
@@ -62,8 +62,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         DoubleTensor dOutWrtX = yValue.div(denominator).unaryMinusInPlace();
         DoubleTensor dOutWrtY = xValue.div(denominator);
 
-        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX, this.getShape()));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY, this.getShape()));
+        partials.put(left, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX, this.getShape()));
+        partials.put(right, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY, this.getShape()));
         return partials;
     }
 }
