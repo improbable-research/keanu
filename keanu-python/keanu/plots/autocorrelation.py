@@ -7,6 +7,7 @@ from keanu.vartypes import numpy_types
 from math import log, floor
 from numpy import ndarray
 
+
 def __create_new_mpl() -> Tuple[Any, Any]:
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -15,17 +16,19 @@ def __create_new_mpl() -> Tuple[Any, Any]:
 
 def __plot_corr(ax: Any, acf_x: ndarray, nlags: int, **kwargs: Any) -> None:
     ax.vlines(np.arange(nlags), [0], acf_x)
-    ax.axhline(0,0,1, linewidth=1, color='black')
+    ax.axhline(0, 0, 1, linewidth=1, color='black')
     kwargs.setdefault('marker', 'o')
     kwargs.setdefault('markersize', 5)
     kwargs.setdefault('linestyle', 'None')
     ax.set_title("Autocorrelation")
+    ax.set_xlabel('Lag')
+    ax.set_ylabel('ACF')
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     ax.plot(acf_x[:nlags], **kwargs)
 
 
 def _calc_max_lag(data_len: int) -> int:
-    lim = min(int(floor(10 * log(data_len,10))), data_len - 1)
+    lim = min(int(floor(10 * log(data_len, 10))), data_len - 1)
     return lim
 
 
