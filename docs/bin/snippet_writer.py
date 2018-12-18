@@ -115,6 +115,12 @@ def check_output_dir_exists(output_dir):
     if (not os.path.exists(output_dir)):
         os.mkdir(output_dir)
 
+def strip_block_whitespace(string_list):
+    """Treats a list of strings as a code block and strips
+        whitespace so that the min whitespace line sits at char 0 of line."""
+    min_ws = min([(len(x) - len(x.lstrip())) for x in string_list if x != '\n'])
+    return [x[min_ws:] if x != '\n' else x for x in string_list]
+
 
 def main():
     """Parse args (expects source and dest doc directories and snippet source dir)
@@ -135,12 +141,13 @@ def main():
     snippet_store = {}
     for_all_in_dir(args.java_src_dir, lambda x: read_file_snippets(args.java_src_dir + x, snippet_store))
     for_all_in_dir(args.python_src_dir, lambda x: read_file_snippets(args.python_src_dir + x, snippet_store))
-    printd(str(snippet_store))
+    stripped_snippet_store = {k: strip_block_whitespace(v) for k, v in snippet_store.items()}
+    printd(str(stripped_snippet_store))
     check_output_dir_exists(args.output_dir)
     for_all_in_subdirs(args.input_dir, lambda x: do_rewrites(x,
                                                               args.input_dir,
                                                               args.output_dir,
-                                                              snippet_store))
+                                                              stripped_snippet_store))
 
 if __name__ == "__main__":
     main()
