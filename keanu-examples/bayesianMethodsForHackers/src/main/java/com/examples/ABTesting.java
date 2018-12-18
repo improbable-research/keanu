@@ -41,9 +41,10 @@ public class ABTesting {
 
         //infer the most probable probabilities
         BayesianNetwork net = new BayesianNetwork(probabilityA.getConnectedGraph());
+        int sampleCount = 100;
         NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig()
-            .getPosteriorSamples(net, Arrays.asList(probabilityA, probabilityB, delta), 20000)
-            .drop(1000).downSample(net.getLatentVertices().size());
+            .getPosteriorSamples(net, Arrays.asList(probabilityA, probabilityB, delta), sampleCount)
+            .drop(sampleCount/2).downSample(net.getLatentVertices().size());
 
         DoubleVertexSamples pASamples = networkSamples.getDoubleTensorSamples(probabilityA);
         DoubleVertexSamples pBSamples = networkSamples.getDoubleTensorSamples(probabilityB);
