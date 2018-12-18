@@ -21,30 +21,7 @@ public class Nd4jDoubleTensorScalarOperations {
         new ScalarDoubleTensor(1.)
     };
 
-    public enum Operation {
-        PLUS {
-            public DoubleTensor apply(DoubleTensor lhs, DoubleTensor rhs) {
-                return lhs.plus(rhs);
-            }
-        },
-        MINUS {
-            public DoubleTensor apply(DoubleTensor lhs, DoubleTensor rhs) {
-                return lhs.minus(rhs);
-            }
-        },
-        TIMES {
-            public DoubleTensor apply(DoubleTensor lhs, DoubleTensor rhs) {
-                return lhs.times(rhs);
-            }
-        },
-        DIVIDE {
-            public DoubleTensor apply(DoubleTensor lhs, DoubleTensor rhs) {
-                return lhs.div(rhs);
-            }
-        };
 
-        public abstract DoubleTensor apply(DoubleTensor lhs, DoubleTensor rhs);
-    }
 
     @Param({"PLUS", "MINUS", "TIMES", "DIVIDE"})
     public Operation operation;
