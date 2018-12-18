@@ -32,15 +32,38 @@ public abstract class BinaryOpVertex<A, B, C> extends Vertex<C> implements NonPr
 
     protected abstract C op(A a, B b);
 
-    public static boolean shouldCorrectPartialForScalar(PartialDerivative dSideWrtInput, long[] opShape, long[] sideShape) {
-        return dSideWrtInput.isPresent() && !Arrays.equals(sideShape, opShape);
+    private static boolean shouldCorrectPartialForScalarForward(PartialDerivative partial, long[] targetOfShape, long[] currentOfShape) {
+        return partial.isPresent() && !Arrays.equals(currentOfShape, targetOfShape);
     }
 
-    public static PartialDerivative correctForScalarPartial(PartialDerivative partialDerivative, long[] opShape, int sideRank) {
-        DoubleTensor partial = partialDerivative.getPartial();
-        long[] partialShape = partial.getShape();
-        long[] wrtShape = TensorShape.selectDimensions(sideRank, partialShape.length, partialShape);
-        DoubleTensor correctedPartial = DoubleTensor.zeros(TensorShape.concat(opShape, wrtShape)).plus(partial);
-        return new PartialDerivative(partialDerivative.getKey(), correctedPartial);
+    public static PartialDerivative correctForScalarPartialForward(PartialDerivative partialDerivative, long[] targetOfShape, long[] currentOfShape) {
+
+        if (shouldCorrectPartialForScalarForward(partialDerivative, currentOfShape, targetOfShape)) {
+
+            DoubleTensor partial = partialDerivative.getPartial();
+            long[] partialShape = partial.getShape();
+            long[] wrtShape = TensorShape.selectDimensions(currentOfShape.length, partialShape.length, partialShape);
+            DoubleTensor correctedPartial = DoubleTensor.zeros(TensorShape.concat(targetOfShape, wrtShape)).plus(partial);
+            return new PartialDerivative(partialDerivative.getKey(), correctedPartial);
+        } else {
+            return partialDerivative;
+        }
+    }
+
+    private static boolean shouldCorrectForPartialScalarReverse(PartialDerivative partial, long[] targetWrtShape, long[] currentWrtShape) {
+        return partial.isPresent() && !Arrays.equals(currentWrtShape, targetWrtShape);
+    }
+
+    public static PartialDerivative correctForScalarReverse(PartialDerivative partialForScalar, long[] currentWrtShape, long[] targetWrtShape) {
+
+        if (shouldCorrectForPartialScalarReverse(partialForScalar, currentWrtShape, targetWrtShape)) {
+
+            long[] partialShape = partialForScalar.getPartial().getShape();
+            int[] wrtDims = TensorShape.dimensionRange(partialShape.length - currentWrtShape.length, partialShape.length);
+
+            return partialForScalar.sumOverWrtDimensions(wrtDims, targetWrtShape);
+        } else {
+            return partialForScalar;
+        }
     }
 }

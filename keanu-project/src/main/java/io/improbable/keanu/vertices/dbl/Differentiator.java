@@ -89,7 +89,7 @@ public class Differentiator {
             PartialDerivative dwrtV;
             if (TensorShape.isLengthOne(wrtShape)) {
                 int visitingRank = visitingShape.length;
-                dwrtV = partialsOf.sumOverWrtDimensions(TensorShape.dimensionRange(-visitingRank, 0), wrtShape, visitingRank);
+                dwrtV = partialsOf.sumOverWrtDimensions(TensorShape.dimensionRange(-visitingRank, 0), wrtShape);
             } else {
                 dwrtV = partialsOf;
             }

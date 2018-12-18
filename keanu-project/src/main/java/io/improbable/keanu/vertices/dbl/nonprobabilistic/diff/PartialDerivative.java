@@ -72,10 +72,9 @@ public class PartialDerivative {
      *
      * @param dimensions  dimensions to sum over
      * @param resultShape shape of sum result
-     * @param wrtRank     the rank of the "wrt" part of the partials
      * @return summed and reshaped partials
      */
-    public PartialDerivative sumOverWrtDimensions(int[] dimensions, long[] resultShape, int wrtRank) {
+    public PartialDerivative sumOverWrtDimensions(int[] dimensions, long[] resultShape) {
 
         if (isEmpty()) {
             return this;
@@ -87,7 +86,7 @@ public class PartialDerivative {
 
         DoubleTensor v = getPartial();
         long[] vShape = v.getShape();
-        long[] ofShape = TensorShape.selectDimensions(0, v.getShape().length - wrtRank, vShape);
+        long[] ofShape = TensorShape.selectDimensions(0, vShape.length - dimensions.length, vShape);
 
         DoubleTensor summedV = v.sum(dimensions);
         long[] newShape = TensorShape.concat(ofShape, resultShape);
@@ -132,7 +131,7 @@ public class PartialDerivative {
         DoubleTensor result;
 
         if (multiplier.isScalar()) {
-            result = partial.times(multiplier);
+            result = partial.times(multiplier.scalar());
         } else {
             result = elementWiseMultiplyAlongOf(partial, multiplier);
         }

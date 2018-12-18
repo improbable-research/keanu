@@ -10,8 +10,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartial;
-import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.shouldCorrectPartialForScalar;
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpVertex.correctForScalarPartialForward;
 
 public class PowerVertex extends DoubleBinaryOpVertex {
 
@@ -46,10 +45,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dBaseWrtInput, PartialDerivative dExponentWrtInput) {
 
-        boolean shouldCorrectForLeftScalar = shouldCorrectPartialForScalar(dBaseWrtInput, this.getShape(), left.getShape());
-        PartialDerivative fromBase = shouldCorrectForLeftScalar ? correctForScalarPartial(dBaseWrtInput, this.getShape(), left.getShape().length) : dBaseWrtInput;
-        boolean shouldCorrectForRightScalar = shouldCorrectPartialForScalar(dExponentWrtInput, this.getShape(), right.getShape());
-        PartialDerivative fromExponent = shouldCorrectForRightScalar ? correctForScalarPartial(dExponentWrtInput, this.getShape(), right.getShape().length) : dExponentWrtInput;
+        PartialDerivative fromBase = correctForScalarPartialForward(dBaseWrtInput, this.getShape(), left.getShape());
+        PartialDerivative fromExponent = correctForScalarPartialForward(dExponentWrtInput, this.getShape(), right.getShape());
 
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
         PartialDerivative partialsFromBase;
