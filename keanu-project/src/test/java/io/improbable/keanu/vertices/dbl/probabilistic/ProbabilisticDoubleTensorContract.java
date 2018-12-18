@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradients;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.Pair;
 
@@ -239,7 +239,7 @@ public class ProbabilisticDoubleTensorContract {
     void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<V> vertexUnderTestSupplier) {
 
         ImmutableList.Builder<V> scalarVertices = ImmutableList.builder();
-        Map<VertexId, DoubleTensor> expectedPartialDerivatives = new HashMap<>();
+        LogProbGradients expectedPartialDerivatives = new LogProbGradients();
 
         for (int i = 0; i < vector.length; i++) {
 
@@ -253,7 +253,7 @@ public class ProbabilisticDoubleTensorContract {
                     Map.Entry::getValue)
                 );
 
-            expectedPartialDerivatives = LogProbGradientCalculator.add(expectedPartialDerivatives, dlogPdfById);
+            expectedPartialDerivatives.add(dlogPdfById);
         }
 
         V tensorVertex = vertexUnderTestSupplier.get();
@@ -267,12 +267,12 @@ public class ProbabilisticDoubleTensorContract {
         hyperParameterVertices.remove(tensorVertex);
 
         for (Vertex vertex : hyperParameterVertices) {
-            assertEquals(expectedPartialDerivatives.get(vertex.getId()).sum(), actualDerivatives.get(vertex).sum(), 1e-5);
+            assertEquals(expectedPartialDerivatives.getWithRespectTo(vertex.getId()).sum(), actualDerivatives.get(vertex).sum(), 1e-5);
         }
 
         double expected = 0;
         for (V scalarVertex : scalarVertices.build()) {
-            expected += expectedPartialDerivatives.get(scalarVertex.getId()).scalar();
+            expected += expectedPartialDerivatives.getWithRespectTo(scalarVertex.getId()).scalar();
         }
 
         double actual = actualDerivatives.get(tensorVertex).sum();
