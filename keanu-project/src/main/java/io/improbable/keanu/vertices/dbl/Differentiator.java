@@ -47,17 +47,25 @@ public class Differentiator {
             if (!visiting.isProbabilistic()) {
 
                 if (visiting instanceof Differentiable) {
-                    Differentiable visitingDifferentiable = ((Differentiable) visiting);
-                    Map<Vertex, PartialDerivative> partialDerivatives = visitingDifferentiable.reverseModeAutoDifferentiation(dwrtOf.get(visiting));
-                    collectPartials(partialDerivatives, dwrtOf, visiting.getShape());
-                }
 
-                for (Vertex parent : visiting.getParents()) {
-                    if (!alreadyQueued.contains(parent) && parent instanceof Differentiable) {
-                        priorityQueue.offer(parent);
-                        alreadyQueued.add(parent);
+                    Differentiable visitingDifferentiable = ((Differentiable) visiting);
+                    PartialDerivative derivativeOfOutputWrtVisiting = dwrtOf.get(visiting);
+
+                    if (derivativeOfOutputWrtVisiting != null) {
+
+                        Map<Vertex, PartialDerivative> partialDerivatives = visitingDifferentiable.reverseModeAutoDifferentiation(derivativeOfOutputWrtVisiting);
+                        collectPartials(partialDerivatives, dwrtOf, visiting.getShape());
+
+                        for (Vertex parent : visiting.getParents()) {
+                            if (!alreadyQueued.contains(parent) && parent instanceof Differentiable) {
+                                priorityQueue.offer(parent);
+                                alreadyQueued.add(parent);
+                            }
+                        }
+
                     }
                 }
+
             }
         }
 

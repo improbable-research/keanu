@@ -62,15 +62,11 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable, Non
         for (Vertex v : conditions.values()) {
             if (v == conditionVertex) {
                 partials.put(v, derivativeOfOutputsWithRespectToSelf);
-            } else {
-                partials.put(v, PartialDerivative.OF_CONSTANT);
             }
         }
 
         if (conditionVertex == null) {
             partials.put(defaultResult, derivativeOfOutputsWithRespectToSelf);
-        } else {
-            partials.put(defaultResult, PartialDerivative.OF_CONSTANT);
         }
 
         return partials;

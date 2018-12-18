@@ -53,7 +53,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
                 this.getValue().getShape()
             );
         } else {
-            partialsFromBase = PartialDerivative.OF_CONSTANT;
+            partialsFromBase = PartialDerivative.ZERO;
         }
 
         if (dExponentWrtInputs.isPresent()) {
@@ -62,7 +62,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
                 right.getValue().getShape()
             );
         } else {
-            partialsFromExponent = PartialDerivative.OF_CONSTANT;
+            partialsFromExponent = PartialDerivative.ZERO;
         }
 
         return partialsFromBase.add(partialsFromExponent);

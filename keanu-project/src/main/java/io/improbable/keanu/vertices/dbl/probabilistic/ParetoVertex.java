@@ -130,7 +130,7 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
         if (isObserved()) {
-            return PartialDerivative.OF_CONSTANT;
+            return PartialDerivative.ZERO;
         } else {
             return PartialDerivative.withRespectToSelf(this.getId(), this.getShape());
         }

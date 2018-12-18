@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class PartialDerivative {
 
-    public static final PartialDerivative OF_CONSTANT = new PartialDerivative(null, null);
+    public static final PartialDerivative ZERO = new PartialDerivative();
 
     public static PartialDerivative withRespectToSelf(VertexId withRespectTo, long[] shape) {
         return new PartialDerivative(
@@ -68,6 +68,10 @@ public class PartialDerivative {
      */
     public PartialDerivative sumOverOfDimensions(int[] dimensions, long[] resultShape, int ofRank) {
 
+        if (isEmpty()) {
+            return this;
+        }
+
         DoubleTensor v = getPartial();
         long[] vShape = v.getShape();
         long[] wrtShape = TensorShape.selectDimensions(ofRank, vShape.length, vShape);
@@ -89,6 +93,10 @@ public class PartialDerivative {
      * @return summed and reshaped partials
      */
     public PartialDerivative sumOverWrtDimensions(int[] dimensions, long[] resultShape, int wrtRank) {
+
+        if (isEmpty()) {
+            return this;
+        }
 
         if (dimensions.length == 0) {
             return new PartialDerivative(getKey(), getPartial());
@@ -121,7 +129,7 @@ public class PartialDerivative {
         } else if (added != null && toAdd != null) {
             return new PartialDerivative(getKey(), added.plus(toAdd));
         } else {
-            return new PartialDerivative();
+            return PartialDerivative.ZERO;
         }
 
     }
@@ -142,7 +150,7 @@ public class PartialDerivative {
         } else if (subtracted != null && toSubtract != null) {
             return new PartialDerivative(getKey(), subtracted.minus(toSubtract));
         } else {
-            return new PartialDerivative();
+            return PartialDerivative.ZERO;
         }
 
     }
@@ -166,7 +174,7 @@ public class PartialDerivative {
     public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier, long[] ofShape) {
 
         if (isEmpty()) {
-            return duplicate();
+            return this;
         }
 
         DoubleTensor result;
@@ -183,7 +191,7 @@ public class PartialDerivative {
     public PartialDerivative multiplyAlongWrtDimensions(DoubleTensor multiplier, long[] wrtShape) {
 
         if (isEmpty()) {
-            return duplicate();
+            return this;
         }
 
         DoubleTensor result;
@@ -240,7 +248,7 @@ public class PartialDerivative {
     public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
         if (partial.isEmpty()) {
-            partial.duplicate();
+            return partial;
         }
 
         int partialRank = partial.getPartial().getRank();
@@ -265,7 +273,7 @@ public class PartialDerivative {
     public static PartialDerivative matrixMultiplyAlongWrtDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
         if (partial.isEmpty()) {
-            return partial.duplicate();
+            return partial;
         }
 
         int partialRank = partial.getPartial().getRank();
@@ -293,7 +301,7 @@ public class PartialDerivative {
     public PartialDerivative multiplyBy(double multiplier) {
 
         if (isEmpty()) {
-            return duplicate();
+            return this;
         }
 
         return new PartialDerivative(id, partial.times(multiplier));
@@ -302,7 +310,7 @@ public class PartialDerivative {
     public PartialDerivative divideBy(DoubleTensor divisor) {
 
         if (isEmpty()) {
-            return duplicate();
+            return this;
         }
 
         DoubleTensor partial = getPartial();
@@ -318,7 +326,7 @@ public class PartialDerivative {
     public PartialDerivative reshape(int currentRank, long[] proposedShape) {
 
         if (isEmpty()) {
-            return duplicate();
+            return this;
         }
 
         long[] wrtShape = extractWrtShape(partial.getShape(), currentRank);
@@ -343,7 +351,7 @@ public class PartialDerivative {
     public PartialDerivative slice(int dimension, long index, boolean reshape) {
 
         if (isEmpty()) {
-            return duplicate();
+            return this;
         }
 
         long[] partialDerivativeShape = Arrays.copyOf(partial.getShape(), partial.getShape().length);
