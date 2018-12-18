@@ -40,19 +40,19 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         PartialDerivative partialsFromRight;
 
         if (dLeftWrtInputs.isPresent()) {
-            partialsFromLeft = PartialDerivative.OF_CONSTANT;
-        } else {
             partialsFromLeft = dLeftWrtInputs.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
+        } else {
+            partialsFromLeft = PartialDerivative.OF_CONSTANT;
         }
 
         if (dRightWrtInputs.isPresent()) {
-            partialsFromRight = PartialDerivative.OF_CONSTANT;
-        } else {
             partialsFromRight = dRightWrtInputs.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
+        } else {
+            partialsFromRight = PartialDerivative.OF_CONSTANT;
         }
 
         PartialDerivative dSelfWrtInputs;
-        if (partialsFromLeft.isPresent() && partialsFromRight.isPresent()) {
+        if (partialsFromLeft.isEmpty() && partialsFromRight.isEmpty()) {
             dSelfWrtInputs = PartialDerivative.OF_CONSTANT;
         } else {
             dSelfWrtInputs = partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().pow(2));

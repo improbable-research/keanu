@@ -18,7 +18,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     /**
      * Raises a vertex to the power of another
      *
-     * @param base  the base vertex
+     * @param base     the base vertex
      * @param exponent the exponent vertex
      */
     @ExportVertexToPythonBindings
@@ -48,21 +48,21 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         PartialDerivative partialsFromExponent;
 
         if (dBaseWrtInputs.isPresent()) {
-            partialsFromBase = PartialDerivative.OF_CONSTANT;
-        } else {
             partialsFromBase = dBaseWrtInputs.multiplyAlongOfDimensions(
                 right.getValue().times(left.getValue().pow(right.getValue().minus(1))),
                 this.getValue().getShape()
             );
+        } else {
+            partialsFromBase = PartialDerivative.OF_CONSTANT;
         }
 
         if (dExponentWrtInputs.isPresent()) {
-            partialsFromExponent = PartialDerivative.OF_CONSTANT;
-        } else {
             partialsFromExponent = dExponentWrtInputs.multiplyAlongOfDimensions(
                 left.getValue().log().timesInPlace(this.getValue()),
                 right.getValue().getShape()
             );
+        } else {
+            partialsFromExponent = PartialDerivative.OF_CONSTANT;
         }
 
         return partialsFromBase.add(partialsFromExponent);
