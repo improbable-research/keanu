@@ -2,7 +2,6 @@ package io.improbable.keanu.benchmarks;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -14,13 +13,9 @@ public class Nd4jDoubleTensorScalarOperations {
 
     public DoubleTensor tensor;
 
-    public static DoubleTensor[] scalars = new DoubleTensor[] {
-        Nd4jDoubleTensor.scalar(1.),
-        Nd4jDoubleTensor.scalar(1.).reshape(1),
-        Nd4jDoubleTensor.scalar(1.).reshape(1, 1),
-        new ScalarDoubleTensor(1.)
-    };
-
+    public static final DoubleTensor RANK_0_SCALAR_TENSOR = Nd4jDoubleTensor.scalar(1.);
+    public static final DoubleTensor RANK_1_SCALAR_TENSOR = Nd4jDoubleTensor.scalar(1.).reshape(1);
+    public static final DoubleTensor RANK_2_SCALAR_TENSOR = Nd4jDoubleTensor.scalar(1.).reshape(1, 1);
 
 
     @Param({"PLUS", "MINUS", "TIMES", "DIVIDE"})
@@ -36,25 +31,19 @@ public class Nd4jDoubleTensorScalarOperations {
 
     @Benchmark
     public long baseline() {
-        DoubleTensor product = operation.apply(scalars[0], tensor);
+        DoubleTensor product = operation.apply(RANK_0_SCALAR_TENSOR, tensor);
         return product.getLength();
     }
 
     @Benchmark
     public long rank1() {
-        DoubleTensor product = operation.apply(scalars[1], tensor);
+        DoubleTensor product = operation.apply(RANK_1_SCALAR_TENSOR, tensor);
         return product.getLength();
     }
 
     @Benchmark
     public long rank2() {
-        DoubleTensor product = operation.apply(scalars[2], tensor);
+        DoubleTensor product = operation.apply(RANK_2_SCALAR_TENSOR, tensor);
         return product.getLength();
     }
-    @Benchmark
-    public long customScalars() {
-        DoubleTensor product = operation.apply(scalars[3], tensor);
-        return product.getLength();
-    }
-
 }
