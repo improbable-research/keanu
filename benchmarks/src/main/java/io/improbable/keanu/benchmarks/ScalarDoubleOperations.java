@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations.State;
 public class ScalarDoubleOperations {
 
 
-    private static final double OPERAND = 1.0001;
+    private static final double OPERAND = 1.00001;
     private static final int NUM_OPERATIONS = 1000000;
 
     @Param({"PLUS", "MINUS", "TIMES", "DIVIDE"})
