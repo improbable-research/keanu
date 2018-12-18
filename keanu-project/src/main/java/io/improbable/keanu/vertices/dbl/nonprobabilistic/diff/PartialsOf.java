@@ -31,34 +31,4 @@ public class PartialsOf {
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getPartial()));
     }
 
-    public void putWithRespectTo(VertexId id, PartialDerivative partial) {
-        partials.put(id, partial);
-    }
-
-    public PartialsOf add(PartialsOf other, Vertex<?> resultOf) {
-        Map<VertexId, PartialDerivative> clonedPartials = clonePartials(partials);
-
-        for (Map.Entry<VertexId, PartialDerivative> entry : other.partials.entrySet()) {
-            VertexId id = entry.getKey();
-            if (clonedPartials.containsKey(id)) {
-
-                DoubleTensor summation = clonedPartials.get(entry.getKey()).getPartial().plus(entry.getValue().getPartial());
-
-                clonedPartials.put(id, new PartialDerivative(of != null ? of.getId() : null, summation));
-            } else {
-                clonedPartials.put(id, entry.getValue());
-            }
-        }
-
-        return new PartialsOf(resultOf, clonedPartials);
-    }
-
-    private Map<VertexId, PartialDerivative> clonePartials(Map<VertexId, PartialDerivative> infinitesimals) {
-        Map<VertexId, PartialDerivative> clone = new HashMap<>();
-        for (Map.Entry<VertexId, PartialDerivative> entry : infinitesimals.entrySet()) {
-            clone.put(entry.getKey(), entry.getValue());
-        }
-        return clone;
-    }
-
 }
