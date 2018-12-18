@@ -10,7 +10,7 @@ public interface Differentiable {
 
     default PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
         if (((Vertex) this).isObserved()) {
-            return PartialDerivative.ZERO;
+            return PartialDerivative.EMPTY;
         } else {
             return PartialDerivative.withRespectToSelf(((Vertex) this).getId(), ((Vertex) this).getShape());
         }

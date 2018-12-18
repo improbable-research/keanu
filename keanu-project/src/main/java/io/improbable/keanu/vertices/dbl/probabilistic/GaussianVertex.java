@@ -131,7 +131,7 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
         if (isObserved()) {
-            return PartialDerivative.ZERO;
+            return PartialDerivative.EMPTY;
         } else {
             return PartialDerivative.withRespectToSelf(this.getId(), this.getShape());
         }

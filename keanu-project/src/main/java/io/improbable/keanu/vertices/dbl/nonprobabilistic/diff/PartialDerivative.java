@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class PartialDerivative {
 
-    public static final PartialDerivative ZERO = new PartialDerivative();
+    public static final PartialDerivative EMPTY = new PartialDerivative();
 
     public static PartialDerivative withRespectToSelf(VertexId withRespectTo, long[] shape) {
         return new PartialDerivative(
@@ -112,7 +112,7 @@ public class PartialDerivative {
         } else if (isEmpty() && addition.isPresent()) {
             return new PartialDerivative(addition.getKey(), addition.partial);
         } else {
-            return PartialDerivative.ZERO;
+            return PartialDerivative.EMPTY;
         }
     }
 
@@ -125,7 +125,7 @@ public class PartialDerivative {
         } else if (isEmpty() && subtraction.isPresent()) {
             return new PartialDerivative(subtraction.getKey(), subtraction.partial.unaryMinus());
         } else {
-            return PartialDerivative.ZERO;
+            return PartialDerivative.EMPTY;
         }
 
     }

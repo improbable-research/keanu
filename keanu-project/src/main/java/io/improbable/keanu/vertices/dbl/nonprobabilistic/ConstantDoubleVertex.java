@@ -40,7 +40,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
-        return PartialDerivative.ZERO;
+        return PartialDerivative.EMPTY;
     }
 
     @Override

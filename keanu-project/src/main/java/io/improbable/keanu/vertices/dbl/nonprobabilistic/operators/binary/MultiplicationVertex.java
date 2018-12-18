@@ -43,13 +43,13 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
         if (dLeftWrtInputs.isPresent()) {
             partialsFromLeft = dLeftWrtInputs.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
         } else {
-            partialsFromLeft = PartialDerivative.ZERO;
+            partialsFromLeft = PartialDerivative.EMPTY;
         }
 
         if (dRightWrtInputs.isPresent()) {
             partialsFromRight = dRightWrtInputs.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
         } else {
-            partialsFromRight = PartialDerivative.ZERO;
+            partialsFromRight = PartialDerivative.EMPTY;
         }
 
         return partialsFromLeft.add(partialsFromRight);

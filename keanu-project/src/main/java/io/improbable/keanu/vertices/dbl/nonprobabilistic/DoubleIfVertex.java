@@ -61,8 +61,8 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInputs) {
 
         long[] ofShape = getShape();
-        PartialDerivative thnPartial = derivativeOfParentsWithRespectToInputs.getOrDefault(thn, PartialDerivative.ZERO);
-        PartialDerivative elsPartial = derivativeOfParentsWithRespectToInputs.getOrDefault(els, PartialDerivative.ZERO);
+        PartialDerivative thnPartial = derivativeOfParentsWithRespectToInputs.getOrDefault(thn, PartialDerivative.EMPTY);
+        PartialDerivative elsPartial = derivativeOfParentsWithRespectToInputs.getOrDefault(els, PartialDerivative.EMPTY);
         BooleanTensor predicateValue = predicate.getValue();
 
         if (predicateValue.allTrue()) {

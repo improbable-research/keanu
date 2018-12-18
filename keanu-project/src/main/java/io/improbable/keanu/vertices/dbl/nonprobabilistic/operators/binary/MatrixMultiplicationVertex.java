@@ -65,13 +65,13 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
         if (dLeftWrtInputs.isPresent()) {
             partialsFromLeft = PartialDerivative.matrixMultiplyAlongOfDimensions(dLeftWrtInputs, right.getValue(), true);
         } else {
-            partialsFromLeft = PartialDerivative.ZERO;
+            partialsFromLeft = PartialDerivative.EMPTY;
         }
 
         if (dRightWrtInputs.isPresent()) {
             partialsFromRight = PartialDerivative.matrixMultiplyAlongOfDimensions(dRightWrtInputs, left.getValue(), false);
         } else {
-            partialsFromRight = PartialDerivative.ZERO;
+            partialsFromRight = PartialDerivative.EMPTY;
         }
 
         return partialsFromLeft.add(partialsFromRight);
