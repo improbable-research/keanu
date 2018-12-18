@@ -139,7 +139,7 @@ public class PartialDerivative {
         DoubleTensor result;
 
         if (multiplier.isScalar()) {
-            result = partial.times(multiplier.scalar());
+            result = partial.times(multiplier);
         } else {
             result = elementWiseMultiplyAlongOf(partial, multiplier, ofShape);
         }
@@ -155,7 +155,7 @@ public class PartialDerivative {
 
         DoubleTensor result;
         if (multiplier.isScalar()) {
-            result = partial.times(multiplier.scalar());
+            result = partial.times(multiplier);
         } else {
             result = elementWiseMultiplyAlongWrt(partial, multiplier, wrtShape);
         }
@@ -276,10 +276,6 @@ public class PartialDerivative {
         DoubleTensor result = partial.div(increaseRankByAppendingOnesToShape(divisor, partial.getRank()));
 
         return new PartialDerivative(id, result);
-    }
-
-    private PartialDerivative duplicate() {
-        return new PartialDerivative(id, partial);
     }
 
     public PartialDerivative reshape(int currentRank, long[] proposedShape) {

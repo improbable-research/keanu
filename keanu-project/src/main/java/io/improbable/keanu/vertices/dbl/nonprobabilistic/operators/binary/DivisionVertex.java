@@ -36,29 +36,10 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInputs, PartialDerivative dRightWrtInputs) {
 
         // dc = (B * da - A * db) / B^2;
-        PartialDerivative partialsFromLeft;
-        PartialDerivative partialsFromRight;
+        PartialDerivative partialsFromLeft = dLeftWrtInputs.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
+        PartialDerivative partialsFromRight = dRightWrtInputs.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
 
-        if (dLeftWrtInputs.isPresent()) {
-            partialsFromLeft = dLeftWrtInputs.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
-        } else {
-            partialsFromLeft = PartialDerivative.EMPTY;
-        }
-
-        if (dRightWrtInputs.isPresent()) {
-            partialsFromRight = dRightWrtInputs.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
-        } else {
-            partialsFromRight = PartialDerivative.EMPTY;
-        }
-
-        PartialDerivative dSelfWrtInputs;
-        if (partialsFromLeft.isEmpty() && partialsFromRight.isEmpty()) {
-            dSelfWrtInputs = PartialDerivative.EMPTY;
-        } else {
-            dSelfWrtInputs = partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().pow(2));
-        }
-
-        return dSelfWrtInputs;
+        return partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().pow(2));
     }
 
     @Override
