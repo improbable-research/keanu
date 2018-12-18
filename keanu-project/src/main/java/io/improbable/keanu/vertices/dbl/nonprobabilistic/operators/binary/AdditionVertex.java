@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,11 +37,26 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
 
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInputs, PartialDerivative dRightWrtInputs) {
-        return dLeftWrtInputs.add(dRightWrtInputs,
-            TensorShape.isLengthOne(left.getShape()),
-            TensorShape.isLengthOne(right.getShape()),
-            this.getShape()
-        );
+
+        boolean shouldCorrectForLeftScalar = shouldCorrectPartialForScalar(dLeftWrtInputs, left.getShape());
+
+        PartialDerivative fromLeft = shouldCorrectForLeftScalar ? correctForScalarPartial(dLeftWrtInputs) : dLeftWrtInputs;
+
+        boolean shouldCorrectForRightScalar = shouldCorrectPartialForScalar(dRightWrtInputs, right.getShape());
+
+        PartialDerivative fromRight = shouldCorrectForRightScalar ? correctForScalarPartial(dRightWrtInputs) : dRightWrtInputs;
+
+        return fromLeft.add(fromRight);
+    }
+
+    private boolean shouldCorrectPartialForScalar(PartialDerivative dSideWrtInput, long[] sideShape) {
+        return dSideWrtInput.isPresent() && !Arrays.equals(sideShape, this.getShape());
+    }
+
+    private PartialDerivative correctForScalarPartial(PartialDerivative partialDerivative) {
+        DoubleTensor partial = partialDerivative.getPartial();
+        DoubleTensor correctedPartial = DoubleTensor.zeros(TensorShape.concat(this.getShape(), partial.getShape())).plus(partial);
+        return new PartialDerivative(partialDerivative.getKey(), correctedPartial);
     }
 
     @Override

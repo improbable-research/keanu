@@ -103,25 +103,17 @@ public class PartialDerivative {
         return new PartialDerivative(getKey(), summedV);
     }
 
-    public PartialDerivative add(PartialDerivative toAdd) {
-        return add(toAdd, false, false, null);
-    }
+    public PartialDerivative add(PartialDerivative addition) {
 
-    public PartialDerivative add(PartialDerivative addition, boolean leftIsLengthOne, boolean rightIsLengthOne, long[] resultShape) {
-
-        DoubleTensor added = cloneWithCorrectShape(partial, leftIsLengthOne, resultShape);
-        DoubleTensor toAdd = cloneWithCorrectShape(addition.getPartial(), rightIsLengthOne, resultShape);
-
-        if (added == null && toAdd != null) {
-            return new PartialDerivative(addition.getKey(), toAdd);
-        } else if (added != null && toAdd == null) {
-            return new PartialDerivative(getKey(), added);
-        } else if (added != null && toAdd != null) {
-            return new PartialDerivative(getKey(), added.plus(toAdd));
+        if (isPresent() && addition.isPresent()) {
+            return new PartialDerivative(getKey(), partial.plus(addition.partial));
+        } else if (isPresent() && addition.isEmpty()) {
+            return new PartialDerivative(getKey(), getPartial());
+        } else if (isEmpty() && addition.isPresent()) {
+            return new PartialDerivative(addition.getKey(), addition.partial);
         } else {
             return PartialDerivative.ZERO;
         }
-
     }
 
     public PartialDerivative subtract(PartialDerivative subtraction) {
