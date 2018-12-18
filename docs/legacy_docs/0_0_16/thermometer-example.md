@@ -17,7 +17,7 @@ micro_nav: true
 page_nav:
     prev:
         content: Previous page
-        url: '/docs/0_0_16/plates/'
+        url: '/docs/0_0_16/save-and-load/'
     next:
         content: Next page
         url: '/docs/0_0_16/examples/lorenz/'
@@ -87,7 +87,7 @@ room temperature.
 
 ```java
         BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        Optimizer optimizer = Optimizer.of(bayesNet);
+        Optimizer optimizer = KeanuOptimizer.of(bayesNet);
         optimizer.maxAPosteriori();
 
         double calculatedTemperature = temperature.getValue().scalar();
@@ -116,6 +116,7 @@ Experiment with the size of the sigma in each thermometer (the inaccuracy) and s
 estimated temperature.
 
 ```java
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -134,7 +135,7 @@ public class ThermometerExample {
         secondThermometer.observe(30.);
 
         BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        Optimizer optimizer = Optimizer.of(bayesNet);
+        Optimizer optimizer = KeanuOptimizer.of(bayesNet);
         optimizer.maxAPosteriori();
 
         double calculatedTemperature = temperature.getValue().scalar();

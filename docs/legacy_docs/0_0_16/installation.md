@@ -67,3 +67,12 @@ In your project's `pom.xml`
 ```
 
 Now that you have the dependency, head over to [getting started]({{ site.baseurl }}/docs/0_0_16/getting-started).
+
+## Using Keanu Python
+
+Keanu has a Python API which can be installed [from PyPi](https://pypi.org/project/keanu/):
+```
+pip install keanu
+```
+
+Note: We currently only support Python 3.6.
