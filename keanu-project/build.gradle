@@ -12,12 +12,14 @@ buildscript {
 
 plugins {
     id 'io.franzbecker.gradle-lombok' version '1.14'
+    id "de.marcphilipp.nexus-publish" version "0.1.1"
     id 'maven'
     id 'jacoco'
-    id "de.marcphilipp.nexus-publish" version "0.1.1"
 }
 
 apply plugin: 'com.google.protobuf'
+apply plugin: 'maven-publish'
+apply plugin: 'kotlin'
 
 archivesBaseName = "keanu"
 
@@ -129,13 +131,12 @@ nexusPublishing {
     password = nexusPassword
 }
 
-apply plugin: 'kotlin'
-
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
 }
+
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
