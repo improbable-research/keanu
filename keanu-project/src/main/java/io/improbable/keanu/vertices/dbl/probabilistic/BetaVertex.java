@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -32,8 +31,6 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
     private static final String ALPHA_NAME = "alpha";
     private static final String BETA_NAME = "beta";
 
-    private final Beta distribution;
-
     /**
      * One alpha or beta or both that match a proposed tensor shape of Beta.
      * <p>
@@ -43,14 +40,19 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
      * @param alpha       the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
      * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
-    public BetaVertex(long[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
+    public BetaVertex(long[] tensorShape,
+                      @LoadVertexParam(ALPHA_NAME) DoubleVertex alpha,
+                      @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, alpha.getShape(), beta.getShape());
 
         this.alpha = alpha;
         this.beta = beta;
-        this.distribution = Beta.withParameters(this, alpha, beta, ConstantVertex.of(0.0), ConstantVertex.of(1.0));
         setParents(alpha, beta);
+    }
+
+    ContinuousDistribution distribution() {
+        return Beta.withParameters(alpha.getValue(), beta.getValue(), DoubleTensor.scalar(0.), DoubleTensor.scalar(1.));
     }
 
     /**
@@ -61,8 +63,7 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
      * @param beta  the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public BetaVertex(@LoadVertexParam(ALPHA_NAME) DoubleVertex alpha,
-                      @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
+    public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
@@ -102,16 +103,13 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
 
     @Override
     public double logProb(DoubleTensor value) {
-        return distribution.logProb(value).sum();
-    }
-
-    public LogProbGraph logProbGraph() {
-        return distribution.logProbGraph();
+        DoubleTensor logPdfs = distribution().logProb(value);
+        return logPdfs.sum();
     }
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Diffs dlnP = distribution.dLogProb(value);
+        Diffs dlnP = distribution().dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
@@ -132,7 +130,7 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
 
     @Override
     public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
-        return distribution.sample(shape, random);
+        return distribution().sample(shape, random);
     }
 
 }
