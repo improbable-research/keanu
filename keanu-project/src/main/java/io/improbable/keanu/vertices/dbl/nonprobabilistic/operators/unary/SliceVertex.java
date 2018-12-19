@@ -57,8 +57,7 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        boolean needReshape = this.getValue().getRank() == inputVertex.getValue().getRank();
-        return derivativeOfParentWithRespectToInputs.slice(dimension, index, needReshape);
+        return derivativeOfParentWithRespectToInputs.slice(dimension, index);
     }
 
     private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {
