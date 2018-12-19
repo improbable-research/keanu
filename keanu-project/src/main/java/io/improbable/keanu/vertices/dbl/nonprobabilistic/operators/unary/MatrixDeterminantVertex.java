@@ -43,23 +43,28 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
-        DoubleTensor inverseTranspose = inputVertex.getValue().transpose().matrixInverse();
 
-        PartialDerivative derivativeOfOutputsWithRespectToInputs = derivativeOfOutputWithRespectToSelf
+        PartialDerivative dOutputTimesDeterminant = derivativeOfOutputWithRespectToSelf
             .multiplyBy(inputVertex.getValue().determinant());
 
-        long[] resultShape = TensorShape.concat(derivativeOfOutputWithRespectToSelf.getPartial().getShape(), inputVertex.getShape());
+        long[] resultShape = TensorShape.concat(
+            derivativeOfOutputWithRespectToSelf.getPartial().getShape(),
+            inputVertex.getShape()
+        );
 
         DoubleTensor reshapedPartial = PartialDerivative.increaseRankByAppendingOnesToShape(
-            derivativeOfOutputsWithRespectToInputs.getPartial(),
+            dOutputTimesDeterminant.getPartial(),
             resultShape.length
         );
 
-        DoubleTensor expanded = DoubleTensor.zeros(resultShape).plus(reshapedPartial);
+        DoubleTensor broadcastedPartial = DoubleTensor
+            .zeros(resultShape)
+            .plus(reshapedPartial);
 
-        PartialDerivative dexp = new PartialDerivative(expanded);
+        DoubleTensor inverseTranspose = inputVertex.getValue().transpose().matrixInverse();
 
-        PartialDerivative toInput = dexp.multiplyAlongWrtDimensions(inverseTranspose);
+        PartialDerivative toInput = new PartialDerivative(broadcastedPartial)
+            .multiplyAlongWrtDimensions(inverseTranspose);
 
         return Collections.singletonMap(inputVertex, toInput);
     }

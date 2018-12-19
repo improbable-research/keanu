@@ -67,29 +67,26 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
 
-        DoubleTensor partialDueToSummationShapeChange = getPartialDueToSummationShapeChange(derivativeOfOutputWithRespectToSelf);
-
-        long[] ofShape = derivativeOfOutputWithRespectToSelf.getOfShape(this.getShape());
-        long[] resultShape = TensorShape.concat(ofShape, inputVertex.getShape());
-
-        DoubleTensor expanded = DoubleTensor.ones(resultShape).times(partialDueToSummationShapeChange);
-        PartialDerivative dOfWrtInputVertex = new PartialDerivative(expanded);
-
-        return singletonMap(inputVertex, dOfWrtInputVertex);
-    }
-
-    private DoubleTensor getPartialDueToSummationShapeChange(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
-
         long[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
-
-        DoubleTensor partial = derivativeOfOutputsWithRespectToSelf.getPartial();
+        long[] ofShape = derivativeOfOutputWithRespectToSelf.getOfShape(this.getShape());
 
         long[] newPartialShape = TensorShape.concat(
-            TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
+            ofShape,
             wrtShapeWithoutRankLoss
         );
 
-        return derivativeOfOutputsWithRespectToSelf.getPartial().reshape(newPartialShape);
+        DoubleTensor partialDueToSummationShapeChange = derivativeOfOutputWithRespectToSelf.getPartial().reshape(newPartialShape);
+
+        long[] resultShape = TensorShape.concat(
+            ofShape,
+            inputVertex.getShape()
+        );
+
+        DoubleTensor broadcastedPartial = DoubleTensor
+            .zeros(resultShape)
+            .plus(partialDueToSummationShapeChange);
+
+        return singletonMap(inputVertex, new PartialDerivative(broadcastedPartial));
     }
 
     private static long[] summedOverShapeWithoutRankLoss(long[] shape, int[] sumOverDimensions) {
