@@ -3,7 +3,8 @@
 layout: default
 keywords: tensors
 comments: false
-permalink: /docs/tensors/
+version: 0.0.17
+permalink: /docs/0_0_17/tensors/
 
 # Hero section
 title: Tensors (N Dimensional arrays)
@@ -17,10 +18,10 @@ micro_nav: true
 page_nav:
     prev:
         content: Previous page
-        url: '/docs/vertex-summary/'
+        url: '/docs/0_0_17/vertex-summary/'
     next:
         content: Next page
-        url: '/docs/inference-map/'
+        url: '/docs/0_0_17/inference-map/'
 ---
 
 ## Tensor rank and shape

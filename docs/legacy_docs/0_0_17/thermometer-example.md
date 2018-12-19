@@ -3,7 +3,8 @@
 layout: default
 keywords: example thermometer
 comments: false
-permalink: /docs/examples/thermometer/
+version: 0.0.17
+permalink: /docs/0_0_17/examples/thermometer/
 
 # Hero section
 title: Thermometer Example
@@ -16,10 +17,10 @@ micro_nav: true
 page_nav:
     prev:
         content: Previous page
-        url: '/docs/save-and-load/'
+        url: '/docs/0_0_17/save-and-load/'
     next:
         content: Next page
-        url: '/docs/examples/lorenz/'
+        url: '/docs/0_0_17/examples/lorenz/'
 
 ---
 

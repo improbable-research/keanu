@@ -3,7 +3,8 @@
 layout: default
 keywords: lorenz example
 comments: false
-permalink: /docs/examples/lorenz/
+version: 0.0.17
+permalink: /docs/0_0_17/examples/lorenz/
 
 # Hero section
 title: Lorenz Example
@@ -16,7 +17,7 @@ micro_nav: true
 page_nav:
     prev:
         content: Previous page
-        url: '/docs/examples/thermometer/'
+        url: '/docs/0_0_17/examples/thermometer/'
 ---
 
 ## Overview
