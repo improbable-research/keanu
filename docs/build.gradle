@@ -28,3 +28,9 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
+
+task writeSnippets(type:Exec) {
+    commandLine 'python', 'bin/snippet_writer.py'
+}
+
+build.finalizedBy(writeSnippets)
