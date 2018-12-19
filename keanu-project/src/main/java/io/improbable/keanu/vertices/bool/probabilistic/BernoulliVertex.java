@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbAsAGraphable;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -40,7 +41,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
      * @param shape    the desired shape of the vertex
      * @param probTrue the probability the bernoulli returns true
      */
-    public BernoulliVertex(long[] shape, DoubleVertex probTrue) {
+    public BernoulliVertex(@LoadShape long[] shape, @LoadVertexParam(PROBTRUE_NAME) DoubleVertex probTrue) {
         super(shape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, probTrue.getShape());
         this.probTrue = probTrue;
@@ -54,7 +55,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
      * @param probTrue probTrue with same shape as desired Bernoulli tensor or scalar
      */
     @ExportVertexToPythonBindings
-    public BernoulliVertex(@LoadVertexParam(PROBTRUE_NAME) DoubleVertex probTrue) {
+    public BernoulliVertex(DoubleVertex probTrue) {
         this(probTrue.getShape(), probTrue);
     }
 

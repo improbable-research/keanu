@@ -5,6 +5,7 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -40,7 +41,7 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
      * @param alpha       the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
      * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
-    public BetaVertex(long[] tensorShape,
+    public BetaVertex(@LoadShape long[] tensorShape,
                       @LoadVertexParam(ALPHA_NAME) DoubleVertex alpha,
                       @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
         super(tensorShape);

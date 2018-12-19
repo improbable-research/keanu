@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbAsAGraphable;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -43,7 +44,9 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
      * @param mu          the mu of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
-    public GaussianVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
+    public GaussianVertex(@LoadShape long[] tensorShape,
+                          @LoadVertexParam(MU_NAME) DoubleVertex mu,
+                          @LoadVertexParam(SIGMA_NAME) DoubleVertex sigma) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), sigma.getShape());
 
@@ -53,8 +56,7 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     @ExportVertexToPythonBindings
-    public GaussianVertex(@LoadVertexParam(MU_NAME) DoubleVertex mu,
-                          @LoadVertexParam(SIGMA_NAME) DoubleVertex sigma) {
+    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 

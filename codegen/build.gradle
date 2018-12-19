@@ -1,9 +1,6 @@
 plugins {
-    id 'application'
     id 'io.franzbecker.gradle-lombok' version '1.14'
 }
-
-mainClassName = 'io.improbable.keanu.codegen.python.Runner'
 
 dependencies {
     compile 'org.reflections:reflections:0.9.11'
@@ -33,7 +30,7 @@ task saveJavadocStringsToFile(type: Javadoc) {
 task runCodeGeneration (type: JavaExec) {
     dependsOn saveJavadocStringsToFile
     classpath sourceSets.main.runtimeClasspath
-    main = mainClassName
+    main = 'io.improbable.keanu.codegen.python.Runner'
     args += project.rootDir.toString() + '/keanu-python/keanu/vertex/'
 }
 

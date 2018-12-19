@@ -111,6 +111,15 @@ public class VertexLabelTest {
     }
 
     @Test
+    public void youCanGetTheQualifiedName() {
+        String innerNamespace = "inner";
+        String outerNamespace = "outer";
+        String name = "foo";
+        VertexLabel foo = new VertexLabel(name, innerNamespace, outerNamespace);
+        assertThat(foo.getQualifiedName(), equalTo("outer.inner.foo"));
+    }
+
+    @Test
     public void itUsesADotToPrint() {
         VertexLabel foo = new VertexLabel("foo", "inner", "outer");
         assertThat(foo.toString(), equalTo("outer.inner.foo"));

@@ -1,9 +1,3 @@
-plugins {
-    id 'application'
-}
-
-mainClassName = "com.example.coal.Model"
-
 dependencies {
     compile project(":keanu-project")
 

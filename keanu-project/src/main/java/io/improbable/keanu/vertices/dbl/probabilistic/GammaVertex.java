@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -39,7 +40,9 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
      * @param theta       the theta (scale) of the Gamma with either the same shape as specified for this vertex
      * @param k           the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
-    public GammaVertex(long[] tensorShape, DoubleVertex theta, DoubleVertex k) {
+    public GammaVertex(@LoadShape long[] tensorShape,
+                       @LoadVertexParam(THETA_NAME) DoubleVertex theta,
+                       @LoadVertexParam(K_NAME) DoubleVertex k) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, theta.getShape(), k.getShape());
 
@@ -55,8 +58,8 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
      * @param k     the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     @ExportVertexToPythonBindings
-    public GammaVertex(@LoadVertexParam(THETA_NAME) DoubleVertex theta,
-                       @LoadVertexParam(K_NAME) DoubleVertex k) {
+    public GammaVertex(DoubleVertex theta,
+                       DoubleVertex k) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(theta.getShape(), k.getShape()), theta, k);
     }
 

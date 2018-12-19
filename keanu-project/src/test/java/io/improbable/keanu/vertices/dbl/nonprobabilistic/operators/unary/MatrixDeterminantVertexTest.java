@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import com.google.common.collect.ImmutableList;
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexMatchers;
@@ -107,7 +107,7 @@ public class MatrixDeterminantVertexTest {
         output.observe(new double[]{2.0, 2.4});
         final BayesianNetwork net = new BayesianNetwork(output.getConnectedGraph());
 
-        Optimizer.of(net).maxLikelihood();
+        KeanuOptimizer.of(net).maxLikelihood();
         assertEquals(input.getValue().determinant(), 2.2, 0.1);
     }
 }
