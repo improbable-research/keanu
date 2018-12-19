@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -72,14 +71,12 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
                                            int dimension) {
 
         long[] wrtShape = null;
-        VertexId wrtVertexId = null;
         for (int i = 0; i < partialsOfOperands.size(); i++) {
             PartialDerivative partial = partialsOfOperands.get(i);
             DoubleTensor operandValue = operandValues.get(i);
 
             if (partial.isPresent()) {
                 long[] partialWrtShape = partial.getPartial().getShape();
-                wrtVertexId = partial.getKey();
                 wrtShape = Arrays.copyOfRange(partialWrtShape, operandValue.getRank(), partialWrtShape.length);
                 break;
             }
@@ -91,7 +88,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
             wrtShape
         );
 
-        return new PartialDerivative(wrtVertexId, concatPartialDerivatives(dimension, partialsToConcat));
+        return new PartialDerivative(concatPartialDerivatives(dimension, partialsToConcat));
     }
 
     private static List<DoubleTensor> getPartialsToConcatForInput(List<PartialDerivative> partialsOfOperands,
@@ -147,7 +144,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         List<DoubleTensor> splitPartial = partial.split(wrtSplitOn, splitIndices);
 
         for (int i = 0; i < splitPartial.size(); i++) {
-            splitPartials.put(operands[i], new PartialDerivative(derivativeOfOutputWithRespectToSelf.getKey(), splitPartial.get(i)));
+            splitPartials.put(operands[i], new PartialDerivative(splitPartial.get(i)));
         }
 
         return splitPartials;

@@ -95,7 +95,7 @@ public class Differentiator {
         if (ofVertex.isObserved()) {
             return new PartialsOf(ofVertex, Collections.emptyMap());
         } else {
-            return reverseModeAutoDiff(ofVertex, Differentiable.withRespectToSelf(ofVertex.getId(), ofVertex.getShape()), wrt);
+            return reverseModeAutoDiff(ofVertex, Differentiable.withRespectToSelf(ofVertex.getShape()), wrt);
         }
     }
 

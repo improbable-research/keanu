@@ -61,7 +61,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return new PartialDerivative(dInputVertex.getKey(), dInputVertex.getPartial().sum(overDimensions));
+        return new PartialDerivative(dInputVertex.getPartial().sum(overDimensions));
     }
 
     @Override
@@ -73,7 +73,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
         long[] resultShape = TensorShape.concat(ofShape, inputVertex.getShape());
 
         DoubleTensor expanded = DoubleTensor.ones(resultShape).times(partialDueToSummationShapeChange);
-        PartialDerivative dOfWrtInputVertex = new PartialDerivative(derivativeOfOutputWithRespectToSelf.getKey(), expanded);
+        PartialDerivative dOfWrtInputVertex = new PartialDerivative(expanded);
 
         return singletonMap(inputVertex, dOfWrtInputVertex);
     }

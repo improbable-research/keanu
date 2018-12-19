@@ -35,7 +35,7 @@ public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable
             dInputVertex.getWrtShape(inputVertex.getShape())
         );
 
-        return new PartialDerivative(dInputVertex.getKey(), dInputVertex.getPartial().reshape(newPartialShape));
+        return new PartialDerivative(dInputVertex.getPartial().reshape(newPartialShape));
     }
 
     @Override
@@ -48,7 +48,6 @@ public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable
         );
 
         PartialDerivative dXWrtInputVertex = new PartialDerivative(
-            derivativeOfOutputWithRespectToSelf.getKey(),
             derivativeOfOutputWithRespectToSelf.getPartial().reshape(newPartialShape)
         );
 

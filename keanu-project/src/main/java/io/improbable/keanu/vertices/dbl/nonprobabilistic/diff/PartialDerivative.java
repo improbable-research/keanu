@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.VertexId;
 
 import java.util.Arrays;
 
@@ -10,16 +9,13 @@ public class PartialDerivative {
 
     public static final PartialDerivative EMPTY = new PartialDerivative();
 
-    private final VertexId key;
     private final DoubleTensor partial;
 
-    public PartialDerivative(VertexId key, DoubleTensor partial) {
-        this.key = key;
+    public PartialDerivative(DoubleTensor partial) {
         this.partial = partial;
     }
 
     private PartialDerivative() {
-        this.key = null;
         this.partial = null;
     }
 
@@ -35,10 +31,6 @@ public class PartialDerivative {
         return partial;
     }
 
-    public VertexId getKey() {
-        return key;
-    }
-
     public long[] getOfShape(long[] wrtShape) {
         return Arrays.copyOfRange(partial.getShape(), 0, partial.getShape().length - wrtShape.length);
     }
@@ -50,11 +42,11 @@ public class PartialDerivative {
     public PartialDerivative add(PartialDerivative addition) {
 
         if (isPresent() && addition.isPresent()) {
-            return new PartialDerivative(getKey(), partial.plus(addition.partial));
+            return new PartialDerivative(partial.plus(addition.partial));
         } else if (isPresent() && addition.isEmpty()) {
-            return new PartialDerivative(getKey(), getPartial());
+            return new PartialDerivative(getPartial());
         } else if (isEmpty() && addition.isPresent()) {
-            return new PartialDerivative(addition.getKey(), addition.partial);
+            return new PartialDerivative(addition.partial);
         } else {
             return PartialDerivative.EMPTY;
         }
@@ -63,11 +55,11 @@ public class PartialDerivative {
     public PartialDerivative subtract(PartialDerivative subtraction) {
 
         if (isPresent() && subtraction.isPresent()) {
-            return new PartialDerivative(getKey(), partial.minus(subtraction.partial));
+            return new PartialDerivative(partial.minus(subtraction.partial));
         } else if (isPresent() && subtraction.isEmpty()) {
-            return new PartialDerivative(getKey(), getPartial());
+            return new PartialDerivative(getPartial());
         } else if (isEmpty() && subtraction.isPresent()) {
-            return new PartialDerivative(subtraction.getKey(), subtraction.partial.unaryMinus());
+            return new PartialDerivative(subtraction.partial.unaryMinus());
         } else {
             return PartialDerivative.EMPTY;
         }
@@ -79,7 +71,7 @@ public class PartialDerivative {
             return this;
         }
 
-        return new PartialDerivative(key, partial.times(multiplier));
+        return new PartialDerivative(partial.times(multiplier));
     }
 
     public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier) {
@@ -91,7 +83,7 @@ public class PartialDerivative {
         DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
         DoubleTensor result = partial.times(multiplierFromLeft);
 
-        return new PartialDerivative(key, result);
+        return new PartialDerivative(result);
     }
 
     public PartialDerivative multiplyAlongWrtDimensions(DoubleTensor multiplier) {
@@ -103,7 +95,7 @@ public class PartialDerivative {
         DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
         DoubleTensor result = partial.times(multiplierFromRight);
 
-        return new PartialDerivative(key, result);
+        return new PartialDerivative(result);
     }
 
     public PartialDerivative divideByAlongOfDimensions(DoubleTensor divisor) {
@@ -115,7 +107,7 @@ public class PartialDerivative {
         DoubleTensor divisorFromLeft = increaseRankByAppendingOnesToShape(divisor, partial.getRank());
         DoubleTensor result = partial.div(divisorFromLeft);
 
-        return new PartialDerivative(key, result);
+        return new PartialDerivative(result);
     }
 
     public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
@@ -140,7 +132,7 @@ public class PartialDerivative {
                 .tensorMultiply(partial.getPartial(), new int[]{1}, new int[]{0});
         }
 
-        return new PartialDerivative(partial.getKey(), result);
+        return new PartialDerivative(result);
     }
 
     public static PartialDerivative matrixMultiplyAlongWrtDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
@@ -168,7 +160,7 @@ public class PartialDerivative {
                 .permute(transposeWrt);
         }
 
-        return new PartialDerivative(partial.getKey(), result);
+        return new PartialDerivative(result);
     }
 
     public static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {

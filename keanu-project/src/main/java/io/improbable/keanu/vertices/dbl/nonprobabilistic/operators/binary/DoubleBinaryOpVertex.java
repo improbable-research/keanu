@@ -58,7 +58,7 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Diffe
                 .zeros(TensorShape.concat(targetOfShape, wrtShape))
                 .plus(partial.getPartial());
 
-            return new PartialDerivative(partial.getKey(), correctedPartial);
+            return new PartialDerivative(correctedPartial);
         } else {
             return partial;
         }
@@ -80,7 +80,7 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Diffe
                 targetWrtShape
             );
 
-            return new PartialDerivative(partial.getKey(), partialSummed.reshape(resultShape));
+            return new PartialDerivative(partialSummed.reshape(resultShape));
         } else {
             return partial;
         }

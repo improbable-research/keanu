@@ -57,7 +57,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
 
         DoubleTensor expanded = DoubleTensor.zeros(resultShape).plus(reshapedPartial);
 
-        PartialDerivative dexp = new PartialDerivative(derivativeOfOutputWithRespectToSelf.getKey(), expanded);
+        PartialDerivative dexp = new PartialDerivative(expanded);
 
         PartialDerivative toInput = dexp.multiplyAlongWrtDimensions(inverseTranspose);
 

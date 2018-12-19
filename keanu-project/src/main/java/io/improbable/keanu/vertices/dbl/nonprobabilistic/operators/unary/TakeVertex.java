@@ -49,7 +49,7 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
         long[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
         atIndexTensor = atIndexTensor.reshape(paddedShape);
 
-        return new PartialDerivative(derivativeOfParentWithRespectToInputs.getKey(), atIndexTensor);
+        return new PartialDerivative(atIndexTensor);
     }
 
     private DoubleTensor takeFromPartial(DoubleTensor from, long... indices) {
@@ -78,7 +78,7 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
         DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial.reshape(partialUpRankShape));
         DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
         DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
-        reshapedDerivatives.put(inputVertex, new PartialDerivative(derivativeOfOutputWithRespectToSelf.getKey(), highRankMask));
+        reshapedDerivatives.put(inputVertex, new PartialDerivative(highRankMask));
 
         return reshapedDerivatives;
     }

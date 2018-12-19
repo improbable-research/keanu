@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
@@ -46,10 +45,9 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
-        VertexId k = derivativeOfOutputWithRespectToSelf.getKey();
-        DoubleTensor v = derivativeOfOutputWithRespectToSelf.getPartial();
-        DoubleTensor padded = padSliceWithZerosToMatchOriginalShape(v);
-        partials.put(inputVertex, new PartialDerivative(k, padded));
+        DoubleTensor partial = derivativeOfOutputWithRespectToSelf.getPartial();
+        DoubleTensor padded = padSliceWithZerosToMatchOriginalShape(partial);
+        partials.put(inputVertex, new PartialDerivative(padded));
 
         return partials;
     }
@@ -57,7 +55,7 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return new PartialDerivative(dInputVertex.getKey(), dInputVertex.getPartial().slice(dimension, index));
+        return new PartialDerivative(dInputVertex.getPartial().slice(dimension, index));
     }
 
     private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {
