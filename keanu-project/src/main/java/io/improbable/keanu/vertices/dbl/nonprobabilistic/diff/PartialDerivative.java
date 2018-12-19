@@ -238,16 +238,13 @@ public class PartialDerivative {
         return new PartialDerivative(id, result);
     }
 
-    public PartialDerivative reshape(int currentRank, long[] proposedShape) {
+    public PartialDerivative reshape(long[] shape) {
 
         if (isEmpty()) {
             return this;
         }
 
-        long[] wrtShape = extractWrtShape(partial.getShape(), currentRank);
-        long[] newPartialShape = TensorShape.concat(proposedShape, wrtShape);
-
-        return new PartialDerivative(id, partial.reshape(newPartialShape));
+        return new PartialDerivative(id, partial.reshape(shape));
     }
 
     /**
@@ -278,21 +275,6 @@ public class PartialDerivative {
         }
 
         return new PartialDerivative(getKey(), slicedPartialDerivative);
-    }
-
-    private long[] extractWrtShape(long[] partialDerivativeShape, int rankOfSource) {
-        return extractShape(partialDerivativeShape, rankOfSource, rankOfSource, partialDerivativeShape.length);
-    }
-
-    private long[] extractShape(long[] partialDerivativeShape, int rankOfSource, int from, int to) {
-        if (partialDerivativeShape.length == 0) {
-            if (rankOfSource > 1) {
-                throw new IllegalArgumentException("Partial does not contain of shape requested");
-            } else {
-                return new long[0];
-            }
-        }
-        return Arrays.copyOfRange(partialDerivativeShape, from, to);
     }
 
     public static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
