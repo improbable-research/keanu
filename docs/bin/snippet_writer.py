@@ -30,7 +30,7 @@ def read_file_snippets(file, snippet_store):
     start_reg = re.compile("(.*%%SNIPPET_START%% )([a-zA-Z0-9]+)")
     end_reg =   re.compile("(.*%%SNIPPET_END%% )([a-zA-Z0-9]+)")
     open_snippets = {}
-    with open(file) as w:
+    with open(file, encoding="utf8") as w:
         lines = w.readlines()
 
         for line in lines:
@@ -72,7 +72,7 @@ def read_file_snippets(file, snippet_store):
 
 def replace_tags(in_name, out_name, snippet_store):
     tag_re = re.compile("(.*{% snippet )([a-zA-Z0-9]+)( %})")
-    with open(in_name) as in_file, open(out_name, "w") as out_file:
+    with open(in_name, encoding="utf8") as in_file, open(out_name, "w", encoding="utf8") as out_file:
         for in_line in in_file.readlines():
             m = tag_re.match(in_line)
 
