@@ -154,7 +154,7 @@ In Keanu the above problem would be written as:
 We do not expose Tensors in the Python API. Numpy provides the same concept through its `ndarray` class. 
 
 Most of the operations that used Tensor within Java can be replaced with `ndarray` in Python.
-For example, to create a vertex.
+For example, to create a vertex:
 
 ```python
 {% snippet PythonVertexFromNDArray %}
