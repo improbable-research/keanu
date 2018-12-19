@@ -52,25 +52,11 @@ public class PartialDerivative {
      * The dimensions that are summed over will be reshaped to the specified resultShape.
      *
      * @param dimensions  dimensions to sum over
-     * @param resultShape shape of sum result
-     * @param ofRank      the rank of the "of" part of the partials
      * @return summed and reshaped partials
      */
-    public PartialDerivative sumOverOfDimensions(int[] dimensions, long[] resultShape, int ofRank) {
+    public PartialDerivative sumOverOfDimensions(int[] dimensions) {
 
-        if (isEmpty()) {
-            return this;
-        }
-
-        DoubleTensor v = getPartial();
-        long[] vShape = v.getShape();
-        long[] wrtShape = TensorShape.selectDimensions(ofRank, vShape.length, vShape);
-
-        DoubleTensor summedV = v.sum(dimensions);
-        long[] newShape = TensorShape.concat(resultShape, wrtShape);
-        summedV = summedV.reshape(newShape);
-
-        return new PartialDerivative(getKey(), summedV);
+        return new PartialDerivative(getKey(), partial.sum(dimensions));
     }
 
     /**
