@@ -52,7 +52,7 @@ It's also possible to calculate the autocorrelation of samples in Python.
 {% snippet PythonScalarAutocorrelation %}
 ```
 
-If sampling `ndarray`'s in Python. The index on which to calculate the autocorrelation can be specified 
+If sampling `ndarray`s in Python, the index on which to calculate the autocorrelation can be specified 
 as a tuple.
 
 ```python
