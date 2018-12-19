@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -36,8 +37,8 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
-        PartialDerivative fromLeft = correctForScalarPartialForward(dLeftWrtInput, this.getShape(), left.getShape());
-        PartialDerivative fromRight = correctForScalarPartialForward(dRightWrtInput, this.getShape(), right.getShape());
+        PartialDerivative fromLeft = AutoDiffBroadcast.correctForScalarPartialForward(dLeftWrtInput, left.getShape(), this.getShape());
+        PartialDerivative fromRight = AutoDiffBroadcast.correctForScalarPartialForward(dRightWrtInput, right.getShape(), this.getShape());
 
         // dc = A * db + da * B;
         PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue());
@@ -58,8 +59,8 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
             left.getValue()
         );
 
-        PartialDerivative toLeft = correctForScalarPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
-        PartialDerivative toRight = correctForScalarPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());
+        PartialDerivative toLeft = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
+        PartialDerivative toRight = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());
 
         partials.put(left, toLeft);
         partials.put(right, toRight);

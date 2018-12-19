@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -39,8 +40,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         DoubleTensor xValue = left.getValue();
         DoubleTensor denominator = yValue.pow(2).plusInPlace(xValue.pow(2));
 
-        PartialDerivative fromX = correctForScalarPartialForward(dxWrtInput, this.getShape(), left.getShape());
-        PartialDerivative fromY = correctForScalarPartialForward(dyWrtInput, this.getShape(), right.getShape());
+        PartialDerivative fromX = AutoDiffBroadcast.correctForScalarPartialForward(dxWrtInput, left.getShape(), this.getShape());
+        PartialDerivative fromY = AutoDiffBroadcast.correctForScalarPartialForward(dyWrtInput, right.getShape(), this.getShape());
 
         PartialDerivative diffFromX = fromX.multiplyAlongOfDimensions(yValue.div(denominator).unaryMinusInPlace());
         PartialDerivative diffFromY = fromY.multiplyAlongOfDimensions(xValue.div(denominator));
@@ -61,8 +62,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX);
         PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY);
 
-        PartialDerivative toLeft = correctForScalarPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
-        PartialDerivative toRight = correctForScalarPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());
+        PartialDerivative toLeft = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
+        PartialDerivative toRight = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());
 
         partials.put(left, toLeft);
         partials.put(right, toRight);

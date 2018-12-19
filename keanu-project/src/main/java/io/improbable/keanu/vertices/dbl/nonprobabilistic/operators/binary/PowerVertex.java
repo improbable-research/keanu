@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -43,8 +44,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dBaseWrtInput, PartialDerivative dExponentWrtInput) {
 
-        PartialDerivative fromBase = correctForScalarPartialForward(dBaseWrtInput, this.getShape(), left.getShape());
-        PartialDerivative fromExponent = correctForScalarPartialForward(dExponentWrtInput, this.getShape(), right.getShape());
+        PartialDerivative fromBase = AutoDiffBroadcast.correctForScalarPartialForward(dBaseWrtInput, left.getShape(), this.getShape());
+        PartialDerivative fromExponent = AutoDiffBroadcast.correctForScalarPartialForward(dExponentWrtInput, right.getShape(), this.getShape());
 
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
         PartialDerivative partialsFromBase;
@@ -81,8 +82,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         PartialDerivative dOutputsWrtBase = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase);
         PartialDerivative dOutputsWrtExponent = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent);
 
-        PartialDerivative toBase = correctForScalarPartialReverse(dOutputsWrtBase, this.getShape(), getBase().getShape());
-        PartialDerivative toExponent = correctForScalarPartialReverse(dOutputsWrtExponent, this.getShape(), getExponent().getShape());
+        PartialDerivative toBase = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtBase, this.getShape(), getBase().getShape());
+        PartialDerivative toExponent = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtExponent, this.getShape(), getExponent().getShape());
 
         partials.put(getBase(), toBase);
         partials.put(getExponent(), toExponent);

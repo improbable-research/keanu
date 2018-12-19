@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -11,7 +10,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
@@ -47,47 +45,6 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Diffe
         this.left = left;
         this.right = right;
         setParents(left, right);
-    }
-
-    public static PartialDerivative correctForScalarPartialForward(PartialDerivative partial, long[] targetOfShape, long[] currentOfShape) {
-
-        if (shouldCorrectPartialForScalarForward(partial, targetOfShape, currentOfShape)) {
-
-            long[] wrtShape = partial.getWrtShape(currentOfShape);
-            DoubleTensor correctedPartial = DoubleTensor
-                .zeros(TensorShape.concat(targetOfShape, wrtShape))
-                .plus(partial.getPartial());
-
-            return new PartialDerivative(correctedPartial);
-        } else {
-            return partial;
-        }
-    }
-
-    private static boolean shouldCorrectPartialForScalarForward(PartialDerivative partial, long[] targetOfShape, long[] currentOfShape) {
-        return partial.isPresent() && !Arrays.equals(currentOfShape, targetOfShape);
-    }
-
-    public static PartialDerivative correctForScalarPartialReverse(PartialDerivative partial, long[] currentWrtShape, long[] targetWrtShape) {
-
-        if (shouldCorrectForPartialScalarReverse(partial, targetWrtShape, currentWrtShape)) {
-
-            int[] wrtDims = TensorShape.dimensionRange(-currentWrtShape.length, 0);
-            DoubleTensor partialSummed = partial.getPartial().sum(wrtDims);
-
-            long[] resultShape = TensorShape.concat(
-                partial.getOfShape(currentWrtShape),
-                targetWrtShape
-            );
-
-            return new PartialDerivative(partialSummed.reshape(resultShape));
-        } else {
-            return partial;
-        }
-    }
-
-    public static boolean shouldCorrectForPartialScalarReverse(PartialDerivative partial, long[] targetWrtShape, long[] currentWrtShape) {
-        return partial.isPresent() && !Arrays.equals(currentWrtShape, targetWrtShape);
     }
 
     @Override

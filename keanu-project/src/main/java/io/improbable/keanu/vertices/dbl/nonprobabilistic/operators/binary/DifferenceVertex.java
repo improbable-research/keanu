@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
@@ -37,8 +38,8 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
-        PartialDerivative fromLeft = correctForScalarPartialForward(dLeftWrtInput, this.getShape(), left.getShape());
-        PartialDerivative fromRight = correctForScalarPartialForward(dRightWrtInput, this.getShape(), right.getShape());
+        PartialDerivative fromLeft = AutoDiffBroadcast.correctForScalarPartialForward(dLeftWrtInput, left.getShape(), this.getShape());
+        PartialDerivative fromRight = AutoDiffBroadcast.correctForScalarPartialForward(dRightWrtInput, right.getShape(), this.getShape());
 
         return fromLeft.subtract(fromRight);
     }
@@ -47,8 +48,8 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
-        PartialDerivative toLeft = correctForScalarPartialReverse(derivativeOfOutputWithRespectToSelf, this.getShape(), left.getShape());
-        PartialDerivative toRight = correctForScalarPartialReverse(derivativeOfOutputWithRespectToSelf.multiplyBy(-1), this.getShape(), right.getShape());
+        PartialDerivative toLeft = AutoDiffBroadcast.correctForScalarPartialReverse(derivativeOfOutputWithRespectToSelf, this.getShape(), left.getShape());
+        PartialDerivative toRight = AutoDiffBroadcast.correctForScalarPartialReverse(derivativeOfOutputWithRespectToSelf.multiplyBy(-1), this.getShape(), right.getShape());
 
         partials.put(left, toLeft);
         partials.put(right, toRight);
