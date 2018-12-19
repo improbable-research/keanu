@@ -126,7 +126,15 @@ public class PartialDerivative {
         } else {
             return PartialDerivative.EMPTY;
         }
+    }
 
+    public PartialDerivative multiplyBy(double multiplier) {
+
+        if (isEmpty()) {
+            return this;
+        }
+
+        return new PartialDerivative(id, partial.times(multiplier));
     }
 
     public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier) {
@@ -135,14 +143,8 @@ public class PartialDerivative {
             return this;
         }
 
-        DoubleTensor result;
-
-        if (multiplier.isScalar()) {
-            result = partial.times(multiplier.scalar());
-        } else {
-            DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
-            result = partial.times(multiplierFromLeft);
-        }
+        DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
+        DoubleTensor result = partial.times(multiplierFromLeft);
 
         return new PartialDerivative(id, result);
     }
@@ -153,13 +155,20 @@ public class PartialDerivative {
             return this;
         }
 
-        DoubleTensor result;
-        if (multiplier.isScalar()) {
-            result = partial.times(multiplier.scalar());
-        } else {
-            DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
-            result = partial.times(multiplierFromRight);
+        DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
+        DoubleTensor result = partial.times(multiplierFromRight);
+
+        return new PartialDerivative(id, result);
+    }
+
+    public PartialDerivative divideByAlongOfDimensions(DoubleTensor divisor) {
+
+        if (isEmpty()) {
+            return this;
         }
+
+        DoubleTensor divisorFromLeft = increaseRankByAppendingOnesToShape(divisor, partial.getRank());
+        DoubleTensor result = partial.div(divisorFromLeft);
 
         return new PartialDerivative(id, result);
     }
@@ -215,52 +224,6 @@ public class PartialDerivative {
         }
 
         return new PartialDerivative(partial.getKey(), result);
-    }
-
-    public PartialDerivative multiplyBy(double multiplier) {
-
-        if (isEmpty()) {
-            return this;
-        }
-
-        return new PartialDerivative(id, partial.times(multiplier));
-    }
-
-    public PartialDerivative divideBy(DoubleTensor divisor) {
-
-        if (isEmpty()) {
-            return this;
-        }
-
-        DoubleTensor partial = getPartial();
-        DoubleTensor result = partial.div(increaseRankByAppendingOnesToShape(divisor, partial.getRank()));
-
-        return new PartialDerivative(id, result);
-    }
-
-    public PartialDerivative reshape(long[] shape) {
-
-        if (isEmpty()) {
-            return this;
-        }
-
-        return new PartialDerivative(id, partial.reshape(shape));
-    }
-
-    /**
-     * Slice the partials along dimension at a specified index.
-     *
-     * @param dimension dimension to slice along
-     * @param index     index to slice at
-     * @return the sliced partials
-     */
-    public PartialDerivative slice(int dimension, long index) {
-
-        if (isEmpty()) {
-            return this;
-        }
-
-        return new PartialDerivative(getKey(), partial.slice(dimension, index));
     }
 
     public static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {

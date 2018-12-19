@@ -31,7 +31,7 @@ public class LogVertex extends DoubleUnaryOpVertex implements Differentiable {
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return derivativeOfParentWithRespectToInputs.divideBy(inputVertex.getValue());
+        return derivativeOfParentWithRespectToInputs.divideByAlongOfDimensions(inputVertex.getValue());
     }
 
     @Override

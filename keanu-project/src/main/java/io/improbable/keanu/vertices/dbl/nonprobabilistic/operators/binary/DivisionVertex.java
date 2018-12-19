@@ -42,7 +42,7 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue());
         PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue());
 
-        return partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().pow(2));
+        return partialsFromLeft.subtract(partialsFromRight).divideByAlongOfDimensions(right.getValue().pow(2));
     }
 
     @Override
