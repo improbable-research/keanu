@@ -81,8 +81,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         PartialDerivative dOutputsWrtBase = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase);
         PartialDerivative dOutputsWrtExponent = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent);
 
-        PartialDerivative toBase = correctForScalarReverse(dOutputsWrtBase, this.getShape(), getBase().getShape());
-        PartialDerivative toExponent = correctForScalarReverse(dOutputsWrtExponent, this.getShape(), getExponent().getShape());
+        PartialDerivative toBase = correctForScalarPartialReverse(dOutputsWrtBase, this.getShape(), getBase().getShape());
+        PartialDerivative toExponent = correctForScalarPartialReverse(dOutputsWrtExponent, this.getShape(), getExponent().getShape());
 
         partials.put(getBase(), toBase);
         partials.put(getExponent(), toExponent);

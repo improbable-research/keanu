@@ -49,17 +49,18 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Diffe
         setParents(left, right);
     }
 
-    public static PartialDerivative correctForScalarPartialForward(PartialDerivative partialDerivative, long[] targetOfShape, long[] currentOfShape) {
+    public static PartialDerivative correctForScalarPartialForward(PartialDerivative partial, long[] targetOfShape, long[] currentOfShape) {
 
-        if (shouldCorrectPartialForScalarForward(partialDerivative, currentOfShape, targetOfShape)) {
+        if (shouldCorrectPartialForScalarForward(partial, targetOfShape, currentOfShape)) {
 
-            DoubleTensor partial = partialDerivative.getPartial();
-            long[] partialShape = partial.getShape();
-            long[] wrtShape = TensorShape.selectDimensions(currentOfShape.length, partialShape.length, partialShape);
-            DoubleTensor correctedPartial = DoubleTensor.zeros(TensorShape.concat(targetOfShape, wrtShape)).plus(partial);
-            return new PartialDerivative(partialDerivative.getKey(), correctedPartial);
+            long[] wrtShape = partial.getWrtShape(currentOfShape);
+            DoubleTensor correctedPartial = DoubleTensor
+                .zeros(TensorShape.concat(targetOfShape, wrtShape))
+                .plus(partial.getPartial());
+
+            return new PartialDerivative(partial.getKey(), correctedPartial);
         } else {
-            return partialDerivative;
+            return partial;
         }
     }
 
@@ -67,21 +68,26 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Diffe
         return partial.isPresent() && !Arrays.equals(currentOfShape, targetOfShape);
     }
 
-    public static boolean shouldCorrectForPartialScalarReverse(PartialDerivative partial, long[] targetWrtShape, long[] currentWrtShape) {
-        return partial.isPresent() && !Arrays.equals(currentWrtShape, targetWrtShape);
+    public static PartialDerivative correctForScalarPartialReverse(PartialDerivative partial, long[] currentWrtShape, long[] targetWrtShape) {
+
+        if (shouldCorrectForPartialScalarReverse(partial, targetWrtShape, currentWrtShape)) {
+
+            int[] wrtDims = TensorShape.dimensionRange(-currentWrtShape.length, 0);
+            DoubleTensor partialSummed = partial.getPartial().sum(wrtDims);
+
+            long[] resultShape = TensorShape.concat(
+                partial.getOfShape(currentWrtShape),
+                targetWrtShape
+            );
+
+            return new PartialDerivative(partial.getKey(), partialSummed.reshape(resultShape));
+        } else {
+            return partial;
+        }
     }
 
-    public static PartialDerivative correctForScalarReverse(PartialDerivative partialForScalar, long[] currentWrtShape, long[] targetWrtShape) {
-
-        if (shouldCorrectForPartialScalarReverse(partialForScalar, currentWrtShape, targetWrtShape)) {
-
-            long[] partialShape = partialForScalar.getPartial().getShape();
-            int[] wrtDims = TensorShape.dimensionRange(partialShape.length - currentWrtShape.length, partialShape.length);
-
-            return partialForScalar.sumOverWrtDimensions(wrtDims, targetWrtShape);
-        } else {
-            return partialForScalar;
-        }
+    public static boolean shouldCorrectForPartialScalarReverse(PartialDerivative partial, long[] targetWrtShape, long[] currentWrtShape) {
+        return partial.isPresent() && !Arrays.equals(currentWrtShape, targetWrtShape);
     }
 
     @Override

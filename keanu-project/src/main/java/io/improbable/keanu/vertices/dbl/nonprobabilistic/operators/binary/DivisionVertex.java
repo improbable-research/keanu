@@ -59,8 +59,8 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf
             .multiplyAlongWrtDimensions(dOutWrtRight);
 
-        PartialDerivative toLeft = correctForScalarReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
-        PartialDerivative toRight = correctForScalarReverse(dOutputsWrtRight, this.getShape(), right.getShape());
+        PartialDerivative toLeft = correctForScalarPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
+        PartialDerivative toRight = correctForScalarPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());
 
         partials.put(left, toLeft);
         partials.put(right, toRight);

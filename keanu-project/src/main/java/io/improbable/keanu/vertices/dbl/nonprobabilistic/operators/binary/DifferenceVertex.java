@@ -47,8 +47,8 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
-        PartialDerivative toLeft = correctForScalarReverse(derivativeOfOutputWithRespectToSelf, this.getShape(), left.getShape());
-        PartialDerivative toRight = correctForScalarReverse(derivativeOfOutputWithRespectToSelf.multiplyBy(-1), this.getShape(), right.getShape());
+        PartialDerivative toLeft = correctForScalarPartialReverse(derivativeOfOutputWithRespectToSelf, this.getShape(), left.getShape());
+        PartialDerivative toRight = correctForScalarPartialReverse(derivativeOfOutputWithRespectToSelf.multiplyBy(-1), this.getShape(), right.getShape());
 
         partials.put(left, toLeft);
         partials.put(right, toRight);

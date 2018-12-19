@@ -47,47 +47,6 @@ public class PartialDerivative {
         return Arrays.copyOfRange(partial.getShape(), ofShape.length, partial.getShape().length);
     }
 
-    /**
-     * This will sum partial derivatives that are represented as tensors over given dimensions.
-     * The dimensions that are summed over will be reshaped to the specified resultShape.
-     *
-     * @param dimensions  dimensions to sum over
-     * @return summed and reshaped partials
-     */
-    public PartialDerivative sumOverOfDimensions(int[] dimensions) {
-
-        return new PartialDerivative(getKey(), partial.sum(dimensions));
-    }
-
-    /**
-     * This will sum partial derivatives that are represented as tensors over given dimensions.
-     * The dimensions that are summed over will be reshaped to the specified resultShape.
-     *
-     * @param dimensions  dimensions to sum over
-     * @param resultShape shape of sum result
-     * @return summed and reshaped partials
-     */
-    public PartialDerivative sumOverWrtDimensions(int[] dimensions, long[] resultShape) {
-
-        if (isEmpty()) {
-            return this;
-        }
-
-        if (dimensions.length == 0) {
-            return new PartialDerivative(getKey(), getPartial());
-        }
-
-        DoubleTensor v = getPartial();
-        long[] vShape = v.getShape();
-        long[] ofShape = TensorShape.selectDimensions(0, vShape.length - dimensions.length, vShape);
-
-        DoubleTensor summedV = v.sum(dimensions);
-        long[] newShape = TensorShape.concat(ofShape, resultShape);
-        summedV = summedV.reshape(newShape);
-
-        return new PartialDerivative(getKey(), summedV);
-    }
-
     public PartialDerivative add(PartialDerivative addition) {
 
         if (isPresent() && addition.isPresent()) {
