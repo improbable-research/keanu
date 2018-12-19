@@ -10,16 +10,16 @@ public class PartialDerivative {
 
     public static final PartialDerivative EMPTY = new PartialDerivative();
 
-    private final VertexId id;
+    private final VertexId key;
     private final DoubleTensor partial;
 
-    public PartialDerivative(VertexId id, DoubleTensor partial) {
-        this.id = id;
+    public PartialDerivative(VertexId key, DoubleTensor partial) {
+        this.key = key;
         this.partial = partial;
     }
 
     private PartialDerivative() {
-        this.id = null;
+        this.key = null;
         this.partial = null;
     }
 
@@ -36,7 +36,7 @@ public class PartialDerivative {
     }
 
     public VertexId getKey() {
-        return id;
+        return key;
     }
 
     public long[] getOfShape(long[] wrtShape) {
@@ -79,7 +79,7 @@ public class PartialDerivative {
             return this;
         }
 
-        return new PartialDerivative(id, partial.times(multiplier));
+        return new PartialDerivative(key, partial.times(multiplier));
     }
 
     public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier) {
@@ -91,7 +91,7 @@ public class PartialDerivative {
         DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
         DoubleTensor result = partial.times(multiplierFromLeft);
 
-        return new PartialDerivative(id, result);
+        return new PartialDerivative(key, result);
     }
 
     public PartialDerivative multiplyAlongWrtDimensions(DoubleTensor multiplier) {
@@ -103,7 +103,7 @@ public class PartialDerivative {
         DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
         DoubleTensor result = partial.times(multiplierFromRight);
 
-        return new PartialDerivative(id, result);
+        return new PartialDerivative(key, result);
     }
 
     public PartialDerivative divideByAlongOfDimensions(DoubleTensor divisor) {
@@ -115,7 +115,7 @@ public class PartialDerivative {
         DoubleTensor divisorFromLeft = increaseRankByAppendingOnesToShape(divisor, partial.getRank());
         DoubleTensor result = partial.div(divisorFromLeft);
 
-        return new PartialDerivative(id, result);
+        return new PartialDerivative(key, result);
     }
 
     public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
