@@ -39,15 +39,8 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         PartialDerivative fromRight = correctForScalarPartialForward(dRightWrtInput, this.getShape(), right.getShape());
 
         // dc = (B * da - A * db) / B^2;
-        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(
-            right.getValue(),
-            left.getValue().getShape()
-        );
-
-        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(
-            left.getValue(),
-            right.getValue().getShape()
-        );
+        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue());
+        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue());
 
         return partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().pow(2));
     }
@@ -61,10 +54,10 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         DoubleTensor dOutWrtRight = leftValue.div(rightValue.pow(2.0)).unaryMinusInPlace();
 
         PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(dOutWrtLeft, this.getShape());
+            .multiplyAlongWrtDimensions(dOutWrtLeft);
 
         PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(dOutWrtRight, this.getShape());
+            .multiplyAlongWrtDimensions(dOutWrtRight);
 
         PartialDerivative toLeft = correctForScalarReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
         PartialDerivative toRight = correctForScalarReverse(dOutputsWrtRight, this.getShape(), right.getShape());

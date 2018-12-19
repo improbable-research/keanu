@@ -36,7 +36,7 @@ public class ArcCosVertex extends DoubleUnaryOpVertex implements Differentiable 
 
         DoubleTensor dArcCos = inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1)
             .sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
-        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcCos, inputVertex.getShape());
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcCos);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class ArcCosVertex extends DoubleUnaryOpVertex implements Differentiable 
             .unaryMinusInPlace();
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput));
 
         return partials;
     }

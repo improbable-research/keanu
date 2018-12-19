@@ -42,15 +42,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         PartialDerivative fromX = correctForScalarPartialForward(dxWrtInput, this.getShape(), left.getShape());
         PartialDerivative fromY = correctForScalarPartialForward(dyWrtInput, this.getShape(), right.getShape());
 
-        PartialDerivative diffFromX = fromX.multiplyAlongOfDimensions(
-            yValue.div(denominator).unaryMinusInPlace(),
-            xValue.getShape()
-        );
-
-        PartialDerivative diffFromY = fromY.multiplyAlongOfDimensions(
-            xValue.div(denominator),
-            yValue.getShape()
-        );
+        PartialDerivative diffFromX = fromX.multiplyAlongOfDimensions(yValue.div(denominator).unaryMinusInPlace());
+        PartialDerivative diffFromY = fromY.multiplyAlongOfDimensions(xValue.div(denominator));
 
         return diffFromX.add(diffFromY);
     }
@@ -65,8 +58,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         DoubleTensor dOutWrtX = yValue.div(denominator).unaryMinusInPlace();
         DoubleTensor dOutWrtY = xValue.div(denominator);
 
-        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX, this.getShape());
-        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY, this.getShape());
+        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX);
+        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY);
 
         PartialDerivative toLeft = correctForScalarReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
         PartialDerivative toRight = correctForScalarReverse(dOutputsWrtRight, this.getShape(), right.getShape());

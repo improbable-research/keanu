@@ -52,8 +52,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
 
         if (fromBase.isPresent()) {
             partialsFromBase = fromBase.multiplyAlongOfDimensions(
-                right.getValue().times(left.getValue().pow(right.getValue().minus(1))),
-                this.getValue().getShape()
+                right.getValue().times(left.getValue().pow(right.getValue().minus(1)))
             );
         } else {
             partialsFromBase = PartialDerivative.EMPTY;
@@ -61,8 +60,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
 
         if (fromExponent.isPresent()) {
             partialsFromExponent = fromExponent.multiplyAlongOfDimensions(
-                left.getValue().log().timesInPlace(this.getValue()),
-                right.getValue().getShape()
+                left.getValue().log().timesInPlace(this.getValue())
             );
         } else {
             partialsFromExponent = PartialDerivative.EMPTY;
@@ -80,8 +78,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         DoubleTensor dSelfWrtBase = exponentValue.div(baseValue).timesInPlace(basePowExponent);
         DoubleTensor dSelfWrtExponent = basePowExponent.times(baseValue.log());
 
-        PartialDerivative dOutputsWrtBase = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase, this.getShape());
-        PartialDerivative dOutputsWrtExponent = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent, this.getShape());
+        PartialDerivative dOutputsWrtBase = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase);
+        PartialDerivative dOutputsWrtExponent = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent);
 
         PartialDerivative toBase = correctForScalarReverse(dOutputsWrtBase, this.getShape(), getBase().getShape());
         PartialDerivative toExponent = correctForScalarReverse(dOutputsWrtExponent, this.getShape(), getExponent().getShape());

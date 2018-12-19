@@ -34,14 +34,14 @@ public class CosVertex extends DoubleUnaryOpVertex implements Differentiable {
         DoubleTensor inputValue = inputVertex.getValue();
 
         DoubleTensor dCos = inputValue.sin().unaryMinusInPlace();
-        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dCos, inputValue.getShape());
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dCos);
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         partials.put(inputVertex, derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(inputVertex.getValue().sin().unaryMinusInPlace(), this.getShape()));
+            .multiplyAlongWrtDimensions(inputVertex.getValue().sin().unaryMinusInPlace()));
         return partials;
     }
 }

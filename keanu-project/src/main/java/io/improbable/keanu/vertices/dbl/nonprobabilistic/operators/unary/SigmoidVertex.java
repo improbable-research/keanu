@@ -35,7 +35,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex implements Differentiable
         DoubleTensor x = inputVertex.getValue();
         DoubleTensor xExp = x.exp();
         DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2));
-        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dxdfx, x.getShape());
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dxdfx);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex implements Differentiable
         DoubleTensor derivativeOfSigmoidWrtInput = sigmoidOfInput.minus(sigmoidOfInput.pow(2));
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(derivativeOfSigmoidWrtInput, this.getShape()));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(derivativeOfSigmoidWrtInput));
         return partials;
     }
 

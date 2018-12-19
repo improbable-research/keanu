@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -45,9 +46,21 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
         DoubleTensor inverseTranspose = inputVertex.getValue().transpose().matrixInverse();
 
         PartialDerivative derivativeOfOutputsWithRespectToInputs = derivativeOfOutputWithRespectToSelf
-            .multiplyBy(inputVertex.getValue().determinant())
-            .multiplyAlongWrtDimensions(inverseTranspose, this.getShape());
+            .multiplyBy(inputVertex.getValue().determinant());
 
-        return Collections.singletonMap(inputVertex, derivativeOfOutputsWithRespectToInputs);
+        long[] resultShape = TensorShape.concat(derivativeOfOutputWithRespectToSelf.getPartial().getShape(), inputVertex.getShape());
+
+        DoubleTensor reshapedPartial = PartialDerivative.increaseRankByAppendingOnesToShape(
+            derivativeOfOutputsWithRespectToInputs.getPartial(),
+            resultShape.length
+        );
+
+        DoubleTensor expanded = DoubleTensor.zeros(resultShape).plus(reshapedPartial);
+
+        PartialDerivative dexp = new PartialDerivative(derivativeOfOutputWithRespectToSelf.getKey(), expanded);
+
+        PartialDerivative toInput = dexp.multiplyAlongWrtDimensions(inverseTranspose);
+
+        return Collections.singletonMap(inputVertex, toInput);
     }
 }

@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
-import org.nd4j.linalg.api.shape.Shape;
 
 import java.util.Arrays;
 
@@ -38,6 +37,14 @@ public class PartialDerivative {
 
     public VertexId getKey() {
         return id;
+    }
+
+    public long[] getOfShape(long[] wrtShape) {
+        return Arrays.copyOfRange(partial.getShape(), 0, partial.getShape().length - wrtShape.length);
+    }
+
+    public long[] getWrtShape(long[] ofShape) {
+        return Arrays.copyOfRange(partial.getShape(), ofShape.length, partial.getShape().length);
     }
 
     /**
@@ -122,7 +129,7 @@ public class PartialDerivative {
 
     }
 
-    public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier, long[] ofShape) {
+    public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier) {
 
         if (isEmpty()) {
             return this;
@@ -133,13 +140,14 @@ public class PartialDerivative {
         if (multiplier.isScalar()) {
             result = partial.times(multiplier.scalar());
         } else {
-            result = elementWiseMultiplyAlongOf(partial, multiplier);
+            DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
+            result = partial.times(multiplierFromLeft);
         }
 
         return new PartialDerivative(id, result);
     }
 
-    public PartialDerivative multiplyAlongWrtDimensions(DoubleTensor multiplier, long[] wrtShape) {
+    public PartialDerivative multiplyAlongWrtDimensions(DoubleTensor multiplier) {
 
         if (isEmpty()) {
             return this;
@@ -149,36 +157,11 @@ public class PartialDerivative {
         if (multiplier.isScalar()) {
             result = partial.times(multiplier.scalar());
         } else {
-            result = elementWiseMultiplyAlongWrt(partial, multiplier, wrtShape);
+            DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
+            result = partial.times(multiplierFromRight);
         }
 
         return new PartialDerivative(id, result);
-    }
-
-    private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier) {
-        DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
-        return partial.times(multiplierFromLeft);
-    }
-
-    private DoubleTensor elementWiseMultiplyAlongWrt(DoubleTensor partial, DoubleTensor multiplier, long[] wrtShape) {
-
-        long[] partialWrtShape = extractWrtShape(partial.getShape(), partial.getRank() - wrtShape.length);
-
-        boolean needsBroadcast = !Arrays.equals(partialWrtShape, multiplier.getShape());
-        if (needsBroadcast) {
-
-            long[] partialOfShape = extractOfShape(partial.getShape(), partial.getRank() - wrtShape.length);
-            long[] broadcastedWrtShape = Shape.broadcastOutputShape(multiplier.getShape(), partialWrtShape);
-            long[] resultShape = TensorShape.concat(partialOfShape, broadcastedWrtShape);
-
-            DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, resultShape.length);
-            DoubleTensor appropriateShapePartial = increaseRankByAppendingOnesToShape(partial, resultShape.length);
-
-            return DoubleTensor.ones(resultShape).times(appropriateShapePartial).times(multiplierFromRight);
-        }
-
-        DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
-        return partial.times(multiplierFromRight);
     }
 
     public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
@@ -301,10 +284,6 @@ public class PartialDerivative {
         return extractShape(partialDerivativeShape, rankOfSource, rankOfSource, partialDerivativeShape.length);
     }
 
-    private long[] extractOfShape(long[] partialDerivativeShape, int rankOfSource) {
-        return extractShape(partialDerivativeShape, rankOfSource, 0, rankOfSource);
-    }
-
     private long[] extractShape(long[] partialDerivativeShape, int rankOfSource, int from, int to) {
         if (partialDerivativeShape.length == 0) {
             if (rankOfSource > 1) {
@@ -316,13 +295,13 @@ public class PartialDerivative {
         return Arrays.copyOfRange(partialDerivativeShape, from, to);
     }
 
-    private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+    public static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
         return lowRankTensor.reshape(
             TensorShape.shapeDesiredToRankByAppendingOnes(lowRankTensor.getShape(), desiredRank)
         );
     }
 
-    private static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+    public static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
         return lowRankTensor.reshape(
             TensorShape.shapeToDesiredRankByPrependingOnes(lowRankTensor.getShape(), desiredRank)
         );

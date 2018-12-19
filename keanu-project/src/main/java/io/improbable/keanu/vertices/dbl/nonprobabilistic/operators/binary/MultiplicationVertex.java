@@ -40,15 +40,8 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
         PartialDerivative fromRight = correctForScalarPartialForward(dRightWrtInput, this.getShape(), right.getShape());
 
         // dc = A * db + da * B;
-        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(
-            right.getValue(),
-            left.getValue().getShape()
-        );
-
-        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(
-            left.getValue(),
-            right.getValue().getShape()
-        );
+        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue());
+        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue());
 
         return partialsFromLeft.add(partialsFromRight);
     }
@@ -58,13 +51,11 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
         PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(
-            right.getValue(),
-            this.getShape()
+            right.getValue()
         );
 
         PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(
-            left.getValue(),
-            this.getShape()
+            left.getValue()
         );
 
         PartialDerivative toLeft = correctForScalarReverse(dOutputsWrtLeft, this.getShape(), left.getShape());

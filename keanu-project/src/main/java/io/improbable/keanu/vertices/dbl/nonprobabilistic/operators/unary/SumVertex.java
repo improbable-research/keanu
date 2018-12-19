@@ -69,17 +69,18 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
 
-        long[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
+        DoubleTensor partialDueToSummationShapeChange = getPartialDueToSummationShapeChange(derivativeOfOutputWithRespectToSelf);
 
-        PartialDerivative partialDueToSummationShapeChange = getPartialDueToSummationShapeChange(derivativeOfOutputWithRespectToSelf);
+        long[] ofShape = derivativeOfOutputWithRespectToSelf.getOfShape(this.getShape());
+        long[] resultShape = TensorShape.concat(ofShape, inputVertex.getShape());
 
-        PartialDerivative derivativesWrtInput = partialDueToSummationShapeChange
-            .multiplyAlongWrtDimensions(DoubleTensor.ones(inputVertex.getShape()), wrtShapeWithoutRankLoss);
+        DoubleTensor expanded = DoubleTensor.ones(resultShape).times(partialDueToSummationShapeChange);
+        PartialDerivative dOfWrtInputVertex = new PartialDerivative(derivativeOfOutputWithRespectToSelf.getKey(), expanded);
 
-        return singletonMap(inputVertex, derivativesWrtInput);
+        return singletonMap(inputVertex, dOfWrtInputVertex);
     }
 
-    private PartialDerivative getPartialDueToSummationShapeChange(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
+    private DoubleTensor getPartialDueToSummationShapeChange(PartialDerivative derivativeOfOutputsWithRespectToSelf) {
 
         long[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
 
@@ -90,9 +91,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
             wrtShapeWithoutRankLoss
         );
 
-        DoubleTensor reshapedPartialDerivative = derivativeOfOutputsWithRespectToSelf.getPartial().reshape(newPartialShape);
-
-        return new PartialDerivative(derivativeOfOutputsWithRespectToSelf.getKey(), reshapedPartialDerivative);
+        return derivativeOfOutputsWithRespectToSelf.getPartial().reshape(newPartialShape);
     }
 
     private static long[] summedOverShapeWithoutRankLoss(long[] shape, int[] sumOverDimensions) {

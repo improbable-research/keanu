@@ -60,7 +60,6 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
 
-        long[] ofShape = getShape();
         PartialDerivative thnPartial = derivativeOfParentsWithRespectToInput.getOrDefault(thn, PartialDerivative.EMPTY);
         PartialDerivative elsPartial = derivativeOfParentsWithRespectToInput.getOrDefault(els, PartialDerivative.EMPTY);
         BooleanTensor predicateValue = predicate.getValue();
@@ -70,8 +69,8 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
         } else if (predicateValue.allFalse()) {
             return elsPartial;
         } else {
-            return thnPartial.multiplyAlongOfDimensions(predicateValue.toDoubleMask(), ofShape)
-                .add(elsPartial.multiplyAlongOfDimensions(predicateValue.not().toDoubleMask(), ofShape));
+            return thnPartial.multiplyAlongOfDimensions(predicateValue.toDoubleMask())
+                .add(elsPartial.multiplyAlongOfDimensions(predicateValue.not().toDoubleMask()));
         }
     }
 
@@ -89,9 +88,9 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
         partials.put(thn, derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(predicateValue.toDoubleMask(), this.getShape()));
+            .multiplyAlongWrtDimensions(predicateValue.toDoubleMask()));
         partials.put(els, derivativeOfOutputWithRespectToSelf
-            .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask(), this.getShape()));
+            .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask()));
         return partials;
     }
 

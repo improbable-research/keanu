@@ -36,7 +36,7 @@ public class ArcSinVertex extends DoubleUnaryOpVertex implements Differentiable 
 
         DoubleTensor dArcSin = (inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1))
             .sqrtInPlace().reciprocalInPlace();
-        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcSin, inputValue.getShape());
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcSin);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ArcSinVertex extends DoubleUnaryOpVertex implements Differentiable 
             .reciprocalInPlace();
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput));
 
         return partials;
     }
