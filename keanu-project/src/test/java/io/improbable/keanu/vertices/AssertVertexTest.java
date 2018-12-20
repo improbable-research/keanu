@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -61,6 +62,17 @@ public class AssertVertexTest {
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observingVertex.getConnectedGraph());
         MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork,bayesianNetwork.getLatentVertices()).generate(10);
+    }
+
+    @Test
+    public void optimizerWithAssertionWorks() {
+        thrown.expect(AssertionError.class);
+        UniformVertex temperature = new UniformVertex(20,30);
+        GaussianVertex observedTemp = new GaussianVertex(temperature,1);
+        observedTemp.observe(29);
+        temperature.greaterThan(new ConstantDoubleVertex(34)).assertTrue();
+        KeanuOptimizer.of(temperature.getConnectedGraph()).maxAPosteriori();
+        System.out.println(temperature.getValue().scalar());
     }
 
     @Test
