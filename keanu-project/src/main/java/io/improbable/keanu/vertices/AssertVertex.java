@@ -4,22 +4,21 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import java.util.Optional;
 
 public class AssertVertex extends BoolVertex implements NonProbabilistic<BooleanTensor>, NonSaveableVertex {
 
     private final Vertex<? extends BooleanTensor> predicate;
-    private String errorMessage = "";
+    private final String errorMessage;
 
     public AssertVertex(Vertex<? extends BooleanTensor> predicate, String errorMessage) {
-        this(predicate);
+        super(predicate.getShape());
+        this.predicate = predicate;
         this.errorMessage = errorMessage;
+        setParents(predicate);
     }
 
     public AssertVertex(Vertex<? extends BooleanTensor> predicate) {
-        super(predicate.getShape());
-        this.predicate = predicate;
-        setParents(predicate);
+        this(predicate, "");
     }
 
 
@@ -41,7 +40,7 @@ public class AssertVertex extends BoolVertex implements NonProbabilistic<Boolean
         if (getLabel() != null) {
             stringBuilder.append(" (" + getLabel().getQualifiedName() + ")");
         }
-        if(!errorMessage.equals("")) {
+        if (!errorMessage.equals("")) {
             stringBuilder.append(": " + errorMessage);
         }
         return stringBuilder.toString();
