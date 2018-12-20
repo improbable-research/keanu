@@ -8,7 +8,7 @@ import lombok.experimental.UtilityClass;
 public class ModelScoring {
     /**
      * Calculates the <a href="https://en.wikipedia.org/wiki/Coefficient_of_determination">coefficient of determination</a> - i.e.
-     * the R² value - for the given predicted output and true values.
+     * the R^2 value - for the given predicted output and true values.
      *
      * @param predictedOutput predicted output
      * @param trueOutput      the true output to compare the predicted output against
