@@ -146,7 +146,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         resetVertexValue(sampleFromVertices, position);
 
-        Tree tree = Tree.createBasicTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
+        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
 
         return new NUTSSampler(
             sampleFromVertices,

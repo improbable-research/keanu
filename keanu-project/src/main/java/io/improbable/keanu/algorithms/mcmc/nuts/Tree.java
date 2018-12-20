@@ -79,11 +79,11 @@ class Tree implements SaveStatistics {
      * @param sampleAtAcceptedPosition the initial sample
      * @return a basic tree
      */
-    public static Tree createBasicTree(Map<VertexId, DoubleTensor> position,
-                                       Map<VertexId, DoubleTensor> momentum,
-                                       Map<VertexId, DoubleTensor> gradient,
-                                       double initialLogOfMasterP,
-                                       Map<VertexId, ?> sampleAtAcceptedPosition) {
+    public static Tree createInitialTree(Map<VertexId, DoubleTensor> position,
+                                         Map<VertexId, DoubleTensor> momentum,
+                                         Map<VertexId, DoubleTensor> gradient,
+                                         double initialLogOfMasterP,
+                                         Map<VertexId, ?> sampleAtAcceptedPosition) {
 
         return new Tree(
             new Leapfrog(position, momentum, gradient),
