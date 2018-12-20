@@ -32,9 +32,9 @@ public class KeanuComputableGraphTest {
         KeanuComputableGraph computableGraph = KeanuGraphConverter.convert(C.getConnectedGraph());
 
         DoubleTensor evaluatedC = computableGraph.compute(ImmutableMap.of(
-            A_LABEL, DoubleTensor.scalar(2),
-            B_LABEL, DoubleTensor.scalar(3)
-        ), cLabel);
+            A.getReference(), DoubleTensor.scalar(2),
+            B.getReference(), DoubleTensor.scalar(3)
+        ), C.getReference());
 
         assertEquals(DoubleTensor.scalar(5), evaluatedC);
     }

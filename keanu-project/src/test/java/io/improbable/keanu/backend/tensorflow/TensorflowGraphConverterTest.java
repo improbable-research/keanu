@@ -1,5 +1,6 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -32,21 +33,15 @@ public class TensorflowGraphConverterTest {
         DoubleVertex B = new GaussianVertex(1, 1);
         B.setValue(3);
 
-        A.setLabel("A");
-        B.setLabel("B");
-
         DoubleVertex C = A.plus(B);
-
-        String outputName = "someOutput";
-        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
-        Map<String, DoubleTensor> inputs = new HashMap<>();
-        inputs.put(A.getLabel().toString(), A.getValue());
-        inputs.put(B.getLabel().toString(), B.getValue());
+        Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
 
-        DoubleTensor result = graph.compute(inputs, outputName);
+        DoubleTensor result = graph.compute(inputs, C.getReference());
 
         assertEquals(C.getValue(), result);
     }
@@ -59,21 +54,15 @@ public class TensorflowGraphConverterTest {
         DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
         B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        A.setLabel("A");
-        B.setLabel("B");
-
         DoubleVertex C = A.plus(B);
-
-        String outputName = "someOutput";
-        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
-        Map<String, DoubleTensor> inputs = new HashMap<>();
-        inputs.put(A.getLabel().toString(), A.getValue());
-        inputs.put(B.getLabel().toString(), B.getValue());
+        Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
 
-        DoubleTensor result = graph.compute(inputs, outputName);
+        DoubleTensor result = graph.compute(inputs, C.getReference());
 
         assertEquals(C.getValue(), result);
     }
@@ -86,27 +75,21 @@ public class TensorflowGraphConverterTest {
         DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
         B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        A.setLabel("A");
-        B.setLabel("B");
-
         DoubleVertex C = A.plus(B);
-
-        String outputName = "someOutput";
-        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
         DoubleTensor result = graph.compute(of(
-            "A", A.getValue(),
-            "B", B.getValue()
-        ), outputName);
+            A.getReference(), A.getValue(),
+            B.getReference(), B.getValue()
+        ), C.getReference());
 
         assertEquals(C.eval(), result);
 
         DoubleTensor nextBValue = DoubleTensor.create(new double[]{0.1, 0.1, 0.1, 0.1}, 2, 2);
         DoubleTensor resultAfterRun = graph.compute(of(
-            "B", nextBValue
-        ), outputName);
+            B.getReference(), nextBValue
+        ), C.getReference());
 
         B.setValue(nextBValue);
 
@@ -121,21 +104,15 @@ public class TensorflowGraphConverterTest {
         IntegerVertex B = new UniformIntVertex(new long[]{2, 2}, 1, 1);
         B.setValue(IntegerTensor.create(new int[]{5, 6, 7, 8}, 2, 2));
 
-        A.setLabel("A");
-        B.setLabel("B");
-
         IntegerVertex C = A.times(B).abs();
-
-        String outputName = "someOutput";
-        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
-        Map<String, IntegerTensor> inputs = new HashMap<>();
-        inputs.put(A.getLabel().toString(), A.getValue());
-        inputs.put(B.getLabel().toString(), B.getValue());
+        Map<VariableReference, IntegerTensor> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
 
-        IntegerTensor result = graph.compute(inputs, outputName);
+        IntegerTensor result = graph.compute(inputs, C.getReference());
 
         assertEquals(C.getValue(), result);
     }
@@ -148,21 +125,15 @@ public class TensorflowGraphConverterTest {
         BoolVertex B = new BernoulliVertex(new long[]{2, 2}, 0.75);
         B.setValue(BooleanTensor.create(new boolean[]{false, false, true, true}, 2, 2));
 
-        A.setLabel("A");
-        B.setLabel("B");
-
         BoolVertex C = A.and(B).not();
-
-        String outputName = "someOutput";
-        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
-        Map<String, BooleanTensor> inputs = new HashMap<>();
-        inputs.put(A.getLabel().toString(), A.getValue());
-        inputs.put(B.getLabel().toString(), B.getValue());
+        Map<VariableReference, BooleanTensor> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
 
-        BooleanTensor result = graph.compute(inputs, outputName);
+        BooleanTensor result = graph.compute(inputs, C.getReference());
 
         assertEquals(C.getValue(), result);
     }
@@ -175,21 +146,15 @@ public class TensorflowGraphConverterTest {
         DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
         B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        A.setLabel("A");
-        B.setLabel("B");
-
         DoubleVertex C = DoubleVertex.concat(0, A, B);
-
-        String outputName = "someOutput";
-        C.setLabel(outputName);
 
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
-        Map<String, DoubleTensor> inputs = new HashMap<>();
-        inputs.put(A.getLabel().toString(), A.getValue());
-        inputs.put(B.getLabel().toString(), B.getValue());
+        Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
 
-        DoubleTensor result = graph.compute(inputs, outputName);
+        DoubleTensor result = graph.compute(inputs, C.getReference());
 
         assertEquals(C.getValue(), result);
     }
@@ -217,11 +182,11 @@ public class TensorflowGraphConverterTest {
         E.setLabel("E");
         E.observe(DoubleTensor.create(new double[]{0, 0, 0, 0, 0, 0, 0, 0}, 4, 2));
 
-        Map<String, DoubleTensor> inputs = new HashMap<>();
-        inputs.put(A.getLabel().toString(), A.getValue());
-        inputs.put(B.getLabel().toString(), B.getValue());
-        inputs.put(C.getLabel().toString(), C.getValue());
-        inputs.put(E.getLabel().toString(), E.getValue());
+        Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
+        inputs.put(C.getReference(), C.getValue());
+        inputs.put(E.getReference(), E.getValue());
 
         BayesianNetwork network = new BayesianNetwork(E.getConnectedGraph());
         double expectedLogProb = network.getLogOfMasterP();
@@ -236,12 +201,12 @@ public class TensorflowGraphConverterTest {
         try (ProbabilisticWithGradientGraph graph = TensorflowGraphConverter.convertWithGradient(network)) {
 
             double tensorflowLogProb = graph.logProb(inputs);
-            Map<String, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
+            Map<VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
 
-            assertEquals(keanuGradients.get(A.getId()), tensorflowGradients.get("A"));
-            assertEquals(keanuGradients.get(B.getId()), tensorflowGradients.get("B"));
-            assertEquals(keanuGradients.get(C.getId()), tensorflowGradients.get("C"));
-            assertEquals(keanuGradients.get(E.getId()), tensorflowGradients.get("E"));
+            assertEquals(keanuGradients.get(A.getId()), tensorflowGradients.get(A.getReference()));
+            assertEquals(keanuGradients.get(B.getId()), tensorflowGradients.get(B.getReference()));
+            assertEquals(keanuGradients.get(C.getId()), tensorflowGradients.get(C.getReference()));
+            assertEquals(keanuGradients.get(E.getId()), tensorflowGradients.get(E.getReference()));
             assertEquals(expectedLogProb, tensorflowLogProb, 1e-2);
         }
     }
@@ -254,23 +219,17 @@ public class TensorflowGraphConverterTest {
         DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
         B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        A.setLabel("A");
-        B.setLabel("B");
-
         DoubleVertex C = A.plus(B);
         DoubleVertex D = C.times(B);
         DoubleVertex out = D.matrixMultiply(C);
 
-        String outputName = "output";
-        out.setLabel(outputName);
-
         ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
 
-        Map<String, DoubleTensor> inputs = new HashMap<>();
-        inputs.put(A.getLabel().toString(), A.getValue());
-        inputs.put(B.getLabel().toString(), B.getValue());
+        Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
 
-        DoubleTensor result = graph.compute(inputs, outputName);
+        DoubleTensor result = graph.compute(inputs, out.getReference());
 
         assertEquals(out.getValue(), result);
     }
@@ -290,9 +249,6 @@ public class TensorflowGraphConverterTest {
         A.setValue(initialA);
         B.setValue(initialB);
 
-        A.setLabel("A");
-        B.setLabel("B");
-
         DoubleVertex C = A.matrixMultiply(B).matrixMultiply(A).times(0.5).matrixMultiply(B);
 
         DoubleVertex CObserved = new GaussianVertex(shape, C, 2);
@@ -310,15 +266,15 @@ public class TensorflowGraphConverterTest {
 
         try (ProbabilisticWithGradientGraph graph = TensorflowGraphConverter.convertWithGradient(network)) {
 
-            Map<String, DoubleTensor> inputs = new HashMap<>();
-            inputs.put(A.getLabel().toString(), initialA);
-            inputs.put(B.getLabel().toString(), initialB);
+            Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
+            inputs.put(A.getReference(), initialA);
+            inputs.put(B.getReference(), initialB);
 
             double tensorflowResult = graph.logProb(inputs);
-            Map<String, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
+            Map<VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
 
-            assertEquals(keanuGradients.get(A.getId()), tensorflowGradients.get("A"));
-            assertEquals(keanuGradients.get(B.getId()), tensorflowGradients.get("B"));
+            assertEquals(keanuGradients.get(A.getId()), tensorflowGradients.get(A.getReference()));
+            assertEquals(keanuGradients.get(B.getId()), tensorflowGradients.get(B.getReference()));
             assertEquals(expectedLogProb, tensorflowResult, 1e-2);
         }
 

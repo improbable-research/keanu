@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
@@ -45,8 +46,19 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
+    public LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> outputs) {
+
+        return null;
+    }
+
+    @Override
     public List<? extends Variable> getLatentVariables() {
         return this.latentVertices;
+    }
+
+    @Override
+    public Map<VariableReference, ?> getLatentVariablesValues() {
+        return null;
     }
 
     public void cascadeUpdate(Map<VariableReference, ?> inputs) {

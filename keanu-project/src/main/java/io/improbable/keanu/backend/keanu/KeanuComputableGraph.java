@@ -1,6 +1,7 @@
 package io.improbable.keanu.backend.keanu;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.vertices.Vertex;
 
@@ -15,22 +16,22 @@ import static java.util.stream.Collectors.toMap;
 
 public class KeanuComputableGraph implements ComputableGraph {
 
-    private final Map<String, Vertex> vertexLookup;
+    private final Map<VariableReference, Vertex> vertexLookup;
 
     public KeanuComputableGraph(Set<Vertex> vertices) {
         this.vertexLookup = vertices.stream()
-            .collect(toMap(Vertex::getUniqueStringReference, v -> v));
+            .collect(toMap(Vertex::getReference, v -> v));
     }
 
     @Override
-    public <T> T compute(Map<String, ?> inputs, String output) {
+    public <T> T compute(Map<VariableReference, ?> inputs, VariableReference output) {
         return (T) compute(inputs, singletonList(output)).get(output);
     }
 
     @Override
-    public Map<String, ?> compute(Map<String, ?> inputs, Collection<String> outputs) {
+    public Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs, Collection<VariableReference> outputs) {
 
-        for (Map.Entry<String, ?> input : inputs.entrySet()) {
+        for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {
             vertexLookup.get(input.getKey()).setValue(input.getValue());
         }
 
@@ -40,14 +41,12 @@ public class KeanuComputableGraph implements ComputableGraph {
 
         VertexValuePropagation.eval(outputVertices);
 
-        Map<String, ?> results = outputVertices.stream()
-            .collect(toMap(v -> v.getLabel().toString(), v -> (Object) v.getValue()));
-
-        return results;
+        return outputVertices.stream()
+            .collect(toMap(Vertex::getReference, v -> (Object) v.getValue()));
     }
 
     @Override
-    public <T> T getInput(String input) {
+    public <T> T getInput(VariableReference input) {
         return (T) vertexLookup.get(input).getValue();
     }
 

@@ -1,5 +1,6 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -31,9 +32,9 @@ public class TensorflowComputableGraph implements ComputableGraph {
     @Getter
     private final Scope scope;
 
-    private Map<String, Object> inputCache = new HashMap<>();
+    private Map<VariableReference, Object> inputCache = new HashMap<>();
 
-    public TensorflowComputableGraph(Session session, Scope scope, Map<String, Object> defaultInputs) {
+    public TensorflowComputableGraph(Session session, Scope scope, Map<VariableReference, Object> defaultInputs) {
         this.session = session;
         this.scope = scope;
         this.inputCache.putAll(defaultInputs);
@@ -44,54 +45,57 @@ public class TensorflowComputableGraph implements ComputableGraph {
     }
 
     @Override
-    public <T> T compute(Map<String, ?> inputs, String output) {
+    public <T> T compute(Map<VariableReference, ?> inputs, VariableReference output) {
         return (T) compute(inputs, singletonList(output)).get(output);
     }
 
     @Override
-    public Map<String, Object> compute(Map<String, ?> inputs, Collection<String> outputs) {
+    public Map<VariableReference, Object> compute(Map<VariableReference, ?> inputs, Collection<VariableReference> outputs) {
 
         cacheInputs(inputs);
 
-        List<String> outputsNotFed = filterInputs(inputCache, outputs);
+        List<VariableReference> outputsNotFed = filterInputs(inputCache, outputs);
         Session.Runner runner = feedInputs(inputCache);
         List<Tensor<?>> tfResults = fetchOutputs(runner, outputsNotFed).run();
 
-        Map<String, Object> resultsAsKeanu = convertToKeanuTensors(outputsNotFed, tfResults);
+        Map<VariableReference, Object> resultsAsKeanu = convertToKeanuTensors(outputsNotFed, tfResults);
 
-        Map<String, Object> inputsFromOutputs = getOutputValuesThatAreInputs(inputCache, outputs);
+        Map<VariableReference, Object> inputsFromOutputs = getOutputValuesThatAreInputs(inputCache, outputs);
 
         resultsAsKeanu.putAll(inputsFromOutputs);
 
         return resultsAsKeanu;
     }
 
-    private Map<String, Object> getOutputValuesThatAreInputs(Map<String, ?> inputs, Collection<String> outputs) {
+    private Map<VariableReference, Object> getOutputValuesThatAreInputs(Map<VariableReference, ?> inputs,
+                                                                        Collection<VariableReference> outputs) {
         return outputs.stream()
             .filter(inputs::containsKey)
             .collect(toMap(output -> output, inputs::get));
     }
 
-    private List<String> filterInputs(Map<String, ?> inputs, Collection<String> outputs) {
+    private List<VariableReference> filterInputs(Map<VariableReference, ?> inputs,
+                                                 Collection<VariableReference> outputs) {
         return outputs.stream()
             .filter(v -> !inputs.containsKey(v))
             .collect(toList());
     }
 
     @Override
-    public <T> T getInput(String input) {
+    public <T> T getInput(VariableReference input) {
         return (T) inputCache.get(input);
     }
 
-    private void cacheInputs(Map<String, ?> inputs) {
+    private void cacheInputs(Map<VariableReference, ?> inputs) {
         inputs.forEach((inputLabel, inputValue) -> inputCache.put(inputLabel, inputValue));
     }
 
-    private Map<String, Object> convertToKeanuTensors(Collection<String> outputs, List<Tensor<?>> tfResults) {
+    private Map<VariableReference, Object> convertToKeanuTensors(Collection<VariableReference> outputs,
+                                                                 List<Tensor<?>> tfResults) {
 
-        Map<String, Object> results = new HashMap<>();
+        Map<VariableReference, Object> results = new HashMap<>();
         Iterator<Tensor<?>> resultIterator = tfResults.iterator();
-        for (String output : outputs) {
+        for (VariableReference output : outputs) {
             results.put(output, convertToKeanuTensor(resultIterator.next()));
         }
         return results;
@@ -113,10 +117,10 @@ public class TensorflowComputableGraph implements ComputableGraph {
         }
     }
 
-    private Session.Runner feedInputs(Map<String, ?> inputs) {
+    private Session.Runner feedInputs(Map<VariableReference, ?> inputs) {
 
         Session.Runner runner = session.runner();
-        for (Map.Entry<String, ?> inputEntry : inputs.entrySet()) {
+        for (Map.Entry<VariableReference, ?> inputEntry : inputs.entrySet()) {
 
             Object tensor = inputEntry.getValue();
 
@@ -129,17 +133,17 @@ public class TensorflowComputableGraph implements ComputableGraph {
                 tensorFlowTensor = toTensorFlow((IntegerTensor) tensor);
             }
 
-            runner = runner.feed(inputEntry.getKey(), tensorFlowTensor);
+            runner = runner.feed(inputEntry.getKey().toStringReference(), tensorFlowTensor);
         }
 
         return runner;
     }
 
-    private Session.Runner fetchOutputs(Session.Runner runner, Collection<String> outputs) {
+    private Session.Runner fetchOutputs(Session.Runner runner, Collection<VariableReference> outputs) {
 
         Session.Runner fetchedRunner = runner;
-        for (String output : outputs) {
-            fetchedRunner = fetchedRunner.fetch(output);
+        for (VariableReference output : outputs) {
+            fetchedRunner = fetchedRunner.fetch(output.toStringReference());
         }
 
         return fetchedRunner;

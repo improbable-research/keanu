@@ -189,16 +189,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
         return id;
     }
 
-    public String getUniqueStringReference() {
-        if (label != null) {
-            return label.toString();
-        } else {
-            return Arrays.stream(id.getValue()).boxed()
-                .map(Objects::toString)
-                .collect(Collectors.joining("_"));
-        }
-    }
-
     public int getIndentation() {
         return id.getIndentation();
     }

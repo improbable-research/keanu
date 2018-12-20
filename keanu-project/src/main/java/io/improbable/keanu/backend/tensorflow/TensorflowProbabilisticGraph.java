@@ -1,5 +1,7 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -19,24 +21,29 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
     private final TensorflowComputableGraph computableGraph;
 
     @Getter
-    private final List<String> latentVariables;
+    private final List<? extends Variable> latentVariables;
 
     @Getter
-    private final String logProbSumTotalOpName;
+    private final VariableReference logProbSumTotalOpName;
 
     @Override
-    public double logProb(Map<String, ?> inputs) {
+    public double logProb(Map<VariableReference, ?> inputs) {
         DoubleTensor logProb = computableGraph.compute(inputs, logProbSumTotalOpName);
         return logProb.scalar();
     }
 
     @Override
-    public LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> sampleFrom) {
+    public double logLikelihood(Map<VariableReference, ?> inputs) {
+        return 0;
+    }
 
-        List<String> allOutputs = new ArrayList<>(sampleFrom);
+    @Override
+    public LogProbWithSample logProbWithSample(Map<VariableReference, ?> inputs, List<VariableReference> sampleFrom) {
+
+        List<VariableReference> allOutputs = new ArrayList<>(sampleFrom);
         allOutputs.add(logProbSumTotalOpName);
 
-        Map<String, ?> results = computableGraph.compute(inputs, allOutputs);
+        Map<VariableReference, ?> results = computableGraph.compute(inputs, allOutputs);
         double logProb = ((DoubleTensor) results.get(logProbSumTotalOpName)).scalar();
         results.remove(logProbSumTotalOpName);
 
@@ -44,11 +51,11 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
-    public Map<String, ?> getLatentVariablesValues() {
+    public Map<VariableReference, ?> getLatentVariablesValues() {
 
-        Map<String, ?> values = new HashMap<>();
-        for (String latent : latentVariables) {
-            values.put(latent, computableGraph.getInput(latent));
+        Map<VariableReference, ?> values = new HashMap<>();
+        for (Variable latent : latentVariables) {
+            values.put(latent.getReference(), computableGraph.getInput(latent.getReference()));
         }
 
         return values;

@@ -1,5 +1,6 @@
 package io.improbable.keanu.backend.keanu;
 
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -15,7 +16,7 @@ import static java.util.stream.Collectors.toMap;
 public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph implements ProbabilisticWithGradientGraph {
 
     private LogProbGradientCalculator gradientCalculator;
-    private Map<VertexId, String> idToLabelLookup;
+    private Map<VertexId, VariableReference> idToLabelLookup;
 
     public KeanuProbabilisticWithGradientGraph(BayesianNetwork bayesianNetwork) {
         super(bayesianNetwork);
@@ -23,7 +24,7 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
         this.idToLabelLookup = continuousLatentVertices.stream()
             .collect(toMap(
                 Vertex::getId,
-                Vertex::getUniqueStringReference
+                Vertex::getReference
                 )
             );
         this.gradientCalculator = new LogProbGradientCalculator(
@@ -33,7 +34,7 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
     }
 
     @Override
-    public Map<String, DoubleTensor> logProbGradients(Map<String, ?> inputs) {
+    public Map<VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
 
         if (inputs != null && !inputs.isEmpty()) {
             cascadeUpdate(inputs);

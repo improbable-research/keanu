@@ -2,6 +2,7 @@ package io.improbable.keanu.backend;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.backend.keanu.KeanuGraphConverter;
 import io.improbable.keanu.backend.tensorflow.TensorflowGraphConverter;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -127,8 +128,8 @@ public class ProbabilisticGraphTest {
         double defaultLogProb = probabilisticGraph.logProb();
 
         double logProb = probabilisticGraph.logProb(ImmutableMap.of(
-            A_LABEL, initialA,
-            B_LABEL, initialB
+            A.getReference(), initialA,
+            B.getReference(), initialB
         ));
 
         assertEquals(defaultLogProb, logProb);
@@ -138,7 +139,7 @@ public class ProbabilisticGraphTest {
 
         DoubleTensor newA = KeanuRandom.getDefaultRandom().nextDouble(initialA.getShape());
         double postUpdateLogProb = probabilisticGraph.logProb(ImmutableMap.of(
-            A_LABEL, newA
+            A.getReference(), newA
         ));
 
         double expectedPostUpdateLogProb = expectedLogProb(newA, initialB, observationD);
@@ -149,16 +150,16 @@ public class ProbabilisticGraphTest {
     public void canConvertSimpleNetworkAndTakeSample(ProbabilisticGraph probabilisticGraph) {
 
         LogProbWithSample logProbWithSample = probabilisticGraph.logProbWithSample(ImmutableMap.of(
-            A_LABEL, initialA,
-            B_LABEL, initialB
-        ), ImmutableList.of(A_LABEL, B_LABEL, C_LABEL));
+            A.getReference(), initialA,
+            B.getReference(), initialB
+        ), ImmutableList.of(A.getReference(), B.getReference(), C.getReference()));
 
         double expectedLogProb = expectedLogProb(initialA, initialB, observationD);
         assertEquals(expectedLogProb, logProbWithSample.getLogProb(), 1e-5);
 
-        Map<String, ?> sample = logProbWithSample.getSample();
-        assertEquals(initialA, ((DoubleTensor) sample.get(A_LABEL)));
-        assertEquals(initialB, ((DoubleTensor) sample.get(B_LABEL)));
-        assertEquals(initialA.plus(initialB), ((DoubleTensor) sample.get(C_LABEL)));
+        Map<VariableReference, ?> sample = logProbWithSample.getSample();
+        assertEquals(initialA, ((DoubleTensor) sample.get(A.getReference())));
+        assertEquals(initialB, ((DoubleTensor) sample.get(B.getReference())));
+        assertEquals(initialA.plus(initialB), ((DoubleTensor) sample.get(C.getReference())));
     }
 }

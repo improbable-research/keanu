@@ -1,6 +1,7 @@
 package io.improbable.keanu.backend.keanu;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -10,7 +11,6 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -20,25 +20,30 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     private final BayesianNetwork bayesianNetwork;
 
     @Getter
-    private final Map<String, Vertex> vertexLookup;
+    private final Map<VariableReference, Vertex> vertexLookup;
 
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
         this.bayesianNetwork = bayesianNetwork;
         this.vertexLookup = bayesianNetwork.getVertices().stream()
-            .collect(toMap(Vertex::getUniqueStringReference, v -> v));
+            .collect(toMap(Vertex::getReference, v -> v));
     }
 
     @Override
-    public double logProb(Map<String, ?> inputs) {
+    public double logProb(Map<VariableReference, ?> inputs) {
         cascadeUpdate(inputs);
         return this.bayesianNetwork.getLogOfMasterP();
     }
 
     @Override
-    public LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> outputs) {
+    public double logLikelihood(Map<VariableReference, ?> inputs) {
+        return 0;
+    }
+
+    @Override
+    public LogProbWithSample logProbWithSample(Map<VariableReference, ?> inputs, List<VariableReference> outputs) {
 
         double logProb = logProb(inputs);
-        Map<String, Object> sample = outputs.stream()
+        Map<VariableReference, Object> sample = outputs.stream()
             .collect(toMap(
                 output -> output,
                 output -> vertexLookup.get(output).getValue()
@@ -48,25 +53,23 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
-    public List<String> getLatentVariables() {
-        return bayesianNetwork.getLatentVertices().stream()
-            .map(Vertex::getUniqueStringReference)
-            .collect(Collectors.toList());
+    public List<Vertex> getLatentVariables() {
+        return bayesianNetwork.getLatentVertices();
     }
 
     @Override
-    public Map<String, ?> getLatentVariablesValues() {
+    public Map<VariableReference, ?> getLatentVariablesValues() {
         return bayesianNetwork.getLatentVertices().stream()
             .collect(toMap(
-                Vertex::getUniqueStringReference,
+                Vertex::getReference,
                 Vertex::getValue)
             );
     }
 
-    public void cascadeUpdate(Map<String, ?> inputs) {
+    public void cascadeUpdate(Map<VariableReference, ?> inputs) {
 
         List<Vertex> updatedVertices = new ArrayList<>();
-        for (Map.Entry<String, ?> input : inputs.entrySet()) {
+        for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {
             Vertex updatingVertex = vertexLookup.get(input.getKey());
             updatingVertex.setValue(input.getValue());
             updatedVertices.add(updatingVertex);

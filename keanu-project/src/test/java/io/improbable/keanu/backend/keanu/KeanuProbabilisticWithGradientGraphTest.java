@@ -1,5 +1,6 @@
 package io.improbable.keanu.backend.keanu;
 
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -36,10 +37,10 @@ public class KeanuProbabilisticWithGradientGraphTest {
             new BayesianNetwork(C.getConnectedGraph())
         );
 
-        Map<String, DoubleTensor> gradients = graph.logProbGradients(null);
+        Map<VariableReference, DoubleTensor> gradients = graph.logProbGradients(null);
 
-        DoubleTensor dLogProbWrtA = gradients.get(A_LABEL);
-        DoubleTensor dLogProbWrtB = gradients.get(B_LABEL);
+        DoubleTensor dLogProbWrtA = gradients.get(A.getReference());
+        DoubleTensor dLogProbWrtB = gradients.get(B.getReference());
 
         //logProb = log(A*B)
         //dLogProb w.r.t A = B * 1/(A*B) = 1/A

@@ -1,10 +1,12 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
+import io.improbable.keanu.backend.LogProbWithSample;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public interface ProbabilisticGraph {
+public interface ProbabilisticGraph extends AutoCloseable {
 
     default double logProb() {
         return logProb(Collections.emptyMap());
@@ -18,6 +20,13 @@ public interface ProbabilisticGraph {
 
     double logLikelihood(Map<VariableReference, ?> inputs);
 
+    LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> outputs);
+
     List<? extends Variable> getLatentVariables();
 
+    Map<VariableReference, ?> getLatentVariablesValues();
+
+    @Override
+    default void close() {
+    }
 }

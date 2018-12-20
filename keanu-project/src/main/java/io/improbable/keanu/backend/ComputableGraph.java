@@ -1,15 +1,17 @@
 package io.improbable.keanu.backend;
 
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+
 import java.util.Collection;
 import java.util.Map;
 
 public interface ComputableGraph extends AutoCloseable {
 
-    <T> T compute(Map<String, ?> inputs, String output);
+    <T> T compute(Map<VariableReference, ?> inputs, VariableReference output);
 
-    Map<String, ?> compute(Map<String, ?> inputs, Collection<String> outputs);
+    Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs, Collection<VariableReference> outputs);
 
-    <T> T getInput(String input);
+    <T> T getInput(VariableReference input);
 
     @Override
     default void close() {

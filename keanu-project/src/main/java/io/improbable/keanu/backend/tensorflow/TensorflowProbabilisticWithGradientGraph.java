@@ -1,5 +1,7 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
@@ -10,25 +12,24 @@ import java.util.Map;
 public class TensorflowProbabilisticWithGradientGraph extends TensorflowProbabilisticGraph implements ProbabilisticWithGradientGraph {
 
     private final TensorflowComputableGraph computableGraph;
-    private final Map<String, String> gradientOutputNameToInputName;
+    private final Map<VariableReference, VariableReference> gradientOutputNameToInputName;
 
     public TensorflowProbabilisticWithGradientGraph(TensorflowComputableGraph computableGraph,
-                                                    List<String> latentVariables,
-                                                    String logProbSumTotalOpName,
-                                                    Map<String, String> gradientOutputNameToInputName) {
+                                                    List<? extends Variable> latentVariables,
+                                                    VariableReference logProbSumTotalOpName,
+                                                    Map<VariableReference, VariableReference> gradientOutputNameToInputName) {
         super(computableGraph, latentVariables, logProbSumTotalOpName);
         this.computableGraph = computableGraph;
         this.gradientOutputNameToInputName = gradientOutputNameToInputName;
-
     }
 
     @Override
-    public Map<String, DoubleTensor> logProbGradients(Map<String, ?> inputs) {
+    public Map<VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
 
-        Map<String, ?> results = computableGraph.compute(inputs, gradientOutputNameToInputName.keySet());
+        Map<VariableReference, ?> results = computableGraph.compute(inputs, gradientOutputNameToInputName.keySet());
 
-        Map<String, DoubleTensor> gradientsByInputName = new HashMap<>();
-        for (Map.Entry<String, ?> result : results.entrySet()) {
+        Map<VariableReference, DoubleTensor> gradientsByInputName = new HashMap<>();
+        for (Map.Entry<VariableReference, ?> result : results.entrySet()) {
             gradientsByInputName.put(gradientOutputNameToInputName.get(result.getKey()), (DoubleTensor) result.getValue());
         }
 

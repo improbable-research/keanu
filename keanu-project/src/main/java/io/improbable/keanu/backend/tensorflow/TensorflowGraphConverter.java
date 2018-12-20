@@ -1,5 +1,7 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.TensorShape;
@@ -273,7 +275,7 @@ public class TensorflowGraphConverter {
     }
 
     private static String getTensorflowOpName(Vertex vertex) {
-        return vertex.getUniqueStringReference();
+        return vertex.getReference().toStringReference();
     }
 
     public static TensorflowComputableGraph convert(Set<Vertex> vertices) {
@@ -289,7 +291,7 @@ public class TensorflowGraphConverter {
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.addAll(vertices);
 
-        Map<String, Object> latentVariables = new HashMap<>();
+        Map<VariableReference, Object> latentVariables = new HashMap<>();
 
         Vertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
@@ -299,7 +301,7 @@ public class TensorflowGraphConverter {
                     lookup.put(visiting, createConstant(visiting, lookup, graphBuilder));
                 } else {
                     Output<?> tfVisiting = createVariable(visiting, graphBuilder);
-                    latentVariables.put(tfVisiting.op().name(), visiting.getValue());
+                    latentVariables.put(visiting.getReference(), visiting.getValue());
                     lookup.put(visiting, tfVisiting);
                 }
             } else {
@@ -330,11 +332,11 @@ public class TensorflowGraphConverter {
             network.getLatentOrObservedVertices()
         );
 
-        List<String> latentVariables = network.getLatentVertices().stream()
-            .map(Vertex::getUniqueStringReference)
+        List<Variable<?>> latentVariables = network.getLatentVertices().stream()
+            .map(v -> new TensorflowVariable<>(computableGraph, v.getReference()))
             .collect(Collectors.toList());
 
-        return new TensorflowProbabilisticGraph(computableGraph, latentVariables, logProbSumTotalOpName);
+        return new TensorflowProbabilisticGraph(computableGraph, latentVariables, new StringVariableReference(logProbSumTotalOpName));
     }
 
     private static String addLogProbCalculation(Scope scope,
@@ -414,14 +416,22 @@ public class TensorflowGraphConverter {
         Map<Vertex<?>, Output<?>> vertexLookup = new HashMap<>();
         TensorflowProbabilisticGraph tensorflowProbabilisticGraph = convert(bayesianNetwork, vertexLookup);
 
-        List<String> latentVariables = bayesianNetwork.getContinuousLatentVertices().stream()
-            .map(latent -> vertexLookup.get(latent).op().name())
+        TensorflowComputableGraph computeGraph = tensorflowProbabilisticGraph.getComputableGraph();
+
+        List<Vertex<DoubleTensor>> latentVertices = bayesianNetwork.getContinuousLatentVertices();
+
+        List<VariableReference> latentVariablesReferences = latentVertices.stream()
+            .map(Vertex::getReference)
             .collect(Collectors.toList());
 
-        Map<String, String> gradientOutputNameToInputName = addGradients(
+        List<Variable<?>> latentVariables = latentVariablesReferences.stream()
+            .map(ref -> new TensorflowVariable<>(computeGraph, ref))
+            .collect(Collectors.toList());
+
+        Map<VariableReference, VariableReference> gradientOutputNameToInputName = addGradients(
             tensorflowProbabilisticGraph.getComputableGraph().getScope().graph(),
             tensorflowProbabilisticGraph.getLogProbSumTotalOpName(),
-            latentVariables
+            latentVariablesReferences
         );
 
         return new TensorflowProbabilisticWithGradientGraph(
@@ -438,17 +448,19 @@ public class TensorflowGraphConverter {
      * @param withRespectToLabels with respect to labels
      * @return gradient output name to input name lookup
      */
-    private static Map<String, String> addGradients(Graph graph, String ofLabel, List<String> withRespectToLabels) {
+    private static Map<VariableReference, VariableReference> addGradients(Graph graph,
+                                                                          VariableReference ofLabel,
+                                                                          List<VariableReference> withRespectToLabels) {
 
         Output<?>[] wrt = withRespectToLabels.stream()
-            .map(opName -> graph.operation(opName).output(0))
+            .map(opName -> graph.operation(opName.toStringReference()).output(0))
             .toArray(Output[]::new);
 
-        Output<?>[] gradientOutputs = graph.addGradients(graph.operation(ofLabel).output(0), wrt);
+        Output<?>[] gradientOutputs = graph.addGradients(graph.operation(ofLabel.toStringReference()).output(0), wrt);
 
-        Map<String, String> gradientOutputNameToInputName = new HashMap<>();
+        Map<VariableReference, VariableReference> gradientOutputNameToInputName = new HashMap<>();
         for (int i = 0; i < withRespectToLabels.size(); i++) {
-            gradientOutputNameToInputName.put(gradientOutputs[i].op().name(), withRespectToLabels.get(i));
+            gradientOutputNameToInputName.put(new StringVariableReference(gradientOutputs[i].op().name()), withRespectToLabels.get(i));
         }
 
         return gradientOutputNameToInputName;
