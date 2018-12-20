@@ -21,31 +21,27 @@ public class AssertVertexTest {
     public void assertThrowsOnFalseConstBool() {
         thrown.expect(AssertionError.class);
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
-        AssertVertex assertVertex = new AssertVertex(constBool);
-        assertVertex.eval();
+        constBool.assertTrue().eval();
     }
 
     @Test
     public void assertPassesOnTrueConstBool() {
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(true));
-        AssertVertex assertVertex = new AssertVertex(constBool);
-        assertVertex.eval();
+        constBool.assertTrue().eval();
     }
 
     @Test
-    public void lazyEvalThrowsOFalseConstBool() {
+    public void lazyEvalThrowsOnFalseConstBool() {
         thrown.expect(AssertionError.class);
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
-        AssertVertex assertVertex = new AssertVertex(constBool);
-        assertVertex.lazyEval();
+        constBool.assertTrue().lazyEval();
     }
 
     @Test
     public void assertPassesOnRVWithTruePredicate() {
         UniformVertex uniform = new UniformVertex(0,5);
         BoolVertex predicate = uniform.lessThan(new ConstantDoubleVertex(new double[]{10}));
-        AssertVertex assertVertex = new AssertVertex(predicate);
-        assertVertex.eval();
+        predicate.assertTrue().eval();
     }
 
     @Test
@@ -53,16 +49,16 @@ public class AssertVertexTest {
         thrown.expect(AssertionError.class);
         UniformVertex uniform = new UniformVertex(0,5);
         BoolVertex predicate = uniform.greaterThan(new ConstantDoubleVertex(new double[]{10}));
-        AssertVertex assertVertex = new AssertVertex(predicate);
-        assertVertex.eval();
+        predicate.assertTrue().eval();
     }
 
     @Test
     public void samplingWithAssertionWorks() {
         thrown.expect(AssertionError.class);
         GaussianVertex uniform = new GaussianVertex(5,1);
-        AssertVertex assertion = new AssertVertex(uniform.greaterThan(new ConstantDoubleVertex(10000)));
         GaussianVertex observingVertex = new GaussianVertex(uniform, 1);
+        uniform.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
+
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observingVertex.getConnectedGraph());
         MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork,bayesianNetwork.getLatentVertices()).generate(10);
     }
@@ -72,7 +68,7 @@ public class AssertVertexTest {
         thrown.expect(AssertionError.class);
         thrown.expectMessage("AssertVertex (testAssert): this is wrong");
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
-        AssertVertex assertVertex = new AssertVertex(constBool, "this is wrong");
+        AssertVertex assertVertex = constBool.assertTrue("this is wrong");
         assertVertex.setLabel("testAssert");
         assertVertex.eval();
     }

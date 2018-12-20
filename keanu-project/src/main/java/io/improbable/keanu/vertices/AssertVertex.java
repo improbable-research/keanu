@@ -9,11 +9,11 @@ import java.util.Optional;
 public class AssertVertex extends BoolVertex implements NonProbabilistic<BooleanTensor>, NonSaveableVertex {
 
     private final Vertex<? extends BooleanTensor> predicate;
-    private Optional<String> errorMessage = Optional.empty();
+    private String errorMessage = "";
 
     public AssertVertex(Vertex<? extends BooleanTensor> predicate, String errorMessage) {
         this(predicate);
-        this.errorMessage = Optional.of(errorMessage);
+        this.errorMessage = errorMessage;
     }
 
     public AssertVertex(Vertex<? extends BooleanTensor> predicate) {
@@ -41,7 +41,9 @@ public class AssertVertex extends BoolVertex implements NonProbabilistic<Boolean
         if (getLabel() != null) {
             stringBuilder.append(" (" + getLabel().getQualifiedName() + ")");
         }
-        errorMessage.ifPresent((s -> stringBuilder.append(": " + s)));
+        if(!errorMessage.equals("")) {
+            stringBuilder.append(": " + errorMessage);
+        }
         return stringBuilder.toString();
     }
 

@@ -6,6 +6,7 @@ import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.AssertVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
@@ -84,6 +85,10 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> implements Boolea
     public static final BoolVertex not(Vertex<BooleanTensor> vertex) {
         return new NotVertex(vertex);
     }
+
+    public AssertVertex assertTrue() { return new AssertVertex(this); }
+
+    public AssertVertex assertTrue(String errorMessage) { return new AssertVertex(this, errorMessage); }
 
     public BoolVertex equalTo(BoolVertex rhs) {
         return new EqualsVertex<>(this, rhs);
