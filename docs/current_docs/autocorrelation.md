@@ -49,5 +49,5 @@ NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPost
     bayesNet.getLatentVertices(),
     100
 );
-DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation(0,1);
+DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation(0, 1);
 ```

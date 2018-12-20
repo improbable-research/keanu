@@ -105,8 +105,8 @@ The CSV can be loaded as a Java object by
 
 ```java
 List<MyClass> myPojos = ReadCsv.fromFile("some/file/path")
-        .asRowsDefinedBy(MyClass.class)
-        .load();
+    .asRowsDefinedBy(MyClass.class)
+    .load();
 ```
 
 If your CSV header names contain illegal characters you have the option to
@@ -251,9 +251,9 @@ To learn more about the parameters being used here, head over to the [NUTS docum
 
 ```java
 NetworkSamples samples = NUTS.withDefaultConfig().getPosteriorSamples(
-        new BayesianNetwork(aVertex.getConnectedGraph()),
-        aVertex,
-        1000
+    new BayesianNetwork(aVertex.getConnectedGraph()),
+    aVertex,
+    1000
 );
 ```
 

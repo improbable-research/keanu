@@ -40,7 +40,7 @@ thermometerB.observe(19.5);
 
 //Create a particle filter with default settings
 ParticleFilter filter = ParticleFilter.ofVertexInGraph(temperature)
-        .build();
+    .build();
 
 //Get a sorted list of the most probable particles in order of descending probability
 List<Particle> particles = filter.getSortedMostProbableParticles();

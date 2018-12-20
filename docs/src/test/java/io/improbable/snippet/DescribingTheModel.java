@@ -14,63 +14,63 @@ import java.util.Arrays;
 public class DescribingTheModel {
 
     public void doubleExample() {
-//%%SNIPPET_START%% DescribeVertex
-DoubleVertex A = new GaussianVertex(0, 1);
-DoubleVertex B = new GaussianVertex(0, 1);
-DoubleVertex C = A.plus(B);
-//%%SNIPPET_END%% DescribeVertex
+        //%%SNIPPET_START%% DescribeVertex
+        DoubleVertex A = new GaussianVertex(0, 1);
+        DoubleVertex B = new GaussianVertex(0, 1);
+        DoubleVertex C = A.plus(B);
+        //%%SNIPPET_END%% DescribeVertex
 
-//%%SNIPPET_START%% DescribePropagate
-A.setAndCascade(1.234);
-//%%SNIPPET_END%% DescribePropagate
+        //%%SNIPPET_START%% DescribePropagate
+        A.setAndCascade(1.234);
+        //%%SNIPPET_END%% DescribePropagate
 
-//%%SNIPPET_START%% DescribeLazy
-A.setValue(1.234);
-B.setValue(4.321);
-C.lazyEval();
-//%%SNIPPET_END%% DescribeLazy
+        //%%SNIPPET_START%% DescribeLazy
+        A.setValue(1.234);
+        B.setValue(4.321);
+        C.lazyEval();
+        //%%SNIPPET_END%% DescribeLazy
 
 
-//%%SNIPPET_START%% DescribeCascade
-A.setValue(1.234);
-B.setValue(4.321);
-VertexValuePropagation.cascadeUpdate(A, B);
-//%%SNIPPET_END%% DescribeCascade
+        //%%SNIPPET_START%% DescribeCascade
+        A.setValue(1.234);
+        B.setValue(4.321);
+        VertexValuePropagation.cascadeUpdate(A, B);
+        //%%SNIPPET_END%% DescribeCascade
     }
 
     public void booleanExample() {
-//%%SNIPPET_START%% DescribeAnd
-BoolVertex A = new BernoulliVertex(0.5);
-BoolVertex B = new BernoulliVertex(0.5);
-BoolVertex C = A.and(B);
-//%%SNIPPET_END%% DescribeAnd
+        //%%SNIPPET_START%% DescribeAnd
+        BoolVertex A = new BernoulliVertex(0.5);
+        BoolVertex B = new BernoulliVertex(0.5);
+        BoolVertex C = A.and(B);
+        //%%SNIPPET_END%% DescribeAnd
 
-//%%SNIPPET_START%% DescribeObserve
-C.observe(true);
-//%%SNIPPET_END%% DescribeObserve
+        //%%SNIPPET_START%% DescribeObserve
+        C.observe(true);
+        //%%SNIPPET_END%% DescribeObserve
 
-//%%SNIPPET_START%% DescribeInfer
-A.observe(true);
-B.observe(true);
+        //%%SNIPPET_START%% DescribeInfer
+        A.observe(true);
+        B.observe(true);
 
-NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-        new BayesianNetwork(C.getConnectedGraph()),
-        Arrays.asList(A, B),
-        100000
-).drop(10000).downSample(2);
-double probabilityOfA = posteriorSamples.get(A).probability(isTrue -> isTrue.scalar() == true);
-//probabilityOfA evaluates to 1.0
-//%%SNIPPET_END%% DescribeInfer
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+            new BayesianNetwork(C.getConnectedGraph()),
+            Arrays.asList(A, B),
+            100000
+        ).drop(10000).downSample(2);
+        double probabilityOfA = posteriorSamples.get(A).probability(isTrue -> isTrue.scalar() == true);
+        //probabilityOfA evaluates to 1.0
+        //%%SNIPPET_END%% DescribeInfer
 
-//%%SNIPPET_START%% DescribeInferIncorrect
-//WRONG
-A.lazyEval();
-B.lazyEval();
-System.out.println(A.getValue().scalar());
-//%%SNIPPET_END%% DescribeInferIncorrect
-//%%SNIPPET_START%% ProbeInfer
-BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
-net.probeForNonZeroProbability(10);
-//%%SNIPPET_END%% ProbeInfer
+        //%%SNIPPET_START%% DescribeInferIncorrect
+        //WRONG
+        A.lazyEval();
+        B.lazyEval();
+        System.out.println(A.getValue().scalar());
+        //%%SNIPPET_END%% DescribeInferIncorrect
+        //%%SNIPPET_START%% ProbeInfer
+        BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
+        net.probeForNonZeroProbability(10);
+        //%%SNIPPET_END%% ProbeInfer
     }
 }

@@ -46,8 +46,8 @@ and indicating whether they wish to save the current state of the model or to st
 example to save as a Protobuf:
 ```java
 public void saveNetToProtobuf(BayesianNetwork net,
-                                OutputStream outputStream,
-                                boolean saveValuesAndObservations) throws IOException {
+                              OutputStream outputStream,
+                              boolean saveValuesAndObservations) throws IOException {
     NetworkSaver saver = new ProtobufSaver(net);
     saver.save(outputStream, saveValuesAndObservations);
 }
