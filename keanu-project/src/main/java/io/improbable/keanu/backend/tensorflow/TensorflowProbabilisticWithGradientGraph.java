@@ -24,7 +24,7 @@ public class TensorflowProbabilisticWithGradientGraph extends TensorflowProbabil
     }
 
     @Override
-    public Map<VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
+    public Map<? extends VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
 
         Map<VariableReference, ?> results = computableGraph.compute(inputs, gradientOutputNameToInputName.keySet());
 
@@ -37,17 +37,17 @@ public class TensorflowProbabilisticWithGradientGraph extends TensorflowProbabil
     }
 
     @Override
-    public Map<VariableReference, DoubleTensor> logProbGradients() {
+    public Map<? extends VariableReference, DoubleTensor> logProbGradients() {
         return logProbGradients(null);
     }
 
     @Override
-    public Map<VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
+    public Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
         return null;
     }
 
     @Override
-    public Map<VariableReference, DoubleTensor> logLikelihoodGradients() {
+    public Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients() {
         return null;
     }
 }

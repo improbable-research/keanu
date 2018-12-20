@@ -201,7 +201,7 @@ public class TensorflowGraphConverterTest {
         try (ProbabilisticWithGradientGraph graph = TensorflowGraphConverter.convertWithGradient(network)) {
 
             double tensorflowLogProb = graph.logProb(inputs);
-            Map<VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
+            Map<? extends VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
 
             assertEquals(keanuGradients.get(A.getId()), tensorflowGradients.get(A.getReference()));
             assertEquals(keanuGradients.get(B.getId()), tensorflowGradients.get(B.getReference()));
@@ -271,7 +271,7 @@ public class TensorflowGraphConverterTest {
             inputs.put(B.getReference(), initialB);
 
             double tensorflowResult = graph.logProb(inputs);
-            Map<VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
+            Map<? extends VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
 
             assertEquals(keanuGradients.get(A.getId()), tensorflowGradients.get(A.getReference()));
             assertEquals(keanuGradients.get(B.getId()), tensorflowGradients.get(B.getReference()));
