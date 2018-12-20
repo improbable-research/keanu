@@ -19,30 +19,22 @@ public class AssertVertexTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void basicFailingAssertVertex() {
+    public void assertThrowsOnConstBoolWithIncorrectExpected() {
         thrown.expect(AssertionError.class);
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(true));
         AssertVertex assertVertex = new AssertVertex(constBool, BooleanTensor.create(false));
-        assertVertex.calculate();
+        assertVertex.eval();
     }
 
     @Test
-    public void basicAssertVertex() {
+    public void assertPassesOnConstBoolWithCorrectExpected() {
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(true));
-        AssertVertex assertVertex = new AssertVertex(constBool, BooleanTensor.create(true));
-        assertVertex.calculate();
-    }
-
-    @Test
-    public void checkEvalStillCausesCorrectAssertion() {
-        thrown.expect(AssertionError.class);
-        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = new AssertVertex(constBool, BooleanTensor.create(true));
         assertVertex.eval();
     }
 
     @Test
-    public void checkLazyEvalStillCausesCorrectAssertion() {
+    public void lazyEvalThrowsOnConstBoolWithIncorrectExpected() {
         thrown.expect(AssertionError.class);
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = new AssertVertex(constBool, BooleanTensor.create(true));
@@ -66,4 +58,5 @@ public class AssertVertexTest {
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observingVertex.getConnectedGraph());
         MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork,bayesianNetwork.getLatentVertices()).generate(1000);
     }
+
 }
