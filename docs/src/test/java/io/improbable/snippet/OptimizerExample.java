@@ -27,34 +27,34 @@ public class OptimizerExample {
     }
 
     private static double runGradientOptimizer(DoubleVertex temperature) {
-//%%SNIPPET_START%% GradientOptimizerMostProbable
-GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(temperature.getConnectedGraph())
-    .maxEvaluations(5000)
-    .relativeThreshold(1e-8)
-    .absoluteThreshold(1e-8)
-    .build();
-optimizer.maxAPosteriori();
+        //%%SNIPPET_START%% GradientOptimizerMostProbable
+        GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(temperature.getConnectedGraph())
+            .maxEvaluations(5000)
+            .relativeThreshold(1e-8)
+            .absoluteThreshold(1e-8)
+            .build();
+        optimizer.maxAPosteriori();
 
-double calculatedTemperature = temperature.getValue().scalar();
-//%%SNIPPET_END%% GradientOptimizerMostProbable
+        double calculatedTemperature = temperature.getValue().scalar();
+        //%%SNIPPET_END%% GradientOptimizerMostProbable
 
         return calculatedTemperature;
     }
 
     private static double runNonGradientOptimizer(DoubleVertex temperature) {
-//%%SNIPPET_START%% NonGradientOptimizerMostProbable
-OptimizerBounds temperatureBounds = new OptimizerBounds().addBound(temperature.getId(), -250., 250.0);
-NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.builderFor(temperature.getConnectedGraph())
-    .maxEvaluations(5000)
-    .boundsRange(100000)
-    .optimizerBounds(temperatureBounds)
-    .initialTrustRegionRadius(5.)
-    .stoppingTrustRegionRadius(2e-8)
-    .build();
-optimizer.maxAPosteriori();
+        //%%SNIPPET_START%% NonGradientOptimizerMostProbable
+        OptimizerBounds temperatureBounds = new OptimizerBounds().addBound(temperature.getId(), -250., 250.0);
+        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.builderFor(temperature.getConnectedGraph())
+            .maxEvaluations(5000)
+            .boundsRange(100000)
+            .optimizerBounds(temperatureBounds)
+            .initialTrustRegionRadius(5.)
+            .stoppingTrustRegionRadius(2e-8)
+            .build();
+        optimizer.maxAPosteriori();
 
-double calculatedTemperature = temperature.getValue().scalar();
-//%%SNIPPET_END%% NonGradientOptimizerMostProbable
+        double calculatedTemperature = temperature.getValue().scalar();
+        //%%SNIPPET_END%% NonGradientOptimizerMostProbable
 
         return calculatedTemperature;
     }

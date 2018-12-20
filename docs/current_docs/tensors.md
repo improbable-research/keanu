@@ -136,10 +136,10 @@ long[] shape = new long[]{3, 1};
 DoubleVertex mu = new ConstantDoubleVertex(new double[]{1, 2, 3});
 GaussianVertex vertex = new GaussianVertex(shape, mu, 0);
 /** Creates a GaussianVertex that looks like...
-* [ Gaussian(mu: 1, sigma: 0),
-*   Gaussian(mu: 2, sigma: 0),
-*   Gaussian(mu: 3, sigma: 0) ]
-*/
+ * [ Gaussian(mu: 1, sigma: 0),
+ *   Gaussian(mu: 2, sigma: 0),
+ *   Gaussian(mu: 3, sigma: 0) ]
+ */
 ```  
 
 
@@ -177,7 +177,7 @@ DoubleVertex CObservation = new GaussianVertex(C, 1);
 CObservation.observe(new double[]{6, 12});
 
 //Use algorithm to find MAP or posterior samples for A and/or B
-Optimizer optimizer = Optimizer.of(new BayesianNetwork(A.getConnectedGraph()));
+Optimizer optimizer = KeanuOptimizer.of(new BayesianNetwork(A.getConnectedGraph()));
 optimizer.maxAPosteriori();
 
 //Retrieve the most likely estimate using MAP estimation
