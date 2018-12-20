@@ -42,10 +42,19 @@ public class AssertVertexTest {
     }
 
     @Test
-    public void checkUsingPredicatesWorks() {
-        UniformVertex uniform = new UniformVertex(Tensor.SCALAR_SHAPE,0,5);
-        BoolVertex predicate = uniform.lessThan(new ConstantDoubleVertex(new double[]{10}, Tensor.SCALAR_SHAPE));
-        AssertVertex assertVertex = new AssertVertex(predicate, BooleanTensor.create(true, Tensor.SCALAR_SHAPE));
+    public void assertPassesOnRVWithCorrectExpected() {
+        UniformVertex uniform = new UniformVertex(0,5);
+        BoolVertex predicate = uniform.lessThan(new ConstantDoubleVertex(new double[]{10}));
+        AssertVertex assertVertex = new AssertVertex(predicate, BooleanTensor.create(new boolean[]{true}));
+        assertVertex.eval();
+    }
+
+    @Test
+    public void assertPassesOnRVWithIncorrectExpected() {
+        thrown.expect(AssertionError.class);
+        UniformVertex uniform = new UniformVertex(0,5);
+        BoolVertex predicate = uniform.lessThan(new ConstantDoubleVertex(new double[]{10}));
+        AssertVertex assertVertex = new AssertVertex(predicate, BooleanTensor.create(new boolean[]{false}));
         assertVertex.eval();
     }
 
