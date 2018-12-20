@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
@@ -19,53 +18,63 @@ public class AssertVertexTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void assertThrowsOnConstBoolWithIncorrectExpected() {
-        thrown.expect(AssertionError.class);
-        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(true));
-        AssertVertex assertVertex = new AssertVertex(constBool, BooleanTensor.create(false));
-        assertVertex.eval();
-    }
-
-    @Test
-    public void assertPassesOnConstBoolWithCorrectExpected() {
-        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(true));
-        AssertVertex assertVertex = new AssertVertex(constBool, BooleanTensor.create(true));
-        assertVertex.eval();
-    }
-
-    @Test
-    public void lazyEvalThrowsOnConstBoolWithIncorrectExpected() {
+    public void assertThrowsOnFalseConstBool() {
         thrown.expect(AssertionError.class);
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
-        AssertVertex assertVertex = new AssertVertex(constBool, BooleanTensor.create(true));
+        AssertVertex assertVertex = new AssertVertex(constBool);
+        assertVertex.eval();
+    }
+
+    @Test
+    public void assertPassesOnTrueConstBool() {
+        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(true));
+        AssertVertex assertVertex = new AssertVertex(constBool);
+        assertVertex.eval();
+    }
+
+    @Test
+    public void lazyEvalThrowsOFalseConstBool() {
+        thrown.expect(AssertionError.class);
+        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        AssertVertex assertVertex = new AssertVertex(constBool);
         assertVertex.lazyEval();
     }
 
     @Test
-    public void assertPassesOnRVWithCorrectExpected() {
+    public void assertPassesOnRVWithTruePredicate() {
         UniformVertex uniform = new UniformVertex(0,5);
         BoolVertex predicate = uniform.lessThan(new ConstantDoubleVertex(new double[]{10}));
-        AssertVertex assertVertex = new AssertVertex(predicate, BooleanTensor.create(new boolean[]{true}));
+        AssertVertex assertVertex = new AssertVertex(predicate);
         assertVertex.eval();
     }
 
     @Test
-    public void assertPassesOnRVWithIncorrectExpected() {
+    public void assertPassesOnRVWithFalsePredicate() {
         thrown.expect(AssertionError.class);
         UniformVertex uniform = new UniformVertex(0,5);
-        BoolVertex predicate = uniform.lessThan(new ConstantDoubleVertex(new double[]{10}));
-        AssertVertex assertVertex = new AssertVertex(predicate, BooleanTensor.create(new boolean[]{false}));
+        BoolVertex predicate = uniform.greaterThan(new ConstantDoubleVertex(new double[]{10}));
+        AssertVertex assertVertex = new AssertVertex(predicate);
         assertVertex.eval();
     }
 
     @Test
-    public void checkSamplingWithAssertionWorks() {
+    public void samplingWithAssertionWorks() {
         thrown.expect(AssertionError.class);
         GaussianVertex uniform = new GaussianVertex(5,1);
-        AssertVertex assertion = new AssertVertex(uniform.greaterThan(new ConstantDoubleVertex(10000)), BooleanTensor.trues(Tensor.SCALAR_SHAPE));
+        AssertVertex assertion = new AssertVertex(uniform.greaterThan(new ConstantDoubleVertex(10000)));
         GaussianVertex observingVertex = new GaussianVertex(uniform, 1);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observingVertex.getConnectedGraph());
-        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork,bayesianNetwork.getLatentVertices()).generate(1000);
+        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork,bayesianNetwork.getLatentVertices()).generate(10);
+    }
+
+    @Test
+    public void assertGivesCorrectErrorMessage() {
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("AssertVertex (testAssert): this is wrong");
+        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        AssertVertex assertVertex = new AssertVertex(constBool, "this is wrong");
+        assertVertex.setLabel("testAssert");
+        assertVertex.eval();
     }
 
 }
