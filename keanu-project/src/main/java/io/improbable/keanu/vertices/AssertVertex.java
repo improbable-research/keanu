@@ -11,6 +11,22 @@ public class AssertVertex extends BoolVertex implements NonProbabilistic<Boolean
     private final BooleanTensor expected;
     private final String errorMessage;
 
+    public static AssertVertex allTrue(Vertex<? extends BooleanTensor> predicate) {
+        return new AssertVertex(predicate, BooleanTensor.trues(predicate.getShape()));
+    }
+
+    public static AssertVertex allTrue(Vertex<? extends BooleanTensor> predicate, String errorMessage) {
+        return new AssertVertex(predicate, BooleanTensor.trues(predicate.getShape()), errorMessage);
+    }
+
+    public static AssertVertex allFalse(Vertex<? extends BooleanTensor> predicate) {
+        return new AssertVertex(predicate, BooleanTensor.falses(predicate.getShape()));
+    }
+
+    public static AssertVertex allFalse(Vertex<? extends BooleanTensor> predicate, String errorMessage) {
+        return new AssertVertex(predicate, BooleanTensor.falses(predicate.getShape()), errorMessage);
+    }
+
     public AssertVertex(Vertex<? extends BooleanTensor> predicate, BooleanTensor expected,
                         String errorMessage) {
         super(TensorShapeValidation.checkAllShapesMatch(predicate.getShape(), expected.getShape()));
@@ -21,18 +37,9 @@ public class AssertVertex extends BoolVertex implements NonProbabilistic<Boolean
     }
 
     public AssertVertex(Vertex<? extends BooleanTensor> predicate, BooleanTensor expected) {
-        this(predicate,expected,"Failed assertion");
+        this(predicate, expected, "Failed assertion");
     }
 
-    private boolean predicateMatchesExpected() {
-        return predicate.getValue().xor(expected).allFalse();
-    }
-
-    private void assertion() {
-        if(!predicateMatchesExpected()) {
-            throw new AssertionError(errorMessage);
-        }
-    }
 
     @Override
     public BooleanTensor calculate() {
@@ -40,8 +47,20 @@ public class AssertVertex extends BoolVertex implements NonProbabilistic<Boolean
         return predicate.getValue();
     }
 
+    private void assertion() {
+        if (!predicateMatchesExpected()) {
+            throw new AssertionError(errorMessage);
+        }
+    }
+
+    private boolean predicateMatchesExpected() {
+        return predicate.getValue().xor(expected).allFalse();
+    }
+
+
     @Override
     public BooleanTensor sample(KeanuRandom random) {
         return predicate.sample();
     }
+
 }
