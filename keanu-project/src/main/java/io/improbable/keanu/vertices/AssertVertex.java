@@ -7,34 +7,41 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class AssertVertex extends BoolVertex implements NonProbabilistic<BooleanTensor>, NonSaveableVertex {
 
-    private final Vertex<? extends BooleanTensor> actual;
+    private final Vertex<? extends BooleanTensor> predicate;
     private final BooleanTensor expected;
+    private final String errorMessage;
 
-    public AssertVertex(Vertex<? extends BooleanTensor> predicate, BooleanTensor expected) {
+    public AssertVertex(Vertex<? extends BooleanTensor> predicate, BooleanTensor expected,
+                        String errorMessage) {
         super(TensorShapeValidation.checkAllShapesMatch(predicate.getShape(), expected.getShape()));
-        this.actual = predicate;
+        this.predicate = predicate;
         this.expected = expected;
+        this.errorMessage = errorMessage;
         setParents(predicate);
     }
 
-    private boolean actualMatchesExpected() {
-        return actual.getValue().xor(expected).allFalse();
+    public AssertVertex(Vertex<? extends BooleanTensor> predicate, BooleanTensor expected) {
+        this(predicate,expected,"Failed assertion");
+    }
+
+    private boolean predicateMatchesExpected() {
+        return predicate.getValue().xor(expected).allFalse();
     }
 
     private void assertion() {
-        if(!actualMatchesExpected()) {
-            throw new AssertionError("Asserted value does not match");
+        if(!predicateMatchesExpected()) {
+            throw new AssertionError(errorMessage);
         }
     }
 
     @Override
     public BooleanTensor calculate() {
         assertion();
-        return actual.getValue();
+        return predicate.getValue();
     }
 
     @Override
     public BooleanTensor sample(KeanuRandom random) {
-        return actual.sample();
+        return predicate.sample();
     }
 }
