@@ -35,4 +35,19 @@ public class TensorflowProbabilisticWithGradientGraph extends TensorflowProbabil
 
         return gradientsByInputName;
     }
+
+    @Override
+    public Map<VariableReference, DoubleTensor> logProbGradients() {
+        return logProbGradients(null);
+    }
+
+    @Override
+    public Map<VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
+        return null;
+    }
+
+    @Override
+    public Map<VariableReference, DoubleTensor> logLikelihoodGradients() {
+        return null;
+    }
 }
