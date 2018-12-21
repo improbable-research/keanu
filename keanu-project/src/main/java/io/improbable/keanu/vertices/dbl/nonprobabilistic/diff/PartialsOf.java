@@ -6,8 +6,8 @@ import io.improbable.keanu.vertices.VertexId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class PartialsOf {
@@ -26,8 +26,13 @@ public class PartialsOf {
     }
 
     public Map<VertexId, DoubleTensor> asMap() {
-        return partials.entrySet().stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
+        final Map<VertexId, DoubleTensor> tensorMap = new HashMap<>();
+
+        for (Map.Entry<VertexId, PartialDerivative> entry : partials.entrySet()) {
+            tensorMap.put(entry.getKey(), entry.getValue().get());
+        }
+
+        return tensorMap;
     }
 
 }

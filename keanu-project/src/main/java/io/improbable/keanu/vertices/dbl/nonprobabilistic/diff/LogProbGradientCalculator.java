@@ -40,7 +40,7 @@ public class LogProbGradientCalculator {
 
         for (final Vertex<?> ofVertex : logProbOfVertices) {
             LogProbGradients logProbGradientOfVertex = reverseModeLogProbGradientWrtLatents(ofVertex);
-            totalLogProbGradients = logProbGradientOfVertex.add(totalLogProbGradients);
+            totalLogProbGradients.add(logProbGradientOfVertex);
         }
 
         return totalLogProbGradients.getPartials();
