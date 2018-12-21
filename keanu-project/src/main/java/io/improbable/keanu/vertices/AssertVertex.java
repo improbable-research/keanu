@@ -32,7 +32,6 @@ public class AssertVertex extends BoolVertex implements NonProbabilistic<Boolean
         this(predicate, "");
     }
 
-
     @Override
     public BooleanTensor calculate() {
         assertion();

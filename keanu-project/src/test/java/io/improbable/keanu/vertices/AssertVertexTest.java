@@ -56,11 +56,10 @@ public class AssertVertexTest {
     @Test
     public void samplingWithAssertionWorks() {
         thrown.expect(AssertionError.class);
-        GaussianVertex uniform = new GaussianVertex(5, 1);
-        GaussianVertex observingVertex = new GaussianVertex(uniform, 1);
-        uniform.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
+        GaussianVertex gaussian = new GaussianVertex(5, 1);
+        gaussian.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
 
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(observingVertex.getConnectedGraph());
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(gaussian.getConnectedGraph());
         MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork, bayesianNetwork.getLatentVertices()).generate(10);
     }
 
@@ -72,7 +71,6 @@ public class AssertVertexTest {
         observedTemp.observe(29);
         temperature.greaterThan(new ConstantDoubleVertex(34)).assertTrue();
         KeanuOptimizer.of(temperature.getConnectedGraph()).maxAPosteriori();
-        System.out.println(temperature.getValue().scalar());
     }
 
     @Test
