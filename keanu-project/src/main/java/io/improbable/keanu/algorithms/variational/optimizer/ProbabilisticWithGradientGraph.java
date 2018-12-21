@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Map;
 
-public interface ProbabilisticWithGradientGraph extends ProbabilisticGraph {
+public interface ProbabilisticWithGradientGraph extends ProbabilisticGraph, AutoCloseable {
 
     Map<? extends VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs);
 
@@ -14,4 +14,7 @@ public interface ProbabilisticWithGradientGraph extends ProbabilisticGraph {
 
     Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients();
 
+    @Override
+    default void close() {
+    }
 }
