@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -17,6 +18,9 @@ public class AssertVertexTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
 
     @Test
     public void assertThrowsOnFalseConstBool() {
