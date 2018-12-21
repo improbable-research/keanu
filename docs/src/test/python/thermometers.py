@@ -2,6 +2,7 @@ from keanu import BayesNet, KeanuRandom, Model
 from keanu.vertex import Gamma, Exponential, Cauchy, Gaussian, Uniform
 from keanu.algorithm import GradientOptimizer
 
+
 def thermometers_example():
     # %%SNIPPET_START%% PythonTwoThermometers
     with Model() as m:
@@ -19,5 +20,6 @@ def thermometers_example():
     calculated_temperature = m.temperature.get_value()
     print(calculated_temperature)
     # %%SNIPPET_END%% PythonTwoThermometers
+
 
 thermometers_example()

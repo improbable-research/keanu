@@ -188,12 +188,12 @@ DoubleTensor mostLikelyEstimate = A.getValue(); //approximately [2, 3]
 
 We do not expose Tensors in the Python API. Numpy provides the same concept through its `ndarray` class. 
 
-Most of the operations that used Tensor within Java can be replaced with `ndarray` in Python.
-For example, to create a vertex.
+All of the operations that used Tensor within Java can be replaced with `ndarray` in Python.
+For example, to create a vertex:
 
 ```python
 mu = np.array([[2., 3., 4.],
-              [1., 4., 7.]])
-sigma = np.ones([2,3])
+               [1., 4., 7.]])
+sigma = np.ones([2, 3])
 g = Gaussian(mu, sigma)
 ```
