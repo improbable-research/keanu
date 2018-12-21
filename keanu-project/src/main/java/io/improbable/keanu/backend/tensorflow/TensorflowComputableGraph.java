@@ -1,7 +1,7 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
+import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -21,7 +21,6 @@ import static io.improbable.keanu.backend.tensorflow.TensorflowData.toBooleanTen
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toDoubleTensor;
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toIntegerTensor;
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toTensorFlow;
-import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -42,11 +41,6 @@ public class TensorflowComputableGraph implements ComputableGraph {
 
     public TensorflowComputableGraph(Session session, Scope scope) {
         this(session, scope, Collections.emptyMap());
-    }
-
-    @Override
-    public <T> T compute(Map<VariableReference, ?> inputs, VariableReference output) {
-        return (T) compute(inputs, singletonList(output)).get(output);
     }
 
     @Override

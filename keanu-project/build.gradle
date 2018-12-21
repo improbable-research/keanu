@@ -30,6 +30,8 @@ dependencies {
 
     compile 'org.tensorflow:tensorflow:1.12.0-rc0'
 
+    compile 'org.jooq:joor-java-8:0.9.10'
+
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.google.guava:guava:20.0'
     compile 'com.google.protobuf:protobuf-java:3.6.1'
