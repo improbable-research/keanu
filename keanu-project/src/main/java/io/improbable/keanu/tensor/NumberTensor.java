@@ -77,7 +77,7 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
     T setWithMask(T mask, N value);
 
     T apply(Function<N, N> function);
-    
+
     // In Place
 
     T minusInPlace(T that);

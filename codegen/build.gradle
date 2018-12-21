@@ -19,7 +19,7 @@ task saveJavadocStringsToFile(type: Javadoc) {
     source = project(':keanu-project').sourceSets.main.allJava
 
     def docletClasspath = rootProject.compileJava.classpath.files.toList()
-    docletClasspath.add(new File(layout.projectDirectory.get().path + "/build/classes/java/main"))
+    docletClasspath.add(new File(layout.projectDirectory.asFile.getPath() + "/build/classes/java/main"))
     options.setDocletpath(docletClasspath)
     options.setDoclet("io.improbable.keanu.codegen.python.KeanuProjectDoclet")
 

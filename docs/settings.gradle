@@ -1,2 +1,0 @@
-include 'keanu-project'
-project(':keanu-project').projectDir = new File('../keanu-project')
