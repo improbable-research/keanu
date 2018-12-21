@@ -64,7 +64,14 @@ public class AssertVertexTest {
     }
 
     @Test
-    public void valuePropagationAssertion() {
+    public void valuePropagationPassesOnTrueAssertion() {
+        ConstantDoubleVertex constDouble = new ConstantDoubleVertex(3);
+        constDouble.lessThan(new ConstantDoubleVertex(10)).assertTrue();
+        constDouble.setAndCascade(8);
+    }
+
+    @Test
+    public void valuePropagationThrowsOnFalseAssertion() {
         thrown.expect(AssertionError.class);
         ConstantDoubleVertex constDouble = new ConstantDoubleVertex(3);
         constDouble.lessThan(new ConstantDoubleVertex(10)).assertTrue();
