@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
@@ -22,6 +23,9 @@ public class DifferentiablePathChecker {
     }
 
     public boolean differentiablePath(Vertex vertex) {
+        if (isDiscreteLatent(vertex)) {
+            return false;
+        }
         Queue<Vertex> queue = new LinkedList<>();
         queue.offer(vertex);
         Set<Vertex> queued = new HashSet<>(Collections.singletonList(vertex));
@@ -29,7 +33,7 @@ public class DifferentiablePathChecker {
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
 
-            if (!visiting.isDifferentiable() && parentTreeContainsWrt(visiting)) {
+            if (!visiting.isDifferentiable() && parentTreeContainsLatent(visiting)) {
                 return false;
             }
 
@@ -42,7 +46,13 @@ public class DifferentiablePathChecker {
         return true;
     }
 
-    private boolean parentTreeContainsWrt(Vertex vertex) {
+    private boolean isDiscreteLatent(Vertex vertex) {
+        boolean latent = vertex.isProbabilistic() && !vertex.isObserved();
+        boolean discrete = !(vertex.getValue() instanceof DoubleTensor);
+        return latent && discrete;
+    }
+
+    private boolean parentTreeContainsLatent(Vertex vertex) {
         Collection<Vertex> initialNext = Collections.singletonList(vertex);
         Queue<Vertex> queue = new LinkedList<>(initialNext);
         Set<Vertex> queued = new HashSet<>(initialNext);
@@ -50,7 +60,7 @@ public class DifferentiablePathChecker {
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
 
-            if (wrtVertices.contains(visiting)) {
+            if (visiting.isProbabilistic()) {
                 return true;
             }
 
