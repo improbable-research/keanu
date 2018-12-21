@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
