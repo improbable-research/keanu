@@ -93,12 +93,40 @@ public class AssertVertexTest {
     }
 
     @Test
-    public void assertGivesCorrectErrorMessage() {
+    public void assertGivesCorrectErrorWhenLabelledAndMessagePresent() {
         thrown.expect(AssertionError.class);
         thrown.expectMessage("AssertVertex (testAssert): this is wrong");
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = constBool.assertTrue("this is wrong");
         assertVertex.setLabel("testAssert");
+        assertVertex.eval();
+    }
+
+    @Test
+    public void assertGivesCorrectErrorWhenLabelled() {
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("AssertVertex (testAssert)");
+        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        AssertVertex assertVertex = constBool.assertTrue();
+        assertVertex.setLabel("testAssert");
+        assertVertex.eval();
+    }
+
+    @Test
+    public void assertGivesCorrectErrorWhenMessagePresent() {
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("AssertVertex: this is wrong");
+        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        AssertVertex assertVertex = constBool.assertTrue("this is wrong");
+        assertVertex.eval();
+    }
+
+    @Test
+    public void assertGivesCorrectErrorWhenPlain() {
+        thrown.expect(AssertionError.class);
+        thrown.expectMessage("AssertVertex");
+        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        AssertVertex assertVertex = constBool.assertTrue();
         assertVertex.eval();
     }
 }
