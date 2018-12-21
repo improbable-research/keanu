@@ -64,6 +64,10 @@ Interested in more technical examples? Explore the examples repo at `/keanu-exam
 
 ## Development
 
+#### Building the code
+
+We use Gradle, so running `./gradlew build` (or `gradlew.bat build` on Windows) will compile all the code and run all the tests. You can also run the JMH performance benchmarks with `./gradlew runAllBenchmarks`.
+
 #### Annotations
 
 We use [Lombok](https://projectlombok.org/) annotations, which you will need to enable in your IDE.
