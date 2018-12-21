@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.backend.Variable;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;

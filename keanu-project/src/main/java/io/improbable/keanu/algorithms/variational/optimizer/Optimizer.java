@@ -1,6 +1,8 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.backend.Variable;
+import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

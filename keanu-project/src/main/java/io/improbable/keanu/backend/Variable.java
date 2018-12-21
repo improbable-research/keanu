@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.backend;
 
 public interface Variable<T> {
 

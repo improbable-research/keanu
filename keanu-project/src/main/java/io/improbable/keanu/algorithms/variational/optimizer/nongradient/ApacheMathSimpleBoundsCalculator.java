@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.backend.Variable;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.RequiredArgsConstructor;

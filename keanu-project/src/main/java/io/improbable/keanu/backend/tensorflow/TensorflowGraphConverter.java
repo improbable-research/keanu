@@ -1,7 +1,7 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.backend.Variable;
+import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.TensorShape;

@@ -1,7 +1,7 @@
 package io.improbable.keanu.backend.keanu;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.vertices.Vertex;
 

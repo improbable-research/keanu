@@ -1,8 +1,9 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.backend;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import io.improbable.keanu.backend.ProbabilisticGraph;
+import io.improbable.keanu.backend.keanu.KeanuProbabilisticGraph;
+import io.improbable.keanu.backend.keanu.KeanuProbabilisticWithGradientGraph;
 import io.improbable.keanu.backend.tensorflow.TensorflowGraphConverter;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

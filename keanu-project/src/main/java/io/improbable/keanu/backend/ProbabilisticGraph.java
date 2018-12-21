@@ -1,8 +1,5 @@
 package io.improbable.keanu.backend;
 
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

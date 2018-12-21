@@ -1,6 +1,7 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.backend.keanu;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
