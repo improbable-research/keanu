@@ -16,7 +16,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,13 +75,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
                                               List<? extends Vertex> verticesToSampleFrom,
                                               int sampleCount) {
         return generatePosteriorSamples(bayesianNetwork, verticesToSampleFrom)
-            .generate(sampleCount);
-    }
-
-    public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
-                                              Vertex vertexToSampleFrom,
-                                              int sampleCount) {
-        return generatePosteriorSamples(bayesianNetwork, Collections.singletonList(vertexToSampleFrom))
             .generate(sampleCount);
     }
 

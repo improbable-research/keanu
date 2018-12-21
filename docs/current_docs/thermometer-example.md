@@ -60,7 +60,7 @@ Let's assume we're on a distant planet and have no prior knowledge about what th
 we define the temperature as a Uniform Distribution between 20° and 30°.
 
 ```java
-        UniformVertex temperature = new UniformVertex(20., 30.);
+UniformVertex temperature = new UniformVertex(20., 30.);
 ```
 
 Let's now define our two thermometers. Looking at the graph we made earlier, we can see that each thermometer
@@ -70,26 +70,26 @@ Let's represent each thermometer as a Gaussian distribution with a mu of the roo
 As the first thermometer is more accurate, its sigma will be smaller.
 
 ```java
-        GaussianVertex firstThermometer = new GaussianVertex(temperature, 2.5);
-        GaussianVertex secondThermometer = new GaussianVertex(temperature, 5.);
+GaussianVertex firstThermometer = new GaussianVertex(temperature, 2.5);
+GaussianVertex secondThermometer = new GaussianVertex(temperature, 5.);
 ```
 
 Now we can take the readings of each thermometer.
 
 ```java
-        firstThermometer.observe(25.);
-        secondThermometer.observe(30.);
+firstThermometer.observe(25.);
+secondThermometer.observe(30.);
 ```
 
 Now that we have taken our thermometer readings, let's calculate the most probable value for the 
 room temperature.
 
 ```java
-        BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        Optimizer optimizer = KeanuOptimizer.of(bayesNet);
-        optimizer.maxAPosteriori();
+BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
+Optimizer optimizer = KeanuOptimizer.of(bayesNet);
+optimizer.maxAPosteriori();
 
-        double calculatedTemperature = temperature.getValue().scalar();
+double calculatedTemperature = temperature.getValue().scalar();
 ```
 
 Given our graph and observed values, this will attempt to calculate the most likely value for each vertex.

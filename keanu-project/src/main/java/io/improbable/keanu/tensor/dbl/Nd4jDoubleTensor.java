@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.google.common.primitives.Ints.checkedCast;
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 import static java.util.Arrays.copyOf;
 
@@ -919,9 +920,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public List<DoubleTensor> split(int dimension, long... splitAtIndices) {
 
         long[] shape = getShape();
-        if (dimension < 0) {
-            dimension += shape.length;
-        }
+        dimension = getAbsoluteDimension(dimension, getRank());
 
         if (dimension < 0 || dimension >= shape.length) {
             throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
@@ -1050,7 +1049,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof DoubleTensor) {
             if (isLengthOne()) {
-                return ((DoubleTensor)that).elementwiseEquals(this.scalar());
+                return (that).elementwiseEquals(this.scalar());
             } else if (that.isLengthOne()) {
                 return elementwiseEquals(((DoubleTensor) that).scalar());
             } else {

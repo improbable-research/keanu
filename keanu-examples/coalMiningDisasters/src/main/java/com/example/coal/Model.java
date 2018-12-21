@@ -55,12 +55,12 @@ public class Model {
      */
     public void run() {
         BayesianNetwork net = buildBayesianNetwork();
-        Integer numSamples = 50000;
+        Integer numSamples = 500;
 
         results = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
             net,
             net.getLatentVertices()
-        ).dropCount(10000).downSampleInterval(3).generate(numSamples);
+        ).dropCount(numSamples/5).downSampleInterval(3).generate(numSamples);
     }
 
     private BayesianNetwork buildBayesianNetwork() {

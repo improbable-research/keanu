@@ -15,6 +15,7 @@
     <script type="text/javascript" src="static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Distributions" href="distributions.html" />
     <link rel="prev" title="keanu" href="keanu.html" />
    
   <link rel="stylesheet" href="static/custom.css" type="text/css" />
@@ -36,43 +37,73 @@
 <h1>keanu.vertex<a class="headerlink" href="#keanu-vertex" title="Permalink to this headline">¶</a></h1>
 <p>This package exposes all of Keanu’s vertices which can be used to construct Bayesian Networks.</p>
 <span class="target" id="module-keanu.vertex"></span><dl class="function">
+<dt id="keanu.vertex.BooleanIf">
+<code class="descclassname">keanu.vertex.</code><code class="descname">BooleanIf</code><span class="sig-paren">(</span><em>predicate: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], thn: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], els: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#BooleanIf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.BooleanIf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.CastBool">
+<code class="descclassname">keanu.vertex.</code><code class="descname">CastBool</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#CastBool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.CastBool" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="keanu.vertex.ConstantBool">
 <code class="descclassname">keanu.vertex.</code><code class="descname">ConstantBool</code><span class="sig-paren">(</span><em>constant: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ConstantBool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ConstantBool" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="keanu.vertex.NumericalEquals">
+<code class="descclassname">keanu.vertex.</code><code class="descname">NumericalEquals</code><span class="sig-paren">(</span><em>a: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], b: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], epsilon: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#NumericalEquals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.NumericalEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.AndBinary">
+<code class="descclassname">keanu.vertex.</code><code class="descname">AndBinary</code><span class="sig-paren">(</span><em>a: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], b: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#AndBinary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.AndBinary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.OrBinary">
+<code class="descclassname">keanu.vertex.</code><code class="descname">OrBinary</code><span class="sig-paren">(</span><em>a: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], b: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#OrBinary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.OrBinary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="keanu.vertex.Equals">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Equals</code><span class="sig-paren">(</span><em>a: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], b: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Equals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Equals" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Equals</code><span class="sig-paren">(</span><em>a: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], b: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Equals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Equals" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.GreaterThanOrEqual">
-<code class="descclassname">keanu.vertex.</code><code class="descname">GreaterThanOrEqual</code><span class="sig-paren">(</span><em>a: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], b: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#GreaterThanOrEqual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.GreaterThanOrEqual" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">GreaterThanOrEqual</code><span class="sig-paren">(</span><em>a: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], b: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#GreaterThanOrEqual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.GreaterThanOrEqual" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.GreaterThan">
-<code class="descclassname">keanu.vertex.</code><code class="descname">GreaterThan</code><span class="sig-paren">(</span><em>a: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], b: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#GreaterThan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.GreaterThan" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">GreaterThan</code><span class="sig-paren">(</span><em>a: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], b: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#GreaterThan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.GreaterThan" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.LessThanOrEqual">
-<code class="descclassname">keanu.vertex.</code><code class="descname">LessThanOrEqual</code><span class="sig-paren">(</span><em>a: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], b: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#LessThanOrEqual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.LessThanOrEqual" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">LessThanOrEqual</code><span class="sig-paren">(</span><em>a: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], b: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#LessThanOrEqual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.LessThanOrEqual" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.LessThan">
-<code class="descclassname">keanu.vertex.</code><code class="descname">LessThan</code><span class="sig-paren">(</span><em>a: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], b: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#LessThan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.LessThan" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">LessThan</code><span class="sig-paren">(</span><em>a: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], b: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#LessThan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.LessThan" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.NotEquals">
-<code class="descclassname">keanu.vertex.</code><code class="descname">NotEquals</code><span class="sig-paren">(</span><em>a: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], b: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#NotEquals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.NotEquals" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">NotEquals</code><span class="sig-paren">(</span><em>a: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], b: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#NotEquals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.NotEquals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Not">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Not</code><span class="sig-paren">(</span><em>a: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Not"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Not" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.Bernoulli">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Bernoulli</code><span class="sig-paren">(</span><em>prob_true: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Bernoulli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Bernoulli" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Bernoulli</code><span class="sig-paren">(</span><em>prob_true: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Bernoulli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Bernoulli" title="Permalink to this definition">¶</a></dt>
 <dd><p>One to one constructor for mapping some shape of probTrue to
 a matching shaped Bernoulli.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -87,7 +118,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.CastDouble">
-<code class="descclassname">keanu.vertex.</code><code class="descname">CastDouble</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#CastDouble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.CastDouble" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">CastDouble</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#CastDouble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.CastDouble" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -97,12 +128,12 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.DoubleIf">
-<code class="descclassname">keanu.vertex.</code><code class="descname">DoubleIf</code><span class="sig-paren">(</span><em>shape: Iterable[Union[int, numpy.integer, float, numpy.floating, numpy.bool_]], predicate: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], thn: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], els: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#DoubleIf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.DoubleIf" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">DoubleIf</code><span class="sig-paren">(</span><em>predicate: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], thn: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], els: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#DoubleIf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.DoubleIf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.Addition">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Addition</code><span class="sig-paren">(</span><em>left: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], right: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Addition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Addition" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Addition</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Addition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Addition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds one vertex to another</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -120,7 +151,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.ArcTan2">
-<code class="descclassname">keanu.vertex.</code><code class="descname">ArcTan2</code><span class="sig-paren">(</span><em>x: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], y: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ArcTan2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArcTan2" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">ArcTan2</code><span class="sig-paren">(</span><em>x: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], y: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ArcTan2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArcTan2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -138,7 +169,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Difference">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Difference</code><span class="sig-paren">(</span><em>left: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], right: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Difference" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Difference</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Difference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Difference" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subtracts one vertex from another</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -156,7 +187,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Division">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Division</code><span class="sig-paren">(</span><em>left: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], right: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Division"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Division" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Division</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Division"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Division" title="Permalink to this definition">¶</a></dt>
 <dd><p>Divides one vertex by another</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -174,7 +205,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.MatrixMultiplication">
-<code class="descclassname">keanu.vertex.</code><code class="descname">MatrixMultiplication</code><span class="sig-paren">(</span><em>left: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], right: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#MatrixMultiplication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.MatrixMultiplication" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">MatrixMultiplication</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#MatrixMultiplication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.MatrixMultiplication" title="Permalink to this definition">¶</a></dt>
 <dd><p>Matrix multiplies one vertex by another. C = AB</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -192,7 +223,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Max">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Max</code><span class="sig-paren">(</span><em>left: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], right: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Max" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Max</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds the maximum between two vertices</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -210,7 +241,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Min">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Min</code><span class="sig-paren">(</span><em>left: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], right: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Min" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Min</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Min" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds the minimum between two vertices</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -228,7 +259,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Multiplication">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Multiplication</code><span class="sig-paren">(</span><em>left: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], right: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Multiplication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Multiplication" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Multiplication</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Multiplication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Multiplication" title="Permalink to this definition">¶</a></dt>
 <dd><p>Multiplies one vertex by another</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -246,7 +277,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Power">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Power</code><span class="sig-paren">(</span><em>base: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], exponent: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Power"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Power" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Power</code><span class="sig-paren">(</span><em>base: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], exponent: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Power"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Power" title="Permalink to this definition">¶</a></dt>
 <dd><p>Raises a vertex to the power of another</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -264,7 +295,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Abs">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Abs</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Abs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Abs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Abs</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Abs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Abs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes the absolute of a vertex</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -278,7 +309,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.ArcCos">
-<code class="descclassname">keanu.vertex.</code><code class="descname">ArcCos</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ArcCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArcCos" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">ArcCos</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ArcCos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArcCos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes the inverse cosine of a vertex, Arccos(vertex)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -292,7 +323,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.ArcSin">
-<code class="descclassname">keanu.vertex.</code><code class="descname">ArcSin</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ArcSin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArcSin" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">ArcSin</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ArcSin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArcSin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes the inverse sin of a vertex, Arcsin(vertex)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -306,7 +337,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.ArcTan">
-<code class="descclassname">keanu.vertex.</code><code class="descname">ArcTan</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ArcTan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArcTan" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">ArcTan</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ArcTan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ArcTan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes the inverse tan of a vertex, Arctan(vertex)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -320,7 +351,7 @@ a matching shaped Bernoulli.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Ceil">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Ceil</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Ceil"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Ceil" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Ceil</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Ceil"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Ceil" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the Ceiling operator to a vertex.
 This maps a vertex to the smallest integer greater than or equal to its value</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -335,7 +366,7 @@ This maps a vertex to the smallest integer greater than or equal to its value</p
 
 <dl class="function">
 <dt id="keanu.vertex.Cos">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Cos</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Cos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Cos" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Cos</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Cos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Cos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes the cosine of a vertex, Cos(vertex)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -349,7 +380,7 @@ This maps a vertex to the smallest integer greater than or equal to its value</p
 
 <dl class="function">
 <dt id="keanu.vertex.Exp">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Exp</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Exp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Exp" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Exp</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Exp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Exp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the exponential of an input vertex</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -363,7 +394,7 @@ This maps a vertex to the smallest integer greater than or equal to its value</p
 
 <dl class="function">
 <dt id="keanu.vertex.Floor">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Floor</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Floor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Floor" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Floor</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Floor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Floor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the Floor operator to a vertex.
 This maps a vertex to the biggest integer less than or equal to its value</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -378,7 +409,7 @@ This maps a vertex to the biggest integer less than or equal to its value</p>
 
 <dl class="function">
 <dt id="keanu.vertex.LogGamma">
-<code class="descclassname">keanu.vertex.</code><code class="descname">LogGamma</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#LogGamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.LogGamma" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">LogGamma</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#LogGamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.LogGamma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the log of the gamma of the inputVertex</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -392,7 +423,7 @@ This maps a vertex to the biggest integer less than or equal to its value</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Log">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Log</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Log" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Log</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Log" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the natural logarithm, base e, of a vertex</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -406,22 +437,17 @@ This maps a vertex to the biggest integer less than or equal to its value</p>
 
 <dl class="function">
 <dt id="keanu.vertex.MatrixDeterminant">
-<code class="descclassname">keanu.vertex.</code><code class="descname">MatrixDeterminant</code><span class="sig-paren">(</span><em>vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#MatrixDeterminant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.MatrixDeterminant" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">MatrixDeterminant</code><span class="sig-paren">(</span><em>vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#MatrixDeterminant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.MatrixDeterminant" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.MatrixInverse">
-<code class="descclassname">keanu.vertex.</code><code class="descname">MatrixInverse</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#MatrixInverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.MatrixInverse" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Reshape">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Reshape</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], proposed_shape: Iterable[Union[int, numpy.integer, float, numpy.floating, numpy.bool_]]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Reshape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Reshape" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">MatrixInverse</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#MatrixInverse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.MatrixInverse" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.Round">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Round</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Round"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Round" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Round</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Round"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Round" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the Rounding operator to a vertex.
 This maps a vertex to the nearest integer value</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -436,7 +462,7 @@ This maps a vertex to the nearest integer value</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Sigmoid">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Sigmoid</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Sigmoid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Sigmoid" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Sigmoid</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Sigmoid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Sigmoid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the sigmoid function to a vertex.
 The sigmoid function is a special case of the Logistic function.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -451,7 +477,7 @@ The sigmoid function is a special case of the Logistic function.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Sin">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Sin</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Sin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Sin" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Sin</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Sin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Sin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes the sine of a vertex. Sin(vertex).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -465,35 +491,13 @@ The sigmoid function is a special case of the Logistic function.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Sum">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Sum</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], over_dimensions: Iterable[Union[int, numpy.integer, float, numpy.floating, numpy.bool_]]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Sum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs a sum across specified dimensions. Negative dimension indexing is not supported.</p>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Sum</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a sum across all dimensions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>input_vertex</strong> – the vertex to have its values summed</li>
-<li><strong>over_dimensions</strong> – dimensions to sum over</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="keanu.vertex.Take">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Take</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], index: Iterable[Union[int, numpy.integer, float, numpy.floating, numpy.bool_]]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Take"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Take" title="Permalink to this definition">¶</a></dt>
-<dd><p>A vertex that extracts a scalar at a given index</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>input_vertex</strong> – the input vertex to extract from</li>
-<li><strong>index</strong> – the index to extract at</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_vertex</strong> – the vertex to have its values summed</td>
 </tr>
 </tbody>
 </table>
@@ -501,7 +505,7 @@ The sigmoid function is a special case of the Logistic function.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Tan">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Tan</code><span class="sig-paren">(</span><em>input_vertex: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Tan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Tan" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Tan</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Tan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Tan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes the tangent of a vertex. Tan(vertex).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -515,7 +519,7 @@ The sigmoid function is a special case of the Logistic function.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Beta">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Beta</code><span class="sig-paren">(</span><em>alpha: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], beta: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Beta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Beta" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Beta</code><span class="sig-paren">(</span><em>alpha: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], beta: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Beta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Beta" title="Permalink to this definition">¶</a></dt>
 <dd><p>One to one constructor for mapping some tensorShape of alpha and beta to
 a matching tensorShaped Beta.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -534,12 +538,12 @@ a matching tensorShaped Beta.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Cauchy">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Cauchy</code><span class="sig-paren">(</span><em>location: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], scale: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Cauchy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Cauchy" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Cauchy</code><span class="sig-paren">(</span><em>location: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], scale: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Cauchy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Cauchy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.ChiSquared">
-<code class="descclassname">keanu.vertex.</code><code class="descname">ChiSquared</code><span class="sig-paren">(</span><em>k: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ChiSquared"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ChiSquared" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">ChiSquared</code><span class="sig-paren">(</span><em>k: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ChiSquared"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ChiSquared" title="Permalink to this definition">¶</a></dt>
 <dd><p>One to one constructor for mapping some shape of k to
 a matching shaped ChiSquared.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -554,7 +558,7 @@ a matching shaped ChiSquared.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Dirichlet">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Dirichlet</code><span class="sig-paren">(</span><em>concentration: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Dirichlet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Dirichlet" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Dirichlet</code><span class="sig-paren">(</span><em>concentration: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Dirichlet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Dirichlet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Matches a vector of concentration values to a Dirichlet distribution</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -568,7 +572,7 @@ a matching shaped ChiSquared.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Exponential">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Exponential</code><span class="sig-paren">(</span><em>rate: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Exponential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Exponential" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Exponential</code><span class="sig-paren">(</span><em>rate: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Exponential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Exponential" title="Permalink to this definition">¶</a></dt>
 <dd><p>One to one constructor for mapping some shape of rate to matching shaped exponential.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -582,7 +586,7 @@ a matching shaped ChiSquared.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Gamma">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Gamma</code><span class="sig-paren">(</span><em>theta: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], k: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Gamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Gamma" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Gamma</code><span class="sig-paren">(</span><em>theta: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], k: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Gamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Gamma" title="Permalink to this definition">¶</a></dt>
 <dd><p>One to one constructor for mapping some shape of theta and k to matching shaped gamma.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -600,22 +604,22 @@ a matching shaped ChiSquared.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Gaussian">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Gaussian</code><span class="sig-paren">(</span><em>mu: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], sigma: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Gaussian" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Gaussian</code><span class="sig-paren">(</span><em>mu: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], sigma: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Gaussian" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.HalfCauchy">
-<code class="descclassname">keanu.vertex.</code><code class="descname">HalfCauchy</code><span class="sig-paren">(</span><em>scale: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#HalfCauchy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.HalfCauchy" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">HalfCauchy</code><span class="sig-paren">(</span><em>scale: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#HalfCauchy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.HalfCauchy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.HalfGaussian">
-<code class="descclassname">keanu.vertex.</code><code class="descname">HalfGaussian</code><span class="sig-paren">(</span><em>sigma: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#HalfGaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.HalfGaussian" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">HalfGaussian</code><span class="sig-paren">(</span><em>sigma: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#HalfGaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.HalfGaussian" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.InverseGamma">
-<code class="descclassname">keanu.vertex.</code><code class="descname">InverseGamma</code><span class="sig-paren">(</span><em>alpha: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], beta: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#InverseGamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.InverseGamma" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">InverseGamma</code><span class="sig-paren">(</span><em>alpha: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], beta: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#InverseGamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.InverseGamma" title="Permalink to this definition">¶</a></dt>
 <dd><p>One to one constructor for mapping some shape of alpha and beta to
 alpha matching shaped Inverse Gamma.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -634,7 +638,7 @@ alpha matching shaped Inverse Gamma.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Laplace">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Laplace</code><span class="sig-paren">(</span><em>mu: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], beta: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Laplace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Laplace" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Laplace</code><span class="sig-paren">(</span><em>mu: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], beta: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Laplace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Laplace" title="Permalink to this definition">¶</a></dt>
 <dd><p>One to one constructor for mapping some shape of mu and sigma to
 a matching shaped Laplace.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -653,17 +657,17 @@ a matching shaped Laplace.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.LogNormal">
-<code class="descclassname">keanu.vertex.</code><code class="descname">LogNormal</code><span class="sig-paren">(</span><em>mu: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], sigma: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#LogNormal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.LogNormal" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">LogNormal</code><span class="sig-paren">(</span><em>mu: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], sigma: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#LogNormal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.LogNormal" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.Logistic">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Logistic</code><span class="sig-paren">(</span><em>mu: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], s: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Logistic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Logistic" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Logistic</code><span class="sig-paren">(</span><em>mu: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], s: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Logistic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Logistic" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.MultivariateGaussian">
-<code class="descclassname">keanu.vertex.</code><code class="descname">MultivariateGaussian</code><span class="sig-paren">(</span><em>mu: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], covariance: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#MultivariateGaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.MultivariateGaussian" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">MultivariateGaussian</code><span class="sig-paren">(</span><em>mu: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], covariance: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#MultivariateGaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.MultivariateGaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Matches a mu and covariance of some shape to a Multivariate Gaussian</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -681,22 +685,22 @@ a matching shaped Laplace.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Pareto">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Pareto</code><span class="sig-paren">(</span><em>location: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], scale: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Pareto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Pareto" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Pareto</code><span class="sig-paren">(</span><em>location: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], scale: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Pareto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Pareto" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.SmoothUniform">
-<code class="descclassname">keanu.vertex.</code><code class="descname">SmoothUniform</code><span class="sig-paren">(</span><em>x_min: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], x_max: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#SmoothUniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.SmoothUniform" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">SmoothUniform</code><span class="sig-paren">(</span><em>x_min: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], x_max: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#SmoothUniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.SmoothUniform" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.StudentT">
-<code class="descclassname">keanu.vertex.</code><code class="descname">StudentT</code><span class="sig-paren">(</span><em>v: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#StudentT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.StudentT" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">StudentT</code><span class="sig-paren">(</span><em>v: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#StudentT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.StudentT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="keanu.vertex.Triangular">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Triangular</code><span class="sig-paren">(</span><em>x_min: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], x_max: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], c: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Triangular"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Triangular" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Triangular</code><span class="sig-paren">(</span><em>x_min: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], x_max: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], c: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Triangular"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Triangular" title="Permalink to this definition">¶</a></dt>
 <dd><p>One to one constructor for mapping some shape of xMin, xMax and c to a matching shaped triangular.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -715,7 +719,7 @@ a matching shaped Laplace.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.Uniform">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Uniform</code><span class="sig-paren">(</span><em>x_min: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], x_max: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Uniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Uniform" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Uniform</code><span class="sig-paren">(</span><em>x_min: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], x_max: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Uniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Uniform" title="Permalink to this definition">¶</a></dt>
 <dd><p>One to one constructor for mapping some shape of mu and sigma to
 a matching shaped Uniform Vertex</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -733,13 +737,54 @@ a matching shaped Uniform Vertex</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="keanu.vertex.CastInteger">
+<code class="descclassname">keanu.vertex.</code><code class="descname">CastInteger</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#CastInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.CastInteger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="keanu.vertex.ConstantInteger">
 <code class="descclassname">keanu.vertex.</code><code class="descname">ConstantInteger</code><span class="sig-paren">(</span><em>constant: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#ConstantInteger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.ConstantInteger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="keanu.vertex.IntegerAddition">
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerAddition</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerAddition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerAddition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds one vertex to another</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>left</strong> – a vertex to add</li>
+<li><strong>right</strong> – a vertex to add</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.IntegerDifference">
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerDifference</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerDifference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerDifference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subtracts one vertex from another</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>left</strong> – the vertex to be subtracted from</li>
+<li><strong>right</strong> – the vertex to subtract</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="keanu.vertex.IntegerDivision">
-<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerDivision</code><span class="sig-paren">(</span><em>left: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], right: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerDivision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerDivision" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerDivision</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerDivision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerDivision" title="Permalink to this definition">¶</a></dt>
 <dd><p>Divides one vertex by another</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -756,8 +801,118 @@ a matching shaped Uniform Vertex</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="keanu.vertex.IntegerMax">
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerMax</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the maximum between two vertices</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>left</strong> – one of the vertices to find the maximum of</li>
+<li><strong>right</strong> – one of the vertices to find the maximum of</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.IntegerMin">
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerMin</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerMin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the minimum between two vertices</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>left</strong> – one of the vertices to find the minimum of</li>
+<li><strong>right</strong> – one of the vertices to find the minimum of</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.IntegerMultiplication">
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerMultiplication</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerMultiplication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerMultiplication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplies one vertex by another</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>left</strong> – a vertex to be multiplied</li>
+<li><strong>right</strong> – a vertex to be multiplied</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.IntegerPower">
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerPower</code><span class="sig-paren">(</span><em>left: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], right: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerPower"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerPower" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises one vertex to the power of another</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>left</strong> – the base vertex</li>
+<li><strong>right</strong> – the exponent vertex</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.IntegerAbs">
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerAbs</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerAbs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerAbs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes the absolute value of a vertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_vertex</strong> – the vertex</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.IntegerSum">
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerSum</code><span class="sig-paren">(</span><em>input_vertex: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerSum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a sum across each value stored in a vertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_vertex</strong> – the vertex to have its values summed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Binomial">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Binomial</code><span class="sig-paren">(</span><em>p: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], n: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Binomial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Binomial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="keanu.vertex.Multinomial">
+<code class="descclassname">keanu.vertex.</code><code class="descname">Multinomial</code><span class="sig-paren">(</span><em>n: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], p: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Multinomial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Multinomial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="keanu.vertex.Poisson">
-<code class="descclassname">keanu.vertex.</code><code class="descname">Poisson</code><span class="sig-paren">(</span><em>mu: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Poisson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Poisson" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">Poisson</code><span class="sig-paren">(</span><em>mu: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#Poisson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.Poisson" title="Permalink to this definition">¶</a></dt>
 <dd><p>One to one constructor for mapping some shape of mu to
 a matching shaped Poisson.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -772,7 +927,7 @@ a matching shaped Poisson.</p>
 
 <dl class="function">
 <dt id="keanu.vertex.UniformInt">
-<code class="descclassname">keanu.vertex.</code><code class="descname">UniformInt</code><span class="sig-paren">(</span><em>min: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps], max: Union[int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper, keanu.vertex.ops.VertexOps]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#UniformInt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.UniformInt" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.vertex.</code><code class="descname">UniformInt</code><span class="sig-paren">(</span><em>min: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper], max: Union[Vertex, int, numpy.integer, float, numpy.floating, numpy.bool_, pandas.core.series.Series, pandas.core.frame.DataFrame, numpy.ndarray, keanu.base.JavaObjectWrapper]</em><span class="sig-paren">)</span> &#x2192; keanu.vertex.base.Vertex<a class="reference internal" href="modules/keanu/vertex/generated.html#UniformInt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.UniformInt" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -799,6 +954,7 @@ a matching shaped Poisson.</p>
 <li class="toctree-l1 current"><a class="reference internal" href="keanu.html">keanu</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="keanu.html#submodules">Submodules</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">keanu.vertex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distributions.html">Distributions</a></li>
 </ul>
 </li>
 </ul>
@@ -811,6 +967,7 @@ a matching shaped Poisson.</p>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="keanu.html">keanu</a><ul>
       <li>Previous: <a href="keanu.html" title="previous chapter">keanu</a></li>
+      <li>Next: <a href="distributions.html" title="next chapter">Distributions</a></li>
   </ul></li>
   </ul></li>
 </ul>
