@@ -13,9 +13,10 @@ public class Nd4jDoubleTensorScalarOperations {
 
     public DoubleTensor tensor;
 
-    public static final DoubleTensor RANK_0_SCALAR_TENSOR = Nd4jDoubleTensor.scalar(1.);
-    public static final DoubleTensor RANK_1_SCALAR_TENSOR = Nd4jDoubleTensor.scalar(1.).reshape(1);
-    public static final DoubleTensor RANK_2_SCALAR_TENSOR = Nd4jDoubleTensor.scalar(1.).reshape(1, 1);
+    public static final double SCALAR_VALUE = 42.;
+    public static final DoubleTensor RANK_0_SCALAR_TENSOR = Nd4jDoubleTensor.scalar(SCALAR_VALUE);
+    public static final DoubleTensor RANK_1_SCALAR_TENSOR = Nd4jDoubleTensor.scalar(SCALAR_VALUE).reshape(1);
+    public static final DoubleTensor RANK_2_SCALAR_TENSOR = Nd4jDoubleTensor.scalar(SCALAR_VALUE).reshape(1, 1);
 
 
     @Param({"PLUS", "MINUS", "TIMES", "DIVIDE"})
