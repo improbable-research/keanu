@@ -11,9 +11,9 @@ import java.util.Optional;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 
-public class IntegerTensorVertexSamples extends VertexSamples<IntegerTensor> {
+public class IntegerVertexSamples extends VertexSamples<IntegerTensor> {
 
-    public IntegerTensorVertexSamples(List<IntegerTensor> samples) {
+    public IntegerVertexSamples(List<IntegerTensor> samples) {
         super(samples);
     }
 
@@ -54,5 +54,9 @@ public class IntegerTensorVertexSamples extends VertexSamples<IntegerTensor> {
         } else {
             throw new IllegalStateException("Mode is undefined");
         }
+    }
+
+    public IntegerTensor asTensor() {
+        return IntegerTensor.stack(0, samples.toArray(new IntegerTensor[0]));
     }
 }
