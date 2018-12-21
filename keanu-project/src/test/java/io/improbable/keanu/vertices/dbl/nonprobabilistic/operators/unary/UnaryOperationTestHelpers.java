@@ -35,14 +35,14 @@ public class UnaryOperationTestHelpers {
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
         T output = op.apply(A);
 
-        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output).getPartial();
+        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output).get();
         assertEquals(
             expectedGradientWrtA,
             wrtAForward.scalar(),
             1e-5
         );
 
-        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).getPartial();
+        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).get();
         assertEquals(
             expectedGradientWrtA,
             wrtAReverse.scalar(),
@@ -78,11 +78,11 @@ public class UnaryOperationTestHelpers {
         T output = op.apply(A);
 
         PartialDerivative result = Differentiator.forwardModeAutoDiff(A, output).of(output);
-        DoubleTensor wrtAForward = result.getPartial();
+        DoubleTensor wrtAForward = result.get();
         assertArrayEquals(expectedGradientWrtA, wrtAForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedShape, wrtAForward.getShape());
 
-        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).getPartial();
+        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).get();
         assertArrayEquals(expectedGradientWrtA, wrtAReverse.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedShape, wrtAReverse.getShape());
     }

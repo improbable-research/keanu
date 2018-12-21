@@ -27,7 +27,7 @@ public class PartialsOf {
 
     public Map<VertexId, DoubleTensor> asMap() {
         return partials.entrySet().stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getPartial()));
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
     }
 
 }

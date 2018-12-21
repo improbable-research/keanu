@@ -151,8 +151,8 @@ public class LogProbGradientCalculatorTest {
 
         PartialsOf dHForward = Differentiator.reverseModeAutoDiff(H, A, B);
 
-        DoubleTensor dHdA = dHForward.withRespectTo(A).getPartial();
-        DoubleTensor dHdB = dHForward.withRespectTo(B).getPartial();
+        DoubleTensor dHdA = dHForward.withRespectTo(A).get();
+        DoubleTensor dHdB = dHForward.withRespectTo(B).get();
         DoubleTensor dJLogProbWrtH = J.dLogProbAtValue(H).get(H);
 
         DoubleTensor expectedDJLogProbWrtAValue = dJLogProbWrtH.times(dHdA);

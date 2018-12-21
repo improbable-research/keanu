@@ -40,8 +40,8 @@ public class ReshapeVertexTest {
 
         ReshapeVertex reshapedN = new ReshapeVertex(N, 4, 1);
 
-        DoubleTensor dReshapedNWrtmForward = Differentiator.forwardModeAutoDiff(m, reshapedN).of(reshapedN).getPartial();
-        DoubleTensor dReshapedNWrtmBackward = Differentiator.reverseModeAutoDiff(reshapedN, ImmutableSet.of(m, alpha)).withRespectTo(m).getPartial();
+        DoubleTensor dReshapedNWrtmForward = Differentiator.forwardModeAutoDiff(m, reshapedN).of(reshapedN).get();
+        DoubleTensor dReshapedNWrtmBackward = Differentiator.reverseModeAutoDiff(reshapedN, ImmutableSet.of(m, alpha)).withRespectTo(m).get();
 
         Assert.assertArrayEquals(new long[]{4, 1, 2, 2}, dReshapedNWrtmForward.getShape());
         Assert.assertArrayEquals(new long[]{4, 1, 2, 2}, dReshapedNWrtmBackward.getShape());
@@ -59,15 +59,15 @@ public class ReshapeVertexTest {
 
         MatrixMultiplicationVertex N = m.matrixMultiply(a);
 
-        DoubleTensor dNdm = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m).getPartial();
-        DoubleTensor dNda = Differentiator.reverseModeAutoDiff(N, a).withRespectTo(a).getPartial();
+        DoubleTensor dNdm = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m).get();
+        DoubleTensor dNda = Differentiator.reverseModeAutoDiff(N, a).withRespectTo(a).get();
 
         double[] nWrtMpartialsBeforeReshape = dNdm.asFlatDoubleArray();
         double[] nWrtApartialsBeforeReshape = dNda.asFlatDoubleArray();
 
         ReshapeVertex reshapedN = new ReshapeVertex(N, 4, 1);
-        DoubleTensor reshapedPartialWrtM = Differentiator.reverseModeAutoDiff(reshapedN, m).withRespectTo(m).getPartial();
-        DoubleTensor reshapedPartialWrtA = Differentiator.reverseModeAutoDiff(reshapedN, a).withRespectTo(a).getPartial();
+        DoubleTensor reshapedPartialWrtM = Differentiator.reverseModeAutoDiff(reshapedN, m).withRespectTo(m).get();
+        DoubleTensor reshapedPartialWrtA = Differentiator.reverseModeAutoDiff(reshapedN, a).withRespectTo(a).get();
 
         Assert.assertArrayEquals(nWrtMpartialsBeforeReshape, reshapedPartialWrtM.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(nWrtApartialsBeforeReshape, reshapedPartialWrtA.asFlatDoubleArray(), 1e-6);
@@ -90,11 +90,11 @@ public class ReshapeVertexTest {
 
         MultiplicationVertex F = D.times(E);
 
-        DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, F).of(F).getPartial();
+        DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, F).of(F).get();
         PartialsOf backward = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A, B));
 
         Assert.assertArrayEquals(new long[]{4, 1, 2, 2}, forwardWrtA.getShape());
-        Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backward.withRespectTo(A).getPartial().asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backward.withRespectTo(A).get().asFlatDoubleArray(), 1e-6);
     }
 
     @Test
@@ -110,11 +110,11 @@ public class ReshapeVertexTest {
         DoubleVertex D = C.reshape(4, 2, 2);
         ReshapeVertex E = D.reshape(4, 4);
 
-        DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, E).of(E).getPartial();
+        DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, E).of(E).get();
         PartialsOf backward = Differentiator.reverseModeAutoDiff(E, ImmutableSet.of(A, B));
 
         Assert.assertArrayEquals(new long[]{4, 4, 2, 2, 2, 2}, forwardWrtA.getShape());
-        Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backward.withRespectTo(A).getPartial().asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backward.withRespectTo(A).get().asFlatDoubleArray(), 1e-6);
     }
 
     @Test

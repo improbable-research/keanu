@@ -76,7 +76,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
             DoubleTensor operandValue = operandValues.get(i);
 
             if (partial.isPresent()) {
-                long[] partialWrtShape = partial.getPartial().getShape();
+                long[] partialWrtShape = partial.get().getShape();
                 wrtShape = Arrays.copyOfRange(partialWrtShape, operandValue.getRank(), partialWrtShape.length);
                 break;
             }
@@ -102,7 +102,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
             DoubleTensor operandValue = operandValues.get(i);
 
             if (partialOfOperand.isPresent()) {
-                partialsToConcat.add(partialOfOperand.getPartial());
+                partialsToConcat.add(partialOfOperand.get());
             } else {
                 long[] resultShape = TensorShape.concat(operandValue.getShape(), wrtShape);
                 partialsToConcat.add(DoubleTensor.zeros(resultShape));
@@ -139,7 +139,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         int wrtStartsAt = -operandsRank;
         int wrtSplitOn = wrtStartsAt + dimension;
 
-        DoubleTensor partial = derivativeOfOutputWithRespectToSelf.getPartial();
+        DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
 
         List<DoubleTensor> splitPartial = partial.split(wrtSplitOn, splitIndices);
 

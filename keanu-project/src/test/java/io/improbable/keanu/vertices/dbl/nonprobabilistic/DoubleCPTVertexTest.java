@@ -62,8 +62,8 @@ public class DoubleCPTVertexTest {
     private void assertDiffFromACondition(boolean left, boolean right, DoubleTensor expected) {
         DoubleCPTVertex doubleCPTVertex = doubleCPTNetwork(left, right);
 
-        DoubleTensor actualReverse = Differentiator.reverseModeAutoDiff(doubleCPTVertex, A).withRespectTo(A).getPartial();
-        DoubleTensor actualForward = Differentiator.forwardModeAutoDiff(A, doubleCPTVertex).of(doubleCPTVertex).getPartial();
+        DoubleTensor actualReverse = Differentiator.reverseModeAutoDiff(doubleCPTVertex, A).withRespectTo(A).get();
+        DoubleTensor actualForward = Differentiator.forwardModeAutoDiff(A, doubleCPTVertex).of(doubleCPTVertex).get();
 
         assertEquals(expected, actualReverse);
         assertEquals(expected, actualForward);

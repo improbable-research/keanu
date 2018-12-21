@@ -48,12 +48,12 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
             .multiplyBy(inputVertex.getValue().determinant());
 
         long[] resultShape = TensorShape.concat(
-            derivativeOfOutputWithRespectToSelf.getPartial().getShape(),
+            derivativeOfOutputWithRespectToSelf.get().getShape(),
             inputVertex.getShape()
         );
 
         DoubleTensor reshapedPartial = PartialDerivative.increaseRankByAppendingOnesToShape(
-            dOutputTimesDeterminant.getPartial(),
+            dOutputTimesDeterminant.get(),
             resultShape.length
         );
 

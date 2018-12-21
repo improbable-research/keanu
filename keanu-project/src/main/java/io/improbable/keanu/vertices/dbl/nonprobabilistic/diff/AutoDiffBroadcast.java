@@ -18,7 +18,7 @@ public class AutoDiffBroadcast {
             long[] wrtShape = partial.getWrtShape(partialOfShape);
             DoubleTensor correctedPartial = DoubleTensor
                 .zeros(TensorShape.concat(targetOfShape, wrtShape))
-                .plus(partial.getPartial());
+                .plus(partial.get());
 
             return new PartialDerivative(correctedPartial);
         } else {
@@ -31,7 +31,7 @@ public class AutoDiffBroadcast {
         if (shouldCorrectPartialForScalar(partial, partialWrtShape, targetWrtShape)) {
 
             int[] wrtDims = TensorShape.dimensionRange(-partialWrtShape.length, 0);
-            DoubleTensor partialSummed = partial.getPartial().sum(wrtDims);
+            DoubleTensor partialSummed = partial.get().sum(wrtDims);
 
             long[] resultShape = TensorShape.concat(
                 partial.getOfShape(partialWrtShape),

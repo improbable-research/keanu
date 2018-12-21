@@ -27,7 +27,7 @@ public class PartialDerivative {
         return !isPresent();
     }
 
-    public DoubleTensor getPartial() {
+    public DoubleTensor get() {
         return partial;
     }
 
@@ -44,7 +44,7 @@ public class PartialDerivative {
         if (isPresent() && addition.isPresent()) {
             return new PartialDerivative(partial.plus(addition.partial));
         } else if (isPresent() && addition.isEmpty()) {
-            return new PartialDerivative(getPartial());
+            return new PartialDerivative(get());
         } else if (isEmpty() && addition.isPresent()) {
             return new PartialDerivative(addition.partial);
         } else {
@@ -57,7 +57,7 @@ public class PartialDerivative {
         if (isPresent() && subtraction.isPresent()) {
             return new PartialDerivative(partial.minus(subtraction.partial));
         } else if (isPresent() && subtraction.isEmpty()) {
-            return new PartialDerivative(getPartial());
+            return new PartialDerivative(get());
         } else if (isEmpty() && subtraction.isPresent()) {
             return new PartialDerivative(subtraction.partial.unaryMinus());
         } else {
@@ -116,20 +116,20 @@ public class PartialDerivative {
             return partial;
         }
 
-        int partialRank = partial.getPartial().getRank();
+        int partialRank = partial.get().getRank();
 
         DoubleTensor result;
         if (partialIsLeft) {
             int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
             rearrange[0] = 0;
             rearrange[1] = partialRank - 1;
-            result = partial.getPartial()
+            result = partial.get()
                 .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
                 .permute(rearrange);
 
         } else {
             result = multiplier
-                .tensorMultiply(partial.getPartial(), new int[]{1}, new int[]{0});
+                .tensorMultiply(partial.get(), new int[]{1}, new int[]{0});
         }
 
         return new PartialDerivative(result);
@@ -141,21 +141,21 @@ public class PartialDerivative {
             return partial;
         }
 
-        int partialRank = partial.getPartial().getRank();
+        int partialRank = partial.get().getRank();
 
         int wrtRightDimension = partialRank - 1;
         int wrtLeftDimension = partialRank - 2;
 
         DoubleTensor result;
         if (partialIsLeft) {
-            result = partial.getPartial()
+            result = partial.get()
                 .tensorMultiply(multiplier, new int[]{wrtRightDimension}, new int[]{1});
         } else {
             int[] transposeWrt = TensorShape.dimensionRange(0, partialRank);
             transposeWrt[wrtRightDimension] = wrtLeftDimension;
             transposeWrt[wrtLeftDimension] = wrtRightDimension;
 
-            result = partial.getPartial()
+            result = partial.get()
                 .tensorMultiply(multiplier, new int[]{wrtLeftDimension}, new int[]{0})
                 .permute(transposeWrt);
         }
