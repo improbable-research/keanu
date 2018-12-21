@@ -65,7 +65,7 @@ vertex_samples = posterior_samples.get('a')
 ac = stats.autocorrelation(vertex_samples)
 ```
 
-If sampling `ndarray`'s in Python. The index on which to calculate the autocorrelation can be specified 
+When the samples are `ndarrays` the index on which to calculate the autocorrelation can be specified 
 as a tuple.
 
 ```python
