@@ -40,7 +40,7 @@ public class AssertVertexTest {
 
     @Test
     public void assertPassesOnRVWithTruePredicate() {
-        UniformVertex uniform = new UniformVertex(0,5);
+        UniformVertex uniform = new UniformVertex(0, 5);
         BoolVertex predicate = uniform.lessThan(new ConstantDoubleVertex(new double[]{10}));
         predicate.assertTrue().eval();
     }
@@ -48,7 +48,7 @@ public class AssertVertexTest {
     @Test
     public void assertPassesOnRVWithFalsePredicate() {
         thrown.expect(AssertionError.class);
-        UniformVertex uniform = new UniformVertex(0,5);
+        UniformVertex uniform = new UniformVertex(0, 5);
         BoolVertex predicate = uniform.greaterThan(new ConstantDoubleVertex(new double[]{10}));
         predicate.assertTrue().eval();
     }
@@ -56,19 +56,19 @@ public class AssertVertexTest {
     @Test
     public void samplingWithAssertionWorks() {
         thrown.expect(AssertionError.class);
-        GaussianVertex uniform = new GaussianVertex(5,1);
+        GaussianVertex uniform = new GaussianVertex(5, 1);
         GaussianVertex observingVertex = new GaussianVertex(uniform, 1);
         uniform.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observingVertex.getConnectedGraph());
-        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork,bayesianNetwork.getLatentVertices()).generate(10);
+        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork, bayesianNetwork.getLatentVertices()).generate(10);
     }
 
     @Test
     public void optimizerWithAssertionWorks() {
         thrown.expect(AssertionError.class);
-        UniformVertex temperature = new UniformVertex(20,30);
-        GaussianVertex observedTemp = new GaussianVertex(temperature,1);
+        UniformVertex temperature = new UniformVertex(20, 30);
+        GaussianVertex observedTemp = new GaussianVertex(temperature, 1);
         observedTemp.observe(29);
         temperature.greaterThan(new ConstantDoubleVertex(34)).assertTrue();
         KeanuOptimizer.of(temperature.getConnectedGraph()).maxAPosteriori();

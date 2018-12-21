@@ -16,7 +16,7 @@ public class AssertVertex extends BoolVertex implements NonProbabilistic<Boolean
     /**
      * A vertex that asserts a {@link BoolVertex} is all true on calculation.
      *
-     * @param predicate the predicate to evaluate
+     * @param predicate    the predicate to evaluate
      * @param errorMessage a message to include in the {@link AssertionError}
      * @throws AssertionError if any element of the predicate is false when calculated.
      */
