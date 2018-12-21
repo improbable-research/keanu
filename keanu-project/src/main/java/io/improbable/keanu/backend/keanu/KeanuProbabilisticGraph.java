@@ -5,6 +5,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;
 
@@ -31,12 +32,13 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
         cascadeUpdate(inputs);
-        return this.bayesianNetwork.getLogOfMasterP();
+        return ProbabilityCalculator.calculateLogProbFor(bayesianNetwork.getLatentOrObservedVertices());
     }
 
     @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
-        return 0;
+        cascadeUpdate(inputs);
+        return ProbabilityCalculator.calculateLogProbFor(bayesianNetwork.getObservedVertices());
     }
 
     @Override
@@ -71,6 +73,11 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
         List<Vertex> updatedVertices = new ArrayList<>();
         for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {
             Vertex updatingVertex = vertexLookup.get(input.getKey());
+
+            if (updatingVertex == null) {
+                throw new IllegalArgumentException("Cannot cascade update for input: " + input.getKey());
+            }
+
             updatingVertex.setValue(input.getValue());
             updatedVertices.add(updatingVertex);
         }

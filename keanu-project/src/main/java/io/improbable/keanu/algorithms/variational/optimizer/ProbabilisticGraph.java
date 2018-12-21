@@ -20,7 +20,7 @@ public interface ProbabilisticGraph extends AutoCloseable {
 
     double logLikelihood(Map<VariableReference, ?> inputs);
 
-    LogProbWithSample logProbWithSample(Map<String, ?> inputs, List<String> outputs);
+    LogProbWithSample logProbWithSample(Map<VariableReference, ?> inputs, List<VariableReference> outputs);
 
     List<? extends Variable> getLatentVariables();
 
