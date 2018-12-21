@@ -6,6 +6,10 @@ import io.improbable.keanu.vertices.VertexId;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class stores the gradients of a log probability. It serves
+ * as way to sum multiple gradients from the same vertices.
+ */
 public class LogProbGradients {
 
     private final Map<VertexId, DoubleTensor> partials;
@@ -20,17 +24,15 @@ public class LogProbGradients {
 
     public LogProbGradients add(Map<VertexId, DoubleTensor> addition) {
 
-        Map<VertexId, DoubleTensor> initial = partials;
-
         for (Map.Entry<VertexId, DoubleTensor> entry : addition.entrySet()) {
+
             VertexId id = entry.getKey();
-            if (initial.containsKey(id)) {
+            DoubleTensor existingPartialDerivative = partials.get(id);
 
-                DoubleTensor summation = initial.get(entry.getKey()).plus(entry.getValue());
-
-                initial.put(id, summation);
+            if (existingPartialDerivative != null) {
+                partials.put(id, existingPartialDerivative.plusInPlace(entry.getValue()));
             } else {
-                initial.put(id, entry.getValue());
+                partials.put(id, entry.getValue().duplicate());
             }
         }
 
