@@ -19,7 +19,7 @@ import java.util.Arrays;
 import static junit.framework.TestCase.assertEquals;
 
 @RunWith(Parameterized.class)
-public class KeanuProbabilisticGraphTest {
+public class ProbabilisticGraphTest {
 
     private GaussianVertex A;
     private GaussianVertex B;
@@ -38,7 +38,7 @@ public class KeanuProbabilisticGraphTest {
         });
     }
 
-    public KeanuProbabilisticGraphTest(DoubleTensor initialA, DoubleTensor initialB, DoubleTensor observationD) {
+    public ProbabilisticGraphTest(DoubleTensor initialA, DoubleTensor initialB, DoubleTensor observationD) {
 
         this.initialA = initialA;
         this.initialB = initialB;
