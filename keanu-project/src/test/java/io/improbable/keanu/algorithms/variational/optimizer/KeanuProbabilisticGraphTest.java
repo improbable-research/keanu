@@ -121,6 +121,8 @@ public class KeanuProbabilisticGraphTest {
             A.getId(), newA
         ));
 
+        A.setAndCascade(newA);
+
         double expectedPostUpdateLogProb = expectedLogProb();
 
         assertEquals(expectedPostUpdateLogProb, postUpdateLogProb, 1e-5);
@@ -144,6 +146,8 @@ public class KeanuProbabilisticGraphTest {
         double postUpdateLogProb = probabilisticGraph.logLikelihood(ImmutableMap.of(
             A.getId(), newA
         ));
+
+        A.setAndCascade(newA);
 
         double expectedPostUpdateLogProb = expectedLogLikelihood();
 

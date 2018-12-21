@@ -326,26 +326,38 @@ public class TensorflowGraphConverter {
 
         TensorflowComputableGraph computableGraph = convert(network.getVertices(), vertexLookup);
 
-        String logProbSumTotalOpName = addLogProbCalculation(
-            computableGraph.getScope(),
+        GraphBuilder graphBuilder = new GraphBuilder(computableGraph.getScope());
+
+        Output<Double> logLikelihoodOutput = addLogProbCalculation(
+            graphBuilder,
             vertexLookup,
-            network.getLatentOrObservedVertices()
+            network.getObservedVertices()
         );
+
+        Output<Double> priorLogProbOutput = addLogProbCalculation(
+            graphBuilder,
+            vertexLookup,
+            network.getLatentVertices()
+        );
+
+        Output<Double> totalLogProbOutput = graphBuilder.add(logLikelihoodOutput, priorLogProbOutput);
 
         List<Variable<?>> latentVariables = network.getLatentVertices().stream()
             .map(v -> new TensorflowVariable<>(computableGraph, v.getReference()))
             .collect(Collectors.toList());
 
-        return new TensorflowProbabilisticGraph(computableGraph, latentVariables, new StringVariableReference(logProbSumTotalOpName));
+        StringVariableReference logProbReference = new StringVariableReference(totalLogProbOutput.op().name());
+        StringVariableReference logLikelihoodReference = new StringVariableReference(logLikelihoodOutput.op().name());
+
+        return new TensorflowProbabilisticGraph(computableGraph, latentVariables, logProbReference, logLikelihoodReference);
     }
 
-    private static String addLogProbCalculation(Scope scope,
-                                                Map<Vertex<?>, Output<?>> vertexLookup,
-                                                List<Vertex> latentOrObservedVertices) {
+    private static Output<Double> addLogProbCalculation(GraphBuilder graphBuilder,
+                                                        Map<Vertex<?>, Output<?>> vertexLookup,
+                                                        List<Vertex> probabilisticVertices) {
         List<Output<Double>> logProbOps = new ArrayList<>();
-        GraphBuilder graphBuilder = new GraphBuilder(scope);
 
-        for (Vertex visiting : latentOrObservedVertices) {
+        for (Vertex visiting : probabilisticVertices) {
 
             if (visiting instanceof LogProbAsAGraphable) {
                 LogProbGraph logProbGraph = ((LogProbAsAGraphable) visiting).logProbGraph();
@@ -357,9 +369,7 @@ public class TensorflowGraphConverter {
             }
         }
 
-        Output<Double> logProbSumTotal = addLogProbSumTotal(logProbOps, graphBuilder);
-
-        return logProbSumTotal.op().name();
+        return addLogProbSumTotal(logProbOps, graphBuilder);
     }
 
     private static Output<Double> addLogProbFrom(LogProbGraph logProbGraph, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
@@ -430,14 +440,15 @@ public class TensorflowGraphConverter {
 
         Map<VariableReference, VariableReference> gradientOutputNameToInputName = addGradients(
             tensorflowProbabilisticGraph.getComputableGraph().getScope().graph(),
-            tensorflowProbabilisticGraph.getLogProbSumTotalOpName(),
+            tensorflowProbabilisticGraph.getLogProbOp(),
             latentVariablesReferences
         );
 
         return new TensorflowProbabilisticWithGradientGraph(
             tensorflowProbabilisticGraph.getComputableGraph(),
             latentVariables,
-            tensorflowProbabilisticGraph.getLogProbSumTotalOpName(),
+            tensorflowProbabilisticGraph.getLogProbOp(),
+            tensorflowProbabilisticGraph.getLogLikelihoodOp(),
             gradientOutputNameToInputName
         );
     }

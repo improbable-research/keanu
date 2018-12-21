@@ -24,28 +24,32 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
     private final List<? extends Variable> latentVariables;
 
     @Getter
-    private final VariableReference logProbSumTotalOpName;
+    private final VariableReference logProbOp;
+
+    @Getter
+    private final VariableReference logLikelihoodOp;
 
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
-        DoubleTensor logProb = computableGraph.compute(inputs, logProbSumTotalOpName);
+        DoubleTensor logProb = computableGraph.compute(inputs, logProbOp);
         return logProb.scalar();
     }
 
     @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
-        return 0;
+        DoubleTensor logLikelihood = computableGraph.compute(inputs, logLikelihoodOp);
+        return logLikelihood.scalar();
     }
 
     @Override
     public LogProbWithSample logProbWithSample(Map<VariableReference, ?> inputs, List<VariableReference> sampleFrom) {
 
         List<VariableReference> allOutputs = new ArrayList<>(sampleFrom);
-        allOutputs.add(logProbSumTotalOpName);
+        allOutputs.add(logProbOp);
 
         Map<VariableReference, ?> results = computableGraph.compute(inputs, allOutputs);
-        double logProb = ((DoubleTensor) results.get(logProbSumTotalOpName)).scalar();
-        results.remove(logProbSumTotalOpName);
+        double logProb = ((DoubleTensor) results.get(logProbOp)).scalar();
+        results.remove(logProbOp);
 
         return new LogProbWithSample(logProb, results);
     }

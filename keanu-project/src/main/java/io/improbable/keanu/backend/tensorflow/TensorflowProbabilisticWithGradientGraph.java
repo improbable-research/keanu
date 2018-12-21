@@ -16,9 +16,10 @@ public class TensorflowProbabilisticWithGradientGraph extends TensorflowProbabil
 
     public TensorflowProbabilisticWithGradientGraph(TensorflowComputableGraph computableGraph,
                                                     List<? extends Variable> latentVariables,
-                                                    VariableReference logProbSumTotalOpName,
+                                                    VariableReference logProbOp,
+                                                    VariableReference logLikelihoodOp,
                                                     Map<VariableReference, VariableReference> gradientOutputNameToInputName) {
-        super(computableGraph, latentVariables, logProbSumTotalOpName);
+        super(computableGraph, latentVariables, logProbOp, logLikelihoodOp);
         this.computableGraph = computableGraph;
         this.gradientOutputNameToInputName = gradientOutputNameToInputName;
     }
