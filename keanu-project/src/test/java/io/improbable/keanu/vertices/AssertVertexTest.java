@@ -64,6 +64,14 @@ public class AssertVertexTest {
     }
 
     @Test
+    public void valuePropagationAssertion() {
+        thrown.expect(AssertionError.class);
+        ConstantDoubleVertex constDouble = new ConstantDoubleVertex(3);
+        constDouble.lessThan(new ConstantDoubleVertex(10)).assertTrue();
+        constDouble.setAndCascade(15);
+    }
+
+    @Test
     public void optimizerWithAssertionWorks() {
         thrown.expect(AssertionError.class);
         UniformVertex temperature = new UniformVertex(20, 30);
@@ -82,5 +90,4 @@ public class AssertVertexTest {
         assertVertex.setLabel("testAssert");
         assertVertex.eval();
     }
-
 }
