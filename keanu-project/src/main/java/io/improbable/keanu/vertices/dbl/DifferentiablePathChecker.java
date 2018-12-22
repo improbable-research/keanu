@@ -61,7 +61,11 @@ public class DifferentiablePathChecker {
             Vertex visiting = queue.poll();
 
             if (visiting.isProbabilistic()) {
-                return true;
+                if(visiting.isObserved()) {
+                    continue;
+                } else {
+                    return true;
+                }
             }
 
             Collection<Vertex> nextVertices = visiting.getParents();
