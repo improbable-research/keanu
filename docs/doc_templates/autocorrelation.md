@@ -30,6 +30,8 @@ calculating autocorrelation on samples.
 
 ### Example
 
+#### Java
+
 With a network defined, we can get the autocorrelation vertex A. The result is 
 a tensor containing the autocorrelation at varying lags.
 ```java
@@ -40,4 +42,19 @@ When the samples are tensors, we need to specify the tensor index on which to ca
 For example, if the sample shape is `[1,5]` we can evaluate the autocorrelation at index `[0,1]`.
 ```java
 {% snippet TensorAutocorrelation %}
+```
+
+#### Python
+
+It's also possible to calculate the autocorrelation of samples in Python.
+
+```python
+{% snippet PythonScalarAutocorrelation %}
+```
+
+When the samples are `ndarrays` the index on which to calculate the autocorrelation can be specified 
+as a tuple.
+
+```python
+{% snippet PythonNdAutocorrelation %}
 ```

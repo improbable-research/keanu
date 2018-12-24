@@ -30,6 +30,8 @@ calculating autocorrelation on samples.
 
 ### Example
 
+#### Java
+
 With a network defined, we can get the autocorrelation vertex A. The result is 
 a tensor containing the autocorrelation at varying lags.
 ```java
@@ -50,4 +52,25 @@ NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPost
     100
 );
 DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation(0, 1);
+```
+
+#### Python
+
+It's also possible to calculate the autocorrelation of samples in Python.
+
+```python
+posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
+                           algo="metropolis", draws=100)
+vertex_samples = posterior_samples.get('a')
+ac = stats.autocorrelation(vertex_samples)
+```
+
+When the samples are `ndarrays` the index on which to calculate the autocorrelation can be specified 
+as a tuple.
+
+```python
+posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
+                           algo="metropolis", draws=100)
+vertex_samples = posterior_samples.get('a')
+ac = stats.autocorrelation(vertex_samples, (0,1))
 ```
