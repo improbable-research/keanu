@@ -65,10 +65,11 @@ def test_probe_for_non_zero_probability_from_bayes_net() -> None:
     assert poisson.has_value()
 
 
-def test_can_save_and_load() -> None:
-    PROTO_FILE = "temp.proto"
-    JSON_FILE = "temp.json"
-    DOT_FILE = "temp.dot"
+def test_can_save_and_load(tmpdir) -> None:
+    PROTO_FILE = str(tmpdir.join("test.proto"))
+    JSON_FILE = str(tmpdir.join("test.json"))
+    DOT_FILE = str(tmpdir.join("test.dot"))
+
     gamma = Gamma(1.0, 1.0)
     gamma.set_value(2.5)
     net = BayesNet(gamma.get_connected_graph())
