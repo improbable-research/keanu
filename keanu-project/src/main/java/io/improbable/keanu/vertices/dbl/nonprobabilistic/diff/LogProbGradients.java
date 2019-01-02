@@ -32,7 +32,7 @@ public class LogProbGradients {
             if (existingPartialDerivative == null) {
                 partials.put(id, entry.getValue().duplicate());
             } else {
-                existingPartialDerivative.plusInPlace(entry.getValue());
+                partials.put(id, existingPartialDerivative.plusInPlace(entry.getValue()));
             }
         }
 
