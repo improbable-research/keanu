@@ -195,12 +195,6 @@ public class TensorShape {
         return paddedShape;
     }
 
-    public static long[] shapeSlice(int dimension, long[] shape) {
-        long[] newShape = Arrays.copyOf(shape, shape.length);
-        newShape[dimension] = 1;
-        return newShape;
-    }
-
     /**
      * It's possible to express negative dimensions, which are relative to the rank of a
      * tensor. E.g. given a rank 3 tensor, dimensions [-1, -2] would refer to the 3rd and 2nd dimension.

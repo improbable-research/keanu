@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
+import static io.improbable.keanu.tensor.TensorShape.removeDimension;
 
 public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
 
@@ -26,7 +26,7 @@ public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
     public GenericSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<Tensor<T>> inputVertex,
                               @LoadVertexParam(DIMENSION_NAME) int dimension,
                               @LoadVertexParam(INDEX_NAME) int index) {
-        super(shapeSlice(dimension, inputVertex.getShape()), inputVertex);
+        super(removeDimension(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
     }
