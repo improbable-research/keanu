@@ -1,6 +1,8 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import com.google.common.base.Preconditions;
+import com.sun.javafx.font.Metrics;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.Statistics;
@@ -36,11 +38,11 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     private static final int DEFAULT_ADAPT_COUNT = 1000;
     private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.65;
 
-    enum Metrics {
+    private final Statistics statistics = new Statistics(Metrics.values());
+
+    public enum Metrics {
         STEPSIZE, LOG_PROB, MEAN_TREE_ACCEPT, TREE_SIZE
     }
-
-    private final Statistics statistics = new Statistics(Metrics.values());
 
     public static NUTS withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
