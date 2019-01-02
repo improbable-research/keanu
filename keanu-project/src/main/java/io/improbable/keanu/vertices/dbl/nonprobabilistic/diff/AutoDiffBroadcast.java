@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import lombok.experimental.UtilityClass;
 
 import java.util.Arrays;
 
@@ -9,6 +10,7 @@ import java.util.Arrays;
  * This class is meant to help with auto diff in operations that support implicit broadcasting. E.g. In
  * addition/subtraction/multiplication/division scalar operands can be operated with non-scalar operands.
  */
+@UtilityClass
 public class AutoDiffBroadcast {
 
     public static PartialDerivative correctForScalarPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
