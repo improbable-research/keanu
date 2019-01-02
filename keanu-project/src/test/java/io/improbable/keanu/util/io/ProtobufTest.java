@@ -15,7 +15,6 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -100,8 +99,8 @@ public class ProtobufTest {
 
     @Test
     public void shapeIsCorrectlySavedAndLoaded() throws IOException {
-        long[] shape1 = new long[] {2, 3};
-        long[] shape2 = new long[] {3, 2};
+        long[] shape1 = new long[]{2, 3};
+        long[] shape2 = new long[]{3, 2};
         final VertexLabel LABEL_ONE = new VertexLabel("Vertex1");
         final VertexLabel LABEL_TWO = new VertexLabel("Vertex2");
 
@@ -133,21 +132,21 @@ public class ProtobufTest {
         ProtobufSaver saver = new ProtobufSaver(complexNet);
         saver.save(outputStream, true);
         DoubleIfVertex outputVertex = (DoubleIfVertex) complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        DoubleVertex inputVertex = (DoubleVertex) complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        GaussianVertex inputVertex = (GaussianVertex) complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         ByteArrayInputStream input = new ByteArrayInputStream(outputStream.toByteArray());
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork loadedNet = loader.loadNetwork(input);
         DoubleIfVertex outputVertex2 = (DoubleIfVertex) loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        DoubleVertex inputVertex2 = (DoubleVertex) loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        GaussianVertex inputVertex2 = (GaussianVertex) loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(
-            (Vertex & Differentiable) inputVertex,
+            inputVertex,
             outputVertex
         ).of(outputVertex).get();
 
         DoubleTensor dOutputAfter = Differentiator.forwardModeAutoDiff(
-            (Vertex & Differentiable) inputVertex2,
+            inputVertex2,
             outputVertex2
         ).of(outputVertex2).get();
 
@@ -392,8 +391,8 @@ public class ProtobufTest {
     }
 
     private KeanuSavedBayesNet.Model createBasicNetworkProtobufWithValue(String labelForValue,
-                                                                                   String idForValue,
-                                                                                   Double valueToStore) {
+                                                                         String idForValue,
+                                                                         Double valueToStore) {
 
         KeanuSavedBayesNet.Vertex muVertex = KeanuSavedBayesNet.Vertex.newBuilder()
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
