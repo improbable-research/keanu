@@ -116,20 +116,21 @@ public class PartialDerivative {
             return partial;
         }
 
-        int partialRank = partial.get().getRank();
+        final DoubleTensor partialValue = partial.get();
+        final int partialRank = partialValue.getRank();
 
         DoubleTensor result;
         if (partialIsLeft) {
-            int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
+            final int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
             rearrange[0] = 0;
             rearrange[1] = partialRank - 1;
-            result = partial.get()
+            result = partialValue
                 .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
                 .permute(rearrange);
 
         } else {
             result = multiplier
-                .tensorMultiply(partial.get(), new int[]{1}, new int[]{0});
+                .tensorMultiply(partialValue, new int[]{1}, new int[]{0});
         }
 
         return new PartialDerivative(result);
@@ -141,21 +142,21 @@ public class PartialDerivative {
             return partial;
         }
 
-        int partialRank = partial.get().getRank();
-
-        int wrtRightDimension = partialRank - 1;
-        int wrtLeftDimension = partialRank - 2;
+        final DoubleTensor partialValue = partial.get();
+        final int partialRank = partialValue.getRank();
+        final int wrtRightDimension = partialRank - 1;
 
         DoubleTensor result;
         if (partialIsLeft) {
-            result = partial.get()
+            result = partialValue
                 .tensorMultiply(multiplier, new int[]{wrtRightDimension}, new int[]{1});
         } else {
+            int wrtLeftDimension = partialRank - 2;
             int[] transposeWrt = TensorShape.dimensionRange(0, partialRank);
             transposeWrt[wrtRightDimension] = wrtLeftDimension;
             transposeWrt[wrtLeftDimension] = wrtRightDimension;
 
-            result = partial.get()
+            result = partialValue
                 .tensorMultiply(multiplier, new int[]{wrtLeftDimension}, new int[]{0})
                 .permute(transposeWrt);
         }
