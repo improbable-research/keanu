@@ -20,7 +20,7 @@ public interface Differentiable {
 
     static PartialDerivative withRespectToSelf(long[] shape) {
         return new PartialDerivative(
-            DoubleTensor.eye((int) TensorShape.getLength(shape)).reshape(TensorShape.concat(shape, shape))
+            DoubleTensor.eye(TensorShape.getLength(shape)).reshape(TensorShape.concat(shape, shape))
         );
     }
 
