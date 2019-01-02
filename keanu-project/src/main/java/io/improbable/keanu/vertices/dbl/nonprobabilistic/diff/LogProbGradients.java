@@ -29,10 +29,10 @@ public class LogProbGradients {
             VertexId id = entry.getKey();
             DoubleTensor existingPartialDerivative = partials.get(id);
 
-            if (existingPartialDerivative != null) {
-                partials.put(id, existingPartialDerivative.plusInPlace(entry.getValue()));
-            } else {
+            if (existingPartialDerivative == null) {
                 partials.put(id, entry.getValue().duplicate());
+            } else {
+                existingPartialDerivative.plusInPlace(entry.getValue());
             }
         }
 
