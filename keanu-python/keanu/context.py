@@ -4,9 +4,9 @@ import os
 import logging
 from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView
 from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
+from py4j.protocol import Py4JError
 from typing import Dict, Any, Iterable, List, Collection, Set
 from _io import TextIOWrapper
-from .base import JavaObjectWrapper
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
@@ -67,8 +67,15 @@ class KeanuContext(metaclass=Singleton):
         m = self._gateway.jvm.java.util.HashMap()
 
         for (k, v) in python_map.items():
-            new_k = k.unwrap() if isinstance(k, JavaObjectWrapper) else k
-            new_v = v.unwrap() if isinstance(v, JavaObjectWrapper) else v
+            try:
+                new_k = k.unwrap()
+            except AttributeError:
+                new_k = k
+
+            try:
+                new_v = v.unwrap()
+            except AttributeError:
+                new_v = v
 
             m.put(new_k, new_v)
 
@@ -78,7 +85,11 @@ class KeanuContext(metaclass=Singleton):
         lst = self._gateway.jvm.java.util.ArrayList()
 
         for o in l:
-            o = o.unwrap() if isinstance(o, JavaObjectWrapper) else o
+            try:
+                o = o.unwrap()
+            except (AttributeError, Py4JError):
+                pass
+
             lst.add(o)
 
         return lst
