@@ -13,38 +13,38 @@ import static org.junit.Assert.assertThat;
 
 public class TensorTestOperations {
     public static <T extends DoubleVertex & Differentiable>
-    void finiteDifferenceMatchesForwardAndReverseModeGradient(List<DoubleVertex> inputVertices,
-                                                                            T outputVertex,
-                                                                            double incrementAmount,
-                                                                            Double delta) {
+    void finiteDifferenceMatchesForwardAndReverseModeGradient(List<T> inputVertices,
+                                                              T outputVertex,
+                                                              double incrementAmount,
+                                                              Double delta) {
         finiteDifferenceMatchesForwardModeGradient(inputVertices, outputVertex, incrementAmount, delta);
         finiteDifferenceMatchesReverseModeGradient(inputVertices, outputVertex, incrementAmount, delta);
     }
 
     public static <T extends DoubleVertex & Differentiable>
-    void finiteDifferenceMatchesForwardModeGradient(List<DoubleVertex> inputVertices,
-                                                                  T outputVertex,
-                                                                  double incrementAmount,
-                                                                  double delta) {
+    void finiteDifferenceMatchesForwardModeGradient(List<T> inputVertices,
+                                                    T outputVertex,
+                                                    double incrementAmount,
+                                                    double delta) {
         inputVertices.forEach(v ->
             runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, true));
     }
 
     public static <T extends DoubleVertex & Differentiable>
-    void finiteDifferenceMatchesReverseModeGradient(List<DoubleVertex> inputVertices,
-                                                                  T outputVertex,
-                                                                  double incrementAmount,
-                                                                  double delta) {
+    void finiteDifferenceMatchesReverseModeGradient(List<T> inputVertices,
+                                                    T outputVertex,
+                                                    double incrementAmount,
+                                                    double delta) {
         inputVertices.forEach(v ->
             runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, false));
     }
 
     private static <T extends DoubleVertex & Differentiable>
-    void runGradientTestOnSingleInput(DoubleVertex inputVertex,
-                                                     T outputVertex,
-                                                     double incrementAmount,
-                                                     double delta,
-                                                     boolean isForwardMode) {
+    void runGradientTestOnSingleInput(T inputVertex,
+                                      T outputVertex,
+                                      double incrementAmount,
+                                      double delta,
+                                      boolean isForwardMode) {
         DoubleTensor initialInput = inputVertex.getValue();
 
         DoubleTensor initialOutput = outputVertex.eval();
@@ -66,9 +66,9 @@ public class TensorTestOperations {
     }
 
     private static <T extends DoubleVertex & Differentiable>
-    DoubleTensor dOutputWrtInput(T outputVertex, DoubleVertex inputVertex, boolean isForwardMode) {
+    DoubleTensor dOutputWrtInput(T outputVertex, T inputVertex, boolean isForwardMode) {
         if (isForwardMode) {
-            return outputVertex.getDerivativeWrtLatents().withRespectTo(inputVertex);
+            return Differentiator.forwardModeAutoDiff(inputVertex, outputVertex).of(outputVertex);
         } else {
             return Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
         }

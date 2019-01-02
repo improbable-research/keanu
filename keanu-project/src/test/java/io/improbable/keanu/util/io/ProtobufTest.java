@@ -133,16 +133,23 @@ public class ProtobufTest {
         ProtobufSaver saver = new ProtobufSaver(complexNet);
         saver.save(outputStream, true);
         DoubleIfVertex outputVertex = (DoubleIfVertex) complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        DoubleVertex inputVertex = (DoubleVertex) complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        GaussianVertex inputVertex = (GaussianVertex) complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         ByteArrayInputStream input = new ByteArrayInputStream(outputStream.toByteArray());
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork loadedNet = loader.loadNetwork(input);
         DoubleIfVertex outputVertex2 = (DoubleIfVertex) loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        DoubleVertex inputVertex2 = (DoubleVertex) loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        GaussianVertex inputVertex2 = (GaussianVertex) loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
-        DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(outputVertex).withRespectTo(inputVertex);
-        DoubleTensor dOutputAfter = Differentiator.forwardModeAutoDiff(outputVertex2).withRespectTo(inputVertex2);
+        DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(
+            inputVertex,
+            outputVertex
+        ).of(outputVertex);
+
+        DoubleTensor dOutputAfter = Differentiator.forwardModeAutoDiff(
+            inputVertex2,
+            outputVertex2
+        ).of(outputVertex2);
 
         assertEquals(dOutputBefore, dOutputAfter);
 

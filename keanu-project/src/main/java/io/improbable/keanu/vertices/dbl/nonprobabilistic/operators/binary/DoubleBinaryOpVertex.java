@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Map;
 
@@ -71,15 +71,18 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Diffe
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         try {
-            return forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs.get(left), derivativeOfParentsWithRespectToInputs.get(right));
+            return forwardModeAutoDifferentiation(
+                derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY),
+                derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY)
+            );
         } catch (UnsupportedOperationException e) {
-            return Differentiable.super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs);
+            return Differentiable.super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
         }
     }
 
     protected abstract DoubleTensor op(DoubleTensor l, DoubleTensor r);
 
-    protected abstract PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r);
+    protected abstract PartialDerivative forwardModeAutoDifferentiation(PartialDerivative l, PartialDerivative r);
 }

@@ -1,15 +1,13 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -69,10 +67,9 @@ public class AutoDiffTest {
         vB.setValue(B);
         vC.eval();
 
-        PartialDerivatives dcdx = vC.getDerivativeWrtLatents();
+        PartialsOf dcdx = Differentiator.reverseModeAutoDiff(vC, vA, vB);
 
         DoubleTensor C = vC.getValue();
-        Map<VertexId, DoubleTensor> dcdxMap = dcdx.asMap();
 
         double da = 0.00000001;
 
@@ -82,7 +79,7 @@ public class AutoDiffTest {
 
         DoubleTensor dcdaApprox = (vC.getValue().minus(C)).div(da);
 
-        assertEquals(dcdaApprox.scalar(), dcdxMap.get(vA.getId()).scalar(), 0.00001);
+        assertEquals(dcdaApprox.scalar(), dcdx.withRespectTo(vA).scalar(), 0.00001);
 
         double db = da;
 
@@ -92,6 +89,6 @@ public class AutoDiffTest {
 
         DoubleTensor dcdbApprox = (vC.getValue().minus(C)).div(db);
 
-        assertEquals(dcdbApprox.scalar(), dcdxMap.get(vB.getId()).scalar(), 0.00001);
+        assertEquals(dcdbApprox.scalar(), dcdx.withRespectTo(vB).scalar(), 0.00001);
     }
 }
