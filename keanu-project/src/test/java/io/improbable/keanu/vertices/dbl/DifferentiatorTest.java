@@ -6,17 +6,13 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.TestGraphGenerator;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Test;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
@@ -158,33 +154,4 @@ public class DifferentiatorTest {
         assertEquals(expecteddHdB, dHdB);
     }
 
-    @Test
-    public void doesNotPerformUnnecessaryReverseModeAutoDiffCalculations() {
-        AtomicInteger n = new AtomicInteger(0);
-        AtomicInteger m = new AtomicInteger(0);
-        UniformVertex start = new UniformVertex(0, 1);
-
-        int links = 20;
-        TestGraphGenerator.SumVertex end = TestGraphGenerator.addLinks(start, n, m, links);
-
-        Differentiator.reverseModeAutoDiff(end, start);
-
-        //Does the right amount of work
-        assertEquals(3 * links, m.get());
-    }
-
-    @Test
-    public void doesNotPerformUnnecessaryForwardModeAutoDiffCalculations() {
-        AtomicInteger n = new AtomicInteger(0);
-        AtomicInteger m = new AtomicInteger(0);
-        UniformVertex start = new UniformVertex(0, 1);
-
-        int links = 20;
-        TestGraphGenerator.SumVertex end = TestGraphGenerator.addLinks(start, n, m, links);
-
-        Differentiator.forwardModeAutoDiff(start, end);
-
-        //Does the right amount of work
-        assertEquals(3 * links, m.get());
-    }
 }
