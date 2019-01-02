@@ -148,7 +148,7 @@ public class LogProbGradientCalculator {
                         this.parentToLatentLookup.get(vertexWithDiff)
                     );
 
-                dOfWrtLatentsAccumulated = dOfWrtLatentsAccumulated.add(dOfWrtLatentsContributionFromParent.asMap());
+                dOfWrtLatentsAccumulated = dOfWrtLatentsAccumulated.add(dOfWrtLatentsContributionFromParent);
             }
 
         }

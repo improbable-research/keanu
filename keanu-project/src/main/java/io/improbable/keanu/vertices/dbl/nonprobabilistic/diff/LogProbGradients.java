@@ -25,18 +25,29 @@ public class LogProbGradients {
     public LogProbGradients add(Map<VertexId, DoubleTensor> addition) {
 
         for (Map.Entry<VertexId, DoubleTensor> entry : addition.entrySet()) {
-
-            VertexId id = entry.getKey();
-            DoubleTensor existingPartialDerivative = partials.get(id);
-
-            if (existingPartialDerivative == null) {
-                partials.put(id, entry.getValue().duplicate());
-            } else {
-                partials.put(id, existingPartialDerivative.plusInPlace(entry.getValue()));
-            }
+            putPartial(entry.getKey(), entry.getValue());
         }
 
         return this;
+    }
+
+    public LogProbGradients add(PartialsOf addition) {
+
+        for (Map.Entry<VertexId, PartialDerivative> entry : addition.rawPartials().entrySet()) {
+            putPartial(entry.getKey(), entry.getValue().get());
+        }
+
+        return this;
+    }
+
+    private void putPartial(VertexId id, DoubleTensor value) {
+        final DoubleTensor existingPartialDerivative = partials.get(id);
+
+        if (existingPartialDerivative == null) {
+            partials.put(id, value.duplicate());
+        } else {
+            partials.put(id, existingPartialDerivative.plusInPlace(value));
+        }
     }
 
     public DoubleTensor getWithRespectTo(VertexId id) {

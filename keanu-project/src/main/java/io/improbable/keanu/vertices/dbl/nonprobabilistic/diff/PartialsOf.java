@@ -35,4 +35,8 @@ public class PartialsOf {
         return tensorMap;
     }
 
+    public Map<VertexId, PartialDerivative> rawPartials() {
+        return partials;
+    }
+
 }
