@@ -118,7 +118,7 @@ public class Differentiator {
         alreadyQueued.add(wrt);
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        Map<Vertex, PartialDerivative> ofWrt = new HashMap<>();
+        Map<VertexId, PartialDerivative> ofWrt = new HashMap<>();
 
         while (!priorityQueue.isEmpty()) {
             V visiting = priorityQueue.poll();
@@ -127,7 +127,7 @@ public class Differentiator {
             partials.put(visiting, partialOfVisiting);
 
             if (of.contains(visiting)) {
-                ofWrt.put(visiting, partialOfVisiting);
+                ofWrt.put(visiting.getId(), partialOfVisiting);
                 continue;
             }
 
