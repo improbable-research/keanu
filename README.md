@@ -11,6 +11,7 @@
 [![Quality Gate][sonar-image]][sonar-url]
 [![Maven Central][maven-image]][maven-url]
 [![Javadocs](https://www.javadoc.io/badge/io.improbable/keanu.svg)](https://www.javadoc.io/doc/io.improbable/keanu)
+[![Slack](https://img.shields.io/badge/join%20slack-%23keanu-brightgreen.svg)](https://join.slack.com/t/improbable-eng/shared_invite/enQtMzQ1ODcyMzQ5MjM4LWY5ZWZmNGM2ODc5MmViNmQ3ZTA3ZTY3NzQwOTBlMTkzZmIxZTIxODk0OWU3YjZhNWVlNDU3MDlkZGViZjhkMjc)
 
 ## Overview
 

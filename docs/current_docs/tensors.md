@@ -183,3 +183,18 @@ optimizer.maxAPosteriori();
 //Retrieve the most likely estimate using MAP estimation
 DoubleTensor mostLikelyEstimate = A.getValue(); //approximately [2, 3]
 ```
+
+## Python
+
+We do not expose Tensors in the Python API. Numpy provides the same concept 
+through its `ndarray` class and these are converted to/from Tensors for you.
+
+All of the operations that used Tensor within Java can be replaced with `ndarray` in Python.
+For example, to create a vertex:
+
+```python
+mu = np.array([[2., 3., 4.],
+               [1., 4., 7.]])
+sigma = np.ones([2, 3])
+g = Gaussian(mu, sigma)
+```
