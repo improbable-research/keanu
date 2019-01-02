@@ -65,6 +65,18 @@ def test_probe_for_non_zero_probability_from_bayes_net() -> None:
     assert poisson.has_value()
 
 
+def check_loaded_net(net) -> None:
+    latents = list(net.get_latent_vertices())
+    assert len(latents) == 1
+    gamma = latents[0]
+    assert gamma.get_value() == 2.5
+
+
+def check_dot_file(dot_file_name: str) -> None:
+    with open(dot_file_name) as f:
+        assert len(f.readlines()) == 9
+
+
 def test_can_save_and_load(tmpdir) -> None:
     PROTO_FILE = str(tmpdir.join("test.proto"))
     JSON_FILE = str(tmpdir.join("test.json"))
@@ -80,16 +92,11 @@ def test_can_save_and_load(tmpdir) -> None:
     json_saver.save(JSON_FILE, True, metadata)
     dot_saver = DotSaver(net)
     dot_saver.save(DOT_FILE, True, metadata)
+    check_dot_file(DOT_FILE)
 
     protobuf_loader = ProtobufLoader()
     json_loader = JsonLoader()
     new_net_from_proto = protobuf_loader.load(PROTO_FILE)
+    check_loaded_net(new_net_from_proto)
     new_net_from_json = json_loader.load(JSON_FILE)
-    latents = list(new_net_from_proto.get_latent_vertices())
-    assert len(latents) == 1
-    new_gamma = latents[0]
-    assert new_gamma.get_value() == 2.5
-    latents = list(new_net_from_json.get_latent_vertices())
-    assert len(latents) == 1
-    new_gamma = latents[0]
-    assert new_gamma.get_value() == 2.5
+    check_loaded_net(new_net_from_json)
