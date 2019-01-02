@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class PartialDerivative {
 
-    public static final PartialDerivative EMPTY = new PartialDerivative();
+    public static final PartialDerivative EMPTY = new PartialDerivative(null);
 
     private final DoubleTensor partial;
 
@@ -15,16 +15,8 @@ public class PartialDerivative {
         this.partial = partial;
     }
 
-    private PartialDerivative() {
-        this.partial = null;
-    }
-
     public boolean isPresent() {
         return partial != null;
-    }
-
-    public boolean isEmpty() {
-        return !isPresent();
     }
 
     public DoubleTensor get() {
@@ -41,11 +33,11 @@ public class PartialDerivative {
 
     public PartialDerivative add(PartialDerivative addition) {
 
-        if (isPresent() && addition.isPresent()) {
+        if (this.isPresent() && addition.isPresent()) {
             return new PartialDerivative(partial.plus(addition.partial));
-        } else if (isPresent() && addition.isEmpty()) {
+        } else if (this.isPresent() && !addition.isPresent()) {
             return new PartialDerivative(get());
-        } else if (isEmpty() && addition.isPresent()) {
+        } else if (!this.isPresent() && addition.isPresent()) {
             return new PartialDerivative(addition.partial);
         } else {
             return PartialDerivative.EMPTY;
@@ -54,11 +46,11 @@ public class PartialDerivative {
 
     public PartialDerivative subtract(PartialDerivative subtraction) {
 
-        if (isPresent() && subtraction.isPresent()) {
+        if (this.isPresent() && subtraction.isPresent()) {
             return new PartialDerivative(partial.minus(subtraction.partial));
-        } else if (isPresent() && subtraction.isEmpty()) {
+        } else if (this.isPresent() && !subtraction.isPresent()) {
             return new PartialDerivative(get());
-        } else if (isEmpty() && subtraction.isPresent()) {
+        } else if (!this.isPresent() && subtraction.isPresent()) {
             return new PartialDerivative(subtraction.partial.unaryMinus());
         } else {
             return PartialDerivative.EMPTY;
@@ -67,7 +59,7 @@ public class PartialDerivative {
 
     public PartialDerivative multiplyBy(double multiplier) {
 
-        if (isEmpty()) {
+        if (!isPresent()) {
             return this;
         }
 
@@ -76,7 +68,7 @@ public class PartialDerivative {
 
     public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier) {
 
-        if (isEmpty()) {
+        if (!isPresent()) {
             return this;
         }
 
@@ -88,7 +80,7 @@ public class PartialDerivative {
 
     public PartialDerivative multiplyAlongWrtDimensions(DoubleTensor multiplier) {
 
-        if (isEmpty()) {
+        if (!isPresent()) {
             return this;
         }
 
@@ -100,7 +92,7 @@ public class PartialDerivative {
 
     public PartialDerivative divideByAlongOfDimensions(DoubleTensor divisor) {
 
-        if (isEmpty()) {
+        if (!isPresent()) {
             return this;
         }
 
@@ -112,7 +104,7 @@ public class PartialDerivative {
 
     public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
-        if (partial.isEmpty()) {
+        if (!partial.isPresent()) {
             return partial;
         }
 
@@ -138,7 +130,7 @@ public class PartialDerivative {
 
     public static PartialDerivative matrixMultiplyAlongWrtDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
-        if (partial.isEmpty()) {
+        if (!partial.isPresent()) {
             return partial;
         }
 
