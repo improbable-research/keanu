@@ -114,6 +114,8 @@ Here is the completed code if you'd like to run it yourself.
 Experiment with the size of the sigma in each thermometer (the inaccuracy) and see how it affects the 
 estimated temperature.
 
+#### Java
+
 ```java
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
@@ -142,4 +144,23 @@ public class ThermometerExample {
         System.out.println("Calculated Room Temperature: " + calculatedTemperature);
     }
 }
+```
+
+#### Python
+
+```python
+with Model() as m:
+    m.temperature = Uniform(20., 30.)
+    m.first_thermometer = Gaussian(m.temperature, 2.5)
+    m.second_thermometer = Gaussian(m.temperature, 5.)
+
+m.first_thermometer.observe(25.)
+m.second_thermometer.observe(30.)
+
+bayes_net = m.to_bayes_net()
+optimizer = GradientOptimizer(bayes_net)
+optimizer.max_a_posteriori()
+
+calculated_temperature = m.temperature.get_value()
+print(calculated_temperature)
 ```
