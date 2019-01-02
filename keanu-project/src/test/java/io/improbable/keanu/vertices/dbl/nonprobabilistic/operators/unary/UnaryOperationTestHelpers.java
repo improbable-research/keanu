@@ -42,7 +42,7 @@ public class UnaryOperationTestHelpers {
             1e-5
         );
 
-        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).get();
+        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A);
         assertEquals(
             expectedGradientWrtA,
             wrtAReverse.scalar(),
@@ -82,7 +82,7 @@ public class UnaryOperationTestHelpers {
         assertArrayEquals(expectedGradientWrtA, wrtAForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedShape, wrtAForward.getShape());
 
-        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A).get();
+        DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA, wrtAReverse.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedShape, wrtAReverse.getShape());
     }

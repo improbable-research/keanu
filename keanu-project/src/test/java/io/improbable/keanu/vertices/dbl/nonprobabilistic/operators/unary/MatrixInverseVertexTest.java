@@ -63,7 +63,7 @@ public class MatrixInverseVertexTest {
         inverse.lazyEval();
 
         DoubleTensor inverseWrtMatrix = Differentiator.forwardModeAutoDiff(matrix, inverse).of(inverse).get();
-        DoubleTensor reverseInverseWrtMatrix = Differentiator.reverseModeAutoDiff(inverse, matrix).withRespectTo(matrix).get();
+        DoubleTensor reverseInverseWrtMatrix = Differentiator.reverseModeAutoDiff(inverse, matrix).withRespectTo(matrix);
 
         DoubleTensor expectedInverseWrtMatrix = DoubleTensor.create(new double[]{
                 -4.0, 3.0,
@@ -94,7 +94,7 @@ public class MatrixInverseVertexTest {
             assertEquals(result, DoubleTensor.eye(4));
 
             DoubleTensor changeInMultipliedWrtInput = Differentiator.forwardModeAutoDiff(inputVertex, multiplied).of(multiplied).get();
-            DoubleTensor reverseOutputWrtInput = Differentiator.reverseModeAutoDiff(multiplied, inputVertex).withRespectTo(inputVertex).get();
+            DoubleTensor reverseOutputWrtInput = Differentiator.reverseModeAutoDiff(multiplied, inputVertex).withRespectTo(inputVertex);
             assertEquals(changeInMultipliedWrtInput.pow(2.0).sum(), 0.0, 1e-10);
             assertEquals(reverseOutputWrtInput.pow(2.0).sum(), 0.0, 1e-10);
         }

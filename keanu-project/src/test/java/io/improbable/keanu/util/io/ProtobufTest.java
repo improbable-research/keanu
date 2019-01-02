@@ -152,8 +152,8 @@ public class ProtobufTest {
 
         assertEquals(dOutputBefore, dOutputAfter);
 
-        dOutputBefore = Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex).get();
-        dOutputAfter = Differentiator.reverseModeAutoDiff(outputVertex2, inputVertex2).withRespectTo(inputVertex2).get();
+        dOutputBefore = Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
+        dOutputAfter = Differentiator.reverseModeAutoDiff(outputVertex2, inputVertex2).withRespectTo(inputVertex2);
 
         assertEquals(dOutputBefore, dOutputAfter);
     }

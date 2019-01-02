@@ -70,7 +70,7 @@ public class TensorTestOperations {
         if (isForwardMode) {
             return Differentiator.forwardModeAutoDiff(inputVertex, outputVertex).of(outputVertex).get();
         } else {
-            return Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex).get();
+            return Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
         }
     }
 

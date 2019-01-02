@@ -83,7 +83,7 @@ public class SumVertexTest {
         SumVertex b = a.sum();
 
         DoubleTensor dbdaForward = Differentiator.forwardModeAutoDiff(a, b).of(b).get();
-        DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a).get();
+        DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
         DoubleTensor expectedDbDa = DoubleTensor.ones(new long[]{2, 2, 2});
 
@@ -100,7 +100,7 @@ public class SumVertexTest {
         SumVertex b = a.sum(sumDimension);
 
         DoubleTensor dbdaForward = Differentiator.forwardModeAutoDiff(a, b).of(b).get();
-        DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a).get();
+        DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
         DoubleTensor expectedDbDa = DoubleTensor.eye(4).reshape(2, 2, 2, 2).sum(sumDimension).reshape(2, 2, 2);
 
@@ -117,7 +117,7 @@ public class SumVertexTest {
         SumVertex b = a.sum(sumDimension);
 
         DoubleTensor dbdaForward = Differentiator.forwardModeAutoDiff(a, b).of(b).get();
-        DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a).get();
+        DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
         DoubleTensor expectedDbDa = DoubleTensor.eye(8).reshape(2, 2, 2, 2, 2, 2).sum(sumDimension).reshape(2, 2, 2, 2, 2);
 
@@ -140,7 +140,7 @@ public class SumVertexTest {
         DoubleTensor dfdaForward = Differentiator.forwardModeAutoDiff(a, f).of(f).get();
 
         PartialsOf dfdx = Differentiator.reverseModeAutoDiff(f, a);
-        DoubleTensor dfdaReverse = dfdx.withRespectTo(a).get();
+        DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
         DoubleTensor expectedDfdx = DoubleTensor.create(new double[]{
             4, 4, 4,
@@ -172,7 +172,7 @@ public class SumVertexTest {
         DoubleTensor dfdaForward = Differentiator.forwardModeAutoDiff(a, f).of(f).get();
 
         PartialsOf dfdx = Differentiator.reverseModeAutoDiff(f, a);
-        DoubleTensor dfdaReverse = dfdx.withRespectTo(a).get();
+        DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
         DoubleTensor expectedDfdx = DoubleTensor.create(new double[]{
             2, 2, 2,
@@ -198,7 +198,7 @@ public class SumVertexTest {
         DoubleTensor dfdaForward = Differentiator.forwardModeAutoDiff(a, f).of(f).get();
 
         PartialsOf dfdx = Differentiator.reverseModeAutoDiff(f, a);
-        DoubleTensor dfdaReverse = dfdx.withRespectTo(a).get();
+        DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
         DoubleTensor expectedDfda = DoubleTensor.create(1, 2, 3);
 

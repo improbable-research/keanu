@@ -46,8 +46,8 @@ public class BinaryOperationTestHelpers {
         assertEquals(expectedGradientWrtB, Differentiator.forwardModeAutoDiff(B, output).of(output).get().scalar(), 1e-5);
 
         PartialsOf wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
-        assertEquals(expectedGradientWrtA, wrtReverse.withRespectTo(A).get().scalar(), 1e-5);
-        assertEquals(expectedGradientWrtB, wrtReverse.withRespectTo(B).get().scalar(), 1e-5);
+        assertEquals(expectedGradientWrtA, wrtReverse.withRespectTo(A).scalar(), 1e-5);
+        assertEquals(expectedGradientWrtB, wrtReverse.withRespectTo(B).scalar(), 1e-5);
     }
 
     public static void operatesOnTwo2x2MatrixVertexValues(double[] aValues,
@@ -94,11 +94,11 @@ public class BinaryOperationTestHelpers {
 
         PartialsOf wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
 
-        DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A).get();
+        DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAReverse.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtA.getShape(), wrtAReverse.getShape());
 
-        DoubleTensor wrtBReverse = wrtReverse.withRespectTo(B).get();
+        DoubleTensor wrtBReverse = wrtReverse.withRespectTo(B);
         assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBReverse.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBReverse.getShape());
     }
@@ -125,11 +125,11 @@ public class BinaryOperationTestHelpers {
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBForward.getShape());
 
         PartialsOf wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
-        DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A).get();
+        DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAReverse.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtA.getShape(), wrtAReverse.getShape());
 
-        DoubleTensor wrtBReverse = wrtReverse.withRespectTo(B).get();
+        DoubleTensor wrtBReverse = wrtReverse.withRespectTo(B);
         assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBReverse.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBReverse.getShape());
     }
@@ -156,11 +156,11 @@ public class BinaryOperationTestHelpers {
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBForward.getShape());
 
         PartialsOf wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
-        DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A).get();
+        DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAReverse.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtA.getShape(), wrtAReverse.getShape());
 
-        DoubleTensor wrtBReverse = wrtReverse.withRespectTo(B).get();
+        DoubleTensor wrtBReverse = wrtReverse.withRespectTo(B);
         assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBReverse.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBReverse.getShape());
     }

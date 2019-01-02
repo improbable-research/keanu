@@ -42,8 +42,8 @@ public class DifferentiatorTest {
 
         PartialsOf dC = Differentiator.reverseModeAutoDiff(C, ImmutableSet.of(A, B));
 
-        DoubleTensor dCdA = dC.withRespectTo(A).get();
-        DoubleTensor dCdB = dC.withRespectTo(B).get();
+        DoubleTensor dCdA = dC.withRespectTo(A);
+        DoubleTensor dCdB = dC.withRespectTo(B);
 
         assertEquals(A.getValue().scalar(), dCdB.scalar(), 1e-5);
         assertEquals(B.getValue().scalar(), dCdA.scalar(), 1e-5);
@@ -63,8 +63,8 @@ public class DifferentiatorTest {
 
         PartialsOf dY = Differentiator.reverseModeAutoDiff(Y, ImmutableSet.of(A, B));
 
-        DoubleTensor dYdA = dY.withRespectTo(A).get();
-        DoubleTensor dYdB = dY.withRespectTo(B).get();
+        DoubleTensor dYdA = dY.withRespectTo(A);
+        DoubleTensor dYdB = dY.withRespectTo(B);
 
         assertEquals(A.getValue().reciprocal().scalar(), dYdA.scalar(), 1e-5);
         assertEquals(B.getValue().reciprocal().scalar(), dYdB.scalar(), 1e-5);
@@ -87,8 +87,8 @@ public class DifferentiatorTest {
 
         PartialsOf dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
 
-        DoubleTensor dHdAReverse = dHReverse.withRespectTo(A).get();
-        DoubleTensor dHdBReverse = dHReverse.withRespectTo(B).get();
+        DoubleTensor dHdAReverse = dHReverse.withRespectTo(A);
+        DoubleTensor dHdBReverse = dHReverse.withRespectTo(B);
 
         DoubleTensor dHdAForward = Differentiator.forwardModeAutoDiff(A, H).of(H).get();
         DoubleTensor dHdBForward = Differentiator.forwardModeAutoDiff(B, H).of(H).get();
@@ -137,8 +137,8 @@ public class DifferentiatorTest {
 
         PartialsOf dH = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
 
-        DoubleTensor dHdA = dH.withRespectTo(A).get();
-        DoubleTensor dHdB = dH.withRespectTo(B).get();
+        DoubleTensor dHdA = dH.withRespectTo(A);
+        DoubleTensor dHdB = dH.withRespectTo(B);
 
         DoubleTensor predicateTrueMask = predicate.getValue().toDoubleMask();
         DoubleTensor predicateFalseMask = predicate.getValue().not().toDoubleMask();

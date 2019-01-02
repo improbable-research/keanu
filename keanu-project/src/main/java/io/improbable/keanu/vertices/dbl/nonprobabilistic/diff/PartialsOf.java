@@ -17,12 +17,12 @@ public class PartialsOf {
 
     private final Map<VertexId, PartialDerivative> partials;
 
-    public PartialDerivative withRespectTo(Vertex vertex) {
+    public DoubleTensor withRespectTo(Vertex vertex) {
         return withRespectTo(vertex.getId());
     }
 
-    public PartialDerivative withRespectTo(VertexId id) {
-        return partials.get(id);
+    public DoubleTensor withRespectTo(VertexId id) {
+        return partials.get(id).get();
     }
 
     public Map<VertexId, DoubleTensor> asMap() {
