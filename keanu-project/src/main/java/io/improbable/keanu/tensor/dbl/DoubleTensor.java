@@ -4,12 +4,16 @@ import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
+
 
 public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
@@ -92,11 +96,48 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new ScalarDoubleTensor(scalarValue);
     }
 
+    /**
+     * @param dimension  the dimension along which toStack are stacked
+     * @param toStack    an array of DoubleTensor's of the same shape
+     * @return  a DoubleTensor with toStack joined along a new dimension
+     * <p>
+     * e.g. A, B, C = DoubleTensor.ones(4, 2)
+     * <p>
+     * DoubleTensor.stack(0, A, B, C) gives DoubleTensor.ones(3, 4, 2)
+     * <p>
+     * DoubleTensor.stack(1, A, B, C) gives DoubleTensor.ones(4, 3, 2)
+     * <p>
+     * DoubleTensor.stack(2, A, B, C) gives DoubleTensor.ones(4, 2, 3)
+     * <p>
+     * DoubleTensor.stack(-1, A, B, C) gives DoubleTensor.ones(4, 2, 3)
+     */
+    static DoubleTensor stack(int dimension, DoubleTensor... toStack) {
+        long[] shape = toStack[0].getShape();
+        int stackedRank = toStack[0].getRank() + 1;
+        int absoluteDimension = getAbsoluteDimension(dimension, stackedRank);
+        long[] stackedShape = ArrayUtils.insert(absoluteDimension, shape, 1);
+
+        DoubleTensor[] reshaped = new DoubleTensor[toStack.length];
+        for (int i = 0; i < toStack.length; i++) {
+            reshaped[i] = toStack[i].reshape(stackedShape);
+        }
+
+        return concat(absoluteDimension, reshaped);
+    }
 
     static DoubleTensor concat(DoubleTensor... toConcat) {
         return concat(0, toConcat);
     }
 
+     /**
+     * @param dimension the dimension along which the tensors will be joined
+     * @param toConcat  an array of DoubleTensor
+     * @return  a DoubleTensor with toConcat joined along an existing dimension
+     * <p>
+     * e.g. A, B, C = DoubleTensor.ones(4, 2)
+     * <p>
+     * DoubleTensor.concat(0, A, B, C) gives DoubleTensor.ones(12, 2)
+     */
     static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {

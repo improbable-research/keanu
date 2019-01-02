@@ -1,8 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import com.google.common.base.Preconditions;
-import com.sun.javafx.font.Metrics;
-
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.Statistics;
@@ -17,9 +15,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +51,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     }
 
     @Getter
-    @Setter
     @Builder.Default
     private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
@@ -96,17 +91,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
      * @param sampleFromVertices the vertices inside the bayesNet to sample from
      * @return Samples taken with NUTS
      */
+    @Override
     public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                               final List<? extends Vertex> sampleFromVertices,
                                               final int sampleCount) {
         return generatePosteriorSamples(bayesNet, sampleFromVertices)
             .generate(sampleCount);
-    }
-
-    public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                              final Vertex fromVertex,
-                                              final int sampleCount) {
-        return getPosteriorSamples(bayesNet, Collections.singletonList(fromVertex), sampleCount);
     }
 
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesNet,

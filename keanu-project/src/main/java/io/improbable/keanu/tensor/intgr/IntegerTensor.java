@@ -4,11 +4,14 @@ import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.Arrays;
 import java.util.function.Function;
+
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
@@ -66,10 +69,47 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return new ScalarIntegerTensor(scalarValue);
     }
 
+    /**
+     * @param dimension  the dimension along which toStack are stacked
+     * @param toStack    an array of IntegerTensor
+     * @return  an IntegerTensor with toStack joined along a new dimension
+     * <p>
+     * e.g. A, B, C = IntegerTensor.ones(4, 2)
+     * <p>
+     * IntegerTensor.stack(0, A, B, C) gives IntegerTensor.ones(3, 4, 2)
+     * <p>
+     * IntegerTensor.stack(1, A, B, C) gives IntegerTensor.ones(4, 3, 2)
+     * <p>
+     * IntegerTensor.stack(2, A, B, C) gives IntegerTensor.ones(4, 2, 3)
+     * <p>
+     * IntegerTensor.stack(-1, A, B, C) gives IntegerTensor.ones(4, 2, 3)
+     */
+    static IntegerTensor stack(int dimension, IntegerTensor... toStack) {
+        long[] shape = toStack[0].getShape();
+        int absoluteDimension = getAbsoluteDimension(dimension, shape.length + 1);
+        long[] stackedShape = ArrayUtils.insert(absoluteDimension, shape, 1);
+
+        IntegerTensor[] reshaped = new IntegerTensor[toStack.length];
+        for (int i = 0; i < toStack.length; i++) {
+            reshaped[i] = toStack[i].reshape(stackedShape);
+        }
+
+        return concat(absoluteDimension, reshaped);
+    }
+
     static IntegerTensor concat(IntegerTensor... toConcat) {
         return concat(0, toConcat);
     }
 
+    /**
+     * @param dimension the dimension along which the tensors will be joined
+     * @param toConcat  an array of IntegerTensor
+     * @return  an IntegerTensor with toConcat joined along existing dimension
+     * <p>
+     * e.g. A, B, C = IntegerTensor.ones(4, 2)
+     * <p>
+     * IntegerTensor.concat(0, A, B, C) gives IntegerTensor.ones(12, 2)
+     */
     static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
         INDArray[] concatAsINDArray = new INDArray[toConcat.length];
         for (int i = 0; i < toConcat.length; i++) {

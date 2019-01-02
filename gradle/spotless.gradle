@@ -1,6 +1,6 @@
 spotless {
     java {
-        target '**/*.java'
+        target '*/src/*/java/**/*.java'
 
         indentWithSpaces(4)
         removeUnusedImports()

@@ -118,9 +118,9 @@ A.observe(true);
 B.observe(true);
 
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-        new BayesianNetwork(C.getConnectedGraph()),
-        Arrays.asList(A, B),
-        100000
+    new BayesianNetwork(C.getConnectedGraph()),
+    Arrays.asList(A, B),
+    100000
 ).drop(10000).downSample(2);
 double probabilityOfA = posteriorSamples.get(A).probability(isTrue -> isTrue.scalar() == true);
 //probabilityOfA evaluates to 1.0

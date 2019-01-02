@@ -5,6 +5,7 @@ import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -56,6 +57,10 @@ public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
 
     public DoubleVertex getWeightVertex() {
         return modelGraph.getWeightVertex();
+    }
+
+    public Vertex<OUTPUT> getOutputVertex() {
+        return modelGraph.getOutputVertex();
     }
 
     @Override

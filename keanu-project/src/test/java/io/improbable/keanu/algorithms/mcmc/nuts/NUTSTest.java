@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class NUTSTest {
 
@@ -162,9 +161,6 @@ public class NUTSTest {
             net.getLatentVertices(),
             2
         );
-
-        nuts.setRandom(null);
-        assertNull(nuts.getRandom());
 
         assertFalse(posteriorSamples.get(A).asList().isEmpty());
     }

@@ -148,3 +148,15 @@ In Keanu the above problem would be written as:
 ```java
 {% snippet TensorFinal %}
 ```
+
+## Python
+
+We do not expose Tensors in the Python API. Numpy provides the same concept 
+through its `ndarray` class and these are converted to/from Tensors for you.
+
+All of the operations that used Tensor within Java can be replaced with `ndarray` in Python.
+For example, to create a vertex:
+
+```python
+{% snippet PythonVertexFromNDArray %}
+```

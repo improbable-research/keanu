@@ -8,29 +8,32 @@
 
    Snippets are inserted at any point in the input file with a corresponding {% snippet <name> %}"""
 
-
 import argparse
 import re
 import os
 import sys
 import logging
+from io import open
 
 error_code = 0
+
 
 def record_error(output_str):
     logging.getLogger("keanu").error(output_str)
     global error_code
     error_code = 1
 
+
 def printd(debug_str):
     logging.getLogger("keanu").debug(debug_str)
+
 
 def read_file_snippets(file, snippet_store):
     """Parse a file and add all snippets to the snippet_store dictionary"""
     start_reg = re.compile("(.*%%SNIPPET_START%% )([a-zA-Z0-9]+)")
-    end_reg =   re.compile("(.*%%SNIPPET_END%% )([a-zA-Z0-9]+)")
+    end_reg = re.compile("(.*%%SNIPPET_END%% )([a-zA-Z0-9]+)")
     open_snippets = {}
-    with open(file) as w:
+    with open(file, encoding="utf-8") as w:
         lines = w.readlines()
 
         for line in lines:
@@ -72,7 +75,7 @@ def read_file_snippets(file, snippet_store):
 
 def replace_tags(in_name, out_name, snippet_store):
     tag_re = re.compile("(.*{% snippet )([a-zA-Z0-9]+)( %})")
-    with open(in_name) as in_file, open(out_name, "w") as out_file:
+    with open(in_name, encoding="utf-8") as in_file, open(out_name, "w", encoding="utf-8") as out_file:
         for in_line in in_file.readlines():
             m = tag_re.match(in_line)
 
@@ -100,10 +103,12 @@ def for_all_in_dir(directory, action):
     for file in os.listdir(directory):
         action(file)
 
+
 def subtractStrings(str1, str2):
     if str2 in str1:
         return str1.replace(str2, '')
     return ""
+
 
 def for_all_in_subdirs(directory, action):
     for path, subdirs, files in os.walk(directory):
@@ -111,9 +116,17 @@ def for_all_in_subdirs(directory, action):
             path = subtractStrings(path, directory)
             action(os.path.join(path, file))
 
+
 def check_output_dir_exists(output_dir):
     if (not os.path.exists(output_dir)):
         os.mkdir(output_dir)
+
+
+def strip_block_whitespace(string_list):
+    """Treats a list of strings as a code block and strips
+        whitespace so that the min whitespace line sits at char 0 of line."""
+    min_ws = min([(len(x) - len(x.lstrip())) for x in string_list if x != '\n'])
+    return [x[min_ws:] if x != '\n' else x for x in string_list]
 
 
 def main():
@@ -124,21 +137,27 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_dir", help="The Input file directory", default="doc_templates/")
     parser.add_argument("--output_dir", help="Where to store the processed files", default="current_docs/")
-    parser.add_argument("--src_dir", help="Where snippet source files are located", default="src/test/java/io/improbable/snippet/")
+    parser.add_argument("--java_src_dir", help="Where Java snippet source files are located",
+                        default="src/test/java/io/improbable/snippet/")
+    parser.add_argument("--python_src_dir", help="Where Python snippet source files are located",
+                        default="src/test/python/")
     parser.add_argument("--debug", action='store_true', help="Turn on script debugging")
 
     args = parser.parse_args()
     if args.debug:
-        logging.basicConfig(level = logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG)
 
     snippet_store = {}
-    for_all_in_dir(args.src_dir, lambda x: read_file_snippets(args.src_dir + x, snippet_store))
-    printd(str(snippet_store))
+    for_all_in_dir(args.java_src_dir, lambda x: read_file_snippets(args.java_src_dir + x, snippet_store))
+    for_all_in_dir(args.python_src_dir, lambda x: read_file_snippets(args.python_src_dir + x, snippet_store))
+    stripped_snippet_store = {k: strip_block_whitespace(v) for k, v in snippet_store.items()}
+    printd(str(stripped_snippet_store))
     check_output_dir_exists(args.output_dir)
     for_all_in_subdirs(args.input_dir, lambda x: do_rewrites(x,
-                                                              args.input_dir,
-                                                              args.output_dir,
-                                                              snippet_store))
+                                                             args.input_dir,
+                                                             args.output_dir,
+                                                             stripped_snippet_store))
+
 
 if __name__ == "__main__":
     main()
