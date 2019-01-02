@@ -42,8 +42,8 @@ public class BinaryOperationTestHelpers {
         B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
         T output = op.apply(A, B);
 
-        assertEquals(expectedGradientWrtA, Differentiator.forwardModeAutoDiff(A, output).of(output).get().scalar(), 1e-5);
-        assertEquals(expectedGradientWrtB, Differentiator.forwardModeAutoDiff(B, output).of(output).get().scalar(), 1e-5);
+        assertEquals(expectedGradientWrtA, Differentiator.forwardModeAutoDiff(A, output).of(output).scalar(), 1e-5);
+        assertEquals(expectedGradientWrtB, Differentiator.forwardModeAutoDiff(B, output).of(output).scalar(), 1e-5);
 
         PartialsOf wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
         assertEquals(expectedGradientWrtA, wrtReverse.withRespectTo(A).scalar(), 1e-5);
@@ -84,11 +84,11 @@ public class BinaryOperationTestHelpers {
 
         T output = op.apply(A, B);
 
-        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output).get();
+        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtA.getShape(), wrtAForward.getShape());
 
-        DoubleTensor wrtBForward = Differentiator.forwardModeAutoDiff(B, output).of(output).get();
+        DoubleTensor wrtBForward = Differentiator.forwardModeAutoDiff(B, output).of(output);
         assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBForward.getShape());
 
@@ -116,11 +116,11 @@ public class BinaryOperationTestHelpers {
 
         T output = op.apply(A, B);
 
-        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output).get();
+        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtA.getShape(), wrtAForward.getShape());
 
-        DoubleTensor wrtBForward = Differentiator.forwardModeAutoDiff(B, output).of(output).get();
+        DoubleTensor wrtBForward = Differentiator.forwardModeAutoDiff(B, output).of(output);
         assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBForward.getShape());
 
@@ -147,11 +147,11 @@ public class BinaryOperationTestHelpers {
 
         T output = op.apply(A, B);
 
-        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output).get();
+        DoubleTensor wrtAForward = Differentiator.forwardModeAutoDiff(A, output).of(output);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtA.getShape(), wrtAForward.getShape());
 
-        DoubleTensor wrtBForward = Differentiator.forwardModeAutoDiff(B, output).of(output).get();
+        DoubleTensor wrtBForward = Differentiator.forwardModeAutoDiff(B, output).of(output);
         assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBForward.getShape());
 

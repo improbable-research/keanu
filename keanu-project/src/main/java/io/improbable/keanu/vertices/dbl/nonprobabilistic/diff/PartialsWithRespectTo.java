@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import lombok.AllArgsConstructor;
@@ -15,11 +16,11 @@ public class PartialsWithRespectTo {
 
     private final Map<VertexId, PartialDerivative> partials;
 
-    public PartialDerivative of(Vertex vertex) {
+    public DoubleTensor of(Vertex vertex) {
         return of(vertex.getId());
     }
 
-    public PartialDerivative of(VertexId id) {
-        return partials.get(id);
+    public DoubleTensor of(VertexId id) {
+        return partials.get(id).get();
     }
 }

@@ -68,7 +68,7 @@ public class TensorTestOperations {
     private static <T extends DoubleVertex & Differentiable>
     DoubleTensor dOutputWrtInput(T outputVertex, T inputVertex, boolean isForwardMode) {
         if (isForwardMode) {
-            return Differentiator.forwardModeAutoDiff(inputVertex, outputVertex).of(outputVertex).get();
+            return Differentiator.forwardModeAutoDiff(inputVertex, outputVertex).of(outputVertex);
         } else {
             return Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
         }
