@@ -17,10 +17,46 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import static java.util.Collections.singletonMap;
 
 @UtilityClass
 public class Differentiator {
+
+    public static <V extends Vertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, V... of) {
+        return forwardModeAutoDiff(wrt, new HashSet<>(Arrays.asList(of)));
+    }
+
+    public static <V extends Vertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, Collection<V> of) {
+
+        PriorityQueue<V> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
+        priorityQueue.add(wrt);
+
+        HashSet<Vertex> alreadyQueued = new HashSet<>();
+        alreadyQueued.add(wrt);
+
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+        Map<VertexId, PartialDerivative> ofWrt = new HashMap<>();
+
+        while (!priorityQueue.isEmpty()) {
+            V visiting = priorityQueue.poll();
+
+            PartialDerivative partialOfVisiting = visiting.forwardModeAutoDifferentiation(partials);
+            partials.put(visiting, partialOfVisiting);
+
+            if (of.contains(visiting)) {
+                ofWrt.put(visiting.getId(), partialOfVisiting);
+                continue;
+            }
+
+            for (Vertex child : (Set<Vertex<?>>) visiting.getChildren()) {
+                if (!child.isProbabilistic() && !alreadyQueued.contains(child) && child instanceof Differentiable) {
+                    priorityQueue.offer((V) child);
+                    alreadyQueued.add(child);
+                }
+            }
+        }
+
+        return new PartialsWithRespectTo(wrt, ofWrt);
+    }
 
     public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Set<DoubleVertex> wrt) {
         if (ofVertex.isObserved()) {
@@ -103,42 +139,5 @@ public class Differentiator {
                 dwrtOf.put(wrtVertex, dwrtV);
             }
         }
-    }
-
-    public static <V extends Vertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, V... of) {
-        return forwardModeAutoDiff(wrt, new HashSet<>(Arrays.asList(of)));
-    }
-
-    public static <V extends Vertex & Differentiable> PartialsWithRespectTo forwardModeAutoDiff(V wrt, Collection<V> of) {
-
-        PriorityQueue<V> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
-        priorityQueue.add(wrt);
-
-        HashSet<Vertex> alreadyQueued = new HashSet<>();
-        alreadyQueued.add(wrt);
-
-        Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        Map<VertexId, PartialDerivative> ofWrt = new HashMap<>();
-
-        while (!priorityQueue.isEmpty()) {
-            V visiting = priorityQueue.poll();
-
-            PartialDerivative partialOfVisiting = visiting.forwardModeAutoDifferentiation(partials);
-            partials.put(visiting, partialOfVisiting);
-
-            if (of.contains(visiting)) {
-                ofWrt.put(visiting.getId(), partialOfVisiting);
-                continue;
-            }
-
-            for (Vertex child : (Set<Vertex<?>>) visiting.getChildren()) {
-                if (!child.isProbabilistic() && !alreadyQueued.contains(child) && child instanceof Differentiable) {
-                    priorityQueue.offer((V) child);
-                    alreadyQueued.add(child);
-                }
-            }
-        }
-
-        return new PartialsWithRespectTo(wrt, ofWrt);
     }
 }
