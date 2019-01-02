@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,11 +58,10 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
 
-        long[] ofShape = getShape();
-        PartialDerivatives thnPartial = derivativeOfParentsWithRespectToInputs.get(thn);
-        PartialDerivatives elsPartial = derivativeOfParentsWithRespectToInputs.get(els);
+        PartialDerivative thnPartial = derivativeOfParentsWithRespectToInput.getOrDefault(thn, PartialDerivative.EMPTY);
+        PartialDerivative elsPartial = derivativeOfParentsWithRespectToInput.getOrDefault(els, PartialDerivative.EMPTY);
         BooleanTensor predicateValue = predicate.getValue();
 
         if (predicateValue.allTrue()) {
@@ -70,8 +69,8 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
         } else if (predicateValue.allFalse()) {
             return elsPartial;
         } else {
-            return thnPartial.multiplyAlongOfDimensions(predicateValue.toDoubleMask(), ofShape)
-                .add(elsPartial.multiplyAlongOfDimensions(predicateValue.not().toDoubleMask(), ofShape));
+            return thnPartial.multiplyAlongOfDimensions(predicateValue.toDoubleMask())
+                .add(elsPartial.multiplyAlongOfDimensions(predicateValue.not().toDoubleMask()));
         }
     }
 
@@ -85,13 +84,13 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
-        partials.put(thn, derivativeOfOutputsWithRespectToSelf
-            .multiplyAlongWrtDimensions(predicateValue.toDoubleMask(), this.getShape()));
-        partials.put(els, derivativeOfOutputsWithRespectToSelf
-            .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask(), this.getShape()));
+        partials.put(thn, derivativeOfOutputWithRespectToSelf
+            .multiplyAlongWrtDimensions(predicateValue.toDoubleMask()));
+        partials.put(els, derivativeOfOutputWithRespectToSelf
+            .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask()));
         return partials;
     }
 

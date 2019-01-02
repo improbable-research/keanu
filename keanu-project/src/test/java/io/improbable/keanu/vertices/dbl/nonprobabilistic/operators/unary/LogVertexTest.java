@@ -52,7 +52,7 @@ public class LogVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, 1.0, 10.0);
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, 1.0, 10.0);
         LogVertex outputVertex = inputVertex.div(3).log();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5);

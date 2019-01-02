@@ -29,9 +29,9 @@ public class MinVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex A = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        UniformVertex A = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         A.setValue(DoubleTensor.create(1, 2, 3, 4, 5, 6, 7, 8));
-        DoubleVertex B = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        UniformVertex B = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         B.setValue(DoubleTensor.create(8, 7, 6, 5, 4, 3, 2, 1));
         MinVertex C = DoubleVertex.min(A, B);
 

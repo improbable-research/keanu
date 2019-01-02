@@ -1,9 +1,11 @@
 package io.improbable.keanu.algorithms.statistics;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.lessThan;
@@ -12,6 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class AutocorrelationTest {
+
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
 
     @Test
     public void autocorrAtLagZeroIsOne() {

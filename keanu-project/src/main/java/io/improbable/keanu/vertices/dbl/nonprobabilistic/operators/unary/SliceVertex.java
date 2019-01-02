@@ -5,15 +5,14 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
+import static io.improbable.keanu.tensor.TensorShape.removeDimension;
 
 public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
 
@@ -32,7 +31,7 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
     public SliceVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                        @LoadVertexParam(DIMENSION_NAME) int dimension,
                        @LoadVertexParam(INDEX_NAME) long index) {
-        super(shapeSlice(dimension, inputVertex.getShape()), inputVertex);
+        super(removeDimension(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
     }
@@ -43,24 +42,20 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
-        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            VertexId k = entry.getKey();
-            DoubleTensor v = entry.getValue();
-            DoubleTensor padded = padSliceWithZerosToMatchOriginalShape(v);
-            partials.put(inputVertex, new PartialDerivatives(k, padded));
-        }
+        DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
+        DoubleTensor padded = padSliceWithZerosToMatchOriginalShape(partial);
+        partials.put(inputVertex, new PartialDerivative(padded));
 
         return partials;
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
-        boolean needReshape = this.getValue().getRank() == inputVertex.getValue().getRank();
-        return derivativeOfParentWithRespectToInputs.slice(dimension, index, needReshape);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
+        return new PartialDerivative(dInputVertex.get().slice(dimension, index));
     }
 
     private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {
