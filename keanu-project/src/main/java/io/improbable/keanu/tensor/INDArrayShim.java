@@ -220,23 +220,19 @@ public class INDArrayShim {
     }
 
     public static INDArray getGreaterThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> oldGreaterThanConstructor = OldGreaterThan::new;
-        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, oldGreaterThanConstructor);
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldGreaterThan::new);
     }
 
     public static INDArray getGreaterThanOrEqualToMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> oldGreaterThanOrEqualConstructor = OldGreaterThanOrEqual::new;
-        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, oldGreaterThanOrEqualConstructor);
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldGreaterThanOrEqual::new);
     }
 
     public static INDArray getLessThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> oldLessThanConstructor = OldLessThan::new;
-        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, oldLessThanConstructor);
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldLessThan::new);
     }
 
     public static INDArray getLessThanOrEqualToMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
-        QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> oldLessThanOrEqualConstructor = OldLessThanOrEqual::new;
-        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, oldLessThanOrEqualConstructor);
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldLessThanOrEqual::new);
     }
 
     private static boolean shapeAIsSmallerThanShapeB(long[] shapeA, long[] shapeB) {
