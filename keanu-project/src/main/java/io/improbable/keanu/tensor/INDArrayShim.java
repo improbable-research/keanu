@@ -76,14 +76,22 @@ public class INDArrayShim {
         return inlineOperation(left, right, a -> a, INDArray::muli, INDArray::muli, INDArrayShim::broadcastMultiply);
     }
 
-    private static INDArray broadcastMultiply(INDArray a, INDArray b) {
+    private static INDArray broadcastOperation(INDArray a,
+                                               INDArray b,
+                                               BiFunction<INDArray, INDArray, INDArray> inverseBroadcast,
+                                               Function<INDArray, INDArray> inverseOperand,
+                                               QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp) {
         if (shapeAIsSmallerThanShapeB(a.shape(), b.shape())) {
-            return broadcastMultiply(b, a);
+            return inverseBroadcast.apply(inverseOperand.apply(b), a);
         } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
+            List<Integer> broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
             INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
-            return Broadcast.mul(a, b, result, broadcastDimensions);
+            return baseBroadcastOp.apply(a, b, result, broadcastDimensions);
         }
+    }
+
+    private static INDArray broadcastMultiply(INDArray a, INDArray b) {
+        return broadcastOperation(a, b, INDArrayShim::broadcastMultiply, x -> x, (l, r, result, dims) -> Broadcast.mul(l, r, result, Ints.toArray(dims)));
     }
 
     public static INDArray divi(INDArray left, INDArray right) {
@@ -91,13 +99,7 @@ public class INDArrayShim {
     }
 
     private static INDArray broadcastDivide(INDArray a, INDArray b) {
-        if (shapeAIsSmallerThanShapeB(a.shape(), b.shape())) {
-            return broadcastMultiply(b.rdiv(1.0), a);
-        } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
-            return Broadcast.div(a, b, result, broadcastDimensions);
-        }
+        return broadcastOperation(a, b, INDArrayShim::broadcastMultiply, x -> x.rdiv(1.), (l, r, result, dims) -> Broadcast.div(l, r, result, Ints.toArray(dims)));
     }
 
     public static INDArray addi(INDArray left, INDArray right) {
@@ -105,13 +107,7 @@ public class INDArrayShim {
     }
 
     private static INDArray broadcastPlus(INDArray a, INDArray b) {
-        if (shapeAIsSmallerThanShapeB(a.shape(), b.shape())) {
-            return broadcastPlus(b, a);
-        } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
-            return Broadcast.add(a, b, result, broadcastDimensions);
-        }
+        return broadcastOperation(a, b, INDArrayShim::broadcastPlus, x -> x, (l, r, result, dims) -> Broadcast.add(l, r, result, Ints.toArray(dims)));
     }
 
     public static INDArray subi(INDArray left, INDArray right) {
@@ -119,13 +115,7 @@ public class INDArrayShim {
     }
 
     private static INDArray broadcastMinus(INDArray a, INDArray b) {
-        if (shapeAIsSmallerThanShapeB(a.shape(), b.shape())) {
-            return broadcastPlus(a, b.neg());
-        } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
-            return Broadcast.sub(a, b, result, broadcastDimensions);
-        }
+        return broadcastOperation(a, b, INDArrayShim::broadcastPlus, x -> x.neg(), (l, r, result, dims) -> Broadcast.sub(l, r, result, Ints.toArray(dims)));
     }
 
     private static INDArray applyScalarTensorOperationWithPreservedShape(INDArray scalarTensor, INDArray tensor, BiFunction<INDArray, INDArray, INDArray> operation) {
@@ -232,7 +222,7 @@ public class INDArrayShim {
         return shapeA.length < shapeB.length;
     }
 
-    private static int[] getBroadcastDimensions(long[] shapeA, long[] shapeB) {
+    private static List<Integer> getBroadcastDimensions(long[] shapeA, long[] shapeB) {
         int minRank = Math.min(shapeA.length, shapeB.length);
         int maxRank = Math.max(shapeA.length, shapeB.length);
 
@@ -243,7 +233,7 @@ public class INDArrayShim {
                 along.add(maxRank - i - 1);
             }
         }
-        return Ints.toArray(along);
+        return along;
     }
 
     public static INDArray sum(INDArray tensor, int... overDimensions) {
