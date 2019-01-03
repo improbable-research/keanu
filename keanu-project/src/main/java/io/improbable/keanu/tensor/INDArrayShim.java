@@ -55,40 +55,40 @@ public class INDArrayShim {
         }
     }
 
-    private static INDArray inlineOperation(INDArray left,
-                                            INDArray right,
-                                            Function<INDArray, INDArray> inverse,
-                                            BiFunction<INDArray, INDArray, INDArray> inlineOp,
-                                            BiFunction<INDArray, INDArray, INDArray> inverseInlineOp,
-                                            QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp,
-                                            QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> inverseBroadcastOp) {
+    private static INDArray applyInlineOperation(INDArray left,
+                                                 INDArray right,
+                                                 Function<INDArray, INDArray> inverseOperand,
+                                                 BiFunction<INDArray, INDArray, INDArray> baseInlineOp,
+                                                 BiFunction<INDArray, INDArray, INDArray> inverseInlineOp,
+                                                 QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp,
+                                                 QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> inverseBroadcastOp) {
         if (Arrays.equals(left.shape(), right.shape())) {
-            return inlineOp.apply(left, right);
+            return baseInlineOp.apply(left, right);
         } else if (left.length() == 1) {
-            return applyScalarTensorOperationWithPreservedShape(left, inverse.apply(right), inverseInlineOp);
+            return applyScalarTensorOperationWithPreservedShape(left, inverseOperand.apply(right), inverseInlineOp);
         } else if (right.length() == 1) {
-            return applyScalarTensorOperationWithPreservedShape(right, left, inlineOp);
+            return applyScalarTensorOperationWithPreservedShape(right, left, baseInlineOp);
         } else {
-            return broadcastOperation(left, right, inverseBroadcastOp, inverse, baseBroadcastOp);
+            return applyBroadcastOperation(left, right, inverseOperand, baseBroadcastOp, inverseBroadcastOp);
         }
     }
 
-    private static INDArray broadcastOperation(INDArray a,
-                                               INDArray b,
-                                               QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> inverseBroadcastOp,
-                                               Function<INDArray, INDArray> inverseOperand,
-                                               QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp) {
-        if (shapeAIsSmallerThanShapeB(a.shape(), b.shape())) {
-            return broadcastOperation(inverseOperand.apply(b), a, baseBroadcastOp, inverseOperand, inverseBroadcastOp);
+    private static INDArray applyBroadcastOperation(INDArray left,
+                                                    INDArray right,
+                                                    Function<INDArray, INDArray> inverseOperand,
+                                                    QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp,
+                                                    QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> inverseBroadcastOp) {
+        if (shapeAIsSmallerThanShapeB(left.shape(), right.shape())) {
+            return applyBroadcastOperation(inverseOperand.apply(right), left, inverseOperand, inverseBroadcastOp, baseBroadcastOp);
         } else {
-            List<Integer> broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
-            return baseBroadcastOp.apply(a, b, result, broadcastDimensions);
+            List<Integer> broadcastDimensions = getBroadcastDimensions(left.shape(), right.shape());
+            INDArray result = Nd4j.create(Shape.broadcastOutputShape(left.shape(), right.shape()));
+            return baseBroadcastOp.apply(left, right, result, broadcastDimensions);
         }
     }
 
     public static INDArray muli(INDArray left, INDArray right) {
-        return inlineOperation(
+        return applyInlineOperation(
             left, right,
             a -> a,
             INDArray::muli,
@@ -98,7 +98,7 @@ public class INDArrayShim {
     }
 
     public static INDArray divi(INDArray left, INDArray right) {
-        return inlineOperation(
+        return applyInlineOperation(
             left, right,
             a -> a.rdiv(1.),
             INDArray::divi,
@@ -108,7 +108,7 @@ public class INDArrayShim {
     }
 
     public static INDArray addi(INDArray left, INDArray right) {
-        return inlineOperation(
+        return applyInlineOperation(
             left, right,
             a -> a,
             INDArray::addi,
@@ -118,7 +118,7 @@ public class INDArrayShim {
     }
 
     public static INDArray subi(INDArray left, INDArray right) {
-        return inlineOperation(
+        return applyInlineOperation(
             left, right,
             a -> a.neg(),
             INDArray::subi,
