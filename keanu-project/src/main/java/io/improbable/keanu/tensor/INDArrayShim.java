@@ -60,7 +60,8 @@ public class INDArrayShim {
                                             Function<INDArray, INDArray> inverse,
                                             BiFunction<INDArray, INDArray, INDArray> inlineOp,
                                             BiFunction<INDArray, INDArray, INDArray> inverseInlineOp,
-                                            BiFunction<INDArray, INDArray, INDArray> broadcastOp) {
+                                            QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp,
+                                            QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> inverseBroadcastOp) {
         if (Arrays.equals(left.shape(), right.shape())) {
             return inlineOp.apply(left, right);
         } else if (left.length() == 1) {
@@ -68,21 +69,17 @@ public class INDArrayShim {
         } else if (right.length() == 1) {
             return applyScalarTensorOperationWithPreservedShape(right, left, inlineOp);
         } else {
-            return broadcastOp.apply(left, right);
+            return broadcastOperation(left, right, inverseBroadcastOp, inverse, baseBroadcastOp);
         }
-    }
-
-    public static INDArray muli(INDArray left, INDArray right) {
-        return inlineOperation(left, right, a -> a, INDArray::muli, INDArray::muli, INDArrayShim::broadcastMultiply);
     }
 
     private static INDArray broadcastOperation(INDArray a,
                                                INDArray b,
-                                               BiFunction<INDArray, INDArray, INDArray> inverseBroadcast,
+                                               QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> inverseBroadcastOp,
                                                Function<INDArray, INDArray> inverseOperand,
                                                QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp) {
         if (shapeAIsSmallerThanShapeB(a.shape(), b.shape())) {
-            return inverseBroadcast.apply(inverseOperand.apply(b), a);
+            return broadcastOperation(inverseOperand.apply(b), a, baseBroadcastOp, inverseOperand, inverseBroadcastOp);
         } else {
             List<Integer> broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
             INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
@@ -90,32 +87,44 @@ public class INDArrayShim {
         }
     }
 
-    private static INDArray broadcastMultiply(INDArray a, INDArray b) {
-        return broadcastOperation(a, b, INDArrayShim::broadcastMultiply, x -> x, (l, r, result, dims) -> Broadcast.mul(l, r, result, Ints.toArray(dims)));
+    public static INDArray muli(INDArray left, INDArray right) {
+        return inlineOperation(
+            left, right,
+            a -> a,
+            INDArray::muli,
+            INDArray::muli,
+            (l, r, result, dims) -> Broadcast.mul(l, r, result, Ints.toArray(dims)),
+            (l, r, result, dims) -> Broadcast.mul(l, r, result, Ints.toArray(dims)));
     }
 
     public static INDArray divi(INDArray left, INDArray right) {
-        return inlineOperation(left, right, a -> a.rdiv(1.), INDArray::divi, INDArray::muli, INDArrayShim::broadcastDivide);
-    }
-
-    private static INDArray broadcastDivide(INDArray a, INDArray b) {
-        return broadcastOperation(a, b, INDArrayShim::broadcastMultiply, x -> x.rdiv(1.), (l, r, result, dims) -> Broadcast.div(l, r, result, Ints.toArray(dims)));
+        return inlineOperation(
+            left, right,
+            a -> a.rdiv(1.),
+            INDArray::divi,
+            INDArray::muli,
+            (l, r, result, dims) -> Broadcast.div(l, r, result, Ints.toArray(dims)),
+            (l, r, result, dims) -> Broadcast.mul(l, r, result, Ints.toArray(dims)));
     }
 
     public static INDArray addi(INDArray left, INDArray right) {
-        return inlineOperation(left, right, a -> a, INDArray::addi, INDArray::addi, INDArrayShim::broadcastPlus);
-    }
-
-    private static INDArray broadcastPlus(INDArray a, INDArray b) {
-        return broadcastOperation(a, b, INDArrayShim::broadcastPlus, x -> x, (l, r, result, dims) -> Broadcast.add(l, r, result, Ints.toArray(dims)));
+        return inlineOperation(
+            left, right,
+            a -> a,
+            INDArray::addi,
+            INDArray::addi,
+            (l, r, result, dims) -> Broadcast.add(l, r, result, Ints.toArray(dims)),
+            (l, r, result, dims) -> Broadcast.add(l, r, result, Ints.toArray(dims)));
     }
 
     public static INDArray subi(INDArray left, INDArray right) {
-        return inlineOperation(left, right, a -> a.neg(), INDArray::subi, INDArray::addi, INDArrayShim::broadcastMinus);
-    }
-
-    private static INDArray broadcastMinus(INDArray a, INDArray b) {
-        return broadcastOperation(a, b, INDArrayShim::broadcastPlus, x -> x.neg(), (l, r, result, dims) -> Broadcast.sub(l, r, result, Ints.toArray(dims)));
+        return inlineOperation(
+            left, right,
+            a -> a.neg(),
+            INDArray::subi,
+            INDArray::addi,
+            (l, r, result, dims) -> Broadcast.sub(l, r, result, Ints.toArray(dims)),
+            (l, r, result, dims) -> Broadcast.add(l, r, result, Ints.toArray(dims)));
     }
 
     private static INDArray applyScalarTensorOperationWithPreservedShape(INDArray scalarTensor, INDArray tensor, BiFunction<INDArray, INDArray, INDArray> operation) {
