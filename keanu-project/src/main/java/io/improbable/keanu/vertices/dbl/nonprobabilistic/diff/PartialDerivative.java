@@ -66,27 +66,30 @@ public class PartialDerivative {
         return new PartialDerivative(partial.times(multiplier));
     }
 
-    public static DoubleTensor alignAlongOf(long[] partialShape, int partialOfRank, DoubleTensor tensor) {
-
-        final long[] alongOfShape = new long[partialShape.length];
-        Arrays.fill(alongOfShape, 1L);
-
-        System.arraycopy(tensor.getShape(), 0, alongOfShape, partialOfRank - tensor.getShape().length, tensor.getShape().length);
-
-        return tensor.reshape(alongOfShape);
-    }
-
+    /**
+     * This method assumes the partial 'of' rank is the same as the multiplier. This is the case except
+     * for some broadcast operations.
+     *
+     * @param multiplier the value to multiply by
+     * @return a partial derivative with of dimensions multiplied
+     */
     public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier) {
         return multiplyAlongOfDimensions(multiplier, multiplier.getRank());
     }
 
+    /**
+     * @param multiplier    the value to multiply by
+     * @param partialOfRank the rank of the 'of' part of the partial. This is needed if it is different
+     *                      from the rank of the multiplier. This happens for rank changing broadcast ops.
+     * @return a partial derivative with of dimensions multiplied
+     */
     public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier, int partialOfRank) {
 
         if (!isPresent()) {
             return this;
         }
 
-        DoubleTensor multiplierAlignedAlongOf = alignAlongOf(partial.getShape(), partialOfRank, multiplier);
+        DoubleTensor multiplierAlignedAlongOf = alignAlongOf(multiplier, partial.getShape(), partialOfRank);
         DoubleTensor result = partial.times(multiplierAlignedAlongOf);
 
         return new PartialDerivative(result);
@@ -102,7 +105,7 @@ public class PartialDerivative {
             return this;
         }
 
-        DoubleTensor divisorAlignedAlongOf = alignAlongOf(partial.getShape(), partialOfRank, divisor);
+        DoubleTensor divisorAlignedAlongOf = alignAlongOf(divisor, partial.getShape(), partialOfRank);
         DoubleTensor result = partial.div(divisorAlignedAlongOf);
 
         return new PartialDerivative(result);
@@ -114,8 +117,8 @@ public class PartialDerivative {
             return this;
         }
 
-        DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
-        DoubleTensor result = partial.times(multiplierFromRight);
+        DoubleTensor multiplierAlignedAlongWrt = alignAlongWrt(multiplier, partial.getRank());
+        DoubleTensor result = partial.times(multiplierAlignedAlongWrt);
 
         return new PartialDerivative(result);
     }
@@ -174,15 +177,34 @@ public class PartialDerivative {
         return new PartialDerivative(result);
     }
 
-    public static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
-        return lowRankTensor.reshape(
-            TensorShape.shapeDesiredToRankByAppendingOnes(lowRankTensor.getShape(), desiredRank)
-        );
+    /**
+     * This is import for the case where the partial 'of' and the tensor are different ranks but are
+     * broadcastable.
+     *
+     * @param tensor        the tensor to align along the of dimensions
+     * @param partialShape  the full shape of the partial in the format [of,wrt]
+     * @param partialOfRank the rank of the 'of' part of the partial
+     * @return a reshaped tensor with a shape of ones everywhere except the aligned of dimensions.
+     * E.g.
+     * partialShape = [2,3,4,5,6,7]
+     * partialOfRank = 3
+     * tensorShape = [3,4]
+     * <p>
+     * returned tensor will be of shape [1,3,4,1,1,1]
+     */
+    public static DoubleTensor alignAlongOf(DoubleTensor tensor, long[] partialShape, int partialOfRank) {
+
+        final long[] alongOfShape = new long[partialShape.length];
+        Arrays.fill(alongOfShape, 1L);
+
+        int tensorRank = tensor.getShape().length;
+        System.arraycopy(tensor.getShape(), 0, alongOfShape, partialOfRank - tensorRank, tensorRank);
+
+        return tensor.reshape(alongOfShape);
     }
 
-    public static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
-        return lowRankTensor.reshape(
-            TensorShape.shapeToDesiredRankByPrependingOnes(lowRankTensor.getShape(), desiredRank)
-        );
+    public static DoubleTensor alignAlongWrt(DoubleTensor tensor, int partialRank) {
+        final long[] alongWrtShape = TensorShape.shapeToDesiredRankByPrependingOnes(tensor.getShape(), partialRank);
+        return tensor.reshape(alongWrtShape);
     }
 }
