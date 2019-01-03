@@ -67,7 +67,7 @@ public class PartialDerivative {
     }
 
     /**
-     * This method assumes the partial 'of' rank is the same as the multiplier. This is the case except
+     * This method assumes the partial 'of' rank is the same as the multiplier. This is usually the case except
      * for some broadcast operations.
      *
      * @param multiplier the value to multiply by
@@ -178,8 +178,8 @@ public class PartialDerivative {
     }
 
     /**
-     * This is import for the case where the partial 'of' and the tensor are different ranks but are
-     * broadcastable.
+     * This is important for the case where the partial 'of' and the tensor are different ranks but are
+     * still broadcastable.
      *
      * @param tensor        the tensor to align along the of dimensions
      * @param partialShape  the full shape of the partial in the format [of,wrt]
