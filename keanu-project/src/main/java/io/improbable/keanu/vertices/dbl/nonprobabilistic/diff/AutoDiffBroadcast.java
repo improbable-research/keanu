@@ -16,9 +16,9 @@ import java.util.List;
 @UtilityClass
 public class AutoDiffBroadcast {
 
-    public static PartialDerivative correctForScalarPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
+    public static PartialDerivative correctForBroadcastPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
 
-        if (shouldCorrectPartialForScalar(partial, partialOfShape, targetOfShape)) {
+        if (shouldCorrectPartialForBroadcast(partial, partialOfShape, targetOfShape)) {
 
             long[] wrtShape = partial.getWrtShape(partialOfShape);
             DoubleTensor correctedPartial = DoubleTensor
@@ -31,9 +31,9 @@ public class AutoDiffBroadcast {
         }
     }
 
-    public static PartialDerivative correctForScalarPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
+    public static PartialDerivative correctForBroadcastPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
 
-        if (shouldCorrectPartialForScalar(partial, partialWrtShape, targetWrtShape)) {
+        if (shouldCorrectPartialForBroadcast(partial, partialWrtShape, targetWrtShape)) {
 
             long[] partialShape = partial.get().getShape();
 
@@ -60,7 +60,7 @@ public class AutoDiffBroadcast {
      *                      This should match the actual shape if no broadcast was performed.
      * @return true if a broadcast should be taken into account and corrected for in the auto diff calculation, false otherwise.
      */
-    private static boolean shouldCorrectPartialForScalar(PartialDerivative partial, long[] actualShape, long[] expectedShape) {
+    private static boolean shouldCorrectPartialForBroadcast(PartialDerivative partial, long[] actualShape, long[] expectedShape) {
         return partial.isPresent() && !Arrays.equals(actualShape, expectedShape);
     }
 
