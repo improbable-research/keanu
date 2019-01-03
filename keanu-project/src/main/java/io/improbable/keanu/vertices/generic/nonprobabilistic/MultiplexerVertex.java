@@ -6,9 +6,10 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class MultiplexerVertex<T> extends Vertex<T> implements NonProbabilistic<T> {
+public class MultiplexerVertex<T> extends GenericVertex<T> implements NonProbabilistic<T> {
 
     private final static String SELECTOR_CONTROL_NAME = "selectorControlVertex";
     private final static String SELECT_VERTICES_NAME = "selectVertices";

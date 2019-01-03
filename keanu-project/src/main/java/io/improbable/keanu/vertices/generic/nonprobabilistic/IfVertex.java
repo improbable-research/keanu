@@ -8,8 +8,9 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 
-public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<Tensor<T>> {
+public class IfVertex<T> extends GenericTensorVertex<Tensor<T>> implements NonProbabilistic<Tensor<T>> {
 
     private final static String PREDICATE_NAME = "predicate";
     private final static String THEN_NAME = "then";
