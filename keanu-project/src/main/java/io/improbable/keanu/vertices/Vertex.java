@@ -3,6 +3,8 @@ package io.improbable.keanu.vertices;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
@@ -13,7 +15,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape {
+public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable<T> {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
@@ -105,12 +107,9 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         }
     }
 
+    @Override
     public T getValue() {
         return hasValue() ? value : lazyEval();
-    }
-
-    protected T getRawValue() {
-        return value;
     }
 
     public boolean hasValue() {
@@ -179,6 +178,11 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         return observation.getObservedValue();
     }
 
+    @Override
+    public VariableReference getReference() {
+        return getId();
+    }
+
     public VertexId getId() {
         return id;
     }
@@ -215,6 +219,10 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
 
     public Set<Vertex> getParents() {
         return parents;
+    }
+
+    public int getDegree() {
+        return children.size() + parents.size();
     }
 
     @Override
@@ -260,6 +268,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     }
 
     public void loadValue(NetworkLoader loader) {
-       loader.loadValue(this);
+        loader.loadValue(this);
     }
 }

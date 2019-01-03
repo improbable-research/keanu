@@ -4,3 +4,4 @@
 
 from pandas.core.frame import *
 from pandas.core.series import *
+from pandas.io.parsers import *

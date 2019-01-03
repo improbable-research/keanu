@@ -5,11 +5,12 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 
 import java.util.List;
 import java.util.Map;
 
-public class CPTVertex<OUT extends Tensor> extends Vertex<OUT> implements NonProbabilistic<OUT>, NonSaveableVertex {
+public class CPTVertex<OUT extends Tensor> extends GenericTensorVertex<OUT> implements NonProbabilistic<OUT>, NonSaveableVertex {
 
     private final List<Vertex<? extends Tensor<Boolean>>> inputs;
     private final Map<CPTCondition, ? extends Vertex<OUT>> conditions;

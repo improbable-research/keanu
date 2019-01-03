@@ -1,0 +1,86 @@
+{
+    "network": {
+        "vertices": [{
+            "id": {
+                "id": "[0]"
+            },
+            "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
+            "parameters": [{
+                "name": "constant",
+                "doubleTensorParam": {
+                    "values": [0.0]
+                }
+            }]
+        }, {
+            "id": {
+                "id": "[1]"
+            },
+            "vertexType": "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex",
+            "parameters": [{
+                "name": "constant",
+                "doubleTensorParam": {
+                    "shape": ["2"],
+                    "values": [3.0, 4.0]
+                }
+            }],
+            "shape": ["2"]
+        }, {
+            "id": {
+                "id": "[2]"
+            },
+            "label": "GaussianVertex",
+            "vertexType": "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex",
+            "parameters": [{
+                "name": "mu",
+                "parentVertex": {
+                    "id": "[0]"
+                }
+            }, {
+                "name": "sigma",
+                "parentVertex": {
+                    "id": "[1]"
+                }
+            }],
+            "shape": ["2"]
+        }]
+    },
+    "networkState": {
+        "defaultState": [{
+            "value": {
+                "doubleVal": {
+                    "values": [0.0]
+                }
+            },
+            "id": {
+                "id": "[0]"
+            }
+        }, {
+            "value": {
+                "doubleVal": {
+                    "shape": ["2"],
+                    "values": [3.0, 4.0]
+                }
+            },
+            "id": {
+                "id": "[1]"
+            }
+        }, {
+            "value": {
+                "doubleVal": {
+                    "shape": ["2"],
+                    "values": [1.0, 1.0]
+                }
+            },
+            "id": {
+                "id": "[2]"
+            },
+            "isObserved": true
+        }]
+    },
+    "metadata": {
+        "metadataInfo": {
+            "Author": "Some Author",
+            "Tag": "MyBayesNet"
+        }
+    }
+}

@@ -1,5 +1,6 @@
 package io.improbable.keanu.network;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
@@ -27,10 +28,11 @@ public class BayesianNetwork {
 
     private final List<? extends Vertex> vertices;
     private final Map<VertexLabel, Vertex> vertexLabels;
-    private final int TOP_LEVEL_INDENTATION = 1;
+    private static final int TOP_LEVEL_INDENTATION = 1;
     private int indentation = TOP_LEVEL_INDENTATION;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
+        Preconditions.checkArgument(!vertices.isEmpty(), "A bayesian network must contain at least one vertex");
         this.vertices = ImmutableList.copyOf(vertices);
         this.vertexLabels = buildLabelMap(vertices);
     }
@@ -61,6 +63,14 @@ public class BayesianNetwork {
 
     List<? extends Vertex> getVertices() {
         return vertices;
+    }
+
+    public int getVertexCount() {
+        return getVertices().size();
+    }
+
+    public double getAverageVertexDegree() {
+        return getVertices().stream().mapToDouble(Vertex::getDegree).average().getAsDouble();
     }
 
     public void setState(NetworkState state) {
@@ -193,8 +203,7 @@ public class BayesianNetwork {
     }
 
     public boolean isInImpossibleState() {
-        double logOfMasterP = getLogOfMasterP();
-        return logOfMasterP == Double.NEGATIVE_INFINITY || Double.isNaN(logOfMasterP);
+        return ProbabilityCalculator.isImpossibleLogProb(getLogOfMasterP());
     }
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {
@@ -249,7 +258,7 @@ public class BayesianNetwork {
     }
 
     public void saveValues(NetworkSaver networkSaver) {
-        for (Vertex vertex : vertices) {
+        for (Vertex vertex : TopologicalSort.sort(vertices)) {
             vertex.saveValue(networkSaver);
         }
     }

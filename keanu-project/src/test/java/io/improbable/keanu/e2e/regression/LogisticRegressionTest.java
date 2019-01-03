@@ -17,14 +17,13 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
-import static io.improbable.keanu.tensor.TensorMatchers.lessThanOrEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LogisticRegressionTest {
 
     private static final int NUM_FEATURES = 3;
     private static final double[] SIGMAS = new double[]{1.0, 1.0, 1.0};
-    private static final DoubleTensor TRUE_WEIGHTS = DoubleTensor.create(new double[]{0.5, -3.0, 1.5}, 1, 3);
+    private static final DoubleTensor TRUE_WEIGHTS = DoubleTensor.create(new double[]{0.5, -3.0, 1.5}, 3, 1);
     private static final double TRUE_INTERCEPT = 0.0;
     private static final int NUM_SAMPLES_TRAINING = 1250;
     private static final int NUM_SAMPLES_TESTING = 200;
@@ -52,28 +51,25 @@ public class LogisticRegressionTest {
 
         double accuracy = ModelScoring.accuracy(model.predict(xTest), yTest);
         Assert.assertTrue(accuracy > 0.75);
-        assertWeightsAreCalculated(model.getWeights());
+        assertWeightsAreCalculated(model.getWeightVertex());
     }
 
     private DoubleTensor generateX(int nSamples) {
         DoubleVertex[] xVertices = new DoubleVertex[NUM_FEATURES];
         for (int i = 0; i < NUM_FEATURES; i++) {
-            xVertices[i] = new GaussianVertex(new long[]{1, nSamples}, 0.0, SIGMAS[i]);
+            xVertices[i] = new GaussianVertex(new long[]{nSamples, 1}, 0.0, SIGMAS[i]);
         }
-        return DoubleVertex.concat(0, xVertices).sample(random);
+        return DoubleVertex.concat(1, xVertices).sample(random);
     }
 
     private BooleanTensor generateY(DoubleTensor x) {
-        DoubleTensor probabilities = TRUE_WEIGHTS.matrixMultiply(x).plus(TRUE_INTERCEPT).sigmoid();
+        DoubleTensor probabilities = x.matrixMultiply(TRUE_WEIGHTS).plus(TRUE_INTERCEPT).sigmoid();
         BoolVertex yVertex = new BernoulliVertex(ConstantVertex.of(probabilities));
         return yVertex.getValue();
     }
 
-    private void assertWeightsAreCalculated(DoubleTensor weights) {
-        assertThat(weights, allCloseTo(0.15, TRUE_WEIGHTS));
+    private void assertWeightsAreCalculated(DoubleVertex weights) {
+        assertThat(weights.getValue(), allCloseTo(0.15, TRUE_WEIGHTS));
     }
 
-    private void assertRegularizedWeightsAreSmaller(DoubleVertex unregularizedWeights, DoubleVertex regularizedWeights) {
-        assertThat(regularizedWeights.getValue().abs(), lessThanOrEqualTo(unregularizedWeights.getValue().abs()));
-    }
 }

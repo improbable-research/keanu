@@ -4,9 +4,10 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadShape;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -39,7 +40,9 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
      * @param mu          the mu (location) of the Logistic with either the same shape as specified for this vertex or mu scalar
      * @param s           the s (scale) of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
-    public LogisticVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex s) {
+    public LogisticVertex(@LoadShape long[] tensorShape,
+                          @LoadVertexParam(MU_NAME) DoubleVertex mu,
+                          @LoadVertexParam(S_NAME) DoubleVertex s) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), s.getShape());
 
@@ -49,8 +52,7 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     @ExportVertexToPythonBindings
-    public LogisticVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu,
-                          @LoadParentVertex(S_NAME) DoubleVertex s) {
+    public LogisticVertex(DoubleVertex mu, DoubleVertex s) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), s.getShape()), mu, s);
     }
 
@@ -66,12 +68,12 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
         this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(s));
     }
 
-    @SaveParentVertex(MU_NAME)
+    @SaveVertexParam(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }
 
-    @SaveParentVertex(S_NAME)
+    @SaveVertexParam(S_NAME)
     public DoubleVertex getS() {
         return s;
     }

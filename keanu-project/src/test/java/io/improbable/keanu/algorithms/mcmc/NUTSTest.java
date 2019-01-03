@@ -7,9 +7,13 @@ import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -27,13 +31,40 @@ public class NUTSTest {
 
     @Category(Slow.class)
     @Test
+    public void samplesHalfGaussian() {
+        double sigma = 1.0;
+        HalfGaussianVertex A = new HalfGaussianVertex(new long[]{1, 1}, sigma);
+        A.setAndCascade(0.5);
+        BayesianNetwork b = new BayesianNetwork(A.getConnectedGraph());
+
+        NUTS nuts = NUTS.builder()
+            .adaptCount(500)
+            .random(random)
+            .targetAcceptanceProb(0.65)
+            .build();
+
+        NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
+            b,
+            b.getLatentVertices(),
+            500
+        );
+
+        List<DoubleTensor> samples = posteriorSamples.get(A).asList();
+
+        for (DoubleTensor sample : samples) {
+            Assert.assertTrue(sample.scalar() > 0.);
+        }
+    }
+
+    @Category(Slow.class)
+    @Test
     public void samplesGaussian() {
         double mu = 0.0;
         double sigma = 1.0;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
 
         NUTS nuts = NUTS.builder()
-            .adaptCount(50)
+            .adaptCount(2000)
             .random(random)
             .build();
 
@@ -51,19 +82,20 @@ public class NUTSTest {
     @Test
     public void samplesContinuousPrior() {
 
-        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 20.0);
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 15.0);
 
+        int sampleCount = 5000;
         NUTS nuts = NUTS.builder()
-            .adaptCount(0)
-            .maxTreeHeight(8)
+            .adaptCount(sampleCount)
+            .maxTreeHeight(4)
             .random(random)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVertices(),
-            3000
-        );
+            sampleCount
+        ).drop((int) (sampleCount * 0.25));
 
         Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
         Vertex<DoubleTensor> B = bayesNet.getContinuousLatentVertices().get(1);
@@ -77,7 +109,7 @@ public class NUTSTest {
         BayesianNetwork donutBayesNet = MCMCTestDistributions.create2DDonutDistribution();
 
         NUTS nuts = NUTS.builder()
-            .adaptCount(100)
+            .adaptCount(1000)
             .random(random)
             .build();
 

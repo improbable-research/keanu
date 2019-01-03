@@ -4,11 +4,13 @@ import com.google.common.base.Preconditions;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -16,7 +18,7 @@ import java.util.function.Consumer;
 @Slf4j
 public class TestGraphGenerator {
 
-    static SumVertex addLinks(DoubleVertex end, AtomicInteger opCount, AtomicInteger autoDiffCount, int links) {
+    public static SumVertex addLinks(DoubleVertex end, AtomicInteger opCount, AtomicInteger autoDiffCount, int links) {
         Preconditions.checkArgument(links > 0);
 
         for (int i = 0; i < links; i++) {
@@ -28,7 +30,7 @@ public class TestGraphGenerator {
         return (SumVertex) end;
     }
 
-    static class PassThroughVertex extends DoubleUnaryOpVertex implements Differentiable, NonSaveableVertex {
+    public static class PassThroughVertex extends DoubleUnaryOpVertex implements Differentiable, NonSaveableVertex {
 
         private final AtomicInteger opCount;
         private final AtomicInteger autoDiffCount;
@@ -49,18 +51,24 @@ public class TestGraphGenerator {
         }
 
         @Override
-        public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-            PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+        public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+            PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
             autoDiffCount.incrementAndGet();
             return derivativeOfParentWithRespectToInputs;
         }
+
+        @Override
+        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+            autoDiffCount.incrementAndGet();
+            return Collections.singletonMap(inputVertex, derivativeOfOutputWithRespectToSelf);
+        }
     }
 
-    static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger autoDiffCount, Consumer<VertexId> onOp) {
+    public static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger autoDiffCount, Consumer<VertexId> onOp) {
         return new PassThroughVertex(from, opCount, autoDiffCount, onOp);
     }
 
-    static class SumVertex extends DoubleBinaryOpVertex {
+    public static class SumVertex extends DoubleBinaryOpVertex {
 
         private final AtomicInteger opCount;
         private final AtomicInteger autoDiffCount;
@@ -75,7 +83,7 @@ public class TestGraphGenerator {
             this.onOp = onOp;
         }
 
-        public SumVertex(@LoadParentVertex("left")DoubleVertex left, @LoadParentVertex("right")DoubleVertex right) {
+        public SumVertex(@LoadVertexParam("left")DoubleVertex left, @LoadVertexParam("right")DoubleVertex right) {
             super(left, right);
             this.opCount = new AtomicInteger();
             this.autoDiffCount = new AtomicInteger();
@@ -90,13 +98,22 @@ public class TestGraphGenerator {
         }
 
         @Override
-        protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
+        protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative l, PartialDerivative r) {
             autoDiffCount.incrementAndGet();
             return l.add(r);
         }
+
+        @Override
+        public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+            autoDiffCount.incrementAndGet();
+            Map<Vertex, PartialDerivative> partials = new HashMap<>();
+            partials.put(left, derivativeOfOutputWithRespectToSelf);
+            partials.put(right, derivativeOfOutputWithRespectToSelf);
+            return partials;
+        }
     }
 
-    static SumVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<VertexId> onOp) {
+    public static SumVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<VertexId> onOp) {
         return new SumVertex(left, right, opCount, dualNumberCount, onOp);
     }
 

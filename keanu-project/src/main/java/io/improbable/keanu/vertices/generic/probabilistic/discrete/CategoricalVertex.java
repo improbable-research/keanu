@@ -13,6 +13,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
+import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +27,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 import static java.util.stream.Collectors.toMap;
 
 
-public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extends Vertex<TENSOR> implements Probabilistic<TENSOR>, NonSaveableVertex {
+public class CategoricalVertex<CATEGORY, TENSOR extends Tensor<CATEGORY>> extends GenericTensorVertex<TENSOR> implements Probabilistic<TENSOR>, NonSaveableVertex {
 
     private final Map<CATEGORY, DoubleVertex> selectableValues;
 

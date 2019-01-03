@@ -6,9 +6,10 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadShape;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -35,7 +36,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
      * @param shape the desired shape of the vertex
      * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
      */
-    public PoissonVertex(long[] shape, DoubleVertex mu) {
+    public PoissonVertex(@LoadShape long[] shape, @LoadVertexParam(MU_NAME) DoubleVertex mu) {
         super(shape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, mu.getShape());
 
@@ -54,7 +55,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
      * @param mu mu with same shape as desired Poisson tensor or scalar
      */
     @ExportVertexToPythonBindings
-    public PoissonVertex(@LoadParentVertex(MU_NAME) DoubleVertex mu) {
+    public PoissonVertex(DoubleVertex mu) {
         this(mu.getShape(), mu);
     }
 
@@ -66,7 +67,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
         this(Tensor.SCALAR_SHAPE, new ConstantDoubleVertex(mu));
     }
 
-    @SaveParentVertex(MU_NAME)
+    @SaveVertexParam(MU_NAME)
     public DoubleVertex getMu() {
         return mu;
     }

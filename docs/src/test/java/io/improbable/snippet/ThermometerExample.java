@@ -1,6 +1,7 @@
 package io.improbable.snippet;
 
 //%%SNIPPET_START%% TempFull
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -26,7 +27,7 @@ public class ThermometerExample {
 
         //%%SNIPPET_START%% TempMostProbable
         BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        Optimizer optimizer = Optimizer.of(bayesNet);
+        Optimizer optimizer = KeanuOptimizer.of(bayesNet);
         optimizer.maxAPosteriori();
 
         double calculatedTemperature = temperature.getValue().scalar();

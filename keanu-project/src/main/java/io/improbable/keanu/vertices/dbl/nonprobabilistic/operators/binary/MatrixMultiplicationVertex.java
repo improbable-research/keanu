@@ -2,10 +2,10 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,8 +20,8 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
      */
 
     @ExportVertexToPythonBindings
-    public MatrixMultiplicationVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
-                                      @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
+    public MatrixMultiplicationVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
+                                      @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
         super(getResultingShape(left.getShape(), right.getShape()),
             left, right);
     }
@@ -32,23 +32,23 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
 
-        PartialDerivatives dOutputsWrtLeft = PartialDerivatives
+        PartialDerivative dOutputsWrtLeft = PartialDerivative
             .matrixMultiplyAlongWrtDimensions(
-                derivativeOfOutputsWithRespectToSelf,
+                derivativeOfOutputWithRespectToSelf,
                 right.getValue(),
                 true
             );
 
-        PartialDerivatives dOutputsWrtRight = PartialDerivatives
+        PartialDerivative dOutputsWrtRight = PartialDerivative
             .matrixMultiplyAlongWrtDimensions(
-                derivativeOfOutputsWithRespectToSelf,
+                derivativeOfOutputWithRespectToSelf,
                 left.getValue(),
                 false
             );
 
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
         partials.put(left, dOutputsWrtLeft);
         partials.put(right, dOutputsWrtRight);
 
@@ -56,23 +56,20 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
+    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
         // dc = A * db + da * B;
-        PartialDerivatives partialsFromLeft;
-        PartialDerivatives partialsFromRight;
+        PartialDerivative partialsFromLeft = PartialDerivative.matrixMultiplyAlongOfDimensions(
+            dLeftWrtInput,
+            right.getValue(),
+            true
+        );
 
-        if (dLeftWrtInputs.isEmpty()) {
-            partialsFromLeft = PartialDerivatives.OF_CONSTANT;
-        } else {
-            partialsFromLeft = PartialDerivatives.matrixMultiplyAlongOfDimensions(dLeftWrtInputs, right.getValue(), true);
-        }
-
-        if (dRightWrtInputs.isEmpty()) {
-            partialsFromRight = PartialDerivatives.OF_CONSTANT;
-        } else {
-            partialsFromRight = PartialDerivatives.matrixMultiplyAlongOfDimensions(dRightWrtInputs, left.getValue(), false);
-        }
+        PartialDerivative partialsFromRight = PartialDerivative.matrixMultiplyAlongOfDimensions(
+            dRightWrtInput,
+            left.getValue(),
+            false
+        );
 
         return partialsFromLeft.add(partialsFromRight);
     }

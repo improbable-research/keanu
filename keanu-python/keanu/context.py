@@ -2,8 +2,11 @@ import sys
 import io
 import os
 import logging
-from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject
-from typing import Dict, Any, Iterable, List
+from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView
+from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
+from py4j.protocol import Py4JError
+from typing import Dict, Any, Iterable, List, Collection, Set
+from _io import TextIOWrapper
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
@@ -42,7 +45,7 @@ class KeanuContext(metaclass=Singleton):
         else:
             return os.pathsep.join([keanu_path, os.path.join(nd4j_path, "*")])
 
-    def __stderr_with_redirect_disabled_for_jupyter(self) -> Any:
+    def __stderr_with_redirect_disabled_for_jupyter(self) -> TextIOWrapper:
         try:
             sys.stderr.fileno()
             return sys.stderr
@@ -57,18 +60,49 @@ class KeanuContext(metaclass=Singleton):
         jgws.resetCallbackClient(jgws.getCallbackClient().getAddress(),
                                  self._gateway.get_callback_server().get_listening_port())
 
-    def jvm_view(self) -> Any:
+    def jvm_view(self) -> JVMView:
         return self.__jvm_view
 
-    def to_java_object_list(self, l: Iterable[Any]) -> Any:
+    def to_java_map(self, python_map: Dict[Any, Any]) -> JavaMap:
+        m = self._gateway.jvm.java.util.HashMap()
+
+        for (k, v) in python_map.items():
+            try:
+                new_k = k.unwrap()
+            except (AttributeError, Py4JError):
+                new_k = k
+
+            try:
+                new_v = v.unwrap()
+            except (AttributeError, Py4JError):
+                new_v = v
+
+            m.put(new_k, new_v)
+
+        return m
+
+    def to_java_object_list(self, l: Iterable[Any]) -> JavaList:
         lst = self._gateway.jvm.java.util.ArrayList()
 
         for o in l:
-            lst.add(o.unwrap())
+            try:
+                o = o.unwrap()
+            except (AttributeError, Py4JError):
+                pass
+
+            lst.add(o)
 
         return lst
 
-    def to_java_array(self, l: List[Any], klass: Any = None) -> Any:
+    def to_java_object_set(self, l: Iterable[Any]) -> JavaSet:
+        set_ = self._gateway.jvm.java.util.HashSet()
+
+        for o in l:
+            set_.add(o.unwrap())
+
+        return set_
+
+    def to_java_array(self, l: Collection[Any], klass: JavaClass = None) -> JavaArray:
         if klass is None:
             klass = self.__infer_class_from_array(l)
         array = self._gateway.new_array(klass, len(l))
@@ -78,19 +112,21 @@ class KeanuContext(metaclass=Singleton):
 
         return array
 
-    def to_java_long_array(self, l: Any) -> Any:
+    def to_java_long_array(self, l: Collection[Any]) -> JavaArray:
         return self.to_java_array(l, self._gateway.jvm.long)
 
-    def __infer_class_from_array(self, l: List[Any]) -> Any:
+    def __infer_class_from_array(self, l: Collection[Any]) -> JavaClass:
         if len(l) == 0:
             raise ValueError("Cannot infer type because array is empty")
 
-        if isinstance(l[0], bool):
+        first_item = l.__iter__().__next__()
+        if isinstance(first_item, bool):
             return self._gateway.jvm.boolean
-        elif isinstance(l[0], int):
+        elif isinstance(first_item, int):
             return self._gateway.jvm.int
-        elif isinstance(l[0], float):
+        elif isinstance(first_item, float):
             return self._gateway.jvm.double
         else:
             raise NotImplementedError(
-                "Cannot infer class from array because it doesn't contain primitives. Was given {}".format(type(l[0])))
+                "Cannot infer class from array because it doesn't contain primitives. Was given {}".format(
+                    type(first_item)))

@@ -11,6 +11,7 @@
 [![Quality Gate][sonar-image]][sonar-url]
 [![Maven Central][maven-image]][maven-url]
 [![Javadocs](https://www.javadoc.io/badge/io.improbable/keanu.svg)](https://www.javadoc.io/doc/io.improbable/keanu)
+[![Slack](https://img.shields.io/badge/join%20slack-%23keanu-brightgreen.svg)](https://join.slack.com/t/improbable-eng/shared_invite/enQtMzQ1ODcyMzQ5MjM4LWY5ZWZmNGM2ODc5MmViNmQ3ZTA3ZTY3NzQwOTBlMTkzZmIxZTIxODk0OWU3YjZhNWVlNDU3MDlkZGViZjhkMjc)
 
 ## Overview
 
@@ -64,6 +65,10 @@ Interested in more technical examples? Explore the examples repo at `/keanu-exam
 
 ## Development
 
+#### Building the code
+
+We use Gradle, so running `./gradlew build` (or `gradlew.bat build` on Windows) will compile all the code and run all the tests. You can also run the JMH performance benchmarks with `./gradlew runAllBenchmarks`.
+
 #### Annotations
 
 We use [Lombok](https://projectlombok.org/) annotations, which you will need to enable in your IDE.
@@ -74,7 +79,7 @@ For IntelliJ:
 
 #### Formatting
 
-We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) and [yapf](https://github.com/google/yapf) to automatically enforce some basic code style checks. If your build fails due to a formatting issue, simply run `./gradlew formatApply` and commit the changes.
+We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) and [yapf](https://github.com/google/yapf) to automatically enforce some basic code style checks. If your build fails due to a formatting issue, simply run `./gradlew formatApply` and commit the changes. You need to have run `./gradlew build` or `test` at least once before running `formatApply`, as this installs yapf in your virtual environment.
 
 #### Python Code Generation
 

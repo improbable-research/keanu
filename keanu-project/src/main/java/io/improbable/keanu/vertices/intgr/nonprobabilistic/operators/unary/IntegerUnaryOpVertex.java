@@ -2,12 +2,11 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public abstract class IntegerUnaryOpVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor>, NonSaveableVertex {
+public abstract class IntegerUnaryOpVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     protected final IntegerVertex inputVertex;
     protected static final String INPUT_NAME = "inputVertex";
@@ -45,7 +44,7 @@ public abstract class IntegerUnaryOpVertex extends IntegerVertex implements NonP
 
     protected abstract IntegerTensor op(IntegerTensor value);
 
-    @SaveParentVertex(INPUT_NAME)
+    @SaveVertexParam(INPUT_NAME)
     public IntegerVertex getInputVertex() {
         return inputVertex;
     }

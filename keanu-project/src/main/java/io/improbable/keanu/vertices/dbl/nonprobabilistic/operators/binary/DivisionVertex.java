@@ -3,10 +3,11 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +23,8 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
      * @param right the vertex to divide
      */
     @ExportVertexToPythonBindings
-    public DivisionVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
-                          @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
+    public DivisionVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
+                          @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
         super(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right);
     }
 
@@ -33,45 +34,38 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
+    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
+
+        PartialDerivative fromLeft = AutoDiffBroadcast.correctForScalarPartialForward(dLeftWrtInput, left.getShape(), this.getShape());
+        PartialDerivative fromRight = AutoDiffBroadcast.correctForScalarPartialForward(dRightWrtInput, right.getShape(), this.getShape());
 
         // dc = (B * da - A * db) / B^2;
-        PartialDerivatives partialsFromLeft;
-        PartialDerivatives partialsFromRight;
+        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue());
+        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue());
 
-        if (dLeftWrtInputs.isEmpty()) {
-            partialsFromLeft = PartialDerivatives.OF_CONSTANT;
-        } else {
-            partialsFromLeft = dLeftWrtInputs.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
-        }
-
-        if (dRightWrtInputs.isEmpty()) {
-            partialsFromRight = PartialDerivatives.OF_CONSTANT;
-        } else {
-            partialsFromRight = dRightWrtInputs.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
-        }
-
-        PartialDerivatives dSelfWrtInputs;
-        if (partialsFromLeft.isEmpty() && partialsFromRight.isEmpty()) {
-            dSelfWrtInputs = PartialDerivatives.OF_CONSTANT;
-        } else {
-            dSelfWrtInputs = partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().pow(2));
-        }
-
-        return dSelfWrtInputs;
+        return partialsFromLeft.subtract(partialsFromRight).divideByAlongOfDimensions(right.getValue().pow(2));
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor leftValue = left.getValue();
         DoubleTensor rightValue = right.getValue();
         DoubleTensor dOutWrtLeft = rightValue.reciprocal();
         DoubleTensor dOutWrtRight = leftValue.div(rightValue.pow(2.0)).unaryMinusInPlace();
-        partials.put(left, derivativeOfOutputsWithRespectToSelf
-            .multiplyAlongWrtDimensions(dOutWrtLeft, this.getShape()));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf
-            .multiplyAlongWrtDimensions(dOutWrtRight, this.getShape()));
+
+        PartialDerivative dOutputsWrtLeft = derivativeOfOutputWithRespectToSelf
+            .multiplyAlongWrtDimensions(dOutWrtLeft);
+
+        PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf
+            .multiplyAlongWrtDimensions(dOutWrtRight);
+
+        PartialDerivative toLeft = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
+        PartialDerivative toRight = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());
+
+        partials.put(left, toLeft);
+        partials.put(right, toRight);
+
         return partials;
     }
 }

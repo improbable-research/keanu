@@ -4,9 +4,10 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadShape;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -32,7 +33,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
      * @param tensorShape the desired shape of the vertex
      * @param k           the number of degrees of freedom
      */
-    public ChiSquaredVertex(long[] tensorShape, IntegerVertex k) {
+    public ChiSquaredVertex(@LoadShape long[] tensorShape, @LoadVertexParam(K_NAME) IntegerVertex k) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, k.getShape());
 
@@ -51,7 +52,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
      * @param k the number of degrees of freedom
      */
     @ExportVertexToPythonBindings
-    public ChiSquaredVertex(@LoadParentVertex(K_NAME) IntegerVertex k) {
+    public ChiSquaredVertex(IntegerVertex k) {
         this(k.getShape(), k);
     }
 
@@ -59,7 +60,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
         this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(k));
     }
 
-    @SaveParentVertex(K_NAME)
+    @SaveVertexParam(K_NAME)
     public IntegerVertex getK() {
         return k;
     }

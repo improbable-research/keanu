@@ -12,13 +12,15 @@ class Model:
     def to_bayes_net(self) -> BayesNet:
         return BayesNet((filter(lambda vertex: isinstance(vertex, Vertex), self._vertices.values())))
 
-    def __setattr__(self, k: str, v: Vertex) -> None:
+    def __setattr__(self, k: str, v: Any) -> None:
         if k in self.__dict__:
             super(Model, self).__setattr__(k, v)
         else:
             self._vertices[k] = v
+            if isinstance(v, Vertex):
+                v.set_label(k)
 
-    def __getattr__(self, k: str) -> Vertex:
+    def __getattr__(self, k: str) -> Any:
         if k in self.__dict__:
             return self.__dict__[k]
         return self._vertices[k]

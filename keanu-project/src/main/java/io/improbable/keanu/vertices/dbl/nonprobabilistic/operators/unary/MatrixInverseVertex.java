@@ -2,11 +2,11 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.Map;
 public class MatrixInverseVertex extends DoubleUnaryOpVertex implements Differentiable {
 
     @ExportVertexToPythonBindings
-    public MatrixInverseVertex(@LoadParentVertex(INPUT_VERTEX_NAME) DoubleVertex inputVertex) {
+    public MatrixInverseVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex) {
         super(checkInputIsSquareMatrix(inputVertex.getShape()), inputVertex);
     }
 
@@ -24,25 +24,25 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex implements Differen
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
         //dc = -A^-1 * da * A^-1
         DoubleTensor negatedValue = this.getValue().unaryMinus();
-        PartialDerivatives partial = PartialDerivatives.matrixMultiplyAlongOfDimensions(derivativeOfParentWithRespectToInputs, negatedValue, false);
-        partial = PartialDerivatives.matrixMultiplyAlongOfDimensions(partial, this.getValue(), true);
+        PartialDerivative partial = PartialDerivative.matrixMultiplyAlongOfDimensions(derivativeOfParentWithRespectToInputs, negatedValue, false);
+        partial = PartialDerivative.matrixMultiplyAlongOfDimensions(partial, this.getValue(), true);
         return partial;
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
         DoubleTensor parentValue = getValue();
         DoubleTensor negativeValue = getValue().unaryMinus();
 
-        PartialDerivatives newPartials =
-            PartialDerivatives.matrixMultiplyAlongWrtDimensions(derivativeOfOutputsWithRespectToSelf, negativeValue, false);
-        newPartials = PartialDerivatives.matrixMultiplyAlongWrtDimensions(newPartials, parentValue, true);
+        PartialDerivative newPartials =
+            PartialDerivative.matrixMultiplyAlongWrtDimensions(derivativeOfOutputWithRespectToSelf, negativeValue, false);
+        newPartials = PartialDerivative.matrixMultiplyAlongWrtDimensions(newPartials, parentValue, true);
 
         partials.put(inputVertex, newPartials);
 

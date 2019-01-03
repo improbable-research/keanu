@@ -19,7 +19,7 @@ page_nav:
         url: '/docs/particle-filter/'
     next:
         content: Next page
-        url: '/docs/examples/thermometer/'
+        url: '/docs/autocorrelation/'
 
 ---
 
@@ -50,18 +50,20 @@ This is an example of how you could pull in data from a csv file and run linear 
 plates to build identical sections of the graph for each line of the csv.
 
 ```java
+
 /**
-    * Each plate contains a linear regression model:
-    * VertexY = VertexX * VertexM + VertexB
-    * @param dataFileName The input data file defines, for each plate:
-    *                          - the value of the input, VertexX
-    *                          - the value of the observed output, VertexY
-    */
+ * Each plate contains a linear regression model:
+ * VertexY = VertexX * VertexM + VertexB
+ *
+ * @param dataFileName The input data file defines, for each plate:
+ *                     - the value of the input, VertexX
+ *                     - the value of the observed output, VertexY
+ */
 public Plates buildPlates(String dataFileName) {
     //Parse the csv data to MyData objects
     List<MyData> allMyData = ReadCsv.fromFile(dataFileName)
-            .asRowsDefinedBy(MyData.class)
-            .load();
+        .asRowsDefinedBy(MyData.class)
+        .load();
 
     DoubleVertex m = new GaussianVertex(0, 1);
     DoubleVertex b = new GaussianVertex(0, 1);
@@ -70,26 +72,26 @@ public Plates buildPlates(String dataFileName) {
 
     //Build plates from each line in the csv
     Plates plates = new PlateBuilder<MyData>()
-            .fromIterator(allMyData.iterator())
-            .withFactory((plate, csvMyData) -> {
+        .fromIterator(allMyData.iterator())
+        .withFactory((plate, csvMyData) -> {
 
-                ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x).setLabel(xLabel);
-                DoubleVertex y = m.multiply(x).plus(b).setLabel(yLabel);
+            ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x).setLabel(xLabel);
+            DoubleVertex y = m.multiply(x).plus(b).setLabel(yLabel);
 
-                DoubleVertex yObserved = new GaussianVertex(y, 1);
-                yObserved.observe(csvMyData.y);
+            DoubleVertex yObserved = new GaussianVertex(y, 1);
+            yObserved.observe(csvMyData.y);
 
-                // this labels the x and y vertex for later use
-                plate.add(x);
-                plate.add(y);
-            })
-            .build();
+            // this labels the x and y vertex for later use
+            plate.add(x);
+            plate.add(y);
+        })
+        .build();
 
     //now you have access to the "x" from any one of the plates
     DoubleTensor valueForXAtCSVLine1 = plates.asList()
-            .get(1) // get plate 1 which is built from csv line 1
-            .<DoubleVertex>get(xLabel) //get the vertex that we labelled "x" in that plate
-            .getValue(); //get the value from that vertex
+        .get(1) // get plate 1 which is built from csv line 1
+        .<DoubleVertex>get(xLabel) //get the vertex that we labelled "x" in that plate
+        .getValue(); //get the value from that vertex
 
     //Now run an inference algorithm on vertex m and vertex b and you have linear regression
 

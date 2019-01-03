@@ -5,9 +5,10 @@ import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadShape;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -27,7 +28,9 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     private final static String P_NAME = "p";
     private final static String N_NAME = "n";
 
-    public BinomialVertex(long[] tensorShape, DoubleVertex p, IntegerVertex n) {
+    public BinomialVertex(@LoadShape long[] tensorShape,
+                          @LoadVertexParam(P_NAME) DoubleVertex p,
+                          @LoadVertexParam(N_NAME) IntegerVertex n) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, p.getShape(), n.getShape());
         this.p = p;
@@ -49,7 +52,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     }
 
     @ExportVertexToPythonBindings
-    public BinomialVertex(@LoadParentVertex(P_NAME) DoubleVertex p, @LoadParentVertex(N_NAME) IntegerVertex n) {
+    public BinomialVertex(DoubleVertex p, IntegerVertex n) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(p.getShape(), n.getShape()), p, n);
     }
 
@@ -80,12 +83,12 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
         return Binomial.withParameters(p.getValue(), n.getValue()).sample(shape, random);
     }
 
-    @SaveParentVertex(P_NAME)
+    @SaveVertexParam(P_NAME)
     public DoubleVertex getP() {
         return p;
     }
 
-    @SaveParentVertex(N_NAME)
+    @SaveVertexParam(N_NAME)
     public IntegerVertex getN() {
         return n;
     }

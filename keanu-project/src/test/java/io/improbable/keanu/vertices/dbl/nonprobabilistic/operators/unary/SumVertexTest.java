@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
@@ -77,12 +77,12 @@ public class SumVertexTest {
 
     @Test
     public void doesSumAllSimpleAutoDiff() {
-        DoubleVertex a = new UniformVertex(new long[]{2, 2, 2}, 0, 10);
+        UniformVertex a = new UniformVertex(new long[]{2, 2, 2}, 0, 10);
         a.setValue(a.sample());
 
         SumVertex b = a.sum();
 
-        DoubleTensor dbdaForward = b.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dbdaForward = Differentiator.forwardModeAutoDiff(a, b).of(b);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
         DoubleTensor expectedDbDa = DoubleTensor.ones(new long[]{2, 2, 2});
@@ -93,13 +93,13 @@ public class SumVertexTest {
 
     @Test
     public void doesSumSpecifiedSimpleAutoDiff() {
-        DoubleVertex a = new UniformVertex(new long[]{2, 2}, 0, 10);
+        UniformVertex a = new UniformVertex(new long[]{2, 2}, 0, 10);
         a.setValue(DoubleTensor.arange(0, 4).reshape(2, 2));
 
         int sumDimension = 1;
         SumVertex b = a.sum(sumDimension);
 
-        DoubleTensor dbdaForward = b.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dbdaForward = Differentiator.forwardModeAutoDiff(a, b).of(b);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
         DoubleTensor expectedDbDa = DoubleTensor.eye(4).reshape(2, 2, 2, 2).sum(sumDimension).reshape(2, 2, 2);
@@ -110,13 +110,13 @@ public class SumVertexTest {
 
     @Test
     public void doesSumSpecifiedRank3AutoDiff() {
-        DoubleVertex a = new UniformVertex(new long[]{2, 2, 2}, 0, 10);
+        UniformVertex a = new UniformVertex(new long[]{2, 2, 2}, 0, 10);
         a.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
         int sumDimension = 1;
         SumVertex b = a.sum(sumDimension);
 
-        DoubleTensor dbdaForward = b.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dbdaForward = Differentiator.forwardModeAutoDiff(a, b).of(b);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
         DoubleTensor expectedDbDa = DoubleTensor.eye(8).reshape(2, 2, 2, 2, 2, 2).sum(sumDimension).reshape(2, 2, 2, 2, 2);
@@ -127,7 +127,7 @@ public class SumVertexTest {
 
     @Test
     public void canDoSumAutoDiffWhenSumIsNotWrtOrOf() {
-        DoubleVertex a = new UniformVertex(new long[]{2, 3}, 0, 10);
+        UniformVertex a = new UniformVertex(new long[]{2, 3}, 0, 10);
         a.setValue(DoubleTensor.arange(0, 6).reshape(2, 3));
 
         DoubleVertex d = a.sum();
@@ -137,9 +137,9 @@ public class SumVertexTest {
 
         MultiplicationVertex f = d.times(e);
 
-        DoubleTensor dfdaForward = f.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dfdaForward = Differentiator.forwardModeAutoDiff(a, f).of(f);
 
-        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
+        PartialsOf dfdx = Differentiator.reverseModeAutoDiff(f, a);
         DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
         DoubleTensor expectedDfdx = DoubleTensor.create(new double[]{
@@ -159,7 +159,7 @@ public class SumVertexTest {
 
     @Test
     public void canDoSumAutoDiffWhenOfIsScalar() {
-        DoubleVertex a = new UniformVertex(new long[]{2, 3}, 0, 10);
+        UniformVertex a = new UniformVertex(new long[]{2, 3}, 0, 10);
         a.setValue(DoubleTensor.arange(0, 6).reshape(2, 3));
 
         DoubleVertex d = a.sum();
@@ -169,9 +169,9 @@ public class SumVertexTest {
 
         MultiplicationVertex f = d.times(e);
 
-        DoubleTensor dfdaForward = f.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dfdaForward = Differentiator.forwardModeAutoDiff(a, f).of(f);
 
-        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
+        PartialsOf dfdx = Differentiator.reverseModeAutoDiff(f, a);
         DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
         DoubleTensor expectedDfdx = DoubleTensor.create(new double[]{
@@ -185,7 +185,7 @@ public class SumVertexTest {
 
     @Test
     public void canDoSumAutoDiffWhenWrtIsScalar() {
-        DoubleVertex a = new UniformVertex(0, 10);
+        UniformVertex a = new UniformVertex(0, 10);
         a.setValue(2);
 
         DoubleVertex d = a.sum();
@@ -195,9 +195,9 @@ public class SumVertexTest {
 
         MultiplicationVertex f = d.times(e);
 
-        DoubleTensor dfdaForward = f.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dfdaForward = Differentiator.forwardModeAutoDiff(a, f).of(f);
 
-        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
+        PartialsOf dfdx = Differentiator.reverseModeAutoDiff(f, a);
         DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
         DoubleTensor expectedDfda = DoubleTensor.create(1, 2, 3);
@@ -208,7 +208,7 @@ public class SumVertexTest {
 
     @Test
     public void changesMatchGradientWhenSummingAll() {
-        DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
         MultiplicationVertex outputVertex = inputVertex.sum().times(inputVertex);
 
@@ -217,7 +217,7 @@ public class SumVertexTest {
 
     @Test
     public void changesMatchGradientWhenSummingSpecificDimensions() {
-        DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
         MultiplicationVertex outputVertex = inputVertex.sum(0)

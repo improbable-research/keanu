@@ -1,9 +1,16 @@
 spotless {
     java {
-        target '**/*.java'
+        target '*/src/*/java/**/*.java'
 
         indentWithSpaces(4)
         removeUnusedImports()
         importOrder '', 'javax', 'java', 'static '
+    }
+
+    format 'python', {
+        target '**/*.py'
+
+        replaceRegex 'loggers may not use root context', /logging.(debug|info|warning|error|critical|exception|log)/, 'logging.getLogger("keanu").$1'
+        replaceRegex 'all tests must be type annotated', /def test_([a-z_]+)\(\):/, 'def test_$1() -> None:'
     }
 }

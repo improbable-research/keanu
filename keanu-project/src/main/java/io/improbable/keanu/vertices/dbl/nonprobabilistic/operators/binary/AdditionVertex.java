@@ -2,12 +2,12 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +24,8 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
      * @param right a vertex to add
      */
     @ExportVertexToPythonBindings
-    public AdditionVertex(@LoadParentVertex(LEFT_NAME) DoubleVertex left,
-                          @LoadParentVertex(RIGHT_NAME) DoubleVertex right) {
+    public AdditionVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
+                          @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
         super(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right);
     }
 
@@ -35,19 +35,23 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
-        return dLeftWrtInputs.add(dRightWrtInputs,
-            TensorShape.isLengthOne(left.getShape()),
-            TensorShape.isLengthOne(right.getShape()),
-            this.getShape()
-        );
+    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
+
+        PartialDerivative fromLeft = AutoDiffBroadcast.correctForScalarPartialForward(dLeftWrtInput, left.getShape(), this.getShape());
+        PartialDerivative fromRight = AutoDiffBroadcast.correctForScalarPartialForward(dRightWrtInput, right.getShape(), this.getShape());
+
+        return fromLeft.add(fromRight);
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(left, derivativeOfOutputsWithRespectToSelf);
-        partials.put(right, derivativeOfOutputsWithRespectToSelf);
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+
+        PartialDerivative toLeft = AutoDiffBroadcast.correctForScalarPartialReverse(derivativeOfOutputWithRespectToSelf, this.getShape(), left.getShape());
+        PartialDerivative toRight = AutoDiffBroadcast.correctForScalarPartialReverse(derivativeOfOutputWithRespectToSelf, this.getShape(), right.getShape());
+
+        partials.put(left, toLeft);
+        partials.put(right, toRight);
         return partials;
     }
 

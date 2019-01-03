@@ -11,12 +11,21 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 public interface NetworkSaver {
 
-    void save(OutputStream output, boolean saveValues) throws IOException;
+    void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException;
+
+    default void save(OutputStream output, boolean saveValues) throws IOException {
+        save(output, saveValues, null);
+    }
+
     void save(Vertex vertex);
-    void save(ConstantVertex vertex);
+
+    default void save(ConstantVertex vertex) {
+        save((Vertex)vertex);
+    }
 
     default void save(ConstantDoubleVertex vertex) {
         save((ConstantVertex)vertex);
@@ -31,7 +40,16 @@ public interface NetworkSaver {
     }
 
     void saveValue(Vertex vertex);
-    void saveValue(DoubleVertex vertex);
-    void saveValue(IntegerVertex vertex);
-    void saveValue(BoolVertex vertex);
+
+    default void saveValue(DoubleVertex vertex) {
+        saveValue((Vertex)vertex);
+    }
+
+    default void saveValue(IntegerVertex vertex)  {
+        saveValue((Vertex)vertex);
+    }
+
+    default void saveValue(BoolVertex vertex)  {
+        saveValue((Vertex)vertex);
+    }
 }

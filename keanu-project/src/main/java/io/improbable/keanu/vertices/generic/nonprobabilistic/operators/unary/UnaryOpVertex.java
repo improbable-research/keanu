@@ -2,11 +2,14 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
 
 import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericVertex;
 
-public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> implements NonProbabilistic<OUT>, NonSaveableVertex {
+public abstract class UnaryOpVertex<IN, OUT> extends GenericVertex<OUT> implements NonProbabilistic<OUT> {
+
+    protected static final String INPUT_NAME = "inputVertex";
 
     protected final Vertex<IN> inputVertex;
 
@@ -27,4 +30,9 @@ public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> implements NonP
     }
 
     protected abstract OUT op(IN a);
+
+    @SaveVertexParam(INPUT_NAME)
+    public Vertex<IN> getInputVertex() {
+        return inputVertex;
+    }
 }

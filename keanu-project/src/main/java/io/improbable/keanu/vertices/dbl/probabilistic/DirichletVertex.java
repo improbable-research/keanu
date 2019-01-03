@@ -4,9 +4,10 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadShape;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -31,7 +32,8 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
      * @param tensorShape   the desired shape of the vertex
      * @param concentration the concentration values of the dirichlet
      */
-    public DirichletVertex(long[] tensorShape, DoubleVertex concentration) {
+    public DirichletVertex(@LoadShape long[] tensorShape,
+                           @LoadVertexParam(CONCENTRATION_NAME) DoubleVertex concentration) {
         super(tensorShape);
         this.concentration = concentration;
         if (concentration.getValue().getLength() < 2) {
@@ -46,7 +48,7 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
      * @param concentration the concentration values of the dirichlet
      */
     @ExportVertexToPythonBindings
-    public DirichletVertex(@LoadParentVertex(CONCENTRATION_NAME) DoubleVertex concentration) {
+    public DirichletVertex(DoubleVertex concentration) {
         this(concentration.getShape(), concentration);
     }
 
@@ -69,7 +71,7 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
         this(new ConstantDoubleVertex(concentration));
     }
 
-    @SaveParentVertex(CONCENTRATION_NAME)
+    @SaveVertexParam(CONCENTRATION_NAME)
     public DoubleVertex getConcentration() {
         return concentration;
     }

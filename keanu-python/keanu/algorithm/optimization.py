@@ -1,18 +1,19 @@
-from py4j.java_gateway import java_import
+from py4j.java_gateway import java_import, JavaObject, JavaClass
 from keanu.context import KeanuContext
 from keanu.net import BayesNet
 from keanu.vertex.base import Vertex
-from typing import Union, Any, Optional
+from typing import Union, Optional, Tuple
 
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer")
 
 
 class Optimizer:
 
-    def __init__(self, optimizer: Any, net: Union[BayesNet, Vertex]) -> None:
+    def __init__(self, optimizer: JavaObject, net: Union[BayesNet, Vertex]) -> None:
         self.optimizer = optimizer
         self.net = net
 
@@ -23,13 +24,14 @@ class Optimizer:
         return self.optimizer.maxLikelihood()
 
     @staticmethod
-    def _build_bayes_net(builder: Any, net: Union[BayesNet, Vertex]) -> Any:
+    def _build_bayes_net(factory_class: JavaClass,
+                         net: Union[BayesNet, Vertex]) -> Tuple[JavaObject, Union[BayesNet, Vertex]]:
 
         if not (isinstance(net, BayesNet) or isinstance(net, Vertex)):
             raise TypeError("net must be a Vertex or a BayesNet. Was given {}".format(type(net)))
         elif isinstance(net, Vertex):
             net = BayesNet(net.get_connected_graph())
-        return builder.bayesianNetwork(net.unwrap()), net
+        return factory_class.builderFor(net.unwrap()), net
 
 
 class GradientOptimizer(Optimizer):
@@ -39,8 +41,7 @@ class GradientOptimizer(Optimizer):
                  max_evaluations: Optional[int] = None,
                  relative_threshold: Optional[float] = None,
                  absolute_threshold: Optional[float] = None) -> None:
-        builder = k.jvm_view().GradientOptimizer.builder()
-        builder, net = Optimizer._build_bayes_net(builder, net)
+        builder, net = Optimizer._build_bayes_net(k.jvm_view().KeanuOptimizer.Gradient, net)
         if max_evaluations is not None:
             builder.maxEvaluations(max_evaluations)
         if relative_threshold is not None:
@@ -59,8 +60,7 @@ class NonGradientOptimizer(Optimizer):
                  bounds_range: Optional[float] = None,
                  initial_trust_region_radius: Optional[float] = None,
                  stopping_trust_region_radius: Optional[float] = None) -> None:
-        builder = k.jvm_view().NonGradientOptimizer.builder()
-        builder, net = Optimizer._build_bayes_net(builder, net)
+        builder, net = Optimizer._build_bayes_net(k.jvm_view().KeanuOptimizer.NonGradient, net)
         if max_evaluations is not None:
             builder.maxEvaluations(max_evaluations)
         if bounds_range is not None:

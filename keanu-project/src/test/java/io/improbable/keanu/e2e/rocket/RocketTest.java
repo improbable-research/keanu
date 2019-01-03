@@ -1,8 +1,8 @@
 package io.improbable.keanu.e2e.rocket;
 
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -52,12 +52,12 @@ public class RocketTest {
         BayesianNetwork net = new BayesianNetwork(oRingFailure.getConnectedGraph());
         net.probeForNonZeroProbability(1000);
 
-        Stream<NetworkState> networkSamples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
+        Stream<NetworkSample> networkSamples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
             net,
             Arrays.asList(oRingFailure, residualFuel, alarm1FalsePositive)
         ).stream();
 
-        long sampleCount = 100000;
+        long sampleCount = 10000;
         EventCounts eventCounts = networkSamples
             .limit(sampleCount)
             .map(state -> new EventCounts(

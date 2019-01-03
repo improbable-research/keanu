@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import com.google.common.collect.ImmutableList;
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexMatchers;
@@ -50,7 +50,7 @@ public class MatrixDeterminantVertexTest {
     @Test
     public void canDifferentiateWhenOutputIsScalar() {
         final long[] shape = new long[]{2, 2};
-        final DoubleVertex input = new UniformVertex(shape, 0, 10);
+        final UniformVertex input = new UniformVertex(shape, 0, 10);
         input.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, shape));
         final MatrixDeterminantVertex output = input.matrixDeterminant();
         finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(input), output, 0.001, 1e-5);
@@ -59,7 +59,7 @@ public class MatrixDeterminantVertexTest {
     @Test
     public void canDifferentiateWhenOutputIsTensor() {
         final long[] shape = new long[]{2, 2};
-        final DoubleVertex input = new UniformVertex(shape, 0, 10);
+        final UniformVertex input = new UniformVertex(shape, 0, 10);
         input.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, shape));
         final MultiplicationVertex output = input.matrixDeterminant().times(input);
 
@@ -107,7 +107,7 @@ public class MatrixDeterminantVertexTest {
         output.observe(new double[]{2.0, 2.4});
         final BayesianNetwork net = new BayesianNetwork(output.getConnectedGraph());
 
-        Optimizer.of(net).maxLikelihood();
+        KeanuOptimizer.of(net).maxLikelihood();
         assertEquals(input.getValue().determinant(), 2.2, 0.1);
     }
 }

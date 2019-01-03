@@ -1,8 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
@@ -87,9 +86,9 @@ public class NUTSSampler implements SamplingAlgorithm {
     }
 
     @Override
-    public NetworkState sample() {
+    public NetworkSample sample() {
         step();
-        return new SimpleNetworkState(tree.sampleAtAcceptedPosition);
+        return new NetworkSample(tree.sampleAtAcceptedPosition, tree.logOfMasterPAtAcceptedPosition);
     }
 
     @Override
@@ -100,7 +99,7 @@ public class NUTSSampler implements SamplingAlgorithm {
 
         double logOfMasterPMinusMomentumBeforeLeapfrog = tree.logOfMasterPAtAcceptedPosition - 0.5 * dotProduct(tree.momentumForward);
 
-        double u = random.nextDouble() * Math.exp(logOfMasterPMinusMomentumBeforeLeapfrog);
+        double logU = Math.log(random.nextDouble()) + logOfMasterPMinusMomentumBeforeLeapfrog;
 
         int treeHeight = 0;
         tree.shouldContinueFlag = true;
@@ -117,7 +116,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                 probabilisticVertices,
                 logProbGradientCalculator,
                 sampleFromVertices,
-                u,
+                logU,
                 buildDirection,
                 treeHeight,
                 stepSize,
@@ -167,7 +166,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                                                   List<Vertex> probabilisticVertices,
                                                   LogProbGradientCalculator logProbGradientCalculator,
                                                   final List<? extends Vertex> sampleFromVertices,
-                                                  double u,
+                                                  double logU,
                                                   int buildDirection,
                                                   int treeHeight,
                                                   double epsilon,
@@ -186,7 +185,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                 currentTree.positionBackward,
                 currentTree.gradientBackward,
                 currentTree.momentumBackward,
-                u,
+                logU,
                 buildDirection,
                 treeHeight,
                 epsilon,
@@ -208,7 +207,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                 currentTree.positionForward,
                 currentTree.gradientForward,
                 currentTree.momentumForward,
-                u,
+                logU,
                 buildDirection,
                 treeHeight,
                 epsilon,
@@ -231,7 +230,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                                        Map<VertexId, DoubleTensor> position,
                                        Map<VertexId, DoubleTensor> gradient,
                                        Map<VertexId, DoubleTensor> momentum,
-                                       double u,
+                                       double logU,
                                        int buildDirection,
                                        int treeHeight,
                                        double epsilon,
@@ -248,7 +247,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                 position,
                 gradient,
                 momentum,
-                u,
+                logU,
                 buildDirection,
                 epsilon,
                 logOfMasterPMinusMomentumBeforeLeapfrog
@@ -265,7 +264,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                 position,
                 gradient,
                 momentum,
-                u,
+                logU,
                 buildDirection,
                 treeHeight - 1,
                 epsilon,
@@ -282,7 +281,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                     probabilisticVertices,
                     logProbGradientCalculator,
                     sampleFromVertices,
-                    u,
+                    logU,
                     buildDirection,
                     treeHeight - 1,
                     epsilon,
@@ -322,7 +321,7 @@ public class NUTSSampler implements SamplingAlgorithm {
                                                Map<VertexId, DoubleTensor> position,
                                                Map<VertexId, DoubleTensor> gradient,
                                                Map<VertexId, DoubleTensor> momentum,
-                                               double u,
+                                               double logU,
                                                int buildDirection,
                                                double epsilon,
                                                double logOfMasterPMinusMomentumBeforeLeapfrog) {
@@ -339,8 +338,8 @@ public class NUTSSampler implements SamplingAlgorithm {
         final double logOfMasterPAfterLeapfrog = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
 
         final double logOfMasterPMinusMomentum = logOfMasterPAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
-        final int acceptedLeapfrogCount = u <= Math.exp(logOfMasterPMinusMomentum) ? 1 : 0;
-        final boolean shouldContinueFlag = u < Math.exp(DELTA_MAX + logOfMasterPMinusMomentum);
+        final int acceptedLeapfrogCount = logU <= logOfMasterPMinusMomentum ? 1 : 0;
+        final boolean shouldContinueFlag = logU < DELTA_MAX + logOfMasterPMinusMomentum;
 
         final Map<VertexId, ?> sampleAtAcceptedPosition = takeSample(sampleFromVertices);
 

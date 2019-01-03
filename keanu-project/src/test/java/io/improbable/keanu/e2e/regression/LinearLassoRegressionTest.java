@@ -38,8 +38,8 @@ public class LinearLassoRegressionTest {
             .build();
 
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -53,9 +53,11 @@ public class LinearLassoRegressionTest {
             .withPriorOnIntercept(0, 20)
             .build();
 
+        linearRegressionModel.fit();
+
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -69,9 +71,11 @@ public class LinearLassoRegressionTest {
             .withPriorOnIntercept(0, 20)
             .build();
 
+        linearRegressionModel.fit();
+
         assertWeightsAndInterceptMatchTestData(
-            linearRegressionModel.getWeights(),
-            linearRegressionModel.getIntercept(),
+            linearRegressionModel.getWeightVertex(),
+            linearRegressionModel.getInterceptVertex(),
             data
         );
     }
@@ -90,7 +94,11 @@ public class LinearLassoRegressionTest {
             .withPriorOnWeightsAndIntercept(0, 0.00001)
             .build();
 
-        assertThat(linearRegressionModelNarrow.getWeights().abs().sum(), lessThan(linearRegressionModelWide.getWeights().abs().sum()));
+        linearRegressionModelWide.fit();
+
+        linearRegressionModelNarrow.fit();
+
+        assertThat(linearRegressionModelNarrow.getWeightVertex().getValue().abs().sum(), lessThan(linearRegressionModelWide.getWeightVertex().getValue().abs().sum()));
 
     }
 
@@ -103,14 +111,16 @@ public class LinearLassoRegressionTest {
             .withRegularization(RegressionRegularization.LASSO)
             .build();
 
-        assertThat(linearRegressionModel.getWeight(2), closeTo(0., 1e-3));
+        linearRegressionModel.fit();
+
+        assertThat(linearRegressionModel.getWeightVertex().getValue(2), closeTo(0., 1e-3));
     }
 
     @Category(Slow.class)
     @Test
     public void youCanChooseSamplingInsteadOfGradientOptimization() {
         final int smallRawDataSize = 20;
-        final int samplingCount = 30000;
+        final int samplingCount = 5000;
 
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData(smallRawDataSize);
 
@@ -126,17 +136,17 @@ public class LinearLassoRegressionTest {
             .withRegularization(RegressionRegularization.LASSO)
             .withPriorOnIntercept(0, data.intercept)
             .withPriorOnWeights(
-                DoubleTensor.create(0., data.weights.getShape()).asFlatDoubleArray(),
-                data.weights.asFlatDoubleArray()
+                DoubleTensor.create(0., data.weights.getShape()),
+                data.weights
             )
             .withSampling(sampling)
             .build();
 
-        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount - 10000).downSample(100);
+        NetworkSamples networkSamples = sampling.getNetworkSamples().drop(samplingCount / 10).downSample(2);
 
         assertSampledWeightsAndInterceptMatchTestData(
-            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightsVertexId()),
-            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertexId()),
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getWeightVertex().getId()),
+            networkSamples.getDoubleTensorSamples(linearRegressionModel.getInterceptVertex().getId()),
             data);
     }
 

@@ -1,8 +1,8 @@
 from typing import Iterable, Union, Type, Any, TYPE_CHECKING, Dict, Tuple, List, Generator
 from numpy import integer, floating, bool_, ndarray
 from pandas import Series, DataFrame
-from keanu.vertex.ops import VertexOps
 from .base import JavaObjectWrapper
+from py4j.java_gateway import JavaObject
 
 # see numpy's scalar hierarchy: https://docs.scipy.org/doc/numpy/reference/arrays.scalars.html#scalars
 int_types = Union[int, integer]
@@ -22,13 +22,11 @@ Vertex arg types
 '''
 wrapped_java_types = Union[JavaObjectWrapper]
 shape_types = Iterable[primitive_types]
-
-vertex_param_types = Union[tensor_arg_types, wrapped_java_types, VertexOps]
 '''
 Sample types
 '''
-sample_types = Dict[Tuple[Any, ...], List[numpy_types]]
-sample_generator_types = Generator[Dict[Tuple[Any, ...], numpy_types], None, None]
+sample_types = Dict[str, List[numpy_types]]
+sample_generator_types = Generator[Dict[str, numpy_types], None, None]
 '''
 Runtime types
 '''

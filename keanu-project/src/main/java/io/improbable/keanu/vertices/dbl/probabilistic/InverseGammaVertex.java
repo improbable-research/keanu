@@ -4,9 +4,10 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.InverseGamma;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LoadParentVertex;
+import io.improbable.keanu.vertices.LoadShape;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveParentVertex;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -39,7 +40,9 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
      * @param alpha       the alpha of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      * @param beta        the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
-    public InverseGammaVertex(long[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
+    public InverseGammaVertex(@LoadShape long[] tensorShape,
+                              @LoadVertexParam(ALPHA_NAME) DoubleVertex alpha,
+                              @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, alpha.getShape(), beta.getShape());
 
@@ -56,8 +59,7 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
      * @param beta  the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
     @ExportVertexToPythonBindings
-    public InverseGammaVertex(@LoadParentVertex(ALPHA_NAME) DoubleVertex alpha,
-                              @LoadParentVertex(BETA_NAME) DoubleVertex beta) {
+    public InverseGammaVertex(DoubleVertex alpha, DoubleVertex beta) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
@@ -85,12 +87,12 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
         this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
-    @SaveParentVertex(ALPHA_NAME)
+    @SaveVertexParam(ALPHA_NAME)
     public DoubleVertex getAlpha() {
         return alpha;
     }
 
-    @SaveParentVertex(BETA_NAME)
+    @SaveVertexParam(BETA_NAME)
     public DoubleVertex getBeta() {
         return beta;
     }

@@ -5,15 +5,18 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadVertexValue;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class ConstantIntegerVertex extends IntegerVertex implements ConstantVertex, NonProbabilistic<IntegerTensor> {
 
+    private final static String CONSTANT_NAME = "constant";
+
     @ExportVertexToPythonBindings
-    public ConstantIntegerVertex(@LoadVertexValue IntegerTensor constant) {
+    public ConstantIntegerVertex(@LoadVertexParam(CONSTANT_NAME) IntegerTensor constant) {
         super(constant.getShape());
         setValue(constant);
     }
@@ -42,6 +45,11 @@ public class ConstantIntegerVertex extends IntegerVertex implements ConstantVert
 
     @Override
     public IntegerTensor calculate() {
+        return getValue();
+    }
+
+    @SaveVertexParam(CONSTANT_NAME)
+    public IntegerTensor getConstantValue() {
         return getValue();
     }
 }
