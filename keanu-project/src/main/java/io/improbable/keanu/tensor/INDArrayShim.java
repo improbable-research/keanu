@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 
@@ -54,16 +55,25 @@ public class INDArrayShim {
         }
     }
 
-    public static INDArray muli(INDArray left, INDArray right) {
+    private static INDArray inlineOperation(INDArray left,
+                                            INDArray right,
+                                            Function<INDArray, INDArray> inverse,
+                                            BiFunction<INDArray, INDArray, INDArray> inlineOp,
+                                            BiFunction<INDArray, INDArray, INDArray> inverseInlineOp,
+                                            BiFunction<INDArray, INDArray, INDArray> broadcastOp) {
         if (Arrays.equals(left.shape(), right.shape())) {
-            return left.muli(right);
+            return inlineOp.apply(left, right);
         } else if (left.length() == 1) {
-            return applyScalarTensorOperationWithPreservedShape(left, right, INDArray::muli);
+            return applyScalarTensorOperationWithPreservedShape(left, inverse.apply(right), inverseInlineOp);
         } else if (right.length() == 1) {
-            return applyScalarTensorOperationWithPreservedShape(right, left, INDArray::muli);
+            return applyScalarTensorOperationWithPreservedShape(right, left, inlineOp);
         } else {
-            return broadcastMultiply(left, right);
+            return broadcastOp.apply(left, right);
         }
+    }
+
+    public static INDArray muli(INDArray left, INDArray right) {
+        return inlineOperation(left, right, a -> a, INDArray::muli, INDArray::muli, INDArrayShim::broadcastMultiply);
     }
 
     private static INDArray broadcastMultiply(INDArray a, INDArray b) {
@@ -77,15 +87,7 @@ public class INDArrayShim {
     }
 
     public static INDArray divi(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.divi(right);
-        } else if (right.length() == 1) {
-            return applyScalarTensorOperationWithPreservedShape(right, left, INDArray::divi);
-        } else if (left.length() == 1) {
-            return applyScalarTensorOperationWithPreservedShape(left, right.rdiv(1.0), INDArray::muli);
-        } else {
-            return broadcastDivide(left, right);
-        }
+        return inlineOperation(left, right, a -> a.rdiv(1.), INDArray::divi, INDArray::muli, INDArrayShim::broadcastDivide);
     }
 
     private static INDArray broadcastDivide(INDArray a, INDArray b) {
@@ -99,15 +101,7 @@ public class INDArrayShim {
     }
 
     public static INDArray addi(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.addi(right);
-        } else if (left.length() == 1) {
-            return applyScalarTensorOperationWithPreservedShape(left, right, INDArray::addi);
-        } else if (right.length() == 1) {
-            return applyScalarTensorOperationWithPreservedShape(right, left, INDArray::addi);
-        } else {
-            return broadcastPlus(left, right);
-        }
+        return inlineOperation(left, right, a -> a, INDArray::addi, INDArray::addi, INDArrayShim::broadcastPlus);
     }
 
     private static INDArray broadcastPlus(INDArray a, INDArray b) {
@@ -121,15 +115,7 @@ public class INDArrayShim {
     }
 
     public static INDArray subi(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.subi(right);
-        } else if (right.length() == 1) {
-            return applyScalarTensorOperationWithPreservedShape(right, left, INDArray::subi);
-        } else if (left.length() == 1) {
-            return applyScalarTensorOperationWithPreservedShape(left, right.neg(), INDArray::addi);
-        } else {
-            return broadcastMinus(left, right);
-        }
+        return inlineOperation(left, right, a -> a.neg(), INDArray::subi, INDArray::addi, INDArrayShim::broadcastMinus);
     }
 
     private static INDArray broadcastMinus(INDArray a, INDArray b) {
