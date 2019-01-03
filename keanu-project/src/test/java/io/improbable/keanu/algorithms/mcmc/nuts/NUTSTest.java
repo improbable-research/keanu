@@ -143,7 +143,7 @@ public class NUTSTest {
     }
 
     @Test
-    public void canDefaultToSettingsInBuilderAndIsConfigurableAfterBuilding() {
+    public void canDefaultToSettingsInBuilder() {
 
         GaussianVertex A = new GaussianVertex(0.0, 1.0);
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
