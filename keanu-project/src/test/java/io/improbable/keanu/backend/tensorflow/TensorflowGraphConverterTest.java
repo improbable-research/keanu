@@ -35,7 +35,7 @@ public class TensorflowGraphConverterTest {
 
         DoubleVertex C = A.plus(B);
 
-        ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
+        ComputableGraph graph = TensorflowComputableGraphFactory.convert(C.getConnectedGraph());
 
         Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
         inputs.put(A.getReference(), A.getValue());
@@ -56,7 +56,7 @@ public class TensorflowGraphConverterTest {
 
         DoubleVertex C = A.plus(B);
 
-        ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
+        ComputableGraph graph = TensorflowComputableGraphFactory.convert(C.getConnectedGraph());
 
         Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
         inputs.put(A.getReference(), A.getValue());
@@ -77,7 +77,7 @@ public class TensorflowGraphConverterTest {
 
         DoubleVertex C = A.plus(B);
 
-        ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
+        ComputableGraph graph = TensorflowComputableGraphFactory.convert(C.getConnectedGraph());
 
         DoubleTensor result = graph.compute(of(
             A.getReference(), A.getValue(),
@@ -106,7 +106,7 @@ public class TensorflowGraphConverterTest {
 
         IntegerVertex C = A.times(B).abs();
 
-        ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
+        ComputableGraph graph = TensorflowComputableGraphFactory.convert(C.getConnectedGraph());
 
         Map<VariableReference, IntegerTensor> inputs = new HashMap<>();
         inputs.put(A.getReference(), A.getValue());
@@ -127,7 +127,7 @@ public class TensorflowGraphConverterTest {
 
         BoolVertex C = A.and(B).not();
 
-        ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
+        ComputableGraph graph = TensorflowComputableGraphFactory.convert(C.getConnectedGraph());
 
         Map<VariableReference, BooleanTensor> inputs = new HashMap<>();
         inputs.put(A.getReference(), A.getValue());
@@ -148,7 +148,7 @@ public class TensorflowGraphConverterTest {
 
         DoubleVertex C = DoubleVertex.concat(0, A, B);
 
-        ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
+        ComputableGraph graph = TensorflowComputableGraphFactory.convert(C.getConnectedGraph());
 
         Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
         inputs.put(A.getReference(), A.getValue());
@@ -198,7 +198,7 @@ public class TensorflowGraphConverterTest {
 
         Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
-        try (ProbabilisticWithGradientGraph graph = TensorflowGraphConverter.convertWithGradient(network)) {
+        try (ProbabilisticWithGradientGraph graph = TensorflowProbabilisticWithGradientFactory.convertWithGradient(network)) {
 
             double tensorflowLogProb = graph.logProb(inputs);
             Map<? extends VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
@@ -223,7 +223,7 @@ public class TensorflowGraphConverterTest {
         DoubleVertex D = C.times(B);
         DoubleVertex out = D.matrixMultiply(C);
 
-        ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
+        ComputableGraph graph = TensorflowComputableGraphFactory.convert(C.getConnectedGraph());
 
         Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
         inputs.put(A.getReference(), A.getValue());
@@ -264,7 +264,7 @@ public class TensorflowGraphConverterTest {
 
         Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
-        try (ProbabilisticWithGradientGraph graph = TensorflowGraphConverter.convertWithGradient(network)) {
+        try (ProbabilisticWithGradientGraph graph = TensorflowProbabilisticWithGradientFactory.convertWithGradient(network)) {
 
             Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
             inputs.put(A.getReference(), initialA);

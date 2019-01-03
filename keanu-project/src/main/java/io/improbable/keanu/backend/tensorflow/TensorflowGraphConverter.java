@@ -1,7 +1,6 @@
 package io.improbable.keanu.backend.tensorflow;
 
 import io.improbable.keanu.backend.Variable;
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.TensorShape;
@@ -10,7 +9,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LogProbAsAGraphable;
 import io.improbable.keanu.vertices.LogProbGraph;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexUnaryOp;
@@ -56,28 +54,22 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
 import org.apache.commons.math3.analysis.function.Sigmoid;
-import org.tensorflow.Graph;
 import org.tensorflow.Output;
-import org.tensorflow.Session;
 import org.tensorflow.Shape;
 import org.tensorflow.op.Operands;
-import org.tensorflow.op.Scope;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class TensorflowGraphConverter {
 
-    private static Map<Class<?>, OpMapper> opMappers;
+    public static Map<Class<?>, OpMapper> opMappers;
 
     static {
         opMappers = new HashMap<>();
@@ -225,7 +217,7 @@ public class TensorflowGraphConverter {
         throw new IllegalArgumentException("Cannot convert " + value.getClass());
     }
 
-    private static Output<?> createVariable(Vertex<?> vertex, GraphBuilder graphBuilder) {
+    public static Output<?> createVariable(Vertex<?> vertex, GraphBuilder graphBuilder) {
 
         Object value = vertex.getValue();
 
@@ -240,32 +232,6 @@ public class TensorflowGraphConverter {
         throw new IllegalArgumentException("Cannot create variable for " + value.getClass());
     }
 
-    private static <T> Output<T> createVariableInitializer(Output<T> variable, Output<T> assignment, GraphBuilder graphBuilder) {
-        return graphBuilder.assign(variable, assignment);
-    }
-
-    private static Output<Double> zeros(long[] variableShape, GraphBuilder graphBuilder) {
-        double[] zeros = new double[(int) TensorShape.getLength(variableShape)];
-        Arrays.fill(zeros, 0);
-
-        return graphBuilder.constant(zeros, variableShape);
-    }
-
-    private static Output<?> createPlaceholder(Vertex<?> vertex, GraphBuilder graphBuilder) {
-
-        Object value = vertex.getValue();
-
-        if (value instanceof DoubleTensor) {
-            return graphBuilder.placeholder(getTensorflowOpName(vertex), toShape(vertex.getShape()), Double.class);
-        } else if (value instanceof IntegerTensor) {
-            return graphBuilder.placeholder(getTensorflowOpName(vertex), toShape(vertex.getShape()), Integer.class);
-        } else if (value instanceof BooleanTensor) {
-            return graphBuilder.placeholder(getTensorflowOpName(vertex), toShape(vertex.getShape()), Boolean.class);
-        }
-
-        throw new IllegalArgumentException("Cannot create placeholder for " + value.getClass());
-    }
-
     private static Shape toShape(long[] shape) {
         if (shape.length == 0) {
             return Shape.scalar();
@@ -278,53 +244,13 @@ public class TensorflowGraphConverter {
         return vertex.getReference().toStringReference();
     }
 
-    public static TensorflowComputableGraph convert(Set<Vertex> vertices) {
-        return convert(vertices, new HashMap<>());
-    }
-
-    public static TensorflowComputableGraph convert(Collection<? extends Vertex> vertices, Map<Vertex<?>, Output<?>> lookup) {
-
-        Graph graph = new Graph();
-        Scope scope = new Scope(graph);
-        GraphBuilder graphBuilder = new GraphBuilder(scope);
-
-        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
-        priorityQueue.addAll(vertices);
-
-        Map<VariableReference, Object> latentVariables = new HashMap<>();
-
-        Vertex visiting;
-        while ((visiting = priorityQueue.poll()) != null) {
-
-            if (visiting instanceof Probabilistic) {
-                if (visiting.isObserved()) {
-                    lookup.put(visiting, createConstant(visiting, lookup, graphBuilder));
-                } else {
-                    Output<?> tfVisiting = createVariable(visiting, graphBuilder);
-                    latentVariables.put(visiting.getReference(), visiting.getValue());
-                    lookup.put(visiting, tfVisiting);
-                }
-            } else {
-                OpMapper vertexMapper = opMappers.get(visiting.getClass());
-
-                if (vertexMapper == null) {
-                    throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported for Tensorflow conversion");
-                }
-
-                lookup.put(visiting, vertexMapper.apply(visiting, lookup, graphBuilder));
-            }
-        }
-
-        return new TensorflowComputableGraph(new Session(scope.graph()), scope, latentVariables);
-    }
-
     public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
         return convert(network, new HashMap<>());
     }
 
     public static TensorflowProbabilisticGraph convert(BayesianNetwork network, Map<Vertex<?>, Output<?>> vertexLookup) {
 
-        TensorflowComputableGraph computableGraph = convert(network.getVertices().get(0).getConnectedGraph(), vertexLookup);
+        TensorflowComputableGraph computableGraph = TensorflowComputableGraphFactory.convert(network.getVertices().get(0).getConnectedGraph(), vertexLookup);
 
         GraphBuilder graphBuilder = new GraphBuilder(computableGraph.getScope());
 
@@ -426,77 +352,6 @@ public class TensorflowGraphConverter {
 
         Output<Double> lastLogProbContrib = logProbOps.get(logProbOps.size() - 1);
         return graphBuilder.add(totalLogProb, lastLogProbContrib);
-    }
-
-    public static TensorflowProbabilisticWithGradientGraph convertWithGradient(BayesianNetwork bayesianNetwork) {
-
-        Map<Vertex<?>, Output<?>> vertexLookup = new HashMap<>();
-        TensorflowProbabilisticGraph tensorflowProbabilisticGraph = convert(bayesianNetwork, vertexLookup);
-
-        TensorflowComputableGraph computeGraph = tensorflowProbabilisticGraph.getComputableGraph();
-
-        List<Vertex<DoubleTensor>> latentVertices = bayesianNetwork.getContinuousLatentVertices();
-
-        List<VariableReference> latentVariablesReferences = latentVertices.stream()
-            .map(Vertex::getReference)
-            .collect(Collectors.toList());
-
-        List<Variable<?>> latentVariables = latentVariablesReferences.stream()
-            .map(ref -> new TensorflowVariable<>(computeGraph, ref))
-            .collect(Collectors.toList());
-
-        Graph computableGraph = tensorflowProbabilisticGraph.getComputableGraph().getScope().graph();
-
-
-        Map<VariableReference, VariableReference> logLikelihoodGradients = null;
-        VariableReference logLikelihoodOp = tensorflowProbabilisticGraph.getLogLikelihoodOp();
-
-        if (logLikelihoodOp != null) {
-            logLikelihoodGradients = addGradients(
-                computableGraph,
-                tensorflowProbabilisticGraph.getLogLikelihoodOp(),
-                latentVariablesReferences
-            );
-        }
-
-        Map<VariableReference, VariableReference> logProbGradients = addGradients(
-            computableGraph,
-            tensorflowProbabilisticGraph.getLogProbOp(),
-            latentVariablesReferences
-        );
-
-        return new TensorflowProbabilisticWithGradientGraph(
-            tensorflowProbabilisticGraph.getComputableGraph(),
-            latentVariables,
-            tensorflowProbabilisticGraph.getLogProbOp(),
-            tensorflowProbabilisticGraph.getLogLikelihoodOp(),
-            logProbGradients,
-            logLikelihoodGradients
-        );
-    }
-
-    /**
-     * @param graph               graph to add gradients
-     * @param ofLabel             of operation reference
-     * @param withRespectToLabels with respect to references
-     * @return gradient output name to input name lookup
-     */
-    private static Map<VariableReference, VariableReference> addGradients(Graph graph,
-                                                                          VariableReference ofLabel,
-                                                                          List<VariableReference> withRespectToLabels) {
-
-        Output<?>[] wrt = withRespectToLabels.stream()
-            .map(opName -> graph.operation(opName.toStringReference()).output(0))
-            .toArray(Output[]::new);
-
-        Output<?>[] gradientOutputs = graph.addGradients(graph.operation(ofLabel.toStringReference()).output(0), wrt);
-
-        Map<VariableReference, VariableReference> gradientOutputNameToInputName = new HashMap<>();
-        for (int i = 0; i < withRespectToLabels.size(); i++) {
-            gradientOutputNameToInputName.put(new StringVariableReference(gradientOutputs[i].op().name()), withRespectToLabels.get(i));
-        }
-
-        return gradientOutputNameToInputName;
     }
 
 }
