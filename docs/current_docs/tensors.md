@@ -161,12 +161,12 @@ Let’s define A as a tensor of shape [2, 2]. It’s therefore a 2x2 matrix of r
 Let’s define B as a tensor of shape []. It’s therefore a rank 0 constant (a scalar).
 
 ```java
-DoubleTensor A = Nd4jDoubleTensor.create(new double[]{
+DoubleTensor A = DoubleTensor.create(new double[]{
     10., 20.,
     30., 40.
-}, new long[]{2, 2}); //shape [2, 2]
+}, 2, 2); //shape [2, 2]
 
-DoubleTensor B = Nd4jDoubleTensor.scalar(5.); //shape []
+DoubleTensor B = DoubleTensor.scalar(5.); //shape []
 
 DoubleTensor C = A.times(B); //shape [2, 2]
 ```
@@ -199,12 +199,12 @@ Here are some examples of both cases.
 Operating on a `[2, 2, 2]` and a `[2, 2]`
 
 ```java
-DoubleTensor A = Nd4jDoubleTensor.create(new double[]{
+DoubleTensor A = DoubleTensor.create(new double[]{
     10., 20., 30., 40.,
     50., 60., 70., 80.
-}, new long[]{2, 2, 2});  //shape [2, 2, 2]
+}, 2, 2, 2);  //shape [2, 2, 2]
 
-DoubleTensor B = Nd4jDoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
+DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
 
 DoubleTensor C = A.times(B); //shape [2, 2, 2]
 DoubleTensor D = A.plus(B); //shape[2, 2, 2]
@@ -215,12 +215,12 @@ DoubleTensor D = A.plus(B); //shape[2, 2, 2]
 Operating on a `[2, 2, 3]` and a `[2, 2]`
 
 ```java
-DoubleTensor A = Nd4jDoubleTensor.create(new double[]{
+DoubleTensor A = DoubleTensor.create(new double[]{
     10., 20., 30., 40., 50., 60.,
     70., 80., 90., 100., 110., 120.
-}, new long[]{2, 2, 3});  //shape [2, 2, 3]
+}, 2, 2, 3);  //shape [2, 2, 3]
 
-DoubleTensor B = Nd4jDoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
+DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
 
 DoubleTensor C = A.times(B); //error
 DoubleTensor D = A.plus(B); //error
@@ -233,12 +233,12 @@ DoubleTensor D = A.plus(B); //error
 Operating on a `[2, 2, 2]` and a `[2, 2, 1]`
 
 ```java
-DoubleTensor A = Nd4jDoubleTensor.create(new double[]{
+DoubleTensor A = DoubleTensor.create(new double[]{
     10., 20., 30., 40.,
     50., 60., 70., 80.
-}, new long[]{2, 2, 2});  //shape [2, 2, 2]
+}, 2, 2, 2);  //shape [2, 2, 2]
 
-DoubleTensor B = Nd4jDoubleTensor.arange(1, 8).reshape(2, 2, 1);  //shape [2, 2, 1]
+DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2, 1);  //shape [2, 2, 1]
 
 DoubleTensor C = A.times(B); //shape [2, 2, 2]
 DoubleTensor D = A.plus(B); //shape[2, 2, 2]
@@ -252,15 +252,15 @@ Let’s multiply a column vector along each column of a matrix.
 Operating on a `[2, 3]` and a `[2, 1]`
 
 ```java
-DoubleTensor A = Nd4jDoubleTensor.create(new double[]{
+DoubleTensor A = DoubleTensor.create(new double[]{
     10., 20., 30.,
     40., 50., 60.
-}, new long[]{2, 3});   //shape [2, 3]
+}, 2, 3);   //shape [2, 3]
 
-DoubleTensor B = Nd4jDoubleTensor.create(new double[]{
+DoubleTensor B = DoubleTensor.create(new double[]{
     5,
     3
-}, new long[]{2, 1});  //shape [2, 1]
+}, 2, 1);  //shape [2, 1]
 
 DoubleTensor C = A.times(B); //shape [2, 3].
 // values: [50,  100, 150]

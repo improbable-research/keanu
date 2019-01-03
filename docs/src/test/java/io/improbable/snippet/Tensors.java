@@ -121,12 +121,12 @@ public class Tensors {
 
     private static void tensorScalarBroadcast() {
         //%%SNIPPET_START%% TensorScalarBroadcast
-        DoubleTensor A = Nd4jDoubleTensor.create(new double[]{
+        DoubleTensor A = DoubleTensor.create(new double[]{
             10., 20.,
             30., 40.
-        }, new long[]{2, 2}); //shape [2, 2]
+        }, 2, 2); //shape [2, 2]
 
-        DoubleTensor B = Nd4jDoubleTensor.scalar(5.); //shape []
+        DoubleTensor B = DoubleTensor.scalar(5.); //shape []
 
         DoubleTensor C = A.times(B); //shape [2, 2]
         //%%SNIPPET_END%% TensorScalarBroadcast
@@ -134,12 +134,12 @@ public class Tensors {
 
     private static void tensorBroadcastSubsetValid() {
         //%%SNIPPET_START%% TensorBroadcastSubsetValid
-        DoubleTensor A = Nd4jDoubleTensor.create(new double[]{
+        DoubleTensor A = DoubleTensor.create(new double[]{
             10., 20., 30., 40.,
             50., 60., 70., 80.
-        }, new long[]{2, 2, 2});  //shape [2, 2, 2]
+        }, 2, 2, 2);  //shape [2, 2, 2]
 
-        DoubleTensor B = Nd4jDoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
+        DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
 
         DoubleTensor C = A.times(B); //shape [2, 2, 2]
         DoubleTensor D = A.plus(B); //shape[2, 2, 2]
@@ -148,12 +148,12 @@ public class Tensors {
 
     private static void tensorBroadcastSubsetInvalid() {
         //%%SNIPPET_START%% TensorBroadcastSubsetInvalid
-        DoubleTensor A = Nd4jDoubleTensor.create(new double[]{
+        DoubleTensor A = DoubleTensor.create(new double[]{
             10., 20., 30., 40., 50., 60.,
             70., 80., 90., 100., 110., 120.
-        }, new long[]{2, 2, 3});  //shape [2, 2, 3]
+        }, 2, 2, 3);  //shape [2, 2, 3]
 
-        DoubleTensor B = Nd4jDoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
+        DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
 
         DoubleTensor C = A.times(B); //error
         DoubleTensor D = A.plus(B); //error
@@ -162,12 +162,12 @@ public class Tensors {
 
     private static void tensorBroadcastWithOnes() {
         //%%SNIPPET_START%% TensorBroadcastSubsetWithOnes
-        DoubleTensor A = Nd4jDoubleTensor.create(new double[]{
+        DoubleTensor A = DoubleTensor.create(new double[]{
             10., 20., 30., 40.,
             50., 60., 70., 80.
-        }, new long[]{2, 2, 2});  //shape [2, 2, 2]
+        }, 2, 2, 2);  //shape [2, 2, 2]
 
-        DoubleTensor B = Nd4jDoubleTensor.arange(1, 8).reshape(2, 2, 1);  //shape [2, 2, 1]
+        DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2, 1);  //shape [2, 2, 1]
 
         DoubleTensor C = A.times(B); //shape [2, 2, 2]
         DoubleTensor D = A.plus(B); //shape[2, 2, 2]
@@ -176,15 +176,15 @@ public class Tensors {
 
     private static void tensorBroadcastColumnExample() {
         //%%SNIPPET_START%% TensorBroadcastColumnExample
-        DoubleTensor A = Nd4jDoubleTensor.create(new double[]{
+        DoubleTensor A = DoubleTensor.create(new double[]{
             10., 20., 30.,
             40., 50., 60.
-        }, new long[]{2, 3});   //shape [2, 3]
+        }, 2, 3);   //shape [2, 3]
 
-        DoubleTensor B = Nd4jDoubleTensor.create(new double[]{
+        DoubleTensor B = DoubleTensor.create(new double[]{
             5,
             3
-        }, new long[]{2, 1});  //shape [2, 1]
+        }, 2, 1);  //shape [2, 1]
 
         DoubleTensor C = A.times(B); //shape [2, 3].
         // values: [50,  100, 150]
