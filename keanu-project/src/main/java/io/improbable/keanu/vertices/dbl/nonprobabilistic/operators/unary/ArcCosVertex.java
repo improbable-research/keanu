@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,18 +29,18 @@ public class ArcCosVertex extends DoubleUnaryOpVertex implements Differentiable 
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
         DoubleTensor inputValue = inputVertex.getValue();
 
         DoubleTensor dArcCos = inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1)
             .sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
-        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcCos, inputVertex.getShape());
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcCos);
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         DoubleTensor inputValue = inputVertex.getValue();
 
         //dArcCosdx = -1 / sqrt(1 - x^2)
@@ -49,8 +49,8 @@ public class ArcCosVertex extends DoubleUnaryOpVertex implements Differentiable 
             .reciprocalInPlace()
             .unaryMinusInPlace();
 
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput));
 
         return partials;
     }
