@@ -198,7 +198,7 @@ public class TensorflowGraphConverterTest {
 
         Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
-        try (ProbabilisticWithGradientGraph graph = TensorflowProbabilisticWithGradientFactory.convertWithGradient(network)) {
+        try (ProbabilisticWithGradientGraph graph = TensorflowProbabilisticGraphWithGradientFactory.convert(network)) {
 
             double tensorflowLogProb = graph.logProb(inputs);
             Map<? extends VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
@@ -264,7 +264,7 @@ public class TensorflowGraphConverterTest {
 
         Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
-        try (ProbabilisticWithGradientGraph graph = TensorflowProbabilisticWithGradientFactory.convertWithGradient(network)) {
+        try (ProbabilisticWithGradientGraph graph = TensorflowProbabilisticGraphWithGradientFactory.convert(network)) {
 
             Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
             inputs.put(A.getReference(), initialA);

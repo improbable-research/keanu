@@ -17,6 +17,10 @@ import java.util.Set;
 
 public class TensorflowComputableGraphFactory {
 
+    public static TensorflowComputableGraph convert(Set<Vertex> vertices) {
+        return convert(vertices, new HashMap<>());
+    }
+
     public static TensorflowComputableGraph convert(Collection<? extends Vertex> vertices, Map<Vertex<?>, Output<?>> lookup) {
 
         Graph graph = new Graph();
@@ -51,9 +55,5 @@ public class TensorflowComputableGraphFactory {
         }
 
         return new TensorflowComputableGraph(new Session(scope.graph()), scope, latentVariables);
-    }
-
-    public static TensorflowComputableGraph convert(Set<Vertex> vertices) {
-        return convert(vertices, new HashMap<>());
     }
 }

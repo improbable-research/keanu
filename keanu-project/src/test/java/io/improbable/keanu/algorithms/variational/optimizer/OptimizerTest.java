@@ -3,8 +3,8 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
-import io.improbable.keanu.backend.tensorflow.TensorflowGraphConverter;
-import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticWithGradientFactory;
+import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticGraphFactory;
+import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticGraphWithGradientFactory;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -76,13 +76,13 @@ public class OptimizerTest {
 
     private Function<BayesianNetwork, Optimizer> getTensorflowGradientOptimizer() {
         return (bayesNet) -> GradientOptimizer.builder()
-            .bayesianNetwork(TensorflowProbabilisticWithGradientFactory.convertWithGradient(bayesNet))
+            .bayesianNetwork(TensorflowProbabilisticGraphWithGradientFactory.convert(bayesNet))
             .build();
     }
 
     private Function<BayesianNetwork, Optimizer> getTensorflowNonGradientOptimizer() {
         return (bayesNet) -> NonGradientOptimizer.builder()
-            .bayesianNetwork(TensorflowGraphConverter.convert(bayesNet))
+            .bayesianNetwork(TensorflowProbabilisticGraphFactory.convert(bayesNet))
             .build();
     }
 

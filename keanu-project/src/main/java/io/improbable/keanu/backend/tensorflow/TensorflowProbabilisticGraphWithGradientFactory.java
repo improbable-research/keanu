@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class TensorflowProbabilisticWithGradientFactory {
+public class TensorflowProbabilisticGraphWithGradientFactory {
 
-    public static TensorflowProbabilisticWithGradientGraph convertWithGradient(BayesianNetwork bayesianNetwork) {
+    public static TensorflowProbabilisticGraphWithGradient convert(BayesianNetwork bayesianNetwork) {
 
         Map<Vertex<?>, Output<?>> vertexLookup = new HashMap<>();
-        TensorflowProbabilisticGraph tensorflowProbabilisticGraph = TensorflowGraphConverter.convert(bayesianNetwork, vertexLookup);
+        TensorflowProbabilisticGraph tensorflowProbabilisticGraph = TensorflowProbabilisticGraphFactory.convert(bayesianNetwork, vertexLookup);
 
         TensorflowComputableGraph computeGraph = tensorflowProbabilisticGraph.getComputableGraph();
 
@@ -51,7 +51,7 @@ public class TensorflowProbabilisticWithGradientFactory {
             latentVariablesReferences
         );
 
-        return new TensorflowProbabilisticWithGradientGraph(
+        return new TensorflowProbabilisticGraphWithGradient(
             tensorflowProbabilisticGraph.getComputableGraph(),
             latentVariables,
             tensorflowProbabilisticGraph.getLogProbOp(),

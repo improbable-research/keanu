@@ -9,13 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TensorflowProbabilisticWithGradientGraph extends TensorflowProbabilisticGraph implements ProbabilisticWithGradientGraph {
+public class TensorflowProbabilisticGraphWithGradient extends TensorflowProbabilisticGraph implements ProbabilisticWithGradientGraph {
 
     private final TensorflowComputableGraph computableGraph;
     private final Map<VariableReference, VariableReference> logProbGradients;
     private final Map<VariableReference, VariableReference> logLikelihoodGradients;
 
-    public TensorflowProbabilisticWithGradientGraph(TensorflowComputableGraph computableGraph,
+    public TensorflowProbabilisticGraphWithGradient(TensorflowComputableGraph computableGraph,
                                                     List<? extends Variable> latentVariables,
                                                     VariableReference logProbOp,
                                                     VariableReference logLikelihoodOp,
