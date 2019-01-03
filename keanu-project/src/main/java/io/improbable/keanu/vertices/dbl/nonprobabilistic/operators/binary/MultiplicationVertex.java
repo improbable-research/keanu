@@ -41,8 +41,8 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
         PartialDerivative fromRight = AutoDiffBroadcast.correctForBroadcastPartialForward(dRightWrtInput, right.getShape(), this.getShape());
 
         // dc = A * db + da * B;
-        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue());
-        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue());
+        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue(), this.getShape().length);
+        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue(), this.getShape().length);
 
         return partialsFromLeft.add(partialsFromRight);
     }

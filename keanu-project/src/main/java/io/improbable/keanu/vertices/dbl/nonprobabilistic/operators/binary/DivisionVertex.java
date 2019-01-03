@@ -40,10 +40,10 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         PartialDerivative fromRight = AutoDiffBroadcast.correctForBroadcastPartialForward(dRightWrtInput, right.getShape(), this.getShape());
 
         // dc = (B * da - A * db) / B^2;
-        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue());
-        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue());
+        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue(), this.getShape().length);
+        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue(), this.getShape().length);
 
-        return partialsFromLeft.subtract(partialsFromRight).divideByAlongOfDimensions(right.getValue().pow(2));
+        return partialsFromLeft.subtract(partialsFromRight).divideByAlongOfDimensions(right.getValue().pow(2), this.getShape().length);
     }
 
     @Override

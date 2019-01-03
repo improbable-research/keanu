@@ -66,14 +66,44 @@ public class PartialDerivative {
         return new PartialDerivative(partial.times(multiplier));
     }
 
+    public static DoubleTensor alignAlongOf(long[] partialShape, int partialOfRank, DoubleTensor tensor) {
+
+        final long[] alongOfShape = new long[partialShape.length];
+        Arrays.fill(alongOfShape, 1L);
+
+        System.arraycopy(tensor.getShape(), 0, alongOfShape, partialOfRank - tensor.getShape().length, tensor.getShape().length);
+
+        return tensor.reshape(alongOfShape);
+    }
+
     public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier) {
+        return multiplyAlongOfDimensions(multiplier, multiplier.getRank());
+    }
+
+    public PartialDerivative multiplyAlongOfDimensions(DoubleTensor multiplier, int partialOfRank) {
 
         if (!isPresent()) {
             return this;
         }
 
-        DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
-        DoubleTensor result = partial.times(multiplierFromLeft);
+        DoubleTensor multiplierAlignedAlongOf = alignAlongOf(partial.getShape(), partialOfRank, multiplier);
+        DoubleTensor result = partial.times(multiplierAlignedAlongOf);
+
+        return new PartialDerivative(result);
+    }
+
+    public PartialDerivative divideByAlongOfDimensions(DoubleTensor divisor) {
+        return divideByAlongOfDimensions(divisor, divisor.getRank());
+    }
+
+    public PartialDerivative divideByAlongOfDimensions(DoubleTensor divisor, int partialOfRank) {
+
+        if (!isPresent()) {
+            return this;
+        }
+
+        DoubleTensor divisorAlignedAlongOf = alignAlongOf(partial.getShape(), partialOfRank, divisor);
+        DoubleTensor result = partial.div(divisorAlignedAlongOf);
 
         return new PartialDerivative(result);
     }
@@ -86,18 +116,6 @@ public class PartialDerivative {
 
         DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
         DoubleTensor result = partial.times(multiplierFromRight);
-
-        return new PartialDerivative(result);
-    }
-
-    public PartialDerivative divideByAlongOfDimensions(DoubleTensor divisor) {
-
-        if (!isPresent()) {
-            return this;
-        }
-
-        DoubleTensor divisorFromLeft = increaseRankByAppendingOnesToShape(divisor, partial.getRank());
-        DoubleTensor result = partial.div(divisorFromLeft);
 
         return new PartialDerivative(result);
     }
