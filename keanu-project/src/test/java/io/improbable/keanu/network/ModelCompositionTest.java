@@ -3,6 +3,7 @@ package io.improbable.keanu.network;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
@@ -122,7 +123,7 @@ public class ModelCompositionTest {
         GaussianVertex sourceOfTruth = new GaussianVertex(new long[]{NUM_SAMPLES, 1}, REAL_HYPER_LOC, REAL_HYPER_SIZE);
 
         gaussOutputVertex.observe(sourceOfTruth.sample());
-        GradientOptimizer optimizer = GradientOptimizer.of(outerNet);
+        GradientOptimizer optimizer = KeanuOptimizer.Gradient.of(outerNet);
         optimizer.maxAPosteriori();
 
         assertEquals(trueLocation.getValue().scalar(), REAL_HYPER_LOC, 0.05);

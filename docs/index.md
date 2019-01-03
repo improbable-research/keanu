@@ -4,7 +4,7 @@ layout: homepage
 keywords:
 
 # Hero section
-title: 
+title: Keanu Docs
 description: Keanu is a general-purpose probabilistic programming library. The main
              design goal is to build a Bayesian inference tool that scales to a point where
              we can model the world and therefore optimize it.
@@ -64,6 +64,14 @@ grid_navigation:
       excerpt: Learn how to use plates to describe repeating subgraphs in Keanu or to do time series modelling.
       cta: Read more
       url: /docs/plates/
+    - title: Autocorrelation
+      excerpt: Learn how to calculate autocorrelation on your samples.
+      cta: Read more
+      url: /docs/autocorrelation/
+    - title: Saving and Loading Models
+      excerpt: Learn how to Save and Load constructed & trained models
+      cta: Read more
+      url: /docs/save-and-load/
     - title: Tutorial - Two thermometers
       excerpt: Learn from a real-world example.
       cta: Read more

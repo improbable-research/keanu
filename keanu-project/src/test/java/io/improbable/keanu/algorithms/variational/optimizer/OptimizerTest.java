@@ -1,10 +1,12 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -18,6 +20,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class OptimizerTest {
+
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
 
     @Test
     public void gradientOptimizerCanMLE() {
@@ -40,15 +45,11 @@ public class OptimizerTest {
     }
 
     private Function<BayesianNetwork, Optimizer> getGradientOptimizer() {
-        return (bayesNet) -> GradientOptimizer.builder()
-            .bayesianNetwork(bayesNet)
-            .build();
+        return (bayesNet) -> KeanuOptimizer.Gradient.of(bayesNet);
     }
 
     private Function<BayesianNetwork, Optimizer> getNonGradientOptimizer() {
-        return (bayesNet) -> NonGradientOptimizer.builder()
-            .bayesianNetwork(bayesNet)
-            .build();
+        return (bayesNet) -> KeanuOptimizer.NonGradient.of(bayesNet);
     }
 
     private void assertCanCalculateMaxLikelihood(Function<BayesianNetwork, Optimizer> optimizerMapper) {
@@ -101,7 +102,7 @@ public class OptimizerTest {
     @Test
     public void gradientOptimizerCanRemoveFitnessCalculationHandler() {
         GaussianVertex gaussianVertex = new GaussianVertex(0, 1);
-        GradientOptimizer optimizer = GradientOptimizer.of(gaussianVertex.getConnectedGraph());
+        GradientOptimizer optimizer = KeanuOptimizer.Gradient.of(gaussianVertex.getConnectedGraph());
         canRemoveFitnessCalculationHandler(optimizer);
     }
 
@@ -110,7 +111,7 @@ public class OptimizerTest {
         GaussianVertex A = new GaussianVertex(0, 1);
         GaussianVertex B = new GaussianVertex(0, 1);
         A.plus(B);
-        NonGradientOptimizer optimizer = NonGradientOptimizer.of(A.getConnectedGraph());
+        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.of(A.getConnectedGraph());
         canRemoveFitnessCalculationHandler(optimizer);
     }
 

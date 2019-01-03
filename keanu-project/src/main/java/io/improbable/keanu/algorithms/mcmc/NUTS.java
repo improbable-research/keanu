@@ -15,7 +15,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,17 +85,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
      * @param sampleFromVertices the vertices inside the bayesNet to sample from
      * @return Samples taken with NUTS
      */
+    @Override
     public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                               final List<? extends Vertex> sampleFromVertices,
                                               final int sampleCount) {
         return generatePosteriorSamples(bayesNet, sampleFromVertices)
             .generate(sampleCount);
-    }
-
-    public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                              final Vertex fromVertex,
-                                              final int sampleCount) {
-        return getPosteriorSamples(bayesNet, Collections.singletonList(fromVertex), sampleCount);
     }
 
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesNet,
@@ -130,6 +124,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             initialLogOfMasterP,
             random
         ) : initialStepSize;
+
+        resetVertexValue(sampleFromVertices, position);
 
         NUTSSampler.AutoTune autoTune = new NUTSSampler.AutoTune(
             stepSize,
@@ -190,6 +186,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static <T> void putValue(Vertex<T> vertex, Map<VertexId, ?> target) {
         ((Map<VertexId, T>) target).put(vertex.getId(), vertex.getValue());
+    }
+
+    private static void resetVertexValue(List<? extends Vertex> sampleFromVertices, Map<VertexId, DoubleTensor> previousPosition) {
+        for (Vertex vertex : sampleFromVertices) {
+            vertex.setValue(previousPosition.get(vertex.getId()));
+        }
     }
 
 }

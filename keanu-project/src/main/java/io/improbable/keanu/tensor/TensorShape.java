@@ -195,12 +195,6 @@ public class TensorShape {
         return paddedShape;
     }
 
-    public static long[] shapeSlice(int dimension, long[] shape) {
-        long[] newShape = Arrays.copyOf(shape, shape.length);
-        newShape[dimension] = 1;
-        return newShape;
-    }
-
     /**
      * It's possible to express negative dimensions, which are relative to the rank of a
      * tensor. E.g. given a rank 3 tensor, dimensions [-1, -2] would refer to the 3rd and 2nd dimension.
@@ -211,13 +205,7 @@ public class TensorShape {
      */
     public static int[] getAbsoluteDimensions(int rank, int[] dimensions) {
         for (int i = 0; i < dimensions.length; i++) {
-            if (dimensions[i] >= rank || dimensions[i] < -rank) {
-                throw new IllegalArgumentException("Dimension " + dimensions[i] + " is invalid for rank " + rank + " tensor.");
-            }
-
-            if (dimensions[i] < 0) {
-                dimensions[i] += rank;
-            }
+            dimensions[i] = getAbsoluteDimension(dimensions[i], rank);
         }
         return dimensions;
     }
@@ -233,6 +221,24 @@ public class TensorShape {
     public static long[] removeDimension(int dimension, long[] shape) {
         TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
         return ArrayUtils.remove(shape, dimension);
+    }
+
+    /**
+     * Finds the absolute dimension for a shape
+     *
+     * @param dimension the negative or positive dimension to find the absolute of
+     * @param rank      the rank
+     *
+     * @return an absolute dimension from a shape
+     */
+    public static int getAbsoluteDimension(int dimension, int rank) {
+        if (dimension >= rank || dimension < -rank) {
+            throw new IllegalArgumentException("Dimension " + dimension + " is invalid for rank " + rank + " tensor.");
+        }
+        if (dimension < 0) {
+            dimension += rank;
+        }
+        return dimension;
     }
 
 }

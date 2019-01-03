@@ -7,11 +7,12 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
-import io.improbable.keanu.vertices.intgr.IntegerTensorVertexSamples;
+import io.improbable.keanu.vertices.intgr.IntegerVertexSamples;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,26 @@ public class NetworkSamples {
         this.size = size;
     }
 
+    public static NetworkSamples from(List<NetworkSample> networkSamples) {
+        Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
+        List<Double> logOfMasterPForEachSample = new ArrayList<>();
+
+        networkSamples.forEach(networkSample -> addSamplesForNetworkSample(networkSample, samplesByVertex));
+        networkSamples.forEach(networkSample -> logOfMasterPForEachSample.add(networkSample.getLogOfMasterP()));
+        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, networkSamples.size());
+    }
+
+    private static void addSamplesForNetworkSample(NetworkSample networkSample, Map<VertexId, List<?>> samplesByVertex) {
+        for (VertexId vertexId : networkSample.getVertexIds()) {
+            addSampleForVertex(vertexId, networkSample.get(vertexId), samplesByVertex);
+        }
+    }
+
+    private static <T> void addSampleForVertex(VertexId vertexId, T value, Map<VertexId, List<?>> samples) {
+        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertexId, v -> new ArrayList<T>());
+        samplesForVertex.add(value);
+    }
+
     public int size() {
         return this.size;
     }
@@ -58,12 +79,12 @@ public class NetworkSamples {
         return new DoubleVertexSamples(samplesByVertex.get(vertexId));
     }
 
-    public IntegerTensorVertexSamples getIntegerTensorSamples(Vertex<IntegerTensor> vertex) {
+    public IntegerVertexSamples getIntegerTensorSamples(Vertex<IntegerTensor> vertex) {
         return getIntegerTensorSamples(vertex.getId());
     }
 
-    public IntegerTensorVertexSamples getIntegerTensorSamples(VertexId vertexId) {
-        return new IntegerTensorVertexSamples(samplesByVertex.get(vertexId));
+    public IntegerVertexSamples getIntegerTensorSamples(VertexId vertexId) {
+        return new IntegerVertexSamples(samplesByVertex.get(vertexId));
     }
 
     public NetworkSamples drop(int dropCount) {
@@ -131,7 +152,7 @@ public class NetworkSamples {
     public List<NetworkState> toNetworkStates() {
         List<NetworkState> states = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            states.add(new SamplesBackedNetworkState(samplesByVertex, i));
+            states.add(getNetworkState(i));
         }
         return states;
     }
@@ -171,5 +192,4 @@ public class NetworkSamples {
             return new HashSet<>(samplesByVertex.keySet());
         }
     }
-
 }

@@ -213,3 +213,12 @@ Here is the same implementation, but done in Java.
 ```java
 {% snippet LorenzJavaFull %}
 ```
+
+## Python Code
+
+Here is the same implementation, but done in Python.
+
+```java
+{% snippet LorenzPythonFull %}
+```
+

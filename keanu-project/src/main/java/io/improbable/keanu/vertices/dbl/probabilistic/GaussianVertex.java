@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -12,7 +13,6 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,9 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
      * @param mu          the mu of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
-    public GaussianVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
+    public GaussianVertex(@LoadShape long[] tensorShape,
+                          @LoadVertexParam(MU_NAME) DoubleVertex mu,
+                          @LoadVertexParam(SIGMA_NAME) DoubleVertex sigma) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), sigma.getShape());
 
@@ -50,8 +52,7 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     @ExportVertexToPythonBindings
-    public GaussianVertex(@LoadVertexParam(MU_NAME) DoubleVertex mu,
-                          @LoadVertexParam(SIGMA_NAME) DoubleVertex sigma) {
+    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
@@ -126,12 +127,4 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
         return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(shape, random);
     }
 
-    @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        if (isObserved()) {
-            return PartialDerivatives.OF_CONSTANT;
-        } else {
-            return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
-        }
-    }
 }

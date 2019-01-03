@@ -1,29 +1,30 @@
 package io.improbable.keanu.vertices.dbl;
 
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
 
 public interface Differentiable {
 
-    default PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        if (((Vertex)this).isObserved()) {
-            return PartialDerivatives.OF_CONSTANT;
+    default PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        if (((Vertex) this).isObserved()) {
+            return PartialDerivative.EMPTY;
         } else {
-            return PartialDerivatives.withRespectToSelf(((Vertex)this).getId(), ((Vertex)this).getShape());
+            return withRespectToSelf(((Vertex) this).getShape());
         }
     }
 
-    default Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        return Collections.singletonMap(
-            ((Vertex)this),
-            PartialDerivatives.withRespectToSelf(((Vertex)this).getId(), ((Vertex)this).getShape())
+    static PartialDerivative withRespectToSelf(long[] shape) {
+        return new PartialDerivative(
+            DoubleTensor.eye(TensorShape.getLength(shape)).reshape(TensorShape.concat(shape, shape))
         );
     }
 
-    default PartialDerivatives getDerivativeWrtLatents() {
-        return Differentiator.forwardModeAutoDiff((Vertex & Differentiable) this);
+    default Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        return Collections.emptyMap();
     }
 }

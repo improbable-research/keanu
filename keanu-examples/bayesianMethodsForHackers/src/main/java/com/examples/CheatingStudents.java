@@ -19,7 +19,7 @@ public class CheatingStudents {
 
     public static double runWithBernoulli(int numberOfStudents, int numberOfYesAnswers) {
 
-        int numberOfSamples = 10000;
+        int numberOfSamples = 2000;
         UniformVertex probabilityOfCheating = new UniformVertex(0.0, 1.0);
         BoolVertex studentCheated = new BernoulliVertex(new long[]{numberOfStudents}, probabilityOfCheating);
         BoolVertex answerIsTrue = new BernoulliVertex(new long[]{numberOfStudents}, 0.5);
@@ -45,7 +45,7 @@ public class CheatingStudents {
             .generatePosteriorSamples(network, singletonList(probabilityOfCheating));
 
         NetworkSamples networkSamples = samplesGenerator
-            .dropCount(numberOfSamples / 10)
+            .dropCount(numberOfSamples / 2)
             .downSampleInterval(network.getLatentVertices().size())
             .generate(numberOfSamples);
 
@@ -58,7 +58,7 @@ public class CheatingStudents {
     }
 
     public static double runUsingBinomial(int numberOfStudents, int numberOfYesAnswers) {
-        int numberOfSamples = 10000;
+        int numberOfSamples = 100;
 
         UniformVertex probabilityOfCheating = new UniformVertex(0.0, 1.0);
         DoubleVertex pYesAnswer = probabilityOfCheating.times(0.5).plus(0.25);

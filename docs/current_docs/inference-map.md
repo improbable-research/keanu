@@ -60,11 +60,11 @@ Let's say you've described the [thermometer model]({{ site.baseurl }}/docs/examp
 whether to use the Gradient or Non-Gradient Optimizer. You can use the following code to let Keanu decide which one to use.
 
 ```java
-        BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        Optimizer optimizer = Optimizer.of(bayesNet);
-        optimizer.maxAPosteriori();
+BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
+Optimizer optimizer = KeanuOptimizer.of(bayesNet);
+optimizer.maxAPosteriori();
 
-        double calculatedTemperature = temperature.getValue().scalar();
+double calculatedTemperature = temperature.getValue().scalar();
 ```
 
 The Optimizer mutates the values of the graph while finding the most probable values and leaves the graph in its
@@ -76,14 +76,14 @@ This section will focus on the parameters available to you on the Gradient Optim
 for the Gradient Optimizer that lets you change any combination of the default parameters. The snippet below demonstrates
 how to use the builder to change all of the available parameters.
 
+#### Java
+
 ```java
-BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-GradientOptimizer optimizer = GradientOptimizer.builder().
-        bayesianNetwork(bayesNet).
-        maxEvaluations(5000).
-        relativeThreshold(1e-8).
-        absoluteThreshold(1e-8).
-        build();
+GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(temperature.getConnectedGraph())
+    .maxEvaluations(5000)
+    .relativeThreshold(1e-8)
+    .absoluteThreshold(1e-8)
+    .build();
 optimizer.maxAPosteriori();
 
 double calculatedTemperature = temperature.getValue().scalar();
@@ -94,6 +94,14 @@ double calculatedTemperature = temperature.getValue().scalar();
 * `relativeThreshold` (default: 1e-8) - If the delta in the log prob is less than the log prob times relativeThreshold, the Optimizer has converged
 * `absoluteThreshold` (default: 1e-8) - If the delta in the log prob is less than absoluteThreshold, the Optimizer has converged
 
+#### Python
+
+```python
+optimizer = GradientOptimizer(bayes_net, max_evaluations=5000,
+                              relative_threshold=1e-8, absolute_threshold=1e-8)
+optimizer.max_a_posteriori()
+calculated_temperature = model.temperature.get_value()
+```
 
 ### Non-Gradient Optimizer
 
@@ -105,18 +113,17 @@ This section will focus on the parameters available to you on the Non-Gradient O
 for the Non-Gradient Optimizer that lets you change any combination of the default parameters. The snippet below demonstrates
 how to use the builder to change all of the available parameters. 
 
+#### Java
+
 ```java
-BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-OptimizerBounds temperatureBounds = new OptimizerBounds();
-temperatureBounds.addBound(temperature, -250., 250.0);
-NonGradientOptimizer optimizer = NonGradientOptimizer.builder().
-        bayesianNetwork(bayesNet).
-        maxEvaluations(5000).
-        boundsRange(100000).
-        optimizerBounds(temperatureBounds).
-        initialTrustRegionRadius(5.).
-        stoppingTrustRegionRadius(2e-8).
-        build();
+OptimizerBounds temperatureBounds = new OptimizerBounds().addBound(temperature.getId(), -250., 250.0);
+NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.builderFor(temperature.getConnectedGraph())
+    .maxEvaluations(5000)
+    .boundsRange(100000)
+    .optimizerBounds(temperatureBounds)
+    .initialTrustRegionRadius(5.)
+    .stoppingTrustRegionRadius(2e-8)
+    .build();
 optimizer.maxAPosteriori();
 
 double calculatedTemperature = temperature.getValue().scalar();
@@ -128,3 +135,12 @@ double calculatedTemperature = temperature.getValue().scalar();
 * `optimizerBounds` (default: no bounds) - a bounding box of 'allowed values' for a specific vertex 
 * `initialTrustRegionRadius` (default: 10) - initial trust region radius (refer to BOBYQA paper for detail)
 * `stoppingTrustRegionRadius` (default: 1e-8) - stopping trust region radius (refer to BOBYQA paper for detail) 
+
+#### Python
+
+```python
+optimizer = NonGradientOptimizer(bayes_net, max_evaluations=5000, bounds_range=100000.,
+                                 initial_trust_region_radius=5., stopping_trust_region_radius=2e-8)
+optimizer.max_a_posteriori()
+calculated_temperature = model.temperature.get_value()
+```

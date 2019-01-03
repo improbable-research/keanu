@@ -57,7 +57,7 @@ public class ArcTanVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -2.0, 2.0);
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -2.0, 2.0);
         ArcTanVertex outputVertex = inputVertex.times(2).atan();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-4);

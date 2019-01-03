@@ -2,13 +2,14 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
@@ -36,18 +37,35 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+
+        PartialDerivative dOutputTimesDeterminant = derivativeOfOutputWithRespectToSelf
+            .multiplyBy(inputVertex.getValue().determinant());
+
+        long[] resultShape = TensorShape.concat(
+            derivativeOfOutputWithRespectToSelf.get().getShape(),
+            inputVertex.getShape()
+        );
+
+        DoubleTensor reshapedPartial = PartialDerivative.increaseRankByAppendingOnesToShape(
+            dOutputTimesDeterminant.get(),
+            resultShape.length
+        );
+
+        DoubleTensor broadcastedPartial = DoubleTensor
+            .zeros(resultShape)
+            .plus(reshapedPartial);
+
         DoubleTensor inverseTranspose = inputVertex.getValue().transpose().matrixInverse();
 
-        PartialDerivatives derivativeOfOutputsWithRespectToInputs = derivativeOfOutputsWithRespectToSelf
-            .multiplyBy(inputVertex.getValue().determinant())
-            .multiplyAlongWrtDimensions(inverseTranspose, this.getShape());
+        PartialDerivative toInput = new PartialDerivative(broadcastedPartial)
+            .multiplyAlongWrtDimensions(inverseTranspose);
 
-        return Collections.singletonMap(inputVertex, derivativeOfOutputsWithRespectToInputs);
+        return Collections.singletonMap(inputVertex, toInput);
     }
 }

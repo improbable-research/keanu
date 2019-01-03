@@ -57,7 +57,7 @@ public class TanVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -1.0, 1.0);
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -1.0, 1.0);
         TanVertex outputVertex = inputVertex.div(3).tan();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.0001, 1e-6);

@@ -1,12 +1,11 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -17,7 +16,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,13 +78,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             .generate(sampleCount);
     }
 
-    public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
-                                              Vertex vertexToSampleFrom,
-                                              int sampleCount) {
-        return generatePosteriorSamples(bayesianNetwork, Collections.singletonList(vertexToSampleFrom))
-            .generate(sampleCount);
-    }
-
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
                                                             final List<? extends Vertex> verticesToSampleFrom) {
 
@@ -122,10 +113,10 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         private int sampleNum;
 
         public MetropolisHastingsSampler(List<Vertex> latentVertices,
-                       List<? extends Vertex> verticesToSampleFrom,
-                       MetropolisHastingsStep mhStep,
-                       MHStepVariableSelector variableSelector,
-                       double logProbabilityBeforeStep) {
+                                         List<? extends Vertex> verticesToSampleFrom,
+                                         MetropolisHastingsStep mhStep,
+                                         MHStepVariableSelector variableSelector,
+                                         double logProbabilityBeforeStep) {
             this.latentVertices = latentVertices;
             this.verticesToSampleFrom = verticesToSampleFrom;
             this.mhStep = mhStep;
@@ -154,9 +145,9 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         }
 
         @Override
-        public NetworkState sample() {
+        public NetworkSample sample() {
             step();
-            return new SimpleNetworkState(takeSample(verticesToSampleFrom));
+            return new NetworkSample(takeSample(verticesToSampleFrom), logProbabilityBeforeStep);
         }
     }
 

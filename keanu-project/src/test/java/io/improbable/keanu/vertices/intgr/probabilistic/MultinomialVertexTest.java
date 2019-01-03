@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.distributions.discrete.Multinomial;
@@ -17,6 +18,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.Conc
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -37,6 +39,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class MultinomialVertexTest {
+
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
 
     @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheProbabilitiesDontSumToOne() {

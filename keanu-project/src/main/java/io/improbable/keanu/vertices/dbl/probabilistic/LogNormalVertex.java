@@ -5,6 +5,7 @@ import io.improbable.keanu.distributions.continuous.LogNormal;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -39,7 +40,9 @@ public class LogNormalVertex extends DoubleVertex implements Differentiable, Pro
      *                    vertex or mu scalar
      * @param sigma       the sigma of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
-    public LogNormalVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
+    public LogNormalVertex(@LoadShape long[] tensorShape,
+                           @LoadVertexParam(MU_NAME) DoubleVertex mu,
+                           @LoadVertexParam(SIGMA_NAME) DoubleVertex sigma) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), sigma.getShape());
 
@@ -61,8 +64,7 @@ public class LogNormalVertex extends DoubleVertex implements Differentiable, Pro
     }
 
     @ExportVertexToPythonBindings
-    public LogNormalVertex(@LoadVertexParam(MU_NAME) DoubleVertex mu,
-                           @LoadVertexParam(SIGMA_NAME) DoubleVertex sigma) {
+    public LogNormalVertex(DoubleVertex mu, DoubleVertex sigma) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
