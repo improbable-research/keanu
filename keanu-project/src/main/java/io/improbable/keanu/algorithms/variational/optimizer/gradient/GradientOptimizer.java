@@ -1,7 +1,10 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.backend.VariableReference;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
@@ -17,6 +20,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjuga
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsDoubleTensors;
@@ -113,7 +117,7 @@ public class GradientOptimizer implements Optimizer {
     }
 
     @Override
-    public double maxAPosteriori() {
+    public OptimizedResult maxAPosteriori() {
         assertHasLatents();
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
@@ -127,7 +131,7 @@ public class GradientOptimizer implements Optimizer {
     }
 
     @Override
-    public double maxLikelihood() {
+    public OptimizedResult maxLikelihood() {
         assertHasLatents();
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
@@ -140,7 +144,7 @@ public class GradientOptimizer implements Optimizer {
         return optimize(fitnessFunction);
     }
 
-    private double optimize(FitnessFunctionWithGradient fitnessFunction) {
+    private OptimizedResult optimize(FitnessFunctionWithGradient fitnessFunction) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
@@ -174,7 +178,11 @@ public class GradientOptimizer implements Optimizer {
         );
 
         progressBar.finish();
-        return pointValuePair.getValue();
+
+        Map<VariableReference, DoubleTensor> optimizedValues = Optimizer
+            .convertFromPoint(pointValuePair.getPoint(), probabilisticWithGradientGraph.getLatentVariables());
+
+        return new OptimizedResult(optimizedValues, pointValuePair.getValue());
     }
 
     private static void warnIfGradientIsFlat(double[] gradient) {

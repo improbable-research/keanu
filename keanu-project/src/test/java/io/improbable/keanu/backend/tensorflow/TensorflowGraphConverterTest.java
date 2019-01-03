@@ -1,8 +1,8 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

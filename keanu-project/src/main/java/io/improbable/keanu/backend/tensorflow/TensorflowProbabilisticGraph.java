@@ -1,9 +1,9 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import io.improbable.keanu.backend.Variable;
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticGraph;
+import io.improbable.keanu.backend.Variable;
+import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,6 +37,11 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
 
     @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
+
+        if (logLikelihoodOp == null) {
+            throw new IllegalStateException("Likelihood is undefined");
+        }
+
         DoubleTensor logLikelihood = computableGraph.compute(inputs, logLikelihoodOp);
         return logLikelihood.scalar();
     }

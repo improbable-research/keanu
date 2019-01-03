@@ -324,15 +324,9 @@ public class TensorflowGraphConverter {
 
     public static TensorflowProbabilisticGraph convert(BayesianNetwork network, Map<Vertex<?>, Output<?>> vertexLookup) {
 
-        TensorflowComputableGraph computableGraph = convert(network.getVertices(), vertexLookup);
+        TensorflowComputableGraph computableGraph = convert(network.getVertices().get(0).getConnectedGraph(), vertexLookup);
 
         GraphBuilder graphBuilder = new GraphBuilder(computableGraph.getScope());
-
-        Output<Double> logLikelihoodOutput = addLogProbCalculation(
-            graphBuilder,
-            vertexLookup,
-            network.getObservedVertices()
-        );
 
         Output<Double> priorLogProbOutput = addLogProbCalculation(
             graphBuilder,
@@ -340,14 +334,27 @@ public class TensorflowGraphConverter {
             network.getLatentVertices()
         );
 
-        Output<Double> totalLogProbOutput = graphBuilder.add(logLikelihoodOutput, priorLogProbOutput);
+        Output<Double> totalLogProbOutput;
+        StringVariableReference logLikelihoodReference = null;
+
+        if (!network.getObservedVertices().isEmpty()) {
+            Output<Double> logLikelihoodOutput = addLogProbCalculation(
+                graphBuilder,
+                vertexLookup,
+                network.getObservedVertices()
+            );
+
+            logLikelihoodReference = new StringVariableReference(logLikelihoodOutput.op().name());
+            totalLogProbOutput = graphBuilder.add(logLikelihoodOutput, priorLogProbOutput);
+        } else {
+            totalLogProbOutput = priorLogProbOutput;
+        }
 
         List<Variable<?>> latentVariables = network.getLatentVertices().stream()
             .map(v -> new TensorflowVariable<>(computableGraph, v.getReference()))
             .collect(Collectors.toList());
 
         StringVariableReference logProbReference = new StringVariableReference(totalLogProbOutput.op().name());
-        StringVariableReference logLikelihoodReference = new StringVariableReference(logLikelihoodOutput.op().name());
 
         return new TensorflowProbabilisticGraph(computableGraph, latentVariables, logProbReference, logLikelihoodReference);
     }
@@ -438,8 +445,22 @@ public class TensorflowGraphConverter {
             .map(ref -> new TensorflowVariable<>(computeGraph, ref))
             .collect(Collectors.toList());
 
-        Map<VariableReference, VariableReference> gradientOutputNameToInputName = addGradients(
-            tensorflowProbabilisticGraph.getComputableGraph().getScope().graph(),
+        Graph computableGraph = tensorflowProbabilisticGraph.getComputableGraph().getScope().graph();
+
+
+        Map<VariableReference, VariableReference> logLikelihoodGradients = null;
+        VariableReference logLikelihoodOp = tensorflowProbabilisticGraph.getLogLikelihoodOp();
+
+        if (logLikelihoodOp != null) {
+            logLikelihoodGradients = addGradients(
+                computableGraph,
+                tensorflowProbabilisticGraph.getLogLikelihoodOp(),
+                latentVariablesReferences
+            );
+        }
+
+        Map<VariableReference, VariableReference> logProbGradients = addGradients(
+            computableGraph,
             tensorflowProbabilisticGraph.getLogProbOp(),
             latentVariablesReferences
         );
@@ -449,14 +470,15 @@ public class TensorflowGraphConverter {
             latentVariables,
             tensorflowProbabilisticGraph.getLogProbOp(),
             tensorflowProbabilisticGraph.getLogLikelihoodOp(),
-            gradientOutputNameToInputName
+            logProbGradients,
+            logLikelihoodGradients
         );
     }
 
     /**
      * @param graph               graph to add gradients
-     * @param ofLabel             of operation label
-     * @param withRespectToLabels with respect to labels
+     * @param ofLabel             of operation reference
+     * @param withRespectToLabels with respect to references
      * @return gradient output name to input name lookup
      */
     private static Map<VariableReference, VariableReference> addGradients(Graph graph,

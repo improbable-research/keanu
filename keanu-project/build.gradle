@@ -28,7 +28,7 @@ dependencies {
     compile 'org.apache.commons:commons-math3:3.6.1'
     compile 'org.nd4j:nd4j-native-platform:1.0.0-beta3'
 
-    compile 'org.tensorflow:tensorflow:1.12.0-rc0'
+    compile 'org.tensorflow:tensorflow:1.12.0'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.google.guava:guava:20.0'
