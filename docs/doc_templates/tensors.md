@@ -120,6 +120,88 @@ In this case, you must make sure that the size of the mu and sigma vectors match
 {% snippet TensorVector %}
 ```  
 
+## Tensor Broadcasting
+
+Broadcasting enables you to perform operations across tensors of different shape, rank and length.
+
+* length (the total number of elements)
+* rank (the number of dimensions)
+* shape (the length in each dimension). 
+
+Tensors can be added, subtracted, multiplied and more with each other. 
+It wouldn’t be very useful if you could only operate on tensors of the same shape, fortunately you can perform broadcasting.  
+
+### Tensor and Scalar
+
+Let’s start with a simple example, multiplying each element inside a matrix by a constant.
+
+Let’s define A as a tensor of shape [2, 2]. It’s therefore a 2x2 matrix of rank 2. 
+Let’s define B as a tensor of shape []. It’s therefore a rank 0 constant (a scalar).
+
+```java
+{% snippet TensorScalarBroadcast %}
+```
+
+We can do operations as normal between the two, even though they have different shapes. 
+In the case of a tensor and a scalar, the resulting tensor will always have the shape of the initial tensor.
+
+
+### Tensor and Tensor
+
+You will want to operate on tensors of different sizes. 
+Fortunately this is also supported given that you abide by certain broadcasting rules.
+
+Numpy have a very clear and thorough explanation of when broadcasting between tensors is valid and explanations of 
+how we determine which dimension to broadcast along that can be found [here](https://docs.scipy.org/doc/numpy-1.15.0/user/basics.broadcasting.html).
+
+In summary: When analysing two tensor shapes to determine if they are broadcastable, always read from the right. 
+If they are different rank, just ignore the remaining values on the left. 
+
+There is one simple rule that must be abided for broadcasting to be successful. 
+
+* When reading the shapes from the right, do they match or is one of the values a 1?
+
+Here are some examples of both cases.
+
+#### Subset of shape
+
+*Valid Example*
+
+Operating on a `[2, 2, 2]` and a `[2, 2]`
+
+```java
+{% snippet TensorBroadcastSubsetValid %}
+```
+
+*Invalid Example*
+
+Operating on a `[2, 2, 3]` and a `[2, 2]`
+
+```java
+{% snippet TensorBroadcastSubsetInvalid %}
+```
+
+#### Subset of shape or with 1’s
+
+*Valid Example*
+
+Operating on a `[2, 2, 2]` and a `[2, 2, 1]`
+
+```java
+{% snippet TensorBroadcastSubsetWithOnes %}
+```
+
+### Example
+
+So now that we know the rules, what’s a useful example of this?
+Let’s multiply a column vector along each column of a matrix.
+
+Operating on a `[2, 3]` and a `[2, 1]`
+
+```java
+{% snippet TensorBroadcastColumnExample %}
+```
+
 
 ## Example of Tensors
 Tensors can provide us with a more succinct way of describing problems and can allow us to solve problems computationally efficiently on the GPU. 
