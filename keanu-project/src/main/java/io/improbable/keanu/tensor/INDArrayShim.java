@@ -164,10 +164,10 @@ public class INDArrayShim {
 
     private static INDArray performOperationWithScalarTensorPreservingShape(INDArray left, INDArray right, BiFunction<INDArray, INDArray, INDArray> operation) {
         if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
             INDArray result = (left.length() == 1) ?
                 operation.apply(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right) :
                 operation.apply(left, Nd4j.valueArrayOf(left.shape(), right.getDouble(0)));
-            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
             return result.reshape(resultShape);
         } else {
             return operation.apply(left, right);
@@ -181,6 +181,7 @@ public class INDArrayShim {
 
     private static INDArray executeNd4jTransformOpWithPreservedScalarTensorShape(INDArray mask, INDArray right, DataBuffer.Type bufferType, QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> baseTransformOpConstructor) {
         if (mask.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
             if (mask.length() == 1) {
                 mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
                 Nd4j.getExecutioner().exec(
@@ -195,7 +196,6 @@ public class INDArrayShim {
                     )
                 );
             }
-            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
             return mask.reshape(resultShape);
         } else {
             Nd4j.getExecutioner().exec(
