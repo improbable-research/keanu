@@ -25,8 +25,20 @@ public class DoubleScalarTensorShapePreservationTest {
     }
 
     @Test
+    public void doubleScalarMultiplicationPreservesShapeReverse() {
+        Tensor multiplicationResult = scalarDoubleTensor.times(doubleTensor);
+        resultShapeMatchesBroadcastShape(multiplicationResult, doubleTensor, scalarDoubleTensor);
+    }
+
+    @Test
     public void doubleScalarAdditionPreservesShape() {
         Tensor additionResult = doubleTensor.plus(scalarDoubleTensor);
+        resultShapeMatchesBroadcastShape(additionResult, doubleTensor, scalarDoubleTensor);
+    }
+
+    @Test
+    public void doubleScalarAdditionPreservesShapeReverse() {
+        Tensor additionResult = scalarDoubleTensor.plus(doubleTensor);
         resultShapeMatchesBroadcastShape(additionResult, doubleTensor, scalarDoubleTensor);
     }
 
@@ -37,27 +49,15 @@ public class DoubleScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void doubleScalarSubtractionPreservesShape() {
-        Tensor subtractionResult = doubleTensor.minus(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(subtractionResult, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarMultiplicationPreservesShapeReverse() {
-        Tensor multiplicationResult = scalarDoubleTensor.times(doubleTensor);
-        resultShapeMatchesBroadcastShape(multiplicationResult, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarAdditionPreservesShapeReverse() {
-        Tensor additionResult = scalarDoubleTensor.plus(doubleTensor);
-        resultShapeMatchesBroadcastShape(additionResult, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
     public void doubleScalarDivisionPreservesShapeReverse() {
         Tensor divisionResult = scalarDoubleTensor.div(doubleTensor);
         resultShapeMatchesBroadcastShape(divisionResult, doubleTensor, scalarDoubleTensor);
+    }
+
+    @Test
+    public void doubleScalarSubtractionPreservesShape() {
+        Tensor subtractionResult = doubleTensor.minus(scalarDoubleTensor);
+        resultShapeMatchesBroadcastShape(subtractionResult, doubleTensor, scalarDoubleTensor);
     }
 
     @Test

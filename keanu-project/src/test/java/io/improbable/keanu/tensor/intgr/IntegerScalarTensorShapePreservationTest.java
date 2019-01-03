@@ -25,8 +25,20 @@ public class IntegerScalarTensorShapePreservationTest {
     }
 
     @Test
+    public void integerScalarMultiplicationPreservesShapeReverse() {
+        Tensor multiplicationResult = scalarIntTensor.times(intTensor);
+        resultShapeMatchesBroadcastShape(multiplicationResult, intTensor, scalarIntTensor);
+    }
+
+    @Test
     public void integerScalarAdditionPreservesShape() {
         Tensor additionResult = intTensor.plus(scalarIntTensor);
+        resultShapeMatchesBroadcastShape(additionResult, intTensor, scalarIntTensor);
+    }
+
+    @Test
+    public void integerScalarAdditionPreservesShapeReverse() {
+        Tensor additionResult = scalarIntTensor.plus(intTensor);
         resultShapeMatchesBroadcastShape(additionResult, intTensor, scalarIntTensor);
     }
 
@@ -37,27 +49,15 @@ public class IntegerScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void integerScalarSubtractionPreservesShape() {
-        Tensor subtractionResult = intTensor.minus(scalarIntTensor);
-        resultShapeMatchesBroadcastShape(subtractionResult, intTensor, scalarIntTensor);
-    }
-
-    @Test
-    public void integerScalarMultiplicationPreservesShapeReverse() {
-        Tensor multiplicationResult = scalarIntTensor.times(intTensor);
-        resultShapeMatchesBroadcastShape(multiplicationResult, intTensor, scalarIntTensor);
-    }
-
-    @Test
-    public void integerScalarAdditionPreservesShapeReverse() {
-        Tensor additionResult = scalarIntTensor.plus(intTensor);
-        resultShapeMatchesBroadcastShape(additionResult, intTensor, scalarIntTensor);
-    }
-
-    @Test
     public void integerScalarDivisionPreservesShapeReverse() {
         Tensor divisionResult = scalarIntTensor.div(intTensor);
         resultShapeMatchesBroadcastShape(divisionResult, intTensor, scalarIntTensor);
+    }
+
+    @Test
+    public void integerScalarSubtractionPreservesShape() {
+        Tensor subtractionResult = intTensor.minus(scalarIntTensor);
+        resultShapeMatchesBroadcastShape(subtractionResult, intTensor, scalarIntTensor);
     }
 
     @Test
