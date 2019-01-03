@@ -193,7 +193,7 @@ public class INDArrayShim {
         Result apply(First one, Second two, Third three, Fourth four);
     }
 
-    public static INDArray executeNd4jTransformOpWithPreservedScalarTensorShape(INDArray mask, INDArray right, DataBuffer.Type bufferType, QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> baseTransformOpConstructor) {
+    private static INDArray executeNd4jTransformOpWithPreservedScalarTensorShape(INDArray mask, INDArray right, DataBuffer.Type bufferType, QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> baseTransformOpConstructor) {
         if (mask.length() == 1 || right.length() == 1) {
             long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
             if (mask.length() == 1) {
