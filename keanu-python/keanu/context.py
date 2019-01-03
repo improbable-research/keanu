@@ -69,12 +69,12 @@ class KeanuContext(metaclass=Singleton):
         for (k, v) in python_map.items():
             try:
                 new_k = k.unwrap()
-            except AttributeError:
+            except (AttributeError, Py4JError):
                 new_k = k
 
             try:
                 new_v = v.unwrap()
-            except AttributeError:
+            except (AttributeError, Py4JError):
                 new_v = v
 
             m.put(new_k, new_v)
