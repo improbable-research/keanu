@@ -172,7 +172,6 @@ public class BinaryOperationTestHelpers {
         return DoubleTensor.create(diagonal).diag().asFlatDoubleArray();
     }
 
-    @Test
     public static <T extends DoubleVertex & Differentiable> void finiteDifferenceMatchesElementwise(BiFunction<UniformVertex, UniformVertex, T> op) {
         testWithFiniteDifference(op, new long[0], new long[0]);
         testWithFiniteDifference(op, new long[]{3}, new long[]{3});
@@ -180,7 +179,6 @@ public class BinaryOperationTestHelpers {
         testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{2, 2, 2});
     }
 
-    @Test
     public static <T extends DoubleVertex & Differentiable> void finiteDifferenceMatchesBroadcast(BiFunction<UniformVertex, UniformVertex, T> op) {
         testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{1, 1, 1});
         testWithFiniteDifference(op, new long[]{1, 1, 1}, new long[]{2, 2, 2});
@@ -195,6 +193,6 @@ public class BinaryOperationTestHelpers {
         UniformVertex A = new UniformVertex(leftShape, -10.0, 10.0);
         UniformVertex B = new UniformVertex(rightShape, -10.0, 10.0);
 
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), op.apply(A, B), 1e-6, 1e-10);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), op.apply(A, B), 1e-10, 1e-10);
     }
 }
