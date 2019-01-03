@@ -14,17 +14,17 @@ import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.ADD;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONCAT_V2;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONSTANT;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.PLACE_HOLDER;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.VARIABLE_V2;
+import static io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType.ADD;
+import static io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType.CONCAT_V2;
+import static io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType.CONSTANT;
+import static io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType.PLACE_HOLDER;
+import static io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType.VARIABLE_V2;
 
-public class GraphBuilder {
+public class TensorflowOpHelper {
 
     private Scope scope;
 
-    public GraphBuilder(Scope scope) {
+    public TensorflowOpHelper(Scope scope) {
         this.scope = scope;
     }
 

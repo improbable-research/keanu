@@ -25,7 +25,7 @@ public class TensorflowProbabilisticGraphFactory {
 
         TensorflowComputableGraph computableGraph = TensorflowComputableGraphFactory.convert(network.getVertices().get(0).getConnectedGraph(), vertexLookup);
 
-        GraphBuilder graphBuilder = new GraphBuilder(computableGraph.getScope());
+        TensorflowOpHelper graphBuilder = new TensorflowOpHelper(computableGraph.getScope());
 
         Output<Double> priorLogProbOutput = addLogProbCalculation(
             graphBuilder,
@@ -58,7 +58,7 @@ public class TensorflowProbabilisticGraphFactory {
         return new TensorflowProbabilisticGraph(computableGraph, latentVariables, logProbReference, logLikelihoodReference);
     }
 
-    private static Output<Double> addLogProbCalculation(GraphBuilder graphBuilder,
+    private static Output<Double> addLogProbCalculation(TensorflowOpHelper graphBuilder,
                                                         Map<Vertex<?>, Output<?>> vertexLookup,
                                                         List<Vertex> probabilisticVertices) {
         List<Output<Double>> logProbOps = new ArrayList<>();
@@ -78,7 +78,7 @@ public class TensorflowProbabilisticGraphFactory {
         return addLogProbSumTotal(logProbOps, graphBuilder);
     }
 
-    private static Output<Double> addLogProbFrom(LogProbGraph logProbGraph, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+    private static Output<Double> addLogProbFrom(LogProbGraph logProbGraph, Map<Vertex<?>, Output<?>> lookup, TensorflowOpHelper graphBuilder) {
 
         Map<Vertex<?>, Vertex<?>> inputs = logProbGraph.getInputs();
 
@@ -110,7 +110,7 @@ public class TensorflowProbabilisticGraphFactory {
         return (Output<Double>) lookup.get(logProbGraph.getLogProbOutput());
     }
 
-    private static Output<Double> addLogProbSumTotal(List<Output<Double>> logProbOps, GraphBuilder graphBuilder) {
+    private static Output<Double> addLogProbSumTotal(List<Output<Double>> logProbOps, TensorflowOpHelper graphBuilder) {
 
         Output<Double> totalLogProb = logProbOps.get(0);
 

@@ -1,6 +1,6 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType;
+import io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -113,9 +113,9 @@ public class TensorflowGraphConverter {
         opMappers.put(IntegerAbsVertex.class, unaryOp(OpType.ABS));
 
         //constants
-        opMappers.put(ConstantDoubleVertex.class, TensorflowGraphConverter::createConstant);
-        opMappers.put(ConstantIntegerVertex.class, TensorflowGraphConverter::createConstant);
-        opMappers.put(ConstantBoolVertex.class, TensorflowGraphConverter::createConstant);
+        opMappers.put(ConstantDoubleVertex.class, (vertex, lookup, graphBuilder) -> createConstant(vertex, graphBuilder));
+        opMappers.put(ConstantIntegerVertex.class, (vertex, lookup, graphBuilder) -> createConstant(vertex, graphBuilder));
+        opMappers.put(ConstantBoolVertex.class, (vertex, lookup, graphBuilder) -> createConstant(vertex, graphBuilder));
 
         //special case ops
         opMappers.put(DoubleIfVertex.class, TensorflowGraphConverter::createDoubleIf);
@@ -124,7 +124,7 @@ public class TensorflowGraphConverter {
     }
 
     interface OpMapper {
-        Output<?> apply(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder);
+        Output<?> apply(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, TensorflowOpHelper graphBuilder);
     }
 
     private static OpMapper binaryOp(OpType op) {
@@ -144,7 +144,7 @@ public class TensorflowGraphConverter {
         };
     }
 
-    private static Output<?> createDoubleIf(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+    private static Output<?> createDoubleIf(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, TensorflowOpHelper graphBuilder) {
         DoubleIfVertex doubleIfVertex = (DoubleIfVertex) vertex;
 
         Output<Boolean> predicate = (Output<Boolean>) lookup.get(doubleIfVertex.getPredicate());
@@ -160,7 +160,7 @@ public class TensorflowGraphConverter {
         return graphBuilder.where(predicate, thnBroadcast, elsBroadcast);
     }
 
-    private static Output<?> createConcat(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+    private static Output<?> createConcat(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, TensorflowOpHelper graphBuilder) {
         ConcatenationVertex concatenationVertex = (ConcatenationVertex) vertex;
 
         Output<Double>[] inputs = (Output<Double>[]) Operands.asOutputs(
@@ -172,7 +172,7 @@ public class TensorflowGraphConverter {
         return graphBuilder.concat(inputs, concatenationVertex.getDimension(), getTensorflowOpName(concatenationVertex));
     }
 
-    private static <T> Output<T> createSum(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+    private static <T> Output<T> createSum(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, TensorflowOpHelper graphBuilder) {
         SumVertex summationVertex = (SumVertex) vertex;
         Output<?> input = lookup.get(summationVertex.getInput());
         String name = getTensorflowOpName(vertex);
@@ -191,7 +191,7 @@ public class TensorflowGraphConverter {
         return graphBuilder.binaryOp(OpType.SUM, name, input, overDimensions);
     }
 
-    public static Output<?> createConstant(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+    public static Output<?> createConstant(Vertex<?> vertex, TensorflowOpHelper graphBuilder) {
 
         Object value = vertex.getValue();
 
@@ -209,7 +209,7 @@ public class TensorflowGraphConverter {
         throw new IllegalArgumentException("Cannot convert " + value.getClass());
     }
 
-    public static Output<?> createVariable(Vertex<?> vertex, GraphBuilder graphBuilder) {
+    public static Output<?> createVariable(Vertex<?> vertex, TensorflowOpHelper graphBuilder) {
 
         Object value = vertex.getValue();
 

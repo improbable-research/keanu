@@ -25,7 +25,7 @@ public class TensorflowComputableGraphFactory {
 
         Graph graph = new Graph();
         Scope scope = new Scope(graph);
-        GraphBuilder graphBuilder = new GraphBuilder(scope);
+        TensorflowOpHelper graphBuilder = new TensorflowOpHelper(scope);
 
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.addAll(vertices);
@@ -35,13 +35,13 @@ public class TensorflowComputableGraphFactory {
         Vertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
 
+            Output<?> visitingConverted;
             if (visiting instanceof Probabilistic) {
                 if (visiting.isObserved()) {
-                    lookup.put(visiting, TensorflowGraphConverter.createConstant(visiting, lookup, graphBuilder));
+                    visitingConverted = TensorflowGraphConverter.createConstant(visiting, graphBuilder);
                 } else {
-                    Output<?> tfVisiting = TensorflowGraphConverter.createVariable(visiting, graphBuilder);
+                    visitingConverted = TensorflowGraphConverter.createVariable(visiting, graphBuilder);
                     latentVariables.put(visiting.getReference(), visiting.getValue());
-                    lookup.put(visiting, tfVisiting);
                 }
             } else {
                 TensorflowGraphConverter.OpMapper vertexMapper = TensorflowGraphConverter.opMappers.get(visiting.getClass());
@@ -50,8 +50,10 @@ public class TensorflowComputableGraphFactory {
                     throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported for Tensorflow conversion");
                 }
 
-                lookup.put(visiting, vertexMapper.apply(visiting, lookup, graphBuilder));
+                visitingConverted = vertexMapper.apply(visiting, lookup, graphBuilder);
             }
+
+            lookup.put(visiting, visitingConverted);
         }
 
         return new TensorflowComputableGraph(new Session(scope.graph()), scope, latentVariables);
