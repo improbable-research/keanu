@@ -1,10 +1,13 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.experimental.UtilityClass;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class is meant to help with auto diff in operations that support implicit broadcasting. E.g. In
@@ -32,8 +35,11 @@ public class AutoDiffBroadcast {
 
         if (shouldCorrectPartialForScalar(partial, partialWrtShape, targetWrtShape)) {
 
-            int[] wrtDims = TensorShape.dimensionRange(-partialWrtShape.length, 0);
-            DoubleTensor partialSummed = partial.get().sum(wrtDims);
+            long[] partialShape = partial.get().getShape();
+
+            int[] broadcastDimensions = dimensionsWithShapeChange(partialShape, partialWrtShape.length, targetWrtShape);
+
+            DoubleTensor partialSummed = partial.get().sum(broadcastDimensions);
 
             long[] resultShape = TensorShape.concat(
                 partial.getOfShape(partialWrtShape),
@@ -56,5 +62,20 @@ public class AutoDiffBroadcast {
      */
     private static boolean shouldCorrectPartialForScalar(PartialDerivative partial, long[] actualShape, long[] expectedShape) {
         return partial.isPresent() && !Arrays.equals(actualShape, expectedShape);
+    }
+
+    private static int[] dimensionsWithShapeChange(long[] partialShape, int partialWrtRank, long[] wrtShape) {
+
+        final int partialRank = partialShape.length;
+        final int wrtRank = wrtShape.length;
+        List<Integer> dimensionMismatch = new ArrayList<>();
+
+        for (int i = 0; i < partialWrtRank; i++) {
+            if (i >= wrtRank || partialShape[partialRank - i - 1] != wrtShape[wrtRank - i - 1]) {
+                dimensionMismatch.add(-i - 1);
+            }
+        }
+
+        return Ints.toArray(dimensionMismatch);
     }
 }

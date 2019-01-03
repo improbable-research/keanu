@@ -800,7 +800,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public FlattenedView<Double> getFlattenedView() {
-        return new SimpleDoubleFlattenedView(value);
+        return new SimpleDoubleFlattenedView();
     }
 
     @Override
@@ -863,13 +863,10 @@ public class ScalarDoubleTensor implements DoubleTensor {
             "\n}";
     }
 
-    private static class SimpleDoubleFlattenedView implements FlattenedView<Double> {
+    private class SimpleDoubleFlattenedView implements FlattenedView<Double> {
 
-        private double value;
 
-        public SimpleDoubleFlattenedView(double value) {
-            this.value = value;
-        }
+        public SimpleDoubleFlattenedView() { }
 
         @Override
         public long size() {
@@ -894,7 +891,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             if (index != 0) {
                 throw new IndexOutOfBoundsException();
             }
-            this.value = value;
+            ScalarDoubleTensor.this.value = value;
         }
     }
 }

@@ -154,6 +154,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor sum(int... overDimensions) {
+        if (overDimensions.length == 0) {
+            return duplicate();
+        }
         return new Nd4jDoubleTensor(INDArrayShim.sum(tensor, overDimensions));
     }
 

@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkIsBroadcastable;
 
 @DisplayInformationForOutput(displayName = "*")
 public class MultiplicationVertex extends DoubleBinaryOpVertex {
@@ -26,7 +26,7 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     @ExportVertexToPythonBindings
     public MultiplicationVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
                                 @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
-        super(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right);
+        super(checkIsBroadcastable(left.getShape(), right.getShape()), left, right);
     }
 
     @Override
