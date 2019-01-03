@@ -195,7 +195,6 @@ public class INDArrayShim {
 
     private static INDArray executeNd4jTransformOpWithPreservedScalarTensorShape(INDArray mask, INDArray right, DataBuffer.Type bufferType, QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> baseTransformOpConstructor) {
         if (mask.length() == 1 || right.length() == 1) {
-            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
             if (mask.length() == 1) {
                 mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
                 Nd4j.getExecutioner().exec(
@@ -210,12 +209,14 @@ public class INDArrayShim {
                     )
                 );
             }
+            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
             return mask.reshape(resultShape);
+        } else {
+            Nd4j.getExecutioner().exec(
+                baseTransformOpConstructor.apply(mask, right, mask, mask.length())
+            );
+            return mask;
         }
-        Nd4j.getExecutioner().exec(
-            baseTransformOpConstructor.apply(mask, right, mask, mask.length())
-        );
-        return mask;
     }
 
     public static INDArray getGreaterThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
