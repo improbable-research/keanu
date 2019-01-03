@@ -9,7 +9,6 @@ import org.tensorflow.Output;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,17 +17,16 @@ import java.util.stream.Collectors;
 public class TensorflowProbabilisticGraphFactory {
 
     public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
-        return convert(network, new HashMap<>());
-    }
 
-    public static TensorflowProbabilisticGraph convert(BayesianNetwork network, Map<Vertex<?>, Output<?>> vertexLookup) {
+        TensorflowGraphBuilder graphBuilder = new TensorflowGraphBuilder();
+        TensorflowComputableGraph computableGraph = TensorflowComputableGraphFactory.convert(network.getVertices().get(0).getConnectedGraph(), graphBuilder);
 
-        TensorflowComputableGraph computableGraph = TensorflowComputableGraphFactory.convert(network.getVertices().get(0).getConnectedGraph(), vertexLookup);
+        Map<Vertex<?>, Output<?>> vertexLookup = graphBuilder.getLookup();
 
-        TensorflowOpHelper graphBuilder = new TensorflowOpHelper(computableGraph.getScope());
+        TensorflowOpHelper opHelper = new TensorflowOpHelper(computableGraph.getScope());
 
         Output<Double> priorLogProbOutput = addLogProbCalculation(
-            graphBuilder,
+            opHelper,
             vertexLookup,
             network.getLatentVertices()
         );
@@ -38,13 +36,13 @@ public class TensorflowProbabilisticGraphFactory {
 
         if (!network.getObservedVertices().isEmpty()) {
             Output<Double> logLikelihoodOutput = addLogProbCalculation(
-                graphBuilder,
+                opHelper,
                 vertexLookup,
                 network.getObservedVertices()
             );
 
             logLikelihoodReference = new StringVariableReference(logLikelihoodOutput.op().name());
-            totalLogProbOutput = graphBuilder.add(logLikelihoodOutput, priorLogProbOutput);
+            totalLogProbOutput = opHelper.add(logLikelihoodOutput, priorLogProbOutput);
         } else {
             totalLogProbOutput = priorLogProbOutput;
         }

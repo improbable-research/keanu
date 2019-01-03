@@ -17,8 +17,7 @@ public class TensorflowProbabilisticGraphWithGradientFactory {
 
     public static TensorflowProbabilisticGraphWithGradient convert(BayesianNetwork bayesianNetwork) {
 
-        Map<Vertex<?>, Output<?>> vertexLookup = new HashMap<>();
-        TensorflowProbabilisticGraph tensorflowProbabilisticGraph = TensorflowProbabilisticGraphFactory.convert(bayesianNetwork, vertexLookup);
+        TensorflowProbabilisticGraph tensorflowProbabilisticGraph = TensorflowProbabilisticGraphFactory.convert(bayesianNetwork);
 
         TensorflowComputableGraph computeGraph = tensorflowProbabilisticGraph.getComputableGraph();
 
