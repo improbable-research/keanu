@@ -145,5 +145,4 @@ generateDocumentation.dependsOn(preparePythonEnvironment)
 test.dependsOn(preparePythonEnvironment)
 test.dependsOn(pytest)
 check.dependsOn(formatCheck)
-assemble.dependsOn(buildBinaryDistribution)
 
