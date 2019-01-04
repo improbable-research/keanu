@@ -148,17 +148,19 @@ Broadcasting enables you to perform operations across tensors of different shape
 
 * length (the total number of elements)
 * rank (the number of dimensions)
-* shape (the length in each dimension). 
+* shape (the size in each dimension)
+
+For example a 3x3 matrix has rank 2, shape `[3, 3]`, and length 9. 
 
 Tensors can be added, subtracted, multiplied and more with each other. 
 It wouldn’t be very useful if you could only operate on tensors of the same shape, fortunately you can perform broadcasting.  
 
 ### Tensor and Scalar
 
-Let’s start with a simple example, multiplying each element inside a matrix by a constant.
+Let’s start with a simple example, multiplying each element inside a matrix by a single value.
 
-Let’s define A as a tensor of shape [2, 2]. It’s therefore a 2x2 matrix of rank 2. 
-Let’s define B as a tensor of shape []. It’s therefore a rank 0 constant (a scalar).
+Let’s define A as a tensor of shape `[2, 2]`. It’s therefore a 2x2 matrix of rank 2. 
+Let’s define B as a tensor of shape `[]`. It’s therefore a rank 0 value (a scalar).
 
 ```java
 DoubleTensor A = DoubleTensor.create(new double[]{
@@ -172,7 +174,7 @@ DoubleTensor C = A.times(B); //shape [2, 2]
 ```
 
 We can do operations as normal between the two, even though they have different shapes. 
-In the case of a tensor and a scalar, the resulting tensor will always have the shape of the initial tensor.
+The resulting tensor will always have the shape of the initial tensor.
 
 
 ### Tensor and Tensor
@@ -200,11 +202,14 @@ Operating on a `[2, 2, 2]` and a `[2, 2]`
 
 ```java
 DoubleTensor A = DoubleTensor.create(new double[]{
-    10., 20., 30., 40.,
-    50., 60., 70., 80.
+    10., 20.,
+    30., 40.,
+
+    50., 60.,
+    70., 80.
 }, 2, 2, 2);  //shape [2, 2, 2]
 
-DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
+DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2);  //shape [2, 2]
 
 DoubleTensor C = A.times(B); //shape [2, 2, 2]
 DoubleTensor D = A.plus(B); //shape[2, 2, 2]
@@ -216,11 +221,17 @@ Operating on a `[2, 2, 3]` and a `[2, 2]`
 
 ```java
 DoubleTensor A = DoubleTensor.create(new double[]{
-    10., 20., 30., 40., 50., 60.,
-    70., 80., 90., 100., 110., 120.
+    10., 20.,
+    30., 40.,
+
+    50., 60.,
+    70., 80.,
+
+    90., 100.,
+    110., 120.
 }, 2, 2, 3);  //shape [2, 2, 3]
 
-DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
+DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2);  //shape [2, 2]
 
 DoubleTensor C = A.times(B); //error
 DoubleTensor D = A.plus(B); //error
@@ -234,11 +245,14 @@ Operating on a `[2, 2, 2]` and a `[2, 2, 1]`
 
 ```java
 DoubleTensor A = DoubleTensor.create(new double[]{
-    10., 20., 30., 40.,
-    50., 60., 70., 80.
+    10., 20.,
+    30., 40.,
+
+    50., 60.,
+    70., 80.
 }, 2, 2, 2);  //shape [2, 2, 2]
 
-DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2, 1);  //shape [2, 2, 1]
+DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2, 1);  //shape [2, 2, 1]
 
 DoubleTensor C = A.times(B); //shape [2, 2, 2]
 DoubleTensor D = A.plus(B); //shape[2, 2, 2]

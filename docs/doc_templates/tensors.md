@@ -126,24 +126,26 @@ Broadcasting enables you to perform operations across tensors of different shape
 
 * length (the total number of elements)
 * rank (the number of dimensions)
-* shape (the length in each dimension). 
+* shape (the size in each dimension)
+
+For example a 3x3 matrix has rank 2, shape `[3, 3]`, and length 9. 
 
 Tensors can be added, subtracted, multiplied and more with each other. 
 It wouldn’t be very useful if you could only operate on tensors of the same shape, fortunately you can perform broadcasting.  
 
 ### Tensor and Scalar
 
-Let’s start with a simple example, multiplying each element inside a matrix by a constant.
+Let’s start with a simple example, multiplying each element inside a matrix by a single value.
 
-Let’s define A as a tensor of shape [2, 2]. It’s therefore a 2x2 matrix of rank 2. 
-Let’s define B as a tensor of shape []. It’s therefore a rank 0 constant (a scalar).
+Let’s define A as a tensor of shape `[2, 2]`. It’s therefore a 2x2 matrix of rank 2. 
+Let’s define B as a tensor of shape `[]`. It’s therefore a rank 0 value (a scalar).
 
 ```java
 {% snippet TensorScalarBroadcast %}
 ```
 
 We can do operations as normal between the two, even though they have different shapes. 
-In the case of a tensor and a scalar, the resulting tensor will always have the shape of the initial tensor.
+The resulting tensor will always have the shape of the initial tensor.
 
 
 ### Tensor and Tensor

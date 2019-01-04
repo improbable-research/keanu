@@ -133,11 +133,14 @@ public class Tensors {
     private static void tensorBroadcastSubsetValid() {
         //%%SNIPPET_START%% TensorBroadcastSubsetValid
         DoubleTensor A = DoubleTensor.create(new double[]{
-            10., 20., 30., 40.,
-            50., 60., 70., 80.
+            10., 20.,
+            30., 40.,
+
+            50., 60.,
+            70., 80.
         }, 2, 2, 2);  //shape [2, 2, 2]
 
-        DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
+        DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2);  //shape [2, 2]
 
         DoubleTensor C = A.times(B); //shape [2, 2, 2]
         DoubleTensor D = A.plus(B); //shape[2, 2, 2]
@@ -147,11 +150,17 @@ public class Tensors {
     private static void tensorBroadcastSubsetInvalid() {
         //%%SNIPPET_START%% TensorBroadcastSubsetInvalid
         DoubleTensor A = DoubleTensor.create(new double[]{
-            10., 20., 30., 40., 50., 60.,
-            70., 80., 90., 100., 110., 120.
+            10., 20.,
+            30., 40.,
+
+            50., 60.,
+            70., 80.,
+
+            90., 100.,
+            110., 120.
         }, 2, 2, 3);  //shape [2, 2, 3]
 
-        DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2);  //shape [2, 2]
+        DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2);  //shape [2, 2]
 
         DoubleTensor C = A.times(B); //error
         DoubleTensor D = A.plus(B); //error
@@ -161,11 +170,14 @@ public class Tensors {
     private static void tensorBroadcastWithOnes() {
         //%%SNIPPET_START%% TensorBroadcastSubsetWithOnes
         DoubleTensor A = DoubleTensor.create(new double[]{
-            10., 20., 30., 40.,
-            50., 60., 70., 80.
+            10., 20.,
+            30., 40.,
+
+            50., 60.,
+            70., 80.
         }, 2, 2, 2);  //shape [2, 2, 2]
 
-        DoubleTensor B = DoubleTensor.arange(1, 8).reshape(2, 2, 1);  //shape [2, 2, 1]
+        DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2, 1);  //shape [2, 2, 1]
 
         DoubleTensor C = A.times(B); //shape [2, 2, 2]
         DoubleTensor D = A.plus(B); //shape[2, 2, 2]
