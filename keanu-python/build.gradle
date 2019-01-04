@@ -143,6 +143,6 @@ pythonVersionInfo.mustRunAfter(installPipenv)
 installDependencies.dependsOn(installPipenv)
 generateDocumentation.dependsOn(preparePythonEnvironment)
 test.dependsOn(preparePythonEnvironment)
+test.dependsOn(formatCheck)
 test.dependsOn(pytest)
-check.dependsOn(formatCheck)
 
