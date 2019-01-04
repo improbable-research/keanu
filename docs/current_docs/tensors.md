@@ -155,7 +155,7 @@ It wouldn’t be very useful if you could only operate on tensors of the same sh
 
 ### Tensor and Scalar
 
-Let’s start with a simple example, multiplying each element inside a matrix by a constant.
+Let’s start with a simple example: multiplying each element inside a matrix by a constant.
 
 Let’s define A as a tensor of shape [2, 2]. It’s therefore a 2x2 matrix of rank 2. 
 Let’s define B as a tensor of shape []. It’s therefore a rank 0 constant (a scalar).
