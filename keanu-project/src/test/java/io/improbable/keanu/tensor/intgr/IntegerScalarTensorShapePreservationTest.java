@@ -28,28 +28,33 @@ public class IntegerScalarTensorShapePreservationTest {
     @Test
     public void tensorMultiplicationPreservesShape() {
         checkOperationPreservesShape(IntegerTensor::times);
+        checkOperationPreservesShape(IntegerTensor::timesInPlace);
     }
 
     @Test
     public void tensorAdditionPreservesShape() {
         checkOperationPreservesShape(IntegerTensor::plus);
+        checkOperationPreservesShape(IntegerTensor::plusInPlace);
 
     }
 
     @Test
     public void tensorDivisionPreservesShape() {
         checkOperationPreservesShape(IntegerTensor::div);
+        checkOperationPreservesShape(IntegerTensor::divInPlace);
 
     }
 
     @Test
     public void tensorSubtractionPreservesShape() {
         checkOperationPreservesShape(IntegerTensor::minus);
+        checkOperationPreservesShape(IntegerTensor::minusInPlace);
     }
 
     @Test
     public void tensorPowerPreservesShape() {
         checkOperationPreservesShape(IntegerTensor::pow);
+        checkOperationPreservesShape(IntegerTensor::powInPlace);
 
     }
 
@@ -79,12 +84,14 @@ public class IntegerScalarTensorShapePreservationTest {
 
     @Test
     public void tensorMaxInPlacePreservesShape() {
+        checkOperationPreservesShape(IntegerTensor::max);
         checkOperationPreservesShape(IntegerTensor::maxInPlace);
 
     }
 
     @Test
     public void tensorMinInPlacePreservesShape() {
+        checkOperationPreservesShape(IntegerTensor::min);
         checkOperationPreservesShape(IntegerTensor::minInPlace);
 
     }

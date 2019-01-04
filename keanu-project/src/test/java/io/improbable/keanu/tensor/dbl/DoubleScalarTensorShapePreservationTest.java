@@ -28,34 +28,40 @@ public class DoubleScalarTensorShapePreservationTest {
     @Test
     public void tensorMultiplicationPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::times);
+        checkOperationPreservesShape(DoubleTensor::timesInPlace);
     }
 
     @Test
     public void tensorAdditionPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::plus);
+        checkOperationPreservesShape(DoubleTensor::plusInPlace);
 
     }
 
     @Test
     public void tensorDivisionPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::div);
+        checkOperationPreservesShape(DoubleTensor::divInPlace);
 
     }
 
     @Test
     public void tensorSubtractionPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::minus);
+        checkOperationPreservesShape(DoubleTensor::minusInPlace);
 
     }
 
     @Test
     public void tensorPowerPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::pow);
+        checkOperationPreservesShape(DoubleTensor::powInPlace);
     }
 
     @Test
     public void tensorAtan2PreservesShape() {
         checkOperationPreservesShape(DoubleTensor::atan2);
+        checkOperationPreservesShape(DoubleTensor::atan2InPlace);
 
     }
 
@@ -85,12 +91,14 @@ public class DoubleScalarTensorShapePreservationTest {
 
     @Test
     public void tensorMaxInPlacePreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::max);
         checkOperationPreservesShape(DoubleTensor::maxInPlace);
 
     }
 
     @Test
     public void tensorMinInPlacePreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::min);
         checkOperationPreservesShape(DoubleTensor::minInPlace);
 
     }
