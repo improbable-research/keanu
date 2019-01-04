@@ -5,226 +5,138 @@ import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.api.shape.Shape;
 
-import static org.junit.Assert.assertArrayEquals;
+import java.util.function.BiFunction;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class DoubleScalarTensorShapePreservationTest {
 
-    private static DoubleTensor doubleTensor;
-    private static DoubleTensor scalarDoubleTensor;
+    private static Nd4jDoubleTensor doubleTensor;
+    private static Nd4jDoubleTensor lengthOneTensor;
+    private static ScalarDoubleTensor scalarDoubleTensor;
+    private static DoubleTensor[] tensors;
 
     @Before
     public void setup() {
-        doubleTensor = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, new long[]{2, 3});
-        scalarDoubleTensor = DoubleTensor.create(1.0, new long[]{1, 1, 1, 1});
+        doubleTensor = new Nd4jDoubleTensor(new double[]{1, 2, 3, 4, 5, 6}, new long[]{2, 3});
+        lengthOneTensor = new Nd4jDoubleTensor(new double[]{1.0}, new long[]{1, 1, 1, 1});
+        scalarDoubleTensor = new ScalarDoubleTensor(1.);
+        tensors = new DoubleTensor[]{doubleTensor, lengthOneTensor, scalarDoubleTensor};
     }
 
     @Test
-    public void doubleScalarMultiplicationPreservesShape() {
-        Tensor multiplicationResult = doubleTensor.times(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(multiplicationResult, doubleTensor, scalarDoubleTensor);
+    public void tensorMultiplicationPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::times);
     }
 
     @Test
-    public void doubleScalarMultiplicationPreservesShapeReverse() {
-        Tensor multiplicationResult = scalarDoubleTensor.times(doubleTensor);
-        resultShapeMatchesBroadcastShape(multiplicationResult, doubleTensor, scalarDoubleTensor);
+    public void tensorAdditionPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::plus);
+
     }
 
     @Test
-    public void doubleScalarAdditionPreservesShape() {
-        Tensor additionResult = doubleTensor.plus(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(additionResult, doubleTensor, scalarDoubleTensor);
+    public void tensorDivisionPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::div);
+
     }
 
     @Test
-    public void doubleScalarAdditionPreservesShapeReverse() {
-        Tensor additionResult = scalarDoubleTensor.plus(doubleTensor);
-        resultShapeMatchesBroadcastShape(additionResult, doubleTensor, scalarDoubleTensor);
+    public void tensorSubtractionPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::minus);
+
     }
 
     @Test
-    public void doubleScalarDivisionPreservesShape() {
-        Tensor divisionResult = doubleTensor.div(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(divisionResult, doubleTensor, scalarDoubleTensor);
+    public void tensorPowerPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::pow);
     }
 
     @Test
-    public void doubleScalarDivisionPreservesShapeReverse() {
-        Tensor divisionResult = scalarDoubleTensor.div(doubleTensor);
-        resultShapeMatchesBroadcastShape(divisionResult, doubleTensor, scalarDoubleTensor);
+    public void tensorAtan2PreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::atan2);
+
     }
 
     @Test
-    public void doubleScalarSubtractionPreservesShape() {
-        Tensor subtractionResult = doubleTensor.minus(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(subtractionResult, doubleTensor, scalarDoubleTensor);
+    public void tensorGetGreaterThanMaskPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::getGreaterThanMask);
+
     }
 
     @Test
-    public void doubleScalarSubtractionPreservesShapeReverse() {
-        Tensor subtractionResult = scalarDoubleTensor.minus(doubleTensor);
-        resultShapeMatchesBroadcastShape(subtractionResult, doubleTensor, scalarDoubleTensor);
+    public void tensorGetGreaterThanOrEqualToMaskPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::getGreaterThanOrEqualToMask);
+
     }
 
     @Test
-    public void doubleScalarPowerPreservesShape() {
-        Tensor powerResult = doubleTensor.pow(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(powerResult, doubleTensor, scalarDoubleTensor);
+    public void tensorGetLessThanMaskPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::getLessThanMask);
+
     }
 
     @Test
-    public void doubleScalarPowerPreservesShapeReverse() {
-        Tensor powerResult = scalarDoubleTensor.pow(doubleTensor);
-        resultShapeMatchesBroadcastShape(powerResult, doubleTensor, scalarDoubleTensor);
+    public void tensorGetLessThanOrEqualToMaskPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::getLessThanOrEqualToMask);
+
     }
 
     @Test
-    public void doubleScalarAtan2PreservesShape() {
-        Tensor atan2Result = doubleTensor.atan2(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(atan2Result, doubleTensor, scalarDoubleTensor);
+    public void tensorMaxInPlacePreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::maxInPlace);
+
     }
 
     @Test
-    public void doubleScalarAtan2PreservesShapeReverse() {
-        Tensor atan2Result = scalarDoubleTensor.atan2(doubleTensor);
-        resultShapeMatchesBroadcastShape(atan2Result, doubleTensor, scalarDoubleTensor);
+    public void tensorMinInPlacePreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::minInPlace);
+
     }
 
     @Test
-    public void doubleScalarGetGreaterThanMaskPreservesShape() {
-        Tensor result = doubleTensor.getGreaterThanMask(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
+    public void tensorLessThanPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::lessThan);
+
     }
 
     @Test
-    public void doubleScalarGetGreaterThanMaskPreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.getGreaterThanMask(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
+    public void tensorLessThanOrEqualPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::lessThanOrEqual);
+
     }
 
     @Test
-    public void doubleScalarGetGreaterThanOrEqualToMaskPreservesShape() {
-        Tensor result = doubleTensor.getGreaterThanOrEqualToMask(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
+    public void tensorGreaterThanPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::greaterThan);
+
     }
 
     @Test
-    public void doubleScalarGetGreaterThanOrEqualToMaskPreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.getGreaterThanOrEqualToMask(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
+    public void tensorGreaterThanOrEqualPreservesShape() {
+        checkOperationPreservesShape(DoubleTensor::greaterThanOrEqual);
+
     }
 
     @Test
-    public void doubleScalarGetLessThanMaskPreservesShape() {
-        Tensor result = doubleTensor.getLessThanMask(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
+    public void tensorElementwiseEqualsPreservesShape() {
+        checkOperationPreservesShape((l,r) -> l.elementwiseEquals(r));
     }
 
-    @Test
-    public void doubleScalarGetLessThanMaskPreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.getLessThanMask(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
 
-    @Test
-    public void doubleScalarGetLessThanOrEqualToMaskPreservesShape() {
-        Tensor result = doubleTensor.getLessThanOrEqualToMask(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarGetLessThanOrEqualToMaskPreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.getLessThanOrEqualToMask(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarMaxInPlacePreservesShape() {
-        Tensor result = doubleTensor.maxInPlace(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarMaxInPlacePreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.maxInPlace(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarMinInPlacePreservesShape() {
-        Tensor result = doubleTensor.minInPlace(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarMinInPlacePreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.minInPlace(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarLessThanPreservesShape() {
-        Tensor result = doubleTensor.lessThan(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarLessThanPreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.lessThan(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarLessThanOrEqualPreservesShape() {
-        Tensor result = doubleTensor.lessThanOrEqual(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarLessThanOrEqualPreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.lessThanOrEqual(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarGreaterThanPreservesShape() {
-        Tensor result = doubleTensor.greaterThan(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarGreaterThanPreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.greaterThan(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarGreaterThanOrEqualPreservesShape() {
-        Tensor result = doubleTensor.greaterThanOrEqual(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarGreaterThanOrEqualPreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.greaterThan(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarElementwiseEqualsPreservesShape() {
-        Tensor result = doubleTensor.elementwiseEquals(scalarDoubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
-    }
-
-    @Test
-    public void doubleScalarElementwiseEqualsPreservesShapeReverse() {
-        Tensor result = scalarDoubleTensor.elementwiseEquals(doubleTensor);
-        resultShapeMatchesBroadcastShape(result, doubleTensor, scalarDoubleTensor);
+    private void checkOperationPreservesShape(BiFunction<DoubleTensor, DoubleTensor, Tensor> operation) {
+        for (DoubleTensor t1 : tensors) {
+            for (DoubleTensor t2 : tensors) {
+                Tensor result = operation.apply(t1, t2);
+                resultShapeMatchesBroadcastShape(result, t1, t2);
+            }
+        }
     }
 
     private static void resultShapeMatchesBroadcastShape(Tensor result, Tensor input1, Tensor input2) {
         long[] broadcastShape = Shape.broadcastOutputShape(input1.getShape(), input2.getShape());
         long[] resultShape = result.getShape();
-        assertArrayEquals(broadcastShape, resultShape);
+        assertThat(broadcastShape, equalTo(resultShape));
     }
 }
