@@ -177,7 +177,7 @@ In the case of a tensor and a scalar, the resulting tensor will always have the 
 
 ### Tensor and Tensor
 
-You will want to operate on tensors of different sizes. 
+Sometimes you will want to operate on tensors of different sizes. 
 Fortunately this is also supported given that you abide by certain broadcasting rules.
 
 Numpy have a very clear and thorough explanation of when broadcasting between tensors is valid and explanations of 
