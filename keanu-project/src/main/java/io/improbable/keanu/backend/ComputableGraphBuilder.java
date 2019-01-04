@@ -7,9 +7,21 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class ComputableGraphConverter {
+public interface ComputableGraphBuilder<T extends ComputableGraph> {
 
-    public static <T extends ComputableGraph> T convert(Collection<? extends Vertex> vertices, GraphBuilder<T> graphBuilder) {
+    void createConstant(Vertex visiting);
+
+    void createVariable(Vertex visiting);
+
+    Collection<VariableReference> getLatentVariables();
+
+    void create(Vertex visiting);
+
+    void alias(VariableReference from, VariableReference to);
+
+    VariableReference add(VariableReference left, VariableReference right);
+
+    default void convert(Collection<? extends Vertex> vertices) {
 
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(
             Comparator.comparing(Vertex::getId, Comparator.naturalOrder())
@@ -22,16 +34,16 @@ public class ComputableGraphConverter {
 
             if (visiting instanceof Probabilistic) {
                 if (visiting.isObserved()) {
-                    graphBuilder.createConstant(visiting);
+                    createConstant(visiting);
                 } else {
-                    graphBuilder.createVariable(visiting);
+                    createVariable(visiting);
                 }
             } else {
-                graphBuilder.convert(visiting);
+                create(visiting);
             }
 
         }
-
-        return graphBuilder.build();
     }
+
+    T build();
 }

@@ -12,6 +12,9 @@ public class LogProbGraph {
 
     @Getter
     @Singular
+    /*
+     * parameter -> placeholder in log-prob-graph
+     */
     private final Map<Vertex<?>, Vertex<?>> inputs;
 
     @Getter
