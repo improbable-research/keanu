@@ -151,7 +151,7 @@ Broadcasting enables you to perform operations across tensors of different shape
 * shape (the length in each dimension). 
 
 Tensors can be added, subtracted, multiplied and more with each other. 
-It wouldn’t be very useful if you could only operate on tensors of the same shape, fortunately you can perform broadcasting.  
+It wouldn’t be very useful if you could only operate on tensors of the same shape; fortunately you can perform broadcasting.  
 
 ### Tensor and Scalar
 
