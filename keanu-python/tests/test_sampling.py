@@ -64,6 +64,7 @@ def test_down_sample_interval(net: BayesNet) -> None:
     assert all(len(vertex_samples) == expected_num_samples for label, vertex_samples in samples.items())
 
 
+@pytest.mark.filterwarnings('ignore:Matplotlib is currently using agg')
 def test_sample_with_plot(net: BayesNet) -> None:
     KeanuRandom.set_default_random_seed(1)
     _, ax = plt.subplots(3, 1, squeeze=False)
@@ -118,6 +119,7 @@ def test_iter_returns_same_result_as_sample(algo: str) -> None:
         np.testing.assert_almost_equal(samples_dataframe[vertex_label].mean(), np.average(samples[vertex_label]))
 
 
+@pytest.mark.filterwarnings('ignore:Matplotlib is currently using agg')
 def test_iter_with_live_plot(net: BayesNet) -> None:
     KeanuRandom.set_default_random_seed(1)
     _, ax = plt.subplots(3, 1, squeeze=False)
