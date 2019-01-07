@@ -100,20 +100,13 @@ task generateDocumentation {
     }
 }
 
-List<String> formatExcludes = [
-        '--exclude', project.file('keanu/vertex/generated.py'),
-        '--exclude', project.file('keanu/vertex/__init__.py'),
-        '--exclude', project.file('build'),
-        '--exclude', project.file('.venv')
-]
-
 task formatApply {
     mustRunAfter preparePythonEnvironment // this is a dependency but only needs to be run once
     mustRunAfter ':spotlessPythonApply'   // spotless does some checks of the python code too
 
     doLast {
         exec {
-            commandLine(['pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel', project.rootDir].addAll(formatExcludes))
+            commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel', '.'
         }
     }
 }
@@ -124,7 +117,7 @@ task formatCheck {
 
     doLast {
         exec {
-            commandLine(['pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel', project.rootDir].addAll(formatExcludes))
+            commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel', '.'
         }
     }
 }
