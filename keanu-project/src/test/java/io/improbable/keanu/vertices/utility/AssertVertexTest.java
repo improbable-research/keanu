@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices;
+package io.improbable.keanu.vertices.utility;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
