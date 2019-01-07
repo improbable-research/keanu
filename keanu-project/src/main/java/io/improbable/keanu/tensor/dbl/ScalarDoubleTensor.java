@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
+import static io.improbable.keanu.tensor.TensorShape.calculateShapeForLengthOneBroadcast;
+
 public class ScalarDoubleTensor implements DoubleTensor {
 
     private Double value;
@@ -639,10 +641,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
         return this;
     }
 
-    private long[] calculateShapeForLengthOneBroadcast(long[] myShape, long[] operandShape) {
-        return (myShape.length >= operandShape.length) ? myShape : operandShape;
-    }
-
     @Override
     public DoubleTensor divInPlace(DoubleTensor that) {
         if (that.isLengthOne()) {
@@ -842,6 +840,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public BooleanTensor elementwiseEquals(Double value) {
         return BooleanTensor.create(this.scalar().equals(value), shape);
     }
+
 
     @Override
     public double[] asFlatDoubleArray() {
