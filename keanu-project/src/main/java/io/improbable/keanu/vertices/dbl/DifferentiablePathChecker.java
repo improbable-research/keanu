@@ -23,7 +23,7 @@ public class DifferentiablePathChecker {
     }
 
     public boolean differentiablePath(Vertex vertex) {
-        if (isDiscreteLatent(vertex)) {
+        if (!vertex.isDifferentiable()) {
             return false;
         }
         Queue<Vertex> queue = new LinkedList<>();
@@ -44,12 +44,6 @@ public class DifferentiablePathChecker {
             }
         }
         return true;
-    }
-
-    private boolean isDiscreteLatent(Vertex vertex) {
-        boolean latent = vertex.isProbabilistic() && !vertex.isObserved();
-        boolean discrete = !(vertex.getValue() instanceof DoubleTensor);
-        return latent && discrete;
     }
 
     private boolean isConstantVertex(Vertex vertex) {
