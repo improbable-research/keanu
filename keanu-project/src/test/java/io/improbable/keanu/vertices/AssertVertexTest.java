@@ -129,4 +129,21 @@ public class AssertVertexTest {
         AssertVertex assertVertex = constBool.assertTrue();
         assertVertex.eval();
     }
+
+    @Test
+    public void samplingWithAssertThatShouldntFire() {
+        UniformVertex temperature = new UniformVertex(20., 30.);
+        temperature.lessThan(new ConstantDoubleVertex(30)).assertTrue();
+        temperature.greaterThan(new ConstantDoubleVertex(20)).assertTrue();
+        GaussianVertex firstThermometer = new GaussianVertex(temperature, 2.5);
+        GaussianVertex secondThermometer = new GaussianVertex(temperature, 5.);
+        firstThermometer.observe(25.);
+        secondThermometer.observe(30.);
+        BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
+        MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+            bayesNet,
+            bayesNet.getLatentVertices(),
+            100
+        );
+    }
 }
