@@ -106,7 +106,7 @@ task formatApply {
 
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel', '.'
+            commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel', project.relativeProjectPath(".")
         }
     }
 }
@@ -117,7 +117,7 @@ task formatCheck {
 
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel', '.'
+            commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel', project.relativeProjectPath(".")
         }
     }
 }
