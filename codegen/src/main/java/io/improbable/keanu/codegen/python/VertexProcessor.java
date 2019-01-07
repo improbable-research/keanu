@@ -124,6 +124,8 @@ class VertexProcessor {
             return "cast_to_integer_vertex(" + pythonParameter + ")";
         } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
             return "cast_to_bool_vertex(" + pythonParameter + ")";
+        } else if (Vertex.class.isAssignableFrom(parameterType)) {
+            return "cast_to_vertex(" + pythonParameter + ")";
         } else if (DoubleTensor.class.isAssignableFrom(parameterType)) {
             return "cast_to_double_tensor(" + pythonParameter + ")";
         } else if (IntegerTensor.class.isAssignableFrom(parameterType)) {
@@ -136,12 +138,13 @@ class VertexProcessor {
             return "cast_to_int(" + pythonParameter + ")";
         } else if (String.class.isAssignableFrom(parameterType)) {
             return "cast_to_string(" + pythonParameter + ")";
-        } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType)) {
+        } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
+            long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
             return "cast_to_int_list(" + pythonParameter + ")";
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex_list(" + pythonParameter + ")";
         } else {
-            return pythonParameter;
+            throw new IllegalArgumentException("Failed to Encode " + pythonParameter + " of type: " + parameterType);
         }
     }
 
@@ -162,8 +165,17 @@ class VertexProcessor {
                    IntegerTensor.class.isAssignableFrom(parameterType) ||
                    BooleanTensor.class.isAssignableFrom(parameterType)) {
             return "tensor_arg_types";
-        } else if (parameterType.isArray()) {
-            return "shape_types";
+        } else if (Double.class.isAssignableFrom(parameterType)) {
+            return "float";
+        } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
+            return "int";
+        } else if (String.class.isAssignableFrom(parameterType)) {
+            return "str";
+        } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
+            long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
+            return "Iterable[int]";
+        } else if (Vertex[].class.isAssignableFrom(parameterType)) {
+            return "Iterable[vertex_constructor_param_types]";
         } else {
             throw new NotImplementedException(String.format("Mapping from Java type %s is not defined.", parameterType.getName()));
         }

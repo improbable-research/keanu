@@ -93,11 +93,11 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 
 
 def BooleanIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().BooleanIfVertex, predicate, thn, els)
+    return Bool(context.jvm_view().BooleanIfVertex, cast_to_vertex(predicate), cast_to_vertex(thn), cast_to_vertex(els))
 
 
 def CastBool(input_vertex: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().CastBoolVertex, input_vertex)
+    return Bool(context.jvm_view().CastBoolVertex, cast_to_vertex(input_vertex))
 
 
 def ConstantBool(constant: tensor_arg_types) -> Vertex:
@@ -105,43 +105,43 @@ def ConstantBool(constant: tensor_arg_types) -> Vertex:
 
 
 def NumericalEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, epsilon: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().NumericalEqualsVertex, a, b, epsilon)
+    return Bool(context.jvm_view().NumericalEqualsVertex, cast_to_vertex(a), cast_to_vertex(b), cast_to_vertex(epsilon))
 
 
 def AndBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().AndBinaryVertex, a, b)
+    return Bool(context.jvm_view().AndBinaryVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
 def OrBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().OrBinaryVertex, a, b)
+    return Bool(context.jvm_view().OrBinaryVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
 def Equals(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().EqualsVertex, a, b)
+    return Bool(context.jvm_view().EqualsVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
 def GreaterThanOrEqual(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().GreaterThanOrEqualVertex, a, b)
+    return Bool(context.jvm_view().GreaterThanOrEqualVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
 def GreaterThan(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().GreaterThanVertex, a, b)
+    return Bool(context.jvm_view().GreaterThanVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
 def LessThanOrEqual(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().LessThanOrEqualVertex, a, b)
+    return Bool(context.jvm_view().LessThanOrEqualVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
 def LessThan(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().LessThanVertex, a, b)
+    return Bool(context.jvm_view().LessThanVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
 def NotEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().NotEqualsVertex, a, b)
+    return Bool(context.jvm_view().NotEqualsVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
 def Not(a: vertex_constructor_param_types) -> Vertex:
-    return Bool(context.jvm_view().NotVertex, a)
+    return Bool(context.jvm_view().NotVertex, cast_to_vertex(a))
 
 
 def Bernoulli(prob_true: vertex_constructor_param_types) -> Vertex:
@@ -155,7 +155,7 @@ def Bernoulli(prob_true: vertex_constructor_param_types) -> Vertex:
 
 
 def CastDouble(input_vertex: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().CastDoubleVertex, input_vertex)
+    return Double(context.jvm_view().CastDoubleVertex, cast_to_vertex(input_vertex))
 
 
 def ConstantDouble(constant: tensor_arg_types) -> Vertex:
@@ -163,7 +163,7 @@ def ConstantDouble(constant: tensor_arg_types) -> Vertex:
 
 
 def DoubleIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().DoubleIfVertex, predicate, cast_to_double_vertex(thn), cast_to_double_vertex(els))
+    return Double(context.jvm_view().DoubleIfVertex, cast_to_vertex(predicate), cast_to_double_vertex(thn), cast_to_double_vertex(els))
 
 
 def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -394,14 +394,14 @@ def Sum(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().SumVertex, cast_to_double_vertex(input_vertex))
 
 
-def Take(input_vertex: vertex_constructor_param_types, index: shape_types) -> Vertex:
+def Take(input_vertex: vertex_constructor_param_types, index: Iterable[int]) -> Vertex:
     """
     A vertex that extracts a scalar at a given index
     
     :param input_vertex: the input vertex to extract from
     :param index: the index to extract at
     """
-    return Double(context.jvm_view().TakeVertex, cast_to_double_vertex(input_vertex), index)
+    return Double(context.jvm_view().TakeVertex, cast_to_double_vertex(input_vertex), cast_to_int_list(index))
 
 
 def Tan(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -553,7 +553,7 @@ def Uniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_par
 
 
 def CastInteger(input_vertex: vertex_constructor_param_types) -> Vertex:
-    return Integer(context.jvm_view().CastIntegerVertex, input_vertex)
+    return Integer(context.jvm_view().CastIntegerVertex, cast_to_vertex(input_vertex))
 
 
 def ConstantInteger(constant: tensor_arg_types) -> Vertex:
