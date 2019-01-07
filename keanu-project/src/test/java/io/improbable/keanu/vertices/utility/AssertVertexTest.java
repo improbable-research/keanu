@@ -206,6 +206,6 @@ public class AssertVertexTest {
     @Test
     public void doubleAssertion() {
         DoubleVertex A = new ConstantDoubleVertex(20);
-        A.lessThan(new ConstantDoubleVertex(30)).assertTrue().and(ConstantBoolVertex.TRUE).assertTrue();
+        A.lessThan(new ConstantDoubleVertex(30)).assertTrue().and(ConstantBoolVertex.TRUE).assertTrue().eval();
     }
 }
