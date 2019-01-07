@@ -59,6 +59,14 @@ public class IntegerScalarTensorShapePreservationTest {
     }
 
     @Test
+    public void tensorSetWithMaskInPlacePreservesShape() {
+        for (IntegerTensor t1 : tensors) {
+            IntegerTensor t2 = t1.duplicate();
+            Tensor result = t1.setWithMaskInPlace(t2, -1);
+            resultShapeMatchesBroadcastShape(result, t1, t2);
+        }
+    }
+    @Test
     public void tensorGetGreaterThanMaskPreservesShape() {
         checkOperationPreservesShape(IntegerTensor::getGreaterThanMask);
 
