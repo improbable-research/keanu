@@ -7,7 +7,7 @@ from keanu.vartypes import (
     tensor_arg_types,
     shape_types
 )
-from keanu.cast import cast_to_double, cast_to_integer, cast_to_bool
+from keanu.cast import cast_to_double_vertex, cast_to_integer_vertex, cast_to_bool_vertex
 
 context = KeanuContext()
 
@@ -54,6 +54,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.BetaVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
@@ -100,7 +101,7 @@ def CastBool(input_vertex: vertex_constructor_param_types) -> Vertex:
 
 
 def ConstantBool(constant: tensor_arg_types) -> Vertex:
-    return Bool(context.jvm_view().ConstantBoolVertex, constant)
+    return Bool(context.jvm_view().ConstantBoolVertex, cast_to_bool_tensor(constant))
 
 
 def NumericalEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, epsilon: vertex_constructor_param_types) -> Vertex:
@@ -150,7 +151,7 @@ def Bernoulli(prob_true: vertex_constructor_param_types) -> Vertex:
     
     :param prob_true: probTrue with same shape as desired Bernoulli tensor or scalar
     """
-    return Bool(context.jvm_view().BernoulliVertex, cast_to_double(prob_true))
+    return Bool(context.jvm_view().BernoulliVertex, cast_to_double_vertex(prob_true))
 
 
 def CastDouble(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -158,11 +159,11 @@ def CastDouble(input_vertex: vertex_constructor_param_types) -> Vertex:
 
 
 def ConstantDouble(constant: tensor_arg_types) -> Vertex:
-    return Double(context.jvm_view().ConstantDoubleVertex, constant)
+    return Double(context.jvm_view().ConstantDoubleVertex, cast_to_double_tensor(constant))
 
 
 def DoubleIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().DoubleIfVertex, predicate, cast_to_double(thn), cast_to_double(els))
+    return Double(context.jvm_view().DoubleIfVertex, predicate, cast_to_double_vertex(thn), cast_to_double_vertex(els))
 
 
 def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -172,7 +173,7 @@ def Addition(left: vertex_constructor_param_types, right: vertex_constructor_par
     :param left: a vertex to add
     :param right: a vertex to add
     """
-    return Double(context.jvm_view().AdditionVertex, cast_to_double(left), cast_to_double(right))
+    return Double(context.jvm_view().AdditionVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
 def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types) -> Vertex:
@@ -182,7 +183,7 @@ def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types
     :param x: x coordinate
     :param y: y coordinate
     """
-    return Double(context.jvm_view().ArcTan2Vertex, cast_to_double(x), cast_to_double(y))
+    return Double(context.jvm_view().ArcTan2Vertex, cast_to_double_vertex(x), cast_to_double_vertex(y))
 
 
 def Difference(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -192,7 +193,7 @@ def Difference(left: vertex_constructor_param_types, right: vertex_constructor_p
     :param left: the vertex that will be subtracted from
     :param right: the vertex to subtract
     """
-    return Double(context.jvm_view().DifferenceVertex, cast_to_double(left), cast_to_double(right))
+    return Double(context.jvm_view().DifferenceVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
 def Division(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -202,7 +203,7 @@ def Division(left: vertex_constructor_param_types, right: vertex_constructor_par
     :param left: the vertex to be divided
     :param right: the vertex to divide
     """
-    return Double(context.jvm_view().DivisionVertex, cast_to_double(left), cast_to_double(right))
+    return Double(context.jvm_view().DivisionVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
 def MatrixMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -212,7 +213,7 @@ def MatrixMultiplication(left: vertex_constructor_param_types, right: vertex_con
     :param left: vertex A
     :param right: vertex B
     """
-    return Double(context.jvm_view().MatrixMultiplicationVertex, cast_to_double(left), cast_to_double(right))
+    return Double(context.jvm_view().MatrixMultiplicationVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
 def Max(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -222,7 +223,7 @@ def Max(left: vertex_constructor_param_types, right: vertex_constructor_param_ty
     :param left: one of the vertices to find the maximum of
     :param right: one of the vertices to find the maximum of
     """
-    return Double(context.jvm_view().MaxVertex, cast_to_double(left), cast_to_double(right))
+    return Double(context.jvm_view().MaxVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
 def Min(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -232,7 +233,7 @@ def Min(left: vertex_constructor_param_types, right: vertex_constructor_param_ty
     :param left: one of the vertices to find the minimum of
     :param right: one of the vertices to find the minimum of
     """
-    return Double(context.jvm_view().MinVertex, cast_to_double(left), cast_to_double(right))
+    return Double(context.jvm_view().MinVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
 def Multiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -242,7 +243,7 @@ def Multiplication(left: vertex_constructor_param_types, right: vertex_construct
     :param left: vertex to be multiplied
     :param right: vertex to be multiplied
     """
-    return Double(context.jvm_view().MultiplicationVertex, cast_to_double(left), cast_to_double(right))
+    return Double(context.jvm_view().MultiplicationVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
 def Power(base: vertex_constructor_param_types, exponent: vertex_constructor_param_types) -> Vertex:
@@ -252,7 +253,7 @@ def Power(base: vertex_constructor_param_types, exponent: vertex_constructor_par
     :param base: the base vertex
     :param exponent: the exponent vertex
     """
-    return Double(context.jvm_view().PowerVertex, cast_to_double(base), cast_to_double(exponent))
+    return Double(context.jvm_view().PowerVertex, cast_to_double_vertex(base), cast_to_double_vertex(exponent))
 
 
 def Abs(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -261,7 +262,7 @@ def Abs(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().AbsVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().AbsVertex, cast_to_double_vertex(input_vertex))
 
 
 def ArcCos(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -270,7 +271,7 @@ def ArcCos(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().ArcCosVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().ArcCosVertex, cast_to_double_vertex(input_vertex))
 
 
 def ArcSin(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -279,7 +280,7 @@ def ArcSin(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().ArcSinVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().ArcSinVertex, cast_to_double_vertex(input_vertex))
 
 
 def ArcTan(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -288,7 +289,7 @@ def ArcTan(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().ArcTanVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().ArcTanVertex, cast_to_double_vertex(input_vertex))
 
 
 def Ceil(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -298,7 +299,7 @@ def Ceil(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex to be ceil'd
     """
-    return Double(context.jvm_view().CeilVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().CeilVertex, cast_to_double_vertex(input_vertex))
 
 
 def Cos(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -307,7 +308,7 @@ def Cos(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().CosVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().CosVertex, cast_to_double_vertex(input_vertex))
 
 
 def Exp(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -316,7 +317,7 @@ def Exp(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().ExpVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().ExpVertex, cast_to_double_vertex(input_vertex))
 
 
 def Floor(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -326,7 +327,7 @@ def Floor(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex to be floor'd
     """
-    return Double(context.jvm_view().FloorVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().FloorVertex, cast_to_double_vertex(input_vertex))
 
 
 def LogGamma(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -335,7 +336,7 @@ def LogGamma(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().LogGammaVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().LogGammaVertex, cast_to_double_vertex(input_vertex))
 
 
 def Log(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -344,15 +345,15 @@ def Log(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().LogVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().LogVertex, cast_to_double_vertex(input_vertex))
 
 
 def MatrixDeterminant(vertex: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().MatrixDeterminantVertex, cast_to_double(vertex))
+    return Double(context.jvm_view().MatrixDeterminantVertex, cast_to_double_vertex(vertex))
 
 
 def MatrixInverse(input_vertex: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().MatrixInverseVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().MatrixInverseVertex, cast_to_double_vertex(input_vertex))
 
 
 def Round(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -362,7 +363,7 @@ def Round(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex to be rounded
     """
-    return Double(context.jvm_view().RoundVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().RoundVertex, cast_to_double_vertex(input_vertex))
 
 
 def Sigmoid(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -372,7 +373,7 @@ def Sigmoid(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().SigmoidVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().SigmoidVertex, cast_to_double_vertex(input_vertex))
 
 
 def Sin(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -381,7 +382,7 @@ def Sin(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().SinVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().SinVertex, cast_to_double_vertex(input_vertex))
 
 
 def Sum(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -390,7 +391,17 @@ def Sum(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex to have its values summed
     """
-    return Double(context.jvm_view().SumVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().SumVertex, cast_to_double_vertex(input_vertex))
+
+
+def Take(input_vertex: vertex_constructor_param_types, index: shape_types) -> Vertex:
+    """
+    A vertex that extracts a scalar at a given index
+    
+    :param input_vertex: the input vertex to extract from
+    :param index: the index to extract at
+    """
+    return Double(context.jvm_view().TakeVertex, cast_to_double_vertex(input_vertex), index)
 
 
 def Tan(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -399,7 +410,7 @@ def Tan(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Double(context.jvm_view().TanVertex, cast_to_double(input_vertex))
+    return Double(context.jvm_view().TanVertex, cast_to_double_vertex(input_vertex))
 
 
 def Beta(alpha: vertex_constructor_param_types, beta: vertex_constructor_param_types) -> Vertex:
@@ -410,11 +421,11 @@ def Beta(alpha: vertex_constructor_param_types, beta: vertex_constructor_param_t
     :param alpha: the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
     :param beta: the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
     """
-    return Double(context.jvm_view().BetaVertex, cast_to_double(alpha), cast_to_double(beta))
+    return Double(context.jvm_view().BetaVertex, cast_to_double_vertex(alpha), cast_to_double_vertex(beta))
 
 
 def Cauchy(location: vertex_constructor_param_types, scale: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().CauchyVertex, cast_to_double(location), cast_to_double(scale))
+    return Double(context.jvm_view().CauchyVertex, cast_to_double_vertex(location), cast_to_double_vertex(scale))
 
 
 def ChiSquared(k: vertex_constructor_param_types) -> Vertex:
@@ -424,7 +435,7 @@ def ChiSquared(k: vertex_constructor_param_types) -> Vertex:
     
     :param k: the number of degrees of freedom
     """
-    return Double(context.jvm_view().ChiSquaredVertex, cast_to_integer(k))
+    return Double(context.jvm_view().ChiSquaredVertex, cast_to_integer_vertex(k))
 
 
 def Dirichlet(concentration: vertex_constructor_param_types) -> Vertex:
@@ -433,7 +444,7 @@ def Dirichlet(concentration: vertex_constructor_param_types) -> Vertex:
     
     :param concentration: the concentration values of the dirichlet
     """
-    return Double(context.jvm_view().DirichletVertex, cast_to_double(concentration))
+    return Double(context.jvm_view().DirichletVertex, cast_to_double_vertex(concentration))
 
 
 def Exponential(rate: vertex_constructor_param_types) -> Vertex:
@@ -442,7 +453,7 @@ def Exponential(rate: vertex_constructor_param_types) -> Vertex:
     
     :param rate: the rate of the Exponential with either the same shape as specified for this vertex or scalar
     """
-    return Double(context.jvm_view().ExponentialVertex, cast_to_double(rate))
+    return Double(context.jvm_view().ExponentialVertex, cast_to_double_vertex(rate))
 
 
 def Gamma(theta: vertex_constructor_param_types, k: vertex_constructor_param_types) -> Vertex:
@@ -452,19 +463,19 @@ def Gamma(theta: vertex_constructor_param_types, k: vertex_constructor_param_typ
     :param theta: the theta (scale) of the Gamma with either the same shape as specified for this vertex
     :param k: the k (shape) of the Gamma with either the same shape as specified for this vertex
     """
-    return Double(context.jvm_view().GammaVertex, cast_to_double(theta), cast_to_double(k))
+    return Double(context.jvm_view().GammaVertex, cast_to_double_vertex(theta), cast_to_double_vertex(k))
 
 
 def Gaussian(mu: vertex_constructor_param_types, sigma: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().GaussianVertex, cast_to_double(mu), cast_to_double(sigma))
+    return Double(context.jvm_view().GaussianVertex, cast_to_double_vertex(mu), cast_to_double_vertex(sigma))
 
 
 def HalfCauchy(scale: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().HalfCauchyVertex, cast_to_double(scale))
+    return Double(context.jvm_view().HalfCauchyVertex, cast_to_double_vertex(scale))
 
 
 def HalfGaussian(sigma: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().HalfGaussianVertex, cast_to_double(sigma))
+    return Double(context.jvm_view().HalfGaussianVertex, cast_to_double_vertex(sigma))
 
 
 def InverseGamma(alpha: vertex_constructor_param_types, beta: vertex_constructor_param_types) -> Vertex:
@@ -475,7 +486,7 @@ def InverseGamma(alpha: vertex_constructor_param_types, beta: vertex_constructor
     :param alpha: the alpha of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
     :param beta: the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
     """
-    return Double(context.jvm_view().InverseGammaVertex, cast_to_double(alpha), cast_to_double(beta))
+    return Double(context.jvm_view().InverseGammaVertex, cast_to_double_vertex(alpha), cast_to_double_vertex(beta))
 
 
 def Laplace(mu: vertex_constructor_param_types, beta: vertex_constructor_param_types) -> Vertex:
@@ -486,15 +497,15 @@ def Laplace(mu: vertex_constructor_param_types, beta: vertex_constructor_param_t
     :param mu: the mu of the Laplace with either the same shape as specified for this vertex or a scalar
     :param beta: the beta of the Laplace with either the same shape as specified for this vertex or a scalar
     """
-    return Double(context.jvm_view().LaplaceVertex, cast_to_double(mu), cast_to_double(beta))
+    return Double(context.jvm_view().LaplaceVertex, cast_to_double_vertex(mu), cast_to_double_vertex(beta))
 
 
 def LogNormal(mu: vertex_constructor_param_types, sigma: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().LogNormalVertex, cast_to_double(mu), cast_to_double(sigma))
+    return Double(context.jvm_view().LogNormalVertex, cast_to_double_vertex(mu), cast_to_double_vertex(sigma))
 
 
 def Logistic(mu: vertex_constructor_param_types, s: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().LogisticVertex, cast_to_double(mu), cast_to_double(s))
+    return Double(context.jvm_view().LogisticVertex, cast_to_double_vertex(mu), cast_to_double_vertex(s))
 
 
 def MultivariateGaussian(mu: vertex_constructor_param_types, covariance: vertex_constructor_param_types) -> Vertex:
@@ -504,19 +515,19 @@ def MultivariateGaussian(mu: vertex_constructor_param_types, covariance: vertex_
     :param mu: the mu of the Multivariate Gaussian
     :param covariance: the covariance matrix of the Multivariate Gaussian
     """
-    return Double(context.jvm_view().MultivariateGaussianVertex, cast_to_double(mu), cast_to_double(covariance))
+    return Double(context.jvm_view().MultivariateGaussianVertex, cast_to_double_vertex(mu), cast_to_double_vertex(covariance))
 
 
 def Pareto(location: vertex_constructor_param_types, scale: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().ParetoVertex, cast_to_double(location), cast_to_double(scale))
+    return Double(context.jvm_view().ParetoVertex, cast_to_double_vertex(location), cast_to_double_vertex(scale))
 
 
 def SmoothUniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().SmoothUniformVertex, cast_to_double(x_min), cast_to_double(x_max))
+    return Double(context.jvm_view().SmoothUniformVertex, cast_to_double_vertex(x_min), cast_to_double_vertex(x_max))
 
 
 def StudentT(v: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().StudentTVertex, cast_to_integer(v))
+    return Double(context.jvm_view().StudentTVertex, cast_to_integer_vertex(v))
 
 
 def Triangular(x_min: vertex_constructor_param_types, x_max: vertex_constructor_param_types, c: vertex_constructor_param_types) -> Vertex:
@@ -527,7 +538,7 @@ def Triangular(x_min: vertex_constructor_param_types, x_max: vertex_constructor_
     :param x_max: the xMax of the Triangular with either the same shape as specified for this vertex or a scalar
     :param c: the c of the Triangular with either the same shape as specified for this vertex or a scalar
     """
-    return Double(context.jvm_view().TriangularVertex, cast_to_double(x_min), cast_to_double(x_max), cast_to_double(c))
+    return Double(context.jvm_view().TriangularVertex, cast_to_double_vertex(x_min), cast_to_double_vertex(x_max), cast_to_double_vertex(c))
 
 
 def Uniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_param_types) -> Vertex:
@@ -538,7 +549,7 @@ def Uniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_par
     :param x_min: the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
     :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
     """
-    return Double(context.jvm_view().UniformVertex, cast_to_double(x_min), cast_to_double(x_max))
+    return Double(context.jvm_view().UniformVertex, cast_to_double_vertex(x_min), cast_to_double_vertex(x_max))
 
 
 def CastInteger(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -546,7 +557,7 @@ def CastInteger(input_vertex: vertex_constructor_param_types) -> Vertex:
 
 
 def ConstantInteger(constant: tensor_arg_types) -> Vertex:
-    return Integer(context.jvm_view().ConstantIntegerVertex, constant)
+    return Integer(context.jvm_view().ConstantIntegerVertex, cast_to_int_tensor(constant))
 
 
 def IntegerAddition(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -556,7 +567,7 @@ def IntegerAddition(left: vertex_constructor_param_types, right: vertex_construc
     :param left: a vertex to add
     :param right: a vertex to add
     """
-    return Integer(context.jvm_view().IntegerAdditionVertex, cast_to_integer(left), cast_to_integer(right))
+    return Integer(context.jvm_view().IntegerAdditionVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
 def IntegerDifference(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -566,7 +577,7 @@ def IntegerDifference(left: vertex_constructor_param_types, right: vertex_constr
     :param left: the vertex to be subtracted from
     :param right: the vertex to subtract
     """
-    return Integer(context.jvm_view().IntegerDifferenceVertex, cast_to_integer(left), cast_to_integer(right))
+    return Integer(context.jvm_view().IntegerDifferenceVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
 def IntegerDivision(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -576,7 +587,7 @@ def IntegerDivision(left: vertex_constructor_param_types, right: vertex_construc
     :param left: a vertex to be divided
     :param right: a vertex to divide by
     """
-    return Integer(context.jvm_view().IntegerDivisionVertex, cast_to_integer(left), cast_to_integer(right))
+    return Integer(context.jvm_view().IntegerDivisionVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
 def IntegerMax(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -586,7 +597,7 @@ def IntegerMax(left: vertex_constructor_param_types, right: vertex_constructor_p
     :param left: one of the vertices to find the maximum of
     :param right: one of the vertices to find the maximum of
     """
-    return Integer(context.jvm_view().IntegerMaxVertex, cast_to_integer(left), cast_to_integer(right))
+    return Integer(context.jvm_view().IntegerMaxVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
 def IntegerMin(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -596,7 +607,7 @@ def IntegerMin(left: vertex_constructor_param_types, right: vertex_constructor_p
     :param left: one of the vertices to find the minimum of
     :param right: one of the vertices to find the minimum of
     """
-    return Integer(context.jvm_view().IntegerMinVertex, cast_to_integer(left), cast_to_integer(right))
+    return Integer(context.jvm_view().IntegerMinVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
 def IntegerMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -606,7 +617,7 @@ def IntegerMultiplication(left: vertex_constructor_param_types, right: vertex_co
     :param left: a vertex to be multiplied
     :param right: a vertex to be multiplied
     """
-    return Integer(context.jvm_view().IntegerMultiplicationVertex, cast_to_integer(left), cast_to_integer(right))
+    return Integer(context.jvm_view().IntegerMultiplicationVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
 def IntegerPower(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -616,7 +627,7 @@ def IntegerPower(left: vertex_constructor_param_types, right: vertex_constructor
     :param left: the base vertex
     :param right: the exponent vertex
     """
-    return Integer(context.jvm_view().IntegerPowerVertex, cast_to_integer(left), cast_to_integer(right))
+    return Integer(context.jvm_view().IntegerPowerVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
 def IntegerAbs(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -625,7 +636,7 @@ def IntegerAbs(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex
     """
-    return Integer(context.jvm_view().IntegerAbsVertex, cast_to_integer(input_vertex))
+    return Integer(context.jvm_view().IntegerAbsVertex, cast_to_integer_vertex(input_vertex))
 
 
 def IntegerSum(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -634,15 +645,15 @@ def IntegerSum(input_vertex: vertex_constructor_param_types) -> Vertex:
     
     :param input_vertex: the vertex to have its values summed
     """
-    return Integer(context.jvm_view().IntegerSumVertex, cast_to_integer(input_vertex))
+    return Integer(context.jvm_view().IntegerSumVertex, cast_to_integer_vertex(input_vertex))
 
 
 def Binomial(p: vertex_constructor_param_types, n: vertex_constructor_param_types) -> Vertex:
-    return Integer(context.jvm_view().BinomialVertex, cast_to_double(p), cast_to_integer(n))
+    return Integer(context.jvm_view().BinomialVertex, cast_to_double_vertex(p), cast_to_integer_vertex(n))
 
 
 def Multinomial(n: vertex_constructor_param_types, p: vertex_constructor_param_types) -> Vertex:
-    return Integer(context.jvm_view().MultinomialVertex, cast_to_integer(n), cast_to_double(p))
+    return Integer(context.jvm_view().MultinomialVertex, cast_to_integer_vertex(n), cast_to_double_vertex(p))
 
 
 def Poisson(mu: vertex_constructor_param_types) -> Vertex:
@@ -652,8 +663,8 @@ def Poisson(mu: vertex_constructor_param_types) -> Vertex:
     
     :param mu: mu with same shape as desired Poisson tensor or scalar
     """
-    return Integer(context.jvm_view().PoissonVertex, cast_to_double(mu))
+    return Integer(context.jvm_view().PoissonVertex, cast_to_double_vertex(mu))
 
 
 def UniformInt(min: vertex_constructor_param_types, max: vertex_constructor_param_types) -> Vertex:
-    return Integer(context.jvm_view().UniformIntVertex, cast_to_integer(min), cast_to_integer(max))
+    return Integer(context.jvm_view().UniformIntVertex, cast_to_integer_vertex(min), cast_to_integer_vertex(max))

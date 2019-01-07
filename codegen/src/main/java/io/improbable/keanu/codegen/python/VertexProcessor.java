@@ -1,6 +1,7 @@
 package io.improbable.keanu.codegen.python;
 
 import com.google.common.base.CaseFormat;
+import com.google.gson.internal.Primitives;
 import freemarker.template.Template;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -114,13 +115,31 @@ class VertexProcessor {
         return String.join(", ", pythonParams);
     }
 
-    private static String toCastedPythonParam(String pythonParameter, Class<?> parameterType) {
+    private static String toCastedPythonParam(String pythonParameter, Class<?> parameterClass) {
+        Class parameterType = Primitives.wrap(parameterClass);
+
         if (DoubleVertex.class.isAssignableFrom(parameterType)) {
-            return "cast_to_double(" + pythonParameter + ")";
+            return "cast_to_double_vertex(" + pythonParameter + ")";
         } else if (IntegerVertex.class.isAssignableFrom(parameterType)) {
-            return "cast_to_integer(" + pythonParameter + ")";
+            return "cast_to_integer_vertex(" + pythonParameter + ")";
         } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
-            return "cast_to_bool(" + pythonParameter + ")";
+            return "cast_to_bool_vertex(" + pythonParameter + ")";
+        } else if (DoubleTensor.class.isAssignableFrom(parameterType)) {
+            return "cast_to_double_tensor(" + pythonParameter + ")";
+        } else if (IntegerTensor.class.isAssignableFrom(parameterType)) {
+            return "cast_to_int_tensor(" + pythonParameter + ")";
+        } else if (BooleanTensor.class.isAssignableFrom(parameterType)) {
+            return "cast_to_bool_tensor(" + pythonParameter + ")";
+        } else if (Double.class.isAssignableFrom(parameterType)) {
+            return "cast_to_double(" + pythonParameter + ")";
+        } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
+            return "cast_to_int(" + pythonParameter + ")";
+        } else if (String.class.isAssignableFrom(parameterType)) {
+            return "cast_to_string(" + pythonParameter + ")";
+        } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType)) {
+            return "cast_to_int_list(" + pythonParameter + ")";
+        } else if (Vertex[].class.isAssignableFrom(parameterType)) {
+            return "cast_to_vertex_list(" + pythonParameter + ")";
         } else {
             return pythonParameter;
         }

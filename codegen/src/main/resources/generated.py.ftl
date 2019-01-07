@@ -7,7 +7,7 @@ from keanu.vartypes import (
     tensor_arg_types,
     shape_types
 )
-from keanu.cast import cast_to_double, cast_to_integer, cast_to_bool
+from keanu.cast import cast_to_double_vertex, cast_to_integer_vertex, cast_to_bool_vertex
 
 context = KeanuContext()
 
