@@ -7,25 +7,25 @@ import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BoolConcatenationVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolReshapeVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanReshapeVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanSliceVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
 
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class BoolVertex extends Vertex<BooleanTensor> implements BooleanOperators<BoolVertex> {
+public abstract class BooleanVertex extends Vertex<BooleanTensor> implements BooleanOperators<BooleanVertex> {
 
-    public BoolVertex(long[] initialShape) {
+    public BooleanVertex(long[] initialShape) {
         super(initialShape);
     }
 
@@ -39,57 +39,57 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> implements Boolea
     }
 
     @SafeVarargs
-    public final BoolVertex or(Vertex<BooleanTensor>... those) {
+    public final BooleanVertex or(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new OrBinaryVertex(this, those[0]);
         return new OrMultipleVertex(inputList(those));
     }
 
     @Override
-    public BoolVertex or(boolean that) {
-        return this.or(new ConstantBoolVertex(that));
+    public BooleanVertex or(boolean that) {
+        return this.or(new ConstantBooleanVertex(that));
     }
 
     @Override
-    public BoolVertex or(BoolVertex that) {
+    public BooleanVertex or(BooleanVertex that) {
         return new OrBinaryVertex(this, that);
     }
 
     @SafeVarargs
-    public final BoolVertex and(Vertex<BooleanTensor>... those) {
+    public final BooleanVertex and(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new AndBinaryVertex(this, those[0]);
         return new AndMultipleVertex(inputList(those));
     }
 
     @Override
-    public BoolVertex and(BoolVertex that) {
+    public BooleanVertex and(BooleanVertex that) {
         return new AndBinaryVertex(this, that);
     }
 
     @Override
-    public BoolVertex and(boolean that) {
-        return this.and(new ConstantBoolVertex(that));
+    public BooleanVertex and(boolean that) {
+        return this.and(new ConstantBooleanVertex(that));
     }
 
     @Override
-    public BoolVertex not() {
-        return BoolVertex.not(this);
+    public BooleanVertex not() {
+        return BooleanVertex.not(this);
     }
 
-    public static BoolVertex concat(int dimension, BoolVertex... toConcat) {
-        return new BoolConcatenationVertex(dimension, toConcat);
+    public static BooleanVertex concat(int dimension, BooleanVertex... toConcat) {
+        return new BooleanConcatenationVertex(dimension, toConcat);
     }
 
-    public static final BoolVertex not(Vertex<BooleanTensor> vertex) {
+    public static final BooleanVertex not(Vertex<BooleanTensor> vertex) {
         return new NotVertex(vertex);
     }
 
-    public BoolVertex equalTo(BoolVertex rhs) {
+    public BooleanVertex equalTo(BooleanVertex rhs) {
         return new EqualsVertex<>(this, rhs);
     }
 
-    public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
+    public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);
     }
 
@@ -100,8 +100,8 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> implements Boolea
             .build();
     }
 
-    public BoolVertex slice(int dimension, long index) {
-        return new BoolSliceVertex(this, dimension, index);
+    public BooleanVertex slice(int dimension, long index) {
+        return new BooleanSliceVertex(this, dimension, index);
     }
 
     public void setValue(boolean value) {
@@ -132,12 +132,12 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> implements Boolea
         return getValue().getValue(index);
     }
 
-    public BoolVertex take(long... index) {
-        return new BoolTakeVertex(this, index);
+    public BooleanVertex take(long... index) {
+        return new BooleanTakeVertex(this, index);
     }
 
-    public BoolVertex reshape(long... proposedShape) {
-        return new BoolReshapeVertex(this, proposedShape);
+    public BooleanVertex reshape(long... proposedShape) {
+        return new BooleanReshapeVertex(this, proposedShape);
     }
 
 
