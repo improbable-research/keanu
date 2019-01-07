@@ -108,6 +108,14 @@ Here is the completed code if you'd like to run it yourself.
 Experiment with the size of the sigma in each thermometer (the inaccuracy) and see how it affects the 
 estimated temperature.
 
+#### Java
+
 ```java
 {% snippet TempFull %}
+```
+
+#### Python
+
+```python
+{% snippet PythonTwoThermometers %}
 ```

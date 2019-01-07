@@ -57,7 +57,7 @@ public class ArcSinVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -0.25, 0.25);
+        UniformVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -0.25, 0.25);
         ArcSinVertex outputVertex = inputVertex.times(2.0).asin();
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-4);

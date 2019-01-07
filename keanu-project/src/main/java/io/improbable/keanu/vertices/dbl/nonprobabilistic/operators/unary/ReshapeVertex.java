@@ -5,10 +5,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,24 +27,31 @@ public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
-        return derivativeOfParentWithRespectToInputs.reshape(inputVertex.getValue().getRank(), getShape());
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative dInputVertex = derivativeOfParentsWithRespectToInput.get(inputVertex);
+
+        long[] newPartialShape = TensorShape.concat(
+            getShape(),
+            dInputVertex.getWrtShape(inputVertex.getShape())
+        );
+
+        return new PartialDerivative(dInputVertex.get().reshape(newPartialShape));
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> reshapedDerivatives = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> reshapedDerivatives = new HashMap<>();
 
-        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            DoubleTensor partial = partialDerivative.getValue();
-            long[] newPartialShape = TensorShape.concat(
-                TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
-                inputVertex.getShape()
-            );
-            DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
-            reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), reshapedPartialDerivative));
-        }
+        long[] newPartialShape = TensorShape.concat(
+            derivativeOfOutputWithRespectToSelf.getOfShape(getShape()),
+            inputVertex.getShape()
+        );
+
+        PartialDerivative dXWrtInputVertex = new PartialDerivative(
+            derivativeOfOutputWithRespectToSelf.get().reshape(newPartialShape)
+        );
+
+        reshapedDerivatives.put(inputVertex, dXWrtInputVertex);
 
         return reshapedDerivatives;
     }

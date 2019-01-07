@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
@@ -21,7 +20,7 @@ public class SliceVertexTest {
 
     @Before
     public void setup() {
-       matrixA = new ConstantDoubleVertex(DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3));
+        matrixA = new ConstantDoubleVertex(DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3));
     }
 
     @Test
@@ -84,7 +83,7 @@ public class SliceVertexTest {
     }
 
     private void assertPartialsOfSliceWithRespectToOriginalAreCorrect(int dim, int ind, double[] expectedValue, long[] expectedShape, long[] expectedPartialShape) {
-        DoubleVertex m = new UniformVertex(0, 10);
+        UniformVertex m = new UniformVertex(0, 10);
         m.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3));
 
         DoubleVertex alpha = new UniformVertex(0, 10);
@@ -94,19 +93,20 @@ public class SliceVertexTest {
 
         SliceVertex sliceN = new SliceVertex(N, dim, ind);
 
-        PartialDerivatives forward = sliceN.getDerivativeWrtLatents();
-        PartialDerivatives backward = Differentiator.reverseModeAutoDiff(sliceN, ImmutableSet.of(m, alpha));
+        DoubleTensor dSliceNWrtmForward = Differentiator.forwardModeAutoDiff(m, sliceN).of(sliceN);
 
-        DoubleTensor originalPartial = N.getDerivativeWrtLatents().withRespectTo(m);
+        DoubleTensor dSliceNWrtmReverse = Differentiator.reverseModeAutoDiff(sliceN, ImmutableSet.of(m, alpha)).withRespectTo(m);
+
+        DoubleTensor originalPartial = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m);
 
         Assert.assertArrayEquals(sliceN.getValue().asFlatDoubleArray(), expectedValue, 1e-6);
         Assert.assertArrayEquals(expectedShape, sliceN.getShape());
 
-        Assert.assertArrayEquals(originalPartial.slice(dim, ind).asFlatDoubleArray(), forward.withRespectTo(m).asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(expectedPartialShape, forward.withRespectTo(m).getShape());
+        Assert.assertArrayEquals(originalPartial.slice(dim, ind).asFlatDoubleArray(), dSliceNWrtmForward.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(expectedPartialShape, dSliceNWrtmForward.getShape());
 
-        Assert.assertArrayEquals(originalPartial.slice(dim, ind).asFlatDoubleArray(), backward.withRespectTo(m).asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(expectedPartialShape, backward.withRespectTo(m).getShape());
+        Assert.assertArrayEquals(originalPartial.slice(dim, ind).asFlatDoubleArray(), dSliceNWrtmReverse.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(expectedPartialShape, dSliceNWrtmReverse.getShape());
     }
 
     @Test
@@ -121,8 +121,8 @@ public class SliceVertexTest {
 
         SliceVertex sliceN = new SliceVertex(N, 1, 1);
 
-        DoubleTensor originalPartial = N.getDerivativeWrtLatents().withRespectTo(m);
-        DoubleTensor slicePartial = sliceN.getDerivativeWrtLatents().withRespectTo(m);
+        DoubleTensor originalPartial = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m);
+        DoubleTensor slicePartial = Differentiator.reverseModeAutoDiff(sliceN, m).withRespectTo(m);
 
         Assert.assertArrayEquals(sliceN.getValue().asFlatDoubleArray(), new double[]{65, 145}, 1e-6);
         Assert.assertArrayEquals(new long[]{2}, sliceN.getShape());
@@ -151,7 +151,7 @@ public class SliceVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex cube = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        UniformVertex cube = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         SliceVertex slice = new SliceVertex(cube, 2, 0);
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(cube), slice, 10.0, 1e-10);
     }

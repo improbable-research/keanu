@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
@@ -29,9 +30,7 @@ public class AutoDiffTensorTest {
 
         MultiplicationVertex output = prod2.plus(5).times(2);
 
-        PartialDerivatives derivative = output.getDerivativeWrtLatents();
-
-        DoubleTensor wrtA = derivative.withRespectTo(A);
+        DoubleTensor wrtA = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A);
 
         DoubleTensor expectedWrt = DoubleTensor.create(new double[]{4, 16, 36, 64})
             .diag()
@@ -55,9 +54,7 @@ public class AutoDiffTensorTest {
 
         MultiplicationVertex output = prod2.plus(5).times(2);
 
-        PartialDerivatives derivative = output.getDerivativeWrtLatents();
-
-        DoubleTensor wrtA = derivative.withRespectTo(A);
+        DoubleTensor wrtA = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A);
 
         DoubleTensor expectedWrt = DoubleTensor.create(4, 16, 36, 64);
 
@@ -73,9 +70,7 @@ public class AutoDiffTensorTest {
 
         SumVertex B = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
 
-        PartialDerivatives derivative = B.getDerivativeWrtLatents();
-
-        DoubleTensor wrtA = derivative.withRespectTo(A);
+        DoubleTensor wrtA = Differentiator.reverseModeAutoDiff(B, A).withRespectTo(A);
 
         //B = 1*(a00 + a01 + a10 + a11) + 2*(a00 + a01 + a10 + a11)+ 3*(a00 + a01 + a10 + a11)+ 4*(a00 + a01 + a10 + a11)
         //dBda00 = 1 + 2 + 3 + 4 = 10
