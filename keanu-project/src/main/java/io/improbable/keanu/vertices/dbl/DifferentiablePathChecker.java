@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.vertices.Vertex;
+import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -9,16 +10,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
+@UtilityClass
 public class DifferentiablePathChecker {
 
-    private final Set<? extends Vertex<?>> wrtVertices;
-
-    public DifferentiablePathChecker(Collection<? extends Vertex<?>> wrtVertices) {
-        this.wrtVertices = new HashSet<>(wrtVertices);
-    }
-
     public boolean differentiablePath(Collection<Vertex> vertices) {
-        if(!vertices.stream().allMatch(Vertex::isDifferentiable)) {
+        if (!vertices.stream().allMatch(Vertex::isDifferentiable)) {
             return false;
         }
         Queue<Vertex> queue = new LinkedList<>(vertices);
@@ -53,7 +49,7 @@ public class DifferentiablePathChecker {
             Vertex visiting = queue.poll();
 
             if (visiting.isProbabilistic()) {
-                if(visiting.isObserved()) {
+                if (visiting.isObserved()) {
                     continue;
                 } else {
                     return false;

@@ -18,8 +18,7 @@ public class DifferentiablePathCheckerTest {
         GaussianVertex b = new GaussianVertex(a, 1);
         GaussianVertex c = new GaussianVertex(a, 1);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(c.getConnectedGraph());
-        DifferentiablePathChecker dpc = new DifferentiablePathChecker(bayesianNetwork.getContinuousLatentVertices());
-        boolean pathPresent = dpc.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(true, pathPresent);
     }
 
@@ -29,8 +28,7 @@ public class DifferentiablePathCheckerTest {
         DoubleVertex floorVertex = new FloorVertex(latentBeforeNonDiffOp);
         GaussianVertex latentAfterNonDiffOp = new GaussianVertex(floorVertex, 1);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(floorVertex.getConnectedGraph());
-        DifferentiablePathChecker dpc = new DifferentiablePathChecker(bayesianNetwork.getContinuousLatentVertices());
-        boolean pathPresent = dpc.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(false, pathPresent);
     }
 
@@ -42,8 +40,8 @@ public class DifferentiablePathCheckerTest {
         DoubleVertex ifResult = If.isTrue(predicate).then(gaussianA).orElse(gaussianB);
         GaussianVertex postNonDiffVertex = new GaussianVertex(ifResult, 5);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(postNonDiffVertex.getConnectedGraph());
-        DifferentiablePathChecker dpc = new DifferentiablePathChecker(bayesianNetwork.getContinuousLatentVertices());
-        boolean pathPresent = dpc.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(false, pathPresent);
     }
+
 }
