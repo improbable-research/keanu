@@ -17,7 +17,6 @@ def trace() -> sample_types:
                                       array([[0.2, 0.3], [0.4, 0.5]])])])
 
 
-@pytest.mark.filterwarnings('ignore:Matplotlib is currently using agg')
 def test_traceplot_returns_axesplot_with_correct_data(trace: sample_types) -> None:
     ax = traceplot(trace, labels=['gamma', 'gaussian'])
 
