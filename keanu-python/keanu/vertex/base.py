@@ -171,15 +171,15 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     @staticmethod
     def __parse_arg(arg: Union[vertex_constructor_param_types, shape_types]) -> JavaObject:
         print("PARSING ARG: " + str(arg))
-        if isinstance(arg, runtime_tensor_arg_types):
-            print("Making new Constant")
-            return kn.vertex.const.Const(arg).unwrap()
-        elif isinstance(arg, runtime_wrapped_java_types):
+#        if isinstance(arg, runtime_tensor_arg_types):
+#            print("Making new Constant")
+#            return kn.vertex.const.Const(arg).unwrap()
+        if isinstance(arg, runtime_wrapped_java_types):
             print("Unwrapping Arg")
             return arg.unwrap()
-        elif isinstance(arg, collections.Collection) and all(isinstance(x, runtime_primitive_types) for x in arg):
-            print("Converting to java long array")
-            return k.to_java_long_array(arg)
+#        elif isinstance(arg, collections.Collection) and all(isinstance(x, runtime_primitive_types) for x in arg):
+#            print("Converting to java long array")
+#            return k.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
