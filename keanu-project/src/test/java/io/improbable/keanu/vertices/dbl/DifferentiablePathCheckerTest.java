@@ -86,4 +86,14 @@ public class DifferentiablePathCheckerTest {
         assertEquals(true, pathPresent);
     }
 
+    @Test
+    public void NonDiffableNotOnPathToLatent() {
+        GaussianVertex gaussianA = new GaussianVertex(5., 1.);
+        DoubleVertex nonDiffableVertex = new FloorVertex(gaussianA);
+        GaussianVertex gaussianB = new GaussianVertex(gaussianA, 1.);
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(gaussianB.getConnectedGraph());
+        boolean pathPresent = DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices());
+        assertEquals(true, pathPresent);
+    }
+
 }
