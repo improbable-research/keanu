@@ -66,9 +66,17 @@ public class DoubleScalarTensorShapePreservationTest {
     }
 
     @Test
+    public void tensorSetWithMaskInPlacePreservesShape() {
+        for (DoubleTensor t1 : tensors) {
+            DoubleTensor t2 = t1.duplicate();
+            Tensor result = t1.setWithMaskInPlace(t2, -1.);
+            resultShapeMatchesBroadcastShape(result, t1, t2);
+        }
+    }
+
+    @Test
     public void tensorGetGreaterThanMaskPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::getGreaterThanMask);
-
     }
 
     @Test
