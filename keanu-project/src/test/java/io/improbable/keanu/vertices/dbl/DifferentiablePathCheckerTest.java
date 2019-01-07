@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class DifferentiablePathCheckerTest {
 
     @Test
-    public void testBasicDiffPath() {
+    public void simpleDiffable() {
         GaussianVertex a = new GaussianVertex(5., 4.);
         GaussianVertex b = new GaussianVertex(a, 1.);
         GaussianVertex c = new GaussianVertex(a, 1.);
@@ -25,7 +25,7 @@ public class DifferentiablePathCheckerTest {
     }
 
     @Test
-    public void testBasicDiffFail() {
+    public void simpleNonDiffable() {
         GaussianVertex latentBeforeNonDiffOp = new GaussianVertex(5., 3.);
         DoubleVertex floorVertex = new FloorVertex(latentBeforeNonDiffOp);
         GaussianVertex latentAfterNonDiffOp = new GaussianVertex(floorVertex, 1.);
