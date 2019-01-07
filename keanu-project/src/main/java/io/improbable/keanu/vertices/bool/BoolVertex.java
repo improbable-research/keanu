@@ -19,6 +19,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolRe
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
+import io.improbable.keanu.vertices.utility.AssertVertex;
 
 import java.util.Arrays;
 import java.util.List;
@@ -84,6 +85,10 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> implements Boolea
     public static final BoolVertex not(Vertex<BooleanTensor> vertex) {
         return new NotVertex(vertex);
     }
+
+    public AssertVertex assertTrue() { return new AssertVertex(this); }
+
+    public AssertVertex assertTrue(String errorMessage) { return new AssertVertex(this, errorMessage); }
 
     public BoolVertex equalTo(BoolVertex rhs) {
         return new EqualsVertex<>(this, rhs);
