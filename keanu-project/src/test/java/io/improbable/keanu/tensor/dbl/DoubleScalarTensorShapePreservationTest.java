@@ -98,14 +98,14 @@ public class DoubleScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void tensorMaxInPlacePreservesShape() {
+    public void tensorMaxPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::max);
         checkOperationPreservesShape(DoubleTensor::maxInPlace);
 
     }
 
     @Test
-    public void tensorMinInPlacePreservesShape() {
+    public void tensorMinPreservesShape() {
         checkOperationPreservesShape(DoubleTensor::min);
         checkOperationPreservesShape(DoubleTensor::minInPlace);
 

@@ -83,14 +83,14 @@ public class IntegerScalarTensorShapePreservationTest {
     }
 
     @Test
-    public void tensorMaxInPlacePreservesShape() {
+    public void tensorMaxPreservesShape() {
         checkOperationPreservesShape(IntegerTensor::max);
         checkOperationPreservesShape(IntegerTensor::maxInPlace);
 
     }
 
     @Test
-    public void tensorMinInPlacePreservesShape() {
+    public void tensorMinPreservesShape() {
         checkOperationPreservesShape(IntegerTensor::min);
         checkOperationPreservesShape(IntegerTensor::minInPlace);
 
