@@ -5,10 +5,8 @@ import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -19,10 +17,31 @@ public class DifferentiablePathChecker {
         if (!vertices.stream().allMatch(Vertex::isDifferentiable)) {
             return false;
         }
-        Map<Vertex, Boolean> cache = new HashMap<>();
-        for (Vertex v : vertices) {
-            if (!differentiablePathWithCache(v, cache)) {
-                return false;
+        Queue<Vertex> queue = new LinkedList<>(vertices);
+        Set<Vertex> queued = new HashSet<>(vertices);
+        Set<Vertex> constantVerticesCache = new HashSet<>();
+
+        while (!queue.isEmpty()) {
+            Vertex visiting = queue.poll();
+
+            if (visiting.isObserved()) {
+                continue;
+            }
+
+            if (!visiting.isDifferentiable()) {
+                if (isVertexParentsConstant(visiting, constantVerticesCache)) {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+
+            Collection<Vertex> nextVertices = visiting.getParents();
+            for (Vertex next : nextVertices) {
+                if (!queued.contains(next)) {
+                    queue.offer(next);
+                    queued.add(next);
+                }
             }
         }
         return true;
@@ -32,52 +51,17 @@ public class DifferentiablePathChecker {
         return differentiablePath(Collections.singletonList(vertex));
     }
 
-    private boolean differentiablePathWithCache(Vertex vertex, Map<Vertex, Boolean> cachedResults) {
-        Queue<Vertex> queue = new LinkedList<>(Collections.singletonList(vertex));
-        Set<Vertex> queued = new HashSet<>(Collections.singletonList(vertex));
-
-        while (!queue.isEmpty()) {
-            Vertex visiting = queue.poll();
-
-            if (visiting.isObserved()) {
-                continue;
-            }
-
-            if (cachedResults.containsKey(visiting)) {
-                if (cachedResults.get(visiting)) {
-                    continue;
-                } else {
-                    return false;
-                }
-            }
-
-            if (!visiting.isDifferentiable()) {
-                if (isVertexParentsConstant(visiting)) {
-                    cachedResults.put(visiting, true);
-                    continue;
-                } else {
-                    cachedResults.put(visiting, false);
-                    return false;
-                }
-            }
-
-            Collection<Vertex> nextVertices = visiting.getParents();
-            for (Vertex next : nextVertices) {
-                queue.offer(next);
-                queued.add(next);
-            }
-        }
-        cachedResults.put(vertex, true);
-        return true;
-    }
-
-    private boolean isVertexParentsConstant(Vertex vertex) {
+    private boolean isVertexParentsConstant(Vertex vertex, Set<Vertex> constantVerticesCache) {
         Collection<Vertex> initialNext = vertex.getParents();
         Queue<Vertex> queue = new LinkedList<>(initialNext);
         Set<Vertex> queued = new HashSet<>(initialNext);
 
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
+
+            if (constantVerticesCache.contains(visiting)) {
+                continue;
+            }
 
             if (visiting.isProbabilistic()) {
                 if (visiting.isObserved()) {
@@ -95,6 +79,7 @@ public class DifferentiablePathChecker {
                 }
             }
         }
-        return false;
+        constantVerticesCache.addAll(queued);
+        return true;
     }
 }
