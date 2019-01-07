@@ -12,7 +12,14 @@ import java.util.Set;
 
 @UtilityClass
 public class DifferentiablePathChecker {
-
+    
+    /**
+     * Checks whether a set of vertices are differentiable
+     * w.r.t the latents in a graph.
+     *
+     * @param vertices the collection of vertices to check
+     * @return true if the vertices are differentiable w.r.t latents
+     */
     public boolean differentiablePath(Collection<Vertex> vertices) {
         if (!vertices.stream().allMatch(Vertex::isDifferentiable)) {
             return false;
