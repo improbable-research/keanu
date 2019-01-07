@@ -44,7 +44,7 @@ public class AssertVertex extends BoolVertex implements NonProbabilistic<Boolean
 
     private void assertion() {
         if (!predicate.getValue().allTrue()) {
-            throw new AssertionError(buildAssertMessage());
+            throw new GraphAssertionException(buildAssertMessage());
         }
     }
 

@@ -34,7 +34,7 @@ public class AssertVertexTest {
 
     @Test
     public void assertThrowsOnFalseConstBool() {
-        thrown.expect(AssertionError.class);
+        thrown.expect(GraphAssertionException.class);
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
         constBool.assertTrue().eval();
     }
@@ -47,7 +47,7 @@ public class AssertVertexTest {
 
     @Test
     public void lazyEvalThrowsOnFalseConstBool() {
-        thrown.expect(AssertionError.class);
+        thrown.expect(GraphAssertionException.class);
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
         constBool.assertTrue().lazyEval();
     }
@@ -61,7 +61,7 @@ public class AssertVertexTest {
 
     @Test
     public void assertPassesOnRVWithFalsePredicate() {
-        thrown.expect(AssertionError.class);
+        thrown.expect(GraphAssertionException.class);
         UniformVertex uniform = new UniformVertex(0, 5);
         BoolVertex predicate = uniform.greaterThan(new ConstantDoubleVertex(new double[]{10}));
         predicate.assertTrue().eval();
@@ -69,7 +69,7 @@ public class AssertVertexTest {
 
     @Test
     public void samplingWithAssertionWorks() {
-        thrown.expect(AssertionError.class);
+        thrown.expect(GraphAssertionException.class);
         GaussianVertex gaussian = new GaussianVertex(5, 1);
         gaussian.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
 
@@ -86,7 +86,7 @@ public class AssertVertexTest {
 
     @Test
     public void valuePropagationThrowsOnFalseAssertion() {
-        thrown.expect(AssertionError.class);
+        thrown.expect(GraphAssertionException.class);
         ConstantDoubleVertex constDouble = new ConstantDoubleVertex(3);
         constDouble.lessThan(new ConstantDoubleVertex(10)).assertTrue();
         constDouble.setAndCascade(15);
@@ -94,7 +94,7 @@ public class AssertVertexTest {
 
     @Test
     public void optimizerWithAssertionWorks() {
-        thrown.expect(AssertionError.class);
+        thrown.expect(GraphAssertionException.class);
         UniformVertex temperature = new UniformVertex(20, 30);
         GaussianVertex observedTemp = new GaussianVertex(temperature, 1);
         observedTemp.observe(29);
@@ -104,7 +104,7 @@ public class AssertVertexTest {
 
     @Test
     public void assertGivesCorrectErrorWhenLabelledAndMessagePresent() {
-        thrown.expect(AssertionError.class);
+        thrown.expect(GraphAssertionException.class);
         thrown.expectMessage("AssertVertex (testAssert): this is wrong");
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = constBool.assertTrue("this is wrong");
@@ -114,7 +114,7 @@ public class AssertVertexTest {
 
     @Test
     public void assertGivesCorrectErrorWhenLabelled() {
-        thrown.expect(AssertionError.class);
+        thrown.expect(GraphAssertionException.class);
         thrown.expectMessage("AssertVertex (testAssert)");
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = constBool.assertTrue();
@@ -124,7 +124,7 @@ public class AssertVertexTest {
 
     @Test
     public void assertGivesCorrectErrorWhenMessagePresent() {
-        thrown.expect(AssertionError.class);
+        thrown.expect(GraphAssertionException.class);
         thrown.expectMessage("AssertVertex: this is wrong");
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = constBool.assertTrue("this is wrong");
@@ -133,7 +133,7 @@ public class AssertVertexTest {
 
     @Test
     public void assertGivesCorrectErrorWhenPlain() {
-        thrown.expect(AssertionError.class);
+        thrown.expect(GraphAssertionException.class);
         thrown.expectMessage("AssertVertex");
         ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = constBool.assertTrue();
