@@ -5,6 +5,7 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,6 +41,15 @@ public class DifferentiablePathCheckerTest {
         DoubleVertex ifResult = If.isTrue(predicate).then(gaussianA).orElse(gaussianB);
         GaussianVertex postNonDiffVertex = new GaussianVertex(ifResult, 5);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(postNonDiffVertex.getConnectedGraph());
+        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        assertEquals(false, pathPresent);
+    }
+
+    @Test
+    public void discreteLatentsDontHaveDiffablePath() {
+        GaussianVertex mu = new GaussianVertex(5., 1.);
+        PoissonVertex poisson = new PoissonVertex(mu);
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(poisson.getConnectedGraph());
         boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(false, pathPresent);
     }
