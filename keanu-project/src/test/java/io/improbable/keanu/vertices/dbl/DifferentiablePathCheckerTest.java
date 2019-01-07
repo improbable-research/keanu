@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl;
 
-import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -9,7 +8,6 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Test;
-import org.omg.CORBA.BAD_CONTEXT;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,7 +20,7 @@ public class DifferentiablePathCheckerTest {
         GaussianVertex b = new GaussianVertex(a, 1.);
         GaussianVertex c = new GaussianVertex(a, 1.);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(c.getConnectedGraph());
-        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        boolean pathPresent = DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(true, pathPresent);
     }
 
@@ -32,7 +30,7 @@ public class DifferentiablePathCheckerTest {
         DoubleVertex floorVertex = new FloorVertex(latentBeforeNonDiffOp);
         GaussianVertex latentAfterNonDiffOp = new GaussianVertex(floorVertex, 1.);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(floorVertex.getConnectedGraph());
-        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        boolean pathPresent = DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(false, pathPresent);
     }
 
@@ -44,7 +42,7 @@ public class DifferentiablePathCheckerTest {
         DoubleVertex ifResult = If.isTrue(predicate).then(gaussianA).orElse(gaussianB);
         GaussianVertex postNonDiffVertex = new GaussianVertex(ifResult, 5);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(postNonDiffVertex.getConnectedGraph());
-        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        boolean pathPresent = DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(false, pathPresent);
     }
 
@@ -53,7 +51,7 @@ public class DifferentiablePathCheckerTest {
         GaussianVertex mu = new GaussianVertex(5., 1.);
         PoissonVertex poisson = new PoissonVertex(mu);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(poisson.getConnectedGraph());
-        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        boolean pathPresent = DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(false, pathPresent);
     }
 
@@ -63,7 +61,7 @@ public class DifferentiablePathCheckerTest {
         DoubleVertex nonDiffableVertex = new FloorVertex(latent);
         GaussianVertex gaussian = new GaussianVertex(nonDiffableVertex, 1.);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(gaussian.getConnectedGraph());
-        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        boolean pathPresent = DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(false, pathPresent);
     }
 
@@ -74,7 +72,7 @@ public class DifferentiablePathCheckerTest {
         DoubleVertex nonDiffableVertex = new FloorVertex(observedLatent);
         GaussianVertex gaussian = new GaussianVertex(nonDiffableVertex, 1.);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(gaussian.getConnectedGraph());
-        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        boolean pathPresent = DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(true, pathPresent);
     }
 
@@ -84,7 +82,7 @@ public class DifferentiablePathCheckerTest {
         DoubleVertex nonDiffableVertex = new FloorVertex(constantVertex);
         GaussianVertex gaussian = new GaussianVertex(nonDiffableVertex, 1.);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(gaussian.getConnectedGraph());
-        boolean pathPresent = DifferentiablePathChecker.differentiablePath(bayesianNetwork.getLatentOrObservedVertices());
+        boolean pathPresent = DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices());
         assertEquals(true, pathPresent);
     }
 
