@@ -33,7 +33,7 @@ public class DifferentiablePathChecker {
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
 
-            if (!visiting.isDifferentiable() && parentTreeContainsLatent(visiting)) {
+            if (!visiting.isDifferentiable() && !isConstantVertex(visiting)) {
                 return false;
             }
 
@@ -52,8 +52,8 @@ public class DifferentiablePathChecker {
         return latent && discrete;
     }
 
-    private boolean parentTreeContainsLatent(Vertex vertex) {
-        Collection<Vertex> initialNext = Collections.singletonList(vertex);
+    private boolean isConstantVertex(Vertex vertex) {
+        Collection<Vertex> initialNext = vertex.getParents();
         Queue<Vertex> queue = new LinkedList<>(initialNext);
         Set<Vertex> queued = new HashSet<>(initialNext);
 
@@ -64,7 +64,7 @@ public class DifferentiablePathChecker {
                 if(visiting.isObserved()) {
                     continue;
                 } else {
-                    return true;
+                    return false;
                 }
             }
 
