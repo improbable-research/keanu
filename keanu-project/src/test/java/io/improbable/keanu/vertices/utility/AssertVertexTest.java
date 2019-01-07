@@ -199,4 +199,10 @@ public class AssertVertexTest {
         assertEquals(22, maxA, 0.1);
         assertEquals(22, maxB, 0.1);
     }
+
+    @Test
+    public void doubleAssertion() {
+        DoubleVertex A = new ConstantDoubleVertex(20);
+        A.lessThan(new ConstantDoubleVertex(30)).assertTrue().and(ConstantBoolVertex.TRUE).assertTrue();
+    }
 }
