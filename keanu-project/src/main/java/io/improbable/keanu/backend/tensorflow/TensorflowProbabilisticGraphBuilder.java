@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TensorflowProbabilisticGraphBuilder implements ProbabilisticGraphBuilder<TensorflowProbabilisticGraph> {
@@ -26,13 +27,8 @@ public class TensorflowProbabilisticGraphBuilder implements ProbabilisticGraphBu
     }
 
     @Override
-    public void convert(Vertex<?> vertex) {
-        graphBuilder.create(vertex);
-    }
-
-    @Override
-    public void alias(VariableReference from, VariableReference to) {
-        graphBuilder.alias(from, to);
+    public void connect(Map<Vertex<?>, Vertex<?>> connections) {
+        graphBuilder.connect(connections);
     }
 
     @Override

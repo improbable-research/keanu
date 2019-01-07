@@ -63,8 +63,10 @@ public class TensorflowGraphBuilder implements ComputableGraphBuilder<Tensorflow
     }
 
     @Override
-    public void alias(VariableReference from, VariableReference to) {
-        lookup.put(from, lookup.get(to));
+    public void connect(Map<Vertex<?>, Vertex<?>> connections) {
+        connections.forEach((to, from) ->
+            lookup.put(from.getReference(), lookup.get(to.getReference()))
+        );
     }
 
     @Override

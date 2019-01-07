@@ -4,14 +4,13 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.LogProbAsAGraphable;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Vertex;
+import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+@UtilityClass
 public class ProbabilisticGraphConverter {
 
     public static <T extends ProbabilisticGraph> T convert(BayesianNetwork network, ProbabilisticGraphBuilder<T> graphBuilder) {
@@ -51,8 +50,8 @@ public class ProbabilisticGraphConverter {
 
             if (visiting instanceof LogProbAsAGraphable) {
                 LogProbGraph logProbGraph = ((LogProbAsAGraphable) visiting).logProbGraph();
-                VariableReference logProbFromVisiting = addLogProbFrom(logProbGraph, graphBuilder);
-                logProbOps.add(logProbFromVisiting);
+                addLogProbFrom(logProbGraph, graphBuilder);
+                logProbOps.add(logProbGraph.getLogProbOutput().getReference());
 
             } else {
                 throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " logProb as a graph not supported");
@@ -62,30 +61,16 @@ public class ProbabilisticGraphConverter {
         return addLogProbSumTotal(logProbOps, graphBuilder);
     }
 
-    private static <T extends ProbabilisticGraph> VariableReference addLogProbFrom(LogProbGraph logProbGraph,
-                                                                                   ProbabilisticGraphBuilder<T> graphBuilder) {
+    /**
+     * @param logProbGraph the graph to add that represents the logProb calculation
+     * @param graphBuilder the builder that contains state for the probabilistic graph building so far.
+     */
+    private static void addLogProbFrom(LogProbGraph logProbGraph,
+                                       ProbabilisticGraphBuilder graphBuilder) {
 
         Map<Vertex<?>, Vertex<?>> inputs = logProbGraph.getInputs();
-
-        //setup graph connection
-        for (Map.Entry<Vertex<?>, Vertex<?>> input : inputs.entrySet()) {
-            graphBuilder.alias(input.getValue().getReference(), input.getKey().getReference());
-        }
-
-        List<Vertex> topoSortedVertices = (logProbGraph.getLogProbOutput().getConnectedGraph()).stream()
-            .sorted(Comparator.comparing(Vertex::getId))
-            .collect(Collectors.toList());
-
-        HashSet<Vertex<?>> logProbInputs = new HashSet<>(inputs.values());
-
-        for (Vertex visiting : topoSortedVertices) {
-
-            if (!logProbInputs.contains(visiting)) {
-                graphBuilder.convert(visiting);
-            }
-        }
-
-        return logProbGraph.getLogProbOutput().getReference();
+        graphBuilder.connect(inputs);
+        graphBuilder.convert(((Vertex) logProbGraph.getLogProbOutput()).getConnectedGraph());
     }
 
     private static <T extends ProbabilisticGraph> VariableReference addLogProbSumTotal(List<VariableReference> logProbOps,

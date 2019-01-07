@@ -1,10 +1,12 @@
 package io.improbable.keanu.backend;
 
+import io.improbable.keanu.vertices.PlaceHolderVertex;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 public interface ComputableGraphBuilder<T extends ComputableGraph> {
@@ -13,13 +15,15 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
 
     void createVariable(Vertex visiting);
 
-    Collection<VariableReference> getLatentVariables();
-
     void create(Vertex visiting);
 
-    void alias(VariableReference from, VariableReference to);
+    void connect(Map<Vertex<?>, Vertex<?>> connections);
+
+    Collection<VariableReference> getLatentVariables();
 
     VariableReference add(VariableReference left, VariableReference right);
+
+    T build();
 
     default void convert(Collection<? extends Vertex> vertices) {
 
@@ -31,6 +35,10 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
 
         Vertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
+
+            if (visiting instanceof PlaceHolderVertex) {
+                continue;
+            }
 
             if (visiting instanceof Probabilistic) {
                 if (visiting.isObserved()) {
@@ -45,5 +53,4 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
         }
     }
 
-    T build();
 }
