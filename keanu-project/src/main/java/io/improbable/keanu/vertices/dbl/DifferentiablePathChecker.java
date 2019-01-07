@@ -18,16 +18,11 @@ public class DifferentiablePathChecker {
     }
 
     public boolean differentiablePath(Collection<Vertex> vertices) {
-        return vertices.stream().allMatch(this::differentiablePath);
-    }
-
-    public boolean differentiablePath(Vertex vertex) {
-        if (!vertex.isDifferentiable()) {
+        if(!vertices.stream().allMatch(Vertex::isDifferentiable)) {
             return false;
         }
-        Queue<Vertex> queue = new LinkedList<>();
-        queue.offer(vertex);
-        Set<Vertex> queued = new HashSet<>(Collections.singletonList(vertex));
+        Queue<Vertex> queue = new LinkedList<>(vertices);
+        Set<Vertex> queued = new HashSet<>(vertices);
 
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
@@ -43,6 +38,10 @@ public class DifferentiablePathChecker {
             }
         }
         return true;
+    }
+
+    public boolean differentiablePath(Vertex vertex) {
+        return differentiablePath(Collections.singletonList(vertex));
     }
 
     private boolean isConstantVertex(Vertex vertex) {
