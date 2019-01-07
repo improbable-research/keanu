@@ -160,7 +160,7 @@ public class AssertVertexTest {
     }
 
     @Test
-    public void optimizerWithAssertThatShoudlntFire() {
+    public void optimizerWithAssertThatShouldntFire() {
         UniformVertex temperature = new UniformVertex(20., 30.);
         temperature.lessThan(new ConstantDoubleVertex(35)).assertTrue();
         temperature.greaterThan(new ConstantDoubleVertex(15)).assertTrue();
@@ -169,6 +169,9 @@ public class AssertVertexTest {
         GaussianVertex secondThermometer = new GaussianVertex(temperature, 5.);
         firstThermometer.observe(25.);
         secondThermometer.observe(30.);
+
+        firstThermometer.greaterThan(new ConstantDoubleVertex(24)).assertTrue();
+        secondThermometer.greaterThan(new ConstantDoubleVertex(28)).assertTrue();
 
         BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
         KeanuOptimizer.of(bayesNet).maxAPosteriori();
