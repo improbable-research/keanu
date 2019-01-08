@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+
 import static org.junit.Assert.assertEquals;
 
 public class LogProbGraphContract {

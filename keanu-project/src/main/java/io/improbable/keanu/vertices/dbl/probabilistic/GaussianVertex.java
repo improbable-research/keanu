@@ -15,6 +15,7 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,6 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 
 public class GaussianVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphGenerator {
 
