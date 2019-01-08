@@ -8,25 +8,28 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 
-import java.util.Map;
+import java.util.Set;
 
 @Builder
 public class LogProbGraph {
 
     @Getter
     @Singular
-    private final Map<Vertex<?>, Vertex<?>> inputs;
+    private final Set<ProxyVertex<?>> params;
+
+    @Getter
+    private final Vertex<?> x;
 
     @Getter
     private final DoubleVertex logProbOutput;
 
-    public <T> Vertex<T> getInput(Vertex<T> input) {
-        return (Vertex<T>) inputs.get(input);
+    public <T> void setXValue(T value) {
+        ((Vertex <T>) x).setValue(value);
     }
 
-    static public class PlaceHolderDoubleVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, Differentiable {
+    static public class DoublePlaceHolderVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, Differentiable {
 
-        public PlaceHolderDoubleVertex(long[] initialShape) {
+        public DoublePlaceHolderVertex(long[] initialShape) {
             super(initialShape);
         }
 
