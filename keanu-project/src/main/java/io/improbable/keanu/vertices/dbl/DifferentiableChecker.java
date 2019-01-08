@@ -4,7 +4,6 @@ import io.improbable.keanu.vertices.Vertex;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -45,10 +44,6 @@ public class DifferentiableChecker {
             }
         }
         return true;
-    }
-
-    public boolean isDifferentiable(Vertex vertex) {
-        return isDifferentiable(Collections.singletonList(vertex));
     }
 
     private boolean isVertexConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {

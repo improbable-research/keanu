@@ -9,6 +9,8 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
 
 
@@ -63,7 +65,7 @@ public class DifferentiableCheckerTest {
     public void discreteLatentsArentDiffable() {
         GaussianVertex mu = new GaussianVertex(5., 1.);
         PoissonVertex poisson = new PoissonVertex(mu);
-        boolean differentiable = DifferentiableChecker.isDifferentiable(poisson);
+        boolean differentiable = DifferentiableChecker.isDifferentiable(Collections.singletonList(poisson));
         assertEquals(false, differentiable);
     }
 
