@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
-import io.improbable.keanu.vertices.LogProbGraphBuilder;
+import io.improbable.keanu.vertices.LogProbGraphGenerator;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -25,8 +25,9 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 
-public class GaussianVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphBuilder {
+public class GaussianVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphGenerator {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -104,6 +105,28 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceHolderVertex xInput = new LogProbGraph.DoublePlaceHolderVertex(this.getShape());
+        final DoubleProxyVertex muInput = new DoubleProxyVertex(mu.getShape());
+        muInput.setParent(mu);
+        final DoubleProxyVertex sigmaInput = new DoubleProxyVertex(sigma.getShape());
+        sigmaInput.setParent(sigma);
+
+        final DoubleVertex lnSigma = sigmaInput.log();
+        final DoubleVertex xMinusMuSquared = xInput.minus(muInput).pow(2);
+        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigmaInput.pow(2).times(2.0));
+
+        final DoubleVertex logProbOutput = xMinusMuSquaredOver2Variance.plus(lnSigma).plus(Gaussian.LN_SQRT_2PI).unaryMinus().sum();
+
+        return LogProbGraph.builder()
+            .x(xInput)
+            .param(muInput)
+            .param(sigmaInput)
+            .logProbOutput(logProbOutput)
+            .build();
+    }
+
+    @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Gaussian.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
 
@@ -129,23 +152,4 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
         return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(shape, random);
     }
 
-    @Override
-    public LogProbGraph logProbGraph() {
-        final LogProbGraph.PlaceHolderDoubleVertex xInput = new LogProbGraph.PlaceHolderDoubleVertex(this.getShape());
-        final LogProbGraph.PlaceHolderDoubleVertex muInput = new LogProbGraph.PlaceHolderDoubleVertex(mu.getShape());
-        final LogProbGraph.PlaceHolderDoubleVertex sigmaInput = new LogProbGraph.PlaceHolderDoubleVertex(sigma.getShape());
-
-        final DoubleVertex lnSigma = sigmaInput.log();
-        final DoubleVertex xMinusMuSquared = xInput.minus(muInput).pow(2);
-        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigmaInput.pow(2).times(2.0));
-
-        final DoubleVertex logProbOutput = xMinusMuSquaredOver2Variance.plus(lnSigma).plus(Gaussian.LN_SQRT_2PI).unaryMinus().sum();
-
-        return LogProbGraph.builder()
-            .input(this, xInput)
-            .input(mu, muInput)
-            .input(sigma, sigmaInput)
-            .logProbOutput(logProbOutput)
-            .build();
-    }
 }
