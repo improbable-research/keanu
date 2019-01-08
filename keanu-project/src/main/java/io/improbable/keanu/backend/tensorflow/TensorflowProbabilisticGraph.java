@@ -2,8 +2,10 @@ package io.improbable.keanu.backend.tensorflow;
 
 import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticGraph;
+import io.improbable.keanu.backend.ProbabilisticGraphConverter;
 import io.improbable.keanu.backend.Variable;
 import io.improbable.keanu.backend.VariableReference;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +30,10 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
 
     @Getter
     private final VariableReference logLikelihoodOp;
+
+    public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
+        return ProbabilisticGraphConverter.convert(network, new TensorflowProbabilisticGraphBuilder());
+    }
 
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
