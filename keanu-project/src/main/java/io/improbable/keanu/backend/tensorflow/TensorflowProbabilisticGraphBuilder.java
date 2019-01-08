@@ -22,7 +22,7 @@ public class TensorflowProbabilisticGraphBuilder implements ProbabilisticGraphBu
     }
 
     @Override
-    public void convert(Collection<? extends Vertex<?>> vertices) {
+    public void convert(Collection<? extends Vertex> vertices) {
         graphBuilder.convert(vertices);
     }
 

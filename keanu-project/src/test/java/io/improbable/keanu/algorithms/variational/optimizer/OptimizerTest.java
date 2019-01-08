@@ -98,7 +98,7 @@ public class OptimizerTest {
 
         Cobserved.observe(44.0);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
+        BayesianNetwork bayesNet = new BayesianNetwork(A.getConnectedGraph());
 
         Optimizer optimizer = optimizerMapper.apply(bayesNet);
 
@@ -121,7 +121,7 @@ public class OptimizerTest {
 
         Cobserved.observe(46.0);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
+        BayesianNetwork bayesNet = new BayesianNetwork(A.getConnectedGraph());
 
         Optimizer optimizer = optimizerMapper.apply(bayesNet);
 

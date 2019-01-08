@@ -61,10 +61,6 @@ public class BayesianNetwork {
         return labelMap;
     }
 
-    public List<? extends Vertex> getVertices() {
-        return vertices;
-    }
-
     public int getVertexCount() {
         return getVertices().size();
     }
@@ -86,6 +82,10 @@ public class BayesianNetwork {
      */
     public List<Vertex> getAllVertices() {
         return Collections.unmodifiableList(vertices);
+    }
+
+    public List<? extends Vertex> getVertices() {
+        return vertices;
     }
 
     private interface VertexFilter {
@@ -243,12 +243,11 @@ public class BayesianNetwork {
     }
 
     public void save(NetworkSaver networkSaver) {
-        if(isSaveable()) {
+        if (isSaveable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
                 vertex.save(networkSaver);
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Trying to save a BayesianNetwork that isn't Saveable");
         }
     }

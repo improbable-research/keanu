@@ -16,7 +16,7 @@ public class ProbabilisticGraphConverter {
 
     public static <T extends ProbabilisticGraph> T convert(BayesianNetwork network, ProbabilisticGraphBuilder<T> graphBuilder) {
 
-        graphBuilder.convert(network.getVertices().get(0).getConnectedGraph());
+        graphBuilder.convert(network.getVertices());
 
         VariableReference priorLogProbReference = addLogProbCalculation(
             graphBuilder,
@@ -62,7 +62,7 @@ public class ProbabilisticGraphConverter {
 
         Map<Vertex<?>, Vertex<?>> inputs = logProbGraph.getInputs();
         graphBuilder.connect(inputs);
-        graphBuilder.convert(((Vertex) logProbGraph.getLogProbOutput()).getConnectedGraph());
+        graphBuilder.convert(logProbGraph.getLogProbOutput().getConnectedGraph());
         return logProbGraph.getLogProbOutput().getReference();
     }
 

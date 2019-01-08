@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface ProbabilisticGraphBuilder<T extends ProbabilisticGraph> {
 
-    void convert(Collection<? extends Vertex<?>> vertices);
+    void convert(Collection<? extends Vertex> vertices);
 
     void connect(Map<Vertex<?>, Vertex<?>> connections);
 
