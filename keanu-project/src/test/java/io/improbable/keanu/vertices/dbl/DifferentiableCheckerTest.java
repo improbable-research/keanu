@@ -96,4 +96,34 @@ public class DifferentiableCheckerTest {
         assertEquals(true, pathPresent);
     }
 
+    @Test
+    public void graphWithAssertIsDiffable() {
+        GaussianVertex gaussianA = new GaussianVertex(5., 1.);
+        gaussianA.lessThan(new ConstantDoubleVertex(90)).assertTrue();
+        GaussianVertex gaussianB = new GaussianVertex(gaussianA, 1.);
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(gaussianB.getConnectedGraph());
+        boolean pathPresent = DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices());
+        assertEquals(true, pathPresent);
+    }
+
+    @Test
+    public void multipleNonDiffableWithConstantParents() {
+        GaussianVertex gaussianA = new GaussianVertex(5., 1.);
+        GaussianVertex gaussianB = new GaussianVertex(gaussianA, 1.);
+        gaussianA.observe(4.);
+        gaussianB.observe(4.);
+
+        DoubleVertex resultVertex = gaussianA.multiply(gaussianB).plus(gaussianB);
+        DoubleVertex nonDiffableA = new FloorVertex(resultVertex);
+        DoubleVertex nonDiffableB = new FloorVertex(resultVertex);
+        DoubleVertex nonDiffableC = new FloorVertex(resultVertex);
+        DoubleVertex nonDiffableD = new FloorVertex(resultVertex);
+        DoubleVertex nonDiffableE = new FloorVertex(resultVertex);
+        DoubleVertex nonDiffSum = nonDiffableA.plus(nonDiffableB).plus(nonDiffableC).plus(nonDiffableD).plus(nonDiffableE);
+        GaussianVertex gaussianSum = new GaussianVertex(nonDiffSum, 1.);
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(gaussianSum.getConnectedGraph());
+        boolean pathPresent = DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices());
+        assertEquals(true, pathPresent);
+    }
+
 }
