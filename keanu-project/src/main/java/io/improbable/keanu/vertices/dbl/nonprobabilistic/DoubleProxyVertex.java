@@ -28,7 +28,7 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
      * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
      * model in model scenarios) but allows linking at a later point in time.
      *
-     * @param label The label for this Vertex (all Proxy Vertices must be labelled)
+     * @param label The label for this Vertex
      */
     public DoubleProxyVertex(VertexLabel label) {
         this(Tensor.SCALAR_SHAPE, label);
@@ -37,6 +37,10 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
     public DoubleProxyVertex(long[] shape, VertexLabel label) {
         super(shape);
         this.setLabel(label);
+    }
+
+    public DoubleProxyVertex(long[] shape) {
+        super(shape);
     }
 
     public DoubleProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_PARAM_NAME) String label) {
