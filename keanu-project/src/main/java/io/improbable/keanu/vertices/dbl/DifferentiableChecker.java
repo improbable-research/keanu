@@ -21,22 +21,15 @@ public class DifferentiableChecker {
      * @return true if the vertices are differentiable w.r.t latents
      */
     public boolean isDifferentiable(Collection<Vertex> vertices) {
-        if (!vertices.stream().allMatch(Vertex::isDifferentiable)) {
-            return false;
-        }
         Queue<Vertex> queue = new LinkedList<>(vertices);
         Set<Vertex> queued = new HashSet<>(vertices);
-        Set<Vertex> constantVerticesCache = new HashSet<>();
+        Set<Vertex> constantValueVerticesCache = new HashSet<>();
 
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
 
-            if (visiting.isObserved()) {
-                continue;
-            }
-
             if (!visiting.isDifferentiable()) {
-                if (isVertexParentsConstant(visiting, constantVerticesCache)) {
+                if (isVertexConstant(visiting, constantValueVerticesCache)) {
                     continue;
                 } else {
                     return false;
@@ -45,7 +38,7 @@ public class DifferentiableChecker {
 
             Collection<Vertex> nextVertices = visiting.getParents();
             for (Vertex next : nextVertices) {
-                if (!queued.contains(next)) {
+                if (!queued.contains(next) && !constantValueVerticesCache.contains(next)) {
                     queue.offer(next);
                     queued.add(next);
                 }
@@ -58,7 +51,17 @@ public class DifferentiableChecker {
         return isDifferentiable(Collections.singletonList(vertex));
     }
 
-    private boolean isVertexParentsConstant(Vertex vertex, Set<Vertex> constantVerticesCache) {
+    private boolean isVertexConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
+        if(vertex.isProbabilistic() && !vertex.isObserved()) {
+            return false;
+        }
+        if(!isVertexParentsValueConstant(vertex, constantValueVerticesCache)) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isVertexParentsValueConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
         Collection<Vertex> initialNext = vertex.getParents();
         Queue<Vertex> queue = new LinkedList<>(initialNext);
         Set<Vertex> queued = new HashSet<>(initialNext);
@@ -66,7 +69,7 @@ public class DifferentiableChecker {
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
 
-            if (constantVerticesCache.contains(visiting)) {
+            if (constantValueVerticesCache.contains(visiting)) {
                 continue;
             }
 
@@ -86,7 +89,7 @@ public class DifferentiableChecker {
                 }
             }
         }
-        constantVerticesCache.addAll(queued);
+        constantValueVerticesCache.addAll(queued);
         return true;
     }
 }
