@@ -1,5 +1,4 @@
 from .vertex.base import vertex_constructor_param_types, Double, Integer, Bool
-from .vertex.const import Const
 from .vartypes import (tensor_arg_types, runtime_tensor_arg_types, runtime_primitive_types, runtime_numpy_types,
                        runtime_pandas_types)
 
@@ -28,12 +27,12 @@ def cast_tensor_arg_to_bool(arg: tensor_arg_types) -> tensor_arg_types:
 
 
 def cast_to_double_vertex(arg: vertex_constructor_param_types) -> vertex_constructor_param_types:
-    return arg if isinstance(arg, Double) else Const(arg)
+    return arg if isinstance(arg, Double) else cast_tensor_arg_to_double(arg)
 
 
 def cast_to_integer_vertex(arg: vertex_constructor_param_types) -> vertex_constructor_param_types:
-    return arg if isinstance(arg, Integer) else Const(arg)
+    return arg if isinstance(arg, Integer) else cast_tensor_arg_to_integer(arg)
 
 
 def cast_to_bool_vertex(arg: vertex_constructor_param_types) -> vertex_constructor_param_types:
-    return arg if isinstance(arg, Bool) else Const(arg)
+    return arg if isinstance(arg, Bool) else cast_tensor_arg_to_bool(arg)

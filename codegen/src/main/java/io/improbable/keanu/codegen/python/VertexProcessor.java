@@ -140,6 +140,7 @@ class VertexProcessor {
             return "cast_to_string(" + pythonParameter + ")";
         } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
             long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
+            //TODO - This should only be for longs, and should be called array
             return "cast_to_int_list(" + pythonParameter + ")";
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex_list(" + pythonParameter + ")";
