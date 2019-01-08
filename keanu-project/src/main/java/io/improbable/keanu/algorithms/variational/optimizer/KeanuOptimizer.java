@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DifferentiableChecker;
+import io.improbable.keanu.algorithms.graphtraversal.DifferentiableChecker;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;

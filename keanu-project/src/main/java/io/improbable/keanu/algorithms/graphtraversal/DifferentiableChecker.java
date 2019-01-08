@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl;
+package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.vertices.Vertex;
 import lombok.experimental.UtilityClass;
