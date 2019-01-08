@@ -6,6 +6,8 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphBuilder;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -24,7 +26,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class GaussianVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class GaussianVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphBuilder {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -127,4 +129,8 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
         return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(shape, random);
     }
 
+    @Override
+    public LogProbGraph logProbGraph() {
+        return null;
+    }
 }
