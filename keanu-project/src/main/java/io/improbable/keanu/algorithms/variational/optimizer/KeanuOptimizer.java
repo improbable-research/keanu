@@ -4,6 +4,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DifferentiableChecker;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
@@ -33,7 +34,7 @@ public class KeanuOptimizer {
      * @return an {@link Optimizer}
      */
     public Optimizer of(BayesianNetwork network) {
-        if (network.getDiscreteLatentVertices().isEmpty()) {
+        if (DifferentiableChecker.isDifferentiable(network.getLatentOrObservedVertices())) {
             return Gradient.of(network);
         } else {
             return NonGradient.of(network);
