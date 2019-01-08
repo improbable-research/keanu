@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toMap;
 public class TensorflowComputableGraph implements ComputableGraph {
 
     public static TensorflowComputableGraph convert(Set<Vertex> vertices) {
-        TensorflowGraphBuilder graphBuilder = new TensorflowGraphBuilder();
+        TensorflowComputableGraphBuilder graphBuilder = new TensorflowComputableGraphBuilder();
         graphBuilder.convert(vertices);
         return graphBuilder.build();
     }

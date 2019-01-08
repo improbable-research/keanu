@@ -32,6 +32,7 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
     private final VariableReference logLikelihoodOp;
 
     public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
+
         return ProbabilisticGraphConverter.convert(network, new TensorflowProbabilisticGraphBuilder());
     }
 

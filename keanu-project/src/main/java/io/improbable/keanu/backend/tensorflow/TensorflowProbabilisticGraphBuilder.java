@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 
 public class TensorflowProbabilisticGraphBuilder implements ProbabilisticGraphBuilder<TensorflowProbabilisticGraph> {
 
-    private final TensorflowGraphBuilder graphBuilder;
+    private final TensorflowComputableGraphBuilder graphBuilder;
 
     private VariableReference logProbResult;
     private VariableReference logLikelihoodResult;
 
     public TensorflowProbabilisticGraphBuilder() {
-        graphBuilder = new TensorflowGraphBuilder();
+        graphBuilder = new TensorflowComputableGraphBuilder();
     }
 
     @Override

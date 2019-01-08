@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TensorflowGraphBuilder implements ComputableGraphBuilder<TensorflowComputableGraph> {
+public class TensorflowComputableGraphBuilder implements ComputableGraphBuilder<TensorflowComputableGraph> {
 
     @Getter
     private final Map<VariableReference, Output<?>> lookup;
@@ -22,7 +22,7 @@ public class TensorflowGraphBuilder implements ComputableGraphBuilder<Tensorflow
     private final TensorflowOpHelper opHelper;
     private final Scope scope;
 
-    public TensorflowGraphBuilder() {
+    public TensorflowComputableGraphBuilder() {
         lookup = new HashMap<>();
         variableValues = new HashMap<>();
         scope = new Scope(new Graph());
@@ -32,14 +32,14 @@ public class TensorflowGraphBuilder implements ComputableGraphBuilder<Tensorflow
     @Override
     public void createConstant(Vertex visiting) {
 
-        Output<?> converted = TensorflowGraphConverter.createConstant(visiting, opHelper);
+        Output<?> converted = TensorflowComputableGraphConverter.createConstant(visiting, opHelper);
         lookup.put(visiting.getReference(), converted);
     }
 
     @Override
     public void createVariable(Vertex visiting) {
 
-        Output<?> converted = TensorflowGraphConverter.createVariable(visiting, opHelper);
+        Output<?> converted = TensorflowComputableGraphConverter.createVariable(visiting, opHelper);
         lookup.put(visiting.getReference(), converted);
         variableValues.put(visiting.getReference(), visiting.getValue());
     }
@@ -52,7 +52,7 @@ public class TensorflowGraphBuilder implements ComputableGraphBuilder<Tensorflow
     @Override
     public void create(Vertex visiting) {
 
-        TensorflowGraphConverter.OpMapper opMapper = TensorflowGraphConverter.opMappers.get(visiting.getClass());
+        TensorflowComputableGraphConverter.OpMapper opMapper = TensorflowComputableGraphConverter.opMappers.get(visiting.getClass());
 
         if (opMapper == null) {
             throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported for Tensorflow conversion");
