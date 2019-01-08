@@ -5,6 +5,7 @@ import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toBooleanTensor;
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toDoubleTensor;
@@ -26,6 +28,12 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 public class TensorflowComputableGraph implements ComputableGraph {
+
+    public static TensorflowComputableGraph convert(Set<Vertex> vertices) {
+        TensorflowGraphBuilder graphBuilder = new TensorflowGraphBuilder();
+        graphBuilder.convert(vertices);
+        return graphBuilder.build();
+    }
 
     private final Session session;
 
