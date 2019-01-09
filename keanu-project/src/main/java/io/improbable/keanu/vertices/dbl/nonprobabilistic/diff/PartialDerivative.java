@@ -186,13 +186,13 @@ public class PartialDerivative {
      * @param partialOfRank the rank of the 'of' part of the partial
      * @return a reshaped tensor with a shape of ones everywhere except the aligned of dimensions.
      * E.g.
+     * tensorShape = [3,4]
      * partialShape = [2,3,4,5,6,7]
      * partialOfRank = 3
-     * tensorShape = [3,4]
      * <p>
      * returned tensor will be of shape [1,3,4,1,1,1]
      */
-    public static DoubleTensor alignAlongOf(DoubleTensor tensor, long[] partialShape, int partialOfRank) {
+    private static DoubleTensor alignAlongOf(DoubleTensor tensor, long[] partialShape, int partialOfRank) {
 
         final long[] alongOfShape = new long[partialShape.length];
         Arrays.fill(alongOfShape, 1L);
@@ -203,7 +203,7 @@ public class PartialDerivative {
         return tensor.reshape(alongOfShape);
     }
 
-    public static DoubleTensor alignAlongWrt(DoubleTensor tensor, int partialRank) {
+    private static DoubleTensor alignAlongWrt(DoubleTensor tensor, int partialRank) {
         final long[] alongWrtShape = TensorShape.shapeToDesiredRankByPrependingOnes(tensor.getShape(), partialRank);
         return tensor.reshape(alongWrtShape);
     }
