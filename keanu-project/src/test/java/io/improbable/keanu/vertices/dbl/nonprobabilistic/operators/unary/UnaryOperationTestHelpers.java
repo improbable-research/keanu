@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -12,6 +13,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 import java.util.function.Function;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -83,6 +85,18 @@ public class UnaryOperationTestHelpers {
         DoubleTensor wrtAReverse = Differentiator.reverseModeAutoDiff(output, A).withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA, wrtAReverse.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedShape, wrtAReverse.getShape());
+    }
+
+    public static <T extends DoubleVertex & Differentiable> void finiteDifferenceMatchesElementwise(Function<UniformVertex, T> op) {
+        testWithFiniteDifference(op, new long[0]);
+        testWithFiniteDifference(op, new long[]{3});
+        testWithFiniteDifference(op, new long[]{2, 3});
+        testWithFiniteDifference(op, new long[]{2, 2, 2});
+    }
+
+    public static <T extends DoubleVertex & Differentiable> void testWithFiniteDifference(Function<UniformVertex, T> op, long[] shape) {
+        UniformVertex A = new UniformVertex(shape, -10.0, 10.0);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A), op.apply(A), 1e-10, 1e-10);
     }
 
 }
