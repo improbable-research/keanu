@@ -24,11 +24,11 @@ public class NetworkSamplesGenerator {
     private int dropCount = 0;
     private int downSampleInterval = 1;
 
-    private Supplier<ProgressBar> progressBarSupplier;
+    private Supplier<StatusBar> statusBarSupplier;
 
-    public NetworkSamplesGenerator(SamplingAlgorithm algorithm, Supplier<ProgressBar> progressBarSupplier) {
+    public NetworkSamplesGenerator(SamplingAlgorithm algorithm, Supplier<StatusBar> statusBarSupplier) {
         this.algorithm = algorithm;
-        this.progressBarSupplier = progressBarSupplier;
+        this.statusBarSupplier = statusBarSupplier;
     }
 
     public int getDropCount() {
@@ -85,7 +85,7 @@ public class NetworkSamplesGenerator {
             totalSampleCount, dropCount
         );
 
-        StatusBar statusBar = new StatusBar();
+        StatusBar statusBar = statusBarSupplier.get();
 
         Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
         List<Double> logOfMasterPForEachSample = new ArrayList<>();
@@ -116,7 +116,7 @@ public class NetworkSamplesGenerator {
      */
     public Stream<NetworkSample> stream() {
 
-        StatusBar statusBar = new StatusBar();
+        StatusBar statusBar = statusBarSupplier.get();
 
         dropSamples(dropCount, statusBar);
 
