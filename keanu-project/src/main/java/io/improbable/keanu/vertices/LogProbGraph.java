@@ -8,30 +8,32 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 
-import java.util.Set;
+import java.util.Map;
 
 @Builder
 public class LogProbGraph {
 
+    /**
+     * Mapping from Keanu vertices to placeholders, which would have its values fed during execution
+     */
     @Getter
     @Singular
-    private final Set<ProxyVertex<?>> params;
+    private final Map<Vertex<?>, Vertex<?>> inputs;
 
-    @Getter
-    private final Vertex<?> x;
-
+    /**
+     * A vertex representing the result of log probability computation
+     */
     @Getter
     private final DoubleVertex logProbOutput;
 
-    public <T> void setXValue(T value) {
-        ((Vertex <T>) x).setValue(value);
+    public <T> Vertex<T> getPlaceHolder(Vertex<T> input) {
+        return (Vertex<T>) inputs.get(input);
     }
 
     static public class DoublePlaceHolderVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
 
         public DoublePlaceHolderVertex(long[] initialShape) {
             super(initialShape);
-            this.ignoreDuringSave = true;
         }
 
         @Override

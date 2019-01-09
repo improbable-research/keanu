@@ -245,9 +245,7 @@ public class BayesianNetwork {
     public void save(NetworkSaver networkSaver) {
         if (isSaveable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
-                if (!vertex.ignoreDuringSave()) {
-                    vertex.save(networkSaver);
-                }
+                vertex.save(networkSaver);
             }
         } else {
             throw new IllegalArgumentException("Trying to save a BayesianNetwork that isn't Saveable");
@@ -255,7 +253,7 @@ public class BayesianNetwork {
     }
 
     private boolean isSaveable() {
-        return vertices.stream().filter(v -> !v.ignoreDuringSave() && v instanceof NonSaveableVertex).count() == 0;
+        return vertices.stream().filter(v -> v instanceof NonSaveableVertex).count() == 0;
     }
 
     public void saveValues(NetworkSaver networkSaver) {

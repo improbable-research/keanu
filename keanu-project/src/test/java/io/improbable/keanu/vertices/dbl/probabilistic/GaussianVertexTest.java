@@ -45,18 +45,19 @@ public class GaussianVertexTest {
 
     @Test
     public void logProbGraphMatchesKnownLogDensityOfScalar() {
-        DoubleVertex prior = new ExponentialVertex(1.);
-        DoubleVertex mu = prior.plus(1.);
+        DoubleVertex mu = ConstantVertex.of(0.);
         DoubleVertex sigma = ConstantVertex.of(1.);
         GaussianVertex vertex = new GaussianVertex(mu, sigma);
 
         LogProbGraph logProbGraph = vertex.logProbGraph();
-        prior.setValue(-1.);
+        logProbGraph.getPlaceHolder(mu).setValue(DoubleTensor.scalar(0.));
+        logProbGraph.getPlaceHolder(sigma).setValue(DoubleTensor.scalar(1.));
+        logProbGraph.getPlaceHolder(vertex).setValue(DoubleTensor.scalar(0.5));
 
         NormalDistribution distribution = new NormalDistribution(0., 1.);
         double expectedLogDensity = distribution.logDensity(0.5);
 
-        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, DoubleTensor.scalar(0.5), expectedLogDensity);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedLogDensity);
     }
 
     @Test
@@ -70,18 +71,19 @@ public class GaussianVertexTest {
 
     @Test
     public void logProbGraphMatchesKnownLogDensityOfVector() {
-        DoubleVertex prior = new ExponentialVertex(1.);
-        DoubleVertex mu = prior.plus(1.);
+        DoubleVertex mu = ConstantVertex.of(0., 0.);
         DoubleVertex sigma = ConstantVertex.of(1., 1.);
         GaussianVertex vertex = new GaussianVertex(mu, sigma);
 
-        prior.setValue(-1.);
         LogProbGraph logProbGraph = vertex.logProbGraph();
+        logProbGraph.getPlaceHolder(mu).setValue(DoubleTensor.create(0., 0.));
+        logProbGraph.getPlaceHolder(sigma).setValue(DoubleTensor.create(1., 1.));
+        logProbGraph.getPlaceHolder(vertex).setValue(DoubleTensor.create(0.25, -0.75));
 
         NormalDistribution distribution = new NormalDistribution(0., 1.);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(-0.75);
 
-        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, DoubleTensor.create(0.25, -0.75), expectedLogDensity);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedLogDensity);
     }
 
     @Test
@@ -218,4 +220,5 @@ public class GaussianVertexTest {
             random
         );
     }
+
 }

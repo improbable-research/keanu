@@ -107,10 +107,8 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
     @Override
     public LogProbGraph logProbGraph() {
         final LogProbGraph.DoublePlaceHolderVertex xInput = new LogProbGraph.DoublePlaceHolderVertex(this.getShape());
-        final DoubleProxyVertex muInput = new DoubleProxyVertex(mu.getShape());
-        muInput.setParent(mu);
-        final DoubleProxyVertex sigmaInput = new DoubleProxyVertex(sigma.getShape());
-        sigmaInput.setParent(sigma);
+        final LogProbGraph.DoublePlaceHolderVertex muInput = new LogProbGraph.DoublePlaceHolderVertex(mu.getShape());
+        final LogProbGraph.DoublePlaceHolderVertex sigmaInput = new LogProbGraph.DoublePlaceHolderVertex(sigma.getShape());
 
         final DoubleVertex lnSigma = sigmaInput.log();
         final DoubleVertex xMinusMuSquared = xInput.minus(muInput).pow(2);
@@ -119,9 +117,9 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
         final DoubleVertex logProbOutput = xMinusMuSquaredOver2Variance.plus(lnSigma).plus(Gaussian.LN_SQRT_2PI).unaryMinus().sum();
 
         return LogProbGraph.builder()
-            .x(xInput)
-            .param(muInput)
-            .param(sigmaInput)
+            .input(this, xInput)
+            .input(mu, muInput)
+            .input(sigma, sigmaInput)
             .logProbOutput(logProbOutput)
             .build();
     }
