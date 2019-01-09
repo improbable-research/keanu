@@ -3,11 +3,9 @@ package io.improbable.keanu.algorithms.mcmc;
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.util.status.ProgressStatusBar;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.VertexId;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.StackType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

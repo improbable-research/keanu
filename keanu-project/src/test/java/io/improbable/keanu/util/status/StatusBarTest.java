@@ -1,7 +1,6 @@
 package io.improbable.keanu.util.status;
 
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.util.ProgressBar;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +74,7 @@ public class StatusBarTest {
 
     @Test
     public void doesPrintToStreamWhenEnabled() {
-        ProgressBar.enable();
+        StatusBar.enable();
 
         statusBar.setMessage("");
         progressUpdateCall.get().run();
@@ -91,7 +90,7 @@ public class StatusBarTest {
 
     @Test
     public void doesNotPrintToStreamWhenGloballyDisabled() {
-        ProgressBar.disable();
+        StatusBar.disable();
 
         statusBar.setMessage("");
         progressUpdateCall.get().run();
@@ -106,7 +105,7 @@ public class StatusBarTest {
 
     @Test
     public void doesCallFinishHandler() {
-        ProgressBar.enable();
+        StatusBar.enable();
 
         Runnable finishHandler = mock(Runnable.class);
         statusBar.addFinishHandler(finishHandler);
@@ -130,12 +129,12 @@ public class StatusBarTest {
             }
         }).when(mockStream).print(anyString());
 
-        ProgressBar.setDefaultPrintStream(mockStream);
-        ProgressBar.enable();
-        ProgressBar progressBar = new ProgressBar(scheduler);
-        progressBar.progress();
-        progressBar.finish();
-        verify(mockStream, atLeastOnce()).print("\r|Keanu|");
+        StatusBar.setDefaultPrintStream(mockStream);
+        StatusBar.enable();
+        StatusBar statusBar = new StatusBar(scheduler);
+        statusBar.setMessage("");
+        statusBar.finish();
+        verify(mockStream, atLeastOnce()).print("\r|Keanu| ");
     }
 
     @After

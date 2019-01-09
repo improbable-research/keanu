@@ -1,6 +1,5 @@
 package io.improbable.keanu.util.status;
 
-import io.improbable.keanu.util.ProgressBar;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

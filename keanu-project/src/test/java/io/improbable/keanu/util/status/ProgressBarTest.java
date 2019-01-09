@@ -1,6 +1,5 @@
 package io.improbable.keanu.util.status;
 
-import io.improbable.keanu.util.ProgressBar;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +48,7 @@ public class ProgressBarTest {
 
     @Test
     public void doesPrintProgressInAppropriateFormat() {
-        ProgressBar.enable();
+        StatusBar.enable();
 
         progressBar.progress(0.0);
         progressUpdateCall.get().run();
@@ -63,7 +62,7 @@ public class ProgressBarTest {
 
     @Test
     public void doesLimitProgressTo100Percent() {
-        ProgressBar.enable();
+        StatusBar.enable();
 
         progressBar.progress(-0.7);
         progressUpdateCall.get().run();

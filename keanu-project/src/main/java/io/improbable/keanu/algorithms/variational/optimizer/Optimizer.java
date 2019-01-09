@@ -4,7 +4,6 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.util.status.StatusBar;
 
 import java.util.HashMap;
