@@ -113,16 +113,15 @@ public class NUTS implements PosteriorSamplingAlgorithm {
                                      final List<? extends Variable<DoubleTensor>> sampleFromVertices) {
 
         Preconditions.checkArgument(!sampleFromVertices.isEmpty(), "List of vertices to sample from is empty");
-        bayesNet.cascadeObservations();
 
-        final List<Variable<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        Map<VariableReference, Variable> probabilisticVertices = bayesNet.getLatentOrObservedVertices();
+        final List<? extends Variable<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVariables();
+        final List<? extends Variable> probabilisticVertices = bayesNet.getLatentOrObservedVariables();
 
-        Map<VariableReference, DoubleTensor> position = SamplingAlgorithm.takeSample(latentVertices);
-        Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
+        Map<? extends VariableReference, DoubleTensor> position = SamplingAlgorithm.takeSample(latentVertices);
+        Map<? extends VariableReference, DoubleTensor> momentum = new HashMap<>();
         Map<? extends VariableReference, DoubleTensor> gradient = bayesNet.logProbGradients();
 
-        double initialLogOfMasterP = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
+        double initialLogOfMasterP = bayesNet.logProb();
 
         double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(position,
             gradient,
@@ -162,10 +161,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         return statistics;
     }
 
-    private static void resetVariableValue(List<? extends Variable> sampleFromVertices, Map<VariableReference, DoubleTensor> previousPosition) {
+    private static void resetVariableValue(List<? extends Variable> sampleFromVertices, Map<? extends VariableReference, DoubleTensor> previousPosition) {
         for (Variable variable : sampleFromVertices) {
             variable.setValue(previousPosition.get(variable.getReference()));
         }
     }
+
+
 
 }

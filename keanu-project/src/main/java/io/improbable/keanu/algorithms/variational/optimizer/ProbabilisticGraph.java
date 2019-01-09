@@ -4,20 +4,32 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
 public interface ProbabilisticGraph {
 
     default double logProb() {
-        return logProb(Collections.emptyMap());
+        return logProb(Collections.emptyList());
     }
 
-    double logProb(Map<VariableReference, ?> inputs);
+    default double logProbWithCascade() {
+        return logProb(getLatentOrObservedVariables());
+    }
+
+    double logProb(List<? extends Variable> inputs);
 
     default double logLikelihood() {
-        return logLikelihood(Collections.emptyMap());
+        return logLikelihood(Collections.emptyList());
     }
 
-    double logLikelihood(Map<VariableReference, ?> inputs);
+    double logLikelihood(List<? extends Variable> inputs);
 
     List<? extends Variable> getLatentVariables();
+
+    List<? extends Variable<DoubleTensor>> getContinuousLatentVariables();
+
+    List<? extends Variable> getObservedVariables();
+
+    List<? extends Variable> getLatentOrObservedVariables();
 
 }

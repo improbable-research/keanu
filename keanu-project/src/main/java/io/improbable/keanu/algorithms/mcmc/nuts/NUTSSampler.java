@@ -22,9 +22,9 @@ import java.util.Map;
 class NUTSSampler implements SamplingAlgorithm {
 
     private final KeanuRandom random;
-    private final List<Variable<DoubleTensor>> latentVertices;
+    private final List<? extends Variable<DoubleTensor>> latentVertices;
     private final List<? extends Variable> sampleFromVertices;
-    private final Map<VariableReference, Variable> probabilisticVertices;
+    private final List<? extends Variable> probabilisticVertices;
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
     private final Stepsize stepsize;
@@ -48,8 +48,8 @@ class NUTSSampler implements SamplingAlgorithm {
      * @param saveStatistics            whether to record statistics
      */
     public NUTSSampler(List<? extends Variable> sampleFromVertices,
-                       List<Variable<DoubleTensor>> latentVertices,
-                       Map<VariableReference, Variable> probabilisticVertices,
+                       List<? extends Variable<DoubleTensor>> latentVertices,
+                       List<? extends Variable> probabilisticVertices,
                        ProbabilisticWithGradientGraph logProbGradientCalculator,
                        boolean adaptEnabled,
                        Stepsize stepsize,
@@ -162,8 +162,8 @@ class NUTSSampler implements SamplingAlgorithm {
         tree.save(statistics);
     }
 
-    private static void initializeMomentumForEachVariable(List<Variable<DoubleTensor>> vertices,
-                                                        Map<VariableReference, DoubleTensor> momentums,
+    private static void initializeMomentumForEachVariable(List<? extends Variable<DoubleTensor>> vertices,
+                                                        Map<? extends VariableReference, DoubleTensor> momentums,
                                                         KeanuRandom random) {
         for (Variable<DoubleTensor> vertex : vertices) {
             momentums.put(vertex.getReference(), random.nextGaussian(vertex.getShape()));

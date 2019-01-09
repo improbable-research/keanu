@@ -3,12 +3,16 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -33,14 +37,14 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
-    public double logProb(Map<VariableReference, ?> inputs) {
-        cascadeUpdate(inputs);
+    public double logProb(List<? extends Variable> variables) {
+        cascadeUpdate(variables);
         return ProbabilityCalculator.calculateLogProbFor(this.latentOrObservedVertices);
     }
 
     @Override
-    public double logLikelihood(Map<VariableReference, ?> inputs) {
-        cascadeUpdate(inputs);
+    public double logLikelihood(List<? extends Variable> variables) {
+        cascadeUpdate(variables);
         return ProbabilityCalculator.calculateLogProbFor(this.observedVertices);
     }
 
@@ -49,17 +53,35 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
         return this.latentVertices;
     }
 
-    public void cascadeUpdate(Map<VariableReference, ?> inputs) {
+    @Override
+    public List<? extends Variable<DoubleTensor>> getContinuousLatentVariables() {
+        return getLatentVariables().stream()
+            .filter(v -> v.getValue() instanceof DoubleTensor)
+            .map(v -> (Variable<DoubleTensor>) v)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<? extends Variable> getObservedVariables() {
+        return this.observedVertices;
+    }
+
+    @Override
+    public List<? extends Variable> getLatentOrObservedVariables() {
+        return this.latentOrObservedVertices;
+    }
+
+    public void cascadeUpdate(List<? extends Variable> inputs) {
 
         List<Vertex> updatedVertices = new ArrayList<>();
-        for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {
-            Vertex updatingVertex = vertexLookup.get(input.getKey());
+        for (Variable input : inputs) {
+            Vertex updatingVertex = vertexLookup.get(input.getReference());
 
             if (updatingVertex == null) {
-                throw new IllegalArgumentException("Cannot cascade update for input: " + input.getKey());
+                throw new IllegalArgumentException("Cannot cascade update for input: " + input.getReference());
             }
 
-            updatingVertex.setValue(input.getValue());
+            updatingVertex.setValue(input);
             updatedVertices.add(updatingVertex);
         }
 

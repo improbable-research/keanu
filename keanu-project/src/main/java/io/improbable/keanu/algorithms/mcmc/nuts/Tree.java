@@ -30,7 +30,7 @@ class Tree implements SaveStatistics {
 
     private Leapfrog leapfrogForward;
     private Leapfrog leapfrogBackward;
-    private Map<VariableReference, DoubleTensor> acceptedPosition;
+    private Map<? extends VariableReference, DoubleTensor> acceptedPosition;
     private Map<? extends VariableReference, DoubleTensor> gradientAtAcceptedPosition;
     private double logOfMasterPAtAcceptedPosition;
     private Map<VariableReference, ?> sampleAtAcceptedPosition;
@@ -78,8 +78,8 @@ class Tree implements SaveStatistics {
      * @param sampleAtAcceptedPosition the initial sample
      * @return a basic tree
      */
-    public static Tree createInitialTree(Map<VariableReference, DoubleTensor> position,
-                                         Map<VariableReference, DoubleTensor> momentum,
+    public static Tree createInitialTree(Map<? extends VariableReference, DoubleTensor> position,
+                                         Map<? extends VariableReference, DoubleTensor> momentum,
                                          Map<? extends
                                              VariableReference, DoubleTensor> gradient,
                                          double initialLogOfMasterP,
@@ -98,7 +98,7 @@ class Tree implements SaveStatistics {
 
     public static Tree buildOtherHalfOfTree(Tree currentTree,
                                             List<Variable<DoubleTensor>> latentVertices,
-                                            Map<VariableReference, Variable> probabilisticVertices,
+                                            List<? extends Variable> probabilisticVertices,
                                             ProbabilisticWithGradientGraph logProbGradientCalculator,
                                             final List<? extends Variable> sampleFromVertices,
                                             double logU,
@@ -132,7 +132,7 @@ class Tree implements SaveStatistics {
     }
 
     private static Tree buildTree(List<Variable<DoubleTensor>> latentVertices,
-                                  Map<VariableReference, Variable> probabilisticVertices,
+                                  List<? extends Variable> probabilisticVertices,
                                   ProbabilisticWithGradientGraph logProbGradientCalculator,
                                   final List<? extends Variable> sampleFromVertices,
                                   Leapfrog leapfrog,
@@ -213,7 +213,7 @@ class Tree implements SaveStatistics {
     }
 
     private static Tree treeBuilderBaseCase(List<Variable<DoubleTensor>> latentVertices,
-                                            Map<VariableReference, Variable> probabilisticVertices,
+                                            List<? extends Variable> probabilisticVertices,
                                             ProbabilisticWithGradientGraph logProbGradientCalculator,
                                             final List<? extends Variable> sampleFromVertices,
                                             Leapfrog leapfrog,
@@ -260,14 +260,14 @@ class Tree implements SaveStatistics {
         }
     }
 
-    private static boolean isNotUTurning(Map<VariableReference, DoubleTensor> positionForward,
-                                         Map<VariableReference, DoubleTensor> positionBackward,
-                                         Map<VariableReference, DoubleTensor> momentumForward,
-                                         Map<VariableReference, DoubleTensor> momentumBackward) {
+    private static boolean isNotUTurning(Map<? extends VariableReference, DoubleTensor> positionForward,
+                                         Map<? extends VariableReference, DoubleTensor> positionBackward,
+                                         Map<? extends VariableReference, DoubleTensor> momentumForward,
+                                         Map<? extends VariableReference, DoubleTensor> momentumBackward) {
         double forward = 0.0;
         double backward = 0.0;
 
-        for (Map.Entry<VariableReference, DoubleTensor> forwardPositionForLatent : positionForward.entrySet()) {
+        for (Map.Entry<? extends VariableReference, DoubleTensor> forwardPositionForLatent : positionForward.entrySet()) {
 
             final VariableReference latentId = forwardPositionForLatent.getKey();
             final DoubleTensor forwardMinusBackward = forwardPositionForLatent.getValue().minus(
@@ -331,19 +331,19 @@ class Tree implements SaveStatistics {
         return logOfMasterPAtAcceptedPosition;
     }
 
-    public Map<VariableReference, DoubleTensor> getForwardPosition() {
+    public Map<? extends VariableReference, DoubleTensor> getForwardPosition() {
         return leapfrogForward.getPosition();
     }
 
-    public Map<VariableReference, DoubleTensor> getBackwardPosition() {
+    public Map<? extends VariableReference, DoubleTensor> getBackwardPosition() {
         return leapfrogBackward.getPosition();
     }
 
-    public Map<VariableReference, DoubleTensor> getForwardMomentum() {
+    public Map<? extends VariableReference, DoubleTensor> getForwardMomentum() {
         return leapfrogForward.getMomentum();
     }
 
-    public Map<VariableReference, DoubleTensor> getBackwardMomentum() {
+    public Map<? extends VariableReference, DoubleTensor> getBackwardMomentum() {
         return leapfrogBackward.getMomentum();
     }
 

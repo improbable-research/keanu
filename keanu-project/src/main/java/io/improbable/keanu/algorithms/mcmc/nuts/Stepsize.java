@@ -56,10 +56,10 @@ class Stepsize implements SaveStatistics {
      * @param random                    the source of randomness
      * @return a starting step size
      */
-    public static double findStartingStepSize(Map<VariableReference, DoubleTensor> position,
-                                              Map<VariableReference, DoubleTensor> gradient,
-                                              List<Variable<DoubleTensor>> vertices,
-                                              Map<VariableReference, Variable> probabilisticVertices,
+    public static double findStartingStepSize(Map<? extends VariableReference, DoubleTensor> position,
+                                              Map<? extends VariableReference, DoubleTensor> gradient,
+                                              List<? extends Variable<DoubleTensor>> vertices,
+                                              List<? extends Variable> probabilisticVertices,
                                               ProbabilisticWithGradientGraph logProbGradientCalculator,
                                               double initialLogOfMasterP,
                                               KeanuRandom random) {
