@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.mcmc;
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.util.status.ProgressStatusBar;
+import io.improbable.keanu.util.status.ProgressBar;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.VertexId;
 
@@ -90,7 +90,7 @@ public class NetworkSamplesGenerator {
 
         dropSamples(dropCount, statusBar);
 
-        ProgressStatusBar progressBar = new ProgressStatusBar(statusBar);
+        ProgressBar progressBar = new ProgressBar(statusBar);
         int sampleCount = 0;
         int samplesLeft = totalSampleCount - dropCount;
         for (int i = 0; i < samplesLeft; i++) {
@@ -135,7 +135,7 @@ public class NetworkSamplesGenerator {
     }
 
     private void dropSamples(int dropCount, StatusBar statusBar) {
-        ProgressStatusBar progressBar = new ProgressStatusBar(statusBar);
+        ProgressBar progressBar = new ProgressBar(statusBar);
         for (int i = 0; i < dropCount; i++) {
             algorithm.step();
             progressBar.progress("Dropping samples...", (i + 1) / (double) dropCount);

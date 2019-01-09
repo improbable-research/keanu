@@ -1,9 +1,9 @@
 package io.improbable.keanu.util.status;
 
-public class ProgressStatusBar {
+public class ProgressBar {
     private final StatusBar statusBar;
 
-    public ProgressStatusBar(StatusBar statusBar) {
+    public ProgressBar(StatusBar statusBar) {
         this.statusBar = statusBar;
     }
 

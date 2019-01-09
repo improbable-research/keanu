@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 public class ProgressBarTest {
     private AtomicReference<Runnable> progressUpdateCall;
     private StatusBar statusBar;
-    private ProgressStatusBar progressBar;
+    private ProgressBar progressBar;
     private ByteArrayOutputStream byteArrayOutputStream;
     private ScheduledExecutorService scheduler;
 
@@ -42,7 +42,7 @@ public class ProgressBarTest {
             });
 
         statusBar = new StatusBar(printStream, scheduler);
-        progressBar = new ProgressStatusBar(statusBar);
+        progressBar = new ProgressBar(statusBar);
         StatusBar.enable();
     }
 
