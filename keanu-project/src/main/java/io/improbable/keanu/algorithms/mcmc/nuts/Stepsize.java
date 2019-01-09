@@ -50,16 +50,14 @@ class Stepsize implements SaveStatistics {
      * @param position                  the starting position
      * @param gradient                  the gradient at the starting position
      * @param vertices                  the vertices
-     * @param probabilisticVertices     the probabilistic vertices
      * @param logProbGradientCalculator the log prob gradient calculator
      * @param initialLogOfMasterP       the initial master log prob
      * @param random                    the source of randomness
      * @return a starting step size
      */
-    public static double findStartingStepSize(Map<? extends VariableReference, DoubleTensor> position,
+    public static double findStartingStepSize(Map<VariableReference, DoubleTensor> position,
                                               Map<? extends VariableReference, DoubleTensor> gradient,
                                               List<? extends Variable<DoubleTensor>> vertices,
-                                              List<? extends Variable> probabilisticVertices,
                                               ProbabilisticWithGradientGraph logProbGradientCalculator,
                                               double initialLogOfMasterP,
                                               KeanuRandom random) {
@@ -75,7 +73,7 @@ class Stepsize implements SaveStatistics {
 
         Leapfrog delta = leapfrog.step(vertices, logProbGradientCalculator, STARTING_STEPSIZE);
 
-        double probAfterLeapfrog = logProbGradientCalculator.logProb(probabilisticVertices);
+        double probAfterLeapfrog = logProbGradientCalculator.logProbOfProbabilisticVertices();
         double pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
 
         double logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
@@ -85,7 +83,7 @@ class Stepsize implements SaveStatistics {
             stepsize = stepsize * Math.pow(2, scalingFactor);
 
             delta = leapfrog.step(vertices, logProbGradientCalculator, stepsize);
-            probAfterLeapfrog = logProbGradientCalculator.logProb(probabilisticVertices);
+            probAfterLeapfrog = logProbGradientCalculator.logProbOfProbabilisticVertices();
             pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
 
             logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;

@@ -43,6 +43,11 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
+    public double logProbOfProbabilisticVertices() {
+        return logProb(latentOrObservedVertices);
+    }
+
+    @Override
     public double logLikelihood(List<? extends Variable> variables) {
         cascadeUpdate(variables);
         return ProbabilityCalculator.calculateLogProbFor(this.observedVertices);
@@ -59,16 +64,6 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
             .filter(v -> v.getValue() instanceof DoubleTensor)
             .map(v -> (Variable<DoubleTensor>) v)
             .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<? extends Variable> getObservedVariables() {
-        return this.observedVertices;
-    }
-
-    @Override
-    public List<? extends Variable> getLatentOrObservedVariables() {
-        return this.latentOrObservedVertices;
     }
 
     public void cascadeUpdate(List<? extends Variable> inputs) {

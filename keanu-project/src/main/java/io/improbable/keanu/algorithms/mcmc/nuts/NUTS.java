@@ -104,29 +104,29 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     }
 
     public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticWithGradientGraph bayesNet,
-                                                            final List<? extends Variable<DoubleTensor>> fromVertices) {
+                                                            final List<? extends Variable> fromVertices) {
 
         return new NetworkSamplesGenerator(setupSampler(bayesNet, fromVertices), ProgressBar::new);
     }
 
     private NUTSSampler setupSampler(final ProbabilisticWithGradientGraph bayesNet,
-                                     final List<? extends Variable<DoubleTensor>> sampleFromVertices) {
+                                     final List<? extends Variable> sampleFromVertices) {
 
         Preconditions.checkArgument(!sampleFromVertices.isEmpty(), "List of vertices to sample from is empty");
 
         final List<? extends Variable<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVariables();
-        final List<? extends Variable> probabilisticVertices = bayesNet.getLatentOrObservedVariables();
 
-        Map<? extends VariableReference, DoubleTensor> position = SamplingAlgorithm.takeSample(latentVertices);
-        Map<? extends VariableReference, DoubleTensor> momentum = new HashMap<>();
+        Map<VariableReference, Object> startingSample = SamplingAlgorithm.takeSample(latentVertices);
+        Map<VariableReference, DoubleTensor> position = startingSample.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (DoubleTensor) e.getValue()));
+        Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
         Map<? extends VariableReference, DoubleTensor> gradient = bayesNet.logProbGradients();
 
         double initialLogOfMasterP = bayesNet.logProb();
 
-        double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(position,
+        double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(
+            position,
             gradient,
             latentVertices,
-            probabilisticVertices,
             bayesNet,
             initialLogOfMasterP,
             random
@@ -145,7 +145,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         return new NUTSSampler(
             sampleFromVertices,
             latentVertices,
-            probabilisticVertices,
             bayesNet,
             adaptEnabled,
             stepsize,

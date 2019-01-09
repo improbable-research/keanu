@@ -12,11 +12,9 @@ public interface ProbabilisticGraph {
         return logProb(Collections.emptyList());
     }
 
-    default double logProbWithCascade() {
-        return logProb(getLatentOrObservedVariables());
-    }
-
     double logProb(List<? extends Variable> inputs);
+
+    double logProbOfProbabilisticVertices();
 
     default double logLikelihood() {
         return logLikelihood(Collections.emptyList());
@@ -27,9 +25,5 @@ public interface ProbabilisticGraph {
     List<? extends Variable> getLatentVariables();
 
     List<? extends Variable<DoubleTensor>> getContinuousLatentVariables();
-
-    List<? extends Variable> getObservedVariables();
-
-    List<? extends Variable> getLatentOrObservedVariables();
 
 }

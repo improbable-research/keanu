@@ -24,7 +24,6 @@ class NUTSSampler implements SamplingAlgorithm {
     private final KeanuRandom random;
     private final List<? extends Variable<DoubleTensor>> latentVertices;
     private final List<? extends Variable> sampleFromVertices;
-    private final List<? extends Variable> probabilisticVertices;
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
     private final Stepsize stepsize;
@@ -37,7 +36,6 @@ class NUTSSampler implements SamplingAlgorithm {
     /**
      * @param sampleFromVertices        vertices to sampleLegacy from
      * @param latentVertices            vertices that represent latent variables
-     * @param probabilisticVertices     vertices that contribute to total log probability (i.e. latent + observed)
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
      * @param adaptEnabled              enable the NUTS step size adaptation
      * @param stepsize                  configuration for tuning the stepsize, if adaptEnabled
@@ -49,7 +47,6 @@ class NUTSSampler implements SamplingAlgorithm {
      */
     public NUTSSampler(List<? extends Variable> sampleFromVertices,
                        List<? extends Variable<DoubleTensor>> latentVertices,
-                       List<? extends Variable> probabilisticVertices,
                        ProbabilisticWithGradientGraph logProbGradientCalculator,
                        boolean adaptEnabled,
                        Stepsize stepsize,
@@ -60,7 +57,6 @@ class NUTSSampler implements SamplingAlgorithm {
                        boolean saveStatistics) {
 
         this.sampleFromVertices = sampleFromVertices;
-        this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
         this.logProbGradientCalculator = logProbGradientCalculator;
 
@@ -115,7 +111,6 @@ class NUTSSampler implements SamplingAlgorithm {
             Tree otherHalfTree = Tree.buildOtherHalfOfTree(
                 tree,
                 latentVertices,
-                probabilisticVertices,
                 logProbGradientCalculator,
                 sampleFromVertices,
                 logU,
@@ -163,20 +158,20 @@ class NUTSSampler implements SamplingAlgorithm {
     }
 
     private static void initializeMomentumForEachVariable(List<? extends Variable<DoubleTensor>> vertices,
-                                                        Map<? extends VariableReference, DoubleTensor> momentums,
-                                                        KeanuRandom random) {
+                                                          Map<VariableReference, DoubleTensor> momentums,
+                                                          KeanuRandom random) {
         for (Variable<DoubleTensor> vertex : vertices) {
             momentums.put(vertex.getReference(), random.nextGaussian(vertex.getShape()));
         }
     }
 
-    private static void cache(Map<VariableReference, DoubleTensor> from, Map<VariableReference, DoubleTensor> to) {
-        for (Map.Entry<VariableReference, DoubleTensor> entry : from.entrySet()) {
+    private static void cache(Map<? extends VariableReference, DoubleTensor> from, Map<VariableReference, DoubleTensor> to) {
+        for (Map.Entry<? extends VariableReference, DoubleTensor> entry : from.entrySet()) {
             to.put(entry.getKey(), entry.getValue());
         }
     }
 
-    private static double dotProduct(Map<VariableReference, DoubleTensor> momentums) {
+    private static double dotProduct(Map<? extends VariableReference, DoubleTensor> momentums) {
         double dotProduct = 0.0;
         for (DoubleTensor momentum : momentums.values()) {
             dotProduct += momentum.pow(2).sum();
