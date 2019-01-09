@@ -164,13 +164,11 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
     @staticmethod
     def __parse_args(args: Tuple[Union[vertex_constructor_param_types, shape_types], ...]) -> List[JavaObject]:
-        print("parsing args")
         return list(map(Vertex.__parse_arg, args))
 
     @staticmethod
     def __parse_arg(arg: Union[vertex_constructor_param_types, shape_types]) -> JavaObject:
         if isinstance(arg, runtime_wrapped_java_types):
-            print("Unwrapping Arg")
             return arg.unwrap()
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
