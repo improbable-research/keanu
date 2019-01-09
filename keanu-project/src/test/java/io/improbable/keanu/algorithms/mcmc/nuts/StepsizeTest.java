@@ -1,9 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -11,7 +8,6 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -54,7 +50,7 @@ public class StepsizeTest {
 
         vertex.setValue(DoubleTensor.scalar(startingValue));
         Map<VariableReference, DoubleTensor> position = Collections.singletonMap(vertexId, vertex.getValue());
-        Map<? extends VariableReference, DoubleTensor> gradient = graph.logLikelihoodGradients();
+        Map<? extends VariableReference, DoubleTensor> gradient = graph.logProbGradients();
 
         return Stepsize.findStartingStepSize(
             position,
