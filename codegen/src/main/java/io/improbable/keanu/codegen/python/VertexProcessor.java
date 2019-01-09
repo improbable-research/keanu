@@ -100,7 +100,7 @@ class VertexProcessor {
         } else if (IntegerVertex.class.isAssignableFrom(javaClass)) {
             return "Integer";
         } else if (BooleanVertex.class.isAssignableFrom(javaClass)) {
-            return "Bool";
+            return "Boolean";
         } else {
             return "Vertex";
         }

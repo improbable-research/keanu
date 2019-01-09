@@ -6,15 +6,7 @@ from keanu.tensor import Tensor
 from keanu.vartypes import (numpy_types, tensor_arg_types, runtime_numpy_types, runtime_pandas_types,
                             runtime_primitive_types, runtime_bool_types, runtime_int_types, runtime_float_types)
 from .base import Vertex
-
-
-def create_constant_boolean(value):
-
-
-def create_constant_double(value):
-
-
-def create_constant_integer(value):
+from .generated import ConstantBoolean, ConstantDouble, ConstantInteger
 
 
 def Const(t: tensor_arg_types) -> Vertex:
@@ -37,21 +29,21 @@ def Const(t: tensor_arg_types) -> Vertex:
 
 def __infer_const_ctor_from_ndarray(ndarray: numpy_types) -> Callable:
     if np.issubdtype(ndarray.dtype, np.bool_):
-        return create_constant_boolean
+        return ConstantBoolean
     elif np.issubdtype(ndarray.dtype, np.integer):
-        return create_constant_integer
+        return ConstantInteger
     elif np.issubdtype(ndarray.dtype, np.floating):
-        return create_constant_double
+        return ConstantDouble
     else:
         raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(ndarray.dtype))
 
 
 def __infer_const_ctor_from_scalar(scalar: np.generic) -> Callable:
     if isinstance(scalar, runtime_bool_types):
-        return create_constant_boolean
+        return ConstantBoolean
     elif isinstance(scalar, runtime_int_types):
-        return create_constant_integer
+        return ConstantInteger
     elif isinstance(scalar, runtime_float_types):
-        return create_constant_double
+        return ConstantDouble
     else:
         raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(scalar)))

@@ -210,7 +210,7 @@ class Integer(Vertex):
         return cast_tensor_arg_to_integer(v)
 
 
-class Bool(Vertex):
+class Boolean(Vertex):
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         from keanu.cast import cast_tensor_arg_to_bool
