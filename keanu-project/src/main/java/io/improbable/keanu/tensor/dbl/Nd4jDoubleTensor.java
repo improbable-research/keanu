@@ -109,7 +109,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public int getRank() {
-        return tensor.shape().length;
+        return tensor.rank();
     }
 
     @Override

@@ -71,7 +71,7 @@ public class AutoDiffBroadcast {
         List<Integer> dimensionMismatch = new ArrayList<>();
 
         for (int i = 1; i <= partialWrtRank; i++) {
-            if (i >= wrtRank || partialShape[partialRank - i] != wrtShape[wrtRank - i]) {
+            if (i > wrtRank || partialShape[partialRank - i] != wrtShape[wrtRank - i]) {
                 dimensionMismatch.add(-i);
             }
         }
