@@ -51,6 +51,7 @@ public class ProgressBar extends StatusBar {
 
     public void progress(ProgressUpdate progressUpdate) {
         latestProgressUpdate.set(progressUpdate);
+
     }
 
     public ProgressUpdate getProgress() {

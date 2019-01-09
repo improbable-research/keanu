@@ -4,7 +4,10 @@ import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.ProgressStatusBar;
+import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.VertexId;
+import jdk.nashorn.internal.runtime.regexp.joni.constants.StackType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,13 +85,14 @@ public class NetworkSamplesGenerator {
             totalSampleCount, dropCount
         );
 
-        ProgressBar progressBar = progressBarSupplier.get();
+        StatusBar statusBar = new StatusBar();
 
         Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
         List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
-        dropSamples(dropCount, progressBar);
+        dropSamples(dropCount, statusBar);
 
+        ProgressStatusBar progressBar = new ProgressStatusBar(statusBar);
         int sampleCount = 0;
         int samplesLeft = totalSampleCount - dropCount;
         for (int i = 0; i < samplesLeft; i++) {
@@ -102,7 +106,7 @@ public class NetworkSamplesGenerator {
             progressBar.progress("Sampling...", (i + 1) / (double) samplesLeft);
         }
 
-        progressBar.finish();
+        statusBar.finish();
         return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, sampleCount);
     }
 
@@ -112,12 +116,11 @@ public class NetworkSamplesGenerator {
      */
     public Stream<NetworkSample> stream() {
 
-        ProgressBar progressBar = progressBarSupplier.get();
+        StatusBar statusBar = new StatusBar();
 
-        dropSamples(dropCount, progressBar);
+        dropSamples(dropCount, statusBar);
 
         final AtomicInteger sampleNumber = new AtomicInteger(0);
-
         return Stream.generate(() -> {
 
             sampleNumber.getAndIncrement();
@@ -127,13 +130,14 @@ public class NetworkSamplesGenerator {
             }
 
             NetworkSample sample = algorithm.sample();
-            progressBar.progress(String.format("Sample #%,d completed", sampleNumber.get()));
+            statusBar.setMessage(String.format("Sample #%,d completed", sampleNumber.get()));
             return sample;
 
-        }).onClose(progressBar::finish);
+        }).onClose(statusBar::finish);
     }
 
-    private void dropSamples(int dropCount, ProgressBar progressBar) {
+    private void dropSamples(int dropCount, StatusBar statusBar) {
+        ProgressStatusBar progressBar = new ProgressStatusBar(statusBar);
         for (int i = 0; i < dropCount; i++) {
             algorithm.step();
             progressBar.progress("Dropping samples...", (i + 1) / (double) dropCount);

@@ -10,8 +10,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class StatusBar {
+public class StatusBar {
+    private final AtomicReference<String> latestMessage = new AtomicReference<>();
+
     private static final AtomicBoolean ENABLED = new AtomicBoolean(true);
     private static final long FRAME_PERIOD_MS = 500;
     private final AtomicInteger nextFrameIndex = new AtomicInteger(0);
@@ -73,6 +76,18 @@ public abstract class StatusBar {
         startUpdateThread();
     }
 
+    public StatusBar(PrintStream printStream) {
+        this(printStream, getDefaultScheduledExecutorService());
+    }
+
+    public StatusBar(ScheduledExecutorService scheduler) {
+        this(defaultPrintStream, scheduler);
+    }
+
+    public StatusBar() {
+        this(defaultPrintStream, getDefaultScheduledExecutorService());
+    }
+
     private void startUpdateThread() {
         scheduler.scheduleAtFixedRate(this::printUpdate, 0, FRAME_PERIOD_MS, TimeUnit.MILLISECONDS);
     }
@@ -97,7 +112,14 @@ public abstract class StatusBar {
         return result;
     }
 
-    protected abstract String formatContent();
+    protected String formatContent() {
+        StringBuilder sb = new StringBuilder();
+        if(latestMessage.get() != null) {
+            sb.append(" ");
+            sb.append(latestMessage.get());
+        }
+        return sb.toString();
+    }
 
     private void appendSpacesToClearPreviousContent(StringBuilder sb) {
         int originalStringLength = sb.length();
@@ -123,5 +145,10 @@ public abstract class StatusBar {
     public void addFinishHandler(Runnable finishHandler) {
         this.onFinish.add(finishHandler);
     }
+
+    public void setMessage(String message) {
+        latestMessage.set(message);
+    }
+
 
 }
