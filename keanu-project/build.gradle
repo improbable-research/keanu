@@ -79,6 +79,16 @@ if (!hasProperty('nexusPassword')) {
     ext.nexusPassword = ''
 }
 
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -148,16 +158,6 @@ if (project.hasProperty("signing.keyId")) {
     signing {
         sign configurations.archives
     }
-}
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
 }
 
 task deletePythonClasspath(type: Delete) {
