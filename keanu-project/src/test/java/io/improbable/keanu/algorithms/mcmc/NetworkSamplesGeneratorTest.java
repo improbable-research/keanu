@@ -6,14 +6,19 @@ import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.VertexId;
 import lombok.Value;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 public class NetworkSamplesGeneratorTest {
 
@@ -60,64 +65,62 @@ public class NetworkSamplesGeneratorTest {
         assertEquals(totalCollected, algorithm.sampleCount.get());
     }
 
-//    @Ignore
-//    @Test
-//    public void doesUpdateProgressAndFinishProgressOnGeneration() {
-//        AtomicInteger stepCount = new AtomicInteger(0);
-//        AtomicInteger sampleCount = new AtomicInteger(0);
-//
-//        ProgressBar progressBar = mock(ProgressBar.class);
-//        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(stepCount, sampleCount);
-//
-//        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, () -> progressBar);
-//        unitUnderTest.generate(10);
-//
-//        Mockito.verify(progressBar, times(10)).progress(anyString(), anyDouble());
-//        Mockito.verify(progressBar).finish();
-//    }
-//
-//    @Ignore
-//    @Test
-//    public void doesCreateNewProgressBarOnGenerationFinish() {
-//        AtomicInteger stepCount = new AtomicInteger(0);
-//        AtomicInteger sampleCount = new AtomicInteger(0);
-//
-//        ProgressBar progressBar1 = mock(ProgressBar.class);
-//        ProgressBar progressBar2 = mock(ProgressBar.class);
-//
-//        AtomicInteger progressBarCreationCount = new AtomicInteger(0);
-//        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(stepCount, sampleCount);
-//
-//        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, () -> {
-//            int callNumber = progressBarCreationCount.getAndIncrement();
-//            if (callNumber == 0) {
-//                return progressBar1;
-//            } else {
-//                return progressBar2;
-//            }
-//        });
-//
-//        unitUnderTest.generate(10);
-//        Mockito.verify(progressBar1, times(10)).progress(anyString(), anyDouble());
-//        Mockito.verify(progressBar1).finish();
-//
-//        unitUnderTest.generate(8);
-//        Mockito.verify(progressBar2, times(8)).progress(anyString(), anyDouble());
-//        Mockito.verify(progressBar2).finish();
-//    }
-//
-//    @Ignore
-//    @Test
-//    public void doesUpdateProgressAndFinishProgressWhenStreaming() {
-//        ProgressBar progressBar = mock(ProgressBar.class);
-//        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(new AtomicInteger(0), new AtomicInteger(0));
-//        Stream<NetworkSample> sampleStream = new NetworkSamplesGenerator(algorithm, () -> progressBar).stream();
-//        sampleStream.limit(10).count();
-//        sampleStream.close();
-//
-//        Mockito.verify(progressBar, times(10)).progress(anyString());
-//        Mockito.verify(progressBar).finish();
-//    }
+    @Test
+    public void doesUpdateStatusAndFinishStatusOnGeneration() {
+        AtomicInteger stepCount = new AtomicInteger(0);
+        AtomicInteger sampleCount = new AtomicInteger(0);
+
+        StatusBar statusBar = mock(StatusBar.class);
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(stepCount, sampleCount);
+
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, () -> statusBar);
+        unitUnderTest.generate(10);
+
+        Mockito.verify(statusBar, times(10)).setMessage(anyString());
+        Mockito.verify(statusBar).finish();
+    }
+
+
+    @Test
+    public void doesCreateNewStatusBarOnGenerationFinish() {
+        AtomicInteger stepCount = new AtomicInteger(0);
+        AtomicInteger sampleCount = new AtomicInteger(0);
+
+        StatusBar statusBar1 = mock(StatusBar.class);
+        StatusBar statusBar2 = mock(StatusBar.class);
+
+        AtomicInteger statusBarCreationCount = new AtomicInteger(0);
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(stepCount, sampleCount);
+
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, () -> {
+            int callNumber = statusBarCreationCount.getAndIncrement();
+            if (callNumber == 0) {
+                return statusBar1;
+            } else {
+                return statusBar2;
+            }
+        });
+
+        unitUnderTest.generate(10);
+        Mockito.verify(statusBar1, times(10)).setMessage(anyString());
+        Mockito.verify(statusBar1).finish();
+
+        unitUnderTest.generate(8);
+        Mockito.verify(statusBar2, times(8)).setMessage(anyString());
+        Mockito.verify(statusBar2).finish();
+    }
+
+    @Test
+    public void doesUpdateProgressAndFinishProgressWhenStreaming() {
+        StatusBar progressBar = mock(StatusBar.class);
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(new AtomicInteger(0), new AtomicInteger(0));
+        Stream<NetworkSample> sampleStream = new NetworkSamplesGenerator(algorithm, () -> progressBar).stream();
+        sampleStream.limit(10).count();
+        sampleStream.close();
+
+        Mockito.verify(progressBar, times(10)).setMessage(anyString());
+        Mockito.verify(progressBar).finish();
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void doesNotAllowZeroDownSample() {
