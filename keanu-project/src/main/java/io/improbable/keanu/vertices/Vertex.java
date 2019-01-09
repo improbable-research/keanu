@@ -270,5 +270,4 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
     public void loadValue(NetworkLoader loader) {
         loader.loadValue(this);
     }
-
 }

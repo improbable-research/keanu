@@ -14,7 +14,7 @@ import java.util.Map;
 public class LogProbGraph {
 
     /**
-     * Mapping from Keanu vertices to placeholders, which would have its values fed during execution
+     * A mapping from Keanu vertices to placeholders, which would have its values fed during execution
      */
     @Getter
     @Singular

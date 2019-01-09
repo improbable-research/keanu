@@ -7,6 +7,7 @@ import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -48,11 +49,11 @@ public class GaussianVertexTest {
         DoubleVertex mu = ConstantVertex.of(0.);
         DoubleVertex sigma = ConstantVertex.of(1.);
         GaussianVertex vertex = new GaussianVertex(mu, sigma);
-
         LogProbGraph logProbGraph = vertex.logProbGraph();
-        logProbGraph.getPlaceHolder(mu).setValue(DoubleTensor.scalar(0.));
-        logProbGraph.getPlaceHolder(sigma).setValue(DoubleTensor.scalar(1.));
-        logProbGraph.getPlaceHolder(vertex).setValue(DoubleTensor.scalar(0.5));
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, DoubleTensor.scalar(0.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, sigma, DoubleTensor.scalar(1.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.scalar(0.5));
 
         NormalDistribution distribution = new NormalDistribution(0., 1.);
         double expectedLogDensity = distribution.logDensity(0.5);
@@ -74,11 +75,11 @@ public class GaussianVertexTest {
         DoubleVertex mu = ConstantVertex.of(0., 0.);
         DoubleVertex sigma = ConstantVertex.of(1., 1.);
         GaussianVertex vertex = new GaussianVertex(mu, sigma);
-
         LogProbGraph logProbGraph = vertex.logProbGraph();
-        logProbGraph.getPlaceHolder(mu).setValue(DoubleTensor.create(0., 0.));
-        logProbGraph.getPlaceHolder(sigma).setValue(DoubleTensor.create(1., 1.));
-        logProbGraph.getPlaceHolder(vertex).setValue(DoubleTensor.create(0.25, -0.75));
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, DoubleTensor.create(0., 0.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, sigma, DoubleTensor.create(1., 1.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.create(0.25, -0.75));
 
         NormalDistribution distribution = new NormalDistribution(0., 1.);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(-0.75);
