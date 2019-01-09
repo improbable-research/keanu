@@ -1,12 +1,13 @@
 package io.improbable.keanu.vertices;
 
 /**
- * Prematurely feeds values to LogProbGraph for testing
+ * Prematurely feeds values to a placeholder in a LogProbGraph for testing.
+ * Normally values would be fed after compilation.
  */
 public class LogProbGraphValueFeeder {
 
-    public static <T> void feedValue(LogProbGraph logProbGraph, Vertex<T> vertex, T value) {
-        logProbGraph.getPlaceHolder(vertex).setValue(value);
+    public static <T> void feedValue(LogProbGraph logProbGraph, Vertex<T> input, T value) {
+        logProbGraph.getPlaceHolder(input).setValue(value);
     }
 
 }
