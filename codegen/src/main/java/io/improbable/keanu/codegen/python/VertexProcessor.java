@@ -139,10 +139,10 @@ class VertexProcessor {
             return "cast_to_integer(" + pythonParameter + ")";
         } else if (String.class.isAssignableFrom(parameterType)) {
             return "cast_to_string(" + pythonParameter + ")";
-        } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
-            long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
-            //TODO - This should only be for longs, and should be called array
+        } else if (Long[].class.isAssignableFrom(parameterType) || long[].class.isAssignableFrom(parameterType)) {
             return "cast_to_long_list(" + pythonParameter + ")";
+        } else if (Integer[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
+            return "cast_to_int_list(" + pythonParameter + ")";
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex_list(" + pythonParameter + ")";
         } else {

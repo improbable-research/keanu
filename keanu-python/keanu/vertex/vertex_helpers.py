@@ -42,5 +42,9 @@ def cast_to_long_array(input):
     return k.to_java_long_array(input)
 
 
+def cast_to_int_array(input):
+    return k.to_java_int_array(input)
+
+
 def cast_to_vertex_array(input):
     return k.to_java_vertex_array(input)
