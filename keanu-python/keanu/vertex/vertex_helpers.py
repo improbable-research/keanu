@@ -2,6 +2,9 @@ from .base import Vertex
 from keanu.tensor import Tensor
 from keanu.vartypes import (tensor_arg_types, runtime_tensor_arg_types, runtime_primitive_types, runtime_numpy_types,
                        runtime_pandas_types)
+from keanu.context import KeanuContext
+
+k = KeanuContext()
 
 def do_vertex_cast(vertex_ctor, value):
     return value if isinstance(value, Vertex) else vertex_ctor(value)
@@ -47,20 +50,20 @@ def cast_to_boolean_tensor(value):
 
 
 def cast_to_double(input):
-    pass
+    return float(input)
 
 
 def cast_to_integer(input):
-    pass
+    return int(input)
 
 
 def cast_to_string(input):
-    pass
+    return str(input)
 
 
 def cast_to_long_array(input):
-    pass
+    return k.to_java_long_array(input)
 
 
 def cast_to_vertex_array(input):
-    pass
+    return k.to_java_vertex_array(input)
