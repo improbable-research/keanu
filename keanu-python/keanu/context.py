@@ -115,7 +115,7 @@ class KeanuContext(metaclass=Singleton):
     def to_java_long_array(self, l: Collection[Any]) -> JavaArray:
         return self.to_java_array(l, self._gateway.jvm.long)
 
-    def to_java_vertex_array(self, l: Collection[Vertex]) -> JavaArray:
+    def to_java_vertex_array(self, l: Collection[Any]) -> JavaArray:
         return self.to_java_array(l, self._gateway.jvm.Vertex)
 
     def __infer_class_from_array(self, l: Collection[Any]) -> JavaClass:
