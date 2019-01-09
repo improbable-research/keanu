@@ -14,15 +14,15 @@ def do_generic_vertex_cast(ctors, value):
 
 
 def cast_to_double_tensor(value):
-    return Tensor(cast_tensor_arg_to_double(value))
+    return value if isinstance(value, Tensor) else Tensor(cast_tensor_arg_to_double(value))
 
 
 def cast_to_integer_tensor(value):
-    return Tensor(cast_tensor_arg_to_integer(value))
+    return value if isinstance(value, Tensor) else Tensor(cast_tensor_arg_to_integer(value))
 
 
 def cast_to_boolean_tensor(value):
-    return Tensor(cast_tensor_arg_to_bool(value))
+    return value if isinstance(value, Tensor) else Tensor(cast_tensor_arg_to_bool(value))
 
 
 def cast_to_double(input):
