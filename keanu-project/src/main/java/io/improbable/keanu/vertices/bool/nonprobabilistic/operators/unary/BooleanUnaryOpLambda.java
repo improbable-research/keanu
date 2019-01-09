@@ -6,11 +6,11 @@ import io.improbable.keanu.vertices.Vertex;
 
 import java.util.function.Function;
 
-public abstract class BoolUnaryOpLambda<A extends Tensor> extends BoolUnaryOpVertex<A> {
+public abstract class BooleanUnaryOpLambda<A extends Tensor> extends BooleanUnaryOpVertex<A> {
 
     private final Function<A, BooleanTensor> boolOp;
 
-    public BoolUnaryOpLambda(long[] shape, Vertex<A> a, Function<A, BooleanTensor> boolOp) {
+    public BooleanUnaryOpLambda(long[] shape, Vertex<A> a, Function<A, BooleanTensor> boolOp) {
         super(shape, a);
         this.boolOp = boolOp;
     }

@@ -17,7 +17,6 @@ def create_constant_double(value):
 def create_constant_integer(value):
 
 
-
 def Const(t: tensor_arg_types) -> Vertex:
     if isinstance(t, runtime_numpy_types):
         ctor = __infer_const_ctor_from_ndarray(t)

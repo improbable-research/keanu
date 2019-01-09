@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 
-public class BoolTakeVertex extends BoolUnaryOpVertex<BooleanTensor> {
+public class BooleanTakeVertex extends BooleanUnaryOpVertex<BooleanTensor> {
 
     private static final String INDEX_NAME = "index";
     private final long[] index;
@@ -18,8 +18,8 @@ public class BoolTakeVertex extends BoolUnaryOpVertex<BooleanTensor> {
      * @param inputVertex the input vertex to extract from
      * @param index the index to extract at
      */
-    public BoolTakeVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
-                          @LoadVertexParam(INDEX_NAME) long... index) {
+    public BooleanTakeVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
+                             @LoadVertexParam(INDEX_NAME) long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         this.index = index;
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
