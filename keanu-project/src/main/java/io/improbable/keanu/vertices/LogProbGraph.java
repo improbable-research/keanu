@@ -27,7 +27,7 @@ public class LogProbGraph {
         ((Vertex <T>) x).setValue(value);
     }
 
-    static public class DoublePlaceHolderVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, Differentiable {
+    static public class DoublePlaceHolderVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
 
         public DoublePlaceHolderVertex(long[] initialShape) {
             super(initialShape);
