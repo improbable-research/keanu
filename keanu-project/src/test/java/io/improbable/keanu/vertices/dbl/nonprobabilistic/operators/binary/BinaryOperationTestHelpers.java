@@ -183,10 +183,16 @@ public class BinaryOperationTestHelpers {
         testWithFiniteDifference(op, new long[]{1, 1, 1}, new long[]{2, 2, 2});
         testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{});
         testWithFiniteDifference(op, new long[]{}, new long[]{2, 2, 2});
+        testWithFiniteDifference(op, new long[]{2, 4}, new long[]{4});
         testWithFiniteDifference(op, new long[]{2, 4}, new long[]{1, 4});
+        testWithFiniteDifference(op, new long[]{4}, new long[]{2, 4});
+        testWithFiniteDifference(op, new long[]{1, 4}, new long[]{2, 4});
         testWithFiniteDifference(op, new long[]{2, 1, 4}, new long[]{1, 1, 4});
         testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{1, 3, 4});
         testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{3, 4});
+        testWithFiniteDifference(op, new long[]{3, 4}, new long[]{2, 3, 4});
+        testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{4});
+        testWithFiniteDifference(op, new long[]{4}, new long[]{2, 3, 4});
     }
 
     public static <T extends DoubleVertex & Differentiable> void testWithFiniteDifference(BiFunction<UniformVertex, UniformVertex, T> op, long[] leftShape, long[] rightShape) {
