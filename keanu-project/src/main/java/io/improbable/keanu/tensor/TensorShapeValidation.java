@@ -149,7 +149,7 @@ public class TensorShapeValidation {
         return Arrays.stream(shapes)
             .map(TensorShape::new)
             .filter(TensorShape::isLengthOne)
-            .sorted(Comparator.comparingInt(s -> ((TensorShape) s).getShape().length).reversed())
+            .sorted(Comparator.comparingInt(s -> ((TensorShape) s).getRank()).reversed())
             .collect(toList());
     }
 

@@ -955,12 +955,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor lessThan(double value) {
-        return fromMask(tensor.lt(value), copyOf(getShape(), getShape().length));
+        return fromMask(tensor.lt(value), copyOf(getShape(), getRank()));
     }
 
     @Override
     public BooleanTensor lessThanOrEqual(double value) {
-        return fromMask(tensor.lte(value), copyOf(getShape(), getShape().length));
+        return fromMask(tensor.lte(value), copyOf(getShape(), getRank()));
     }
 
     @Override
@@ -995,12 +995,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor greaterThan(double value) {
-        return fromMask(tensor.gt(value), copyOf(getShape(), getShape().length));
+        return fromMask(tensor.gt(value), copyOf(getShape(), getRank()));
     }
 
     @Override
     public BooleanTensor greaterThanOrEqual(double value) {
-        return fromMask(tensor.gte(value), copyOf(getShape(), getShape().length));
+        return fromMask(tensor.gte(value), copyOf(getShape(), getRank()));
     }
 
     @Override
@@ -1061,7 +1061,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor elementwiseEquals(Double value) {
-        return fromMask(tensor.eq(value), copyOf(getShape(), getShape().length));
+        return fromMask(tensor.eq(value), copyOf(getShape(), getRank()));
     }
 
     @Override

@@ -24,11 +24,11 @@ public class PartialDerivative {
     }
 
     public long[] getOfShape(long[] wrtShape) {
-        return Arrays.copyOfRange(partial.getShape(), 0, partial.getShape().length - wrtShape.length);
+        return Arrays.copyOfRange(partial.getShape(), 0, partial.getRank() - wrtShape.length);
     }
 
     public long[] getWrtShape(long[] ofShape) {
-        return Arrays.copyOfRange(partial.getShape(), ofShape.length, partial.getShape().length);
+        return Arrays.copyOfRange(partial.getShape(), ofShape.length, partial.getRank());
     }
 
     public PartialDerivative add(PartialDerivative addition) {
@@ -197,7 +197,7 @@ public class PartialDerivative {
         final long[] alongOfShape = new long[partialShape.length];
         Arrays.fill(alongOfShape, 1L);
 
-        int tensorRank = tensor.getShape().length;
+        int tensorRank = tensor.getRank();
         System.arraycopy(tensor.getShape(), 0, alongOfShape, partialOfRank - tensorRank, tensorRank);
 
         return tensor.reshape(alongOfShape);
