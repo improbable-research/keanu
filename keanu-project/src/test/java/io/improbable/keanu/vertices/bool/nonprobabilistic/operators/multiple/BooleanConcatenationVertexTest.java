@@ -2,20 +2,20 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class BoolConcatenationVertexTest {
+public class BooleanConcatenationVertexTest {
 
     @Test
     public void canConcatVectorsOfSameSize() {
-        ConstantBoolVertex a = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true}, 1, 3));
-        ConstantBoolVertex b = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{false, false, false}, 1, 3));
-        ConstantBoolVertex c = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true}, 1, 3));
+        ConstantBooleanVertex a = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, true, true}, 1, 3));
+        ConstantBooleanVertex b = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{false, false, false}, 1, 3));
+        ConstantBooleanVertex c = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, true, true}, 1, 3));
 
-        BoolConcatenationVertex concatZero = new BoolConcatenationVertex(0, a, b);
-        BoolConcatenationVertex concatOne = new BoolConcatenationVertex(1, a, b, c);
+        BooleanConcatenationVertex concatZero = new BooleanConcatenationVertex(0, a, b);
+        BooleanConcatenationVertex concatOne = new BooleanConcatenationVertex(1, a, b, c);
 
         Assert.assertArrayEquals(new long[]{2, 3}, concatZero.getShape());
         Assert.assertArrayEquals(new long[]{1, 9}, concatOne.getShape());
@@ -26,10 +26,10 @@ public class BoolConcatenationVertexTest {
 
     @Test
     public void canConcatVectorsOfDifferentSize() {
-        ConstantBoolVertex a = new ConstantBoolVertex(new boolean[]{true, true, true});
-        ConstantBoolVertex b = new ConstantBoolVertex(new boolean[]{false, false, false, false, false, false});
+        ConstantBooleanVertex a = new ConstantBooleanVertex(new boolean[]{true, true, true});
+        ConstantBooleanVertex b = new ConstantBooleanVertex(new boolean[]{false, false, false, false, false, false});
 
-        BoolConcatenationVertex concatZero = new BoolConcatenationVertex(0, a, b);
+        BooleanConcatenationVertex concatZero = new BooleanConcatenationVertex(0, a, b);
 
         Assert.assertArrayEquals(new long[]{9}, concatZero.getShape());
         Assert.assertArrayEquals(new double[]{1, 1, 1, 0, 0, 0, 0, 0, 0}, concatZero.getValue().asFlatDoubleArray(), 0.001);
@@ -37,10 +37,10 @@ public class BoolConcatenationVertexTest {
 
     @Test
     public void canConcatScalarToVector() {
-        ConstantBoolVertex a = new ConstantBoolVertex(new boolean[]{true, true, true});
-        ConstantBoolVertex b = new ConstantBoolVertex(new boolean[]{false});
+        ConstantBooleanVertex a = new ConstantBooleanVertex(new boolean[]{true, true, true});
+        ConstantBooleanVertex b = new ConstantBooleanVertex(new boolean[]{false});
 
-        BoolConcatenationVertex concat = new BoolConcatenationVertex(0, a, b);
+        BooleanConcatenationVertex concat = new BooleanConcatenationVertex(0, a, b);
 
         Assert.assertArrayEquals(new long[]{4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 1, 1, 0}, concat.getValue().asFlatDoubleArray(), 0.001);
@@ -48,10 +48,10 @@ public class BoolConcatenationVertexTest {
 
     @Test
     public void canConcatVectorToScalar() {
-        ConstantBoolVertex a = new ConstantBoolVertex(new boolean[]{false});
-        ConstantBoolVertex b = new ConstantBoolVertex(new boolean[]{true, true, true});
+        ConstantBooleanVertex a = new ConstantBooleanVertex(new boolean[]{false});
+        ConstantBooleanVertex b = new ConstantBooleanVertex(new boolean[]{true, true, true});
 
-        BoolConcatenationVertex concat = new BoolConcatenationVertex(0, a, b);
+        BooleanConcatenationVertex concat = new BooleanConcatenationVertex(0, a, b);
 
         Assert.assertArrayEquals(new long[]{4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{0, 1, 1, 1}, concat.getValue().asFlatDoubleArray(), 0.001);
@@ -59,23 +59,23 @@ public class BoolConcatenationVertexTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void errorThrownOnConcatOfWrongSize() {
-        ConstantBoolVertex a = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true}, 1, 3));
-        ConstantBoolVertex b = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{false, false}, 1, 2));
+        ConstantBooleanVertex a = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, true, true}, 1, 3));
+        ConstantBooleanVertex b = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{false, false}, 1, 2));
 
-        new BoolConcatenationVertex(0, a, b);
+        new BooleanConcatenationVertex(0, a, b);
     }
 
     @Test
     public void canConcatMatricesOfSameSize() {
-        ConstantBoolVertex m = new ConstantBoolVertex(new SimpleBooleanTensor(new boolean[]{true, true, true, true}, new long[]{2, 2}));
-        ConstantBoolVertex a = new ConstantBoolVertex(new SimpleBooleanTensor(new boolean[]{false, false, false, false}, new long[]{2, 2}));
+        ConstantBooleanVertex m = new ConstantBooleanVertex(new SimpleBooleanTensor(new boolean[]{true, true, true, true}, new long[]{2, 2}));
+        ConstantBooleanVertex a = new ConstantBooleanVertex(new SimpleBooleanTensor(new boolean[]{false, false, false, false}, new long[]{2, 2}));
 
-        BoolConcatenationVertex concatZero = new BoolConcatenationVertex(0, m, a);
+        BooleanConcatenationVertex concatZero = new BooleanConcatenationVertex(0, m, a);
 
         Assert.assertArrayEquals(new long[]{4, 2}, concatZero.getShape());
         Assert.assertArrayEquals(new double[]{1, 1, 1, 1, 0, 0, 0, 0}, concatZero.getValue().asFlatDoubleArray(), 0.001);
 
-        BoolConcatenationVertex concatOne = new BoolConcatenationVertex(1, m, a);
+        BooleanConcatenationVertex concatOne = new BooleanConcatenationVertex(1, m, a);
 
         Assert.assertArrayEquals(new long[]{2, 4}, concatOne.getShape());
         Assert.assertArrayEquals(new double[]{1, 1, 0, 0, 1, 1, 0, 0}, concatOne.getValue().asFlatDoubleArray(), 0.001);
@@ -83,12 +83,12 @@ public class BoolConcatenationVertexTest {
 
     @Test
     public void canConcatHighDimensionalShapes() {
-        ConstantBoolVertex a = new ConstantBoolVertex(
+        ConstantBooleanVertex a = new ConstantBooleanVertex(
             new SimpleBooleanTensor(new boolean[]{true, true, true, true, true, true, true, true}, new long[]{2, 2, 2}));
-        ConstantBoolVertex b = new ConstantBoolVertex(
+        ConstantBooleanVertex b = new ConstantBooleanVertex(
             new SimpleBooleanTensor(new boolean[]{false, false, false, false, false, false, false, false}, new long[]{2, 2, 2}));
 
-        BoolConcatenationVertex concatZero = new BoolConcatenationVertex(0, a, b);
+        BooleanConcatenationVertex concatZero = new BooleanConcatenationVertex(0, a, b);
 
         Assert.assertArrayEquals(new long[]{4, 2, 2}, concatZero.getShape());
         Assert.assertArrayEquals(
@@ -97,7 +97,7 @@ public class BoolConcatenationVertexTest {
             0.001
         );
 
-        BoolConcatenationVertex concatThree = new BoolConcatenationVertex(2, a, b);
+        BooleanConcatenationVertex concatThree = new BooleanConcatenationVertex(2, a, b);
 
         Assert.assertArrayEquals(new long[]{2, 2, 4}, concatThree.getShape());
         Assert.assertArrayEquals(

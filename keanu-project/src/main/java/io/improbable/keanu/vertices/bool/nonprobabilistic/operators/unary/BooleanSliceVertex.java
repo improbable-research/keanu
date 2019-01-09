@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.Vertex;
 
 import static io.improbable.keanu.tensor.TensorShape.removeDimension;
 
-public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
+public class BooleanSliceVertex extends BooleanUnaryOpVertex<BooleanTensor> {
 
     private final static String DIMENSION_NAME = "dimension";
     private final static String INDEX_NAME = "index";
@@ -22,9 +22,9 @@ public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
-    public BoolSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
-                           @LoadVertexParam(DIMENSION_NAME) int dimension,
-                           @LoadVertexParam(INDEX_NAME) long index) {
+    public BooleanSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
+                              @LoadVertexParam(DIMENSION_NAME) int dimension,
+                              @LoadVertexParam(INDEX_NAME) long index) {
         super(removeDimension(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;

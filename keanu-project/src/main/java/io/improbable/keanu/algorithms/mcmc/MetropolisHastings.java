@@ -16,11 +16,11 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
 import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
 /**
@@ -149,14 +149,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             step();
             return new NetworkSample(takeSample(verticesToSampleFrom), logProbabilityBeforeStep);
         }
-    }
-
-    private static Map<VertexId, ?> takeSample(List<? extends Vertex> fromVertices) {
-        Map<VertexId, Object> sample = new HashMap<>();
-        for (Vertex v : fromVertices) {
-            sample.put(v.getId(), v.getValue());
-        }
-        return sample;
     }
 
     private static void takeSamples(Map<VertexId, List<?>> samples, List<? extends Vertex> fromVertices) {

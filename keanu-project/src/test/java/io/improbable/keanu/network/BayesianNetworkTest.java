@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -28,9 +28,9 @@ public class BayesianNetworkTest {
 
     BayesianNetwork network;
     Set<Vertex> connectedGraph;
-    BoolVertex input1;
-    BoolVertex input2;
-    BoolVertex output;
+    BooleanVertex input1;
+    BooleanVertex input2;
+    BooleanVertex output;
     final String LABEL_A = "Label A";
     final String LABEL_B = "Label B";
     final String LABEL_ORED = "Output";
@@ -66,10 +66,10 @@ public class BayesianNetworkTest {
 
     @Test
     public void youCanLabelVertices() {
-        BoolVertex a = new BernoulliVertex(0.5);
-        BoolVertex b = new BernoulliVertex(0.5);
-        BoolVertex ored = a.or(b);
-        BoolVertex unlabelled = ored.or(a);
+        BooleanVertex a = new BernoulliVertex(0.5);
+        BooleanVertex b = new BernoulliVertex(0.5);
+        BooleanVertex ored = a.or(b);
+        BooleanVertex unlabelled = ored.or(a);
         Vertex retrieved;
         VertexLabel labelA = new VertexLabel(LABEL_A);
         VertexLabel labelB = new VertexLabel(LABEL_B);
@@ -92,9 +92,9 @@ public class BayesianNetworkTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void labelErrorsDetected() {
-        BoolVertex a = new BernoulliVertex(0.5);
-        BoolVertex b = new BernoulliVertex(0.5);
-        BoolVertex ored = a.or(b);
+        BooleanVertex a = new BernoulliVertex(0.5);
+        BooleanVertex b = new BernoulliVertex(0.5);
+        BooleanVertex ored = a.or(b);
 
         a.setLabel(LABEL_A);
         b.setLabel(LABEL_A);

@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexMatchers;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
@@ -33,8 +33,8 @@ public class LoopTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     private final Function<DoubleVertex, DoubleVertex> increment = (v) -> v.plus(1.);
-    private final Supplier<BoolVertex> flip = () -> new BernoulliVertex(0.5);
-    private final Supplier<BoolVertex> alwaysTrue = () -> ConstantVertex.of(true);
+    private final Supplier<BooleanVertex> flip = () -> new BernoulliVertex(0.5);
+    private final Supplier<BooleanVertex> alwaysTrue = () -> ConstantVertex.of(true);
     private final Vertex startValue = ConstantVertex.of(0.);
 
     @Test
@@ -110,10 +110,10 @@ public class LoopTest {
 
         for (int firstFailure : new int[]{0, 1, 2, 10, Loop.DEFAULT_MAX_COUNT - 1}) {
             for (Plate plate : loop.getPlates()) {
-                BoolVertex condition = plate.get(Loop.CONDITION_LABEL);
+                BooleanVertex condition = plate.get(Loop.CONDITION_LABEL);
                 condition.setAndCascade(true);
             }
-            BoolVertex condition = loop.getPlates().asList().get(firstFailure).get(Loop.CONDITION_LABEL);
+            BooleanVertex condition = loop.getPlates().asList().get(firstFailure).get(Loop.CONDITION_LABEL);
             condition.setAndCascade(false);
             Double expectedOutput = new Double(firstFailure);
             assertThat(output, VertexMatchers.hasValue(expectedOutput));
@@ -143,7 +143,7 @@ public class LoopTest {
 
     @Test
     public void theConditionCanBeAFunctionOfThePlateVariables() {
-        Function<Plate, BoolVertex> lessThanTen = plate -> {
+        Function<Plate, BooleanVertex> lessThanTen = plate -> {
             DoubleVertex valueIn = plate.get(Loop.VALUE_IN_LABEL);
             return valueIn.lessThan(ConstantVertex.of(10.));
         };

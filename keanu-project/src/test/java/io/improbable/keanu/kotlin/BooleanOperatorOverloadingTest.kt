@@ -3,7 +3,7 @@ package io.improbable.keanu.kotlin
 import io.improbable.keanu.DeterministicRule
 import io.improbable.keanu.vertices.ConstantVertex
 import io.improbable.keanu.vertices.VertexMatchers.hasValue
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex
 import junit.framework.TestCase
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals
@@ -55,7 +55,7 @@ class BooleanOperatorOverloadingTest {
 
     @Test
     fun boolVertexPrefixOperators() {
-        val boolVertex = ConstantBoolVertex(true)
+        val boolVertex = ConstantBooleanVertex(true)
 
         TestCase.assertEquals(false, !boolVertex.value.scalar())
     }
