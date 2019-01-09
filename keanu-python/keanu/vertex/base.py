@@ -1,3 +1,4 @@
+import collections
 from typing import List, Tuple, Iterator, Union, SupportsRound, Optional
 from typing import cast as typing_cast
 
@@ -170,6 +171,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def __parse_arg(arg: Union[vertex_constructor_param_types, shape_types]) -> JavaObject:
         if isinstance(arg, runtime_wrapped_java_types):
             return arg.unwrap()
+        elif isinstance(arg, collections.Collection) and all(isinstance(x, runtime_primitive_types) for x in arg):
+            return k.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
