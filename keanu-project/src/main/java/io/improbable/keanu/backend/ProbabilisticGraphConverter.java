@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.Vertex;
 import lombok.experimental.UtilityClass;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -58,8 +57,7 @@ public class ProbabilisticGraphConverter {
     private static VariableReference addLogProbGraph(LogProbGraph logProbGraph,
                                                      ProbabilisticGraphBuilder graphBuilder) {
 
-        Map<Vertex<?>, Vertex<?>> inputs = logProbGraph.getInputs();
-        graphBuilder.connect(inputs);
+        graphBuilder.connect(logProbGraph.getInputs());
         graphBuilder.convert(logProbGraph.getLogProbOutput().getConnectedGraph());
         return logProbGraph.getLogProbOutput().getReference();
     }
