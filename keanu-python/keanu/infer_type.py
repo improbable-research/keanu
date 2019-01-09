@@ -5,8 +5,10 @@ import numpy as np
 from keanu.vartypes import (numpy_types, tensor_arg_types, runtime_numpy_types, runtime_pandas_types,
                             runtime_primitive_types, runtime_bool_types, runtime_int_types, runtime_float_types)
 
+
 def infer_type_and_execute(value: tensor_arg_types, actions):
     return actions[__get_type_of_value(value)](value)
+
 
 def __get_type_of_value(t):
     if isinstance(t, runtime_numpy_types):
@@ -20,15 +22,16 @@ def __get_type_of_value(t):
             "Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(
                 type(t)))
 
+
 def __infer_type_from_ndarray(ndarray: numpy_types) -> Callable:
-        if np.issubdtype(ndarray.dtype, np.bool_):
-            return bool
-        elif np.issubdtype(ndarray.dtype, np.integer):
-            return int
-        elif np.issubdtype(ndarray.dtype, np.floating):
-            return float
-        else:
-            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(ndarray.dtype))
+    if np.issubdtype(ndarray.dtype, np.bool_):
+        return bool
+    elif np.issubdtype(ndarray.dtype, np.integer):
+        return int
+    elif np.issubdtype(ndarray.dtype, np.floating):
+        return float
+    else:
+        raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(ndarray.dtype))
 
 
 def __infer_type_from_scalar(scalar: np.generic) -> Callable:

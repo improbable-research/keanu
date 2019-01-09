@@ -10,12 +10,10 @@ from keanu.vertex.base import Double, Boolean, Integer
 
 
 @pytest.mark.parametrize("value", [1, 1., True])
-@pytest.mark.parametrize("cast_fn, expected_type", [(cast_tensor_arg_to_double, float),
-                                                    (cast_tensor_arg_to_integer, int),
-                                                    (cast_tensor_arg_to_bool, bool),
-                                                    (cast_to_boolean_vertex, Boolean),
-                                                    (cast_to_integer_vertex, Integer),
-                                                    (cast_to_double_vertex, Double)])
+@pytest.mark.parametrize("cast_fn, expected_type",
+                         [(cast_tensor_arg_to_double, float), (cast_tensor_arg_to_integer, int),
+                          (cast_tensor_arg_to_bool, bool), (cast_to_boolean_vertex, Boolean),
+                          (cast_to_integer_vertex, Integer), (cast_to_double_vertex, Double)])
 def test_scalar_cast(value: primitive_types, cast_fn: Callable, expected_type: type) -> None:
     assert type(cast_fn(value)) == expected_type
 
@@ -57,8 +55,7 @@ def test_nonscalar_tensor_cast(value: Union[numpy_types, pandas_types], cast_fn:
     pd.Series(data=[True]),
     pd.Series(data=[1, 3, 4]),
 ])
-@pytest.mark.parametrize("cast_fn, expected_type", [(cast_to_double_vertex, Double),
-                                                    (cast_to_integer_vertex, Integer),
+@pytest.mark.parametrize("cast_fn, expected_type", [(cast_to_double_vertex, Double), (cast_to_integer_vertex, Integer),
                                                     (cast_to_boolean_vertex, Boolean)])
 def test_nonscalar_vertex_cast(value: Union[numpy_types, pandas_types], cast_fn: Callable, expected_type: type) -> None:
     assert type(cast_fn(value)) == expected_type

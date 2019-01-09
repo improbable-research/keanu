@@ -81,7 +81,7 @@ def test_can_pass_vertex_to_vertex(jvm_view: JVMView) -> None:
     assert sample.dtype == float
 
 
-def btest_can_pass_array_to_vertex(jvm_view: JVMView) -> None:
+def test_can_pass_array_to_vertex(jvm_view: JVMView) -> None:
     gaussian = Vertex(jvm_view.GaussianVertex, np.array([3, 3]), Const(0.), Const(1.))
     sample = gaussian.sample()
 
