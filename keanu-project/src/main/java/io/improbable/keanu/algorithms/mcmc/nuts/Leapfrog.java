@@ -52,11 +52,16 @@ class Leapfrog {
         Map<VariableReference, DoubleTensor> nextMomentum = stepMomentum(halfTimeStep, momentum, gradient);
         Map<VariableReference, DoubleTensor> nextPosition = stepPosition(latentVertices, halfTimeStep, nextMomentum, position);
 
-        Map<? extends VariableReference, DoubleTensor> nextPositionGradient = logProbGradientCalculator.logProbGradients(latentVertices);
+        Map<VariableReference, ?> latentMap = asMap(latentVertices);
+        Map<? extends VariableReference, DoubleTensor> nextPositionGradient = logProbGradientCalculator.logProbGradients(latentMap);
 
         nextMomentum = stepMomentum(halfTimeStep, nextMomentum, nextPositionGradient);
 
         return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient);
+    }
+
+    private Map<VariableReference, ?> asMap(List<? extends Variable<DoubleTensor>> latentVertices) {
+        return latentVertices.stream().collect(Collectors.toMap(Variable::getReference, v -> v));
     }
 
     private Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor>> latentVertices, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<? extends VariableReference, DoubleTensor> position) {

@@ -9,18 +9,18 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 public interface ProbabilisticGraph {
 
     default double logProb() {
-        return logProb(Collections.emptyList());
+        return logProb(Collections.emptyMap());
     }
 
-    double logProb(List<? extends Variable> inputs);
+    double logProb(Map<VariableReference, ?> inputs);
 
     double logProbOfProbabilisticVertices();
 
     default double logLikelihood() {
-        return logLikelihood(Collections.emptyList());
+        return logLikelihood(Collections.emptyMap());
     }
 
-    double logLikelihood(List<? extends Variable> inputs);
+    double logLikelihood(Map<VariableReference, ?> inputs);
 
     List<? extends Variable> getLatentVariables();
 

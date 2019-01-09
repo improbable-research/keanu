@@ -20,6 +20,8 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     private final Map<VariableReference, Vertex> vertexLookup;
 
+    private final Map<VariableReference, ?> latentOrObservedMap;
+
     private final List<Vertex> latentVertices;
 
     private final List<Vertex> observedVertices;
@@ -31,25 +33,28 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
         this.vertexLookup = bayesianNetwork.getLatentVertices().stream()
             .collect(toMap(Vertex::getId, v -> v));
 
+        this.latentOrObservedMap= bayesianNetwork.getLatentOrObservedVertices().stream()
+            .collect(toMap(Vertex::getId, v -> v));
+
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
     }
 
     @Override
-    public double logProb(List<? extends Variable> variables) {
-        cascadeUpdate(variables);
+    public double logProb(Map<VariableReference, ?> inputs) {
+        cascadeUpdate(inputs);
         return ProbabilityCalculator.calculateLogProbFor(this.latentOrObservedVertices);
     }
 
     @Override
     public double logProbOfProbabilisticVertices() {
-        return logProb(latentOrObservedVertices);
+        return logProb(latentOrObservedMap);
     }
 
     @Override
-    public double logLikelihood(List<? extends Variable> variables) {
-        cascadeUpdate(variables);
+    public double logLikelihood(Map<VariableReference, ?> inputs) {
+        cascadeUpdate(inputs);
         return ProbabilityCalculator.calculateLogProbFor(this.observedVertices);
     }
 
@@ -66,17 +71,17 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
             .collect(Collectors.toList());
     }
 
-    public void cascadeUpdate(List<? extends Variable> inputs) {
+    public void cascadeUpdate(Map<VariableReference, ?> inputs) {
 
         List<Vertex> updatedVertices = new ArrayList<>();
-        for (Variable input : inputs) {
-            Vertex updatingVertex = vertexLookup.get(input.getReference());
+        for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {
+            Vertex updatingVertex = vertexLookup.get(input.getKey());
 
             if (updatingVertex == null) {
-                throw new IllegalArgumentException("Cannot cascade update for input: " + input.getReference());
+                throw new IllegalArgumentException("Cannot cascade update for input: " + input.getKey());
             }
 
-            updatingVertex.setValue(input);
+            updatingVertex.setValue(input.getValue());
             updatedVertices.add(updatingVertex);
         }
 
