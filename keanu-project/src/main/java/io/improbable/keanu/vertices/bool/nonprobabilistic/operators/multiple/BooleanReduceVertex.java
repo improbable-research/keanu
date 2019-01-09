@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<BooleanTensor>, NonSaveableVertex {
+public class BooleanReduceVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor>, NonSaveableVertex {
     private final List<? extends Vertex<BooleanTensor>> inputs;
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
-    public BoolReduceVertex(long[] shape, Collection<Vertex<BooleanTensor>> input,
-                            BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
+    public BooleanReduceVertex(long[] shape, Collection<Vertex<BooleanTensor>> input,
+                               BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
         super(shape);
         if (input.size() < 2) {
-            throw new IllegalArgumentException("BoolReduceVertex should have at least two input vertices, called with " + input.size());
+            throw new IllegalArgumentException("BooleanReduceVertex should have at least two input vertices, called with " + input.size());
         }
 
         this.inputs = new ArrayList<>(input);
@@ -32,7 +32,7 @@ public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<Boo
     }
 
 
-    public BoolReduceVertex(long[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
+    public BooleanReduceVertex(long[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
         this(shape, Arrays.asList(input), f);
     }
 
