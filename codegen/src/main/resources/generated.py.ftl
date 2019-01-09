@@ -8,9 +8,48 @@ from keanu.vartypes import (
     tensor_arg_types,
     shape_types
 )
-from keanu.cast import cast_to_double_vertex, cast_to_integer_vertex, cast_to_bool_vertex
+
+from .vertex_helpers import (
+    do_double_vertex_cast,
+)
 
 context = KeanuContext()
+
+
+def cast_to_double_vertex(input):
+    do_double_vertex_cast(ConstantDouble, input)
+
+def cast_to_integer_vertex(input):
+
+
+def cast_to_boolean_vertex(input):
+
+
+def cast_to_vertex(input):
+
+
+def cast_to_double_tensor(input):
+
+
+def cast_to_integer_tensor(input):
+
+
+def cast_to_boolean_tensor(input):
+
+
+def cast_to_double(input):
+
+
+def cast_to_integer(input):
+
+
+def cast_to_string(input):
+
+
+def cast_to_long_array(input):
+
+
+def cast_to_vertex_array(input):
 
 
 <#list imports as import>

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 class VertexProcessor {
 
@@ -123,25 +124,25 @@ class VertexProcessor {
         } else if (IntegerVertex.class.isAssignableFrom(parameterType)) {
             return "cast_to_integer_vertex(" + pythonParameter + ")";
         } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
-            return "cast_to_bool_vertex(" + pythonParameter + ")";
+            return "cast_to_boolean_vertex(" + pythonParameter + ")";
         } else if (Vertex.class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex(" + pythonParameter + ")";
         } else if (DoubleTensor.class.isAssignableFrom(parameterType)) {
             return "cast_to_double_tensor(" + pythonParameter + ")";
         } else if (IntegerTensor.class.isAssignableFrom(parameterType)) {
-            return "cast_to_int_tensor(" + pythonParameter + ")";
+            return "cast_to_integer_tensor(" + pythonParameter + ")";
         } else if (BooleanTensor.class.isAssignableFrom(parameterType)) {
-            return "cast_to_bool_tensor(" + pythonParameter + ")";
+            return "cast_to_boolean_tensor(" + pythonParameter + ")";
         } else if (Double.class.isAssignableFrom(parameterType)) {
             return "cast_to_double(" + pythonParameter + ")";
         } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
-            return "cast_to_int(" + pythonParameter + ")";
+            return "cast_to_integer(" + pythonParameter + ")";
         } else if (String.class.isAssignableFrom(parameterType)) {
             return "cast_to_string(" + pythonParameter + ")";
         } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
             long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
             //TODO - This should only be for longs, and should be called array
-            return "cast_to_int_list(" + pythonParameter + ")";
+            return "cast_to_long_list(" + pythonParameter + ")";
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex_list(" + pythonParameter + ")";
         } else {
@@ -183,10 +184,9 @@ class VertexProcessor {
     }
 
     private static List<Constructor> getSortedListOfAnnotatedVertexConstructors(Reflections reflections) {
-        List<Constructor> constructors = new ArrayList<>(reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class));
-        constructors.sort(Comparator.comparing(Constructor::getName));
-
-        return constructors;
+        return reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class).stream()
+            .sorted(Comparator.comparing(Constructor::getName))
+            .collect(Collectors.toList());
     }
 
     private static String toPythonClass(String javaClass) {
