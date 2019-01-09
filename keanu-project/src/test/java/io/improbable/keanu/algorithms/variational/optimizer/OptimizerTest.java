@@ -11,7 +11,6 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
