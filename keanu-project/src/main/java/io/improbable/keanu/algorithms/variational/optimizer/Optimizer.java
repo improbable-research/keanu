@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.StatusBar;
 
 import java.util.HashMap;
 import java.util.List;
@@ -115,18 +116,18 @@ public interface Optimizer {
             ).collect(Collectors.toList());
     }
 
-    static ProgressBar createFitnessProgressBar(final Optimizer optimizerThatNeedsProgressBar) {
+    static StatusBar createFitnessStatusBar(final Optimizer optimizerThatNeedsStatusBar) {
         AtomicInteger evalCount = new AtomicInteger(0);
-        ProgressBar progressBar = new ProgressBar();
-        BiConsumer<double[], Double> progressBarFitnessCalculationHandler = (position, logProb) -> {
-            progressBar.progress(
+        StatusBar statusBar = new StatusBar();
+        BiConsumer<double[], Double> statusBarFitnessCalculationHandler = (position, logProb) -> {
+            statusBar.setMessage(
                 String.format("Fitness Evaluation #%d LogProb: %.2f", evalCount.incrementAndGet(), logProb)
             );
         };
 
-        optimizerThatNeedsProgressBar.addFitnessCalculationHandler(progressBarFitnessCalculationHandler);
-        progressBar.addFinishHandler(() -> optimizerThatNeedsProgressBar.removeFitnessCalculationHandler(progressBarFitnessCalculationHandler));
+        optimizerThatNeedsStatusBar.addFitnessCalculationHandler(statusBarFitnessCalculationHandler);
+        statusBar.addFinishHandler(() -> optimizerThatNeedsStatusBar.removeFitnessCalculationHandler(statusBarFitnessCalculationHandler));
 
-        return progressBar;
+        return statusBar;
     }
 }
