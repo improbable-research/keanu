@@ -9,58 +9,31 @@ from keanu.vartypes import (
     shape_types
 )
 from .vertex_helpers import (
-    do_vertex_cast
+    do_vertex_cast,
+    cast_to_vertex,
+    cast_to_double_tensor,
+    cast_to_integer_tensor,
+    cast_to_boolean_tensor,
+    cast_to_double,
+    cast_to_integer,
+    cast_to_string,
+    cast_to_long_array,
+    cast_to_vertex_array,
 )
 
 context = KeanuContext()
 
 
 def cast_to_double_vertex(input):
-    do_vertex_cast(ConstantDouble, input)
+    return do_vertex_cast(ConstantDouble, input)
 
 
 def cast_to_integer_vertex(input):
-    do_vertex_cast(ConstantInteger, input)
+    return do_vertex_cast(ConstantInteger, input)
 
 
 def cast_to_boolean_vertex(input):
-    pass
-
-
-def cast_to_vertex(input):
-    pass
-
-
-def cast_to_double_tensor(input):
-    pass
-
-
-def cast_to_integer_tensor(input):
-    pass
-
-
-def cast_to_boolean_tensor(input):
-    pass
-
-
-def cast_to_double(input):
-    pass
-
-
-def cast_to_integer(input):
-    pass
-
-
-def cast_to_string(input):
-    pass
-
-
-def cast_to_long_array(input):
-    pass
-
-
-def cast_to_vertex_array(input):
-    pass
+    return do_vertex_cast(ConstantBoolean, input)
 
 
 <#list imports as import>
