@@ -885,9 +885,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     private class SimpleDoubleFlattenedView implements FlattenedView<Double> {
 
-
-        public SimpleDoubleFlattenedView() { }
-
         @Override
         public long size() {
             return 1;
