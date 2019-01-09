@@ -160,7 +160,9 @@ class VertexProcessor {
         return String.join(", ", pythonParams);
     }
 
-    private static String toTypedPythonParam(Class<?> parameterType) {
+    private static String toTypedPythonParam(Class<?> parameterClass) {
+        Class parameterType = Primitives.wrap(parameterClass);
+
         if (Vertex.class.isAssignableFrom(parameterType)) {
             return "vertex_constructor_param_types";
         } else if (DoubleTensor.class.isAssignableFrom(parameterType) ||

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import com.google.common.collect.Iterables;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
@@ -39,6 +40,7 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
         this.setLabel(label);
     }
 
+    @ExportVertexToPythonBindings
     public DoubleProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_PARAM_NAME) String label) {
         this(shape, new VertexLabel(label));
     }
