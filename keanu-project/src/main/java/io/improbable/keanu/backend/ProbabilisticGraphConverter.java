@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class ProbabilisticGraphConverter {
 
-    public static <T extends ProbabilisticGraph> T convert(BayesianNetwork network, ProbabilisticGraphBuilder<T> graphBuilder) {
+    static <T extends ProbabilisticGraph> void convert(BayesianNetwork network, ProbabilisticGraphBuilder<T> graphBuilder) {
 
         graphBuilder.convert(network.getVertices());
 
@@ -34,8 +34,6 @@ public class ProbabilisticGraphConverter {
 
         graphBuilder.logProb(logProbReference);
         logLikelihoodReference.ifPresent(graphBuilder::logLikelihood);
-
-        return graphBuilder.build();
     }
 
     private static <T extends ProbabilisticGraph> Optional<VariableReference> addLogProbCalculation(ProbabilisticGraphBuilder<T> graphBuilder,

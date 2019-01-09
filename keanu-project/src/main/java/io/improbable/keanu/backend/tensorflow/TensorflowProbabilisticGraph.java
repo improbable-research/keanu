@@ -2,7 +2,6 @@ package io.improbable.keanu.backend.tensorflow;
 
 import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticGraph;
-import io.improbable.keanu.backend.ProbabilisticGraphConverter;
 import io.improbable.keanu.backend.Variable;
 import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -32,8 +31,10 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
     private final VariableReference logLikelihoodOp;
 
     public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
+        TensorflowProbabilisticGraphBuilder builder = new TensorflowProbabilisticGraphBuilder();
+        builder.convert(network);
 
-        return ProbabilisticGraphConverter.convert(network, new TensorflowProbabilisticGraphBuilder());
+        return builder.build();
     }
 
     @Override
