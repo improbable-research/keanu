@@ -39,8 +39,10 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
         this.setLabel(label);
     }
 
-    public DoubleProxyVertex(long[] shape) {
-        super(shape);
+    public DoubleProxyVertex(DoubleVertex parent) {
+        super(parent.getShape());
+        this.setParent(parent);
+        this.ignoreDuringSave = true;
     }
 
     public DoubleProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_PARAM_NAME) String label) {

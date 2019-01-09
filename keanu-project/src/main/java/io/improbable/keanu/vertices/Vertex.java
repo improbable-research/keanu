@@ -25,6 +25,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
     private VertexLabel label = null;
+    protected boolean ignoreDuringSave = false;
 
     public Vertex() {
         this(Tensor.SCALAR_SHAPE);
@@ -269,5 +270,9 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     public void loadValue(NetworkLoader loader) {
         loader.loadValue(this);
+    }
+
+    public boolean ignoreDuringSave() {
+        return ignoreDuringSave;
     }
 }

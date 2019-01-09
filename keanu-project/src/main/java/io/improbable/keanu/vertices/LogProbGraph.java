@@ -31,6 +31,7 @@ public class LogProbGraph {
 
         public DoublePlaceHolderVertex(long[] initialShape) {
             super(initialShape);
+            this.ignoreDuringSave = true;
         }
 
         @Override

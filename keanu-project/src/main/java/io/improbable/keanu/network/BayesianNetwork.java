@@ -243,18 +243,19 @@ public class BayesianNetwork {
     }
 
     public void save(NetworkSaver networkSaver) {
-        if(isSaveable()) {
+        if (isSaveable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
-                vertex.save(networkSaver);
+                if (!vertex.ignoreDuringSave()) {
+                    vertex.save(networkSaver);
+                }
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Trying to save a BayesianNetwork that isn't Saveable");
         }
     }
 
     private boolean isSaveable() {
-        return vertices.stream().filter(v -> v instanceof NonSaveableVertex).count() == 0;
+        return vertices.stream().filter(v -> !v.ignoreDuringSave() && v instanceof NonSaveableVertex).count() == 0;
     }
 
     public void saveValues(NetworkSaver networkSaver) {
