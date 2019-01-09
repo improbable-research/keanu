@@ -5,7 +5,11 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -92,32 +96,31 @@ public class NUTS implements PosteriorSamplingAlgorithm {
      * @return Samples taken with NUTS
      */
     @Override
-    public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                              final List<? extends Vertex> sampleFromVertices,
+    public NetworkSamples getPosteriorSamples(final ProbabilisticGraph bayesNet,
+                                              final List<? extends Variable> sampleFromVertices,
                                               final int sampleCount) {
-        return generatePosteriorSamples(bayesNet, sampleFromVertices)
+        return generatePosteriorSamples((ProbabilisticWithGradientGraph) bayesNet, sampleFromVertices)
             .generate(sampleCount);
     }
 
-    public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesNet,
-                                                            final List<? extends Vertex> fromVertices) {
+    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticWithGradientGraph bayesNet,
+                                                            final List<? extends Variable<DoubleTensor>> fromVertices) {
 
         return new NetworkSamplesGenerator(setupSampler(bayesNet, fromVertices), ProgressBar::new);
     }
 
-    private NUTSSampler setupSampler(final BayesianNetwork bayesNet,
-                                     final List<? extends Vertex> sampleFromVertices) {
+    private NUTSSampler setupSampler(final ProbabilisticWithGradientGraph bayesNet,
+                                     final List<? extends Variable<DoubleTensor>> sampleFromVertices) {
 
         Preconditions.checkArgument(!sampleFromVertices.isEmpty(), "List of vertices to sample from is empty");
         bayesNet.cascadeObservations();
 
-        final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesNet.getLatentOrObservedVertices(), latentVertices);
-        List<Vertex> probabilisticVertices = bayesNet.getLatentOrObservedVertices();
+        final List<Variable<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
+        Map<VariableReference, Variable> probabilisticVertices = bayesNet.getLatentOrObservedVertices();
 
-        Map<VertexId, DoubleTensor> position = latentVertices.stream().collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
-        Map<VertexId, DoubleTensor> momentum = new HashMap<>();
-        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+        Map<VariableReference, DoubleTensor> position = SamplingAlgorithm.takeSample(latentVertices);
+        Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
+        Map<? extends VariableReference, DoubleTensor> gradient = bayesNet.logProbGradients();
 
         double initialLogOfMasterP = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
 
@@ -125,7 +128,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             gradient,
             latentVertices,
             probabilisticVertices,
-            logProbGradientCalculator,
+            bayesNet,
             initialLogOfMasterP,
             random
         ) : initialStepSize;
@@ -136,7 +139,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        resetVertexValue(sampleFromVertices, position);
+        resetVariableValue(sampleFromVertices, position);
 
         Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
 
@@ -144,7 +147,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             sampleFromVertices,
             latentVertices,
             probabilisticVertices,
-            logProbGradientCalculator,
+            bayesNet,
             adaptEnabled,
             stepsize,
             tree,
@@ -159,9 +162,9 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         return statistics;
     }
 
-    private static void resetVertexValue(List<? extends Vertex> sampleFromVertices, Map<VertexId, DoubleTensor> previousPosition) {
-        for (Vertex vertex : sampleFromVertices) {
-            vertex.setValue(previousPosition.get(vertex.getId()));
+    private static void resetVariableValue(List<? extends Variable> sampleFromVertices, Map<VariableReference, DoubleTensor> previousPosition) {
+        for (Variable variable : sampleFromVertices) {
+            variable.setValue(previousPosition.get(variable.getReference()));
         }
     }
 

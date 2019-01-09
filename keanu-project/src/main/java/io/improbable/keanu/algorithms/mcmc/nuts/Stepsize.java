@@ -2,12 +2,11 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.algorithms.SaveStatistics;
 import io.improbable.keanu.algorithms.Statistics;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 
 import java.util.List;
 import java.util.Map;
@@ -57,17 +56,17 @@ class Stepsize implements SaveStatistics {
      * @param random                    the source of randomness
      * @return a starting step size
      */
-    public static double findStartingStepSize(Map<VertexId, DoubleTensor> position,
-                                              Map<VertexId, DoubleTensor> gradient,
-                                              List<Vertex<DoubleTensor>> vertices,
-                                              List<Vertex> probabilisticVertices,
-                                              LogProbGradientCalculator logProbGradientCalculator,
+    public static double findStartingStepSize(Map<VariableReference, DoubleTensor> position,
+                                              Map<VariableReference, DoubleTensor> gradient,
+                                              List<Variable<DoubleTensor>> vertices,
+                                              Map<VariableReference, Variable> probabilisticVertices,
+                                              ProbabilisticWithGradientGraph logProbGradientCalculator,
                                               double initialLogOfMasterP,
                                               KeanuRandom random) {
         double stepsize = STARTING_STEPSIZE;
-        Map<VertexId, DoubleTensor> momentums = vertices.stream()
+        Map<VariableReference, DoubleTensor> momentums = vertices.stream()
             .collect(Collectors.toMap(
-                Vertex::getId,
+                Variable::getReference,
                 v -> random.nextGaussian(v.getShape())
             ));
 
@@ -76,7 +75,7 @@ class Stepsize implements SaveStatistics {
 
         Leapfrog delta = leapfrog.step(vertices, logProbGradientCalculator, STARTING_STEPSIZE);
 
-        double probAfterLeapfrog = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
+        double probAfterLeapfrog = logProbGradientCalculator.logProb(probabilisticVertices);
         double pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
 
         double logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
@@ -86,7 +85,7 @@ class Stepsize implements SaveStatistics {
             stepsize = stepsize * Math.pow(2, scalingFactor);
 
             delta = leapfrog.step(vertices, logProbGradientCalculator, stepsize);
-            probAfterLeapfrog = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
+            probAfterLeapfrog = logProbGradientCalculator.logProb(probabilisticVertices);
             pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
 
             logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;

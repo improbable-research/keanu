@@ -3,8 +3,8 @@ package io.improbable.keanu.algorithms.mcmc;
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.VertexId;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public class NetworkSamplesGenerator {
 
         ProgressBar progressBar = progressBarSupplier.get();
 
-        Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
+        Map<VariableReference, List<?>> samplesByVertex = new HashMap<>();
         List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
         dropSamples(dropCount, progressBar);

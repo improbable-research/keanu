@@ -1,11 +1,11 @@
 package io.improbable.keanu.algorithms;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.intgr.IntegerVertexSamples;
 import lombok.extern.slf4j.Slf4j;
@@ -29,18 +29,18 @@ import static java.util.stream.Collectors.toMap;
 @Slf4j
 public class NetworkSamples {
 
-    private final Map<VertexId, ? extends List> samplesByVertex;
+    private final Map<VariableReference, ? extends List> samplesByVertex;
     private final List<Double> logOfMasterPForEachSample;
     private final int size;
 
-    public NetworkSamples(Map<VertexId, ? extends List> samplesByVertex, List<Double> logOfMasterPForEachSample, int size) {
+    public NetworkSamples(Map<VariableReference, ? extends List> samplesByVertex, List<Double> logOfMasterPForEachSample, int size) {
         this.samplesByVertex = samplesByVertex;
         this.logOfMasterPForEachSample = logOfMasterPForEachSample;
         this.size = size;
     }
 
     public static NetworkSamples from(List<NetworkSample> networkSamples) {
-        Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
+        Map<VariableReference, List<?>> samplesByVertex = new HashMap<>();
         List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
         networkSamples.forEach(networkSample -> addSamplesForNetworkSample(networkSample, samplesByVertex));
@@ -48,13 +48,13 @@ public class NetworkSamples {
         return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, networkSamples.size());
     }
 
-    private static void addSamplesForNetworkSample(NetworkSample networkSample, Map<VertexId, List<?>> samplesByVertex) {
-        for (VertexId vertexId : networkSample.getVertexIds()) {
+    private static void addSamplesForNetworkSample(NetworkSample networkSample, Map<VariableReference, List<?>> samplesByVertex) {
+        for (VariableReference vertexId : networkSample.getVertexIds()) {
             addSampleForVertex(vertexId, networkSample.get(vertexId), samplesByVertex);
         }
     }
 
-    private static <T> void addSampleForVertex(VertexId vertexId, T value, Map<VertexId, List<?>> samples) {
+    private static <T> void addSampleForVertex(VariableReference vertexId, T value, Map<VariableReference, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertexId, v -> new ArrayList<T>());
         samplesForVertex.add(value);
     }
@@ -63,27 +63,27 @@ public class NetworkSamples {
         return this.size;
     }
 
-    public <T> VertexSamples<T> get(Vertex<T> vertex) {
-        return get(vertex.getId());
+    public <T> VertexSamples<T> get(Variable<T> vertex) {
+        return get(vertex.getReference());
     }
 
-    public <T> VertexSamples<T> get(VertexId vertexId) {
+    public <T> VertexSamples<T> get(VariableReference vertexId) {
         return new VertexSamples<>((List<T>) samplesByVertex.get(vertexId));
     }
 
-    public DoubleVertexSamples getDoubleTensorSamples(Vertex<DoubleTensor> vertex) {
-        return getDoubleTensorSamples(vertex.getId());
+    public DoubleVertexSamples getDoubleTensorSamples(Variable<DoubleTensor> vertex) {
+        return getDoubleTensorSamples(vertex.getReference());
     }
 
-    public DoubleVertexSamples getDoubleTensorSamples(VertexId vertexId) {
+    public DoubleVertexSamples getDoubleTensorSamples(VariableReference vertexId) {
         return new DoubleVertexSamples(samplesByVertex.get(vertexId));
     }
 
-    public IntegerVertexSamples getIntegerTensorSamples(Vertex<IntegerTensor> vertex) {
-        return getIntegerTensorSamples(vertex.getId());
+    public IntegerVertexSamples getIntegerTensorSamples(Variable<IntegerTensor> vertex) {
+        return getIntegerTensorSamples(vertex.getReference());
     }
 
-    public IntegerVertexSamples getIntegerTensorSamples(VertexId vertexId) {
+    public IntegerVertexSamples getIntegerTensorSamples(VariableReference vertexId) {
         return new IntegerVertexSamples(samplesByVertex.get(vertexId));
     }
 
@@ -93,7 +93,7 @@ public class NetworkSamples {
             return this;
         }
 
-        final Map<VertexId, List<?>> withSamplesDropped = samplesByVertex.entrySet().parallelStream()
+        final Map<VariableReference, List<?>> withSamplesDropped = samplesByVertex.entrySet().parallelStream()
             .collect(toMap(
                 Map.Entry::getKey,
                 e -> e.getValue().subList(dropCount, size))
@@ -106,7 +106,7 @@ public class NetworkSamples {
     public NetworkSamples downSample(final int downSampleInterval) {
         Preconditions.checkArgument(downSampleInterval > 0, "Down sample interval of %s is invalid. Sample interval must be positive.", downSampleInterval);
 
-        final Map<VertexId, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
+        final Map<VariableReference, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
             .collect(toMap(
                 Map.Entry::getKey,
                 e -> downSample((List<?>) e.getValue(), downSampleInterval)
@@ -169,26 +169,26 @@ public class NetworkSamples {
 
     private static class SamplesBackedNetworkState implements NetworkState {
 
-        private final Map<VertexId, ? extends List> samplesByVertex;
+        private final Map<VariableReference, ? extends List> samplesByVertex;
         private final int index;
 
-        public SamplesBackedNetworkState(Map<VertexId, ? extends List> samplesByVertex, int index) {
+        public SamplesBackedNetworkState(Map<VariableReference, ? extends List> samplesByVertex, int index) {
             this.samplesByVertex = samplesByVertex;
             this.index = index;
         }
 
         @Override
-        public <T> T get(Vertex<T> vertex) {
-            return ((List<T>) samplesByVertex.get(vertex.getId())).get(index);
+        public <T> T get(Variable<T> vertex) {
+            return ((List<T>) samplesByVertex.get(vertex.getReference())).get(index);
         }
 
         @Override
-        public <T> T get(VertexId vertexId) {
+        public <T> T get(VariableReference vertexId) {
             return ((List<T>) samplesByVertex.get(vertexId)).get(index);
         }
 
         @Override
-        public Set<VertexId> getVertexIds() {
+        public Set<VariableReference> getVertexIds() {
             return new HashSet<>(samplesByVertex.keySet());
         }
     }

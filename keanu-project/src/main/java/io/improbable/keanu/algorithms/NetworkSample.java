@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms;
 
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class NetworkSample implements NetworkState {
 
-    private final Map<VertexId, ?> vertexValues;
+    private final Map<VariableReference, ?> vertexValues;
 
     @Getter
     private final double logOfMasterP;
@@ -27,8 +27,8 @@ public class NetworkSample implements NetworkState {
      * @return the values of the specified vertex
      */
     @Override
-    public <T> T get(Vertex<T> vertex) {
-        return (T) vertexValues.get(vertex.getId());
+    public <T> T get(Variable<T> vertex) {
+        return (T) vertexValues.get(vertex.getReference());
     }
 
     /**
@@ -37,12 +37,12 @@ public class NetworkSample implements NetworkState {
      * @return the values of the specified vertex
      */
     @Override
-    public <T> T get(VertexId vertexId) {
+    public <T> T get(VariableReference vertexId) {
         return (T) vertexValues.get(vertexId);
     }
 
     @Override
-    public Set<VertexId> getVertexIds() {
+    public Set<VariableReference> getVertexIds() {
         return vertexValues.keySet();
     }
 }

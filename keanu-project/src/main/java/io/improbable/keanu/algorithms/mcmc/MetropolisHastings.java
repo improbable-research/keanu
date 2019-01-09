@@ -5,6 +5,9 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
@@ -20,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
 import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
 /**
@@ -70,7 +72,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
      * @param sampleCount          number of samples to take using the algorithm
      * @return Samples for each vertex ordered by MCMC iteration
      */
-    @Override
     public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
                                               List<? extends Vertex> verticesToSampleFrom,
                                               int sampleCount) {
@@ -100,6 +101,11 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         double logProbabilityBeforeStep = bayesianNetwork.getLogOfMasterP();
 
         return new MetropolisHastingsSampler(latentVertices, verticesToSampleFrom, mhStep, variableSelector, logProbabilityBeforeStep);
+    }
+
+    @Override
+    public NetworkSamples getPosteriorSamples(ProbabilisticGraph bayesNet, List<? extends Variable> verticesToSampleFrom, int sampleCount) {
+        return null;
     }
 
     public static class MetropolisHastingsSampler implements SamplingAlgorithm {
@@ -138,7 +144,10 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         }
 
         @Override
-        public void sample(Map<VertexId, List<?>> samplesByVertex, List<Double> logOfMasterPForEachSample) {
+        public void sample(Map<VariableReference, List<?>> samplesByVertex, List<Double> logOfMasterPForEachSample) {
+        }
+
+        public void sampleLegacy(Map<VertexId, List<?>> samplesByVertex, List<Double> logOfMasterPForEachSample) {
             step();
             takeSamples(samplesByVertex, verticesToSampleFrom);
             logOfMasterPForEachSample.add(logProbabilityBeforeStep);
@@ -147,7 +156,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         @Override
         public NetworkSample sample() {
             step();
-            return new NetworkSample(takeSample(verticesToSampleFrom), logProbabilityBeforeStep);
+            return new NetworkSample(SamplingAlgorithm.takeSampleLegacy(verticesToSampleFrom), logProbabilityBeforeStep);
         }
     }
 

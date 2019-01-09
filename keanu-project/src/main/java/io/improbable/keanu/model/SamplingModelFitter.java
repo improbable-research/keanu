@@ -2,6 +2,7 @@ package io.improbable.keanu.model;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
 import io.improbable.keanu.network.NetworkState;
 
 public class SamplingModelFitter implements ModelFitter {
@@ -32,7 +33,7 @@ public class SamplingModelFitter implements ModelFitter {
     @Override
     public void fit(ModelGraph modelGraph) {
         posteriorSamples = samplingAlgorithm
-            .getPosteriorSamples(modelGraph.getBayesianNetwork(), sampleCount);
+            .getPosteriorSamples(new KeanuProbabilisticGraph(modelGraph.getBayesianNetwork()), sampleCount);
         NetworkState mostProbableState = posteriorSamples.getMostProbableState();
         modelGraph.getBayesianNetwork().setState(mostProbableState);
     }

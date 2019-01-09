@@ -1,7 +1,7 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 
 import java.util.Set;
 
@@ -14,9 +14,9 @@ import java.util.Set;
  */
 public interface NetworkState {
 
-    <T> T get(Vertex<T> vertex);
+    <T> T get(Variable<T> vertex);
 
-    <T> T get(VertexId vertexId);
+    <T> T get(VariableReference vertexId);
 
-    Set<VertexId> getVertexIds();
+    Set<VariableReference> getVertexIds();
 }

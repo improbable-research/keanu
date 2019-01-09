@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
@@ -16,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
@@ -115,7 +117,11 @@ public class SimulatedAnnealing {
             }
         }
 
-        return new SimpleNetworkState(maxSamplesByVertex);
+        return new SimpleNetworkState(mapByVariableReference(maxSamplesByVertex));
+    }
+
+    private <T> Map<VariableReference, T> mapByVariableReference(Map<VertexId, T> legacyMap) {
+        return legacyMap.entrySet().stream().collect(Collectors.toMap(k -> (VariableReference) k.getKey(), Map.Entry::getValue));
     }
 
     private static void setSamplesAsMax(Map<VertexId, ?> samples, List<? extends Vertex> fromVertices) {

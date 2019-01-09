@@ -6,5 +6,7 @@ public interface Variable<T> {
 
     T getValue();
 
+    void setValue(T tensor);
+
     long[] getShape();
 }

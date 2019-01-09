@@ -1,14 +1,14 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -17,18 +17,18 @@ import java.util.Map;
  */
 class Leapfrog {
 
-    private final Map<VertexId, DoubleTensor> position;
-    private final Map<VertexId, DoubleTensor> momentum;
-    private final Map<VertexId, DoubleTensor> gradient;
+    private final Map<VariableReference, DoubleTensor> position;
+    private final Map<VariableReference, DoubleTensor> momentum;
+    private final Map<? extends VariableReference, DoubleTensor> gradient;
 
     /**
      * @param position the position of the vertices
      * @param momentum the momentum of the vertices
      * @param gradient the gradient of the vertices
      */
-    Leapfrog(Map<VertexId, DoubleTensor> position,
-             Map<VertexId, DoubleTensor> momentum,
-             Map<VertexId, DoubleTensor> gradient) {
+    Leapfrog(Map<VariableReference, DoubleTensor> position,
+             Map<VariableReference, DoubleTensor> momentum,
+             Map<? extends VariableReference, DoubleTensor> gradient) {
         this.position = position;
         this.momentum = momentum;
         this.gradient = gradient;
@@ -43,40 +43,44 @@ class Leapfrog {
 
      * @return a new leapfrog having taken one step through space
      */
-    public Leapfrog step(final List<Vertex<DoubleTensor>> latentVertices,
-                         final LogProbGradientCalculator logProbGradientCalculator,
+    public Leapfrog step(final List<Variable<DoubleTensor>> latentVertices,
+                         final ProbabilisticWithGradientGraph logProbGradientCalculator,
                          final double epsilon) {
 
         final double halfTimeStep = epsilon / 2.0;
 
-        Map<VertexId, DoubleTensor> nextMomentum = stepMomentum(halfTimeStep, momentum, gradient);
-        Map<VertexId, DoubleTensor> nextPosition = stepPosition(latentVertices, halfTimeStep, nextMomentum, position);
+        Map<VariableReference, DoubleTensor> nextMomentum = stepMomentum(halfTimeStep, momentum, gradient);
+        Map<VariableReference, DoubleTensor> nextPosition = stepPosition(latentVertices, halfTimeStep, nextMomentum, position);
 
-        VertexValuePropagation.cascadeUpdate(latentVertices);
-        Map<VertexId, DoubleTensor> nextPositionGradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+        Map<VariableReference, ?> v = asMap(latentVertices);
+        Map<? extends VariableReference, DoubleTensor> nextPositionGradient = logProbGradientCalculator.logProbGradients(v);
 
         nextMomentum = stepMomentum(halfTimeStep, nextMomentum, nextPositionGradient);
 
         return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient);
     }
 
-    private Map<VertexId, DoubleTensor> stepPosition(List<Vertex<DoubleTensor>> latentVertices, double halfTimeStep, Map<VertexId, DoubleTensor> nextMomentum, Map<VertexId, DoubleTensor> position) {
-        Map<VertexId, DoubleTensor> nextPosition = new HashMap<>();
-        for (Vertex<DoubleTensor> latent : latentVertices) {
-            final DoubleTensor nextPositionForLatent = nextMomentum.get(latent.getId()).
+    private Map<VariableReference,?> asMap(List<Variable<DoubleTensor>> latentVertices) {
+        return latentVertices.stream().collect(Collectors.toMap(Variable::getReference, v -> v));
+    }
+
+    private Map<VariableReference, DoubleTensor> stepPosition(List<Variable<DoubleTensor>> latentVertices, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<VariableReference, DoubleTensor> position) {
+        Map<VariableReference, DoubleTensor> nextPosition = new HashMap<>();
+        for (Variable<DoubleTensor> latent : latentVertices) {
+            final DoubleTensor nextPositionForLatent = nextMomentum.get(latent.getReference()).
                 times(halfTimeStep).
                 plusInPlace(
-                    position.get(latent.getId())
+                    position.get(latent.getReference())
                 );
-            nextPosition.put(latent.getId(), nextPositionForLatent);
+            nextPosition.put(latent.getReference(), nextPositionForLatent);
             latent.setValue(nextPositionForLatent);
         }
         return nextPosition;
     }
 
-    private Map<VertexId, DoubleTensor> stepMomentum(double halfTimeStep, Map<VertexId, DoubleTensor> momentum, Map<VertexId, DoubleTensor> gradient) {
-        Map<VertexId, DoubleTensor> nextMomentum = new HashMap<>();
-        for (Map.Entry<VertexId, DoubleTensor> rEntry : momentum.entrySet()) {
+    private Map<VariableReference, DoubleTensor> stepMomentum(double halfTimeStep, Map<VariableReference, DoubleTensor> momentum, Map<? extends VariableReference, DoubleTensor> gradient) {
+        Map<VariableReference, DoubleTensor> nextMomentum = new HashMap<>();
+        for (Map.Entry<VariableReference, DoubleTensor> rEntry : momentum.entrySet()) {
             final DoubleTensor updatedMomentum = (gradient.get(rEntry.getKey()).times(halfTimeStep)).plusInPlace(rEntry.getValue());
             nextMomentum.put(rEntry.getKey(), updatedMomentum);
         }
@@ -87,23 +91,23 @@ class Leapfrog {
         return 0.5 * dotProduct(momentum);
     }
 
-    public Map<VertexId, DoubleTensor> getPosition() {
+    public Map<VariableReference, DoubleTensor> getPosition() {
         return position;
     }
 
-    public Map<VertexId, DoubleTensor> getMomentum() {
+    public Map<VariableReference, DoubleTensor> getMomentum() {
         return momentum;
     }
 
-    public Map<VertexId, DoubleTensor> getGradient() {
+    public Map<? extends VariableReference, DoubleTensor> getGradient() {
         return gradient;
     }
 
-    public Leapfrog makeJumpTo(Map<VertexId, DoubleTensor> position, Map<VertexId, DoubleTensor> gradient) {
+    public Leapfrog makeJumpTo(Map<VariableReference, DoubleTensor> position, Map<? extends VariableReference, DoubleTensor> gradient) {
         return new Leapfrog(position, getMomentum(), gradient);
     }
 
-    private static double dotProduct(Map<VertexId, DoubleTensor> momentums) {
+    private static double dotProduct(Map<VariableReference, DoubleTensor> momentums) {
         double dotProduct = 0.0;
         for (DoubleTensor momentum : momentums.values()) {
             dotProduct += momentum.pow(2).sum();
