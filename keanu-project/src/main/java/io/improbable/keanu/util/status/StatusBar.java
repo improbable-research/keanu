@@ -32,21 +32,21 @@ public class StatusBar {
     /**
      * Override the default print stream globally
      *
-     * @param printStream The new printStream object to use for all ProgressBars that don't declare one
+     * @param printStream The new printStream object to use for all StatusBars that don't declare one
      */
     public static void setDefaultPrintStream(PrintStream printStream) {
         StatusBar.defaultPrintStream = printStream;
     }
 
     /**
-     * Disables all progress bars globally
+     * Disables all status bars globally
      */
     public static void disable() {
         ENABLED.set(false);
     }
 
     /**
-     * Enables all progress bars globally
+     * Enables all status bars globally
      */
     public static void enable() {
         ENABLED.set(true);
