@@ -1,5 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -43,20 +48,19 @@ public class StepsizeTest {
     private double calculateStepsize(DoubleVertex vertex, double startingValue) {
         List<DoubleVertex> vertices = Arrays.asList(vertex);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(vertex.getConnectedGraph());
+        KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
 
         VertexId vertexId = vertex.getId();
 
-        LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesianNetwork.getLatentOrObservedVertices(), vertices);
         vertex.setValue(DoubleTensor.scalar(startingValue));
-        Map<VertexId, DoubleTensor> position = Collections.singletonMap(vertexId, vertex.getValue());
-        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+        Map<VariableReference, DoubleTensor> position = Collections.singletonMap(vertexId, vertex.getValue());
+        Map<? extends VariableReference, DoubleTensor> gradient = graph.logLikelihoodGradients();
 
         return Stepsize.findStartingStepSize(
             position,
             gradient,
             Collections.singletonList(vertex),
-            bayesianNetwork.getLatentVertices(),
-            logProbGradientCalculator,
+            graph,
             ProbabilityCalculator.calculateLogProbFor(vertices),
             random
         );

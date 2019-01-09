@@ -73,7 +73,7 @@ class Stepsize implements SaveStatistics {
 
         Leapfrog delta = leapfrog.step(vertices, logProbGradientCalculator, STARTING_STEPSIZE);
 
-        double probAfterLeapfrog = logProbGradientCalculator.logProbOfProbabilisticVertices();
+        double probAfterLeapfrog = logProbGradientCalculator.logProb();
         double pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
 
         double logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
@@ -83,7 +83,7 @@ class Stepsize implements SaveStatistics {
             stepsize = stepsize * Math.pow(2, scalingFactor);
 
             delta = leapfrog.step(vertices, logProbGradientCalculator, stepsize);
-            probAfterLeapfrog = logProbGradientCalculator.logProbOfProbabilisticVertices();
+            probAfterLeapfrog = logProbGradientCalculator.logProb();
             pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
 
             logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;

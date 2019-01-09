@@ -14,8 +14,6 @@ public interface ProbabilisticGraph {
 
     double logProb(Map<VariableReference, ?> inputs);
 
-    double logProbOfProbabilisticVertices();
-
     default double logLikelihood() {
         return logLikelihood(Collections.emptyMap());
     }

@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.variational;
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -131,7 +132,7 @@ public class KLDivergenceTest {
     }
 
     private NetworkSamples createNetworkSamplesWithOneVertexAndOneSample(double p) {
-        Map<VertexId, List<DoubleTensor>> samplesByVertex = new HashMap<>();
+        Map<VariableReference, List<DoubleTensor>> samplesByVertex = new HashMap<>();
         samplesByVertex.put(new VertexId(), Collections.singletonList(DoubleTensor.scalar(1.)));
         List<Double> logOfMasterPForEachSample = Collections.singletonList(p);
 

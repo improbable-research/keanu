@@ -61,7 +61,7 @@ class Leapfrog {
     }
 
     private Map<VariableReference, ?> asMap(List<? extends Variable<DoubleTensor>> latentVertices) {
-        return latentVertices.stream().collect(Collectors.toMap(Variable::getReference, v -> v));
+        return latentVertices.stream().collect(Collectors.toMap(Variable::getReference, v -> v.getValue()));
     }
 
     private Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor>> latentVertices, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<? extends VariableReference, DoubleTensor> position) {

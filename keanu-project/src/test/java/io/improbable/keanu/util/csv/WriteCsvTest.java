@@ -1,6 +1,7 @@
 package io.improbable.keanu.util.csv;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -54,7 +55,7 @@ public class WriteCsvTest {
         scalarTensors.addAll(Arrays.asList(c1, c2));
         integerColumnTensors.addAll(Arrays.asList(i1, i2));
 
-        Map<VertexId, List<DoubleTensor>> networkSamples = new HashMap<>();
+        Map<VariableReference, List<DoubleTensor>> networkSamples = new HashMap<>();
         networkSamples.put(g1.getId(), Arrays.asList(g1.getValue(), g1.times(2).getValue()));
         networkSamples.put(g2.getId(), Arrays.asList(g2.getValue(), g2.times(2).getValue()));
         samples = new NetworkSamples(networkSamples, new ArrayList<>(), 2);

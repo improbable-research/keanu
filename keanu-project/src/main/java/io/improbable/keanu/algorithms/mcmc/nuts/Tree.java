@@ -218,7 +218,7 @@ class Tree implements SaveStatistics {
 
         leapfrog = leapfrog.step(latentVertices, logProbGradientCalculator, epsilon * buildDirection);
 
-        final double logOfMasterPAfterLeapfrog = logProbGradientCalculator.logProbOfProbabilisticVertices();
+        final double logOfMasterPAfterLeapfrog = logProbGradientCalculator.logProb();
 
         final double logOfMasterPMinusMomentum = logOfMasterPAfterLeapfrog - leapfrog.halfDotProductMomentum();
         final int acceptedLeapfrogCount = logU <= logOfMasterPMinusMomentum ? 1 : 0;

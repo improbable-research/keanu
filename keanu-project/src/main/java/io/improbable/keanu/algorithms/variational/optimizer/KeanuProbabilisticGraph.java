@@ -8,10 +8,8 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
@@ -19,8 +17,6 @@ import static java.util.stream.Collectors.toMap;
 public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     private final Map<VariableReference, Vertex> vertexLookup;
-
-    private final Map<VariableReference, ?> latentOrObservedMap;
 
     private final List<Vertex> latentVertices;
 
@@ -30,10 +26,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
 
-        this.vertexLookup = bayesianNetwork.getLatentVertices().stream()
-            .collect(toMap(Vertex::getId, v -> v));
-
-        this.latentOrObservedMap= bayesianNetwork.getLatentOrObservedVertices().stream()
+        this.vertexLookup = bayesianNetwork.getLatentOrObservedVertices().stream()
             .collect(toMap(Vertex::getId, v -> v));
 
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
@@ -45,11 +38,6 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     public double logProb(Map<VariableReference, ?> inputs) {
         cascadeUpdate(inputs);
         return ProbabilityCalculator.calculateLogProbFor(this.latentOrObservedVertices);
-    }
-
-    @Override
-    public double logProbOfProbabilisticVertices() {
-        return logProb(latentOrObservedMap);
     }
 
     @Override
