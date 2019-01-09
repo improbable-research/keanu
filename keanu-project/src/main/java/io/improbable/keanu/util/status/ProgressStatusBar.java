@@ -9,10 +9,17 @@ public class ProgressStatusBar {
 
     public void progress(String message, double progressPercentage) {
         StringBuilder sb = new StringBuilder();
-        sb.append(message);
-        sb.append(" ");
+        if(message != null) {
+            sb.append(message);
+            sb.append(" ");
+        }
+
         sb.append(formatProgress(progressPercentage));
         statusBar.setMessage(sb.toString());
+    }
+
+    public void progress(double progressPercentage) {
+        progress(null, progressPercentage);
     }
 
     public String formatProgress(double progressPercentage) {

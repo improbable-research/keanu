@@ -1,6 +1,7 @@
-package io.improbable.keanu.util;
+package io.improbable.keanu.util.status;
 
 import io.improbable.keanu.testcategory.Slow;
+import io.improbable.keanu.util.ProgressBar;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -29,10 +28,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-public class ProgressBarTest {
+public class StatusBarTest {
 
     private AtomicReference<Runnable> progressUpdateCall;
-    private ProgressBar progressBar;
+    private StatusBar statusBar;
     private ByteArrayOutputStream byteArrayOutputStream;
     private ScheduledExecutorService scheduler;
 
@@ -51,8 +50,8 @@ public class ProgressBarTest {
                 return null;
             });
 
-        progressBar = new ProgressBar(printStream, scheduler);
-        ProgressBar.enable();
+        statusBar = new StatusBar(printStream, scheduler);
+        StatusBar.enable();
     }
 
     @After
@@ -78,12 +77,12 @@ public class ProgressBarTest {
     public void doesPrintToStreamWhenEnabled() {
         ProgressBar.enable();
 
-        progressBar.progress();
+        statusBar.setMessage("");
         progressUpdateCall.get().run();
         progressUpdateCall.get().run();
-        progressBar.progress();
+        statusBar.setMessage("");
         progressUpdateCall.get().run();
-        progressBar.finish();
+        statusBar.finish();
 
         String result = getResultWithNewLinesInsteadOfCR();
 
@@ -94,11 +93,11 @@ public class ProgressBarTest {
     public void doesNotPrintToStreamWhenGloballyDisabled() {
         ProgressBar.disable();
 
-        progressBar.progress();
+        statusBar.setMessage("");
         progressUpdateCall.get().run();
         progressUpdateCall.get().run();
-        progressBar.progress();
-        progressBar.finish();
+        statusBar.setMessage("");
+        statusBar.finish();
 
         String result = getResultWithNewLinesInsteadOfCR();
 
@@ -106,44 +105,14 @@ public class ProgressBarTest {
     }
 
     @Test
-    public void doesPrintProgressInAppropriateFormat() {
-        ProgressBar.enable();
-
-        progressBar.progress(0.0);
-        progressUpdateCall.get().run();
-        progressBar.progress(0.675);
-        progressBar.finish();
-
-        String result = getResultWithNewLinesInsteadOfCR();
-
-        assertThat(result, containsString("67.5%"));
-    }
-
-    @Test
-    public void doesLimitProgressTo100Percent() {
-        ProgressBar.enable();
-
-        progressBar.progress(-0.7);
-        progressUpdateCall.get().run();
-        progressBar.progress(1.5);
-        progressBar.finish();
-
-        String result = getResultWithNewLinesInsteadOfCR();
-        String[] lines = result.split("\n");
-
-        assertThat(lines[1], containsString("0.0%"));
-        assertThat(lines[2], containsString("100.0%"));
-    }
-
-    @Test
     public void doesCallFinishHandler() {
         ProgressBar.enable();
 
         Runnable finishHandler = mock(Runnable.class);
-        progressBar.addFinishHandler(finishHandler);
-        progressBar.progress();
+        statusBar.addFinishHandler(finishHandler);
+        statusBar.setMessage("");
         progressUpdateCall.get().run();
-        progressBar.finish();
+        statusBar.finish();
 
         verify(finishHandler).run();
         verifyNoMoreInteractions(finishHandler);
@@ -171,7 +140,7 @@ public class ProgressBarTest {
 
     @After
     public void tearDown() throws Exception {
-        ProgressBar.setDefaultPrintStream(System.out);
-        ProgressBar.disable();
+        StatusBar.setDefaultPrintStream(System.out);
+        StatusBar.disable();
     }
 }
