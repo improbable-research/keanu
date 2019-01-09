@@ -123,7 +123,7 @@ class VertexProcessor {
             return "cast_to_double_vertex(" + pythonParameter + ")";
         } else if (IntegerVertex.class.isAssignableFrom(parameterType)) {
             return "cast_to_integer_vertex(" + pythonParameter + ")";
-        } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
+        } else if (BooleanVertex.class.isAssignableFrom(parameterType)) {
             return "cast_to_boolean_vertex(" + pythonParameter + ")";
         } else if (Vertex.class.isAssignableFrom(parameterType)) {
             return "cast_to_vertex(" + pythonParameter + ")";
