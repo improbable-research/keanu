@@ -224,7 +224,7 @@ class Tree implements SaveStatistics {
         final int acceptedLeapfrogCount = logU <= logOfMasterPMinusMomentum ? 1 : 0;
         final boolean shouldContinueFlag = logU < DELTA_MAX + logOfMasterPMinusMomentum;
 
-        final Map<VariableReference, ?> sampleAtAcceptedPosition = takeSample(sampleFromVertices);
+        final Map<VariableReference, ?> sampleAtAcceptedPosition = takeSample((List<? extends Variable<Object>>)sampleFromVertices);
 
         final double deltaLikelihoodOfLeapfrog = Math.min(
             1.0,

@@ -16,8 +16,7 @@ public interface SamplingAlgorithm {
         return sampleFromVertices.stream().collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
     }
 
-//    static <T> Map<VariableReference, T> takeSample(List<? extends Variable<T>> sampleFromVertices) {
-    static Map<VariableReference, Object> takeSample(List<? extends Variable> sampleFromVertices) {
+    static <T> Map<VariableReference, T> takeSample(List<? extends Variable<T>> sampleFromVertices) {
         return sampleFromVertices.stream().collect(Collectors.toMap(Variable::getReference, Variable::getValue));
     }
 

@@ -12,11 +12,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -116,7 +112,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         final List<? extends Variable<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVariables();
 
-        Map<VariableReference, Object> startingSample = SamplingAlgorithm.takeSample(latentVertices);
+        Map<VariableReference, DoubleTensor> startingSample = SamplingAlgorithm.takeSample(latentVertices);
         Map<VariableReference, DoubleTensor> position = startingSample.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (DoubleTensor) e.getValue()));
         Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
         Map<? extends VariableReference, DoubleTensor> gradient = bayesNet.logProbGradients();
@@ -140,7 +136,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         resetVariableValue(sampleFromVertices, position);
 
-        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
+        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample((List<? extends Variable<Object>>)sampleFromVertices));
 
         return new NUTSSampler(
             sampleFromVertices,
