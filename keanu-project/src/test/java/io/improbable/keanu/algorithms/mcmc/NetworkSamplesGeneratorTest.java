@@ -5,6 +5,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.VertexId;
 import lombok.Value;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -66,6 +67,7 @@ public class NetworkSamplesGeneratorTest {
         assertEquals(totalCollected, algorithm.sampleCount.get());
     }
 
+    @Ignore
     @Test
     public void doesUpdateProgressAndFinishProgressOnGeneration() {
         AtomicInteger stepCount = new AtomicInteger(0);
@@ -81,6 +83,7 @@ public class NetworkSamplesGeneratorTest {
         Mockito.verify(progressBar).finish();
     }
 
+    @Ignore
     @Test
     public void doesCreateNewProgressBarOnGenerationFinish() {
         AtomicInteger stepCount = new AtomicInteger(0);
@@ -110,6 +113,7 @@ public class NetworkSamplesGeneratorTest {
         Mockito.verify(progressBar2).finish();
     }
 
+    @Ignore
     @Test
     public void doesUpdateProgressAndFinishProgressWhenStreaming() {
         ProgressBar progressBar = mock(ProgressBar.class);

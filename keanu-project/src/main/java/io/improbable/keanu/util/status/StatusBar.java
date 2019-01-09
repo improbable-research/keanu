@@ -71,7 +71,7 @@ public class StatusBar {
         // Progress bar is disabled for testing.
         String disableProgressBar = System.getProperty("io.improbable.keanu.util.ProgressBar.disableProgressBar");
         if (disableProgressBar != null && disableProgressBar.equals("true")) {
-            ProgressBar.disable();
+            StatusBar.disable();
         }
         startUpdateThread();
     }
