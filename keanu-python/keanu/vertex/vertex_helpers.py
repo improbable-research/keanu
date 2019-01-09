@@ -1,6 +1,7 @@
 from .base import (Vertex, cast_tensor_arg_to_double, cast_tensor_arg_to_integer, cast_tensor_arg_to_bool)
 from keanu.tensor import Tensor
 from keanu.context import KeanuContext
+from keanu.infer_type import infer_type_and_execute
 
 k = KeanuContext()
 
@@ -8,8 +9,8 @@ def do_vertex_cast(vertex_ctor, value):
     return value if isinstance(value, Vertex) else vertex_ctor(value)
 
 
-def cast_to_vertex(input):
-    return input
+def do_generic_vertex_cast(ctors, value):
+    return value if isinstance(value, Vertex) else infer_type_and_execute(value, ctors)
 
 
 def cast_to_double_tensor(value):

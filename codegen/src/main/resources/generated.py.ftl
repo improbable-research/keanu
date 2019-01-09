@@ -10,7 +10,7 @@ from keanu.vartypes import (
 )
 from .vertex_helpers import (
     do_vertex_cast,
-    cast_to_vertex,
+    do_generic_vertex_cast,
     cast_to_double_tensor,
     cast_to_integer_tensor,
     cast_to_boolean_tensor,
@@ -34,6 +34,10 @@ def cast_to_integer_vertex(input):
 
 def cast_to_boolean_vertex(input):
     return do_vertex_cast(ConstantBoolean, input)
+
+
+def cast_to_vertex(input):
+    return do_generic_vertex_cast({bool: ConstantBoolean, int: ConstantInteger, float: ConstantDouble}, input)
 
 
 <#list imports as import>
