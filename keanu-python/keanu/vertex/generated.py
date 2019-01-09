@@ -1,6 +1,6 @@
 ## This is a generated file. DO NOT EDIT.
 
-from typing import Iterable
+from typing import Collection
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex, Double, Integer, Boolean, vertex_constructor_param_types
@@ -25,19 +25,19 @@ from .vertex_helpers import (
 context = KeanuContext()
 
 
-def cast_to_double_vertex(input):
+def cast_to_double_vertex(input: vertex_constructor_param_types) -> Vertex:
     return do_vertex_cast(ConstantDouble, input)
 
 
-def cast_to_integer_vertex(input):
+def cast_to_integer_vertex(input: vertex_constructor_param_types) -> Vertex:
     return do_vertex_cast(ConstantInteger, input)
 
 
-def cast_to_boolean_vertex(input):
+def cast_to_boolean_vertex(input: vertex_constructor_param_types) -> Vertex:
     return do_vertex_cast(ConstantBoolean, input)
 
 
-def cast_to_vertex(input):
+def cast_to_vertex(input: vertex_constructor_param_types) -> Vertex:
     return do_generic_vertex_cast({bool: ConstantBoolean, int: ConstantInteger, float: ConstantDouble}, input)
 
 
@@ -141,8 +141,8 @@ def BooleanIf(predicate: vertex_constructor_param_types, thn: vertex_constructor
     return Boolean(context.jvm_view().BooleanIfVertex, cast_to_vertex(predicate), cast_to_vertex(thn), cast_to_vertex(els))
 
 
-def BooleanProxy(shape: Iterable[int], label: str) -> Vertex:
-    return Boolean(context.jvm_view().BooleanProxyVertex, cast_to_long_list(shape), cast_to_string(label))
+def BooleanProxy(shape: Collection[int], label: str) -> Vertex:
+    return Boolean(context.jvm_view().BooleanProxyVertex, cast_to_long_array(shape), cast_to_string(label))
 
 
 def CastBoolean(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -189,12 +189,12 @@ def NotEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_typ
     return Boolean(context.jvm_view().NotEqualsVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
-def BooleanConcatenation(dimension: int, input: Iterable[vertex_constructor_param_types]) -> Vertex:
-    return Boolean(context.jvm_view().BooleanConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_list(input))
+def BooleanConcatenation(dimension: int, input: Collection[Vertex]) -> Vertex:
+    return Boolean(context.jvm_view().BooleanConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_array(input))
 
 
-def BooleanReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Iterable[int]) -> Vertex:
-    return Boolean(context.jvm_view().BooleanReshapeVertex, cast_to_vertex(input_vertex), cast_to_long_list(proposed_shape))
+def BooleanReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int]) -> Vertex:
+    return Boolean(context.jvm_view().BooleanReshapeVertex, cast_to_vertex(input_vertex), cast_to_long_array(proposed_shape))
 
 
 def BooleanSlice(input_vertex: vertex_constructor_param_types, dimension: int, index: int) -> Vertex:
@@ -208,14 +208,14 @@ def BooleanSlice(input_vertex: vertex_constructor_param_types, dimension: int, i
     return Boolean(context.jvm_view().BooleanSliceVertex, cast_to_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
 
 
-def BooleanTake(input_vertex: vertex_constructor_param_types, index: Iterable[int]) -> Vertex:
+def BooleanTake(input_vertex: vertex_constructor_param_types, index: Collection[int]) -> Vertex:
     """
     A vertex that extracts a scalar at a given index
     
     :param input_vertex: the input vertex to extract from
     :param index: the index to extract at
     """
-    return Boolean(context.jvm_view().BooleanTakeVertex, cast_to_vertex(input_vertex), cast_to_long_list(index))
+    return Boolean(context.jvm_view().BooleanTakeVertex, cast_to_vertex(input_vertex), cast_to_long_array(index))
 
 
 def Not(a: vertex_constructor_param_types) -> Vertex:
@@ -244,8 +244,8 @@ def DoubleIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_
     return Double(context.jvm_view().DoubleIfVertex, cast_to_vertex(predicate), cast_to_double_vertex(thn), cast_to_double_vertex(els))
 
 
-def DoubleProxy(shape: Iterable[int], label: str) -> Vertex:
-    return Double(context.jvm_view().DoubleProxyVertex, cast_to_long_list(shape), cast_to_string(label))
+def DoubleProxy(shape: Collection[int], label: str) -> Vertex:
+    return Double(context.jvm_view().DoubleProxyVertex, cast_to_long_array(shape), cast_to_string(label))
 
 
 def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -338,8 +338,8 @@ def Power(base: vertex_constructor_param_types, exponent: vertex_constructor_par
     return Double(context.jvm_view().PowerVertex, cast_to_double_vertex(base), cast_to_double_vertex(exponent))
 
 
-def Concatenation(dimension: int, operands: Iterable[vertex_constructor_param_types]) -> Vertex:
-    return Double(context.jvm_view().ConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_list(operands))
+def Concatenation(dimension: int, operands: Collection[Vertex]) -> Vertex:
+    return Double(context.jvm_view().ConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_array(operands))
 
 
 def Abs(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -442,8 +442,8 @@ def MatrixInverse(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().MatrixInverseVertex, cast_to_double_vertex(input_vertex))
 
 
-def Reshape(input_vertex: vertex_constructor_param_types, proposed_shape: Iterable[int]) -> Vertex:
-    return Double(context.jvm_view().ReshapeVertex, cast_to_double_vertex(input_vertex), cast_to_long_list(proposed_shape))
+def Reshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int]) -> Vertex:
+    return Double(context.jvm_view().ReshapeVertex, cast_to_double_vertex(input_vertex), cast_to_long_array(proposed_shape))
 
 
 def Round(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -495,14 +495,14 @@ def Sum(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().SumVertex, cast_to_double_vertex(input_vertex))
 
 
-def Take(input_vertex: vertex_constructor_param_types, index: Iterable[int]) -> Vertex:
+def Take(input_vertex: vertex_constructor_param_types, index: Collection[int]) -> Vertex:
     """
     A vertex that extracts a scalar at a given index
     
     :param input_vertex: the input vertex to extract from
     :param index: the index to extract at
     """
-    return Double(context.jvm_view().TakeVertex, cast_to_double_vertex(input_vertex), cast_to_long_list(index))
+    return Double(context.jvm_view().TakeVertex, cast_to_double_vertex(input_vertex), cast_to_long_array(index))
 
 
 def Tan(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -665,8 +665,8 @@ def ConstantInteger(constant: tensor_arg_types) -> Vertex:
     return Integer(context.jvm_view().ConstantIntegerVertex, cast_to_integer_tensor(constant))
 
 
-def IntegerProxy(tensor_shape: Iterable[int], label: str) -> Vertex:
-    return Integer(context.jvm_view().IntegerProxyVertex, cast_to_long_list(tensor_shape), cast_to_string(label))
+def IntegerProxy(tensor_shape: Collection[int], label: str) -> Vertex:
+    return Integer(context.jvm_view().IntegerProxyVertex, cast_to_long_array(tensor_shape), cast_to_string(label))
 
 
 def IntegerAddition(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -739,8 +739,8 @@ def IntegerPower(left: vertex_constructor_param_types, right: vertex_constructor
     return Integer(context.jvm_view().IntegerPowerVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerConcatenation(dimension: int, input: Iterable[vertex_constructor_param_types]) -> Vertex:
-    return Integer(context.jvm_view().IntegerConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_list(input))
+def IntegerConcatenation(dimension: int, input: Collection[Vertex]) -> Vertex:
+    return Integer(context.jvm_view().IntegerConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_array(input))
 
 
 def IntegerAbs(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -752,8 +752,8 @@ def IntegerAbs(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Integer(context.jvm_view().IntegerAbsVertex, cast_to_integer_vertex(input_vertex))
 
 
-def IntegerReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Iterable[int]) -> Vertex:
-    return Integer(context.jvm_view().IntegerReshapeVertex, cast_to_integer_vertex(input_vertex), cast_to_long_list(proposed_shape))
+def IntegerReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int]) -> Vertex:
+    return Integer(context.jvm_view().IntegerReshapeVertex, cast_to_integer_vertex(input_vertex), cast_to_long_array(proposed_shape))
 
 
 def IntegerSlice(input_vertex: vertex_constructor_param_types, dimension: int, index: int) -> Vertex:
@@ -776,14 +776,14 @@ def IntegerSum(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Integer(context.jvm_view().IntegerSumVertex, cast_to_integer_vertex(input_vertex))
 
 
-def IntegerTake(input_vertex: vertex_constructor_param_types, index: Iterable[int]) -> Vertex:
+def IntegerTake(input_vertex: vertex_constructor_param_types, index: Collection[int]) -> Vertex:
     """
     A vertex that extracts a scalar at a given index
     
     :param input_vertex: the input vertex to extract from
     :param index: the index to extract at
     """
-    return Integer(context.jvm_view().IntegerTakeVertex, cast_to_integer_vertex(input_vertex), cast_to_long_list(index))
+    return Integer(context.jvm_view().IntegerTakeVertex, cast_to_integer_vertex(input_vertex), cast_to_long_array(index))
 
 
 def Binomial(p: vertex_constructor_param_types, n: vertex_constructor_param_types) -> Vertex:

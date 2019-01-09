@@ -16,7 +16,7 @@ from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, n
 k = KeanuContext()
 
 vertex_operation_param_types = Union['Vertex', tensor_arg_types]
-vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_types]
+vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_types, str]
 
 
 class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):

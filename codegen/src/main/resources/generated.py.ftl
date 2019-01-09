@@ -1,6 +1,6 @@
 ## This is a generated file. DO NOT EDIT.
 
-from typing import Iterable
+from typing import Collection
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex, Double, Integer, Boolean, vertex_constructor_param_types
@@ -25,19 +25,19 @@ from .vertex_helpers import (
 context = KeanuContext()
 
 
-def cast_to_double_vertex(input):
+def cast_to_double_vertex(input: vertex_constructor_param_types) -> Vertex:
     return do_vertex_cast(ConstantDouble, input)
 
 
-def cast_to_integer_vertex(input):
+def cast_to_integer_vertex(input: vertex_constructor_param_types) -> Vertex:
     return do_vertex_cast(ConstantInteger, input)
 
 
-def cast_to_boolean_vertex(input):
+def cast_to_boolean_vertex(input: vertex_constructor_param_types) -> Vertex:
     return do_vertex_cast(ConstantBoolean, input)
 
 
-def cast_to_vertex(input):
+def cast_to_vertex(input: vertex_constructor_param_types) -> Vertex:
     return do_generic_vertex_cast({bool: ConstantBoolean, int: ConstantInteger, float: ConstantDouble}, input)
 
 

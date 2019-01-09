@@ -140,11 +140,11 @@ class VertexProcessor {
         } else if (String.class.isAssignableFrom(parameterType)) {
             return "cast_to_string(" + pythonParameter + ")";
         } else if (Long[].class.isAssignableFrom(parameterType) || long[].class.isAssignableFrom(parameterType)) {
-            return "cast_to_long_list(" + pythonParameter + ")";
+            return "cast_to_long_array(" + pythonParameter + ")";
         } else if (Integer[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
-            return "cast_to_int_list(" + pythonParameter + ")";
+            return "cast_to_int_array(" + pythonParameter + ")";
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
-            return "cast_to_vertex_list(" + pythonParameter + ")";
+            return "cast_to_vertex_array(" + pythonParameter + ")";
         } else {
             throw new IllegalArgumentException("Failed to Encode " + pythonParameter + " of type: " + parameterType);
         }
@@ -177,9 +177,9 @@ class VertexProcessor {
             return "str";
         } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
             long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
-            return "Iterable[int]";
+            return "Collection[int]";
         } else if (Vertex[].class.isAssignableFrom(parameterType)) {
-            return "Iterable[vertex_constructor_param_types]";
+            return "Collection[Vertex]";
         } else {
             throw new NotImplementedException(String.format("Mapping from Java type %s is not defined.", parameterType.getName()));
         }
