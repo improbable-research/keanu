@@ -156,7 +156,7 @@ compileTestKotlin {
 if (project.hasProperty("signing.keyId")) {
     apply plugin: 'signing'
     signing {
-        sign configurations.archives
+        sign publishing.publications.mavenJava
     }
 }
 
