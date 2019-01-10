@@ -420,12 +420,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public BooleanTensor lessThan(int value) {
-        return fromMask(tensor.lt(value), copyOf(getShape(), getShape().length));
+        return fromMask(tensor.lt(value), copyOf(getShape(), getRank()));
     }
 
     @Override
     public BooleanTensor lessThanOrEqual(int value) {
-        return fromMask(tensor.lte(value), copyOf(getShape(), getShape().length));
+        return fromMask(tensor.lte(value), copyOf(getShape(), getRank()));
     }
 
     @Override
@@ -459,12 +459,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public BooleanTensor greaterThan(int value) {
-        return fromMask(tensor.gt(value), copyOf(getShape(), getShape().length));
+        return fromMask(tensor.gt(value), copyOf(getShape(), getRank()));
     }
 
     @Override
     public BooleanTensor greaterThanOrEqual(int value) {
-        return fromMask(tensor.gte(value), copyOf(getShape(), getShape().length));
+        return fromMask(tensor.gte(value), copyOf(getShape(), getRank()));
     }
 
     @Override
@@ -617,7 +617,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public BooleanTensor elementwiseEquals(Integer value) {
-        return fromMask(tensor.eq(value), copyOf(getShape(), getShape().length));
+        return fromMask(tensor.eq(value), copyOf(getShape(), getRank()));
     }
 
     @Override

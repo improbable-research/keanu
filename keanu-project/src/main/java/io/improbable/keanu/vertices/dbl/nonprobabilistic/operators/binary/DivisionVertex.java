@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkIsBroadcastable;
 
 @DisplayInformationForOutput(displayName = "/")
 public class DivisionVertex extends DoubleBinaryOpVertex {
@@ -25,7 +25,7 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     @ExportVertexToPythonBindings
     public DivisionVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
                           @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
-        super(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right);
+        super(checkIsBroadcastable(left.getShape(), right.getShape()), left, right);
     }
 
     @Override
@@ -36,14 +36,14 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
 
-        PartialDerivative fromLeft = AutoDiffBroadcast.correctForScalarPartialForward(dLeftWrtInput, left.getShape(), this.getShape());
-        PartialDerivative fromRight = AutoDiffBroadcast.correctForScalarPartialForward(dRightWrtInput, right.getShape(), this.getShape());
+        PartialDerivative fromLeft = AutoDiffBroadcast.correctForBroadcastPartialForward(dLeftWrtInput, left.getShape(), this.getShape());
+        PartialDerivative fromRight = AutoDiffBroadcast.correctForBroadcastPartialForward(dRightWrtInput, right.getShape(), this.getShape());
 
         // dc = (B * da - A * db) / B^2;
-        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue());
-        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue());
+        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue(), this.getRank());
+        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue(), this.getRank());
 
-        return partialsFromLeft.subtract(partialsFromRight).divideByAlongOfDimensions(right.getValue().pow(2));
+        return partialsFromLeft.subtract(partialsFromRight).divideByAlongOfDimensions(right.getValue().pow(2), this.getRank());
     }
 
     @Override
@@ -60,8 +60,8 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         PartialDerivative dOutputsWrtRight = derivativeOfOutputWithRespectToSelf
             .multiplyAlongWrtDimensions(dOutWrtRight);
 
-        PartialDerivative toLeft = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
-        PartialDerivative toRight = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());
+        PartialDerivative toLeft = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtLeft, this.getShape(), left.getShape());
+        PartialDerivative toRight = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtRight, this.getShape(), right.getShape());
 
         partials.put(left, toLeft);
         partials.put(right, toRight);

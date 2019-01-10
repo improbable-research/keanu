@@ -76,4 +76,14 @@ public class MultiplicationVertexTest {
             DoubleVertex::multiply
         );
     }
+
+    @Test
+    public void finiteDifferenceMatchesElementwise() {
+        BinaryOperationTestHelpers.finiteDifferenceMatchesElementwise(DoubleVertex::times);
+    }
+
+    @Test
+    public void finiteDifferenceMatchesSimpleBroadcast() {
+        BinaryOperationTestHelpers.finiteDifferenceMatchesBroadcast(DoubleVertex::times);
+    }
 }
