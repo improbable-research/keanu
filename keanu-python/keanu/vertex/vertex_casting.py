@@ -25,7 +25,6 @@ def do_inferred_vertex_cast(ctors: Dict[type, Callable], value: vertex_construct
         raise NotImplementedError("Can't cast this type to a vertex. Was given {}".format(type(value)))
 
 
-
 def cast_to_double_tensor(value: tensor_arg_types) -> Tensor:
     return value if isinstance(value, Tensor) else Tensor(cast_tensor_arg_to_double(value))
 
