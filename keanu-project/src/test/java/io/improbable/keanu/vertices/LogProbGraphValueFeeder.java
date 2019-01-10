@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices;
 
 /**
  * Prematurely feeds values to a placeholder in a LogProbGraph for testing.
- * Normally values would be fed after compilation.
+ * Normally values would be fed after LogProbGraph is converted to a computation graph.
  */
 public class LogProbGraphValueFeeder {
 
