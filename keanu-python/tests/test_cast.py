@@ -1,4 +1,4 @@
-from keanu.vertex.vertex_helpers import (cast_tensor_arg_to_double, cast_tensor_arg_to_integer,
+from keanu.vertex.vertex_casting import (cast_tensor_arg_to_double, cast_tensor_arg_to_integer,
                                          cast_tensor_arg_to_boolean)
 from keanu.vertex import cast_to_boolean_vertex, cast_to_integer_vertex, cast_to_double_vertex
 from keanu.vartypes import (primitive_types, numpy_types, pandas_types)
