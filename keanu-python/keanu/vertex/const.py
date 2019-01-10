@@ -6,7 +6,7 @@ from keanu.tensor import Tensor
 from keanu.vartypes import (numpy_types, tensor_arg_types, runtime_numpy_types, runtime_pandas_types,
                             runtime_primitive_types, runtime_bool_types, runtime_int_types, runtime_float_types)
 from .base import Vertex
-from .generated import ConstantBool, ConstantInteger, ConstantDouble
+from .generated import ConstantBoolean, ConstantInteger, ConstantDouble
 
 
 def Const(t: tensor_arg_types) -> Vertex:
@@ -29,7 +29,7 @@ def Const(t: tensor_arg_types) -> Vertex:
 
 def __infer_const_ctor_from_ndarray(ndarray: numpy_types) -> Callable:
     if np.issubdtype(ndarray.dtype, np.bool_):
-        return ConstantBool
+        return ConstantBoolean
     elif np.issubdtype(ndarray.dtype, np.integer):
         return ConstantInteger
     elif np.issubdtype(ndarray.dtype, np.floating):
@@ -40,7 +40,7 @@ def __infer_const_ctor_from_ndarray(ndarray: numpy_types) -> Callable:
 
 def __infer_const_ctor_from_scalar(scalar: np.generic) -> Callable:
     if isinstance(scalar, runtime_bool_types):
-        return ConstantBool
+        return ConstantBoolean
     elif isinstance(scalar, runtime_int_types):
         return ConstantInteger
     elif isinstance(scalar, runtime_float_types):

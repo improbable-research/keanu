@@ -8,7 +8,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
@@ -119,13 +119,13 @@ public class TensorflowGraphConverterTest {
 
     @Test
     public void canRunTensorAnd() {
-        BoolVertex A = new BernoulliVertex(new long[]{2, 2}, 0.5);
+        BooleanVertex A = new BernoulliVertex(new long[]{2, 2}, 0.5);
         A.setValue(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
 
-        BoolVertex B = new BernoulliVertex(new long[]{2, 2}, 0.75);
+        BooleanVertex B = new BernoulliVertex(new long[]{2, 2}, 0.75);
         B.setValue(BooleanTensor.create(new boolean[]{false, false, true, true}, 2, 2));
 
-        BoolVertex C = A.and(B).not();
+        BooleanVertex C = A.and(B).not();
 
         ComputableGraph graph = TensorflowComputableGraph.convert(C.getConnectedGraph());
 

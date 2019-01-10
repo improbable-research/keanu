@@ -9,7 +9,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexUnaryOp;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
@@ -116,7 +116,7 @@ public class TensorflowComputableGraphConverter {
         //constants
         opMappers.put(ConstantDoubleVertex.class, (vertex, lookup, graphBuilder) -> createConstant(vertex, graphBuilder));
         opMappers.put(ConstantIntegerVertex.class, (vertex, lookup, graphBuilder) -> createConstant(vertex, graphBuilder));
-        opMappers.put(ConstantBoolVertex.class, (vertex, lookup, graphBuilder) -> createConstant(vertex, graphBuilder));
+        opMappers.put(ConstantBooleanVertex.class, (vertex, lookup, graphBuilder) -> createConstant(vertex, graphBuilder));
 
         //special case ops
         opMappers.put(DoubleIfVertex.class, TensorflowComputableGraphConverter::createDoubleIf);

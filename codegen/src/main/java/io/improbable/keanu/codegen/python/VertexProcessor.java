@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import lombok.Getter;
@@ -97,7 +97,7 @@ class VertexProcessor {
             return "Double";
         } else if (IntegerVertex.class.isAssignableFrom(javaClass)) {
             return "Integer";
-        } else if (BoolVertex.class.isAssignableFrom(javaClass)) {
+        } else if (BooleanVertex.class.isAssignableFrom(javaClass)) {
             return "Bool";
         } else {
             return "Vertex";
@@ -119,7 +119,7 @@ class VertexProcessor {
             return "cast_to_double(" + pythonParameter + ")";
         } else if (IntegerVertex.class.isAssignableFrom(parameterType)) {
             return "cast_to_integer(" + pythonParameter + ")";
-        } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
+        } else if (BooleanVertex.class.isAssignableFrom(parameterType)) {
             return "cast_to_bool(" + pythonParameter + ")";
         } else {
             return pythonParameter;

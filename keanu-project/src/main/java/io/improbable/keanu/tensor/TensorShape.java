@@ -179,6 +179,10 @@ public class TensorShape {
         return increaseRankByPaddingValue(lowRankTensorShape, desiredRank, false);
     }
 
+    public static long[] calculateShapeForLengthOneBroadcast(long[] shape1, long[] shape2) {
+        return (shape1.length >= shape2.length) ? shape1 : shape2;
+    }
+
     private static long[] increaseRankByPaddingValue(long[] lowRankTensorShape, int desiredRank, boolean append) {
         long[] paddedShape = new long[desiredRank];
         if (lowRankTensorShape.length > desiredRank) {

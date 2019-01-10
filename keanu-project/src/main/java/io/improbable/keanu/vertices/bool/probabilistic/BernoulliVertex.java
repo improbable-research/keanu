@@ -13,7 +13,7 @@ import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.PlaceHolderBoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -28,7 +28,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor>, LogProbAsAGraphable {
+public class BernoulliVertex extends BooleanVertex implements ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor>, LogProbAsAGraphable {
 
     private final DoubleVertex probTrue;
     private final static String PROBTRUE_NAME = "probTrue";

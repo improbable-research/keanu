@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -169,7 +169,7 @@ public class DotSaver implements NetworkSaver {
     }
 
     @Override
-    public void saveValue(BoolVertex vertex) {
+    public void saveValue(BooleanVertex vertex) {
         setDotLabelWithValue(vertex);
         graphEdges.addAll(getParentEdges(vertex));
     }

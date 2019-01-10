@@ -7,30 +7,30 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class ConstantBoolVertex extends BoolVertex implements ConstantVertex, NonProbabilistic<BooleanTensor> {
+public class ConstantBooleanVertex extends BooleanVertex implements ConstantVertex, NonProbabilistic<BooleanTensor> {
 
-    public static final BoolVertex TRUE = new ConstantBoolVertex(true);
-    public static final BoolVertex FALSE = new ConstantBoolVertex(false);
+    public static final BooleanVertex TRUE = new ConstantBooleanVertex(true);
+    public static final BooleanVertex FALSE = new ConstantBooleanVertex(false);
     private final static String CONSTANT_NAME = "constant";
 
     @ExportVertexToPythonBindings
-    public ConstantBoolVertex(@LoadVertexParam(CONSTANT_NAME) BooleanTensor constant) {
+    public ConstantBooleanVertex(@LoadVertexParam(CONSTANT_NAME) BooleanTensor constant) {
         super(constant.getShape());
         setValue(constant);
     }
 
-    public ConstantBoolVertex(boolean constant) {
+    public ConstantBooleanVertex(boolean constant) {
         this(BooleanTensor.scalar(constant));
     }
 
-    public ConstantBoolVertex(boolean[] vector) {
+    public ConstantBooleanVertex(boolean[] vector) {
         this(BooleanTensor.create(vector));
     }
 
-    public ConstantBoolVertex(boolean[] data, long[] shape) {
+    public ConstantBooleanVertex(boolean[] data, long[] shape) {
         this(BooleanTensor.create(data, shape));
     }
 

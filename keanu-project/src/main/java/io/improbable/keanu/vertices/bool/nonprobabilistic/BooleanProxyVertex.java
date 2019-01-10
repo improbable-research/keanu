@@ -9,12 +9,12 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVertex>, NonProbabilistic<BooleanTensor> {
+public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<BooleanVertex>, NonProbabilistic<BooleanTensor> {
 
     private final static String LABEL_NAME = "label";
 
@@ -24,16 +24,16 @@ public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVerte
      *
      * @param label The label for this Vertex (all Proxy Vertices must be labelled)
      */
-    public BoolProxyVertex(VertexLabel label) {
+    public BooleanProxyVertex(VertexLabel label) {
         this(Tensor.SCALAR_SHAPE, label);
     }
 
-    public BoolProxyVertex(long[] shape, VertexLabel label) {
+    public BooleanProxyVertex(long[] shape, VertexLabel label) {
         super(shape);
         this.setLabel(label);
     }
 
-    public BoolProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) String label) {
+    public BooleanProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_NAME) String label) {
         this(shape, new VertexLabel(label));
     }
 
@@ -48,13 +48,13 @@ public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVerte
     }
 
     @Override
-    public void setParent(BoolVertex newParent) {
+    public void setParent(BooleanVertex newParent) {
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(getShape(), newParent.getShape());
         setParents(newParent);
     }
 
-    public BoolVertex getParent() {
-        return (BoolVertex) Iterables.getOnlyElement(getParents(), null);
+    public BooleanVertex getParent() {
+        return (BooleanVertex) Iterables.getOnlyElement(getParents(), null);
     }
 
     @Override

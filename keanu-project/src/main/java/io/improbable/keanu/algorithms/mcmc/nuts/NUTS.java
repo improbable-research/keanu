@@ -1,8 +1,10 @@
-package io.improbable.keanu.algorithms.mcmc;
+package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.Statistics;
+import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
@@ -13,11 +15,13 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
 
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
@@ -30,6 +34,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     private static final int DEFAULT_ADAPT_COUNT = 1000;
     private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.65;
 
+    private final Statistics statistics = new Statistics(Metrics.values());
+
+    public enum Metrics {
+        STEPSIZE, LOG_PROB, MEAN_TREE_ACCEPT, TREE_SIZE
+    }
+
     public static NUTS withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
     }
@@ -41,42 +51,38 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     }
 
     @Getter
-    @Setter
     @Builder.Default
     private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
     //The number of samples for which the step size will be tuned. For the remaining samples
     //in which it is not tuned, the step size will be frozen to its last calculated value
     @Getter
-    @Setter
     @Builder.Default
     private int adaptCount = DEFAULT_ADAPT_COUNT;
 
-    //Determines whether the step size will adapt during the first adaptCount samples
+    //The target acceptance probability, a suggested value of this is 0.65,
+    //Beskos et al., 2010; Neal, 2011
+    @Builder.Default
     @Getter
-    @Setter
+    private double targetAcceptanceProb = DEFAULT_TARGET_ACCEPTANCE_PROB;
+
+    //Determines whether the step size wil
+    // l adapt during the first adaptCount samples
     @Builder.Default
     private boolean adaptEnabled = true;
 
     //Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.
-    @Getter
-    @Setter
     @Builder.Default
     private Double initialStepSize = null;
 
-    //The target acceptance probability, a suggested value of this is 0.65,
-    //Beskos et al., 2010; Neal, 2011
-    @Getter
-    @Setter
-    @Builder.Default
-    private double targetAcceptanceProb = DEFAULT_TARGET_ACCEPTANCE_PROB;
-
     //The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This
     //will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample.
-    @Getter
-    @Setter
     @Builder.Default
     private int maxTreeHeight = 10;
+
+    //Sets whether or not to save debug STATISTICS. The STATISTICS available are: Step size, Log Prob, Mean Tree Acceptance Prob, Tree Size.
+    @Builder.Default
+    private boolean saveStatistics = false;
 
     /**
      * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
@@ -109,14 +115,13 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         final LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesNet.getLatentOrObservedVertices(), latentVertices);
         List<Vertex> probabilisticVertices = bayesNet.getLatentOrObservedVertices();
 
-        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+        Map<VertexId, DoubleTensor> position = latentVertices.stream().collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
         Map<VertexId, DoubleTensor> momentum = new HashMap<>();
-        Map<VertexId, DoubleTensor> position = new HashMap<>();
-        cachePosition(latentVertices, position);
+        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
         double initialLogOfMasterP = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
 
-        double stepSize = (initialStepSize == null) ? NUTSSampler.findStartingStepSize(position,
+        double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(position,
             gradient,
             latentVertices,
             probabilisticVertices,
@@ -125,31 +130,15 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             random
         ) : initialStepSize;
 
-        resetVertexValue(sampleFromVertices, position);
-
-        NUTSSampler.AutoTune autoTune = new NUTSSampler.AutoTune(
-            stepSize,
+        Stepsize stepsize = new Stepsize(
+            startingStepSize,
             targetAcceptanceProb,
-            Math.log(stepSize),
             adaptCount
         );
 
-        NUTSSampler.BuiltTree tree = new NUTSSampler.BuiltTree(
-            position,
-            gradient,
-            momentum,
-            position,
-            gradient,
-            momentum,
-            position,
-            gradient,
-            initialLogOfMasterP,
-            takeSample(sampleFromVertices),
-            1,
-            true,
-            0,
-            1
-        );
+        resetVertexValue(sampleFromVertices, position);
+
+        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
 
         return new NUTSSampler(
             sampleFromVertices,
@@ -157,35 +146,17 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             probabilisticVertices,
             logProbGradientCalculator,
             adaptEnabled,
-            autoTune,
+            stepsize,
             tree,
-            stepSize,
             maxTreeHeight,
-            random
+            random,
+            statistics,
+            saveStatistics
         );
     }
 
-    private static void cachePosition(List<Vertex<DoubleTensor>> latentVertices, Map<VertexId, DoubleTensor> position) {
-        for (Vertex<DoubleTensor> vertex : latentVertices) {
-            position.put(vertex.getId(), vertex.getValue());
-        }
-    }
-
-    /**
-     * This is meant to be used for tracking a sample while building tree.
-     *
-     * @param sampleFromVertices take samples from these vertices
-     */
-    private static Map<VertexId, ?> takeSample(List<? extends Vertex> sampleFromVertices) {
-        Map<VertexId, ?> sample = new HashMap<>();
-        for (Vertex vertex : sampleFromVertices) {
-            putValue(vertex, sample);
-        }
-        return sample;
-    }
-
-    private static <T> void putValue(Vertex<T> vertex, Map<VertexId, ?> target) {
-        ((Map<VertexId, T>) target).put(vertex.getId(), vertex.getValue());
+    public Statistics getStatistics() {
+        return statistics;
     }
 
     private static void resetVertexValue(List<? extends Vertex> sampleFromVertices, Map<VertexId, DoubleTensor> previousPosition) {
