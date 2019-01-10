@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.experimental.UtilityClass;
 
@@ -27,30 +28,32 @@ public class DifferentiableChecker {
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
 
-            if (!visiting.isDifferentiable()) {
-                if (isVertexConstant(visiting, constantValueVerticesCache)) {
-                    continue;
-                } else {
-                    return false;
-                }
+            if (isNonDiffableAndNotConstant(visiting, constantValueVerticesCache)) {
+                return false;
             }
 
-            Collection<Vertex> nextVertices = visiting.getParents();
-            for (Vertex next : nextVertices) {
-                if (!queued.contains(next) && !constantValueVerticesCache.contains(next)) {
-                    queue.offer(next);
-                    queued.add(next);
+            if (visiting.isDifferentiable()) {
+                Collection<Vertex> nextVertices = visiting.getParents();
+                for (Vertex next : nextVertices) {
+                    if (!queued.contains(next) && !isValueKnownToBeConstant(next, constantValueVerticesCache)) {
+                        queue.offer(next);
+                        queued.add(next);
+                    }
                 }
             }
         }
         return true;
     }
 
+    private boolean isNonDiffableAndNotConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
+        return !vertex.isDifferentiable() && !isVertexConstant(vertex, constantValueVerticesCache);
+    }
+
     private boolean isVertexConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
-        if(vertex.isProbabilistic() && !vertex.isObserved()) {
+        if (vertex.isProbabilistic() && !vertex.isObserved()) {
             return false;
         }
-        if(!isVertexParentsValueConstant(vertex, constantValueVerticesCache)) {
+        if (!isVertexParentsValueConstant(vertex, constantValueVerticesCache)) {
             return false;
         }
         return true;
@@ -64,27 +67,31 @@ public class DifferentiableChecker {
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
 
-            if (constantValueVerticesCache.contains(visiting)) {
-                continue;
+            if (isUnobservedProbabilistic(visiting)) {
+                return false;
             }
 
-            if (visiting.isProbabilistic()) {
-                if (visiting.isObserved()) {
-                    continue;
-                } else {
-                    return false;
-                }
-            }
-
-            Collection<Vertex> nextVertices = visiting.getParents();
-            for (Vertex next : nextVertices) {
-                if (!queued.contains(next)) {
-                    queue.offer(next);
-                    queued.add(next);
+            if (!isValueKnownToBeConstant(vertex, constantValueVerticesCache)) {
+                Collection<Vertex> nextVertices = visiting.getParents();
+                for (Vertex next : nextVertices) {
+                    if (!queued.contains(next)) {
+                        queue.offer(next);
+                        queued.add(next);
+                    }
                 }
             }
         }
         constantValueVerticesCache.addAll(queued);
         return true;
+    }
+
+    // We know whether these are constant. For cases such as a MultiplicationVertex we would need to
+    // explore its parents to ensure its constant.
+    private boolean isValueKnownToBeConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
+        return vertex instanceof ConstantVertex || constantValueVerticesCache.contains(vertex) || vertex.isObserved();
+    }
+
+    private boolean isUnobservedProbabilistic(Vertex vertex) {
+        return vertex.isProbabilistic() && !vertex.isObserved();
     }
 }
