@@ -7,7 +7,6 @@ import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGra
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
@@ -77,11 +76,6 @@ class NUTSSampler implements SamplingAlgorithm {
         step();
         addSampleFromCache(samples, tree.getSampleAtAcceptedPosition());
         logOfMasterPForEachSample.add(tree.getLogOfMasterPAtAcceptedPosition());
-    }
-
-    @Override
-    public void sampleLegacy(Map<VertexId, List<?>> samples, List<Double> logOfMasterPForEachSample) {
-
     }
 
     @Override

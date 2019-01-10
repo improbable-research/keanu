@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-import io.improbable.keanu.vertices.Vertex;
+
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,8 +15,8 @@ public final class SingleVariableSelector implements MHStepVariableSelector {
     }
 
     @Override
-    public Set<Vertex> select(List<? extends Vertex> latentVertices, int sampleNumber) {
-        Vertex chosenVertex = latentVertices.get(sampleNumber % latentVertices.size());
+    public Set<? extends Variable> select(List<? extends Variable> latentVertices, int sampleNumber) {
+        Variable chosenVertex = latentVertices.get(sampleNumber % latentVertices.size());
         return Collections.singleton(chosenVertex);
     }
 }

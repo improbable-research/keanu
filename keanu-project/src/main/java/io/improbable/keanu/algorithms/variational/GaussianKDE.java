@@ -3,6 +3,8 @@ package io.improbable.keanu.algorithms.variational;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.VertexSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -27,8 +29,9 @@ public class GaussianKDE {
 
     public static KDEVertex approximate(DoubleVertex vertex, Integer nSamples) {
         BayesianNetwork network = new BayesianNetwork(vertex.getConnectedGraph());
+        ProbabilisticGraph graph = new KeanuProbabilisticGraph(network);
         DoubleVertexSamples vertexSamples = MetropolisHastings.withDefaultConfig()
-            .getPosteriorSamples(network, ImmutableList.of(vertex), nSamples).getDoubleTensorSamples(vertex);
+            .getPosteriorSamples(graph, ImmutableList.of(vertex), nSamples).getDoubleTensorSamples(vertex);
         return approximate(vertexSamples);
     }
 

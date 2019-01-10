@@ -2,12 +2,11 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,7 +61,7 @@ public class SimulatedAnnealing {
     @Builder.Default
     private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
 
-    public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
+    public NetworkState getMaxAPosteriori(ProbabilisticGraph bayesNet,
                                           int sampleCount) {
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
         return getMaxAPosteriori(bayesNet, sampleCount, schedule);
@@ -76,7 +75,7 @@ public class SimulatedAnnealing {
      * @param annealingSchedule the schedule to update T (temperature) as a function of sample number.
      * @return the NetworkState that represents the Max A Posteriori
      */
-    public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
+    public NetworkState getMaxAPosteriori(ProbabilisticGraph bayesNet,
                                           int sampleCount,
                                           AnnealingSchedule annealingSchedule) {
 
@@ -86,10 +85,10 @@ public class SimulatedAnnealing {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        Map<VertexId, ?> maxSamplesByVertex = new HashMap<>();
-        List<Vertex> latentVertices = bayesNet.getLatentVertices();
+        Map<VariableReference, ?> maxSamplesByVertex = new HashMap<>();
+        List<? extends Variable> latentVertices = bayesNet.getLatentVariables();
 
-        double logProbabilityBeforeStep = bayesNet.getLogOfMasterP();
+        double logProbabilityBeforeStep = bayesNet.logProb();
         double maxLogP = logProbabilityBeforeStep;
         setSamplesAsMax(maxSamplesByVertex, latentVertices);
 
@@ -102,7 +101,7 @@ public class SimulatedAnnealing {
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-            Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
+            Variable<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
             logProbabilityBeforeStep = mhStep.step(
@@ -120,16 +119,16 @@ public class SimulatedAnnealing {
         return new SimpleNetworkState(mapByVariableReference(maxSamplesByVertex));
     }
 
-    private <T> Map<VariableReference, T> mapByVariableReference(Map<VertexId, T> legacyMap) {
+    private <T> Map<VariableReference, T> mapByVariableReference(Map<VariableReference, T> legacyMap) {
         return legacyMap.entrySet().stream().collect(Collectors.toMap(k -> (VariableReference) k.getKey(), Map.Entry::getValue));
     }
 
-    private static void setSamplesAsMax(Map<VertexId, ?> samples, List<? extends Vertex> fromVertices) {
-        fromVertices.forEach(vertex -> setSampleForVertex((Vertex<?>) vertex, samples));
+    private static void setSamplesAsMax(Map<VariableReference, ?> samples, List<? extends Variable> fromVertices) {
+        fromVertices.forEach(vertex -> setSampleForVertex((Variable<?>) vertex, samples));
     }
 
-    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<VertexId, ?> samples) {
-        ((Map<VertexId, ? super T>) samples).put(vertex.getId(), vertex.getValue());
+    private static <T> void setSampleForVertex(Variable<T> vertex, Map<VariableReference, ?> samples) {
+        ((Map<VariableReference, ? super T>) samples).put(vertex.getReference(), vertex.getValue());
     }
 
     /**
