@@ -44,8 +44,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     @Override
     protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dBaseWrtInput, PartialDerivative dExponentWrtInput) {
 
-        PartialDerivative fromBase = AutoDiffBroadcast.correctForScalarPartialForward(dBaseWrtInput, left.getShape(), this.getShape());
-        PartialDerivative fromExponent = AutoDiffBroadcast.correctForScalarPartialForward(dExponentWrtInput, right.getShape(), this.getShape());
+        PartialDerivative fromBase = AutoDiffBroadcast.correctForBroadcastPartialForward(dBaseWrtInput, left.getShape(), this.getShape());
+        PartialDerivative fromExponent = AutoDiffBroadcast.correctForBroadcastPartialForward(dExponentWrtInput, right.getShape(), this.getShape());
 
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
         PartialDerivative partialsFromBase;
@@ -82,8 +82,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         PartialDerivative dOutputsWrtBase = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase);
         PartialDerivative dOutputsWrtExponent = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent);
 
-        PartialDerivative toBase = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtBase, this.getShape(), getBase().getShape());
-        PartialDerivative toExponent = AutoDiffBroadcast.correctForScalarPartialReverse(dOutputsWrtExponent, this.getShape(), getExponent().getShape());
+        PartialDerivative toBase = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtBase, this.getShape(), getBase().getShape());
+        PartialDerivative toExponent = AutoDiffBroadcast.correctForBroadcastPartialReverse(dOutputsWrtExponent, this.getShape(), getExponent().getShape());
 
         partials.put(getBase(), toBase);
         partials.put(getExponent(), toExponent);

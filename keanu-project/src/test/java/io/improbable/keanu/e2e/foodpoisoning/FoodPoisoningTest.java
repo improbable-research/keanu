@@ -10,7 +10,7 @@ import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -102,7 +102,7 @@ public class FoodPoisoningTest {
             BernoulliVertex didEatLamb = plate.add(didEatLambLabel, new BernoulliVertex(0.4));
             BernoulliVertex didEatPoo = plate.add(didEatPooLabel, new BernoulliVertex(0.4));
 
-            BoolVertex ingestedPathogen =
+            BooleanVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
                     didEatLamb.and(infectedLamb).or(
                         didEatPoo.and(infectedToilet)

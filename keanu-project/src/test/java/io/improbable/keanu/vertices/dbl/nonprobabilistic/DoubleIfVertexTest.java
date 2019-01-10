@@ -5,8 +5,8 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -24,7 +24,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromTruePredicate() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true, true}, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, true, true, true}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
@@ -56,7 +56,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromTruePredicateDifferentRankOf() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true, false, true, true, true, false}, 2, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, true, true, false, true, true, true, false}, 2, 2, 2));
 
         UniformVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.scalar(5.0));
@@ -91,7 +91,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromFalsePredicate() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{false, false, false, false}, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{false, false, false, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
@@ -123,7 +123,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromMixedPredicate() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
@@ -160,7 +160,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromMixedPredicateWithDifferentParentsAndFillInZeroes() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
@@ -217,7 +217,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromMixedPredicateWithDifferentParentsRankThree() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false, true, false, true, false}, 2, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, false, true, false, true, false, true, false}, 2, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
@@ -252,7 +252,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractValueFromMixedPredicate() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
@@ -280,8 +280,8 @@ public class DoubleIfVertexTest {
         UniformVertex b = new UniformVertex(1, 1.5);
         b.setValue(1.1);
 
-        BoolVertex leftFlip = new BernoulliVertex(0.5);
-        BoolVertex rightFlip = new BernoulliVertex(0.5);
+        BooleanVertex leftFlip = new BernoulliVertex(0.5);
+        BooleanVertex rightFlip = new BernoulliVertex(0.5);
         leftFlip.observe(false);
         rightFlip.observe(true);
 
@@ -310,8 +310,8 @@ public class DoubleIfVertexTest {
         UniformVertex b = new UniformVertex(1, 1.5);
         b.setValue(1.1);
 
-        BoolVertex leftFlip = new BernoulliVertex(0.5);
-        BoolVertex rightFlip = new BernoulliVertex(0.5);
+        BooleanVertex leftFlip = new BernoulliVertex(0.5);
+        BooleanVertex rightFlip = new BernoulliVertex(0.5);
         leftFlip.observe(false);
         rightFlip.observe(false);
 
