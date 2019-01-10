@@ -95,7 +95,7 @@ public class UnaryOperationTestHelpers {
     }
 
     public static <T extends DoubleVertex & Differentiable> void testWithFiniteDifference(Function<UniformVertex, T> op, long[] shape) {
-        UniformVertex A = new UniformVertex(shape, -10.0, 10.0);
+        UniformVertex A = new UniformVertex(shape, 0.1, 0.9);
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A), op.apply(A), 1e-10, 1e-10);
     }
 
