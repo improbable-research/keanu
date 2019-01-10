@@ -51,8 +51,8 @@ public class GaussianVertexTest {
         GaussianVertex vertex = new GaussianVertex(mu, sigma);
         LogProbGraph logProbGraph = vertex.logProbGraph();
 
-        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, DoubleTensor.scalar(0.));
-        LogProbGraphValueFeeder.feedValue(logProbGraph, sigma, DoubleTensor.scalar(1.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, mu.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, sigma, sigma.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.scalar(0.5));
 
         NormalDistribution distribution = new NormalDistribution(0., 1.);
@@ -77,8 +77,8 @@ public class GaussianVertexTest {
         GaussianVertex vertex = new GaussianVertex(mu, sigma);
         LogProbGraph logProbGraph = vertex.logProbGraph();
 
-        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, DoubleTensor.create(0., 0.));
-        LogProbGraphValueFeeder.feedValue(logProbGraph, sigma, DoubleTensor.create(1., 1.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, mu.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, sigma, sigma.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.create(0.25, -0.75));
 
         NormalDistribution distribution = new NormalDistribution(0., 1.);
