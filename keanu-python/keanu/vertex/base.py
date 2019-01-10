@@ -204,7 +204,7 @@ class Integer(Vertex):
 class Boolean(Vertex):
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
-        return cast_tensor_arg_to_bool(v)
+        return cast_tensor_arg_to_boolean(v)
 
 
 def __cast_to(arg: tensor_arg_types, cast_to_type: type) -> tensor_arg_types:
@@ -226,5 +226,5 @@ def cast_tensor_arg_to_integer(arg: tensor_arg_types) -> tensor_arg_types:
     return __cast_to(arg, int)
 
 
-def cast_tensor_arg_to_bool(arg: tensor_arg_types) -> tensor_arg_types:
+def cast_tensor_arg_to_boolean(arg: tensor_arg_types) -> tensor_arg_types:
     return __cast_to(arg, bool)

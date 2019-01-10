@@ -1,5 +1,5 @@
 from typing import Callable, Dict, Any, Collection
-from .base import (Vertex, cast_tensor_arg_to_double, cast_tensor_arg_to_integer, cast_tensor_arg_to_bool,
+from .base import (Vertex, cast_tensor_arg_to_double, cast_tensor_arg_to_integer, cast_tensor_arg_to_boolean,
                    vertex_constructor_param_types)
 from keanu.tensor import Tensor
 from keanu.context import KeanuContext
@@ -27,7 +27,7 @@ def cast_to_integer_tensor(value: tensor_arg_types) -> Tensor:
 
 
 def cast_to_boolean_tensor(value: tensor_arg_types) -> Tensor:
-    return value if isinstance(value, Tensor) else Tensor(cast_tensor_arg_to_bool(value))
+    return value if isinstance(value, Tensor) else Tensor(cast_tensor_arg_to_boolean(value))
 
 
 def cast_to_double(input: tensor_arg_types) -> float:
