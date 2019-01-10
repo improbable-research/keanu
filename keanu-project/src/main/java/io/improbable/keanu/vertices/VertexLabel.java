@@ -22,6 +22,18 @@ public class VertexLabel {
         this.namespace = ImmutableList.copyOf(namespace);
     }
 
+    public boolean isInNamespace(String... namespace) {
+        if (namespace.length > this.namespace.size()) {
+            return false;
+        }
+        for (int i = 0; i < namespace.length; i++) {
+            if (!this.namespace.get(i).equals(namespace[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public VertexLabel withExtraNamespace(String topLevelNamespace) {
         List<String> newNamespace = ImmutableList.<String>builder().addAll(namespace).add(topLevelNamespace).build();
         return new VertexLabel(this.name, newNamespace);

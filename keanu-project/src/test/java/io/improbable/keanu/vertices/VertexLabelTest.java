@@ -1,7 +1,13 @@
 package io.improbable.keanu.vertices;
 
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
@@ -139,5 +145,35 @@ public class VertexLabelTest {
     public void itThrowsIfYouDiminishTheNamespaceButThereIsNone() {
         VertexLabel foo = new VertexLabel("foo");
         foo.withoutOuterNamespace();
+    }
+
+    @Test
+    public void isInNamespaceOfEqualValue() {
+        VertexLabel label = new VertexLabel("foo", "root", "outer", "inner");
+        assertTrue(label.isInNamespace("root", "outer", "inner"));
+    }
+
+    @Test
+    public void isInSuperNamespace() {
+        VertexLabel label = new VertexLabel("foo", "root", "outer", "inner");
+        assertTrue(label.isInNamespace("root", "outer"));
+    }
+
+    @Test
+    public void isNotInNamespaceWithMorePrefix() {
+        VertexLabel label = new VertexLabel("foo", "outer", "inner");
+        assertFalse(label.isInNamespace("root", "outer", "inner"));
+    }
+
+    @Test
+    public void isNotInNamespaceWithMissingPrefix() {
+        VertexLabel label = new VertexLabel("foo", "root", "outer", "inner");
+        assertFalse(label.isInNamespace("outer", "inner"));
+    }
+
+    @Test
+    public void isNotInSubNamespace() {
+        VertexLabel label = new VertexLabel("foo", "root", "outer");
+        assertFalse(label.isInNamespace("root", "outer", "inner"));
     }
 }
