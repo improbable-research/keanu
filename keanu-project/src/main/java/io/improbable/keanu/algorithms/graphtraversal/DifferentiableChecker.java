@@ -5,7 +5,6 @@ import io.improbable.keanu.vertices.Vertex;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -47,11 +46,21 @@ public class DifferentiableChecker {
     }
 
     private boolean isNonDiffableAndNotConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
-        return !vertex.isDifferentiable() && !isVertexValueConstant(vertex, constantValueVerticesCache);
+        return !vertex.isDifferentiable() && !isVertexConstant(vertex, constantValueVerticesCache);
     }
 
-    private boolean isVertexValueConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
-        Collection<Vertex> initialNext = Collections.singletonList(vertex);
+    private boolean isVertexConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
+        if (vertex.isProbabilistic() && !vertex.isObserved()) {
+            return false;
+        }
+        if (!isVertexParentsValueConstant(vertex, constantValueVerticesCache)) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isVertexParentsValueConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
+        Collection<Vertex> initialNext = vertex.getParents();
         Queue<Vertex> queue = new LinkedList<>(initialNext);
         Set<Vertex> queued = new HashSet<>(initialNext);
 
