@@ -16,7 +16,7 @@ Tensor arg types
 pandas_types = Union[Series, DataFrame]
 numpy_types = Union[ndarray]
 
-tensor_arg_types = Union[primitive_types, pandas_types, numpy_types, JavaObjectWrapper, str]
+tensor_arg_types = Union[primitive_types, pandas_types, numpy_types]
 '''
 Vertex arg types
 '''
