@@ -15,7 +15,7 @@ public class LogProbGraph {
 
     /**
      * A mapping from vertices to placeholders, which would have its values fed during execution.
-     * The two vertices are not explicitly linked together to avoid possibly mutating the original network.
+     * The two vertices are not explicitly linked together to avoid mutating the existing network.
      */
     @Getter
     @Singular
