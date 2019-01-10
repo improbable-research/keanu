@@ -116,4 +116,90 @@ public class Tensors {
         DoubleTensor mostLikelyEstimate = A.getValue(); //approximately [2, 3]
         //%%SNIPPET_END%% TensorFinal
     }
+
+    private static void tensorScalarBroadcast() {
+        //%%SNIPPET_START%% TensorScalarBroadcast
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            10., 20.,
+            30., 40.
+        }, 2, 2); //shape [2, 2]
+
+        DoubleTensor B = DoubleTensor.scalar(5.); //shape []
+
+        DoubleTensor C = A.times(B); //shape [2, 2]
+        //%%SNIPPET_END%% TensorScalarBroadcast
+    }
+
+    private static void tensorBroadcastSubsetValid() {
+        //%%SNIPPET_START%% TensorBroadcastSubsetValid
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            10., 20.,
+            30., 40.,
+
+            50., 60.,
+            70., 80.
+        }, 2, 2, 2);  //shape [2, 2, 2]
+
+        DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2);  //shape [2, 2]
+
+        DoubleTensor C = A.times(B); //shape [2, 2, 2]
+        DoubleTensor D = A.plus(B); //shape[2, 2, 2]
+        //%%SNIPPET_END%% TensorBroadcastSubsetValid
+    }
+
+    private static void tensorBroadcastSubsetInvalid() {
+        //%%SNIPPET_START%% TensorBroadcastSubsetInvalid
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            10., 20.,
+            30., 40.,
+
+            50., 60.,
+            70., 80.,
+
+            90., 100.,
+            110., 120.
+        }, 2, 2, 3);  //shape [2, 2, 3]
+
+        DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2);  //shape [2, 2]
+
+        DoubleTensor C = A.times(B); //error
+        DoubleTensor D = A.plus(B); //error
+        //%%SNIPPET_END%% TensorBroadcastSubsetInvalid
+    }
+
+    private static void tensorBroadcastWithOnes() {
+        //%%SNIPPET_START%% TensorBroadcastSubsetWithOnes
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            10., 20.,
+            30., 40.,
+
+            50., 60.,
+            70., 80.
+        }, 2, 2, 2);  //shape [2, 2, 2]
+
+        DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2, 1);  //shape [2, 2, 1]
+
+        DoubleTensor C = A.times(B); //shape [2, 2, 2]
+        DoubleTensor D = A.plus(B); //shape[2, 2, 2]
+        //%%SNIPPET_END%% TensorBroadcastSubsetWithOnes
+    }
+
+    private static void tensorBroadcastColumnExample() {
+        //%%SNIPPET_START%% TensorBroadcastColumnExample
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            10., 20., 30.,
+            40., 50., 60.
+        }, 2, 3);   //shape [2, 3]
+
+        DoubleTensor B = DoubleTensor.create(new double[]{
+            5,
+            3
+        }, 2, 1);  //shape [2, 1]
+
+        DoubleTensor C = A.times(B); //shape [2, 3].
+        // values: [50,  100, 150]
+        //         [120, 150, 180]
+        //%%SNIPPET_END%% TensorBroadcastColumnExample
+    }
+
 }
