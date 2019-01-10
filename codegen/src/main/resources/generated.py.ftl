@@ -8,7 +8,7 @@ from keanu.vartypes import (
     tensor_arg_types,
     shape_types
 )
-from .vertex_helpers import (
+from .vertex_casting import (
     do_vertex_cast,
     do_inferred_vertex_cast,
     cast_to_double_tensor,
