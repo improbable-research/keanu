@@ -154,7 +154,6 @@ public class BayesianNetworkTest {
         a0.setLabel(new VertexLabel("0", "root", "a"));
         a1.setLabel(new VertexLabel("1", "root", "a"));
         b0.setLabel(new VertexLabel("0", "root", "b"));
-        c.setLabel(new VertexLabel("c"));
 
         BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
         List<Vertex> verticesInNamespace = net.getVerticesInNamespace("root");
