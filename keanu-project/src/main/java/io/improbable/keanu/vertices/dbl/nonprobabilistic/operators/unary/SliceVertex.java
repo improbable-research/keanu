@@ -62,7 +62,7 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
 
     private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {
         long[] targetShape = TensorShape.concat(getShape(), inputVertex.getShape());
-        int dimensionInWrt = dimension + getShape().length;
+        int dimensionInWrt = dimension + getRank();
         long indicesBefore = index;
         long indicesAfter = targetShape[dimensionInWrt] - index - 1;
         targetShape[dimensionInWrt] = 1;

@@ -67,7 +67,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor scalar = DoubleTensor.create(new double[]{2.0}, new long[]{});
         DoubleTensor expected = DoubleTensor.scalar(2.0);
         assertEquals(expected, scalar);
-        assertEquals(0, scalar.getShape().length);
+        assertEquals(0, scalar.getRank());
     }
 
     @Test
