@@ -496,7 +496,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public FlattenedView<Integer> getFlattenedView() {
-        return new SimpleIntegerFlattenedView(value);
+        return new SimpleIntegerFlattenedView();
     }
 
     @Override
@@ -541,13 +541,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
             '}';
     }
 
-    private static class SimpleIntegerFlattenedView implements FlattenedView<Integer> {
-
-        private int value;
-
-        public SimpleIntegerFlattenedView(int value) {
-            this.value = value;
-        }
+    private class SimpleIntegerFlattenedView implements FlattenedView<Integer> {
 
         @Override
         public long size() {
@@ -572,7 +566,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
             if (index != 0) {
                 throw new IndexOutOfBoundsException();
             }
-            this.value = value;
+            ScalarIntegerTensor.this.value = value;
         }
 
     }
