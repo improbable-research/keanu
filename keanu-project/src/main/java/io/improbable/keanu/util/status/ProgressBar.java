@@ -22,6 +22,10 @@ public class ProgressBar {
         progress(null, progressPercentage);
     }
 
+    public void progress(String message, int currentStep, int totalSteps) {
+        progress((double) currentStep/totalSteps);
+    }
+
     public String formatProgress(double progressPercentage) {
         return String.format(" %3.1f%%", Math.min(100.0, Math.max(0, progressPercentage * 100)));
     }

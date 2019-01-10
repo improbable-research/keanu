@@ -101,7 +101,7 @@ public class NetworkSamplesGenerator {
                 algorithm.step();
             }
 
-            progressBar.progress("Sampling...", (i + 1) / (double) samplesLeft);
+            progressBar.progress("Sampling...", (i + 1), samplesLeft);
         }
 
         statusBar.finish();
