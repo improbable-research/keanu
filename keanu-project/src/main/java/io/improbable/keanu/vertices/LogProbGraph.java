@@ -10,12 +10,15 @@ import lombok.Singular;
 
 import java.util.Map;
 
+/**
+ * A graph of vertices representing the computation of a log probability
+ */
 @Builder
 public class LogProbGraph {
 
     /**
      * A mapping from vertices to placeholders, which would have its values fed during execution.
-     * The two vertices are not explicitly linked together to avoid mutating the existing network.
+     * The two are not explicitly linked together to avoid mutating the vertex's existing network.
      */
     @Getter
     @Singular
