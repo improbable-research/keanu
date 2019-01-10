@@ -49,6 +49,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 
+import io.improbable.keanu.vertices.utility.PrintVertex;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -56,6 +57,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public DoubleVertex(long[] initialShape) {
         super(initialShape);
+    }
+
+    public DoubleVertex print() {
+        return new PrintVertex(this);
     }
 
     /**
