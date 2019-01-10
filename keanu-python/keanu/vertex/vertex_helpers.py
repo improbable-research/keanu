@@ -14,7 +14,7 @@ def do_vertex_cast(vertex_ctor: Callable, value: vertex_constructor_param_types)
     return value if isinstance(value, Vertex) else vertex_ctor(value)
 
 
-def do_generic_vertex_cast(ctors: Dict[type, Callable], value: vertex_constructor_param_types) -> Vertex:
+def do_inferred_vertex_cast(ctors: Dict[type, Callable], value: vertex_constructor_param_types) -> Vertex:
     return value if isinstance(value, Vertex) else infer_type_and_execute(value, ctors)
 
 
