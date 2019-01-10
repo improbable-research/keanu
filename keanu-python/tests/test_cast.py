@@ -1,4 +1,5 @@
-from keanu.vertex.vertex_helpers import (cast_tensor_arg_to_double, cast_tensor_arg_to_integer, cast_tensor_arg_to_boolean)
+from keanu.vertex.vertex_helpers import (cast_tensor_arg_to_double, cast_tensor_arg_to_integer,
+                                         cast_tensor_arg_to_boolean)
 from keanu.vertex import cast_to_boolean_vertex, cast_to_integer_vertex, cast_to_double_vertex
 from keanu.vartypes import (primitive_types, numpy_types, pandas_types)
 import pytest
@@ -61,8 +62,9 @@ def test_nonscalar_vertex_cast(value: Union[numpy_types, pandas_types], cast_fn:
     assert type(cast_fn(value)) == expected_type
 
 
-@pytest.mark.parametrize("cast_fn, cast_to_type", [(cast_tensor_arg_to_double, float),
-                                                   (cast_tensor_arg_to_integer, int), (cast_tensor_arg_to_boolean, bool)])
+@pytest.mark.parametrize("cast_fn, cast_to_type",
+                         [(cast_tensor_arg_to_double, float), (cast_tensor_arg_to_integer, int),
+                          (cast_tensor_arg_to_boolean, bool)])
 def test_cant_pass_vertex_to_cast_tensor_arg(cast_fn: Callable, cast_to_type: type) -> None:
     gaussian = Gaussian(0., 1.)
 
