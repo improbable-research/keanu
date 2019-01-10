@@ -122,12 +122,13 @@ task formatCheck {
     }
 }
 
-task buildSourceDistribution {
+task buildDistribution {
+    mustRunAfter preparePythonEnvironment
     mustRunAfter preparePythonEnvironment
 
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'python', project.file("setup.py"), 'sdist'
+            commandLine 'pipenv', 'run', 'python', project.file("setup.py"), 'bdist_wheel'
         }
     }
 }
@@ -139,5 +140,5 @@ test.dependsOn(preparePythonEnvironment)
 test.dependsOn(formatCheck)
 test.dependsOn(pytest)
 
-buildSourceDistribution.dependsOn(test)
+buildDistribution.dependsOn(test)
 
