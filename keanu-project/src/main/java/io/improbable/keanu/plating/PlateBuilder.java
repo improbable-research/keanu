@@ -185,9 +185,7 @@ public class PlateBuilder<T> {
 
     private void connectTransitionVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> transitionMapping) throws PlateConstructionException {
         Collection<Vertex<?>> proxyVertices = plate.getProxyVertices();
-        if (candidateVertices == null && !proxyVertices.isEmpty()) {
-            throw new IllegalArgumentException("You must provide a base case for the Transition Vertices - use withInitialState()");
-        }
+
         for (Vertex<?> proxy : proxyVertices) {
             VertexLabel proxyLabel = proxy.getLabel().withoutOuterNamespace();
             VertexLabel defaultParentLabel = getDefaultParentLabel(proxyLabel);
@@ -195,6 +193,10 @@ public class PlateBuilder<T> {
 
             if (parentLabel == null) {
                 throw new PlateConstructionException("Cannot find transition mapping for " + proxy.getLabel());
+            }
+
+            if (candidateVertices == null) {
+                throw new IllegalArgumentException("You must provide a base case for the Transition Vertices - use withInitialState()");
             }
 
             Vertex<?> parent = candidateVertices.get(parentLabel);
