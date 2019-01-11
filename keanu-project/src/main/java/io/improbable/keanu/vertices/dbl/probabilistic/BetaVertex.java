@@ -7,6 +7,8 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -25,7 +27,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BetaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class BetaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
@@ -106,6 +108,30 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
     public double logProb(DoubleTensor value) {
         DoubleTensor logPdfs = distribution().logProb(value);
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceHolderVertex xPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceHolderVertex alphaPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(alpha.getShape());
+        final LogProbGraph.DoublePlaceHolderVertex betaPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(beta.getShape());
+
+        final DoubleVertex lnGammaAlpha = alphaPlaceHolder.logGamma();
+        final DoubleVertex lnGammaBeta = betaPlaceHolder.logGamma();
+        final DoubleVertex alphaPlusBetaLnGamma = (alphaPlaceHolder.plus(betaPlaceHolder)).logGamma();
+        final DoubleVertex alphaMinusOneTimesLnX = xPlaceHolder.log().times(alphaPlaceHolder.minus(1));
+        final DoubleVertex betaMinusOneTimesOneMinusXLn = xPlaceHolder.unaryMinus().plus(1).log().times(betaPlaceHolder.minus(1));
+
+        final DoubleVertex betaFunction = lnGammaAlpha.plus(lnGammaBeta).minus(alphaPlusBetaLnGamma);
+
+        final DoubleVertex logProbOutput = alphaMinusOneTimesLnX.plus(betaMinusOneTimesOneMinusXLn).minus(betaFunction);
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceHolder)
+            .input(alpha, alphaPlaceHolder)
+            .input(beta, betaPlaceHolder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
