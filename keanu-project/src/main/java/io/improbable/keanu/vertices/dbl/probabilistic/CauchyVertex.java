@@ -6,6 +6,8 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -24,10 +26,11 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class CauchyVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class CauchyVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex location;
     private final DoubleVertex scale;
+    private static final double NEG_LOG_PI = -Math.log(Math.PI);
     private static final String LOCATION_NAME = "location";
     protected static final String SCALE_NAME = "scale";
 
@@ -99,6 +102,26 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
         DoubleTensor logPdfs = Cauchy.withParameters(locationValues, scaleValues).logProb(value);
 
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        LogProbGraph.DoublePlaceHolderVertex xPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(this.getShape());
+        LogProbGraph.DoublePlaceHolderVertex locationPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(location.getShape());
+        LogProbGraph.DoublePlaceHolderVertex scalePlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(scale.getShape());
+
+        final DoubleVertex negLnScaleMinusLnPi = scalePlaceHolder.log().unaryMinus().plus(NEG_LOG_PI);
+        final DoubleVertex xMinusLocationOverScalePow2Plus1 = xPlaceHolder.minus(locationPlaceHolder).div(scalePlaceHolder).pow(2).plus(1);
+        final DoubleVertex lnXMinusLocationOverScalePow2Plus1 = xMinusLocationOverScalePow2Plus1.log();
+
+        final DoubleVertex logProbOutput = negLnScaleMinusLnPi.minus(lnXMinusLocationOverScalePow2Plus1);
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceHolder)
+            .input(location, locationPlaceHolder)
+            .input(scale, scalePlaceHolder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
