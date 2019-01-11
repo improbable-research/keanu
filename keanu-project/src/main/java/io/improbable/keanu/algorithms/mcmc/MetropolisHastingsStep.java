@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.network.NetworkSnapshot;
@@ -23,30 +23,26 @@ class MetropolisHastingsStep {
     //Temperature for standard MH step accept/reject calculation
     private static final double DEFAULT_TEMPERATURE = 1.0;
 
+    private final ProbabilisticGraph graph;
     private final ProposalDistribution proposalDistribution;
     private final boolean useCacheOnRejection;
-    private final Map<Variable, LambdaSection> affectedVerticesCache;
     private final KeanuRandom random;
 
     /**
-     * @param latentVertices       Vertices that are unknown/hidden variables
      * @param proposalDistribution The proposal distribution
      * @param useCacheOnRejection  True if caching values of the network such that recalculation isn't required
      *                             on step rejection
      * @param random               Source of randomness
      */
-    MetropolisHastingsStep(List<? extends Variable> latentVertices,
+    MetropolisHastingsStep(ProbabilisticGraph graph,
                            ProposalDistribution proposalDistribution,
                            boolean useCacheOnRejection,
                            KeanuRandom random) {
 
+        this.graph = graph;
         this.proposalDistribution = proposalDistribution;
         this.useCacheOnRejection = useCacheOnRejection;
         this.random = random;
-        this.affectedVerticesCache = createVerticesAffectedByCache(
-            latentVertices,
-            useCacheOnRejection
-        );
     }
 
     public StepResult step(final Set<Variable> chosenVertices,
@@ -68,7 +64,7 @@ class MetropolisHastingsStep {
         log.trace(String.format("Chosen vertices: %s", chosenVertices.stream()
             .map(Variable::toString)
             .collect(Collectors.toList())));
-        final double affectedVerticesLogProbOld = sumLogProbabilityOfAffected(chosenVertices, affectedVerticesCache);
+        final double affectedVerticesLogProbOld = graph.downstreamLogProb(chosenVertices);
 
         NetworkSnapshot preProposalSnapshot = null;
         if (useCacheOnRejection) {
@@ -77,9 +73,9 @@ class MetropolisHastingsStep {
 
         Proposal proposal = proposalDistribution.getProposal(chosenVertices, random);
         proposal.apply();
-        VertexValuePropagation.cascadeUpdate(chosenVertices);
+        graph.cascadeUpdate(chosenVertices);
 
-        final double affectedVerticesLogProbNew = sumLogProbabilityOfAffected(chosenVertices, affectedVerticesCache);
+        final double affectedVerticesLogProbNew = graph.downstreamLogProb(chosenVertices);
 
         if (!ProbabilityCalculator.isImpossibleLogProb(affectedVerticesLogProbNew)) {
 
@@ -96,7 +92,6 @@ class MetropolisHastingsStep {
 
             final boolean shouldAccept = r >= random.nextDouble();
 
-
             if (shouldAccept) {
                 log.trace(String.format("ACCEPT %.4f", logR));
                 log.trace(String.format("New log prob = %.4f", logProbabilityAfterStep));
@@ -111,7 +106,7 @@ class MetropolisHastingsStep {
         if (useCacheOnRejection) {
             preProposalSnapshot.apply();
         } else {
-            VertexValuePropagation.cascadeUpdate(chosenVertices);
+            graph.cascadeUpdate(chosenVertices);
         }
 
         return new StepResult(false, logProbabilityBeforeStep);
@@ -126,34 +121,6 @@ class MetropolisHastingsStep {
         }
 
         return NetworkSnapshot.create(allAffectedVertices);
-    }
-
-    private static double sumLogProbabilityOfAffected(Set<Variable> vertices,
-                                                      Map<Variable, LambdaSection> affectedVertices) {
-        double sumLogProb = 0.0;
-        for (Variable v : vertices) {
-            sumLogProb += ProbabilityCalculator.calculateLogProbFor(affectedVertices.get(v).getLatentAndObservedVertices());
-        }
-        return sumLogProb;
-    }
-
-    /**
-     * This creates a cache of potentially all vertices downstream to an observed or probabilistic vertex
-     * from each latent vertex. If useCacheOnRejection is false then only the downstream observed or probabilistic
-     * is cached.
-     *
-     * @param latentVertices      The latent vertices to create a cache for
-     * @param useCacheOnRejection Whether or not to cache the entire downstream set or just the observed/probabilistic
-     * @return A vertex to Lambda Section map that represents the downstream Lambda Section for each latent vertex.
-     * This Lambda Section may include all of the nonprobabilistic vertices if useCacheOnRejection is enabled.
-     */
-    private static Map<Variable, LambdaSection> createVerticesAffectedByCache(List<? extends Variable> latentVertices,
-                                                                            boolean useCacheOnRejection) {
-        return latentVertices.stream()
-            .collect(Collectors.toMap(
-                v -> v,
-                v -> LambdaSection.getDownstreamLambdaSection(v, useCacheOnRejection)
-            ));
     }
 
     @Value

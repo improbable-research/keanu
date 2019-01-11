@@ -3,18 +3,23 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
 public class KeanuProbabilisticGraph implements ProbabilisticGraph {
+
+    private static final boolean USE_CACHE_ON_REJECTION = true;
 
     private final Map<VariableReference, Vertex> vertexLookup;
 
@@ -24,6 +29,8 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     private final List<Vertex> latentOrObservedVertices;
 
+    private Map<Variable, LambdaSection> affectedVerticesCache;
+
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
 
         this.vertexLookup = bayesianNetwork.getLatentOrObservedVertices().stream()
@@ -32,12 +39,28 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
+        this.affectedVerticesCache = null;
     }
 
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
         cascadeUpdate(inputs);
         return ProbabilityCalculator.calculateLogProbFor(this.latentOrObservedVertices);
+    }
+
+    @Override
+    public double downstreamLogProb(Set<? extends Variable> vertices) {
+        if (affectedVerticesCache == null) {
+            affectedVerticesCache = createVerticesAffectedByCache(
+                latentVertices,
+                USE_CACHE_ON_REJECTION
+            );
+        }
+        double sumLogProb = 0.0;
+        for (Variable v : vertices) {
+            sumLogProb += ProbabilityCalculator.calculateLogProbFor(affectedVerticesCache.get(v).getLatentAndObservedVertices());
+        }
+        return sumLogProb;
     }
 
     @Override
@@ -59,7 +82,12 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
             .collect(Collectors.toList());
     }
 
-    public void cascadeUpdate(Map<VariableReference, ?> inputs) {
+    @Override
+    public void cascadeUpdate(Set<? extends Variable> inputs) {
+        VertexValuePropagation.cascadeUpdate((Vertex) inputs);
+    }
+
+    private void cascadeUpdate(Map<VariableReference, ?> inputs) {
 
         List<Vertex> updatedVertices = new ArrayList<>();
         for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {
@@ -73,6 +101,25 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
             updatedVertices.add(updatingVertex);
         }
 
-        VertexValuePropagation.cascadeUpdate(updatedVertices);
+        cascadeUpdate(new HashSet<>(updatedVertices));
+    }
+
+    /**
+     * This creates a cache of potentially all vertices downstream to an observed or probabilistic vertex
+     * from each latent vertex. If useCacheOnRejection is false then only the downstream observed or probabilistic
+     * is cached.
+     *
+     * @param latentVertices      The latent vertices to create a cache for
+     * @param useCacheOnRejection Whether or not to cache the entire downstream set or just the observed/probabilistic
+     * @return A vertex to Lambda Section map that represents the downstream Lambda Section for each latent vertex.
+     * This Lambda Section may include all of the nonprobabilistic vertices if useCacheOnRejection is enabled.
+     */
+    private static Map<Variable, LambdaSection> createVerticesAffectedByCache(List<Vertex> latentVertices,
+                                                                              boolean useCacheOnRejection) {
+        return latentVertices.stream()
+            .collect(Collectors.toMap(
+                v -> v,
+                v -> LambdaSection.getDownstreamLambdaSection(v, useCacheOnRejection)
+            ));
     }
 }

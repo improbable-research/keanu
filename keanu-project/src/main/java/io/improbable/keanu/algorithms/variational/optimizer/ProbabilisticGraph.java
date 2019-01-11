@@ -3,8 +3,11 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 
 public interface ProbabilisticGraph {
 
@@ -13,6 +16,13 @@ public interface ProbabilisticGraph {
     }
 
     double logProb(Map<VariableReference, ?> inputs);
+
+    /**
+     *
+     * @param vertices
+     * @return
+     */
+    double downstreamLogProb(Set<? extends Variable> vertices);
 
     default double logLikelihood() {
         return logLikelihood(Collections.emptyMap());
@@ -23,5 +33,7 @@ public interface ProbabilisticGraph {
     List<? extends Variable> getLatentVariables();
 
     List<? extends Variable<DoubleTensor>> getContinuousLatentVariables();
+
+    void cascadeUpdate(Set<? extends Variable> inputs);
 
 }

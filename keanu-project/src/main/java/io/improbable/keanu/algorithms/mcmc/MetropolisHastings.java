@@ -90,6 +90,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         List<? extends Variable> latentVertices = bayesianNetwork.getLatentVariables();
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
+            bayesianNetwork,
             latentVertices,
             proposalDistribution,
             useCacheOnRejection,
