@@ -9,6 +9,7 @@ import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 
+import io.improbable.keanu.vertices.utility.PrintVertex;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -219,6 +220,11 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     public Set<Vertex> getParents() {
         return parents;
+    }
+
+    public Vertex<T> print() {
+        new PrintVertex<>(this);
+        return this;
     }
 
     public int getDegree() {

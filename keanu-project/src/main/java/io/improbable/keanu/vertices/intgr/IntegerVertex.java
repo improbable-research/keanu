@@ -31,12 +31,19 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 
+import io.improbable.keanu.vertices.utility.PrintVertex;
 import java.util.function.Function;
 
 public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
 
     public IntegerVertex(long[] shape) {
         super(shape);
+    }
+
+    @Override
+    public IntegerVertex print() {
+        new PrintVertex<>(this);
+        return this;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool;
 
+import com.google.common.collect.Iterables;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
@@ -10,12 +11,15 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.utility.PrintVertex;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
 
 import static io.improbable.keanu.vertices.bool.BoolVertex.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -237,6 +241,14 @@ public class BoolVertexTest {
 
         BoolVertex concatDimOne = BoolVertex.concat(1, A, B);
         assertArrayEquals(concatDimOne.getShape(), new long[]{2, 4});
+    }
+
+    @Test
+    public void canPrint() {
+        BoolVertex A = new BernoulliVertex(0.5);
+        A.print();
+        final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
+        assertThat(printVertex, instanceOf(PrintVertex.class));
     }
 
     private double andProbability(double pA, double pB) {

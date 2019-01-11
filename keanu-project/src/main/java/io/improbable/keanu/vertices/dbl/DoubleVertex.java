@@ -59,8 +59,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         super(initialShape);
     }
 
+    @Override
     public DoubleVertex print() {
-        return new PrintVertex(this);
+        new PrintVertex<>(this);
+        return this;
     }
 
     /**

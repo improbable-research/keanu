@@ -21,6 +21,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
 import io.improbable.keanu.vertices.utility.AssertVertex;
 
+import io.improbable.keanu.vertices.utility.PrintVertex;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,6 +29,12 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> implements Boolea
 
     public BoolVertex(long[] initialShape) {
         super(initialShape);
+    }
+
+    @Override
+    public BoolVertex print() {
+        new PrintVertex<>(this);
+        return this;
     }
 
     public void saveValue(NetworkSaver netSaver) {

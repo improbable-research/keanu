@@ -1,14 +1,16 @@
 package io.improbable.keanu.vertices.dbl;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.utility.PrintVertex;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -95,10 +97,9 @@ public class DoubleVertexTest {
 
     @Test
     public void canPrint() {
-        UniformVertex A = new UniformVertex(0, 1);
-        DoubleVertex B = A.print();
-
-        assertThat(B).isInstanceOf(PrintVertex.class);
-        assertThat(B.getParents()).isEqualTo(ImmutableSet.of(A));
+        final UniformVertex A = new UniformVertex(0, 1);
+        A.print();
+        final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
+        assertThat(printVertex, instanceOf(PrintVertex.class));
     }
 }

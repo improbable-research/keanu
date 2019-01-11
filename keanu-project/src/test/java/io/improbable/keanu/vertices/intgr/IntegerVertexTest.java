@@ -1,16 +1,21 @@
 package io.improbable.keanu.vertices.intgr;
 
+import com.google.common.collect.Iterables;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
+import io.improbable.keanu.vertices.utility.PrintVertex;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.function.Function;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -173,4 +178,11 @@ public class IntegerVertexTest {
         assertArrayEquals(new int[]{2, 4, 3, 5}, max.getValue().asFlatIntegerArray());
     }
 
+    @Test
+    public void canPrint() {
+        IntegerVertex A = new UniformIntVertex(0, 1);
+        A.print();
+        final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
+        assertThat(printVertex, instanceOf(PrintVertex.class));
+    }
 }
