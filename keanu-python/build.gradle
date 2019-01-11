@@ -128,7 +128,7 @@ task buildWheelDistribution {
 
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'python', project.file("setup.py"), 'bdist_wheel'
+            commandLine 'pipenv', 'run', 'python', project.file("setup.py"), 'sdist', 'bdist_wheel'
         }
     }
 }
