@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -199,7 +200,12 @@ public class DotSaver implements NetworkSaver {
                 try {
                     Vertex parentVertex = (Vertex) method.invoke(vertex);
                     GraphEdge parentEdge = new GraphEdge(vertex, parentVertex);
-                    edges.stream().filter(parentEdge::equals).findFirst().get().appendToLabel(parentName);
+                    Optional<GraphEdge> foundEdge = edges.stream().filter(parentEdge::equals).findFirst();
+                    if (foundEdge.isPresent()) {
+                        foundEdge.get().appendToLabel(parentName);
+                    } else {
+                        throw new IllegalStateException("Did not find parent edge " + parentName);
+                    }
                 } catch (Exception e) {
                     throw new IllegalArgumentException("Invalid parent retrieval function specified", e);
                 }
