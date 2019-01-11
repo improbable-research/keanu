@@ -30,13 +30,13 @@ public class LogProbGraph {
     @Getter
     private final DoubleVertex logProbOutput;
 
-    public <T> Vertex<T> getPlaceHolder(Vertex<T> input) {
+    public <T> Vertex<T> getPlaceholder(Vertex<T> input) {
         return (Vertex<T>) inputs.get(input);
     }
 
-    static public class DoublePlaceHolderVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
+    static public class DoublePlaceholderVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
 
-        public DoublePlaceHolderVertex(long[] initialShape) {
+        public DoublePlaceholderVertex(long[] initialShape) {
             super(initialShape);
         }
 
