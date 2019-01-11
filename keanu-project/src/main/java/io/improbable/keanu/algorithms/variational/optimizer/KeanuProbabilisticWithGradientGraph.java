@@ -51,7 +51,7 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
 
     private Map<? extends VariableReference, DoubleTensor> gradients(Map<VariableReference, ?> inputs, LogProbGradientCalculator gradientCalculator) {
         if (inputs != null && !inputs.isEmpty()) {
-            cascadeUpdate(inputs);
+            cascadeValues(inputs);
         }
 
         return gradientCalculator.getJointLogProbGradientWrtLatents();

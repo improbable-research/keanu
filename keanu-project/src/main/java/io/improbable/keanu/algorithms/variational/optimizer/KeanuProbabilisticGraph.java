@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.LambdaSection;
+import io.improbable.keanu.network.NetworkSnapshot;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
@@ -44,7 +45,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
-        cascadeUpdate(inputs);
+        cascadeValues(inputs);
         return ProbabilityCalculator.calculateLogProbFor(this.latentOrObservedVertices);
     }
 
@@ -65,7 +66,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
-        cascadeUpdate(inputs);
+        cascadeValues(inputs);
         return ProbabilityCalculator.calculateLogProbFor(this.observedVertices);
     }
 
@@ -87,7 +88,33 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
         VertexValuePropagation.cascadeUpdate((Vertex) inputs);
     }
 
-    private void cascadeUpdate(Map<VariableReference, ?> inputs) {
+    @Override
+    public void cascadeFixedVariables() {
+        VertexValuePropagation.cascadeUpdate(this.observedVertices);
+    }
+
+    @Override
+    public NetworkSnapshot getSnapshotOfAllAffectedVariables(Set<? extends Variable> variables) {
+        if (affectedVerticesCache == null) {
+            affectedVerticesCache = createVerticesAffectedByCache(
+                latentVertices,
+                USE_CACHE_ON_REJECTION
+            );
+        }
+        Set<Variable> allAffectedVertices = new HashSet<>();
+        for (Variable variable : variables) {
+            allAffectedVertices.addAll(affectedVerticesCache.get(variable).getAllVertices());
+        }
+
+        return NetworkSnapshot.create(allAffectedVertices);
+    }
+
+    @Override
+    public boolean isDeterministic() {
+        return latentOrObservedVertices.isEmpty();
+    }
+
+    public void cascadeValues(Map<VariableReference, ?> inputs) {
 
         List<Vertex> updatedVertices = new ArrayList<>();
         for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {

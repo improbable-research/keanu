@@ -68,7 +68,7 @@ class MetropolisHastingsStep {
 
         NetworkSnapshot preProposalSnapshot = null;
         if (useCacheOnRejection) {
-            preProposalSnapshot = getSnapshotOfAllAffectedVertices(chosenVertices, affectedVerticesCache);
+            preProposalSnapshot = graph.getSnapshotOfAllAffectedVariables(chosenVertices);
         }
 
         Proposal proposal = proposalDistribution.getProposal(chosenVertices, random);
@@ -110,17 +110,6 @@ class MetropolisHastingsStep {
         }
 
         return new StepResult(false, logProbabilityBeforeStep);
-    }
-
-    private static NetworkSnapshot getSnapshotOfAllAffectedVertices(final Set<Variable> chosenVertices,
-                                                                    final Map<Variable, LambdaSection> affectedVertices) {
-
-        Set<Variable> allAffectedVertices = new HashSet<>();
-        for (Variable vertex : chosenVertices) {
-            allAffectedVertices.addAll(affectedVertices.get(vertex).getAllVertices());
-        }
-
-        return NetworkSnapshot.create(allAffectedVertices);
     }
 
     @Value

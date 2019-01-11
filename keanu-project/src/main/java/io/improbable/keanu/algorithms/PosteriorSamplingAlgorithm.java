@@ -10,6 +10,12 @@ import java.util.List;
 public interface PosteriorSamplingAlgorithm {
 
     default NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
+                                               List<? extends Variable> verticesToSampleFrom,
+                                               int sampleCount) {
+        return null;
+    }
+
+    default NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
                                                Variable vertexToSampleFrom,
                                                int sampleCount) {
         return null;

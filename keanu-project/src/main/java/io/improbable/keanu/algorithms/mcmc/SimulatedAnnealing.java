@@ -7,6 +7,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
@@ -79,9 +80,9 @@ public class SimulatedAnnealing {
                                           int sampleCount,
                                           AnnealingSchedule annealingSchedule) {
 
-        bayesNet.cascadeObservations();
+        bayesNet.cascadeFixedVariables();
 
-        if (bayesNet.isInImpossibleState()) {
+        if (ProbabilityCalculator.isImpossibleLogProb(bayesNet.logProb())) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
@@ -93,7 +94,7 @@ public class SimulatedAnnealing {
         setSamplesAsMax(maxSamplesByVertex, latentVertices);
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
-            latentVertices,
+            bayesNet,
             proposalDistribution,
             true,
             random

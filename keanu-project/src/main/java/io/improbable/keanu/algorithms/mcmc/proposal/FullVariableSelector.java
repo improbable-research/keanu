@@ -14,7 +14,7 @@ public final class FullVariableSelector implements MHStepVariableSelector {
     }
 
     @Override
-    public Set<? extends Variable> select(List<? extends Variable> latentVertices, int sampleNumber) {
+    public Set<Variable> select(List<? extends Variable> latentVertices, int sampleNumber) {
         return ImmutableSet.copyOf(latentVertices);
     }
 }

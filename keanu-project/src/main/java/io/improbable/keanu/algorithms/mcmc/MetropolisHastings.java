@@ -9,6 +9,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
@@ -91,7 +92,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             bayesianNetwork,
-            latentVertices,
             proposalDistribution,
             useCacheOnRejection,
             random
@@ -127,7 +127,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
         @Override
         public void step() {
-            Set<? extends Variable> chosenVertices = variableSelector.select(latentVertices, sampleNum);
+            Set<Variable> chosenVertices = variableSelector.select(latentVertices, sampleNum);
 
             logProbabilityBeforeStep = mhStep.step(
                 chosenVertices,
@@ -166,10 +166,10 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     }
 
     private static void checkBayesNetInHealthyState(ProbabilisticGraph bayesNet) {
-        bayesNet.cascadeObservations();
-        if (bayesNet.getLatentOrObservedVertices().isEmpty()) {
+        bayesNet.cascadeFixedVariables();
+        if (bayesNet.isDeterministic()) {
             throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
-        } else if (bayesNet.isInImpossibleState()) {
+        } else if (ProbabilityCalculator.isImpossibleLogProb(bayesNet.logProb())) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
     }

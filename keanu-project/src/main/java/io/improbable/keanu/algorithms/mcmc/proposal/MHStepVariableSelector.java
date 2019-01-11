@@ -9,5 +9,5 @@ public interface MHStepVariableSelector {
     MHStepVariableSelector SINGLE_VARIABLE_SELECTOR = SingleVariableSelector.INSTANCE;
     MHStepVariableSelector FULL_VARIABLE_SELECTOR = FullVariableSelector.INSTANCE;
 
-    Set<? extends Variable> select(List<? extends Variable> vertices, int sampleNumber);
+    Set<Variable> select(List<? extends Variable> vertices, int sampleNumber);
 }
