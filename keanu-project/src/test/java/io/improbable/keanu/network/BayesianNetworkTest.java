@@ -12,9 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -139,6 +142,24 @@ public class BayesianNetworkTest {
     @Test
     public void testGetAverageVertexDegree() {
         assertThat(network.getAverageVertexDegree(), equalTo((1. + 1. + 2. + 2. + 2.) / 5));
+    }
+
+    @Test
+    public void networkReturnsVerticesInNamespace() {
+        BooleanVertex a0 = new BernoulliVertex(0.5);
+        BooleanVertex a1 = new BernoulliVertex(0.5);
+        BooleanVertex b0 = new BernoulliVertex(0.5);
+        BooleanVertex c = new BernoulliVertex(0.5);
+
+        a0.setLabel(new VertexLabel("0", "root", "a"));
+        a1.setLabel(new VertexLabel("1", "root", "a"));
+        b0.setLabel(new VertexLabel("0", "root", "b"));
+
+        BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
+        List<Vertex> verticesInNamespace = net.getVerticesInNamespace("root");
+
+        assertThat(verticesInNamespace.size(), equalTo(3));
+        assertTrue(verticesInNamespace.containsAll(Arrays.asList(a0, a1, b0)));
     }
 
 }
