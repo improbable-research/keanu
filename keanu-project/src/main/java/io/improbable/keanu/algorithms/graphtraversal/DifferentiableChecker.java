@@ -14,9 +14,22 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+
 @UtilityClass
 public class DifferentiableChecker {
 
+    /**
+     * Checks whether the given vertices are all differentiable w.r.t latents.
+     * When given latent variables, this ensures that the dLogProb can be calculated.
+     * <p>
+     * This check is performed by traversing up each vertex's parents and ensuring that the path to next RV is
+     * differentiable or constant valued.
+     * If there is a non differentiable vertex on this path, then it must be constant valued as that would mean it has
+     * no effect.
+     *
+     * @param vertices vertices to check whether differentiable
+     * @return whether all the vertices are differentiable w.r.t latents
+     */
     public static boolean isDifferentiableWrtLatents(Collection<Vertex> vertices) {
         if (!allProbabilisticAreDoubleOrObserved(vertices)) {
             return false;
@@ -44,16 +57,18 @@ public class DifferentiableChecker {
     }
 
     private static boolean diffableOrConstantUptoNextRV(Collection<Vertex> vertices, Set<Vertex> constantValueVerticesCache) {
-        return bfsExplorer(vertices,
+        return bfs(vertices,
             vertex -> isNonDiffableAndNotConstant(vertex, constantValueVerticesCache),
             vertex -> !vertex.isProbabilistic(),
             doNothing -> {
             });
     }
 
-    private static boolean bfsExplorer(Collection<Vertex> vertices, Predicate<Vertex> failureCondition,
-                                       Predicate<Vertex> shouldAddParents,
-                                       Consumer<Collection<Vertex>> successfullyVisitedConsumer) {
+    private static boolean bfs(Collection<Vertex> vertices,
+                               Predicate<Vertex> failureCondition,
+                               Predicate<Vertex> shouldAddParents,
+                               Consumer<Collection<Vertex>> successfullyVisitedConsumer) {
+
         Queue<Vertex> queue = new ArrayDeque<>(vertices);
         Set<Vertex> queued = new HashSet<>(vertices);
 
@@ -83,7 +98,7 @@ public class DifferentiableChecker {
     }
 
     private static boolean isVertexValueConstant(Collection<Vertex> vertices, Set<Vertex> constantValueVerticesCache) {
-        return bfsExplorer(vertices,
+        return bfs(vertices,
             DifferentiableChecker::isUnobservedProbabilistic,
             vertex -> !isValueKnownToBeConstant(vertex, constantValueVerticesCache),
             constantValueVerticesCache::addAll);
@@ -96,6 +111,6 @@ public class DifferentiableChecker {
     // We know whether these are constant. For cases such as a MultiplicationVertex we would need to
     // explore its parents to ensure its constant.
     private static boolean isValueKnownToBeConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
-        return vertex instanceof ConstantVertex || constantValueVerticesCache.contains(vertex) || vertex.isObserved();
+        return vertex instanceof ConstantVertex || vertex.isObserved() || constantValueVerticesCache.contains(vertex);
     }
 }
