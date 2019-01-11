@@ -2,8 +2,8 @@ package io.improbable.keanu.network;
 
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -35,7 +35,7 @@ public interface NetworkSaver {
         save((ConstantVertex)vertex);
     }
 
-    default void save(ConstantBoolVertex vertex) {
+    default void save(ConstantBooleanVertex vertex) {
         save((ConstantVertex)vertex);
     }
 
@@ -49,7 +49,7 @@ public interface NetworkSaver {
         saveValue((Vertex)vertex);
     }
 
-    default void saveValue(BoolVertex vertex)  {
+    default void saveValue(BooleanVertex vertex)  {
         saveValue((Vertex)vertex);
     }
 }

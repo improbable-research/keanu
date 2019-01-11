@@ -8,8 +8,8 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
@@ -67,26 +67,26 @@ public class LoopBuilder {
     /**
      * A mandatory method to specify the condition
      *
-     * @param conditionSupplier a lambda that creates and returns a new BoolVertex
+     * @param conditionSupplier a lambda that creates and returns a new BooleanVertex
      * @return the next stage builder
      */
-    public LoopBuilder2 iterateWhile(Supplier<BoolVertex> conditionSupplier) {
+    public LoopBuilder2 iterateWhile(Supplier<BooleanVertex> conditionSupplier) {
         return iterateWhile(plate -> conditionSupplier.get());
     }
 
     /**
      * A mandatory method to specify the condition
      *
-     * @param conditionFunction a lambda that takes the current Plate and creates and returns a new BoolVertex
+     * @param conditionFunction a lambda that takes the current Plate and creates and returns a new BooleanVertex
      * @return the next stage builder
      */
-    public LoopBuilder2 iterateWhile(Function<Plate, BoolVertex> conditionFunction) {
+    public LoopBuilder2 iterateWhile(Function<Plate, BooleanVertex> conditionFunction) {
         return new LoopBuilder2(initialState, conditionFunction, customMappings.build(), maxLoopCount, throwWhenMaxCountIsReached);
     }
 
     public class LoopBuilder2 {
         private final VertexDictionary initialState;
-        private final Function<Plate, BoolVertex> conditionFunction;
+        private final Function<Plate, BooleanVertex> conditionFunction;
         private final Map<VertexLabel, VertexLabel> customMappings;
         private final int maxLoopCount;
         private final boolean throwWhenMaxCountIsReached;
@@ -95,7 +95,7 @@ public class LoopBuilder {
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
-        LoopBuilder2(VertexDictionary initialState, Function<Plate, BoolVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached) {
+        LoopBuilder2(VertexDictionary initialState, Function<Plate, BooleanVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached) {
             this.initialState = setInitialState(initialState);
             this.conditionFunction = conditionFunction;
             this.customMappings = customMappings;
@@ -147,17 +147,17 @@ public class LoopBuilder {
                 .withFactory((plate) -> {
                     // inputs
                     DoubleVertex valueInWhenAlwaysTrue = new DoubleProxyVertex(VALUE_IN_WHEN_ALWAYS_TRUE_LABEL);
-                    BoolVertex stillLooping = new BoolProxyVertex(Loop.STILL_LOOPING_LABEL);
+                    BooleanVertex stillLooping = new BooleanProxyVertex(Loop.STILL_LOOPING_LABEL);
                     DoubleVertex valueIn = new DoubleProxyVertex(Loop.VALUE_IN_LABEL);
                     plate.addAll(valueInWhenAlwaysTrue, stillLooping, valueIn);
 
                     // intermediate
-                    BoolVertex condition = conditionFunction.apply(plate);
+                    BooleanVertex condition = conditionFunction.apply(plate);
                     plate.add(Loop.CONDITION_LABEL, condition);
 
                     // outputs
                     DoubleVertex iterationResult = iterationFunction.apply(plate, valueInWhenAlwaysTrue);
-                    BoolVertex loopAgain = stillLooping.and(condition);
+                    BooleanVertex loopAgain = stillLooping.and(condition);
                     DoubleVertex result = If.isTrue(loopAgain).then(iterationResult).orElse(valueIn);
                     plate.add(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL, iterationResult);
                     plate.add(LOOP_LABEL, loopAgain);

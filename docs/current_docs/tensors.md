@@ -142,6 +142,145 @@ GaussianVertex vertex = new GaussianVertex(shape, mu, 0);
  */
 ```  
 
+## Tensor Broadcasting
+
+Broadcasting enables you to perform operations across tensors of different shape, rank and length.
+
+* length (the total number of elements)
+* rank (the number of dimensions)
+* shape (the size in each dimension)
+
+For example a 3x3 matrix has rank 2, shape `[3, 3]`, and length 9. 
+
+Tensors can be added, subtracted, multiplied and more with each other. 
+It wouldn’t be very useful if you could only operate on tensors of the same shape, fortunately you can perform broadcasting.  
+
+### Tensor and Scalar
+
+Let’s start with a simple example, multiplying each element inside a matrix by a single value.
+
+Let’s define A as a tensor of shape `[2, 2]`. It’s therefore a 2x2 matrix of rank 2. 
+Let’s define B as a tensor of shape `[]`. It’s therefore a rank 0 value (a scalar).
+
+```java
+DoubleTensor A = DoubleTensor.create(new double[]{
+    10., 20.,
+    30., 40.
+}, 2, 2); //shape [2, 2]
+
+DoubleTensor B = DoubleTensor.scalar(5.); //shape []
+
+DoubleTensor C = A.times(B); //shape [2, 2]
+```
+
+We can do operations as normal between the two, even though they have different shapes. 
+The resulting tensor will always have the shape of the initial tensor.
+
+
+### Tensor and Tensor
+
+You will want to operate on tensors of different sizes. 
+Fortunately this is also supported given that you abide by certain broadcasting rules.
+
+Numpy have a very clear and thorough explanation of when broadcasting between tensors is valid and explanations of 
+how we determine which dimension to broadcast along that can be found [here](https://docs.scipy.org/doc/numpy-1.15.0/user/basics.broadcasting.html).
+
+In summary: When analysing two tensor shapes to determine if they are broadcastable, always read from the right. 
+If they are different rank, just ignore the remaining values on the left. 
+
+There is one simple rule that must be abided for broadcasting to be successful. 
+
+* When reading the shapes from the right, do they match or is one of the values a 1?
+
+Here are some examples of both cases.
+
+#### Subset of shape
+
+*Valid Example*
+
+Operating on a `[2, 2, 2]` and a `[2, 2]`
+
+```java
+DoubleTensor A = DoubleTensor.create(new double[]{
+    10., 20.,
+    30., 40.,
+
+    50., 60.,
+    70., 80.
+}, 2, 2, 2);  //shape [2, 2, 2]
+
+DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2);  //shape [2, 2]
+
+DoubleTensor C = A.times(B); //shape [2, 2, 2]
+DoubleTensor D = A.plus(B); //shape[2, 2, 2]
+```
+
+*Invalid Example*
+
+Operating on a `[2, 2, 3]` and a `[2, 2]`
+
+```java
+DoubleTensor A = DoubleTensor.create(new double[]{
+    10., 20.,
+    30., 40.,
+
+    50., 60.,
+    70., 80.,
+
+    90., 100.,
+    110., 120.
+}, 2, 2, 3);  //shape [2, 2, 3]
+
+DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2);  //shape [2, 2]
+
+DoubleTensor C = A.times(B); //error
+DoubleTensor D = A.plus(B); //error
+```
+
+#### Subset of shape or with 1’s
+
+*Valid Example*
+
+Operating on a `[2, 2, 2]` and a `[2, 2, 1]`
+
+```java
+DoubleTensor A = DoubleTensor.create(new double[]{
+    10., 20.,
+    30., 40.,
+
+    50., 60.,
+    70., 80.
+}, 2, 2, 2);  //shape [2, 2, 2]
+
+DoubleTensor B = DoubleTensor.arange(1, 4).reshape(2, 2, 1);  //shape [2, 2, 1]
+
+DoubleTensor C = A.times(B); //shape [2, 2, 2]
+DoubleTensor D = A.plus(B); //shape[2, 2, 2]
+```
+
+### Example
+
+So now that we know the rules, what’s a useful example of this?
+Let’s multiply a column vector along each column of a matrix.
+
+Operating on a `[2, 3]` and a `[2, 1]`
+
+```java
+DoubleTensor A = DoubleTensor.create(new double[]{
+    10., 20., 30.,
+    40., 50., 60.
+}, 2, 3);   //shape [2, 3]
+
+DoubleTensor B = DoubleTensor.create(new double[]{
+    5,
+    3
+}, 2, 1);  //shape [2, 1]
+
+DoubleTensor C = A.times(B); //shape [2, 3].
+// values: [50,  100, 150]
+//         [120, 150, 180]
+```
+
 
 ## Example of Tensors
 Tensors can provide us with a more succinct way of describing problems and can allow us to solve problems computationally efficiently on the GPU. 
