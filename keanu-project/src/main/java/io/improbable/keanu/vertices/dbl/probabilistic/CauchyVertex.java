@@ -106,9 +106,9 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
 
     @Override
     public LogProbGraph logProbGraph() {
-        LogProbGraph.DoublePlaceHolderVertex xPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(this.getShape());
-        LogProbGraph.DoublePlaceHolderVertex locationPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(location.getShape());
-        LogProbGraph.DoublePlaceHolderVertex scalePlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(scale.getShape());
+        LogProbGraph.DoublePlaceholderVertex xPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        LogProbGraph.DoublePlaceholderVertex locationPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(location.getShape());
+        LogProbGraph.DoublePlaceholderVertex scalePlaceHolder = new LogProbGraph.DoublePlaceholderVertex(scale.getShape());
 
         final DoubleVertex negLnScaleMinusLnPi = scalePlaceHolder.log().unaryMinus().plus(NEG_LOG_PI);
         final DoubleVertex xMinusLocationOverScalePow2Plus1 = xPlaceHolder.minus(locationPlaceHolder).div(scalePlaceHolder).pow(2).plus(1);

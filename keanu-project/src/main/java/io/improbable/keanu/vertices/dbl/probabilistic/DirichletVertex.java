@@ -91,8 +91,8 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
 
     @Override
     public LogProbGraph logProbGraph() {
-        LogProbGraph.DoublePlaceHolderVertex xPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(this.getShape());
-        LogProbGraph.DoublePlaceHolderVertex concentrationPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(concentration.getShape());
+        LogProbGraph.DoublePlaceholderVertex xPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        LogProbGraph.DoublePlaceholderVertex concentrationPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(concentration.getShape());
 
         final BoolVertex assertXIsGreaterThanEpsilon = xPlaceHolder
             .sum().minus(1.).abs().greaterThan(ConstantVertex.of(EPSILON))

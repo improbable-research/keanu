@@ -24,7 +24,7 @@ public class LogProbGraph {
      */
     @Getter
     @Singular
-    private final Map<Vertex<?>, Vertex<?>> inputs;
+    private final Map<Vertex<?>, PlaceholderVertex> inputs;
 
     /**
      * A vertex representing the result of log probability computation
@@ -32,13 +32,13 @@ public class LogProbGraph {
     @Getter
     private final DoubleVertex logProbOutput;
 
-    public <T> Vertex<T> getPlaceHolder(Vertex<T> input) {
+    public <T> Vertex<T> getPlaceholder(Vertex<T> input) {
         return (Vertex<T>) inputs.get(input);
     }
 
-    static public class DoublePlaceHolderVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
+    static public class DoublePlaceholderVertex extends DoubleVertex implements PlaceholderVertex, NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
 
-        public DoublePlaceHolderVertex(long[] initialShape) {
+        public DoublePlaceholderVertex(long[] initialShape) {
             super(initialShape);
         }
 
@@ -53,7 +53,7 @@ public class LogProbGraph {
         }
     }
 
-    static public class IntegerPlaceHolderVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
+    static public class IntegerPlaceHolderVertex extends IntegerVertex implements PlaceholderVertex, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
 
         public IntegerPlaceHolderVertex(long[] initialShape) {
             super(initialShape);
@@ -68,5 +68,8 @@ public class LogProbGraph {
         public IntegerTensor sample(KeanuRandom random) {
             return this.getValue();
         }
+    }
+
+    private interface PlaceholderVertex {
     }
 }

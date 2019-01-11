@@ -80,7 +80,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
 
     @Override
     public LogProbGraph logProbGraph() {
-        final LogProbGraph.DoublePlaceHolderVertex xPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex xPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
         final LogProbGraph.IntegerPlaceHolderVertex kPlaceHolder = new LogProbGraph.IntegerPlaceHolderVertex(k.getShape());
 
         final DoubleVertex halfK = kPlaceHolder.toDouble().div(2.);

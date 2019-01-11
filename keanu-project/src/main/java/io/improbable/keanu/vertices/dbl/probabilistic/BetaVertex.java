@@ -112,9 +112,9 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
 
     @Override
     public LogProbGraph logProbGraph() {
-        final LogProbGraph.DoublePlaceHolderVertex xPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(this.getShape());
-        final LogProbGraph.DoublePlaceHolderVertex alphaPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(alpha.getShape());
-        final LogProbGraph.DoublePlaceHolderVertex betaPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(beta.getShape());
+        final LogProbGraph.DoublePlaceholderVertex xPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex alphaPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(alpha.getShape());
+        final LogProbGraph.DoublePlaceholderVertex betaPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(beta.getShape());
 
         final DoubleVertex lnGammaAlpha = alphaPlaceHolder.logGamma();
         final DoubleVertex lnGammaBeta = betaPlaceHolder.logGamma();

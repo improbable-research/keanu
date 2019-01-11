@@ -105,20 +105,20 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
 
     @Override
     public LogProbGraph logProbGraph() {
-        final LogProbGraph.DoublePlaceHolderVertex xPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(this.getShape());
-        final LogProbGraph.DoublePlaceHolderVertex muPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(mu.getShape());
-        final LogProbGraph.DoublePlaceHolderVertex sigmaPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(sigma.getShape());
+        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex muPlaceholder = new LogProbGraph.DoublePlaceholderVertex(mu.getShape());
+        final LogProbGraph.DoublePlaceholderVertex sigmaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(sigma.getShape());
 
-        final DoubleVertex lnSigma = sigmaPlaceHolder.log();
-        final DoubleVertex xMinusMuSquared = xPlaceHolder.minus(muPlaceHolder).pow(2);
-        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigmaPlaceHolder.pow(2).times(2.0));
+        final DoubleVertex lnSigma = sigmaPlaceholder.log();
+        final DoubleVertex xMinusMuSquared = xPlaceholder.minus(muPlaceholder).pow(2);
+        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigmaPlaceholder.pow(2).times(2.0));
 
         final DoubleVertex logProbOutput = xMinusMuSquaredOver2Variance.plus(lnSigma).plus(Gaussian.LN_SQRT_2PI).unaryMinus().sum();
 
         return LogProbGraph.builder()
-            .input(this, xPlaceHolder)
-            .input(mu, muPlaceHolder)
-            .input(sigma, sigmaPlaceHolder)
+            .input(this, xPlaceholder)
+            .input(mu, muPlaceholder)
+            .input(sigma, sigmaPlaceholder)
             .logProbOutput(logProbOutput)
             .build();
     }
