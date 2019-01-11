@@ -11,17 +11,21 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 @UtilityClass
 public class DifferentiableChecker {
 
     public boolean isDifferentiable(Collection<Vertex> vertices) {
-        if(!allProbabilisticAreDoubleOrObserved(vertices)) {
+        if (!allProbabilisticAreDoubleOrObserved(vertices)) {
             return false;
         }
         Set<Vertex> allParents = getSetOfAllParents(vertices);
-        return diffableOrConstantUptoNextRV(allParents);
+        Set<Vertex> constantValueVerticesCache = new HashSet<>();
+        return diffableOrConstantUptoNextRV(allParents, constantValueVerticesCache);
     }
+
     private boolean allProbabilisticAreDoubleOrObserved(Collection<Vertex> vertices) {
         return vertices.stream().filter(Vertex::isProbabilistic)
             .allMatch(DifferentiableChecker::isDoubleOrObserved);
@@ -31,7 +35,7 @@ public class DifferentiableChecker {
         return (v instanceof DoubleVertex || v.isObserved());
     }
 
-    public Set<Vertex> getSetOfAllParents(Collection<Vertex> vertices) {
+    private Set<Vertex> getSetOfAllParents(Collection<Vertex> vertices) {
         Set<Vertex> allParents = new HashSet<>();
         for (Vertex vertex : vertices) {
             allParents.addAll(vertex.getParents());
@@ -39,10 +43,9 @@ public class DifferentiableChecker {
         return allParents;
     }
 
-    private boolean diffableOrConstantUptoNextRV(Collection<Vertex> vertices) {
+    private boolean diffableOrConstantUptoNextRV(Collection<Vertex> vertices, Set<Vertex> constantValueVerticesCache) {
         Queue<Vertex> queue = new LinkedList<>(vertices);
         Set<Vertex> queued = new HashSet<>(vertices);
-        Set<Vertex> constantValueVerticesCache = new HashSet<>();
 
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
@@ -65,22 +68,22 @@ public class DifferentiableChecker {
     }
 
     private boolean isNonDiffableAndNotConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
-        return !vertex.isDifferentiable() && !isVertexValueConstant(vertex, constantValueVerticesCache);
+        return !vertex.isDifferentiable() && !isVertexValueConstant(Collections.singletonList(vertex), constantValueVerticesCache);
     }
 
-    private boolean isVertexValueConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
-        Collection<Vertex> initialNext = Collections.singletonList(vertex);
-        Queue<Vertex> queue = new LinkedList<>(initialNext);
-        Set<Vertex> queued = new HashSet<>(initialNext);
+    private boolean bfsExplorer(Collection<Vertex> vertices, Predicate<Vertex> failureCondition,
+                                Predicate<Vertex> shouldAddParents, Consumer<Collection<Vertex>> successfullyVisitedConsumer) {
+        Queue<Vertex> queue = new LinkedList<>(vertices);
+        Set<Vertex> queued = new HashSet<>(vertices);
 
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
 
-            if (isUnobservedProbabilistic(visiting)) {
+            if (failureCondition.test(visiting)) {
                 return false;
             }
 
-            if (!isValueKnownToBeConstant(visiting, constantValueVerticesCache)) {
+            if (shouldAddParents.test(visiting)) {
                 Collection<Vertex> nextVertices = visiting.getParents();
                 for (Vertex next : nextVertices) {
                     if (!queued.contains(next)) {
@@ -90,8 +93,15 @@ public class DifferentiableChecker {
                 }
             }
         }
-        constantValueVerticesCache.addAll(queued);
+        successfullyVisitedConsumer.accept(queued);
         return true;
+    }
+
+    private boolean isVertexValueConstant(Collection<Vertex> vertices, Set<Vertex> constantValueVerticesCache) {
+        return bfsExplorer(vertices,
+            DifferentiableChecker::isUnobservedProbabilistic,
+            vertex -> !isValueKnownToBeConstant(vertex, constantValueVerticesCache),
+            constantValueVerticesCache::addAll);
     }
 
     // We know whether these are constant. For cases such as a MultiplicationVertex we would need to
