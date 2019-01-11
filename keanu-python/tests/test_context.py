@@ -25,10 +25,10 @@ def test_you_can_convert_a_numpy_array_to_a_java_array() -> None:
     assert java_list[2] == 3.
 
 
-def test_you_can_create_vertex_array_from_different_types() -> None:
-    a = ConstantInteger(1)
-    b = ConstantDouble(1.)
-    c = ConstantBoolean(True)
-
-    context = KeanuContext()
-    context.to_java_vertex_array([a, b, c])
+#def test_you_can_create_vertex_array_from_different_types() -> None:
+#    a = ConstantInteger(1)
+#    b = ConstantDouble(1.)
+#    c = ConstantBoolean(True)
+#
+#    context = KeanuContext()
+#    context.to_java_vertex_array([a, b, c])
