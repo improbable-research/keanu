@@ -2,8 +2,8 @@ package io.improbable.keanu.network;
 
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.VertexState;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexState;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 

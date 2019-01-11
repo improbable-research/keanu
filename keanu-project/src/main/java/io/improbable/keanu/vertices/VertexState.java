@@ -14,10 +14,6 @@ public class VertexState<T> implements VariableState {
         return new VertexState<>(null, false);
     }
 
-    public boolean hasValue() {
-        return getValue() != null;
-    }
-
     public Optional<T> getObservedValue() {
         if (isObserved) {
             return Optional.of(value);
