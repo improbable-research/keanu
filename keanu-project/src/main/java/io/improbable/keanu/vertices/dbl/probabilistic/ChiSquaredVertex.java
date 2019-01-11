@@ -6,6 +6,8 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -20,10 +22,11 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class ChiSquaredVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class ChiSquaredVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private IntegerVertex k;
     private static final String K_NAME = "k";
+    private static final double LOG_TWO = Math.log(2);
 
     /**
      * One k that must match a proposed tensor shape of ChiSquared
@@ -73,6 +76,24 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
     @Override
     public double logProb(DoubleTensor value) {
         return ChiSquared.withParameters(k.getValue()).logProb(value).sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceHolderVertex xPlaceHolder = new LogProbGraph.DoublePlaceHolderVertex(this.getShape());
+        final LogProbGraph.IntegerPlaceHolderVertex kPlaceHolder = new LogProbGraph.IntegerPlaceHolderVertex(k.getShape());
+
+        final DoubleVertex halfK = kPlaceHolder.toDouble().div(2.);
+        final DoubleVertex numerator = halfK.minus(1.).times(xPlaceHolder.log()).minus(xPlaceHolder.div(2.));
+        final DoubleVertex denominator = halfK.times(LOG_TWO).plus(halfK.logGamma());
+
+        final DoubleVertex logProbOutput = numerator.minus(denominator);
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceHolder)
+            .input(k, kPlaceHolder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
