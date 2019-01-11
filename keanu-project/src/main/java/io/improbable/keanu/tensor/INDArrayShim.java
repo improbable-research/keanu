@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor;
 
 import com.google.common.primitives.Ints;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -36,6 +37,7 @@ import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
  * subtract and minus, this requires a small change in the logic, as A - B != B - A and
  * A / B != B / A.
  */
+@Slf4j
 public class INDArrayShim {
 
     /*
@@ -52,7 +54,7 @@ public class INDArrayShim {
         try {
             nd4jInitThread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Failed to start new thread for ND4J", e);
         }
     }
 
