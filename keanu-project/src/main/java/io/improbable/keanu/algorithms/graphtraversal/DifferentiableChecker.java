@@ -5,10 +5,10 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import lombok.experimental.UtilityClass;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -47,13 +47,14 @@ public class DifferentiableChecker {
         return bfsExplorer(vertices,
             vertex -> isNonDiffableAndNotConstant(vertex, constantValueVerticesCache),
             vertex -> !vertex.isProbabilistic(),
-            doNothing -> {});
+            doNothing -> {
+            });
     }
 
     private static boolean bfsExplorer(Collection<Vertex> vertices, Predicate<Vertex> failureCondition,
-                                Predicate<Vertex> shouldAddParents,
-                                Consumer<Collection<Vertex>> successfullyVisitedConsumer) {
-        Queue<Vertex> queue = new LinkedList<>(vertices);
+                                       Predicate<Vertex> shouldAddParents,
+                                       Consumer<Collection<Vertex>> successfullyVisitedConsumer) {
+        Queue<Vertex> queue = new ArrayDeque<>(vertices);
         Set<Vertex> queued = new HashSet<>(vertices);
 
         while (!queue.isEmpty()) {
