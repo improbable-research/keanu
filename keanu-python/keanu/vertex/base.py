@@ -173,6 +173,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             return arg.unwrap()
         elif isinstance(arg, collections.Collection) and all(isinstance(x, runtime_primitive_types) for x in arg):
             return k.to_java_long_array(arg)
+        elif isinstance(arg, runtime_primitive_types) or isinstance(arg, JavaObject):
+            return arg
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
