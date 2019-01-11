@@ -2,8 +2,8 @@ package io.improbable.keanu.network;
 
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexState;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
@@ -32,8 +32,8 @@ public class NetworkSnapshotTest {
 
     @Test
     public void itSetsTheStateOfAVertex() {
-        VertexState<Object> s1 = mock(VertexState.class);
-        VertexState<Object> s2 = mock(VertexState.class);
+        VertexState<Object> s1 = VertexState.nullState();
+        VertexState<Object> s2 = VertexState.nullState();
         Vertex<Object> v1 = mock(Vertex.class);
         Vertex<Object> v2 = mock(Vertex.class);
         when(v1.getState()).thenReturn(s1);

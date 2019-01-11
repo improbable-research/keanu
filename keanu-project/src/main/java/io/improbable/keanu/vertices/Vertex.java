@@ -32,7 +32,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     public Vertex(long[] initialShape) {
         this.initialShape = initialShape;
-        this.state = new VertexState<T>(this);
+        this.state = VertexState.nullState();
     }
 
     /**
@@ -102,7 +102,9 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
      * @param value the observed value
      */
     public void setValue(T value) {
-        state.setValue(value);
+        if (!state.isObserved()) {
+            state = new VertexState<>(value, false);
+        }
     }
 
     @Override
@@ -112,12 +114,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     @Override
     public VertexState getState() {
-        return state.copy();
-    }
-
-    @Override
-    public Observable copy() {
-        throw new RuntimeException();
+        return state;
     }
 
     @Override
@@ -126,12 +123,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
     }
 
     public void setState(VertexState<T> newState) {
-        if (newState.isObserved()) {
-            state.observe(newState.getValue());
-        } else {
-            state.unobserve();
-            state.setValue(newState.getValue());
-        }
+        state = newState;
     }
 
     public boolean hasValue() {
@@ -174,19 +166,22 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
      */
     @Override
     public void observe(T value) {
-        state.observe(value);
+        if (!Observable.isObservable(this.getClass())) {
+            throw new UnsupportedOperationException("This type of vertex does not support being observed");
+        }
+        state = new VertexState<>(value, true);
     }
 
     /**
      * Cause this vertex to observe its own value, for example when generating test data
      */
     public void observeOwnValue() {
-        state.observe(getValue());
+        observe(getValue());
     }
 
     @Override
     public void unobserve() {
-        state.unobserve();
+        state = new VertexState<>(state.getValue(), false);
     }
 
     @Override
