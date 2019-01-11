@@ -7,6 +7,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
+import io.improbable.keanu.network.VariableState;
 import io.improbable.keanu.tensor.Tensor;
 
 import java.util.Arrays;
@@ -19,11 +20,10 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
-    private final Observable<T> observation;
 
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
-    private T value;
+    private VertexState<T> state;
     private VertexLabel label = null;
 
     public Vertex() {
@@ -32,7 +32,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     public Vertex(long[] initialShape) {
         this.initialShape = initialShape;
-        this.observation = Observable.observableTypeFor(this.getClass());
+        this.state = new VertexState<T>(this);
     }
 
     /**
@@ -102,28 +102,46 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
      * @param value the observed value
      */
     public void setValue(T value) {
-        if (!observation.isObserved()) {
-            this.value = value;
-        }
+        state.setValue(value);
     }
 
     @Override
     public T getValue() {
-        return hasValue() ? value : lazyEval();
+        return hasValue() ? state.getValue() : lazyEval();
+    }
+
+    @Override
+    public VertexState getState() {
+        return state.copy();
+    }
+
+    @Override
+    public Observable copy() {
+        throw new RuntimeException();
+    }
+
+    @Override
+    public void setState(VariableState newState) {
+        setState((VertexState<T>) newState);
+    }
+
+    public void setState(VertexState<T> newState) {
+        if (newState.isObserved()) {
+            state.observe(newState.getValue());
+        } else {
+            state.unobserve();
+            state.setValue(newState.getValue());
+        }
     }
 
     public boolean hasValue() {
-        if (value instanceof Tensor) {
-            return !((Tensor) value).isShapePlaceholder();
-        } else {
-            return value != null;
-        }
+        return state.hasValue();
     }
 
     @Override
     public long[] getShape() {
-        if (value instanceof Tensor) {
-            return ((Tensor) value).getShape();
+        if (state.getValue() instanceof Tensor) {
+            return ((Tensor) state.getValue()).getShape();
         } else {
             return initialShape;
         }
@@ -156,30 +174,29 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
      */
     @Override
     public void observe(T value) {
-        this.value = value;
-        observation.observe(value);
+        state.observe(value);
     }
 
     /**
      * Cause this vertex to observe its own value, for example when generating test data
      */
     public void observeOwnValue() {
-        observation.observe(getValue());
+        state.observe(getValue());
     }
 
     @Override
     public void unobserve() {
-        observation.unobserve();
+        state.unobserve();
     }
 
     @Override
     public boolean isObserved() {
-        return observation.isObserved();
+        return state.isObserved();
     }
 
     @Override
     public Optional<T> getObservedValue() {
-        return observation.getObservedValue();
+        return state.getObservedValue();
     }
 
     @Override

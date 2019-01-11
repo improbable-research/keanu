@@ -9,6 +9,10 @@ public class Observation<T> implements Observable<T> {
 
     private T observedValue = null;
 
+    private Observation(T observedValue) {
+        this.observedValue = observedValue;
+    }
+
     @Override
     public void observe(T value) {
         this.observedValue = value;
@@ -27,5 +31,10 @@ public class Observation<T> implements Observable<T> {
     @Override
     public boolean isObserved() {
         return this.observedValue != null;
+    }
+
+    @Override
+    public Observable copy() {
+        return new Observation(observedValue);
     }
 }

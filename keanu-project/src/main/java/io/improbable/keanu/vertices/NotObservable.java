@@ -28,4 +28,9 @@ public class NotObservable<T> implements Observable<T> {
     public boolean isObserved() {
         return false;
     }
+
+    @Override
+    public Observable copy() {
+        return new NotObservable();
+    }
 }

@@ -14,6 +14,8 @@ public interface Observable<T> {
 
     boolean isObserved();
 
+    Observable copy();
+
     static <T> Observable<T> observableTypeFor(Class<? extends Vertex> v) {
 
         boolean isProbabilistic = Probabilistic.class.isAssignableFrom(v);
@@ -27,4 +29,5 @@ public interface Observable<T> {
             return new NotObservable<>();
         }
     }
+
 }
