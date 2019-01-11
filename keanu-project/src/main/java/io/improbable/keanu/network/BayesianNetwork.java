@@ -46,7 +46,9 @@ public class BayesianNetwork {
     }
 
     public List<Vertex> getVerticesInNamespace(String... namespace) {
-        return vertices.stream().filter(v -> v.getLabel() != null && v.getLabel().isInNamespace(namespace)).collect(Collectors.toList());
+        return vertices.stream()
+            .filter(v -> v.getLabel() != null && v.getLabel().isInNamespace(namespace))
+            .collect(Collectors.toList());
     }
 
     private Map<VertexLabel, Vertex> buildLabelMap(Set<? extends Vertex> vertices) {
