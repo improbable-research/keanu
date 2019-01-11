@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices;
 
-public interface LogProbGraphGenerator {
+public interface LogProbGraphSupplier {
 
     LogProbGraph logProbGraph();
 
