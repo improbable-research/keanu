@@ -34,7 +34,7 @@ public class KeanuOptimizer {
      * @return an {@link Optimizer}
      */
     public Optimizer of(BayesianNetwork network) {
-        if (DifferentiableChecker.isDifferentiable(network.getLatentOrObservedVertices())) {
+        if (DifferentiableChecker.isDifferentiableWrtLatents(network.getLatentOrObservedVertices())) {
             return Gradient.of(network);
         } else {
             return NonGradient.of(network);

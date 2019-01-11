@@ -40,7 +40,7 @@ public class MCMC {
      * @return recommended sampling algorithm for this network.
      */
     public PosteriorSamplingAlgorithm forNetwork(BayesianNetwork bayesianNetwork) {
-        if (DifferentiableChecker.isDifferentiable(bayesianNetwork.getLatentOrObservedVertices())) {
+        if (DifferentiableChecker.isDifferentiableWrtLatents(bayesianNetwork.getLatentOrObservedVertices())) {
             return NUTS.withDefaultConfig(random);
         } else {
             return MetropolisHastings.withDefaultConfig(random);

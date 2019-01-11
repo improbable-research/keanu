@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 @UtilityClass
 public class DifferentiableChecker {
 
-    public boolean isDifferentiable(Collection<Vertex> vertices) {
+    public boolean isDifferentiableWrtLatents(Collection<Vertex> vertices) {
         if (!allProbabilisticAreDoubleOrObserved(vertices)) {
             return false;
         }
