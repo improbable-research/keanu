@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.Vertex;
 import java.util.Collection;
 import java.util.Map;
 
-public interface ProbabilisticGraphBuilder<T extends ProbabilisticGraph> {
+public interface ProbabilisticGraphBuilder<T> {
 
     void convert(Collection<? extends Vertex> vertices);
 

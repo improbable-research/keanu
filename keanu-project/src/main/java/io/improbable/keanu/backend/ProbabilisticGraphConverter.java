@@ -11,9 +11,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @UtilityClass
-public class ProbabilisticGraphConverter {
+class ProbabilisticGraphConverter {
 
-    static <T extends ProbabilisticGraph> void convert(BayesianNetwork network, ProbabilisticGraphBuilder<T> graphBuilder) {
+    static void convert(BayesianNetwork network, ProbabilisticGraphBuilder<?> graphBuilder) {
 
         graphBuilder.convert(network.getVertices());
 
@@ -35,8 +35,8 @@ public class ProbabilisticGraphConverter {
         logLikelihoodReference.ifPresent(graphBuilder::logLikelihood);
     }
 
-    private static <T extends ProbabilisticGraph> Optional<VariableReference> addLogProbCalculation(ProbabilisticGraphBuilder<T> graphBuilder,
-                                                                                                    List<Vertex> probabilisticVertices) {
+    private static Optional<VariableReference> addLogProbCalculation(ProbabilisticGraphBuilder<?> graphBuilder,
+                                                                     List<Vertex> probabilisticVertices) {
         List<VariableReference> logProbOps = probabilisticVertices.stream()
             .map(visiting -> {
                 if (visiting instanceof LogProbAsAGraphable) {
@@ -47,7 +47,10 @@ public class ProbabilisticGraphConverter {
                 }
             }).collect(Collectors.toList());
 
-        return addLogProbSumTotal(logProbOps, graphBuilder);
+        Optional<VariableReference> logProbSummation = logProbOps.stream()
+            .reduce(graphBuilder::add);
+
+        return logProbSummation;
     }
 
     /**
@@ -60,18 +63,6 @@ public class ProbabilisticGraphConverter {
         graphBuilder.connect(logProbGraph.getInputs());
         graphBuilder.convert(logProbGraph.getLogProbOutput().getConnectedGraph());
         return logProbGraph.getLogProbOutput().getReference();
-    }
-
-    private static <T extends ProbabilisticGraph> Optional<VariableReference> addLogProbSumTotal(List<VariableReference> logProbOps,
-                                                                                                 ProbabilisticGraphBuilder<T> graphBuilder) {
-        return logProbOps.stream()
-            .reduce((a, b) -> {
-                if (a == null) {
-                    return b;
-                } else {
-                    return graphBuilder.add(a, b);
-                }
-            });
     }
 
 }

@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toBooleanTensor;
 import static io.improbable.keanu.backend.tensorflow.TensorflowData.toDoubleTensor;
@@ -29,7 +28,7 @@ import static java.util.stream.Collectors.toMap;
 
 public class TensorflowComputableGraph implements ComputableGraph {
 
-    public static TensorflowComputableGraph convert(Set<Vertex> vertices) {
+    public static TensorflowComputableGraph convert(Collection<? extends Vertex> vertices) {
         TensorflowComputableGraphBuilder graphBuilder = new TensorflowComputableGraphBuilder();
         graphBuilder.convert(vertices);
         return graphBuilder.build();
