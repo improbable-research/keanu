@@ -60,7 +60,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class TensorflowComputableGraphConverter {
+public class KeanuToTensorflowOpMapper {
 
     private static Map<Class<?>, OpMapper> opMappers;
 
@@ -119,9 +119,9 @@ public class TensorflowComputableGraphConverter {
         opMappers.put(ConstantBooleanVertex.class, (vertex, lookup, opFactory) -> createConstant(vertex, opFactory));
 
         //special case ops
-        opMappers.put(DoubleIfVertex.class, TensorflowComputableGraphConverter::createDoubleIf);
-        opMappers.put(SumVertex.class, TensorflowComputableGraphConverter::createSum);
-        opMappers.put(ConcatenationVertex.class, TensorflowComputableGraphConverter::createConcat);
+        opMappers.put(DoubleIfVertex.class, KeanuToTensorflowOpMapper::createDoubleIf);
+        opMappers.put(SumVertex.class, KeanuToTensorflowOpMapper::createSum);
+        opMappers.put(ConcatenationVertex.class, KeanuToTensorflowOpMapper::createConcat);
     }
 
     public static OpMapper getOpMapperFor(Class<?> clazz) {

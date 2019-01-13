@@ -20,27 +20,27 @@ public class TensorflowComputableGraphBuilder implements ComputableGraphBuilder<
     private final Map<VariableReference, Output<?>> lookup;
 
     private final Map<VariableReference, Object> variableValues;
-    private final TensorflowOpFactory opHelper;
+    private final TensorflowOpFactory opFactory;
     private final Scope scope;
 
     public TensorflowComputableGraphBuilder() {
         lookup = new HashMap<>();
         variableValues = new HashMap<>();
         scope = new Scope(new Graph());
-        opHelper = new TensorflowOpFactory(scope);
+        opFactory = new TensorflowOpFactory(scope);
     }
 
     @Override
     public void createConstant(Vertex visiting) {
 
-        Output<?> converted = TensorflowComputableGraphConverter.createConstant(visiting, opHelper);
+        Output<?> converted = KeanuToTensorflowOpMapper.createConstant(visiting, opFactory);
         lookup.put(visiting.getReference(), converted);
     }
 
     @Override
     public void createVariable(Vertex visiting) {
 
-        Output<?> converted = TensorflowComputableGraphConverter.createVariable(visiting, opHelper);
+        Output<?> converted = KeanuToTensorflowOpMapper.createVariable(visiting, opFactory);
         lookup.put(visiting.getReference(), converted);
         variableValues.put(visiting.getReference(), visiting.getValue());
     }
@@ -53,13 +53,13 @@ public class TensorflowComputableGraphBuilder implements ComputableGraphBuilder<
     @Override
     public void create(Vertex visiting) {
 
-        TensorflowComputableGraphConverter.OpMapper opMapper = TensorflowComputableGraphConverter.getOpMapperFor(visiting.getClass());
+        KeanuToTensorflowOpMapper.OpMapper opMapper = KeanuToTensorflowOpMapper.getOpMapperFor(visiting.getClass());
 
         if (opMapper == null) {
             throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported for Tensorflow conversion");
         }
 
-        Output<?> converted = opMapper.apply(visiting, lookup, opHelper);
+        Output<?> converted = opMapper.apply(visiting, lookup, opFactory);
         lookup.put(visiting.getReference(), converted);
     }
 
@@ -72,7 +72,7 @@ public class TensorflowComputableGraphBuilder implements ComputableGraphBuilder<
 
     @Override
     public VariableReference add(VariableReference left, VariableReference right) {
-        Output<?> sum = opHelper.add((Output<Double>) lookup.get(left), (Output<Double>) lookup.get(right));
+        Output<?> sum = opFactory.add((Output<Double>) lookup.get(left), (Output<Double>) lookup.get(right));
         VariableReference sumReference = new StringVariableReference(sum.op().name());
 
         lookup.put(sumReference, sum);
