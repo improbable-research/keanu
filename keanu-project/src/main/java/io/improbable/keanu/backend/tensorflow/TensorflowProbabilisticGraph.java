@@ -10,16 +10,39 @@ import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbObservation;
+import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbPrior;
 
 @AllArgsConstructor
 public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
 
     public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
-        TensorflowProbabilisticGraphBuilder builder = new TensorflowProbabilisticGraphBuilder();
-        builder.convert(network);
+        TensorflowComputableGraphBuilder builder = new TensorflowComputableGraphBuilder();
 
-        return builder.build();
+        builder.convert(network.getVertices());
+
+        Optional<VariableReference> logLikelihoodReference = convertLogProbObservation(network, builder);
+        VariableReference priorLogProbReference = convertLogProbPrior(network, builder);
+
+        VariableReference logProbReference = logLikelihoodReference
+            .map(ll -> builder.add(ll, priorLogProbReference))
+            .orElse(priorLogProbReference);
+
+        TensorflowComputableGraph computableGraph = builder.build();
+
+        List<Variable<?>> latentVariables = builder.getLatentVariables().stream()
+            .map(v -> new TensorflowVariable<>(computableGraph, v))
+            .collect(Collectors.toList());
+
+        return new TensorflowProbabilisticGraph(
+            computableGraph,
+            latentVariables,
+            logProbReference,
+            logLikelihoodReference.orElse(null)
+        );
     }
 
     @Getter

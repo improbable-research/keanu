@@ -11,31 +11,46 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @UtilityClass
-class ProbabilisticGraphConverter {
+public class ProbabilisticGraphConverter {
 
-    static void convert(BayesianNetwork network, ProbabilisticGraphBuilder<?> graphBuilder) {
 
-        graphBuilder.convert(network.getVertices());
-
-        VariableReference priorLogProbReference = addLogProbCalculation(
-            graphBuilder,
-            network.getLatentVertices()
-        ).orElseThrow(() -> new IllegalArgumentException("Network must contain latent variables"));
-
-        Optional<VariableReference> logLikelihoodReference = addLogProbCalculation(
+    public static Optional<VariableReference> convertLogProbObservation(BayesianNetwork network,
+                                                                        ComputableGraphBuilder<?> graphBuilder) {
+        return addLogProbCalculation(
             graphBuilder,
             network.getObservedVertices()
         );
-
-        VariableReference logProbReference = logLikelihoodReference
-            .map(ll -> graphBuilder.add(ll, priorLogProbReference))
-            .orElse(priorLogProbReference);
-
-        graphBuilder.logProb(logProbReference);
-        logLikelihoodReference.ifPresent(graphBuilder::logLikelihood);
     }
 
-    private static Optional<VariableReference> addLogProbCalculation(ProbabilisticGraphBuilder<?> graphBuilder,
+    public static VariableReference convertLogProbPrior(BayesianNetwork network,
+                                                        ComputableGraphBuilder<?> graphBuilder) {
+        return addLogProbCalculation(
+            graphBuilder,
+            network.getLatentVertices()
+        ).orElseThrow(() -> new IllegalArgumentException("Network must contain latent variables"));
+    }
+
+//    static void convert(BayesianNetwork network, ComputableGraphBuilder<?> graphBuilder) {
+//
+//        graphBuilder.convert(network.getVertices());
+//
+//        VariableReference priorLogProbReference = addLogProbCalculation(
+//            graphBuilder,
+//            network.getLatentVertices()
+//        ).orElseThrow(() -> new IllegalArgumentException("Network must contain latent variables"));
+//
+//        Optional<VariableReference> logLikelihoodReference = addLogProbCalculation(
+//            graphBuilder,
+//            network.getObservedVertices()
+//        );
+//
+//        VariableReference logProbReference = logLikelihoodReference
+//            .map(ll -> graphBuilder.add(ll, priorLogProbReference))
+//            .orElse(priorLogProbReference);
+//
+//    }
+
+    private static Optional<VariableReference> addLogProbCalculation(ComputableGraphBuilder<?> graphBuilder,
                                                                      List<Vertex> probabilisticVertices) {
         List<VariableReference> logProbOps = probabilisticVertices.stream()
             .map(visiting -> {
@@ -58,7 +73,7 @@ class ProbabilisticGraphConverter {
      * @param graphBuilder the builder that contains state for the probabilistic graph building so far.
      */
     private static VariableReference addLogProbGraph(LogProbGraph logProbGraph,
-                                                     ProbabilisticGraphBuilder graphBuilder) {
+                                                     ComputableGraphBuilder<?> graphBuilder) {
 
         graphBuilder.connect(logProbGraph.getInputs());
         graphBuilder.convert(logProbGraph.getLogProbOutput().getConnectedGraph());

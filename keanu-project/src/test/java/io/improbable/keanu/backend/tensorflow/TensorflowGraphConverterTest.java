@@ -1,7 +1,7 @@
 package io.improbable.keanu.backend.tensorflow;
 
 import io.improbable.keanu.backend.ComputableGraph;
-import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.backend.ProbabilisticGraphWithGradient;
 import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -198,7 +198,7 @@ public class TensorflowGraphConverterTest {
 
         Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
-        try (ProbabilisticWithGradientGraph graph = TensorflowProbabilisticGraphWithGradientFactory.convert(network)) {
+        try (ProbabilisticGraphWithGradient graph = TensorflowProbabilisticGraphWithGradient.convert(network)) {
 
             double tensorflowLogProb = graph.logProb(inputs);
             Map<? extends VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
@@ -264,7 +264,7 @@ public class TensorflowGraphConverterTest {
 
         Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
-        try (ProbabilisticWithGradientGraph graph = TensorflowProbabilisticGraphWithGradientFactory.convert(network)) {
+        try (ProbabilisticGraphWithGradient graph = TensorflowProbabilisticGraphWithGradient.convert(network)) {
 
             Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
             inputs.put(A.getReference(), initialA);

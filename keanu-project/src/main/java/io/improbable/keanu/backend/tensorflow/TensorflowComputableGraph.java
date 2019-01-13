@@ -7,6 +7,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;
+import org.tensorflow.Graph;
+import org.tensorflow.Output;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
 import org.tensorflow.op.Scope;
@@ -154,6 +156,32 @@ public class TensorflowComputableGraph implements ComputableGraph {
         }
 
         return fetchedRunner;
+    }
+
+    /**
+     * @param ofLabel             of operation reference
+     * @param withRespectToLabels with respect to references
+     * @return gradient output name to input name lookup
+     */
+    public Map<VariableReference, VariableReference> addGradients(VariableReference ofLabel,
+                                                                  List<VariableReference> withRespectToLabels) {
+
+        Graph graph = scope.graph();
+        Output<?>[] wrt = withRespectToLabels.stream()
+            .map(opName -> graph.operation(opName.toStringReference()).output(0))
+            .toArray(Output[]::new);
+
+        Output<?>[] gradientOutputs = graph.addGradients(
+            graph.operation(ofLabel.toStringReference()).output(0),
+            wrt
+        );
+
+        Map<VariableReference, VariableReference> gradientOutputNameToInputName = new HashMap<>();
+        for (int i = 0; i < withRespectToLabels.size(); i++) {
+            gradientOutputNameToInputName.put(new StringVariableReference(gradientOutputs[i].op().name()), withRespectToLabels.get(i));
+        }
+
+        return gradientOutputNameToInputName;
     }
 
     @Override

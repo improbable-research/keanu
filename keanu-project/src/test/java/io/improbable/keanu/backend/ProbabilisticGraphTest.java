@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.backend.keanu.KeanuProbabilisticGraph;
 import io.improbable.keanu.backend.keanu.KeanuProbabilisticWithGradientGraph;
 import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticGraph;
-import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticGraphWithGradientFactory;
+import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticGraphWithGradient;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -88,7 +88,7 @@ public class ProbabilisticGraphTest {
 
     @Test
     public void canCalculateLogProbOnTensorflowProbabilisticWithGradientGraph() {
-        ProbabilisticGraph probabilisticGraph = TensorflowProbabilisticGraphWithGradientFactory.convert(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticGraph probabilisticGraph = TensorflowProbabilisticGraphWithGradient.convert(new BayesianNetwork(D.getConnectedGraph()));
         canCalculateLogProb(probabilisticGraph);
     }
 
@@ -100,7 +100,7 @@ public class ProbabilisticGraphTest {
 
     @Test
     public void canCalculateLogLikelihoodOnTensorflowProbabilisticWithGradientGraph() {
-        ProbabilisticGraph probabilisticGraph = TensorflowProbabilisticGraphWithGradientFactory.convert(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticGraph probabilisticGraph = TensorflowProbabilisticGraphWithGradient.convert(new BayesianNetwork(D.getConnectedGraph()));
         canCalculateLogLikelihood(probabilisticGraph);
     }
 

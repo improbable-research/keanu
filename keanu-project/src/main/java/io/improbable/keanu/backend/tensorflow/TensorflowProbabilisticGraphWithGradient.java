@@ -1,15 +1,67 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.backend.ProbabilisticGraphWithGradient;
 import io.improbable.keanu.backend.Variable;
 import io.improbable.keanu.backend.VariableReference;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class TensorflowProbabilisticGraphWithGradient extends TensorflowProbabilisticGraph implements ProbabilisticWithGradientGraph {
+import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbObservation;
+import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbPrior;
+
+public class TensorflowProbabilisticGraphWithGradient extends TensorflowProbabilisticGraph implements ProbabilisticGraphWithGradient {
+
+    public static TensorflowProbabilisticGraphWithGradient convert(BayesianNetwork network) {
+
+        TensorflowComputableGraphBuilder builder = new TensorflowComputableGraphBuilder();
+
+        builder.convert(network.getVertices());
+
+        Optional<VariableReference> logLikelihoodReference = convertLogProbObservation(network, builder);
+        VariableReference priorLogProbReference = convertLogProbPrior(network, builder);
+
+        VariableReference logProbReference = logLikelihoodReference
+            .map(ll -> builder.add(ll, priorLogProbReference))
+            .orElse(priorLogProbReference);
+
+        List<VariableReference> latentVariablesReferences = network.getLatentVertices().stream()
+            .map(Variable::getReference)
+            .collect(Collectors.toList());
+
+        TensorflowComputableGraph computableGraph = builder.build();
+
+        Optional<Map<VariableReference, VariableReference>> logLikelihoodGradients = logLikelihoodReference.map(
+            logLikelihoodOp -> computableGraph.addGradients(
+                logLikelihoodOp,
+                latentVariablesReferences
+            )
+        );
+
+        Map<VariableReference, VariableReference> logProbGradients = computableGraph.addGradients(
+            logProbReference,
+            latentVariablesReferences
+        );
+
+        List<Variable<?>> latentVariables = builder.getLatentVariables().stream()
+            .map(v -> new TensorflowVariable<>(computableGraph, v))
+            .collect(Collectors.toList());
+
+        return new TensorflowProbabilisticGraphWithGradient(
+            computableGraph,
+            latentVariables,
+            logProbReference,
+            logLikelihoodReference.orElse(null),
+            logProbGradients,
+            logLikelihoodGradients.orElse(null)
+        );
+
+    }
 
     private final TensorflowComputableGraph computableGraph;
     private final Map<VariableReference, VariableReference> logProbGradients;

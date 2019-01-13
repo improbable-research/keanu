@@ -1,6 +1,6 @@
 package io.improbable.keanu.backend.keanu;
 
-import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.backend.ProbabilisticGraphWithGradient;
 import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCal
 import java.util.List;
 import java.util.Map;
 
-public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph implements ProbabilisticWithGradientGraph {
+public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph implements ProbabilisticGraphWithGradient {
 
     private LogProbGradientCalculator logProbGradientCalculator;
     private LogProbGradientCalculator logLikelihoodGradientCalculator;

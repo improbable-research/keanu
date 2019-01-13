@@ -3,15 +3,17 @@ package io.improbable.keanu.backend.tensorflow;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import lombok.experimental.UtilityClass;
 import org.tensorflow.Tensor;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 
-public class TensorflowData {
+@UtilityClass
+class TensorflowData {
 
-    public static DoubleTensor toDoubleTensor(Tensor<?> tensor) {
+    static DoubleTensor toDoubleTensor(Tensor<?> tensor) {
 
         DoubleBuffer buffer = DoubleBuffer.allocate(tensor.numElements());
         tensor.writeTo(buffer);
@@ -27,7 +29,7 @@ public class TensorflowData {
         }
     }
 
-    public static BooleanTensor toBooleanTensor(Tensor<?> tensor) {
+    static BooleanTensor toBooleanTensor(Tensor<?> tensor) {
 
         ByteBuffer buffer = ByteBuffer.allocate(tensor.numElements());
         tensor.writeTo(buffer);
@@ -51,7 +53,7 @@ public class TensorflowData {
         return out;
     }
 
-    public static IntegerTensor toIntegerTensor(Tensor<?> tensor) {
+    static IntegerTensor toIntegerTensor(Tensor<?> tensor) {
 
         IntBuffer buffer = IntBuffer.allocate(tensor.numElements());
         tensor.writeTo(buffer);
@@ -67,26 +69,26 @@ public class TensorflowData {
         }
     }
 
-    public static Tensor<Double> toTensorFlow(DoubleTensor keanuTensor) {
+    static Tensor<Double> toTensorFlow(DoubleTensor keanuTensor) {
         return toTensorFlow(keanuTensor.getShape(), keanuTensor.asFlatDoubleArray());
     }
 
-    public static Tensor<Boolean> toTensorFlow(BooleanTensor keanuTensor) {
+    static Tensor<Boolean> toTensorFlow(BooleanTensor keanuTensor) {
         return toTensorFlow(keanuTensor.getShape(), keanuTensor.asFlatArray());
     }
 
-    public static Tensor<Integer> toTensorFlow(IntegerTensor keanuTensor) {
+    static Tensor<Integer> toTensorFlow(IntegerTensor keanuTensor) {
         return toTensorFlow(keanuTensor.getShape(), keanuTensor.asFlatIntegerArray());
     }
 
-    public static Tensor<Double> toTensorFlow(long[] shape, double[] data) {
+    static Tensor<Double> toTensorFlow(long[] shape, double[] data) {
         return Tensor.create(
             shape,
             DoubleBuffer.wrap(data)
         );
     }
 
-    public static Tensor<Boolean> toTensorFlow(long[] shape, Boolean[] data) {
+    static Tensor<Boolean> toTensorFlow(long[] shape, Boolean[] data) {
         return Tensor.create(
             Boolean.class,
             shape,
@@ -94,14 +96,14 @@ public class TensorflowData {
         );
     }
 
-    public static Tensor<Integer> toTensorFlow(long[] shape, int[] data) {
+    static Tensor<Integer> toTensorFlow(long[] shape, int[] data) {
         return Tensor.create(
             shape,
             IntBuffer.wrap(data)
         );
     }
 
-    public static byte[] bool2byte(Boolean[] array) {
+    private static byte[] bool2byte(Boolean[] array) {
         byte[] out = new byte[array.length];
         for (int i = 0; i < array.length; i++) {
             out[i] = array[i] ? (byte) 1 : (byte) 0;
