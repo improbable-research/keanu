@@ -11,7 +11,7 @@ import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 
 @UtilityClass
-class TensorflowData {
+class TensorflowDataConversion {
 
     static DoubleTensor toDoubleTensor(Tensor<?> tensor) {
 

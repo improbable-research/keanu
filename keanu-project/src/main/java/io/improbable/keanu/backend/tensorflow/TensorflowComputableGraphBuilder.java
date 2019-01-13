@@ -20,14 +20,14 @@ public class TensorflowComputableGraphBuilder implements ComputableGraphBuilder<
     private final Map<VariableReference, Output<?>> lookup;
 
     private final Map<VariableReference, Object> variableValues;
-    private final TensorflowOpHelper opHelper;
+    private final TensorflowOpFactory opHelper;
     private final Scope scope;
 
     public TensorflowComputableGraphBuilder() {
         lookup = new HashMap<>();
         variableValues = new HashMap<>();
         scope = new Scope(new Graph());
-        opHelper = new TensorflowOpHelper(scope);
+        opHelper = new TensorflowOpFactory(scope);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class TensorflowComputableGraphBuilder implements ComputableGraphBuilder<
     @Override
     public void create(Vertex visiting) {
 
-        TensorflowComputableGraphConverter.OpMapper opMapper = TensorflowComputableGraphConverter.opMappers.get(visiting.getClass());
+        TensorflowComputableGraphConverter.OpMapper opMapper = TensorflowComputableGraphConverter.getOpMapperFor(visiting.getClass());
 
         if (opMapper == null) {
             throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported for Tensorflow conversion");

@@ -21,10 +21,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static io.improbable.keanu.backend.tensorflow.TensorflowData.toBooleanTensor;
-import static io.improbable.keanu.backend.tensorflow.TensorflowData.toDoubleTensor;
-import static io.improbable.keanu.backend.tensorflow.TensorflowData.toIntegerTensor;
-import static io.improbable.keanu.backend.tensorflow.TensorflowData.toTensorFlow;
+import static io.improbable.keanu.backend.tensorflow.TensorflowDataConversion.toBooleanTensor;
+import static io.improbable.keanu.backend.tensorflow.TensorflowDataConversion.toDoubleTensor;
+import static io.improbable.keanu.backend.tensorflow.TensorflowDataConversion.toIntegerTensor;
+import static io.improbable.keanu.backend.tensorflow.TensorflowDataConversion.toTensorFlow;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;

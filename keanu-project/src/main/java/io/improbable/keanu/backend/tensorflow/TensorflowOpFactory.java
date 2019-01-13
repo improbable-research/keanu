@@ -14,17 +14,17 @@ import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 
-import static io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType.ADD;
-import static io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType.CONCAT_V2;
-import static io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType.CONSTANT;
-import static io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType.PLACE_HOLDER;
-import static io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType.VARIABLE_V2;
+import static io.improbable.keanu.backend.tensorflow.TensorflowOpFactory.OpType.ADD;
+import static io.improbable.keanu.backend.tensorflow.TensorflowOpFactory.OpType.CONCAT_V2;
+import static io.improbable.keanu.backend.tensorflow.TensorflowOpFactory.OpType.CONSTANT;
+import static io.improbable.keanu.backend.tensorflow.TensorflowOpFactory.OpType.PLACE_HOLDER;
+import static io.improbable.keanu.backend.tensorflow.TensorflowOpFactory.OpType.VARIABLE_V2;
 
-public class TensorflowOpHelper {
+public class TensorflowOpFactory {
 
     private Scope scope;
 
-    public TensorflowOpHelper(Scope scope) {
+    public TensorflowOpFactory(Scope scope) {
         this.scope = scope;
     }
 
@@ -127,10 +127,6 @@ public class TensorflowOpHelper {
         }
     }
 
-    Output<Double> constant(double[] value, long[] shape) {
-        return constant(value, shape, scope.makeOpName(CONSTANT.tfOpName));
-    }
-
     Output<Double> constant(double[] value, long[] shape, String name) {
         try (Tensor<Double> tensor = Tensor.create(shape, DoubleBuffer.wrap(value))) {
             return this.constant(name, tensor, Double.class);
@@ -142,7 +138,7 @@ public class TensorflowOpHelper {
     }
 
     Output<Boolean> constant(Boolean[] value, long[] shape, String name) {
-        try (Tensor<Boolean> tensor = TensorflowData.toTensorFlow(shape, value)) {
+        try (Tensor<Boolean> tensor = TensorflowDataConversion.toTensorFlow(shape, value)) {
             return this.constant(name, tensor, Boolean.class);
         }
     }

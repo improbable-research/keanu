@@ -1,7 +1,7 @@
 package io.improbable.keanu.backend.tensorflow;
 
 import io.improbable.keanu.backend.VariableReference;
-import io.improbable.keanu.backend.tensorflow.TensorflowOpHelper.OpType;
+import io.improbable.keanu.backend.tensorflow.TensorflowOpFactory.OpType;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -62,7 +62,7 @@ import java.util.stream.Collectors;
 
 public class TensorflowComputableGraphConverter {
 
-    static Map<Class<?>, OpMapper> opMappers;
+    private static Map<Class<?>, OpMapper> opMappers;
 
     static {
         opMappers = new HashMap<>();
@@ -114,9 +114,9 @@ public class TensorflowComputableGraphConverter {
         opMappers.put(IntegerAbsVertex.class, unaryOp(OpType.ABS));
 
         //constants
-        opMappers.put(ConstantDoubleVertex.class, (vertex, lookup, graphBuilder) -> createConstant(vertex, graphBuilder));
-        opMappers.put(ConstantIntegerVertex.class, (vertex, lookup, graphBuilder) -> createConstant(vertex, graphBuilder));
-        opMappers.put(ConstantBooleanVertex.class, (vertex, lookup, graphBuilder) -> createConstant(vertex, graphBuilder));
+        opMappers.put(ConstantDoubleVertex.class, (vertex, lookup, opFactory) -> createConstant(vertex, opFactory));
+        opMappers.put(ConstantIntegerVertex.class, (vertex, lookup, opFactory) -> createConstant(vertex, opFactory));
+        opMappers.put(ConstantBooleanVertex.class, (vertex, lookup, opFactory) -> createConstant(vertex, opFactory));
 
         //special case ops
         opMappers.put(DoubleIfVertex.class, TensorflowComputableGraphConverter::createDoubleIf);
@@ -124,8 +124,12 @@ public class TensorflowComputableGraphConverter {
         opMappers.put(ConcatenationVertex.class, TensorflowComputableGraphConverter::createConcat);
     }
 
+    public static OpMapper getOpMapperFor(Class<?> clazz) {
+        return opMappers.get(clazz);
+    }
+
     interface OpMapper {
-        Output<?> apply(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpHelper graphBuilder);
+        Output<?> apply(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpFactory opFactory);
     }
 
     private static Output<?> getOutput(Map<VariableReference, Output<?>> lookup, Vertex vertex) {
@@ -133,23 +137,23 @@ public class TensorflowComputableGraphConverter {
     }
 
     private static OpMapper binaryOp(OpType op) {
-        return (vertex, lookup, graphBuilder) -> {
+        return (vertex, lookup, opFactory) -> {
             VertexBinaryOp<?, ?> binaryOpVertex = (VertexBinaryOp<?, ?>) vertex;
             Output<?> leftOperand = getOutput(lookup, binaryOpVertex.getLeft());
             Output<?> rightOperand = getOutput(lookup, binaryOpVertex.getRight());
-            return graphBuilder.binaryOp(op, getTensorflowOpName(vertex), leftOperand, rightOperand);
+            return opFactory.binaryOp(op, getTensorflowOpName(vertex), leftOperand, rightOperand);
         };
     }
 
     private static OpMapper unaryOp(OpType op) {
-        return (vertex, lookup, graphBuilder) -> {
+        return (vertex, lookup, opFactory) -> {
             VertexUnaryOp unaryOpVertex = (VertexUnaryOp) vertex;
             Output<?> operand = getOutput(lookup, unaryOpVertex.getInput());
-            return graphBuilder.unaryOp(op, getTensorflowOpName(vertex), operand);
+            return opFactory.unaryOp(op, getTensorflowOpName(vertex), operand);
         };
     }
 
-    private static Output<?> createDoubleIf(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpHelper graphBuilder) {
+    private static Output<?> createDoubleIf(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpFactory opFactory) {
         DoubleIfVertex doubleIfVertex = (DoubleIfVertex) vertex;
 
         Output<Boolean> predicate = (Output<Boolean>) getOutput(lookup, doubleIfVertex.getPredicate());
@@ -157,15 +161,15 @@ public class TensorflowComputableGraphConverter {
         Output<Double> els = (Output<Double>) getOutput(lookup, doubleIfVertex.getEls());
 
         long[] predicateShape = doubleIfVertex.getPredicate().getShape();
-        Output<Long> shape = graphBuilder.constant(predicateShape, new long[]{predicateShape.length});
+        Output<Long> shape = opFactory.constant(predicateShape, new long[]{predicateShape.length});
 
-        Output<Double> thnBroadcast = graphBuilder.broadcastTo(thn, shape);
-        Output<Double> elsBroadcast = graphBuilder.broadcastTo(els, shape);
+        Output<Double> thnBroadcast = opFactory.broadcastTo(thn, shape);
+        Output<Double> elsBroadcast = opFactory.broadcastTo(els, shape);
 
-        return graphBuilder.where(predicate, thnBroadcast, elsBroadcast);
+        return opFactory.where(predicate, thnBroadcast, elsBroadcast);
     }
 
-    private static Output<?> createConcat(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpHelper graphBuilder) {
+    private static Output<?> createConcat(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpFactory opFactory) {
         ConcatenationVertex concatenationVertex = (ConcatenationVertex) vertex;
 
         Output<Double>[] inputs = (Output<Double>[]) Operands.asOutputs(
@@ -174,10 +178,10 @@ public class TensorflowComputableGraphConverter {
                 .collect(Collectors.toList())
         );
 
-        return graphBuilder.concat(inputs, concatenationVertex.getDimension(), getTensorflowOpName(concatenationVertex));
+        return opFactory.concat(inputs, concatenationVertex.getDimension(), getTensorflowOpName(concatenationVertex));
     }
 
-    private static <T> Output<T> createSum(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpHelper graphBuilder) {
+    private static <T> Output<T> createSum(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpFactory opFactory) {
         SumVertex summationVertex = (SumVertex) vertex;
         Output<?> input = getOutput(lookup, summationVertex.getInput());
         String name = getTensorflowOpName(vertex);
@@ -187,49 +191,49 @@ public class TensorflowComputableGraphConverter {
 
         if (summingOverDimensions == null) {
             int inputRank = summationVertex.getInput().getShape().length;
-            overDimensions = graphBuilder.constant(TensorShape.dimensionRange(0, inputRank), new long[]{inputRank});
+            overDimensions = opFactory.constant(TensorShape.dimensionRange(0, inputRank), new long[]{inputRank});
         } else {
             int dims = summationVertex.getOverDimensions().length;
-            overDimensions = graphBuilder.constant(summationVertex.getOverDimensions(), new long[]{dims});
+            overDimensions = opFactory.constant(summationVertex.getOverDimensions(), new long[]{dims});
         }
 
-        return graphBuilder.binaryOp(OpType.SUM, name, input, overDimensions);
+        return opFactory.binaryOp(OpType.SUM, name, input, overDimensions);
     }
 
-    public static Output<?> createConstant(Vertex<?> vertex, TensorflowOpHelper graphBuilder) {
+    public static Output<?> createConstant(Vertex<?> vertex, TensorflowOpFactory opFactory) {
 
         Object value = vertex.getValue();
 
         if (value instanceof DoubleTensor) {
             DoubleTensor doubleValue = (DoubleTensor) value;
-            return graphBuilder.constant(doubleValue.asFlatDoubleArray(), doubleValue.getShape(), getTensorflowOpName(vertex));
+            return opFactory.constant(doubleValue.asFlatDoubleArray(), doubleValue.getShape(), getTensorflowOpName(vertex));
         } else if (value instanceof IntegerTensor) {
             IntegerTensor integerValue = (IntegerTensor) value;
-            return graphBuilder.constant(integerValue.asFlatIntegerArray(), integerValue.getShape(), getTensorflowOpName(vertex));
+            return opFactory.constant(integerValue.asFlatIntegerArray(), integerValue.getShape(), getTensorflowOpName(vertex));
         } else if (value instanceof BooleanTensor) {
             BooleanTensor booleanValue = (BooleanTensor) value;
-            return graphBuilder.constant(booleanValue.asFlatArray(), booleanValue.getShape(), getTensorflowOpName(vertex));
+            return opFactory.constant(booleanValue.asFlatArray(), booleanValue.getShape(), getTensorflowOpName(vertex));
         }
 
         throw new IllegalArgumentException("Cannot create " + value.getClass());
     }
 
-    public static Output<?> createVariable(Vertex<?> vertex, TensorflowOpHelper graphBuilder) {
+    public static Output<?> createVariable(Vertex<?> vertex, TensorflowOpFactory opFactory) {
 
         Object value = vertex.getValue();
 
         if (value instanceof DoubleTensor) {
-            return graphBuilder.variable(getTensorflowOpName(vertex), toShape(vertex.getShape()), Double.class);
+            return opFactory.variable(getTensorflowOpName(vertex), toTensorflowShape(vertex.getShape()), Double.class);
         } else if (value instanceof IntegerTensor) {
-            return graphBuilder.variable(getTensorflowOpName(vertex), toShape(vertex.getShape()), Integer.class);
+            return opFactory.variable(getTensorflowOpName(vertex), toTensorflowShape(vertex.getShape()), Integer.class);
         } else if (value instanceof BooleanTensor) {
-            return graphBuilder.variable(getTensorflowOpName(vertex), toShape(vertex.getShape()), Boolean.class);
+            return opFactory.variable(getTensorflowOpName(vertex), toTensorflowShape(vertex.getShape()), Boolean.class);
         }
 
         throw new IllegalArgumentException("Cannot create variable for " + value.getClass());
     }
 
-    private static Shape toShape(long[] shape) {
+    private static Shape toTensorflowShape(long[] shape) {
         if (shape.length == 0) {
             return Shape.scalar();
         } else {
