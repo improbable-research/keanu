@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class ProbabilisticGraphConverter {
 
-
     public static Optional<VariableReference> convertLogProbObservation(BayesianNetwork network,
                                                                         ComputableGraphBuilder<?> graphBuilder) {
         return addLogProbCalculation(
@@ -29,26 +28,6 @@ public class ProbabilisticGraphConverter {
             network.getLatentVertices()
         ).orElseThrow(() -> new IllegalArgumentException("Network must contain latent variables"));
     }
-
-//    static void convert(BayesianNetwork network, ComputableGraphBuilder<?> graphBuilder) {
-//
-//        graphBuilder.convert(network.getVertices());
-//
-//        VariableReference priorLogProbReference = addLogProbCalculation(
-//            graphBuilder,
-//            network.getLatentVertices()
-//        ).orElseThrow(() -> new IllegalArgumentException("Network must contain latent variables"));
-//
-//        Optional<VariableReference> logLikelihoodReference = addLogProbCalculation(
-//            graphBuilder,
-//            network.getObservedVertices()
-//        );
-//
-//        VariableReference logProbReference = logLikelihoodReference
-//            .map(ll -> graphBuilder.add(ll, priorLogProbReference))
-//            .orElse(priorLogProbReference);
-//
-//    }
 
     private static Optional<VariableReference> addLogProbCalculation(ComputableGraphBuilder<?> graphBuilder,
                                                                      List<Vertex> probabilisticVertices) {

@@ -1,6 +1,5 @@
-package io.improbable.keanu.backend.tensorflow;
+package io.improbable.keanu.backend;
 
-import io.improbable.keanu.backend.VariableReference;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
