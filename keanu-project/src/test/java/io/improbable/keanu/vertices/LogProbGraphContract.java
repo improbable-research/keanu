@@ -2,7 +2,9 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class LogProbGraphContract {
 
@@ -13,6 +15,7 @@ public class LogProbGraphContract {
     }
 
     public static void equal(LogProbGraph actual, LogProbGraph expected) {
-        assertEquals(actual.getLogProbOutput().getValue(), expected.getLogProbOutput().getValue());
+        assertThat(actual.getLogProbOutput().getValue(), equalTo(expected.getLogProbOutput().getValue()));
     }
+
 }

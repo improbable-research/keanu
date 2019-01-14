@@ -11,8 +11,11 @@ import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.apache.commons.math3.util.Pair;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +63,7 @@ public class DirichletVertexTest {
         double expectedDensity = betaDistribution.logDensity(0.5);
         LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
 
-        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.create(0.75, 0.25));
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, vertex, DoubleTensor.create(0.75, 0.25));
         expectedDensity = betaDistribution.logDensity(0.75);
         LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
@@ -86,7 +89,7 @@ public class DirichletVertexTest {
 
     @Test
     public void logProbGraphIsFlatUniformIfAllConcentrationValuesAreOne() {
-        DoubleVertex concentration = ConstantVertex.of(DoubleTensor.create(1, new long[] {1, 4}));
+        DoubleVertex concentration = ConstantVertex.of(DoubleTensor.create(1, new long[]{1, 4}));
         DirichletVertex dirichlet = new DirichletVertex(concentration);
 
         LogProbGraph logProbGraph1 = dirichlet.logProbGraph();
@@ -128,9 +131,22 @@ public class DirichletVertexTest {
         double expectedDensity = Math.log(baseline.density(new double[]{0.1, 0.6, 0.3}));
         LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
 
-        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.create(0.3, 0.4, 0.3));
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, vertex, DoubleTensor.create(0.3, 0.4, 0.3));
         expectedDensity = Math.log(baseline.density(new double[]{0.3, 0.4, 0.3}));
         LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+
+    @Test(expected = GraphAssertionException.class)
+    public void logProbGraphThrowsExceptionIfSumOfXIsNotEqualTo1WithEpsilon() {
+        DoubleVertex concentration = ConstantVertex.of(3., 4., 5.);
+        DirichletVertex vertex = new DirichletVertex(concentration);
+        DoubleTensor x = DoubleTensor.create(0.1, 0.6, 0.300011);
+        assertThat(Math.abs(x.sum() - 1.), is(greaterThan((.00001))));
+
+        LogProbGraph logProbGraph = vertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, concentration, concentration.getValue());
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, vertex, x);
     }
 
     @Category(Slow.class)
