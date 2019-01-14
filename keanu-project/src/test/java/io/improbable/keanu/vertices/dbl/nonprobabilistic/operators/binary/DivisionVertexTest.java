@@ -88,4 +88,14 @@ public class DivisionVertexTest {
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), C, 0.001, 1e-5);
     }
+
+    @Test
+    public void finiteDifferenceMatchesElementwise() {
+        BinaryOperationTestHelpers.finiteDifferenceMatchesElementwise(DoubleVertex::div);
+    }
+
+    @Test
+    public void finiteDifferenceMatchesSimpleBroadcast() {
+        BinaryOperationTestHelpers.finiteDifferenceMatchesBroadcast(DoubleVertex::div);
+    }
 }

@@ -7,8 +7,8 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
@@ -17,15 +17,15 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-import static io.improbable.keanu.vertices.bool.BoolVertex.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static io.improbable.keanu.vertices.bool.BooleanVertex.not;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class BoolVertexTest {
+public class BooleanVertexTest {
 
     private KeanuRandom random;
     private BernoulliVertex v1;
@@ -42,7 +42,7 @@ public class BoolVertexTest {
 
     @Test
     public void doesOr() {
-        BoolVertex v3 = v1.or(v2);
+        BooleanVertex v3 = v1.or(v2);
 
         v1.setValue(true);
         v2.setValue(false);
@@ -52,7 +52,7 @@ public class BoolVertexTest {
 
     @Test
     public void doesAnd() {
-        BoolVertex v3 = v1.and(v2);
+        BooleanVertex v3 = v1.and(v2);
 
         v1.setValue(true);
         v2.setValue(false);
@@ -62,7 +62,7 @@ public class BoolVertexTest {
 
     @Test
     public void doesNot() {
-        BoolVertex v3 = not(v1);
+        BooleanVertex v3 = not(v1);
 
         v1.setValue(true);
 
@@ -73,7 +73,7 @@ public class BoolVertexTest {
     public void doesEqualTo() {
         v1.setValue(true);
         v2.setValue(false);
-        BoolVertex v3 = ConstantVertex.of(true);
+        BooleanVertex v3 = ConstantVertex.of(true);
 
         assertFalse(v1.equalTo(v2).eval().scalar());
         assertTrue(v1.notEqualTo(v2).eval().scalar());
@@ -85,8 +85,8 @@ public class BoolVertexTest {
     public void TheOperatorsAreExecutedInOrder() {
         BernoulliVertex v3 = new BernoulliVertex(0.5);
 
-        BoolVertex v4 = v1.and(v2).or(v3); // (v1 AND v2) OR v3
-        BoolVertex v5 = v1.and(v2.or(v3)); // v1 AND (v2 OR v3)
+        BooleanVertex v4 = v1.and(v2).or(v3); // (v1 AND v2) OR v3
+        BooleanVertex v5 = v1.and(v2.or(v3)); // v1 AND (v2 OR v3)
 
         v1.setValue(false);
         v2.setValue(true);
@@ -114,7 +114,7 @@ public class BoolVertexTest {
     }
 
     private boolean xor(boolean b1, boolean b2) {
-        BoolVertex v3 =
+        BooleanVertex v3 =
             v1.and(not(v2))
                 .or(not(v1).and(v2));
         v1.setValue(b1);
@@ -124,7 +124,7 @@ public class BoolVertexTest {
 
     @Test
     public void orProbabilityIsCorrect() {
-        BoolVertex v3 = v1.or(v2);
+        BooleanVertex v3 = v1.or(v2);
 
         double pV3True = orProbability(pV1, pV2);
 
@@ -133,7 +133,7 @@ public class BoolVertexTest {
 
     @Test
     public void andProbabilityIsCorrect() {
-        BoolVertex v3 = v1.and(v2);
+        BooleanVertex v3 = v1.and(v2);
 
         double pV3True = andProbability(pV1, pV2);
 
@@ -146,7 +146,7 @@ public class BoolVertexTest {
 
         BernoulliVertex f = new BernoulliVertex(0.5);
 
-        CastBoolVertex a = new CastBoolVertex(f);
+        CastBooleanVertex a = new CastBooleanVertex(f);
 
         assertEquals(priorProbabilityTrue(a, 10000, random), p, 0.01);
     }
@@ -156,17 +156,17 @@ public class BoolVertexTest {
         double p = 0.5;
 
         BernoulliVertex f = new BernoulliVertex(0.5);
-        ConstantBoolVertex tru = ConstantVertex.of(true);
-        ConstantBoolVertex fal = ConstantVertex.of(false);
+        ConstantBooleanVertex tru = ConstantVertex.of(true);
+        ConstantBooleanVertex fal = ConstantVertex.of(false);
 
-        BoolVertex a = f.and(tru).or(fal);
+        BooleanVertex a = f.and(tru).or(fal);
 
         assertEquals(priorProbabilityTrue(a, 10000, random), p, 0.01);
     }
 
     @Test
     public void canObserveArrayOfValues() {
-        BoolVertex flip = new BernoulliVertex(0.5);
+        BooleanVertex flip = new BernoulliVertex(0.5);
         boolean[] observation = new boolean[]{true, false, true};
         flip.observe(observation);
         assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
@@ -174,7 +174,7 @@ public class BoolVertexTest {
 
     @Test
     public void canObserveTensor() {
-        BoolVertex flip = new BernoulliVertex(0.5);
+        BooleanVertex flip = new BernoulliVertex(0.5);
         BooleanTensor observation = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
         flip.observe(observation);
         assertArrayEquals(observation.asFlatArray(), flip.getValue().asFlatArray());
@@ -183,7 +183,7 @@ public class BoolVertexTest {
 
     @Test
     public void canSetAndCascadeArrayOfValues() {
-        BoolVertex flip = new BernoulliVertex(0.5);
+        BooleanVertex flip = new BernoulliVertex(0.5);
         boolean[] values = new boolean[]{true, false, true};
         flip.setAndCascade(values);
         assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
@@ -191,7 +191,7 @@ public class BoolVertexTest {
 
     @Test
     public void canSetValueArrayOfValues() {
-        BoolVertex flip = new BernoulliVertex(0.5);
+        BooleanVertex flip = new BernoulliVertex(0.5);
         boolean[] values = new boolean[]{true, false, true};
         flip.setValue(values);
         assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
@@ -199,21 +199,21 @@ public class BoolVertexTest {
 
     @Test
     public void canSetValueAsScalarOnNonScalarVertex() {
-        BoolVertex flip = new BernoulliVertex(new long[]{2, 1}, 0.5);
+        BooleanVertex flip = new BernoulliVertex(new long[]{2, 1}, 0.5);
         flip.setValue(true);
         assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
     }
 
     @Test
     public void canSetAndCascadeAsScalarOnNonScalarVertex() {
-        BoolVertex flip = new BernoulliVertex(new long[]{2, 1}, 0.5);
+        BooleanVertex flip = new BernoulliVertex(new long[]{2, 1}, 0.5);
         flip.setAndCascade(true);
         assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
     }
 
     @Test
     public void canPluckValue() {
-        BoolVertex flip = new BernoulliVertex(0.5);
+        BooleanVertex flip = new BernoulliVertex(0.5);
         boolean[] values = new boolean[]{true, false, true};
         flip.setAndCascade(values);
         assertEquals(true, flip.take(0).getValue().scalar());
@@ -221,31 +221,31 @@ public class BoolVertexTest {
 
     @Test
     public void canReshape() {
-        BoolVertex flip = new BernoulliVertex(0.5);
+        BooleanVertex flip = new BernoulliVertex(0.5);
         flip.setAndCascade(BooleanTensor.trues(2, 2));
         assertArrayEquals(flip.getShape(), new long[]{2, 2});
-        BoolVertex reshaped = flip.reshape(4, 1);
+        BooleanVertex reshaped = flip.reshape(4, 1);
         assertArrayEquals(reshaped.getShape(), new long[]{4, 1});
     }
 
     @Test
     public void canConcat() {
-        BoolVertex A = new BernoulliVertex(0.5);
+        BooleanVertex A = new BernoulliVertex(0.5);
         A.setValue(BooleanTensor.trues(2, 2));
 
-        BoolVertex B = new BernoulliVertex(0.5);
+        BooleanVertex B = new BernoulliVertex(0.5);
         B.setValue(BooleanTensor.falses(2, 2));
 
-        BoolVertex concatDimZero = BoolVertex.concat(0, A, A);
+        BooleanVertex concatDimZero = BooleanVertex.concat(0, A, A);
         assertArrayEquals(concatDimZero.getShape(), new long[]{4, 2});
 
-        BoolVertex concatDimOne = BoolVertex.concat(1, A, B);
+        BooleanVertex concatDimOne = BooleanVertex.concat(1, A, B);
         assertArrayEquals(concatDimOne.getShape(), new long[]{2, 4});
     }
 
     @Test
     public void canPrint() {
-        BoolVertex A = new BernoulliVertex(0.5);
+        final BooleanVertex A = new BernoulliVertex(0.5);
         A.print();
         final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
         assertThat(printVertex, instanceOf(PrintVertex.class));

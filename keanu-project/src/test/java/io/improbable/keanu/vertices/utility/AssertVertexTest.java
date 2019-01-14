@@ -7,8 +7,8 @@ import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -35,27 +35,27 @@ public class AssertVertexTest {
     @Test
     public void assertThrowsOnFalseConstBool() {
         thrown.expect(GraphAssertionException.class);
-        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        ConstantBooleanVertex constBool = new ConstantBooleanVertex(BooleanTensor.create(false));
         constBool.assertTrue().eval();
     }
 
     @Test
     public void assertPassesOnTrueConstBool() {
-        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(true));
+        ConstantBooleanVertex constBool = new ConstantBooleanVertex(BooleanTensor.create(true));
         constBool.assertTrue().eval();
     }
 
     @Test
     public void lazyEvalThrowsOnFalseConstBool() {
         thrown.expect(GraphAssertionException.class);
-        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        ConstantBooleanVertex constBool = new ConstantBooleanVertex(BooleanTensor.create(false));
         constBool.assertTrue().lazyEval();
     }
 
     @Test
     public void assertPassesOnRVWithTruePredicate() {
         UniformVertex uniform = new UniformVertex(0, 5);
-        BoolVertex predicate = uniform.lessThan(new ConstantDoubleVertex(new double[]{10}));
+        BooleanVertex predicate = uniform.lessThan(new ConstantDoubleVertex(new double[]{10}));
         predicate.assertTrue().eval();
     }
 
@@ -63,7 +63,7 @@ public class AssertVertexTest {
     public void assertPassesOnRVWithFalsePredicate() {
         thrown.expect(GraphAssertionException.class);
         UniformVertex uniform = new UniformVertex(0, 5);
-        BoolVertex predicate = uniform.greaterThan(new ConstantDoubleVertex(new double[]{10}));
+        BooleanVertex predicate = uniform.greaterThan(new ConstantDoubleVertex(new double[]{10}));
         predicate.assertTrue().eval();
     }
 
@@ -106,7 +106,7 @@ public class AssertVertexTest {
     public void assertGivesCorrectErrorWhenLabelledAndMessagePresent() {
         thrown.expect(GraphAssertionException.class);
         thrown.expectMessage("AssertVertex (testAssert): this is wrong");
-        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        ConstantBooleanVertex constBool = new ConstantBooleanVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = constBool.assertTrue("this is wrong");
         assertVertex.setLabel("testAssert");
         assertVertex.eval();
@@ -116,7 +116,7 @@ public class AssertVertexTest {
     public void assertGivesCorrectErrorWhenLabelled() {
         thrown.expect(GraphAssertionException.class);
         thrown.expectMessage("AssertVertex (testAssert)");
-        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        ConstantBooleanVertex constBool = new ConstantBooleanVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = constBool.assertTrue();
         assertVertex.setLabel("testAssert");
         assertVertex.eval();
@@ -126,7 +126,7 @@ public class AssertVertexTest {
     public void assertGivesCorrectErrorWhenMessagePresent() {
         thrown.expect(GraphAssertionException.class);
         thrown.expectMessage("AssertVertex: this is wrong");
-        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        ConstantBooleanVertex constBool = new ConstantBooleanVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = constBool.assertTrue("this is wrong");
         assertVertex.eval();
     }
@@ -135,7 +135,7 @@ public class AssertVertexTest {
     public void assertGivesCorrectErrorWhenPlain() {
         thrown.expect(GraphAssertionException.class);
         thrown.expectMessage("AssertVertex");
-        ConstantBoolVertex constBool = new ConstantBoolVertex(BooleanTensor.create(false));
+        ConstantBooleanVertex constBool = new ConstantBooleanVertex(BooleanTensor.create(false));
         AssertVertex assertVertex = constBool.assertTrue();
         assertVertex.eval();
     }
@@ -206,6 +206,6 @@ public class AssertVertexTest {
     @Test
     public void doubleAssertion() {
         DoubleVertex A = new ConstantDoubleVertex(20);
-        A.lessThan(new ConstantDoubleVertex(30)).assertTrue().and(ConstantBoolVertex.TRUE).assertTrue().eval();
+        A.lessThan(new ConstantDoubleVertex(30)).assertTrue().and(ConstantBooleanVertex.TRUE).assertTrue().eval();
     }
 }

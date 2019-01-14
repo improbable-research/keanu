@@ -16,7 +16,7 @@ def generic():
 
 @pytest.mark.parametrize("arr, expected_java_class", [([[1, 2], [3, 4]], "ConstantIntegerVertex"),
                                                       ([[1., 2.], [3., 4.]], "ConstantDoubleVertex"),
-                                                      ([[True, False], [False, True]], "ConstantBoolVertex")])
+                                                      ([[True, False], [False, True]], "ConstantBooleanVertex")])
 def test_const_takes_ndarray(arr: List[List[primitive_types]], expected_java_class: str) -> None:
     ndarray = np.array(arr)
     v = Const(ndarray)
@@ -27,7 +27,7 @@ def test_const_takes_ndarray(arr: List[List[primitive_types]], expected_java_cla
 
 @pytest.mark.parametrize("data, expected_java_class", [([1, 2], "ConstantIntegerVertex"),
                                                        ([1., 2.], "ConstantDoubleVertex"),
-                                                       ([True, False], "ConstantBoolVertex")])
+                                                       ([True, False], "ConstantBooleanVertex")])
 def test_const_takes_panda_series(data: List[primitive_types], expected_java_class: str) -> None:
     series = pd.Series(data)
     v = Const(series)
@@ -46,7 +46,7 @@ def test_const_takes_panda_series(data: List[primitive_types], expected_java_cla
 
 @pytest.mark.parametrize("data, expected_java_class", [([[1, 2], [3, 4]], "ConstantIntegerVertex"),
                                                        ([[1., 2.], [3., 4.]], "ConstantDoubleVertex"),
-                                                       ([[True, False], [True, False]], "ConstantBoolVertex")])
+                                                       ([[True, False], [True, False]], "ConstantBooleanVertex")])
 def test_const_takes_panda_dataframe(data: List[List[primitive_types]], expected_java_class: str) -> None:
     dataframe = pd.DataFrame(columns=['A', 'B'], data=data)
     v = Const(dataframe)
@@ -63,8 +63,8 @@ def test_const_takes_panda_dataframe(data: List[List[primitive_types]], expected
                                                       (np.array([3])[0], "ConstantIntegerVertex"),
                                                       (3.4, "ConstantDoubleVertex"),
                                                       (np.array([3.4])[0], "ConstantDoubleVertex"),
-                                                      (True, "ConstantBoolVertex"),
-                                                      (np.array([True])[0], "ConstantBoolVertex")])
+                                                      (True, "ConstantBooleanVertex"),
+                                                      (np.array([True])[0], "ConstantBooleanVertex")])
 def test_const_takes_num(num: Union[primitive_types, numpy_types], expected_java_class: str) -> None:
     v = Const(num)
 

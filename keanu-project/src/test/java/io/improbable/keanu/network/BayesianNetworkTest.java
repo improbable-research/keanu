@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -12,9 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -28,9 +31,9 @@ public class BayesianNetworkTest {
 
     BayesianNetwork network;
     Set<Vertex> connectedGraph;
-    BoolVertex input1;
-    BoolVertex input2;
-    BoolVertex output;
+    BooleanVertex input1;
+    BooleanVertex input2;
+    BooleanVertex output;
     final String LABEL_A = "Label A";
     final String LABEL_B = "Label B";
     final String LABEL_ORED = "Output";
@@ -66,10 +69,10 @@ public class BayesianNetworkTest {
 
     @Test
     public void youCanLabelVertices() {
-        BoolVertex a = new BernoulliVertex(0.5);
-        BoolVertex b = new BernoulliVertex(0.5);
-        BoolVertex ored = a.or(b);
-        BoolVertex unlabelled = ored.or(a);
+        BooleanVertex a = new BernoulliVertex(0.5);
+        BooleanVertex b = new BernoulliVertex(0.5);
+        BooleanVertex ored = a.or(b);
+        BooleanVertex unlabelled = ored.or(a);
         Vertex retrieved;
         VertexLabel labelA = new VertexLabel(LABEL_A);
         VertexLabel labelB = new VertexLabel(LABEL_B);
@@ -92,9 +95,9 @@ public class BayesianNetworkTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void labelErrorsDetected() {
-        BoolVertex a = new BernoulliVertex(0.5);
-        BoolVertex b = new BernoulliVertex(0.5);
-        BoolVertex ored = a.or(b);
+        BooleanVertex a = new BernoulliVertex(0.5);
+        BooleanVertex b = new BernoulliVertex(0.5);
+        BooleanVertex ored = a.or(b);
 
         a.setLabel(LABEL_A);
         b.setLabel(LABEL_A);
@@ -139,6 +142,24 @@ public class BayesianNetworkTest {
     @Test
     public void testGetAverageVertexDegree() {
         assertThat(network.getAverageVertexDegree(), equalTo((1. + 1. + 2. + 2. + 2.) / 5));
+    }
+
+    @Test
+    public void networkReturnsVerticesInNamespace() {
+        BooleanVertex a0 = new BernoulliVertex(0.5);
+        BooleanVertex a1 = new BernoulliVertex(0.5);
+        BooleanVertex b0 = new BernoulliVertex(0.5);
+        BooleanVertex c = new BernoulliVertex(0.5);
+
+        a0.setLabel(new VertexLabel("0", "root", "a"));
+        a1.setLabel(new VertexLabel("1", "root", "a"));
+        b0.setLabel(new VertexLabel("0", "root", "b"));
+
+        BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
+        List<Vertex> verticesInNamespace = net.getVerticesInNamespace("root");
+
+        assertThat(verticesInNamespace.size(), equalTo(3));
+        assertTrue(verticesInNamespace.containsAll(Arrays.asList(a0, a1, b0)));
     }
 
 }

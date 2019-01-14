@@ -41,7 +41,7 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
      */
     @ExportVertexToPythonBindings
     public SumVertex(DoubleVertex inputVertex) {
-        this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getShape().length));
+        this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getRank()));
     }
 
     private static long[] getSummationResultShape(long[] inputShape, int[] sumOverDimensions) {
