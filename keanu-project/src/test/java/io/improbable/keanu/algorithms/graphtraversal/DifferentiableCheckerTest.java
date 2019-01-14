@@ -42,7 +42,7 @@ public class DifferentiableCheckerTest {
     }
 
     @Test
-    public void simpleDiffable() {
+    public void gaussiansWithAFloorInMiddleIsntDiffable() {
         GaussianVertex a = new GaussianVertex(5., 4.);
         GaussianVertex b = new GaussianVertex(a, 1.);
         GaussianVertex c = new GaussianVertex(a, 1.);
@@ -103,7 +103,7 @@ public class DifferentiableCheckerTest {
     }
 
     @Test
-    public void constantAsParentOfNonDiff() {
+    public void constantAsParentOfNonDiffIsDiffable() {
         DoubleVertex constantVertex = new ConstantDoubleVertex(20.);
         FloorVertex nonDiffableVertex = new FloorVertex(constantVertex);
         GaussianVertex gaussian = new GaussianVertex(nonDiffableVertex, 1.);
@@ -127,7 +127,7 @@ public class DifferentiableCheckerTest {
     }
 
     @Test
-    public void multipleNonDiffableWithConstantParents() {
+    public void multipleNonDiffableWithConstantParentsIsDiffable() {
         GaussianVertex gaussianA = new GaussianVertex(5., 1.);
         GaussianVertex gaussianB = new GaussianVertex(gaussianA, 1.);
         gaussianA.observe(4.);
