@@ -42,7 +42,7 @@ public class DifferentiableCheckerTest {
     }
 
     @Test
-    public void gaussiansWithAFloorInMiddleIsntDiffable() {
+    public void simpleDiffable() {
         GaussianVertex a = new GaussianVertex(5., 4.);
         GaussianVertex b = new GaussianVertex(a, 1.);
         GaussianVertex c = new GaussianVertex(a, 1.);
@@ -50,7 +50,7 @@ public class DifferentiableCheckerTest {
     }
 
     @Test
-    public void simpleNonDiffable() {
+    public void gaussiansWithAFloorInMiddleIsntDiffable() {
         GaussianVertex latentBeforeNonDiffable = new GaussianVertex(5., 3.);
         FloorVertex nonDiffable = new FloorVertex(latentBeforeNonDiffable);
         GaussianVertex latentAfterNonDiffable = new GaussianVertex(nonDiffable, 1.);
