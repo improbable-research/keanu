@@ -49,7 +49,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 
-import io.improbable.keanu.vertices.utility.PrintVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import java.util.Map;
 import java.util.function.Function;
 

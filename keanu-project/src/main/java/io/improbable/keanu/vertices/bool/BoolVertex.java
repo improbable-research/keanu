@@ -19,9 +19,9 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolRe
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import io.improbable.keanu.vertices.utility.AssertVertex;
 
-import io.improbable.keanu.vertices.utility.PrintVertex;
 import java.util.Arrays;
 import java.util.List;
 

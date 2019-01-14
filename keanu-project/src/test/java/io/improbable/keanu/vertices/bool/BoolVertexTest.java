@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.utility.PrintVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import org.junit.Before;
 import org.junit.Test;
 

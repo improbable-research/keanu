@@ -6,7 +6,7 @@ import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.utility.PrintVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

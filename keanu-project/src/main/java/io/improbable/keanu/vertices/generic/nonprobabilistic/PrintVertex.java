@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.utility;
+package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
@@ -7,9 +7,10 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericVertex;
 import java.io.PrintStream;
 
-public class PrintVertex<T> extends Vertex<T> implements NonProbabilistic<T> {
+public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic<T> {
 
     public static void setPrintStream(PrintStream printStream) {
         PrintVertex.printStream = Preconditions.checkNotNull(printStream);

@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.utility;
+package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
