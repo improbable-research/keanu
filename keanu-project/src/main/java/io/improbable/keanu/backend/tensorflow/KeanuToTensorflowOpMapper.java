@@ -192,7 +192,7 @@ public class KeanuToTensorflowOpMapper {
 
     private static <T> Output<T> createIntegerSum(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpFactory opFactory) {
         IntegerSumVertex sumVertex = (IntegerSumVertex) vertex;
-        return createSum(vertex, sumVertex.getInputVertex(), TensorShape.dimensionRange(0, sumVertex.getRank()), lookup, opFactory);
+        return createSum(vertex, sumVertex.getInputVertex(), sumVertex.getOverDimensions(), lookup, opFactory);
     }
 
     private static <T> Output<T> createSum(Vertex<?> vertex, Vertex<?> inputVertex, int[] summingOverDimensions,

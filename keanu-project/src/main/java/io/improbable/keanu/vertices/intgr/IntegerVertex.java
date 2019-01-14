@@ -126,6 +126,10 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerSumVertex(this);
     }
 
+    public IntegerVertex sum(int... overDimensions) {
+        return new IntegerSumVertex(this, overDimensions);
+    }
+
     public IntegerVertex lambda(long[] shape, Function<IntegerTensor, IntegerTensor> op) {
         return new IntegerUnaryOpLambda<>(shape, this, op);
     }

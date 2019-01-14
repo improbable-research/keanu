@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -246,6 +247,15 @@ public class TensorShape {
             dimension += rank;
         }
         return dimension;
+    }
+
+    public static long[] getSummationResultShape(long[] inputShape, int[] sumOverDimensions) {
+        if (inputShape.length > 0) {
+            return ArrayUtils.removeAll(inputShape, sumOverDimensions);
+        } else {
+            Preconditions.checkArgument(sumOverDimensions.length == 0);
+            return inputShape;
+        }
     }
 
 }

@@ -64,6 +64,8 @@ public class TensorflowComputableGraphIntegerOpTest {
 
     @Test
     public void canRunSum() {
+        testIntegerUnaryOperation(new long[]{2, 3}, v -> v.sum(0));
+        testIntegerUnaryOperation(new long[]{2, 3}, v -> v.sum(1));
         testIntegerUnaryOperation(new long[]{2, 3}, IntegerVertex::sum);
     }
 
