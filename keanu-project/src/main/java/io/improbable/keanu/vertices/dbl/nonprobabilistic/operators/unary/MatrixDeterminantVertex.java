@@ -52,7 +52,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
             inputVertex.getShape()
         );
 
-        DoubleTensor reshapedPartial = PartialDerivative.increaseRankByAppendingOnesToShape(
+        DoubleTensor reshapedPartial = increaseRankByAppendingOnesToShape(
             dOutputTimesDeterminant.get(),
             resultShape.length
         );
@@ -67,5 +67,11 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex implements Diff
             .multiplyAlongWrtDimensions(inverseTranspose);
 
         return Collections.singletonMap(inputVertex, toInput);
+    }
+
+    private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+        return lowRankTensor.reshape(
+            TensorShape.shapeDesiredToRankByAppendingOnes(lowRankTensor.getShape(), desiredRank)
+        );
     }
 }

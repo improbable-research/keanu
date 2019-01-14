@@ -541,7 +541,7 @@ public class Nd4jIntegerTensorTest {
     @Test
     public void canFindMinAndMaxFromScalarToTensor() {
         IntegerTensor a = IntegerTensor.create(5, 4, 3, 2).reshape(1, 4);
-        IntegerTensor b = IntegerTensor.create(3);
+        IntegerTensor b = IntegerTensor.scalar(3);
 
         IntegerTensor min = IntegerTensor.min(a, b);
         IntegerTensor max = IntegerTensor.max(a, b);
@@ -645,7 +645,7 @@ public class Nd4jIntegerTensorTest {
     @Test
     public void comparesIntegerTensorWithScalar() {
         IntegerTensor value = IntegerTensor.create(1, 2, 3);
-        IntegerTensor differentValue = IntegerTensor.create(1);
+        IntegerTensor differentValue = IntegerTensor.scalar(1);
         BooleanTensor result = value.elementwiseEquals(differentValue);
         assertThat(result, hasValue(true, false, false));
     }

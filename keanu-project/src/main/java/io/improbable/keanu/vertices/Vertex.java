@@ -135,6 +135,10 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
         }
     }
 
+    public int getRank() {
+        return getShape().length;
+    }
+
     /**
      * This sets the value in this vertex and tells each child vertex about
      * the new change. This causes a cascading change of values if any of the

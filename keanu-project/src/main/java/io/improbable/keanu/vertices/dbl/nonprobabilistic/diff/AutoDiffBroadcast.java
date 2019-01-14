@@ -1,10 +1,13 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.experimental.UtilityClass;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class is meant to help with auto diff in operations that support implicit broadcasting. E.g. In
@@ -13,9 +16,9 @@ import java.util.Arrays;
 @UtilityClass
 public class AutoDiffBroadcast {
 
-    public static PartialDerivative correctForScalarPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
+    public static PartialDerivative correctForBroadcastPartialForward(PartialDerivative partial, long[] partialOfShape, long[] targetOfShape) {
 
-        if (shouldCorrectPartialForScalar(partial, partialOfShape, targetOfShape)) {
+        if (shouldCorrectPartialForBroadcast(partial, partialOfShape, targetOfShape)) {
 
             long[] wrtShape = partial.getWrtShape(partialOfShape);
             DoubleTensor correctedPartial = DoubleTensor
@@ -28,12 +31,15 @@ public class AutoDiffBroadcast {
         }
     }
 
-    public static PartialDerivative correctForScalarPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
+    public static PartialDerivative correctForBroadcastPartialReverse(PartialDerivative partial, long[] partialWrtShape, long[] targetWrtShape) {
 
-        if (shouldCorrectPartialForScalar(partial, partialWrtShape, targetWrtShape)) {
+        if (shouldCorrectPartialForBroadcast(partial, partialWrtShape, targetWrtShape)) {
 
-            int[] wrtDims = TensorShape.dimensionRange(-partialWrtShape.length, 0);
-            DoubleTensor partialSummed = partial.get().sum(wrtDims);
+            long[] partialShape = partial.get().getShape();
+
+            int[] broadcastDimensions = dimensionsWithShapeChange(partialShape, partialWrtShape.length, targetWrtShape);
+
+            DoubleTensor partialSummed = partial.get().sum(broadcastDimensions);
 
             long[] resultShape = TensorShape.concat(
                 partial.getOfShape(partialWrtShape),
@@ -54,7 +60,22 @@ public class AutoDiffBroadcast {
      *                      This should match the actual shape if no broadcast was performed.
      * @return true if a broadcast should be taken into account and corrected for in the auto diff calculation, false otherwise.
      */
-    private static boolean shouldCorrectPartialForScalar(PartialDerivative partial, long[] actualShape, long[] expectedShape) {
+    private static boolean shouldCorrectPartialForBroadcast(PartialDerivative partial, long[] actualShape, long[] expectedShape) {
         return partial.isPresent() && !Arrays.equals(actualShape, expectedShape);
+    }
+
+    private static int[] dimensionsWithShapeChange(long[] partialShape, int partialWrtRank, long[] wrtShape) {
+
+        final int partialRank = partialShape.length;
+        final int wrtRank = wrtShape.length;
+        List<Integer> dimensionMismatch = new ArrayList<>();
+
+        for (int i = 1; i <= partialWrtRank; i++) {
+            if (i > wrtRank || partialShape[partialRank - i] != wrtShape[wrtRank - i]) {
+                dimensionMismatch.add(-i);
+            }
+        }
+
+        return Ints.toArray(dimensionMismatch);
     }
 }

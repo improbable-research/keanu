@@ -8,7 +8,7 @@ package io.improbable.keanu.kotlin
  *    fun <T> isTrue(to: BooleanOperators<T>) = to.not()
  *
  *    // Both valid
- *    isTrue(ConstantBoolVertex(false))
+ *    isTrue(ConstantBooleanVertex(false))
  *    isTrue(ArithmeticBoolean(false))
  */
 data class ArithmeticBoolean(val value: Boolean) : BooleanOperators<ArithmeticBoolean> {

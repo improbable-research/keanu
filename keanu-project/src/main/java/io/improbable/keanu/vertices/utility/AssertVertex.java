@@ -1,15 +1,16 @@
 package io.improbable.keanu.vertices.utility;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 
-public class AssertVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
+public class AssertVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
 
     private static final String PREDICATE_NAME = "predicate";
     private static final String ERROR_MESSAGE_NAME = "error";
@@ -18,12 +19,13 @@ public class AssertVertex extends BoolVertex implements NonProbabilistic<Boolean
     private final String errorMessage;
 
     /**
-     * A vertex that asserts a {@link BoolVertex} is all true on calculation.
+     * A vertex that asserts a {@link BooleanVertex} is all true on calculation.
      *
      * @param predicate    the predicate to evaluate
      * @param errorMessage a message to include in the {@link AssertionError}
      * @throws AssertionError if any element of the predicate is false when calculated.
      */
+    @ExportVertexToPythonBindings
     public AssertVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
                         @LoadVertexParam(ERROR_MESSAGE_NAME) String errorMessage) {
         super(predicate.getShape());

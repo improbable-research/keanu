@@ -63,6 +63,7 @@ public class ProgressBar {
     private final AtomicInteger nextFrameIndex = new AtomicInteger(0);
 
     private final List<Runnable> onFinish = new ArrayList<>();
+    private int previouslyPrintedUpdateLength = 0;
 
     public ProgressBar(PrintStream printStream, ScheduledExecutorService scheduler) {
         this.printStream = printStream;
@@ -159,8 +160,17 @@ public class ProgressBar {
             if (update.getProgressPercentage() != null) {
                 sb.append(String.format(" %3.1f%%", Math.min(100.0, Math.max(0, update.getProgressPercentage() * 100))));
             }
+            appendSpacesToClearPreviousContent(sb);
             printStream.print(sb.toString());
         }
+    }
+
+    private void appendSpacesToClearPreviousContent(StringBuilder sb) {
+        int originalStringLength = sb.length();
+        for (int i = originalStringLength; i < previouslyPrintedUpdateLength; i++) {
+            sb.append(" ");
+        }
+        previouslyPrintedUpdateLength = originalStringLength;
     }
 
     private void printFinish() {

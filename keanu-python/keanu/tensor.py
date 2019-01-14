@@ -31,6 +31,14 @@ class Tensor(JavaObjectWrapper):
     def apply(self, lambda_function):
         return self.unwrap().apply(Function(lambda_function))
 
+    def get_tensor_type(self) -> type:
+        if "Double" in self._class:
+            return float
+        elif "Integer" in self._class:
+            return int
+        else:
+            return bool
+
     @staticmethod
     def __get_tensor_from_ndarray(ndarray: numpy_types) -> JavaObject:
 

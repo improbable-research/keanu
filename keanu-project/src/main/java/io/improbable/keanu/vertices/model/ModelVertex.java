@@ -4,8 +4,8 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.BoolModelResultVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.BooleanModelResultVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleModelResultVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -31,8 +31,8 @@ public interface ModelVertex<T> extends NonProbabilistic<T> {
         return new IntegerModelResultVertex(this, label);
     }
 
-    default BoolVertex getBoolModelOutputVertex(VertexLabel label) {
-        return new BoolModelResultVertex(this, label);
+    default BooleanVertex getBooleanModelOutputVertex(VertexLabel label) {
+        return new BooleanModelResultVertex(this, label);
     }
 
 }

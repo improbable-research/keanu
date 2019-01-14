@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -18,6 +19,7 @@ public class IntegerTakeVertex extends IntegerUnaryOpVertex {
      * @param inputVertex the input vertex to extract from
      * @param index the index to extract at
      */
+    @ExportVertexToPythonBindings
     public IntegerTakeVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
                              @LoadVertexParam(INDEX_NAME) long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);

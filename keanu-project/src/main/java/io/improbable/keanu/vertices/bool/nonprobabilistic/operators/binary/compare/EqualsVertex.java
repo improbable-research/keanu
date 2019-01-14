@@ -5,9 +5,9 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
 
-public class EqualsVertex<TENSOR extends Tensor> extends BoolBinaryOpVertex<TENSOR, TENSOR> {
+public class EqualsVertex<TENSOR extends Tensor> extends BooleanBinaryOpVertex<TENSOR, TENSOR> {
 
     @ExportVertexToPythonBindings
     public EqualsVertex(@LoadVertexParam(A_NAME) Vertex<TENSOR> a, @LoadVertexParam(B_NAME) Vertex<TENSOR> b) {

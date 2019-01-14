@@ -110,4 +110,5 @@ public class MatrixDeterminantVertexTest {
         KeanuOptimizer.of(net).maxLikelihood();
         assertEquals(input.getValue().determinant(), 2.2, 0.1);
     }
+
 }
