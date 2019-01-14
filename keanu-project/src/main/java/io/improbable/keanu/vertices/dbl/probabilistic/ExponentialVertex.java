@@ -4,8 +4,11 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -22,8 +25,10 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import static io.improbable.keanu.vertices.generic.nonprobabilistic.If.isTrue;
 
-public class ExponentialVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class ExponentialVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex rate;
     private static final String RATE_NAME = "rate";
@@ -74,6 +79,26 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
         DoubleTensor logPdfs = Exponential.withParameters(lambdaValues).logProb(value);
 
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex ratePlaceholder = new LogProbGraph.DoublePlaceholderVertex(rate.getShape());
+
+        final DoubleVertex negXMinusADivB = xPlaceholder.unaryMinus().div(ratePlaceholder);
+        final DoubleVertex negXMinusADivBMinusLogB = negXMinusADivB.minus(rate.log());
+
+        final DoubleVertex logProbOutput = If
+            .isTrue(xPlaceholder.lessThan(ConstantVertex.of(DoubleTensor.ZERO_SCALAR)))
+            .then(new ConstantDoubleVertex(DoubleTensor.create(Double.NEGATIVE_INFINITY, negXMinusADivBMinusLogB.getShape())))
+            .orElse(negXMinusADivBMinusLogB);
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(rate, ratePlaceholder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
