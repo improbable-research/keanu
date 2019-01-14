@@ -36,7 +36,7 @@ public class LogProbGraph {
         return (Vertex<T>) inputs.get(input);
     }
 
-    static public class DoublePlaceholderVertex extends DoubleVertex implements PlaceholderVertex, NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
+    static public class DoublePlaceholderVertex extends DoubleVertex implements PlaceholderVertex<DoubleTensor>, NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
 
         public DoublePlaceholderVertex(long[] initialShape) {
             super(initialShape);
@@ -44,16 +44,16 @@ public class LogProbGraph {
 
         @Override
         public DoubleTensor calculate() {
-            return this.getValue();
+            return getPlaceholderVertexValue(this);
         }
 
         @Override
         public DoubleTensor sample(KeanuRandom random) {
-            return this.getValue();
+            return getPlaceholderVertexValue(this);
         }
     }
 
-    static public class IntegerPlaceHolderVertex extends IntegerVertex implements PlaceholderVertex, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
+    static public class IntegerPlaceHolderVertex extends IntegerVertex implements PlaceholderVertex<IntegerTensor>, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
 
         public IntegerPlaceHolderVertex(long[] initialShape) {
             super(initialShape);
@@ -61,15 +61,21 @@ public class LogProbGraph {
 
         @Override
         public IntegerTensor calculate() {
-            return this.getValue();
+            return getPlaceholderVertexValue(this);
         }
 
         @Override
         public IntegerTensor sample(KeanuRandom random) {
-            return this.getValue();
+            return getPlaceholderVertexValue(this);
         }
     }
 
-    private interface PlaceholderVertex {
+    private interface PlaceholderVertex<T> {
+        default T getPlaceholderVertexValue(Vertex<T> vertex) {
+            if (!vertex.hasValue()) {
+                throw new IllegalStateException("Cannot calculate a PlaceholderVertex with no value.");
+            }
+            return vertex.getValue();
+        }
     }
 }
