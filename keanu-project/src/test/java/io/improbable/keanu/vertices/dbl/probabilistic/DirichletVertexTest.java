@@ -3,10 +3,17 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.apache.commons.math3.distribution.BetaDistribution;
 import org.apache.commons.math3.util.Pair;
+import static org.hamcrest.Matchers.equalTo;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,38 +38,82 @@ public class DirichletVertexTest {
     }
 
     @Test
-    public void twoDimensionalDirichletEqualsABeta() {
+    public void twoDimensionalDirichletLogProbEqualsABeta() {
         double alpha = 0.4;
         double beta = 1.;
         BetaVertex betaVertex = new BetaVertex(alpha, beta);
         DirichletVertex dirichletVertex = new DirichletVertex(alpha, beta);
 
-        Assert.assertEquals(betaVertex.logPdf(0.5), dirichletVertex.logPdf(DoubleTensor.create(new double[]{0.5, 0.5})), 1e-6);
-        Assert.assertEquals(betaVertex.logPdf(0.75), dirichletVertex.logPdf(DoubleTensor.create(new double[]{0.75, 0.25})), 1e-6);
-        Assert.assertEquals(betaVertex.logPdf(0.0), dirichletVertex.logPdf(DoubleTensor.create(new double[]{0.0, 1})), 1e-6);
+        Assert.assertEquals(betaVertex.logPdf(0.5), dirichletVertex.logPdf(DoubleTensor.create(0.5, 0.5)), 1e-6);
+        Assert.assertEquals(betaVertex.logPdf(0.75), dirichletVertex.logPdf(DoubleTensor.create(0.75, 0.25)), 1e-6);
+        Assert.assertEquals(betaVertex.logPdf(0.0), dirichletVertex.logPdf(DoubleTensor.create(0.0, 1)), 1e-6);
     }
 
     @Test
-    public void flatUniformIfAllConcentrationValuesAreOne() {
+    public void twoDimensionalDirichletLogProbGraphEqualsABeta() {
+        DoubleVertex concentration = ConstantVertex.of(0.4, 1.);
+        DirichletVertex vertex = new DirichletVertex(concentration);
+        BetaDistribution betaDistribution = new BetaDistribution(0.4, 1.);
+
+        LogProbGraph logProbGraph = vertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, concentration, concentration.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.create(0.5, 0.5));
+        double expectedDensity = betaDistribution.logDensity(0.5);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+
+        logProbGraph = vertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, concentration, concentration.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.create(0.75, 0.25));
+        expectedDensity = betaDistribution.logDensity(0.75);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbIsFlatUniformIfAllConcentrationValuesAreOne() {
         DirichletVertex dirichlet = new DirichletVertex(1, 1);
 
-        double twoDimDirichletPdf1 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.7, 0.3}));
-        double twoDimDirichletPdf2 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.3, 0.7}));
-        double twoDimDirichletPdf3 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.5, 0.5}));
+        double twoDimDirichletPdf1 = dirichlet.logPdf(DoubleTensor.create(0.7, 0.3));
+        double twoDimDirichletPdf2 = dirichlet.logPdf(DoubleTensor.create(0.3, 0.7));
+        double twoDimDirichletPdf3 = dirichlet.logPdf(DoubleTensor.create(0.5, 0.5));
 
         Assert.assertTrue(twoDimDirichletPdf1 == twoDimDirichletPdf2 && twoDimDirichletPdf2 == twoDimDirichletPdf3);
 
         dirichlet = new DirichletVertex(new long[]{1, 4}, 1);
 
-        double fourDimDirichletPdf1 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.1, 0.2, 0.3, 0.4}));
-        double fourDimDirichletPdf2 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.7, 0.1, 0.1, 0.1}));
-        double fourDimDirichletPdf3 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.25, 0.25, 0.25, 0.25}));
+        double fourDimDirichletPdf1 = dirichlet.logPdf(DoubleTensor.create(0.1, 0.2, 0.3, 0.4));
+        double fourDimDirichletPdf2 = dirichlet.logPdf(DoubleTensor.create(0.7, 0.1, 0.1, 0.1));
+        double fourDimDirichletPdf3 = dirichlet.logPdf(DoubleTensor.create(0.25, 0.25, 0.25, 0.25));
 
         Assert.assertTrue(fourDimDirichletPdf1 == fourDimDirichletPdf2 && fourDimDirichletPdf2 == fourDimDirichletPdf3);
     }
 
     @Test
-    public void matchesMontrealDirichletLogPdf() {
+    public void logProbGraphIsFlatUniformIfAllConcentrationValuesAreOne() {
+        DoubleVertex concentration = ConstantVertex.of(1., 1.);
+        DirichletVertex dirichlet = new DirichletVertex(concentration);
+
+        LogProbGraph logProbGraph1 = dirichlet.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph1, concentration, concentration.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph1, dirichlet, DoubleTensor.create(0.7, 0.3));
+
+        LogProbGraph logProbGraph2 = dirichlet.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph2, concentration, concentration.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph2, dirichlet, DoubleTensor.create(0.3, 0.7));
+
+        LogProbGraph logProbGraph3 = dirichlet.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph3, concentration, concentration.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph3, dirichlet, DoubleTensor.create(0.5, 0.5));
+
+        DirichletDist dirichletDist = new DirichletDist(new double[] {1., 1.});
+        double expectedDensity = Math.log(dirichletDist.density(new double[] {0.7, 0.3}));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph1, expectedDensity);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph2, expectedDensity);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph3, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesMontrealDirichletLogPdf() {
         DirichletDist baseline = new DirichletDist(new double[]{3, 4, 5});
         DirichletVertex keanu = new DirichletVertex(3, 4, 5);
 
@@ -70,6 +121,25 @@ public class DirichletVertexTest {
             keanu.logPdf(new double[]{0.1, 0.6, 0.3}), 1e-6);
         Assert.assertEquals(Math.log(baseline.density(new double[]{0.3, 0.4, 0.3})),
             keanu.logPdf(new double[]{0.3, 0.4, 0.3}), 1e-6);
+    }
+
+    @Test
+    public void logProbGraphMatchesMontrealDirichletLogPdf() {
+        DoubleVertex concentration = ConstantVertex.of(3., 4., 5.);
+        DirichletVertex vertex = new DirichletVertex(concentration);
+        DirichletDist baseline = new DirichletDist(new double[]{3, 4, 5});
+
+        LogProbGraph logProbGraph = vertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, concentration, concentration.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.create(0.1, 0.6, 0.3));
+        double expectedDensity = Math.log(baseline.density(new double[]{0.1, 0.6, 0.3}));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+
+        logProbGraph = vertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, concentration, concentration.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.create(0.3, 0.4, 0.3));
+        expectedDensity = Math.log(baseline.density(new double[]{0.3, 0.4, 0.3}));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Category(Slow.class)
