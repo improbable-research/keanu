@@ -32,6 +32,8 @@ public class AcceptanceRateTrackerTest {
     public void setUpMocks() throws Exception {
         when(vertex1.getId()).thenReturn(new VertexId(1));
         when(vertex2.getId()).thenReturn(new VertexId(2));
+        when(vertex1.getReference()).thenReturn(new VertexId(1));
+        when(vertex2.getReference()).thenReturn(new VertexId(2));
     }
 
     @Test
