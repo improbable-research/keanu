@@ -70,7 +70,7 @@ public class DifferentiableChecker {
                                Consumer<Collection<Vertex>> successfullyVisitedConsumer) {
 
         Queue<Vertex> queue = new ArrayDeque<>(vertices);
-        Set<Vertex> queued = new HashSet<>(vertices);
+        Set<Vertex> visited = new HashSet<>(vertices);
 
         while (!queue.isEmpty()) {
             Vertex visiting = queue.poll();
@@ -82,14 +82,14 @@ public class DifferentiableChecker {
             if (shouldAddParents.test(visiting)) {
                 Collection<Vertex> nextVertices = visiting.getParents();
                 for (Vertex next : nextVertices) {
-                    if (!queued.contains(next)) {
+                    if (!visited.contains(next)) {
                         queue.offer(next);
-                        queued.add(next);
+                        visited.add(next);
                     }
                 }
             }
         }
-        successfullyVisitedConsumer.accept(queued);
+        successfullyVisitedConsumer.accept(visited);
         return true;
     }
 
