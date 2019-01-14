@@ -17,7 +17,8 @@ public class IntegerSumVertex extends IntegerUnaryOpVertex {
     /**
      * Performs a sum across each value stored in a vertex
      *
-     * @param inputVertex the vertex to have its values summed
+     * @param inputVertex    the vertex to have its values summed
+     * @param overDimensions the dimensions to sum over
      */
     @ExportVertexToPythonBindings
     public IntegerSumVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,

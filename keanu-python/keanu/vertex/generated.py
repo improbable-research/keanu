@@ -767,13 +767,14 @@ def IntegerSlice(input_vertex: vertex_constructor_param_types, dimension: int, i
     return Integer(context.jvm_view().IntegerSliceVertex, cast_to_integer_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
 
 
-def IntegerSum(input_vertex: vertex_constructor_param_types) -> Vertex:
+def IntegerSum(input_vertex: vertex_constructor_param_types, over_dimensions: Collection[int]) -> Vertex:
     """
     Performs a sum across each value stored in a vertex
     
     :param input_vertex: the vertex to have its values summed
+    :param over_dimensions: the dimensions to sum over
     """
-    return Integer(context.jvm_view().IntegerSumVertex, cast_to_integer_vertex(input_vertex))
+    return Integer(context.jvm_view().IntegerSumVertex, cast_to_integer_vertex(input_vertex), cast_to_int_array(over_dimensions))
 
 
 def IntegerTake(input_vertex: vertex_constructor_param_types, index: Collection[int]) -> Vertex:
