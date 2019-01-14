@@ -24,7 +24,7 @@ public class LogProbGraph {
      */
     @Getter
     @Singular
-    private final Map<Vertex<?>, PlaceholderVertex> inputs;
+    private final Map<Vertex<?>, PlaceholderVertex<?>> inputs;
 
     /**
      * A vertex representing the result of log probability computation
@@ -73,7 +73,7 @@ public class LogProbGraph {
     private interface PlaceholderVertex<T> {
         default T getPlaceholderVertexValue(Vertex<T> vertex) {
             if (!vertex.hasValue()) {
-                throw new IllegalStateException("Cannot calculate a PlaceholderVertex with no value.");
+                throw new IllegalStateException("Cannot get value because PlaceholderVertex has not been initialized.");
             }
             return vertex.getValue();
         }
