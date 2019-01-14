@@ -18,6 +18,7 @@ public class StatusBar {
     private static final long FRAME_PERIOD_MS = 500;
     private final AtomicInteger nextFrameIndex = new AtomicInteger(0);
     private int previouslyPrintedUpdateLength = 0;
+    private final TextComponent textComponent = new TextComponent();
 
     private List<StatusBarComponent> components = new ArrayList<>();
     private static PrintStream defaultPrintStream = System.out;
@@ -73,6 +74,8 @@ public class StatusBar {
         if (disableProgressBar != null && disableProgressBar.equals("true")) {
             StatusBar.disable();
         }
+        addComponent(new KeanuAnimationComponent());
+        addComponent(textComponent);
         startUpdateThread();
     }
 
@@ -97,29 +100,13 @@ public class StatusBar {
             return;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(formatAnimation()).append(formatContent());
-//        sb.append(formatCompontents());
+        sb.append(formatComponents());
         appendSpacesToClearPreviousContent(sb);
         printStream.print(sb.toString());
     }
 
-    protected boolean shouldUpdate() {
+    private boolean shouldUpdate() {
         return ENABLED.get();
-    }
-
-    private String formatAnimation() {
-        String result = "\r";
-        result += FRAMES[nextFrameIndex.getAndIncrement() % FRAMES.length];
-        return result;
-    }
-
-    protected String formatContent() {
-        StringBuilder sb = new StringBuilder();
-        if(latestMessage.get() != null) {
-            sb.append(" ");
-            sb.append(latestMessage.get());
-        }
-        return sb.toString();
     }
 
     private void appendSpacesToClearPreviousContent(StringBuilder sb) {
@@ -148,7 +135,7 @@ public class StatusBar {
     }
 
     public void setMessage(String message) {
-        latestMessage.set(message);
+        textComponent.setText(message);
     }
 
     public void addComponent(StatusBarComponent component) {
@@ -159,10 +146,10 @@ public class StatusBar {
         components.remove(component);
     }
 
-    private String formatCompontents() {
+    private String formatComponents() {
         StringBuilder sb = new StringBuilder();
-        for(StatusBarComponent component : components) {
-            sb.append(component).append(" ");
+        for (StatusBarComponent component : components) {
+            sb.append(component.render()).append(" ");
         }
         return sb.toString();
     }
