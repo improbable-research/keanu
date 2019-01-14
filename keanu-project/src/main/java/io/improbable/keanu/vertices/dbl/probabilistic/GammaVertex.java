@@ -6,6 +6,8 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -24,7 +26,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class GammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class GammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex theta;
     private final DoubleVertex k;
@@ -92,6 +94,27 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
 
         DoubleTensor logPdfs = Gamma.withParameters(thetaValues, kValues).logProb(value);
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex thetaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(theta.getShape());
+        final LogProbGraph.DoublePlaceholderVertex kPlaceholder = new LogProbGraph.DoublePlaceholderVertex(k.getShape());
+
+        final DoubleVertex xOverTheta = xPlaceholder.div(thetaPlaceholder);
+        final DoubleVertex kLnTheta = kPlaceholder.times(thetaPlaceholder.log());
+        final DoubleVertex kMinus1LogX = kPlaceholder.minus(1).times(xPlaceholder.log());
+        final DoubleVertex lgammaK = kPlaceholder.logGamma();
+
+        final DoubleVertex logProbOutput = kMinus1LogX.minus(lgammaK).minus(xOverTheta).minus(kLnTheta);
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(theta, thetaPlaceholder)
+            .input(k, kPlaceholder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
