@@ -19,7 +19,8 @@ public class StatusBar {
     private final AtomicInteger nextFrameIndex = new AtomicInteger(0);
     private int previouslyPrintedUpdateLength = 0;
 
-    protected static PrintStream defaultPrintStream = System.out;
+    private List<StatusBarComponent> components = new ArrayList<>();
+    private static PrintStream defaultPrintStream = System.out;
     private static final String MIDDLE_MESSAGE = "Keanu";
     private static final String[] FRAMES = new String[]{
         "|" + MIDDLE_MESSAGE + "|",
@@ -97,6 +98,7 @@ public class StatusBar {
         }
         StringBuilder sb = new StringBuilder();
         sb.append(formatAnimation()).append(formatContent());
+//        sb.append(formatCompontents());
         appendSpacesToClearPreviousContent(sb);
         printStream.print(sb.toString());
     }
@@ -147,6 +149,22 @@ public class StatusBar {
 
     public void setMessage(String message) {
         latestMessage.set(message);
+    }
+
+    public void addComponent(StatusBarComponent component) {
+        components.add(component);
+    }
+
+    public void removeComponent(StatusBarComponent component) {
+        components.remove(component);
+    }
+
+    private String formatCompontents() {
+        StringBuilder sb = new StringBuilder();
+        for(StatusBarComponent component : components) {
+            sb.append(component).append(" ");
+        }
+        return sb.toString();
     }
 
 
