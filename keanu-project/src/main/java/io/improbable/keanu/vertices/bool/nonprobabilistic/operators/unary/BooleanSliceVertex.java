@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -22,6 +23,7 @@ public class BooleanSliceVertex extends BooleanUnaryOpVertex<BooleanTensor> {
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
+    @ExportVertexToPythonBindings
     public BooleanSliceVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> inputVertex,
                               @LoadVertexParam(DIMENSION_NAME) int dimension,
                               @LoadVertexParam(INDEX_NAME) long index) {

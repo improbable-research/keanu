@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -28,6 +29,7 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
+    @ExportVertexToPythonBindings
     public SliceVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                        @LoadVertexParam(DIMENSION_NAME) int dimension,
                        @LoadVertexParam(INDEX_NAME) long index) {
