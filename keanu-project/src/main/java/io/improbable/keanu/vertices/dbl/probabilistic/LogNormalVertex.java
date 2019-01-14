@@ -7,6 +7,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -24,7 +26,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class LogNormalVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class LogNormalVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -98,6 +100,26 @@ public class LogNormalVertex extends DoubleVertex implements Differentiable, Pro
         DoubleTensor logPdfs = LogNormal.withParameters(muValues, sigmaValues).logProb(value);
 
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex muPlaceholder = new LogProbGraph.DoublePlaceholderVertex(mu.getShape());
+        final LogProbGraph.DoublePlaceholderVertex sigmaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(sigma.getShape());
+
+        final DoubleVertex lnSigmaX = sigmaPlaceholder.times(xPlaceholder).log();
+        final DoubleVertex lnXMinusMuSquared = xPlaceholder.log().minus(muPlaceholder).pow(2);
+        final DoubleVertex lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.div(sigmaPlaceholder.pow(2).times(2.0));
+
+        final DoubleVertex logProbOutput = lnXMinusMuSquaredOver2Variance.plus(lnSigmaX).plus(GaussianVertex.LN_SQRT_2PI).unaryMinus();
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(mu, muPlaceholder)
+            .input(sigma, sigmaPlaceholder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
