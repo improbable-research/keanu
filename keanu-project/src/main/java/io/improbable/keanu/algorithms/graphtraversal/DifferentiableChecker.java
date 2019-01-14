@@ -99,13 +99,18 @@ public class DifferentiableChecker {
     }
 
     private static boolean isNonDiffableAndNotConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
-        return !vertex.isDifferentiable() && !isVertexValueConstant(Collections.singletonList(vertex), constantValueVerticesCache);
+        return !vertex.isDifferentiable() &&
+            !isVertexValueConstant(vertex, constantValueVerticesCache);
     }
 
-    private static boolean isVertexValueConstant(Collection<Vertex> vertices, Set<Vertex> constantValueVerticesCache) {
-        return bfs(vertices,
+    private static boolean isVertexValueConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
+        if (isValueKnownToBeConstant(vertex, constantValueVerticesCache)) {
+            return true;
+        }
+
+        return bfs(Collections.singletonList(vertex),
             DifferentiableChecker::isUnobservedProbabilistic,
-            vertex -> !isValueKnownToBeConstant(vertex, constantValueVerticesCache),
+            visiting -> !isValueKnownToBeConstant(visiting, constantValueVerticesCache),
             constantValueVerticesCache::addAll);
     }
 
