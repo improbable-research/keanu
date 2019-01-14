@@ -80,17 +80,22 @@ public class DifferentiableChecker {
             }
 
             if (shouldAddParents.test(visiting)) {
-                Collection<Vertex> nextVertices = visiting.getParents();
-                for (Vertex next : nextVertices) {
-                    if (!visited.contains(next)) {
-                        queue.offer(next);
-                        visited.add(next);
-                    }
-                }
+                queueUnvisitedParents(visiting, queue, visited);
             }
         }
+
         successfullyVisitedConsumer.accept(visited);
         return true;
+    }
+
+    private static void queueUnvisitedParents(Vertex vertex, Queue<Vertex> queue, Set<Vertex> visited) {
+        Collection<Vertex> nextVertices = vertex.getParents();
+        for (Vertex next : nextVertices) {
+            if (!visited.contains(next)) {
+                queue.offer(next);
+                visited.add(next);
+            }
+        }
     }
 
     private static boolean isNonDiffableAndNotConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
