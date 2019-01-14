@@ -30,18 +30,6 @@ public abstract class BooleanVertex extends Vertex<BooleanTensor> implements Boo
         super(initialShape);
     }
 
-    @Override
-    public BooleanVertex print() {
-        super.print();
-        return this;
-    }
-
-    @Override
-    public BooleanVertex print(final String message, final boolean printData) {
-        super.print(message, printData);
-        return this;
-    }
-
     public void saveValue(NetworkSaver netSaver) {
         netSaver.saveValue(this);
     }

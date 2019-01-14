@@ -58,18 +58,6 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         super(initialShape);
     }
 
-    @Override
-    public DoubleVertex print() {
-        super.print();
-        return this;
-    }
-
-    @Override
-    public DoubleVertex print(final String message, final boolean printData) {
-        super.print(message, printData);
-        return this;
-    }
-
     /**
      * @param dimension dimension to concat along. Negative dimension indexing is not supported.
      * @param toConcat  array of things to concat. Must match in all dimensions except for the provided

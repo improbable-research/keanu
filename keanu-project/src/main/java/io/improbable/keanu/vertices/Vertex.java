@@ -87,6 +87,18 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
         return this.getValue();
     }
 
+
+    public <V extends Vertex<T>> V print() {
+        new PrintVertex<>(this);
+        return (V) this;
+    }
+
+
+    public <V extends Vertex<T>> V print(final String message, final boolean printData) {
+        new PrintVertex<>(this, message, printData);
+        return (V) this;
+    }
+
     /**
      * @return True if the vertex is probabilistic, false otherwise.
      * A probabilistic vertex is defined as a vertex whose value is
@@ -224,16 +236,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     public Set<Vertex> getParents() {
         return parents;
-    }
-
-    public Vertex<T> print() {
-        new PrintVertex<>(this);
-        return this;
-    }
-
-    public Vertex print(final String message, final boolean printData) {
-        new PrintVertex<>(this, message, printData);
-        return this;
     }
 
     public int getDegree() {
