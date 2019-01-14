@@ -11,20 +11,21 @@ import java.io.PrintStream;
 
 public class PrintVertex<T> extends Vertex<T> implements NonProbabilistic<T> {
 
-    private static PrintStream printStream = System.out;
-
     public static void setPrintStream(PrintStream printStream) {
         PrintVertex.printStream = Preconditions.checkNotNull(printStream);
     }
 
+    private static PrintStream printStream = System.out;
+
     private static final String PARENT = "parent";
+
     private static final String MESSAGE = "message";
+
     private static final String PRINT_DATA = "printData";
 
     private final Vertex<T> parent;
 
     private final String message;
-
 
     private final boolean printData;
 
@@ -66,7 +67,7 @@ public class PrintVertex<T> extends Vertex<T> implements NonProbabilistic<T> {
     }
 
     @SaveVertexParam(PRINT_DATA)
-    public boolean printData() {
+    public boolean getPrintData() {
         return printData;
     }
 }
