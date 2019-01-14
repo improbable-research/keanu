@@ -3,6 +3,8 @@ package io.improbable.keanu.algorithms.variational;
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
@@ -85,7 +87,7 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        BayesianNetwork network = new BayesianNetwork(v3.getConnectedGraph());
+        ProbabilisticGraph network = new KeanuProbabilisticGraph(new BayesianNetwork(v3.getConnectedGraph()));
         NetworkSamples samples = MetropolisHastings
             .withDefaultConfig()
             .getPosteriorSamples(network, Collections.singletonList(v1), 1000);
@@ -102,7 +104,7 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        BayesianNetwork network = new BayesianNetwork(v3.getConnectedGraph());
+        ProbabilisticGraph network = new KeanuProbabilisticGraph(new BayesianNetwork(v3.getConnectedGraph()));
         NetworkSamples samples = MetropolisHastings
             .withDefaultConfig()
             .getPosteriorSamples(network, Collections.singletonList(v1), 1000);
@@ -119,7 +121,7 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        BayesianNetwork network = new BayesianNetwork(v3.getConnectedGraph());
+        ProbabilisticGraph network = new KeanuProbabilisticGraph(new BayesianNetwork(v3.getConnectedGraph()));
         NetworkSamples samples = MetropolisHastings
             .withDefaultConfig()
             .getPosteriorSamples(network, Arrays.asList(v1, v3), 1000);

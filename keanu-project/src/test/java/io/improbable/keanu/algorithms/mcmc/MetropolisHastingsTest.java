@@ -80,7 +80,7 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
+            new KeanuProbabilisticGraph(bayesNet),
             Arrays.asList(A, B),
             5000
         );
@@ -112,7 +112,7 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
+            new KeanuProbabilisticGraph(bayesNet),
             Collections.singletonList(A),
             10000
         );
@@ -143,7 +143,7 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
+            new KeanuProbabilisticGraph(bayesNet),
             Collections.singletonList(A),
             1000
         );
@@ -165,7 +165,7 @@ public class MetropolisHastingsTest {
         net.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            net,
+            new KeanuProbabilisticGraph(net),
             Collections.singletonList(A),
             10000
         );
@@ -197,7 +197,7 @@ public class MetropolisHastingsTest {
             .build();
 
         NetworkSamples posteriorSamples =  metropolisHastings.getPosteriorSamples(
-            bayesNet,
+            new KeanuProbabilisticGraph(bayesNet),
             Arrays.asList(A, B),
             1000
         );
@@ -240,7 +240,7 @@ public class MetropolisHastingsTest {
         BayesianNetwork network = new BayesianNetwork(start.getConnectedGraph());
 
         MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            network,
+            new KeanuProbabilisticGraph(network),
             network.getLatentVertices(),
             sampleCount
         );
@@ -264,7 +264,7 @@ public class MetropolisHastingsTest {
         assertNotNull(algo.getVariableSelector());
 
         NetworkSamples posteriorSamples = algo.getPosteriorSamples(
-            net,
+            new KeanuProbabilisticGraph(net),
             net.getLatentVertices(),
             2
         );
