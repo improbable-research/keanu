@@ -74,9 +74,13 @@ public class StatusBar {
         if (disableProgressBar != null && disableProgressBar.equals("true")) {
             StatusBar.disable();
         }
+        addDefaultComponents();
+        startUpdateThread();
+    }
+
+    private void addDefaultComponents() {
         addComponent(new KeanuAnimationComponent());
         addComponent(textComponent);
-        startUpdateThread();
     }
 
     public StatusBar(PrintStream printStream) {
@@ -150,7 +154,7 @@ public class StatusBar {
         StringBuilder sb = new StringBuilder();
         for (StatusBarComponent component : components) {
             String render = component.render();
-            if(render != "") {
+            if (render != "") {
                 sb.append(component.render()).append(" ");
             }
         }
