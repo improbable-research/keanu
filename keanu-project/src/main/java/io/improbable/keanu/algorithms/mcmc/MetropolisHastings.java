@@ -1,13 +1,11 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -16,10 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
@@ -27,7 +22,6 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
  */
 @Builder
-@Slf4j
 public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = ProposalDistribution.usePrior();
@@ -102,65 +96,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         return new MetropolisHastingsSampler(latentVertices, verticesToSampleFrom, mhStep, variableSelector, logProbabilityBeforeStep);
     }
 
-    public static class MetropolisHastingsSampler implements SamplingAlgorithm {
-
-        private final List<? extends Variable> latentVertices;
-        private final List<? extends Variable> verticesToSampleFrom;
-        private final MetropolisHastingsStep mhStep;
-        private final MHStepVariableSelector variableSelector;
-
-        private double logProbabilityBeforeStep;
-        private int sampleNum;
-
-        public MetropolisHastingsSampler(List<? extends Variable> latentVertices,
-                                         List<? extends Variable> verticesToSampleFrom,
-                                         MetropolisHastingsStep mhStep,
-                                         MHStepVariableSelector variableSelector,
-                                         double logProbabilityBeforeStep) {
-            this.latentVertices = latentVertices;
-            this.verticesToSampleFrom = verticesToSampleFrom;
-            this.mhStep = mhStep;
-            this.variableSelector = variableSelector;
-            this.logProbabilityBeforeStep = logProbabilityBeforeStep;
-            this.sampleNum = 0;
-        }
-
-        @Override
-        public void step() {
-            Set<Variable> chosenVertices = variableSelector.select(latentVertices, sampleNum);
-
-            logProbabilityBeforeStep = mhStep.step(
-                chosenVertices,
-                logProbabilityBeforeStep
-            ).getLogProbabilityAfterStep();
-
-            sampleNum++;
-        }
-
-        @Override
-        public void sample(Map<VariableReference, List<?>> samplesByVertex, List<Double> logOfMasterPForEachSample) {
-            step();
-            takeSamples(samplesByVertex, verticesToSampleFrom);
-            logOfMasterPForEachSample.add(logProbabilityBeforeStep);
-        }
-
-        @Override
-        public NetworkSample sample() {
-            step();
-            return new NetworkSample(SamplingAlgorithm.takeSample((List<? extends Variable<Object>>) verticesToSampleFrom), logProbabilityBeforeStep);
-        }
-    }
-
-    private static void takeSamples(Map<VariableReference, List<?>> samples, List<? extends Variable> fromVertices) {
-        fromVertices.forEach(vertex -> addSampleForVertex((Variable<?>) vertex, samples));
-    }
-
-    private static <T> void addSampleForVertex(Variable<T> vertex, Map<VariableReference, List<?>> samples) {
-        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getReference(), v -> new ArrayList<T>());
-        T value = vertex.getValue();
-        samplesForVertex.add(value);
-        log.trace(String.format("Sampled %s", value));
-    }
 
     private static void checkBayesNetInHealthyState(ProbabilisticGraph bayesNet) {
         bayesNet.cascadeFixedVariables();
