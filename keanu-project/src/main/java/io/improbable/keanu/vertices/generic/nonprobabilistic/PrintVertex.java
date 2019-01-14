@@ -47,7 +47,7 @@ public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic
 
     @Override
     public T sample(KeanuRandom random) {
-        return parent.sample();
+        return parent.sample(random);
     }
 
     @Override

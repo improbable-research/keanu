@@ -3,30 +3,39 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.UnaryOpVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import java.io.PrintStream;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PrintVertexTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Mock
     PrintStream printStream;
 
@@ -44,19 +53,22 @@ public class PrintVertexTest {
         assertThat(sut.getParents(), equalTo(ImmutableSet.of(parent)));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void whenCreatedWithNullParentThenFails() {
+        thrown.expect(NullPointerException.class);
         new PrintVertex<>(null);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void whenCreatedWithNullPrefixParentThenFails() {
+        thrown.expect(NullPointerException.class);
         final DoubleVertex parent = new ConstantDoubleVertex(30);
         new PrintVertex<>(parent, null, false);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void whenPrintStreamIsNullThenFails() {
+        thrown.expect(NullPointerException.class);
         PrintVertex.setPrintStream(null);
     }
 
@@ -82,11 +94,21 @@ public class PrintVertexTest {
 
         final PrintVertex<IntegerTensor> sut = new PrintVertex<>(parent);
 
-
         final UnaryOpVertex<IntegerTensor, IntegerTensor> child = new PlusOneOp(new long[]{1, 1}, sut);
 
         assertThat(sut.getValue().scalar(), equalTo(30));
         assertThat(child.getValue().scalar(), equalTo(31));
+    }
+
+    @Test
+    public void testWhenSampleIsCalledThenKeanuRandomIsPassedToParentSample() {
+        final BooleanVertex parent = mock(BooleanVertex.class);
+        final KeanuRandom random = mock(KeanuRandom.class);
+
+
+        final PrintVertex<BooleanTensor> sut = new PrintVertex<>(parent);
+        sut.sample(random);
+        verify(parent).sample(random);
     }
 
     @Test
@@ -128,7 +150,7 @@ public class PrintVertexTest {
             .withDefaultConfig()
             .getPosteriorSamples(bayesNet, bayesNet.getLatentVertices(), nSamples);
 
-        verify(printStream, atLeast(nSamples)).print(any(String.class));
+        verify(printStream, atLeast(nSamples)).print(anyString());
     }
 
     private static class PlusOneOp extends UnaryOpVertex<IntegerTensor, IntegerTensor> implements NonSaveableVertex {
