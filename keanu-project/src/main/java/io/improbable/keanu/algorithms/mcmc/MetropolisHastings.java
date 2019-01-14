@@ -139,9 +139,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
         @Override
         public void sample(Map<VariableReference, List<?>> samplesByVertex, List<Double> logOfMasterPForEachSample) {
-        }
-
-        public void sampleLegacy(Map<VariableReference, List<?>> samplesByVertex, List<Double> logOfMasterPForEachSample) {
             step();
             takeSamples(samplesByVertex, verticesToSampleFrom);
             logOfMasterPForEachSample.add(logProbabilityBeforeStep);

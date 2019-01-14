@@ -18,7 +18,7 @@ import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
  * Used by NUTS as a balanced binary tree to compute and store information
  * about leapfrogs that are taken forwards and backwards in space.
  * <p>
- * The tree is reset for each sampleLegacy.
+ * The tree is reset for each sample.
  */
 class Tree implements SaveStatistics {
 

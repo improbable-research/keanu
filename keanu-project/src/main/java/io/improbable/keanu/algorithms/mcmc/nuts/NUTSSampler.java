@@ -33,7 +33,7 @@ class NUTSSampler implements SamplingAlgorithm {
     private int sampleNum;
 
     /**
-     * @param sampleFromVertices        vertices to sampleLegacy from
+     * @param sampleFromVertices        vertices to sample from
      * @param latentVertices            vertices that represent latent variables
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
      * @param adaptEnabled              enable the NUTS step size adaptation
