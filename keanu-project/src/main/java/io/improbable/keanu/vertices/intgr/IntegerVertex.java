@@ -42,7 +42,13 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
 
     @Override
     public IntegerVertex print() {
-        new PrintVertex<>(this);
+        super.print();
+        return this;
+    }
+
+    @Override
+    public IntegerVertex print(final String message, final boolean printData) {
+        super.print(message, printData);
         return this;
     }
 

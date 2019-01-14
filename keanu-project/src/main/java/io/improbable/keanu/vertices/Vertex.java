@@ -227,6 +227,11 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
         return this;
     }
 
+    public Vertex print(final String message, final boolean printData) {
+        new PrintVertex<>(this, message, printData);
+        return this;
+    }
+
     public int getDegree() {
         return children.size() + parents.size();
     }

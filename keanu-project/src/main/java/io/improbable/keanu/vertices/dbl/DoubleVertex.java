@@ -49,7 +49,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 
-import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -61,7 +60,13 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     @Override
     public DoubleVertex print() {
-        new PrintVertex<>(this);
+        super.print();
+        return this;
+    }
+
+    @Override
+    public DoubleVertex print(final String message, final boolean printData) {
+        super.print(message, printData);
         return this;
     }
 

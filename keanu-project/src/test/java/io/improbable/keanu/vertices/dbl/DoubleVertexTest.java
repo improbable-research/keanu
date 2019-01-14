@@ -4,15 +4,19 @@ import com.google.common.collect.Iterables;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
+import java.io.PrintStream;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class DoubleVertexTest {
 
@@ -96,10 +100,29 @@ public class DoubleVertexTest {
     }
 
     @Test
-    public void canPrint() {
+    public void whenPrintIsCalledAddsPrintVertexAsChild() {
         final UniformVertex A = new UniformVertex(0, 1);
         A.print();
         final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
         assertThat(printVertex, instanceOf(PrintVertex.class));
+    }
+
+    @Test
+    public void whenPrintIsCalledWithOptionsThenOptionsArePassedToPrintVertex() {
+        final PrintStream printStream = mock(PrintStream.class);
+        PrintVertex.setPrintStream(printStream);
+
+        final DoubleVertex A = new ConstantDoubleVertex(42);
+        A.print("testprefix", true);
+
+        final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
+        printVertex.getValue();
+
+        final String expectedOutput = "testprefix{\n" +
+            "data = [42.0]\n" +
+            "shape = []\n" +
+            "}\n";
+
+        verify(printStream).print(expectedOutput);
     }
 }
