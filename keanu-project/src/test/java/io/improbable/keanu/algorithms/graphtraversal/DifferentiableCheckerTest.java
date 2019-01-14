@@ -31,6 +31,12 @@ public class DifferentiableCheckerTest {
         assertFalse(differentiable);
     }
 
+    private void assertMLEIsDifferentiable(Collection<Vertex> vertices) {
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(vertices);
+        boolean differentiable = DifferentiableChecker.isDifferentiableWrtLatents(bayesianNetwork.getObservedVertices());
+        assertTrue(differentiable);
+    }
+
     @Test
     public void simpleDiffable() {
         GaussianVertex a = new GaussianVertex(5., 4.);
@@ -145,11 +151,25 @@ public class DifferentiableCheckerTest {
 
     @Test
     public void observedVertexWithNonDiffableConstantParentIsDiffable() {
-        DoubleVertex constDouble = new ConstantDoubleVertex(4);
+        DoubleVertex constDouble = new ConstantDoubleVertex(4.);
         FloorVertex nonDiffable = new FloorVertex(constDouble);
         GaussianVertex observed = new GaussianVertex(nonDiffable, 1.);
         observed.observe(4.);
         assertMAPIsDifferentiable(observed.getConnectedGraph());
     }
 
+    @Test
+    public void graphWhichShouldBeMLEDiffableAndNotMAPDiffable() {
+        DoubleVertex constDouble = new ConstantDoubleVertex(5.);
+        GaussianVertex gaussianA = new GaussianVertex(constDouble, constDouble);
+        FloorVertex nonDiffable = new FloorVertex(gaussianA);
+        GaussianVertex gaussianB = new GaussianVertex(nonDiffable, constDouble);
+        GaussianVertex gaussianObserved = new GaussianVertex(gaussianB, constDouble);
+
+        // Graph has no non diffable vertices between observed and next latent. So is MLE diffable.
+        assertMLEIsDifferentiable(gaussianObserved.getConnectedGraph());
+
+        // A non diffable floor is between latent and the next latent. So not MAP diffable.
+        assertMAPNotDifferentiable(gaussianObserved.getConnectedGraph());
+    }
 }
