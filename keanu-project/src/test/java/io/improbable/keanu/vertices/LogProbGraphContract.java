@@ -11,4 +11,8 @@ public class LogProbGraphContract {
         double actualDensity = logProbGraphOutput.getValue().sum();
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
+
+    public static void equal(LogProbGraph actual, LogProbGraph expected) {
+        assertEquals(actual.getLogProbOutput().getValue(), expected.getLogProbOutput().getValue());
+    }
 }

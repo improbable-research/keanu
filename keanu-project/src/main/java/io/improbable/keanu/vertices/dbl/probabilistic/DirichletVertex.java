@@ -4,7 +4,6 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -12,7 +11,6 @@ import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -93,11 +91,11 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
     public LogProbGraph logProbGraph() {
         LogProbGraph.DoublePlaceholderVertex xPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
         LogProbGraph.DoublePlaceholderVertex concentrationPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(concentration.getShape());
-
+        /*
         final BoolVertex assertXIsGreaterThanEpsilon = xPlaceHolder
             .sum().minus(1.).abs().greaterThan(ConstantVertex.of(EPSILON))
             .assertTrue("Sum of values to calculate Dirichlet likelihood for must equal 1");
-
+        */
         final DoubleVertex sumConcentrationLogged = concentrationPlaceHolder.minus(1.).times(xPlaceHolder.log()).sum();
         final DoubleVertex sumLogGammaConcentration = concentrationPlaceHolder.logGamma().sum();
         final DoubleVertex logGammaSumConcentration = concentrationPlaceHolder.sum().logGamma();

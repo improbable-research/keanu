@@ -7,7 +7,12 @@ package io.improbable.keanu.vertices;
 public class LogProbGraphValueFeeder {
 
     public static <T> void feedValue(LogProbGraph logProbGraph, Vertex<T> input, T value) {
-        logProbGraph.getPlaceholder(input).setValue(value);
+        Vertex<T> placeholderVertex = logProbGraph.getPlaceholder(input);
+        if (placeholderVertex.hasValue()) {
+            placeholderVertex.setAndCascade(value);
+        } else {
+            placeholderVertex.setValue(value);
+        }
     }
 
 }
