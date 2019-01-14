@@ -85,7 +85,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     @Override
     public void cascadeUpdate(Set<? extends Variable> inputs) {
-        VertexValuePropagation.cascadeUpdate((Vertex) inputs);
+        VertexValuePropagation.cascadeUpdate((Set<Vertex>) inputs);
     }
 
     @Override
