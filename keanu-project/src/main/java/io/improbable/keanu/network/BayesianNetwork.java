@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
@@ -150,7 +149,7 @@ public class BayesianNetwork {
      * @return a list of all vertices that are not differentiable (i.e., there are points at which they do not have a derivative).
      */
     public List<Vertex> getNonDifferentiableVertices() {
-        return vertices.stream().filter(vertex -> !(vertex instanceof Differentiable))
+        return vertices.stream().filter(vertex -> !(((Vertex) vertex).isDifferentiable()))
             .collect(Collectors.toList());
     }
 
