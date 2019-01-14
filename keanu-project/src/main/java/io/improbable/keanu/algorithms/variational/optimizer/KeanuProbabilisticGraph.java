@@ -2,6 +2,9 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastingsSampler;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastingsStep;
+import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkSnapshot;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -91,8 +94,22 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
-    public boolean isDeterministic() {
-        return latentOrObservedVertices.isEmpty();
+    public MetropolisHastingsSampler metropolisHastingsSampler(
+        List<? extends Variable> verticesToSampleFrom,
+        MetropolisHastingsStep mhStep,
+        MHStepVariableSelector variableSelector) {
+
+        checkBayesNetInHealthyState();
+        return new MetropolisHastingsSampler(getLatentVariables(), verticesToSampleFrom, mhStep, variableSelector, logProb());
+    }
+
+    private void checkBayesNetInHealthyState() {
+        cascadeFixedVariables();
+        if (latentOrObservedVertices.isEmpty()) {
+            throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
+        } else if (ProbabilityCalculator.isImpossibleLogProb(this.logProb())) {
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
+        }
     }
 
     public void cascadeValues(Map<VariableReference, ?> inputs) {
