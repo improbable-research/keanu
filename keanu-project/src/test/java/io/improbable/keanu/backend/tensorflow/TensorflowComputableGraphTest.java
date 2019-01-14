@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static org.junit.Assert.assertEquals;
@@ -22,34 +23,147 @@ import static org.junit.Assert.assertEquals;
 public class TensorflowComputableGraphTest {
 
     @Test
-    public void canRunSimpleAddition() {
-        DoubleVertex A = new GaussianVertex(0, 1);
-        A.setValue(2);
-        DoubleVertex B = new GaussianVertex(1, 1);
-        B.setValue(3);
+    public void canRunElementwiseAddition() {
+        testDoubleBinaryOperation(DoubleVertex::plus);
+    }
 
-        DoubleVertex C = A.plus(B);
+    @Test
+    public void canRunElementwiseSubtraction() {
+        testDoubleBinaryOperation(DoubleVertex::minus);
+    }
 
-        ComputableGraph graph = TensorflowComputableGraph.convert(C.getConnectedGraph());
+    @Test
+    public void canRunElementwiseMultiplication() {
+        testDoubleBinaryOperation(DoubleVertex::times);
+    }
+
+    @Test
+    public void canRunElementwiseDivision() {
+        testDoubleBinaryOperation(DoubleVertex::div);
+    }
+
+    @Test
+    public void canRunMatrixMultiplication() {
+        testDoubleBinaryOperation(new long[]{2, 2}, DoubleVertex::matrixMultiply);
+    }
+
+    private void testDoubleBinaryOperation(BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+        testDoubleBinaryOperation(new long[0], op);
+        testDoubleBinaryOperation(new long[]{2, 2}, op);
+        testDoubleBinaryOperation(new long[]{2, 2, 2}, op);
+    }
+
+    private void testDoubleBinaryOperation(long[] shape, BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+        DoubleVertex A = new GaussianVertex(shape, 0, 1);
+        A.setValue(A.sample());
+
+        DoubleVertex B = new GaussianVertex(shape, 1, 1);
+        B.setValue(B.sample());
+
+        DoubleVertex out = op.apply(A, B);
+
+        ComputableGraph graph = TensorflowComputableGraph.convert(out.getConnectedGraph());
 
         Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
         inputs.put(A.getReference(), A.getValue());
         inputs.put(B.getReference(), B.getValue());
 
-        DoubleTensor result = graph.compute(inputs, C.getReference());
+        DoubleTensor result = graph.compute(inputs, out.getReference());
+
+        assertEquals(out.getValue(), result);
+    }
+
+    @Test
+    public void canRunIntegerElementwiseAddition() {
+        testIntegerBinaryOperation(IntegerVertex::plus);
+    }
+
+    @Test
+    public void canRunIntegerElementwiseSubtraction() {
+        testIntegerBinaryOperation(IntegerVertex::minus);
+    }
+
+    @Test
+    public void canRunIntegerElementwiseMultiplication() {
+        testIntegerBinaryOperation(IntegerVertex::times);
+    }
+
+    @Test
+    public void canRunIntegerElementwiseDivision() {
+        testIntegerBinaryOperation(IntegerVertex::div);
+    }
+
+    private void testIntegerBinaryOperation(BiFunction<IntegerVertex, IntegerVertex, IntegerVertex> op) {
+        testIntegerBinaryOperation(new long[0], op);
+        testIntegerBinaryOperation(new long[]{2, 2}, op);
+        testIntegerBinaryOperation(new long[]{2, 2, 2}, op);
+    }
+
+    private void testIntegerBinaryOperation(long[] shape, BiFunction<IntegerVertex, IntegerVertex, IntegerVertex> op) {
+        IntegerVertex A = new UniformIntVertex(shape, 0, 1);
+        A.setValue(A.sample());
+
+        IntegerVertex B = new UniformIntVertex(shape, 1, 1);
+        B.setValue(B.sample());
+
+        IntegerVertex C = op.apply(A, B);
+
+        ComputableGraph graph = TensorflowComputableGraph.convert(C.getConnectedGraph());
+
+        Map<VariableReference, IntegerTensor> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
+
+        IntegerTensor result = graph.compute(inputs, C.getReference());
 
         assertEquals(C.getValue(), result);
     }
 
     @Test
-    public void canRunDoubleTensorAddition() {
+    public void canRunElementwiseAnd() {
+        testBooleanBinaryOperation(BooleanVertex::and);
+    }
+
+    @Test
+    public void canRunElementwiseOr() {
+        testBooleanBinaryOperation(BooleanVertex::or);
+    }
+
+    private void testBooleanBinaryOperation(BiFunction<BooleanVertex, BooleanVertex, BooleanVertex> op) {
+        testBooleanBinaryOperation(new long[0], op);
+        testBooleanBinaryOperation(new long[]{2, 2}, op);
+        testBooleanBinaryOperation(new long[]{2, 2, 2}, op);
+    }
+
+    private void testBooleanBinaryOperation(long[] shape, BiFunction<BooleanVertex, BooleanVertex, BooleanVertex> op) {
+        BernoulliVertex A = new BernoulliVertex(shape, 0.5);
+        A.setValue(A.sample());
+
+        BernoulliVertex B = new BernoulliVertex(shape, 0.5);
+        B.setValue(B.sample());
+
+        BooleanVertex C = op.apply(A, B);
+
+        ComputableGraph graph = TensorflowComputableGraph.convert(C.getConnectedGraph());
+
+        Map<VariableReference, BooleanTensor> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
+
+        BooleanTensor result = graph.compute(inputs, C.getReference());
+
+        assertEquals(C.getValue(), result);
+    }
+
+    @Test
+    public void canTensorConcat() {
         DoubleVertex A = new GaussianVertex(new long[]{2, 2}, 0, 1);
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
         DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
         B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        DoubleVertex C = A.plus(B);
+        DoubleVertex C = DoubleVertex.concat(0, A, B);
 
         ComputableGraph graph = TensorflowComputableGraph.convert(C.getConnectedGraph());
 
@@ -91,89 +205,4 @@ public class TensorflowComputableGraphTest {
         assertEquals(C.eval(), resultAfterRun);
     }
 
-    @Test
-    public void canRunIntegerTensorAddition() {
-        IntegerVertex A = new UniformIntVertex(new long[]{2, 2}, 0, 1);
-        A.setValue(IntegerTensor.create(new int[]{1, 2, 3, 4}, 2, 2));
-
-        IntegerVertex B = new UniformIntVertex(new long[]{2, 2}, 1, 1);
-        B.setValue(IntegerTensor.create(new int[]{5, 6, 7, 8}, 2, 2));
-
-        IntegerVertex C = A.times(B).abs();
-
-        ComputableGraph graph = TensorflowComputableGraph.convert(C.getConnectedGraph());
-
-        Map<VariableReference, IntegerTensor> inputs = new HashMap<>();
-        inputs.put(A.getReference(), A.getValue());
-        inputs.put(B.getReference(), B.getValue());
-
-        IntegerTensor result = graph.compute(inputs, C.getReference());
-
-        assertEquals(C.getValue(), result);
-    }
-
-    @Test
-    public void canRunTensorAnd() {
-        BooleanVertex A = new BernoulliVertex(new long[]{2, 2}, 0.5);
-        A.setValue(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
-
-        BooleanVertex B = new BernoulliVertex(new long[]{2, 2}, 0.75);
-        B.setValue(BooleanTensor.create(new boolean[]{false, false, true, true}, 2, 2));
-
-        BooleanVertex C = A.and(B).not();
-
-        ComputableGraph graph = TensorflowComputableGraph.convert(C.getConnectedGraph());
-
-        Map<VariableReference, BooleanTensor> inputs = new HashMap<>();
-        inputs.put(A.getReference(), A.getValue());
-        inputs.put(B.getReference(), B.getValue());
-
-        BooleanTensor result = graph.compute(inputs, C.getReference());
-
-        assertEquals(C.getValue(), result);
-    }
-
-    @Test
-    public void canTensorConcat() {
-        DoubleVertex A = new GaussianVertex(new long[]{2, 2}, 0, 1);
-        A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
-
-        DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
-        B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
-
-        DoubleVertex C = DoubleVertex.concat(0, A, B);
-
-        ComputableGraph graph = TensorflowComputableGraph.convert(C.getConnectedGraph());
-
-        Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
-        inputs.put(A.getReference(), A.getValue());
-        inputs.put(B.getReference(), B.getValue());
-
-        DoubleTensor result = graph.compute(inputs, C.getReference());
-
-        assertEquals(C.getValue(), result);
-    }
-
-    @Test
-    public void canRunTensorMultiplication() {
-        DoubleVertex A = new GaussianVertex(new long[]{2, 2}, 0, 1);
-        A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
-
-        DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 1, 1);
-        B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
-
-        DoubleVertex C = A.plus(B);
-        DoubleVertex D = C.times(B);
-        DoubleVertex out = D.matrixMultiply(C);
-
-        ComputableGraph graph = TensorflowComputableGraph.convert(C.getConnectedGraph());
-
-        Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
-        inputs.put(A.getReference(), A.getValue());
-        inputs.put(B.getReference(), B.getValue());
-
-        DoubleTensor result = graph.compute(inputs, out.getReference());
-
-        assertEquals(out.getValue(), result);
-    }
 }
