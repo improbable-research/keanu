@@ -1,5 +1,6 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.backend.ProbabilisticGraphWithGradient;
 import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -9,6 +10,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -17,6 +19,9 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 public class TensorflowProbabilisticGraphWithGradientTest {
+
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
 
     /**
      * Tensorflow does not support autodiff through a concat at the moment

@@ -1,15 +1,20 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static org.junit.Assert.assertEquals;
 
 public class TensorflowComputableGraphTest {
+
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
 
     @Test
     public void canMaintainStateInGraph() {

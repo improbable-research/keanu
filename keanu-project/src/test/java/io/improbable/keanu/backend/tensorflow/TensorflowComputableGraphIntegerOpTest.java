@@ -1,10 +1,12 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -15,6 +17,9 @@ import java.util.function.Function;
 import static org.junit.Assert.assertEquals;
 
 public class TensorflowComputableGraphIntegerOpTest {
+
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
 
     @Test
     public void canRunIntegerElementwiseAddition() {
