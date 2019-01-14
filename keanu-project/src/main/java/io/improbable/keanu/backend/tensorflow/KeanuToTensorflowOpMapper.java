@@ -49,7 +49,9 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.tensorflow.Output;
 import org.tensorflow.Shape;
@@ -95,6 +97,7 @@ public class KeanuToTensorflowOpMapper {
         opMappers.put(Sigmoid.class, unaryOp(OpType.SIGMOID));
         opMappers.put(SinVertex.class, unaryOp(OpType.SIN));
         opMappers.put(TanVertex.class, unaryOp(OpType.TAN));
+        opMappers.put(SumVertex.class, KeanuToTensorflowOpMapper::createDoubleSum);
 
         //bool binary ops
         opMappers.put(AndBinaryVertex.class, binaryOp(OpType.AND));
@@ -111,6 +114,7 @@ public class KeanuToTensorflowOpMapper {
         opMappers.put(IntegerMinVertex.class, binaryOp(OpType.MIN));
 
         //integer unary ops
+        opMappers.put(IntegerSumVertex.class, KeanuToTensorflowOpMapper::createIntegerSum);
         opMappers.put(IntegerAbsVertex.class, unaryOp(OpType.ABS));
 
         //constants
@@ -120,8 +124,8 @@ public class KeanuToTensorflowOpMapper {
 
         //special case ops
         opMappers.put(DoubleIfVertex.class, KeanuToTensorflowOpMapper::createDoubleIf);
-        opMappers.put(SumVertex.class, KeanuToTensorflowOpMapper::createSum);
         opMappers.put(ConcatenationVertex.class, KeanuToTensorflowOpMapper::createConcat);
+        opMappers.put(IntegerConcatenationVertex.class, KeanuToTensorflowOpMapper::createConcat);
     }
 
     public static OpMapper getOpMapperFor(Class<?> clazz) {
@@ -181,20 +185,29 @@ public class KeanuToTensorflowOpMapper {
         return opFactory.concat(inputs, concatenationVertex.getDimension(), getTensorflowOpName(concatenationVertex));
     }
 
-    private static <T> Output<T> createSum(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpFactory opFactory) {
-        SumVertex summationVertex = (SumVertex) vertex;
-        Output<?> input = getOutput(lookup, summationVertex.getInput());
+    private static <T> Output<T> createDoubleSum(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpFactory opFactory) {
+        SumVertex sumVertex = (SumVertex) vertex;
+        return createSum(vertex, sumVertex.getInputVertex(), sumVertex.getOverDimensions(), lookup, opFactory);
+    }
+
+    private static <T> Output<T> createIntegerSum(Vertex<?> vertex, Map<VariableReference, Output<?>> lookup, TensorflowOpFactory opFactory) {
+        IntegerSumVertex sumVertex = (IntegerSumVertex) vertex;
+        return createSum(vertex, sumVertex.getInputVertex(), TensorShape.dimensionRange(0, sumVertex.getRank()), lookup, opFactory);
+    }
+
+    private static <T> Output<T> createSum(Vertex<?> vertex, Vertex<?> inputVertex, int[] summingOverDimensions,
+                                           Map<VariableReference, Output<?>> lookup, TensorflowOpFactory opFactory) {
+        Output<?> input = getOutput(lookup, inputVertex);
         String name = getTensorflowOpName(vertex);
 
-        int[] summingOverDimensions = summationVertex.getOverDimensions();
         Output<Integer> overDimensions;
 
         if (summingOverDimensions == null) {
-            int inputRank = summationVertex.getInput().getShape().length;
+            int inputRank = inputVertex.getShape().length;
             overDimensions = opFactory.constant(TensorShape.dimensionRange(0, inputRank), new long[]{inputRank});
         } else {
-            int dims = summationVertex.getOverDimensions().length;
-            overDimensions = opFactory.constant(summationVertex.getOverDimensions(), new long[]{dims});
+            int dims = summingOverDimensions.length;
+            overDimensions = opFactory.constant(summingOverDimensions, new long[]{dims});
         }
 
         return opFactory.binaryOp(OpType.SUM, name, input, overDimensions);
