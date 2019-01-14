@@ -145,7 +145,7 @@ public class PrintVertexTest {
 
         final BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
 
-        final int nSamples = 10000;
+        final int nSamples = 100;
         MetropolisHastings
             .withDefaultConfig()
             .getPosteriorSamples(bayesNet, bayesNet.getLatentVertices(), nSamples);
