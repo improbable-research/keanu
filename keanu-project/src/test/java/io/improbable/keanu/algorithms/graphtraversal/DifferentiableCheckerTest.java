@@ -5,16 +5,20 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.Collection;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 
 public class DifferentiableCheckerTest {
@@ -171,5 +175,24 @@ public class DifferentiableCheckerTest {
 
         // A non diffable floor is between latent and the next latent. So not MAP diffable.
         assertMAPNotDifferentiable(gaussianObserved.getConnectedGraph());
+    }
+
+    @Test
+    public void constantVerticesAreCached() {
+        GaussianVertex baseVertex = new GaussianVertex(1., 1.);
+        AdditionVertex addVertex = new AdditionVertex(baseVertex, new ConstantDoubleVertex(1.));
+        DoubleVertex mockedVertex = Mockito.spy(addVertex);
+        FloorVertex nonDiffable = new FloorVertex(mockedVertex);
+
+        GaussianVertex gaussianA = new GaussianVertex(nonDiffable, new ConstantDoubleVertex(3.));
+        GaussianVertex gaussianB = new GaussianVertex(nonDiffable, new ConstantDoubleVertex(3.));
+        DifferentiableChecker.isDifferentiableWrtLatents(gaussianB.getConnectedGraph());
+
+        /*
+        After gaussianA is checked for whether it is diffable we know that FloorVertex is constant.
+        This should be cached and therefore its parents aren't needed to be explored to determine this in the future.
+        isObserved is called when checking for a constant value, so it should only be called once.
+        */
+        verify(mockedVertex, times(1)).isObserved();
     }
 }
