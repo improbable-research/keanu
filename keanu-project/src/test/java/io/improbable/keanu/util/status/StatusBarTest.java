@@ -130,11 +130,11 @@ public class StatusBarTest {
         }).when(mockStream).print(anyString());
 
         StatusBar.setDefaultPrintStream(mockStream);
-        StatusBar.enable();
         StatusBar statusBar = new StatusBar(scheduler);
+        StatusBar.enable();
         statusBar.setMessage("");
         statusBar.finish();
-        verify(mockStream, atLeastOnce()).print("\r|Keanu| ");
+        verify(mockStream, atLeastOnce()).print(anyString());
     }
 
     @After

@@ -19,10 +19,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class ProgressBarTest {
+public class PercentageComponentTest {
     private AtomicReference<Runnable> progressUpdateCall;
     private StatusBar statusBar;
-    private ProgressBar progressBar;
+    private PercentageComponent percentageComponent;
     private ByteArrayOutputStream byteArrayOutputStream;
     private ScheduledExecutorService scheduler;
 
@@ -42,7 +42,8 @@ public class ProgressBarTest {
             });
 
         statusBar = new StatusBar(printStream, scheduler);
-        progressBar = new ProgressBar(statusBar);
+        percentageComponent = new PercentageComponent();
+        statusBar.addComponent(percentageComponent);
         StatusBar.enable();
     }
 
@@ -50,9 +51,9 @@ public class ProgressBarTest {
     public void doesPrintProgressInAppropriateFormat() {
         StatusBar.enable();
 
-        progressBar.progress(0.0);
+        percentageComponent.progress(0.0);
         progressUpdateCall.get().run();
-        progressBar.progress(0.675);
+        percentageComponent.progress(0.675);
         statusBar.finish();
 
         String result = getResultWithNewLinesInsteadOfCR();
@@ -64,9 +65,9 @@ public class ProgressBarTest {
     public void doesLimitProgressTo100Percent() {
         StatusBar.enable();
 
-        progressBar.progress(-0.7);
+        percentageComponent.progress(-0.7);
         progressUpdateCall.get().run();
-        progressBar.progress(1.5);
+        percentageComponent.progress(1.5);
         statusBar.finish();
 
         String result = getResultWithNewLinesInsteadOfCR();

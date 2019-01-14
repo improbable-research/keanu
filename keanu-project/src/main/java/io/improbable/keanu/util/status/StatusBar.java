@@ -149,7 +149,10 @@ public class StatusBar {
     private String formatComponents() {
         StringBuilder sb = new StringBuilder();
         for (StatusBarComponent component : components) {
-            sb.append(component.render()).append(" ");
+            String render = component.render();
+            if(render != "") {
+                sb.append(component.render()).append(" ");
+            }
         }
         return sb.toString();
     }

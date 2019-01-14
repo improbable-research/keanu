@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.mcmc;
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.util.status.ProgressBar;
+import io.improbable.keanu.util.status.PercentageComponent;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.VertexId;
 
@@ -90,7 +90,8 @@ public class NetworkSamplesGenerator {
 
         dropSamples(dropCount, statusBar);
 
-        ProgressBar progressBar = new ProgressBar(statusBar);
+        PercentageComponent statusPercentage = newPercentageComponentAndAddToStatusBar(statusBar);
+        statusBar.setMessage("Sampling...");
         int sampleCount = 0;
         int samplesLeft = totalSampleCount - dropCount;
         for (int i = 0; i < samplesLeft; i++) {
@@ -100,12 +101,17 @@ public class NetworkSamplesGenerator {
             } else {
                 algorithm.step();
             }
-
-            progressBar.progress("Sampling...", (i + 1), samplesLeft);
+            statusPercentage.progress((double) (i+1) / samplesLeft);
         }
 
         statusBar.finish();
         return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, sampleCount);
+    }
+
+    private PercentageComponent newPercentageComponentAndAddToStatusBar(StatusBar statusBar) {
+        PercentageComponent percentageComponent = new PercentageComponent();
+        statusBar.addComponent(percentageComponent);
+        return percentageComponent;
     }
 
     /**
@@ -135,11 +141,16 @@ public class NetworkSamplesGenerator {
     }
 
     private void dropSamples(int dropCount, StatusBar statusBar) {
-        ProgressBar progressBar = new ProgressBar(statusBar);
+        if(dropCount == 0) {
+            return;
+        }
+        statusBar.setMessage("Dropping samples...");
+        PercentageComponent statusPercent = newPercentageComponentAndAddToStatusBar(statusBar);
         for (int i = 0; i < dropCount; i++) {
             algorithm.step();
-            progressBar.progress("Dropping samples...", (i + 1) / (double) dropCount);
+            statusPercent.progress((i + 1) / (double) dropCount);
         }
+        statusBar.removeComponent(statusPercent);
     }
 
 }

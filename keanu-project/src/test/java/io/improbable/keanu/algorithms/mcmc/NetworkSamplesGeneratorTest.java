@@ -76,7 +76,7 @@ public class NetworkSamplesGeneratorTest {
         NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, () -> statusBar);
         unitUnderTest.generate(10);
 
-        Mockito.verify(statusBar, times(10)).setMessage(anyString());
+        Mockito.verify(statusBar, times(1)).setMessage(anyString());
         Mockito.verify(statusBar).finish();
     }
 
@@ -102,11 +102,11 @@ public class NetworkSamplesGeneratorTest {
         });
 
         unitUnderTest.generate(10);
-        Mockito.verify(statusBar1, times(10)).setMessage(anyString());
+        Mockito.verify(statusBar1, times(1)).setMessage(anyString());
         Mockito.verify(statusBar1).finish();
 
         unitUnderTest.generate(8);
-        Mockito.verify(statusBar2, times(8)).setMessage(anyString());
+        Mockito.verify(statusBar2, times(1)).setMessage(anyString());
         Mockito.verify(statusBar2).finish();
     }
 
