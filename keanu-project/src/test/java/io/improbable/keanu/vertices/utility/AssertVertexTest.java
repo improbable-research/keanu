@@ -3,7 +3,9 @@ package io.improbable.keanu.vertices.utility;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -73,8 +75,8 @@ public class AssertVertexTest {
         GaussianVertex gaussian = new GaussianVertex(5, 1);
         gaussian.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
 
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(gaussian.getConnectedGraph());
-        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork, bayesianNetwork.getLatentVertices()).generate(10);
+        ProbabilisticGraph bayesianNetwork = new KeanuProbabilisticGraph(gaussian.getConnectedGraph());
+        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork, bayesianNetwork.getLatentVariables()).generate(10);
     }
 
     @Test

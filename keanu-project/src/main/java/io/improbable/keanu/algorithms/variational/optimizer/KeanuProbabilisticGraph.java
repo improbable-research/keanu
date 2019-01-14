@@ -32,6 +32,10 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     private Map<Variable, LambdaSection> affectedVerticesCache;
 
+    public KeanuProbabilisticGraph(Set<Vertex> variables) {
+        this(new BayesianNetwork(variables));
+    }
+
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
 
         this.vertexLookup = bayesianNetwork.getLatentOrObservedVertices().stream()
