@@ -24,7 +24,6 @@ import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.C;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 public class DirichletVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 

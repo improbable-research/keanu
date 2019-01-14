@@ -6,6 +6,8 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -24,7 +26,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class InverseGammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class InverseGammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
@@ -104,6 +106,26 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
 
         DoubleTensor logPdfs = InverseGamma.withParameters(alphaValues, betaValues).logProb(value);
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex alphaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(alpha.getShape());
+        final LogProbGraph.DoublePlaceholderVertex betaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(beta.getShape());
+
+        final DoubleVertex aTimesLnB = alphaPlaceholder.times(betaPlaceholder.log());
+        final DoubleVertex negAMinus1TimesLnX = xPlaceholder.log().times(alphaPlaceholder.unaryMinus().minus(1));
+        final DoubleVertex lnGammaA = alphaPlaceholder.logGamma();
+
+        final DoubleVertex logProbOutput = aTimesLnB.plus(negAMinus1TimesLnX).minus(lnGammaA).minus(betaPlaceholder.div(xPlaceholder));
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(alpha, alphaPlaceholder)
+            .input(beta, betaPlaceholder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
