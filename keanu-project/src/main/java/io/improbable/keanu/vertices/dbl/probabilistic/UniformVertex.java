@@ -5,13 +5,17 @@ import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Collections;
 import java.util.Map;
@@ -21,7 +25,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLen
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static java.util.Collections.singletonMap;
 
-public class UniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class UniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
@@ -97,6 +101,28 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
     @Override
     public double logProb(DoubleTensor value) {
         return Uniform.withParameters(xMin.getValue(), xMax.getValue()).logProb(value).sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex xMinPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMin.getShape());
+        final LogProbGraph.DoublePlaceholderVertex xMaxPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMax.getShape());
+
+        final DoubleVertex logOfWithinBounds = xMaxPlaceholder.minus(xMinPlaceholder).log().unaryMinus();
+        final DoubleVertex logOfOutOfBounds = new ConstantDoubleVertex(DoubleTensor.create(Double.NEGATIVE_INFINITY, logOfWithinBounds.getShape()));
+        final BoolVertex xOutOfBounds = xPlaceholder.greaterThanOrEqualTo(xMaxPlaceholder).or(xPlaceholder.lessThan(xMinPlaceholder));
+        final DoubleVertex logProbOutput = If
+            .isTrue(xOutOfBounds)
+            .then(logOfOutOfBounds)
+            .orElse(logOfWithinBounds);
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(xMin, xMinPlaceholder)
+            .input(xMax, xMaxPlaceholder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
