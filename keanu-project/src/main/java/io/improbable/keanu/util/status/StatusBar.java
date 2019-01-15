@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class StatusBar {
+
     private static final AtomicBoolean ENABLED = new AtomicBoolean(true);
     private static final long FRAME_PERIOD_MS = 500;
     private int previouslyPrintedUpdateLength = 0;

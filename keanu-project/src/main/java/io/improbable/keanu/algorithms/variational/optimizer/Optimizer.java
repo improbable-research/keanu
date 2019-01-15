@@ -4,6 +4,7 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.util.status.AverageTimeComponent;
 import io.improbable.keanu.util.status.StatusBar;
 
 import java.util.HashMap;
@@ -118,10 +119,14 @@ public interface Optimizer {
     static StatusBar createFitnessStatusBar(final Optimizer optimizerThatNeedsStatusBar) {
         AtomicInteger evalCount = new AtomicInteger(0);
         StatusBar statusBar = new StatusBar();
+        AverageTimeComponent averageTimeComponent = new AverageTimeComponent();
+        statusBar.addComponent(averageTimeComponent);
+
         BiConsumer<double[], Double> statusBarFitnessCalculationHandler = (position, logProb) -> {
             statusBar.setMessage(
                 String.format("Fitness Evaluation #%d LogProb: %.2f", evalCount.incrementAndGet(), logProb)
             );
+            averageTimeComponent.step();
         };
 
         optimizerThatNeedsStatusBar.addFitnessCalculationHandler(statusBarFitnessCalculationHandler);
