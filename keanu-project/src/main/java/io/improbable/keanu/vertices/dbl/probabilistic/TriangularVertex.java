@@ -3,15 +3,20 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +24,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class TriangularVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class TriangularVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
@@ -134,6 +139,42 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
 
         DoubleTensor logPdfs = Triangular.withParameters(xMinValues, xMaxValues, cValues).logProb(value);
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex xMinPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMin.getShape());
+        final LogProbGraph.DoublePlaceholderVertex xMaxPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMax.getShape());
+        final LogProbGraph.DoublePlaceholderVertex cPlaceholder = new LogProbGraph.DoublePlaceholderVertex(c.getShape());
+
+        final DoubleVertex range = xMaxPlaceholder.minus(xMinPlaceholder);
+
+        final BoolVertex conditionalFirstHalf = xPlaceholder.greaterThan(xMinPlaceholder);
+        final BoolVertex conditionalSecondHalf = xPlaceholder.lessThan(cPlaceholder);
+        final BoolVertex conditionalAnd = conditionalFirstHalf.and(conditionalSecondHalf);
+        final DoubleVertex conditionalResult = If
+            .isTrue(conditionalAnd)
+            .then(ConstantVertex.of(1.).div(range).times(2).times(xPlaceholder.minus(xMinPlaceholder)).div(cPlaceholder.minus(xMinPlaceholder)))
+            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(conditionalAnd.getShape())));
+
+        final BoolVertex elseIfConditionalFirstHalf = xPlaceholder.greaterThan(c);
+        final BoolVertex elseIfConditionalSecondHalf = xPlaceholder.lessThan(xMax);
+        final BoolVertex elseIfConditionalAnd = elseIfConditionalFirstHalf.and(elseIfConditionalSecondHalf);
+        final DoubleVertex elseIfConditionalResult = If
+            .isTrue(elseIfConditionalAnd)
+            .then(ConstantVertex.of(2.).div(range).times(xMaxPlaceholder.minus(xPlaceholder)).div(xMaxPlaceholder.minus(cPlaceholder)))
+            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(elseIfConditionalAnd.getShape())));
+
+        final DoubleVertex logProbOutput = conditionalResult.plus(elseIfConditionalResult.plus(elseIfConditionalResult)).log();
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(xMin, xMinPlaceholder)
+            .input(xMax, xMaxPlaceholder)
+            .input(c, cPlaceholder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
