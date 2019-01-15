@@ -151,6 +151,8 @@ public class ProtobufSaver implements NetworkSaver {
             return getParam(paramName, builder -> builder.setLongParam((long) param));
         } else if (String.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, builder -> builder.setStringParam((String) param));
+        } else if (Boolean.class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, builder -> builder.setBoolParam((boolean) param));
         } else if (Long[].class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (long[]) param);
         } else if (Vertex[].class.isAssignableFrom(param.getClass())) {
