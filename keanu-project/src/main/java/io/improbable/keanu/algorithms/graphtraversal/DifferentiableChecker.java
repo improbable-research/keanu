@@ -14,21 +14,59 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-
+/**
+ * Utility class for checking whether the given vertices are all differentiable w.r.t latents.
+ * When given latent variables, this ensures that the dLogProb can be calculated.
+ * <p>
+ * This check is performed by traversing up each vertex's parents and ensuring that the path to next RV is
+ * differentiable or constant valued.
+ * If there is a non differentiable vertex on this path, then if it is constant valued (0 gradient) it has no effect
+ * and therefore will return true.
+ *
+ *
+ * -- Examples --
+ * RV = Random Variable
+ * (G) = A vertex we want to check whether differentiable
+ * ND = Non-differentiable vertex
+ * D = Differentiable vertex
+ * C = Constant valued vertex
+ *
+ * - Differentiable -
+ *
+ *      RV  RV
+ *       \  /
+ *        D    RV
+ *         \  /
+ *         RV(G)
+ *
+ * This graph is differentiable as traversing up each of the vertex's parent to the next RV is a differentiable path.
+ *
+ *      C    C
+ *       \  /
+ *        ND    RV
+ *         \  /
+ *         RV(G)
+ *
+ * This graph is differentiable as the path that is non differentiable is constant valued.
+ *
+ * - Not Differentiable -
+ *
+ *      RV  RV     - Both RV not observed
+ *       \  /
+ *        ND    RV
+ *         \  /
+ *         RV(G)
+ *
+ * This is not differentiable as there is a non differentiable path which does not have a constant value.
+ *
+ * For more examples see DifferentiableCheckerTest.java.
+ */
 @UtilityClass
 public class DifferentiableChecker {
 
     /**
-     * Checks whether the given vertices are all differentiable w.r.t latents.
-     * When given latent variables, this ensures that the dLogProb can be calculated.
-     * <p>
-     * This check is performed by traversing up each vertex's parents and ensuring that the path to next RV is
-     * differentiable or constant valued.
-     * If there is a non differentiable vertex on this path, then if it is constant valued (0 gradient) it has no effect
-     * and therefore will return true.
-     *
-     * @param vertices vertices to check whether differentiable
-     * @return whether all the vertices are differentiable w.r.t latents
+     * @param vertices the vertices to check are differentiable w.r.t latents.
+     * @return true if all given vertices are differentiable, false otherwise.
      */
     public static boolean isDifferentiableWrtLatents(Collection<Vertex> vertices) {
         // All probabilistic need to be double or observed to ensure that the dLogProb can be calculated, for example
