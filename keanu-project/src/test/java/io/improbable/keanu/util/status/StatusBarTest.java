@@ -79,10 +79,8 @@ public class StatusBarTest {
     public void doesPrintToStreamWhenEnabled() {
         StatusBar.enable();
 
-        statusBar.setMessage("");
         progressUpdateCall.get().run();
         progressUpdateCall.get().run();
-        statusBar.setMessage("");
         progressUpdateCall.get().run();
         statusBar.finish();
 
@@ -95,10 +93,8 @@ public class StatusBarTest {
     public void doesNotPrintToStreamWhenGloballyDisabled() {
         StatusBar.disable();
 
-        statusBar.setMessage("");
         progressUpdateCall.get().run();
         progressUpdateCall.get().run();
-        statusBar.setMessage("");
         statusBar.finish();
 
         String result = getResultWithNewLinesInsteadOfCR();
@@ -112,7 +108,6 @@ public class StatusBarTest {
 
         Runnable finishHandler = mock(Runnable.class);
         statusBar.addFinishHandler(finishHandler);
-        statusBar.setMessage("");
         progressUpdateCall.get().run();
         statusBar.finish();
 
@@ -135,7 +130,6 @@ public class StatusBarTest {
         StatusBar.setDefaultPrintStream(mockStream);
         StatusBar statusBar = new StatusBar(scheduler);
         StatusBar.enable();
-        statusBar.setMessage("");
         statusBar.finish();
         verify(mockStream, atLeastOnce()).print(anyString());
     }
@@ -165,6 +159,16 @@ public class StatusBarTest {
 
         String result = getResultWithNewLinesInsteadOfCR();
         assertThat(result, not(containsString("RenderTest")));
+    }
+
+    @Test
+    public void setMessageDisplaysMessage() {
+        statusBar.setMessage("setMessageTest");
+        progressUpdateCall.get().run();
+        statusBar.finish();
+
+        String result = getResultWithNewLinesInsteadOfCR();
+        assertThat(result, containsString("setMessageTest"));
     }
 
     @After
