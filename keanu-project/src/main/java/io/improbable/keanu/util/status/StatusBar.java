@@ -109,6 +109,9 @@ public class StatusBar {
         previouslyPrintedUpdateLength = originalStringLength;
     }
 
+    /**
+     * Marks the end of use of a {@link StatusBar}. This stops it being printed and notifies handlers.
+     */
     public void finish() {
         scheduler.shutdown();
         printUpdate();
