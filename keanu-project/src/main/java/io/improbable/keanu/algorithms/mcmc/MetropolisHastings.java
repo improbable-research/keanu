@@ -70,30 +70,30 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     private ProposalApplicationStrategy proposalApplicationStrategy = DEFAULT_PROPOSAL_APPLICATION_STRATEGY;
 
     /**
-     * @param bayesianNetwork      a bayesian network containing latent variables
+     * @param model      a probabilistic model containing latent variables
      * @param variablesToSampleFrom the variables to include in the returned samples
      * @param sampleCount          number of samples to take using the algorithm
      * @return Samples for each variable ordered by MCMC iteration
      */
     @Override
-    public NetworkSamples getPosteriorSamples(ProbabilisticModel bayesianNetwork,
+    public NetworkSamples getPosteriorSamples(ProbabilisticModel model,
                                               List<? extends Variable> variablesToSampleFrom,
                                               int sampleCount) {
-        return generatePosteriorSamples(bayesianNetwork, variablesToSampleFrom)
+        return generatePosteriorSamples(model, variablesToSampleFrom)
             .generate(sampleCount);
     }
 
-    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel bayesianNetwork,
+    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
                                                             final List<? extends Variable> variablesToSampleFrom) {
 
-        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, variablesToSampleFrom), ProgressBar::new);
+        return new NetworkSamplesGenerator(setupSampler(model, variablesToSampleFrom), ProgressBar::new);
     }
 
-    private SamplingAlgorithm setupSampler(final ProbabilisticModel bayesianNetwork,
+    private SamplingAlgorithm setupSampler(final ProbabilisticModel model,
                                            final List<? extends Variable> variablesToSampleFrom) {
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
-            bayesianNetwork,
+            model,
             proposalDistribution,
             rejectionStrategy,
             logProbCalculationStrategy,
@@ -101,7 +101,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             random
         );
 
-        return new MetropolisHastingsSampler(bayesianNetwork.getLatentVariables(), variablesToSampleFrom, mhStep, variableSelector, bayesianNetwork.logProb());
+        return new MetropolisHastingsSampler(model.getLatentVariables(), variablesToSampleFrom, mhStep, variableSelector, model.logProb());
     }
 
 }

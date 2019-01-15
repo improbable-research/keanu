@@ -179,10 +179,10 @@ public class ProcessModelVertexTest {
         chanceOfRainObservation.observe(3.0);
         humidityObservation.observe(60.0);
 
-        ProbabilisticModel bayesianNetwork = new KeanuProbabilisticModel(new BayesianNetwork(chanceOfRainObservation.getConnectedGraph()));
+        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(new BayesianNetwork(chanceOfRainObservation.getConnectedGraph()));
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesianNetwork,
+            probabilisticModel,
             inputToModel,
             220
         );

@@ -75,8 +75,8 @@ public class AssertVertexTest {
         GaussianVertex gaussian = new GaussianVertex(5, 1);
         gaussian.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
 
-        ProbabilisticModel bayesianNetwork = new KeanuProbabilisticModel(gaussian.getConnectedGraph());
-        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork, bayesianNetwork.getLatentVariables()).generate(10);
+        ProbabilisticModel model = new KeanuProbabilisticModel(gaussian.getConnectedGraph());
+        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(model, model.getLatentVariables()).generate(10);
     }
 
     @Test
@@ -153,10 +153,10 @@ public class AssertVertexTest {
         firstThermometer.observe(25.);
         secondThermometer.observe(30.);
 
-        ProbabilisticModel bayesNet = new KeanuProbabilisticModel(new BayesianNetwork(temperature.getConnectedGraph()));
+        ProbabilisticModel model = new KeanuProbabilisticModel(new BayesianNetwork(temperature.getConnectedGraph()));
         MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVariables(),
+            model,
+            model.getLatentVariables(),
             100
         );
     }

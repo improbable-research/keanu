@@ -8,17 +8,17 @@ import java.util.List;
 
 public interface PosteriorSamplingAlgorithm {
 
-    default NetworkSamples getPosteriorSamples(ProbabilisticModel bayesianNetwork,
+    default NetworkSamples getPosteriorSamples(ProbabilisticModel model,
                                                Variable variableToSampleFrom,
                                                int sampleCount) {
-        return getPosteriorSamples(bayesianNetwork, Collections.singletonList(variableToSampleFrom), sampleCount);
+        return getPosteriorSamples(model, Collections.singletonList(variableToSampleFrom), sampleCount);
     }
 
-    default NetworkSamples getPosteriorSamples(ProbabilisticModel bayesianNetwork, int sampleCount) {
-        return getPosteriorSamples(bayesianNetwork, bayesianNetwork.getLatentVariables(), sampleCount);
+    default NetworkSamples getPosteriorSamples(ProbabilisticModel model, int sampleCount) {
+        return getPosteriorSamples(model, model.getLatentVariables(), sampleCount);
     }
 
-    NetworkSamples getPosteriorSamples(ProbabilisticModel bayesNet,
+    NetworkSamples getPosteriorSamples(ProbabilisticModel model,
                                        List<? extends Variable> variablesToSampleFrom,
                                        int sampleCount);
 
