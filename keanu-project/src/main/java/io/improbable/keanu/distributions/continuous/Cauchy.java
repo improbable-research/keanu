@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -20,15 +21,15 @@ public class Cauchy implements ContinuousDistribution {
     }
 
     private Cauchy(DoubleTensor location, DoubleTensor scale) {
+        Preconditions.checkArgument(scale.greaterThan(0.).allTrue(),
+            "Invalid argument for Scale. It must be greater than 0. Scale: " + scale);
+
         this.location = location;
         this.scale = scale;
     }
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
-        if (!scale.greaterThan(0.0).allTrue()) {
-            throw new IllegalArgumentException("Invalid argument for Scale. It must be greater than 0. Scale: " + scale.scalar());
-        }
         DoubleTensor unityCauchy = random.nextDouble(shape);
         return unityCauchy.minusInPlace(0.5).timesInPlace(Math.PI).tanInPlace().timesInPlace(scale).plusInPlace(location);
     }

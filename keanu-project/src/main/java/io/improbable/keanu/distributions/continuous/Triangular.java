@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -16,6 +17,9 @@ public class Triangular implements ContinuousDistribution {
     }
 
     private Triangular(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
+        Preconditions.checkArgument(c.greaterThanOrEqual(xMin).allTrue() && c.lessThanOrEqual(xMax).allTrue(),
+            "center must be between xMin and xMax. c: " + c + " xMin: " + xMin + " xMax: " + xMax);
+
         this.xMin = xMin;
         this.xMax = xMax;
         this.c = c;
