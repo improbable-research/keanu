@@ -3,8 +3,8 @@ package io.improbable.keanu.algorithms.mcmc;
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.util.status.AverageTimeComponent;
 import io.improbable.keanu.util.status.PercentageComponent;
+import io.improbable.keanu.util.status.RemainingTimeComponent;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.VertexId;
 
@@ -92,8 +92,8 @@ public class NetworkSamplesGenerator {
         dropSamples(dropCount, statusBar);
 
         PercentageComponent statusPercentage = newPercentageComponentAndAddToStatusBar(statusBar);
-        AverageTimeComponent averageTimeComponent = new AverageTimeComponent();
-        statusBar.addComponent(averageTimeComponent);
+        RemainingTimeComponent remainingTimeComponent = new RemainingTimeComponent(totalSampleCount);
+        statusBar.addComponent(remainingTimeComponent);
         statusBar.setMessage("Sampling...");
         int sampleCount = 0;
         int samplesLeft = totalSampleCount - dropCount;
@@ -104,7 +104,7 @@ public class NetworkSamplesGenerator {
             } else {
                 algorithm.step();
             }
-            averageTimeComponent.step();
+            remainingTimeComponent.step();
             statusPercentage.progress((double) (i+1) / samplesLeft);
         }
 
