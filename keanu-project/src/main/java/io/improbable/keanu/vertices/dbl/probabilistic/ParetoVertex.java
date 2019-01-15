@@ -3,12 +3,17 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Pareto;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -23,8 +28,9 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
-public class ParetoVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class ParetoVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex scale;
     private final DoubleVertex location;
@@ -98,6 +104,37 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
         DoubleTensor logPdfs = Pareto.withParameters(locValues, scaleValues).logProb(value);
 
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex locationPlaceholder = new LogProbGraph.DoublePlaceholderVertex(location.getShape());
+        final LogProbGraph.DoublePlaceholderVertex scalePlaceholder = new LogProbGraph.DoublePlaceholderVertex(scale.getShape());
+
+        final BoolVertex invalidXMask = xPlaceholder.lessThanOrEqualTo(locationPlaceholder);
+        final DoubleVertex ifValid = scalePlaceholder.log().plus(locationPlaceholder.log().times(scalePlaceholder))
+            .minus(scalePlaceholder.plus(1.).times(xPlaceholder.log()));
+        final DoubleVertex ifInValid = ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, ifValid.getShape()));
+        final DoubleVertex resultIfAllParamValuesAreValid = If
+            .isTrue(invalidXMask)
+            .then(ifInValid)
+            .orElse(ifValid);
+
+        final DoubleVertex zero = ConstantVertex.of(0.);
+        final BoolVertex validParamMask = locationPlaceholder.greaterThan(zero).and(scalePlaceholder.greaterThan(zero));
+        final DoubleVertex zeroProb = ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, xPlaceholder.getShape()));
+        final DoubleVertex logProbOutput = If
+            .isTrue(validParamMask.allTrue())
+            .then(resultIfAllParamValuesAreValid)
+            .orElse(zeroProb);
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(location, locationPlaceholder)
+            .input(scale, scalePlaceholder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
