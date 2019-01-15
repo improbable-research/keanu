@@ -71,4 +71,3 @@ public class MetropolisHastingsSampler implements SamplingAlgorithm {
     }
 
 }
-

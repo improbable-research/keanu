@@ -4,8 +4,10 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
@@ -81,6 +83,12 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
                                                             final List<? extends Variable> verticesToSampleFrom) {
 
         return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom), ProgressBar::new);
+    }
+
+    public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
+                                                            final List<? extends Variable> verticesToSampleFrom) {
+
+        return new NetworkSamplesGenerator(setupSampler(new KeanuProbabilisticGraph(bayesianNetwork), verticesToSampleFrom), ProgressBar::new);
     }
 
     private SamplingAlgorithm setupSampler(final ProbabilisticGraph bayesianNetwork,
