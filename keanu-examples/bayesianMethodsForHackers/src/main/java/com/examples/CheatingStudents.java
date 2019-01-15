@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -21,9 +21,9 @@ public class CheatingStudents {
 
         int numberOfSamples = 2000;
         UniformVertex probabilityOfCheating = new UniformVertex(0.0, 1.0);
-        BoolVertex studentCheated = new BernoulliVertex(new long[]{numberOfStudents}, probabilityOfCheating);
-        BoolVertex answerIsTrue = new BernoulliVertex(new long[]{numberOfStudents}, 0.5);
-        BoolVertex randomAnswer = new BernoulliVertex(new long[]{numberOfStudents}, 0.5);
+        BooleanVertex studentCheated = new BernoulliVertex(new long[]{numberOfStudents}, probabilityOfCheating);
+        BooleanVertex answerIsTrue = new BernoulliVertex(new long[]{numberOfStudents}, 0.5);
+        BooleanVertex randomAnswer = new BernoulliVertex(new long[]{numberOfStudents}, 0.5);
 
         DoubleVertex answer = If.isTrue(answerIsTrue)
             .then(

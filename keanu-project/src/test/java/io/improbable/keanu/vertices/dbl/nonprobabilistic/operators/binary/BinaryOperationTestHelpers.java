@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -11,6 +12,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 import java.util.function.BiFunction;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -167,5 +169,36 @@ public class BinaryOperationTestHelpers {
 
     public static double[] toDiagonalArray(double[] diagonal) {
         return DoubleTensor.create(diagonal).diag().asFlatDoubleArray();
+    }
+
+    public static <T extends DoubleVertex & Differentiable> void finiteDifferenceMatchesElementwise(BiFunction<UniformVertex, UniformVertex, T> op) {
+        testWithFiniteDifference(op, new long[0], new long[0]);
+        testWithFiniteDifference(op, new long[]{3}, new long[]{3});
+        testWithFiniteDifference(op, new long[]{2, 3}, new long[]{2, 3});
+        testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{2, 2, 2});
+    }
+
+    public static <T extends DoubleVertex & Differentiable> void finiteDifferenceMatchesBroadcast(BiFunction<UniformVertex, UniformVertex, T> op) {
+        testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{1, 1, 1});
+        testWithFiniteDifference(op, new long[]{1, 1, 1}, new long[]{2, 2, 2});
+        testWithFiniteDifference(op, new long[]{2, 2, 2}, new long[]{});
+        testWithFiniteDifference(op, new long[]{}, new long[]{2, 2, 2});
+        testWithFiniteDifference(op, new long[]{2, 4}, new long[]{4});
+        testWithFiniteDifference(op, new long[]{2, 4}, new long[]{1, 4});
+        testWithFiniteDifference(op, new long[]{4}, new long[]{2, 4});
+        testWithFiniteDifference(op, new long[]{1, 4}, new long[]{2, 4});
+        testWithFiniteDifference(op, new long[]{2, 1, 4}, new long[]{1, 1, 4});
+        testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{1, 3, 4});
+        testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{3, 4});
+        testWithFiniteDifference(op, new long[]{3, 4}, new long[]{2, 3, 4});
+        testWithFiniteDifference(op, new long[]{2, 3, 4}, new long[]{4});
+        testWithFiniteDifference(op, new long[]{4}, new long[]{2, 3, 4});
+    }
+
+    public static <T extends DoubleVertex & Differentiable> void testWithFiniteDifference(BiFunction<UniformVertex, UniformVertex, T> op, long[] leftShape, long[] rightShape) {
+        UniformVertex A = new UniformVertex(leftShape, -10.0, 10.0);
+        UniformVertex B = new UniformVertex(rightShape, -10.0, 10.0);
+
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), op.apply(A, B), 1e-10, 1e-10);
     }
 }

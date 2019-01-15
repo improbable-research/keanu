@@ -81,8 +81,8 @@ public class TensorTestOperations {
 
     private static int[] getWrtDimensions(DoubleVertex wrtVertex,
                                           DoubleVertex ofVertex) {
-        int wrtRank = wrtVertex.getShape().length;
-        int ofRank = ofVertex.getShape().length;
+        int wrtRank = wrtVertex.getRank();
+        int ofRank = ofVertex.getRank();
         int[] wrtDimensions = new int[wrtRank];
 
         for (int i = 0; i < wrtRank; i++) {

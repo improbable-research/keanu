@@ -65,4 +65,14 @@ public class DifferenceVertexTest {
             DoubleVertex::minus
         );
     }
+
+    @Test
+    public void finiteDifferenceMatchesElementwise() {
+        BinaryOperationTestHelpers.finiteDifferenceMatchesElementwise(DoubleVertex::minus);
+    }
+
+    @Test
+    public void finiteDifferenceMatchesSimpleBroadcast() {
+        BinaryOperationTestHelpers.finiteDifferenceMatchesBroadcast(DoubleVertex::minus);
+    }
 }

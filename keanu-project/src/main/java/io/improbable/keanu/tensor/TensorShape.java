@@ -25,6 +25,10 @@ public class TensorShape {
         return isLengthOne(shape);
     }
 
+    public int getRank() {
+        return shape.length;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -179,6 +183,10 @@ public class TensorShape {
         return increaseRankByPaddingValue(lowRankTensorShape, desiredRank, false);
     }
 
+    public static long[] calculateShapeForLengthOneBroadcast(long[] shape1, long[] shape2) {
+        return (shape1.length >= shape2.length) ? shape1 : shape2;
+    }
+
     private static long[] increaseRankByPaddingValue(long[] lowRankTensorShape, int desiredRank, boolean append) {
         long[] paddedShape = new long[desiredRank];
         if (lowRankTensorShape.length > desiredRank) {
@@ -228,7 +236,6 @@ public class TensorShape {
      *
      * @param dimension the negative or positive dimension to find the absolute of
      * @param rank      the rank
-     *
      * @return an absolute dimension from a shape
      */
     public static int getAbsoluteDimension(int dimension, int rank) {
