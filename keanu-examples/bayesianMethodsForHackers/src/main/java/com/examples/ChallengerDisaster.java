@@ -41,8 +41,9 @@ public class ChallengerDisaster {
         defect.observe(data.oRingFailure);
 
         BayesianNetwork net = new BayesianNetwork(defect.getConnectedGraph());
-        KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
         net.probeForNonZeroProbability(1000);
+
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
         final int sampleCount = 3000;
         NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig()

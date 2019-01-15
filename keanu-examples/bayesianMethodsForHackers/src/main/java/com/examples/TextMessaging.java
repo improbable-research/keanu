@@ -49,8 +49,8 @@ public class TextMessaging {
         textsForDay.observe(data.numberOfMessages);
 
         BayesianNetwork net = new BayesianNetwork(textsForDay.getConnectedGraph());
-        KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
         net.probeForNonZeroProbability(1000);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
         final int numSamples = 1000;
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig()
