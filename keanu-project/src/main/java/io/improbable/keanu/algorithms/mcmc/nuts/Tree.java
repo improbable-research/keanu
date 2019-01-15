@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.algorithms.SaveStatistics;
 import io.improbable.keanu.algorithms.Statistics;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -98,7 +98,7 @@ class Tree implements SaveStatistics {
 
     public static Tree buildOtherHalfOfTree(Tree currentTree,
                                             List<? extends Variable<DoubleTensor>> latentVertices,
-                                            ProbabilisticWithGradientGraph logProbGradientCalculator,
+                                            ProbabilisticWithGradientModel logProbGradientCalculator,
                                             final List<? extends Variable> sampleFromVertices,
                                             double logU,
                                             int buildDirection,
@@ -130,7 +130,7 @@ class Tree implements SaveStatistics {
     }
 
     private static Tree buildTree(List<? extends Variable<DoubleTensor>> latentVertices,
-                                  ProbabilisticWithGradientGraph logProbGradientCalculator,
+                                  ProbabilisticWithGradientModel logProbGradientCalculator,
                                   final List<? extends Variable> sampleFromVertices,
                                   Leapfrog leapfrog,
                                   double logU,
@@ -208,7 +208,7 @@ class Tree implements SaveStatistics {
     }
 
     private static Tree treeBuilderBaseCase(List<? extends Variable<DoubleTensor>> latentVertices,
-                                            ProbabilisticWithGradientGraph logProbGradientCalculator,
+                                            ProbabilisticWithGradientModel logProbGradientCalculator,
                                             final List<? extends Variable> sampleFromVertices,
                                             Leapfrog leapfrog,
                                             double logU,

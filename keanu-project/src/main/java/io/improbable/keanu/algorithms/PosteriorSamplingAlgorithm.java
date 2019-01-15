@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms;
 
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 
 import java.util.Collections;
@@ -8,17 +8,17 @@ import java.util.List;
 
 public interface PosteriorSamplingAlgorithm {
 
-    default NetworkSamples getPosteriorSamples(ProbabilisticGraph bayesianNetwork,
+    default NetworkSamples getPosteriorSamples(ProbabilisticModel bayesianNetwork,
                                                Variable vertexToSampleFrom,
                                                int sampleCount) {
         return getPosteriorSamples(bayesianNetwork, Collections.singletonList(vertexToSampleFrom), sampleCount);
     }
 
-    default NetworkSamples getPosteriorSamples(ProbabilisticGraph bayesianNetwork, int sampleCount) {
+    default NetworkSamples getPosteriorSamples(ProbabilisticModel bayesianNetwork, int sampleCount) {
         return getPosteriorSamples(bayesianNetwork, bayesianNetwork.getLatentVariables(), sampleCount);
     }
 
-    NetworkSamples getPosteriorSamples(ProbabilisticGraph bayesNet,
+    NetworkSamples getPosteriorSamples(ProbabilisticModel bayesNet,
                                        List<? extends Variable> verticesToSampleFrom,
                                        int sampleCount);
 

@@ -21,7 +21,7 @@ public class KeanuProbabilisticWithGradientGraphTest {
     GaussianVertex B;
     BernoulliVertex C;
 
-    KeanuProbabilisticWithGradientGraph graph;
+    KeanuProbabilisticWithGradientModel graph;
 
     @Before
     public void setup() {
@@ -33,7 +33,7 @@ public class KeanuProbabilisticWithGradientGraphTest {
         C = new BernoulliVertex(A.times(B));
         C.observe(true);
 
-        graph = new KeanuProbabilisticWithGradientGraph(
+        graph = new KeanuProbabilisticWithGradientModel(
             new BayesianNetwork(C.getConnectedGraph())
         );
     }

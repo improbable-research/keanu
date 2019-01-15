@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientModel;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -38,8 +38,8 @@ public class LeapfrogTest {
     private Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
     private Map<VariableReference, DoubleTensor> gradient = new HashMap<>();
 
-    private ProbabilisticWithGradientGraph mockedGradientCalculator;
-    private ProbabilisticWithGradientGraph mockedReverseGradientCalculator;
+    private ProbabilisticWithGradientModel mockedGradientCalculator;
+    private ProbabilisticWithGradientModel mockedReverseGradientCalculator;
 
     @Before
     public void setupGraphForLeapfrog() {
@@ -54,12 +54,12 @@ public class LeapfrogTest {
         mockedReverseGradientCalculator = setUpMock(-1., 1.);
     }
 
-    private ProbabilisticWithGradientGraph setUpMock(double aValue, double bValue) {
+    private ProbabilisticWithGradientModel setUpMock(double aValue, double bValue) {
         Map<VariableReference, DoubleTensor> gradient = new HashMap<>();
         gradient.put(aID, DoubleTensor.scalar(aValue));
         gradient.put(bID, DoubleTensor.scalar(bValue));
 
-        ProbabilisticWithGradientGraph mock = mock(ProbabilisticWithGradientGraph.class);
+        ProbabilisticWithGradientModel mock = mock(ProbabilisticWithGradientModel.class);
         when(mock.logProbGradients(anyMap())).thenAnswer(
             invocation -> gradient
         );

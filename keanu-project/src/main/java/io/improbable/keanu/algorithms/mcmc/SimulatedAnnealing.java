@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
@@ -63,7 +63,7 @@ public class SimulatedAnnealing {
     @Builder.Default
     private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
 
-    public NetworkState getMaxAPosteriori(ProbabilisticGraph bayesNet,
+    public NetworkState getMaxAPosteriori(ProbabilisticModel bayesNet,
                                           int sampleCount) {
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
         return getMaxAPosteriori(bayesNet, sampleCount, schedule);
@@ -77,7 +77,7 @@ public class SimulatedAnnealing {
      * @param annealingSchedule the schedule to update T (temperature) as a function of sample number.
      * @return the NetworkState that represents the Max A Posteriori
      */
-    public NetworkState getMaxAPosteriori(ProbabilisticGraph bayesNet,
+    public NetworkState getMaxAPosteriori(ProbabilisticModel bayesNet,
                                           int sampleCount,
                                           AnnealingSchedule annealingSchedule) {
 

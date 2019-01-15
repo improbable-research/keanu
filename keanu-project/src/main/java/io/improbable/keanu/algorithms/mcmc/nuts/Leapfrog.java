@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -44,7 +44,7 @@ class Leapfrog {
      * @return a new leapfrog having taken one step through space
      */
     public Leapfrog step(final List<? extends Variable<DoubleTensor>> latentVertices,
-                         final ProbabilisticWithGradientGraph logProbGradientCalculator,
+                         final ProbabilisticWithGradientModel logProbGradientCalculator,
                          final double epsilon) {
 
         final double halfTimeStep = epsilon / 2.0;

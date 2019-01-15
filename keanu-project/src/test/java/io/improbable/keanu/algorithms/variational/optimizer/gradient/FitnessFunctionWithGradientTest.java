@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
@@ -36,7 +36,7 @@ public class FitnessFunctionWithGradientTest {
         GaussianVertex dObservation = new GaussianVertex(D, 1.0);
         dObservation.observe(Nd4jDoubleTensor.scalar(3.0));
 
-        KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
+        KeanuProbabilisticWithGradientModel graph = new KeanuProbabilisticWithGradientModel(new BayesianNetwork(A.getConnectedGraph()));
         FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(graph, false);
 
         assert2DGradientEqualsApproxGradient(
@@ -66,7 +66,7 @@ public class FitnessFunctionWithGradientTest {
         GaussianVertex dObservation = new GaussianVertex(D, 5.0);
         dObservation.observe(Nd4jDoubleTensor.scalar(18.0));
 
-        KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
+        KeanuProbabilisticWithGradientModel graph = new KeanuProbabilisticWithGradientModel(new BayesianNetwork(A.getConnectedGraph()));
         FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(graph, false);
 
         assert2DGradientEqualsApproxGradient(
@@ -99,7 +99,7 @@ public class FitnessFunctionWithGradientTest {
         GaussianVertex fObservation = new GaussianVertex(F, C);
         fObservation.observe(Nd4jDoubleTensor.scalar(1.0));
 
-        KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
+        KeanuProbabilisticWithGradientModel graph = new KeanuProbabilisticWithGradientModel(new BayesianNetwork(A.getConnectedGraph()));
         FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(graph, false);
 
         assert2DGradientEqualsApproxGradient(

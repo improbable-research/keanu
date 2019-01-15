@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.variational.optimizer.LambdaSectionSnapshot;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.vertices.Vertex;
 
@@ -17,7 +17,7 @@ public class LambdaSectionOptimizedLogProbCalculator implements LogProbCalculati
     }
 
     @Override
-    public double calculate(ProbabilisticGraph graph, Set<Variable> variables) {
+    public double calculate(ProbabilisticModel graph, Set<Variable> variables) {
         return lambdaSectionSnapshot.logProb(variables);
     }
 }

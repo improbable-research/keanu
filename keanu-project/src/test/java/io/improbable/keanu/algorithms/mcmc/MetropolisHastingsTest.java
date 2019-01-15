@@ -4,8 +4,8 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
@@ -47,7 +47,7 @@ public class MetropolisHastingsTest {
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
         bayesNet.probeForNonZeroProbability(100);
-        ProbabilisticGraph graph = new KeanuProbabilisticGraph(bayesNet);
+        ProbabilisticModel graph = new KeanuProbabilisticModel(bayesNet);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             graph,
@@ -80,7 +80,7 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            new KeanuProbabilisticGraph(bayesNet),
+            new KeanuProbabilisticModel(bayesNet),
             Arrays.asList(A, B),
             5000
         );
@@ -112,7 +112,7 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            new KeanuProbabilisticGraph(bayesNet),
+            new KeanuProbabilisticModel(bayesNet),
             Collections.singletonList(A),
             10000
         );
@@ -143,7 +143,7 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            new KeanuProbabilisticGraph(bayesNet),
+            new KeanuProbabilisticModel(bayesNet),
             Collections.singletonList(A),
             1000
         );
@@ -165,7 +165,7 @@ public class MetropolisHastingsTest {
         net.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            new KeanuProbabilisticGraph(net),
+            new KeanuProbabilisticModel(net),
             Collections.singletonList(A),
             10000
         );
@@ -197,7 +197,7 @@ public class MetropolisHastingsTest {
             .build();
 
         NetworkSamples posteriorSamples =  metropolisHastings.getPosteriorSamples(
-            new KeanuProbabilisticGraph(bayesNet),
+            new KeanuProbabilisticModel(bayesNet),
             Arrays.asList(A, B),
             1000
         );
@@ -243,7 +243,7 @@ public class MetropolisHastingsTest {
             .rejectionStrategy(new RollBackOnRejection(network.getLatentVertices()))
             .build()
             .getPosteriorSamples(
-            new KeanuProbabilisticGraph(network),
+            new KeanuProbabilisticModel(network),
             network.getLatentVertices(),
             sampleCount
         );
@@ -267,7 +267,7 @@ public class MetropolisHastingsTest {
         assertNotNull(algo.getVariableSelector());
 
         NetworkSamples posteriorSamples = algo.getPosteriorSamples(
-            new KeanuProbabilisticGraph(net),
+            new KeanuProbabilisticModel(net),
             net.getLatentVertices(),
             2
         );
@@ -285,7 +285,7 @@ public class MetropolisHastingsTest {
         int dropCount = 100;
         int downSampleInterval = 2;
         GaussianVertex A = new GaussianVertex(0, 1);
-        ProbabilisticGraph network = new KeanuProbabilisticGraph(new BayesianNetwork(A.getConnectedGraph()));
+        ProbabilisticModel network = new KeanuProbabilisticModel(new BayesianNetwork(A.getConnectedGraph()));
         NetworkSamples samples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(network, network.getLatentVariables())
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
@@ -304,7 +304,7 @@ public class MetropolisHastingsTest {
         int dropCount = 100;
         int downSampleInterval = 1;
         GaussianVertex A = new GaussianVertex(0, 1);
-        ProbabilisticGraph network = new KeanuProbabilisticGraph(new BayesianNetwork(A.getConnectedGraph()));
+        ProbabilisticModel network = new KeanuProbabilisticModel(new BayesianNetwork(A.getConnectedGraph()));
 
         double averageA = algo.generatePosteriorSamples(network, network.getLatentVariables())
             .dropCount(dropCount)

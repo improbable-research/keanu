@@ -2,7 +2,6 @@ package com.examples;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;

@@ -3,9 +3,9 @@ package io.improbable.keanu.vertices.utility;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -75,7 +75,7 @@ public class AssertVertexTest {
         GaussianVertex gaussian = new GaussianVertex(5, 1);
         gaussian.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
 
-        ProbabilisticGraph bayesianNetwork = new KeanuProbabilisticGraph(gaussian.getConnectedGraph());
+        ProbabilisticModel bayesianNetwork = new KeanuProbabilisticModel(gaussian.getConnectedGraph());
         MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork, bayesianNetwork.getLatentVariables()).generate(10);
     }
 
@@ -153,7 +153,7 @@ public class AssertVertexTest {
         firstThermometer.observe(25.);
         secondThermometer.observe(30.);
 
-        ProbabilisticGraph bayesNet = new KeanuProbabilisticGraph(new BayesianNetwork(temperature.getConnectedGraph()));
+        ProbabilisticModel bayesNet = new KeanuProbabilisticModel(new BayesianNetwork(temperature.getConnectedGraph()));
         MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVariables(),

@@ -6,8 +6,8 @@ import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -92,20 +92,20 @@ public class NUTS implements PosteriorSamplingAlgorithm {
      * @return Samples taken with NUTS
      */
     @Override
-    public NetworkSamples getPosteriorSamples(final ProbabilisticGraph bayesNet,
+    public NetworkSamples getPosteriorSamples(final ProbabilisticModel bayesNet,
                                               final List<? extends Variable> sampleFromVertices,
                                               final int sampleCount) {
-        return generatePosteriorSamples((ProbabilisticWithGradientGraph) bayesNet, sampleFromVertices)
+        return generatePosteriorSamples((ProbabilisticWithGradientModel) bayesNet, sampleFromVertices)
             .generate(sampleCount);
     }
 
-    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticWithGradientGraph bayesNet,
+    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticWithGradientModel bayesNet,
                                                             final List<? extends Variable> fromVertices) {
 
         return new NetworkSamplesGenerator(setupSampler(bayesNet, fromVertices), ProgressBar::new);
     }
 
-    private NUTSSampler setupSampler(final ProbabilisticWithGradientGraph bayesNet,
+    private NUTSSampler setupSampler(final ProbabilisticWithGradientModel bayesNet,
                                      final List<? extends Variable> sampleFromVertices) {
 
         Preconditions.checkArgument(!sampleFromVertices.isEmpty(), "List of vertices to sample from is empty");

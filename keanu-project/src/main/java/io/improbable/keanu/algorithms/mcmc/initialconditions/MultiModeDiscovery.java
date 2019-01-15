@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc.initialconditions;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.mcmc.SimulatedAnnealing;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.Vertex;
@@ -27,7 +27,7 @@ public class MultiModeDiscovery {
 
         for (int i = 0; i < attempts; i++) {
             BayesianNetwork.setFromSampleAndCascade(sortedByDependency, random);
-            NetworkState maxAPosteriori = SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(new KeanuProbabilisticGraph(network), samplesPerAttempt);
+            NetworkState maxAPosteriori = SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(new KeanuProbabilisticModel(network), samplesPerAttempt);
             maxSamples.add(maxAPosteriori);
         }
 

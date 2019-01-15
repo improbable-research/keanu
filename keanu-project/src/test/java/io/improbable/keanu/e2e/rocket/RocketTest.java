@@ -2,7 +2,7 @@ package io.improbable.keanu.e2e.rocket;
 
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -54,7 +54,7 @@ public class RocketTest {
         net.probeForNonZeroProbability(1000);
 
         Stream<NetworkSample> networkSamples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
-            new KeanuProbabilisticGraph(net),
+            new KeanuProbabilisticModel(net),
             Arrays.asList(oRingFailure, residualFuel, alarm1FalsePositive)
         ).stream();
 

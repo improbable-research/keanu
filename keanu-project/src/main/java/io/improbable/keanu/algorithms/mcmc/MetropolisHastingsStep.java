@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -18,7 +18,7 @@ public class MetropolisHastingsStep {
     //Temperature for standard MH step accept/reject calculation
     private static final double DEFAULT_TEMPERATURE = 1.0;
 
-    private final ProbabilisticGraph graph;
+    private final ProbabilisticModel graph;
     private final ProposalDistribution proposalDistribution;
     private final ProposalRejectionStrategy rejectionStrategy;
     private final LogProbCalculationStrategy logProbCalculationStrategy;
@@ -32,7 +32,7 @@ public class MetropolisHastingsStep {
      * @param logProbCalculationStrategy
      * @param random               Source of randomness
      */
-    MetropolisHastingsStep(ProbabilisticGraph graph,
+    MetropolisHastingsStep(ProbabilisticModel graph,
                            ProposalDistribution proposalDistribution,
                            ProposalRejectionStrategy rejectionStrategy,
                            LogProbCalculationStrategy logProbCalculationStrategy,

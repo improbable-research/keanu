@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
@@ -46,7 +46,7 @@ public class SimulatedAnnealingTest {
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         network.probeForNonZeroProbability(100, random);
 
-        NetworkState maxAPosterioriSamples = SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(new KeanuProbabilisticGraph(network), 10000);
+        NetworkState maxAPosterioriSamples = SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(new KeanuProbabilisticModel(network), 10000);
         NetworkState maxValuesFromVariational = findMAPWithOptimizer();
 
         assertEquals(maxValuesFromVariational.get(A).scalar(), maxAPosterioriSamples.get(A).scalar(), 0.05);
@@ -67,7 +67,7 @@ public class SimulatedAnnealingTest {
         assertNotNull(algo.getRandom());
         assertNotNull(algo.getVariableSelector());
 
-        NetworkState networkMAP = algo.getMaxAPosteriori(new KeanuProbabilisticGraph(net), 10);
+        NetworkState networkMAP = algo.getMaxAPosteriori(new KeanuProbabilisticModel(net), 10);
 
         algo.setVariableSelector(null);
         assertNull(algo.getVariableSelector());
