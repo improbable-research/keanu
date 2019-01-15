@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -27,6 +28,7 @@ import java.io.PrintStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
@@ -102,7 +104,7 @@ public class PrintVertexTest {
     }
 
     @Test
-    public void testWhenSampleIsCalledThenKeanuRandomIsPassedToParentSample() {
+    public void whenSampleIsCalledThenKeanuRandomIsPassedToParentSample() {
         final BooleanVertex parent = mock(BooleanVertex.class);
         final KeanuRandom random = mock(KeanuRandom.class);
 
@@ -152,6 +154,33 @@ public class PrintVertexTest {
             .getPosteriorSamples(bayesNet, bayesNet.getLatentVertices(), nSamples);
 
         verify(printStream, atLeast(nSamples)).print(anyString());
+    }
+
+    @Test
+    public void whenPrintIsCalledAddsPrintVertexAsChild() {
+        final UniformVertex A = new UniformVertex(0, 1);
+        A.print();
+        final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
+        assertThat(printVertex, instanceOf(PrintVertex.class));
+    }
+
+    @Test
+    public void whenPrintIsCalledWithOptionsThenOptionsArePassedToPrintVertex() {
+        final PrintStream printStream = mock(PrintStream.class);
+        PrintVertex.setPrintStream(printStream);
+
+        final DoubleVertex A = new ConstantDoubleVertex(42);
+        A.print("testprefix", true);
+
+        final Vertex printVertex = Iterables.getOnlyElement(A.getChildren());
+        printVertex.getValue();
+
+        final String expectedOutput = "testprefix{\n" +
+            "data = [42.0]\n" +
+            "shape = []\n" +
+            "}\n";
+
+        verify(printStream).print(expectedOutput);
     }
 
     private static class PlusOneOp extends UnaryOpVertex<IntegerTensor, IntegerTensor> implements NonSaveableVertex {
