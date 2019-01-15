@@ -11,7 +11,6 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,11 +69,6 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
-    public void cascadeUpdate(Set<? extends Variable> inputs) {
-        VertexValuePropagation.cascadeUpdate((Set<Vertex>) inputs);
-    }
-
-    @Override
     public MetropolisHastingsSampler metropolisHastingsSampler(
         List<? extends Variable> verticesToSampleFrom,
         MetropolisHastingsStep mhStep,
@@ -110,7 +104,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
             updatedVertices.add(updatingVertex);
         }
 
-        cascadeUpdate(new HashSet<>(updatedVertices));
+        VertexValuePropagation.cascadeUpdate(updatedVertices);
     }
 
 

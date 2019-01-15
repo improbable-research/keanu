@@ -4,10 +4,8 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
@@ -28,6 +26,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
     public static final CascadeOnRejection DEFAULT_REJECTION_STRATEGY = new CascadeOnRejection();
     private static final LogProbCalculationStrategy DEFAULT_LOG_PROB_CALCULATION_STRATEGY = new SimpleLogProbCalculationStrategy();
+    private static final ProposalApplicationStrategy DEFAULT_PROPOSAL_APPLICATION_STRATEGY = new CascadingApplicationStrategy();
 
     public static MetropolisHastings withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
@@ -65,6 +64,11 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     @Builder.Default
     private LogProbCalculationStrategy logProbCalculationStrategy = DEFAULT_LOG_PROB_CALCULATION_STRATEGY;
 
+    @Getter
+    @Setter
+    @Builder.Default
+    private ProposalApplicationStrategy proposalApplicationStrategy = DEFAULT_PROPOSAL_APPLICATION_STRATEGY;
+
     /**
      * @param bayesianNetwork      a bayesian network containing latent vertices
      * @param verticesToSampleFrom the vertices to include in the returned samples
@@ -85,12 +89,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom), ProgressBar::new);
     }
 
-    public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
-                                                            final List<? extends Variable> verticesToSampleFrom) {
-
-        return new NetworkSamplesGenerator(setupSampler(new KeanuProbabilisticGraph(bayesianNetwork), verticesToSampleFrom), ProgressBar::new);
-    }
-
     private SamplingAlgorithm setupSampler(final ProbabilisticGraph bayesianNetwork,
                                            final List<? extends Variable> verticesToSampleFrom) {
 
@@ -99,6 +97,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             proposalDistribution,
             rejectionStrategy,
             logProbCalculationStrategy,
+            proposalApplicationStrategy,
             random
         );
 

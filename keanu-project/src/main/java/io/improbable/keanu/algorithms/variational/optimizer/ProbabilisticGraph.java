@@ -8,7 +8,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface ProbabilisticGraph {
 
@@ -27,8 +26,6 @@ public interface ProbabilisticGraph {
     List<? extends Variable> getLatentVariables();
 
     List<? extends Variable<DoubleTensor>> getContinuousLatentVariables();
-
-    void cascadeUpdate(Set<? extends Variable> inputs);
 
     MetropolisHastingsSampler metropolisHastingsSampler(List<? extends Variable> verticesToSampleFrom, MetropolisHastingsStep mhStep, MHStepVariableSelector variableSelector);
 }

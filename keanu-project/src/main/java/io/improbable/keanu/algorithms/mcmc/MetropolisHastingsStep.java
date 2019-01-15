@@ -22,6 +22,7 @@ public class MetropolisHastingsStep {
     private final ProposalDistribution proposalDistribution;
     private final ProposalRejectionStrategy rejectionStrategy;
     private final LogProbCalculationStrategy logProbCalculationStrategy;
+    private final ProposalApplicationStrategy proposalApplicationStrategy;
     private final KeanuRandom random;
 
     /**
@@ -34,12 +35,15 @@ public class MetropolisHastingsStep {
     MetropolisHastingsStep(ProbabilisticGraph graph,
                            ProposalDistribution proposalDistribution,
                            ProposalRejectionStrategy rejectionStrategy,
-                           LogProbCalculationStrategy logProbCalculationStrategy, KeanuRandom random) {
+                           LogProbCalculationStrategy logProbCalculationStrategy,
+                           ProposalApplicationStrategy proposalApplicationStrategy,
+                           KeanuRandom random) {
 
         this.graph = graph;
         this.proposalDistribution = proposalDistribution;
         this.rejectionStrategy = rejectionStrategy;
         this.logProbCalculationStrategy = logProbCalculationStrategy;
+        this.proposalApplicationStrategy = proposalApplicationStrategy;
         this.random = random;
     }
 
@@ -68,7 +72,7 @@ public class MetropolisHastingsStep {
 
         Proposal proposal = proposalDistribution.getProposal(chosenVertices, random);
         proposal.apply();
-        graph.cascadeUpdate(chosenVertices);
+        proposalApplicationStrategy.apply(proposal, chosenVertices);
 
         final double affectedVerticesLogProbNew = logProbCalculationStrategy.calculate(graph, chosenVertices);
 

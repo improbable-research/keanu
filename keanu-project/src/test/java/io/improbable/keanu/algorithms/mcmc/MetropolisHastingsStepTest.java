@@ -68,6 +68,7 @@ public class MetropolisHastingsStepTest {
             ProposalDistribution.usePrior(),
             new RollBackOnRejection(bayesNet.getLatentVertices()),
             new LambdaSectionOptimizedLogProbCalculator(bayesNet.getLatentVertices()),
+            new CascadingApplicationStrategy(),
             alwaysAccept
         );
 
@@ -144,6 +145,7 @@ public class MetropolisHastingsStepTest {
             constantProposal(constant),
             new RollBackOnRejection(latentVertices),
             new LambdaSectionOptimizedLogProbCalculator(latentVertices),
+            new CascadingApplicationStrategy(),
             random
         );
     }
