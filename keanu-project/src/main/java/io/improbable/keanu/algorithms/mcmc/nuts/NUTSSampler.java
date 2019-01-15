@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -27,7 +27,7 @@ class NUTSSampler implements SamplingAlgorithm {
     private final boolean adaptEnabled;
     private final Stepsize stepsize;
     private final Tree tree;
-    private final ProbabilisticWithGradientModel logProbGradientCalculator;
+    private final ProbabilisticModelWithGradient logProbGradientCalculator;
     private final Statistics statistics;
     private final boolean saveStatistics;
     private int sampleNum;
@@ -46,7 +46,7 @@ class NUTSSampler implements SamplingAlgorithm {
      */
     public NUTSSampler(List<? extends Variable> sampleFromVertices,
                        List<? extends Variable<DoubleTensor>> latentVertices,
-                       ProbabilisticWithGradientModel logProbGradientCalculator,
+                       ProbabilisticModelWithGradient logProbGradientCalculator,
                        boolean adaptEnabled,
                        Stepsize stepsize,
                        Tree tree,

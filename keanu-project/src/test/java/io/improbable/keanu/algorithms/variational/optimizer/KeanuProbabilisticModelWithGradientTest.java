@@ -15,13 +15,13 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class KeanuProbabilisticWithGradientGraphTest {
+public class KeanuProbabilisticModelWithGradientTest {
 
     GaussianVertex A;
     GaussianVertex B;
     BernoulliVertex C;
 
-    KeanuProbabilisticWithGradientModel graph;
+    KeanuProbabilisticModelWithGradient graph;
 
     @Before
     public void setup() {
@@ -33,7 +33,7 @@ public class KeanuProbabilisticWithGradientGraphTest {
         C = new BernoulliVertex(A.times(B));
         C.observe(true);
 
-        graph = new KeanuProbabilisticWithGradientModel(
+        graph = new KeanuProbabilisticModelWithGradient(
             new BayesianNetwork(C.getConnectedGraph())
         );
     }

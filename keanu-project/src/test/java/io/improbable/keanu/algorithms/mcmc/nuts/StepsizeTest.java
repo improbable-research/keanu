@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientModel;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -44,7 +44,7 @@ public class StepsizeTest {
     private double calculateStepsize(DoubleVertex vertex, double startingValue) {
         List<DoubleVertex> vertices = Arrays.asList(vertex);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(vertex.getConnectedGraph());
-        KeanuProbabilisticWithGradientModel graph = new KeanuProbabilisticWithGradientModel(bayesianNetwork);
+        KeanuProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
 
         VertexId vertexId = vertex.getId();
 

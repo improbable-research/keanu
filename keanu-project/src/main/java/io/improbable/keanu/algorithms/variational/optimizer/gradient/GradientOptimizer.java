@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
@@ -43,7 +43,7 @@ public class GradientOptimizer implements Optimizer {
     }
 
 
-    private ProbabilisticWithGradientModel probabilisticWithGradientGraph;
+    private ProbabilisticModelWithGradient probabilisticWithGradientGraph;
 
     /**
      * maxEvaluations the maximum number of objective function evaluations before throwing an exception
@@ -186,7 +186,7 @@ public class GradientOptimizer implements Optimizer {
 
     public static class GradientOptimizerBuilder {
 
-        private ProbabilisticWithGradientModel probabilisticWithGradientGraph;
+        private ProbabilisticModelWithGradient probabilisticWithGradientGraph;
         private int maxEvaluations = Integer.MAX_VALUE;
         private double relativeThreshold = 1e-8;
         private double absoluteThreshold = 1e-8;
@@ -195,7 +195,7 @@ public class GradientOptimizer implements Optimizer {
         GradientOptimizerBuilder() {
         }
 
-        public GradientOptimizerBuilder bayesianNetwork(ProbabilisticWithGradientModel probabilisticWithGradientGraph) {
+        public GradientOptimizerBuilder bayesianNetwork(ProbabilisticModelWithGradient probabilisticWithGradientGraph) {
             this.probabilisticWithGradientGraph = probabilisticWithGradientGraph;
             return this;
         }

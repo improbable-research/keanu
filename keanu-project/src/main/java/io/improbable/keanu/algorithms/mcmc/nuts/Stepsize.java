@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.algorithms.SaveStatistics;
 import io.improbable.keanu.algorithms.Statistics;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -58,7 +58,7 @@ class Stepsize implements SaveStatistics {
     public static double findStartingStepSize(Map<VariableReference, DoubleTensor> position,
                                               Map<? extends VariableReference, DoubleTensor> gradient,
                                               List<? extends Variable<DoubleTensor>> vertices,
-                                              ProbabilisticWithGradientModel logProbGradientCalculator,
+                                              ProbabilisticModelWithGradient logProbGradientCalculator,
                                               double initialLogOfMasterP,
                                               KeanuRandom random) {
         double stepsize = STARTING_STEPSIZE;

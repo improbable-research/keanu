@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Map;
 
-public interface ProbabilisticWithGradientModel extends ProbabilisticModel {
+public interface ProbabilisticModelWithGradient extends ProbabilisticModel {
 
     Map<? extends VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs);
 

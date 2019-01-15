@@ -3,8 +3,8 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.MCMCTestDistributions;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientModel;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientModel;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
@@ -45,7 +45,7 @@ public class NUTSTest {
         double initStepSize = 1;
         int maxTreeHeight = 4;
         BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
-        ProbabilisticWithGradientModel graph = new KeanuProbabilisticWithGradientModel(simpleGaussian);
+        ProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()
             .adaptEnabled(false)
@@ -80,7 +80,7 @@ public class NUTSTest {
         double mu = 0.0;
         double sigma = 1.0;
         BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
-        ProbabilisticWithGradientModel graph = new KeanuProbabilisticWithGradientModel(simpleGaussian);
+        ProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()
             .adaptCount(2000)
@@ -103,7 +103,7 @@ public class NUTSTest {
     public void samplesContinuousPrior() {
 
         BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 18.0);
-        ProbabilisticWithGradientModel graph = new KeanuProbabilisticWithGradientModel(bayesNet);
+        ProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(bayesNet);
 
         int sampleCount = 2000;
         NUTS nuts = NUTS.builder()
@@ -129,7 +129,7 @@ public class NUTSTest {
     @Test
     public void samplesFromDonut() {
         BayesianNetwork donutBayesNet = MCMCTestDistributions.create2DDonutDistribution();
-        ProbabilisticWithGradientModel graph = new KeanuProbabilisticWithGradientModel(donutBayesNet);
+        ProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(donutBayesNet);
 
         NUTS nuts = NUTS.builder()
             .adaptCount(1000)
@@ -153,7 +153,7 @@ public class NUTSTest {
 
         GaussianVertex A = new GaussianVertex(0.0, 1.0);
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
-        ProbabilisticWithGradientModel graph = new KeanuProbabilisticWithGradientModel(net);
+        ProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(net);
         net.probeForNonZeroProbability(100, random);
 
         NUTS nuts = NUTS.builder()

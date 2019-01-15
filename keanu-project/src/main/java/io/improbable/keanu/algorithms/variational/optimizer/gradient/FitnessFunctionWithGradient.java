@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -18,13 +18,13 @@ import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.con
 
 public class FitnessFunctionWithGradient {
 
-    private final ProbabilisticWithGradientModel probabilisticWithGradientGraph;
+    private final ProbabilisticModelWithGradient probabilisticWithGradientGraph;
     private final boolean useLikelihood;
 
     private final BiConsumer<double[], double[]> onGradientCalculation;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunctionWithGradient(ProbabilisticWithGradientModel probabilisticWithGradientGraph,
+    public FitnessFunctionWithGradient(ProbabilisticModelWithGradient probabilisticWithGradientGraph,
                                        boolean useLikelihood,
                                        BiConsumer<double[], double[]> onGradientCalculation,
                                        BiConsumer<double[], Double> onFitnessCalculation) {
@@ -34,7 +34,7 @@ public class FitnessFunctionWithGradient {
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public FitnessFunctionWithGradient(ProbabilisticWithGradientModel probabilisticWithGradientGraph, boolean useLikelihood) {
+    public FitnessFunctionWithGradient(ProbabilisticModelWithGradient probabilisticWithGradientGraph, boolean useLikelihood) {
         this(probabilisticWithGradientGraph, useLikelihood, null, null);
     }
 

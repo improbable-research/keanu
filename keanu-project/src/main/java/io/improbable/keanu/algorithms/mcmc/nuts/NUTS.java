@@ -7,7 +7,7 @@ import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -95,17 +95,17 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     public NetworkSamples getPosteriorSamples(final ProbabilisticModel bayesNet,
                                               final List<? extends Variable> sampleFromVertices,
                                               final int sampleCount) {
-        return generatePosteriorSamples((ProbabilisticWithGradientModel) bayesNet, sampleFromVertices)
+        return generatePosteriorSamples((ProbabilisticModelWithGradient) bayesNet, sampleFromVertices)
             .generate(sampleCount);
     }
 
-    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticWithGradientModel bayesNet,
+    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModelWithGradient bayesNet,
                                                             final List<? extends Variable> fromVertices) {
 
         return new NetworkSamplesGenerator(setupSampler(bayesNet, fromVertices), ProgressBar::new);
     }
 
-    private NUTSSampler setupSampler(final ProbabilisticWithGradientModel bayesNet,
+    private NUTSSampler setupSampler(final ProbabilisticModelWithGradient bayesNet,
                                      final List<? extends Variable> sampleFromVertices) {
 
         Preconditions.checkArgument(!sampleFromVertices.isEmpty(), "List of vertices to sample from is empty");
