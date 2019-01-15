@@ -3,6 +3,7 @@ package io.improbable.keanu.util.status;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -16,7 +17,7 @@ public class StatusBar {
     private int previouslyPrintedUpdateLength = 0;
     private final TextComponent textComponent = new TextComponent();
 
-    private List<StatusBarComponent> components = new ArrayList<>();
+    private List<StatusBarComponent> components = Collections.synchronizedList(new ArrayList<>());
     private static PrintStream defaultPrintStream = System.out;
 
     /**
@@ -117,7 +118,7 @@ public class StatusBar {
         scheduler.shutdown();
         printUpdate();
         printFinish();
-        components.forEach(this::removeComponent);
+        components.clear();
         onFinish.forEach(Runnable::run);
     }
 
