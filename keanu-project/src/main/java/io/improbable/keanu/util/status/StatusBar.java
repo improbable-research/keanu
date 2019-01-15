@@ -111,12 +111,13 @@ public class StatusBar {
     }
 
     /**
-     * Marks the end of use of a {@link StatusBar}. This stops it being printed and notifies handlers.
+     * Marks the end of use of a {@link StatusBar}.
      */
     public void finish() {
         scheduler.shutdown();
         printUpdate();
         printFinish();
+        components.forEach(this::removeComponent);
         onFinish.forEach(Runnable::run);
     }
 
@@ -152,6 +153,5 @@ public class StatusBar {
         }
         return sb.toString();
     }
-
 
 }
