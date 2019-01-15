@@ -109,8 +109,8 @@ public class LogNormalVertex extends DoubleVertex implements Differentiable, Pro
         final LogProbGraph.DoublePlaceholderVertex sigmaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(sigma.getShape());
 
         final DoubleVertex lnSigmaX = sigmaPlaceholder.times(xPlaceholder).log();
-        final DoubleVertex lnXMinusMuSquared = xPlaceholder.log().minus(muPlaceholder).pow(2);
-        final DoubleVertex lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.div(sigmaPlaceholder.pow(2).times(2.0));
+        final DoubleVertex lnXMinusMuSquared = xPlaceholder.log().minus(muPlaceholder).pow(2.);
+        final DoubleVertex lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.div(sigmaPlaceholder.pow(2.).times(2.));
 
         final DoubleVertex logProbOutput = lnXMinusMuSquaredOver2Variance.plus(lnSigmaX).plus(GaussianVertex.LN_SQRT_2PI).unaryMinus();
 

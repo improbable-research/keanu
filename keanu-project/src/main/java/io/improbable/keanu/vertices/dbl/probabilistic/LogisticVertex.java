@@ -98,7 +98,7 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
         final LogProbGraph.DoublePlaceholderVertex sPlaceholder = new LogProbGraph.DoublePlaceholderVertex(s.getShape());
 
         final DoubleVertex xMinusAOverB = xPlaceholder.minus(muPlaceholder).div(sPlaceholder);
-        final DoubleVertex ln1OverB = ConstantVertex.of(1.).div(sPlaceholder).log();
+        final DoubleVertex ln1OverB = sPlaceholder.reverseDiv(1.).log();
 
         final DoubleVertex logProbOutput = xMinusAOverB.plus(ln1OverB).minus(xMinusAOverB.exp().plus(1).log().times(2));
 

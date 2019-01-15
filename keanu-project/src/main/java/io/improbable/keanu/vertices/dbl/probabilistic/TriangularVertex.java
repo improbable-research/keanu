@@ -155,15 +155,15 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
         final BoolVertex conditionalAnd = conditionalFirstHalf.and(conditionalSecondHalf);
         final DoubleVertex conditionalResult = If
             .isTrue(conditionalAnd)
-            .then(ConstantVertex.of(1.).div(range).times(2).times(xPlaceholder.minus(xMinPlaceholder)).div(cPlaceholder.minus(xMinPlaceholder)))
+            .then(range.reverseDiv(1.).times(2.).times(xPlaceholder.minus(xMinPlaceholder)).div(cPlaceholder.minus(xMinPlaceholder)))
             .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(conditionalAnd.getShape())));
 
-        final BoolVertex elseIfConditionalFirstHalf = xPlaceholder.greaterThan(c);
-        final BoolVertex elseIfConditionalSecondHalf = xPlaceholder.lessThan(xMax);
+        final BoolVertex elseIfConditionalFirstHalf = xPlaceholder.greaterThan(cPlaceholder);
+        final BoolVertex elseIfConditionalSecondHalf = xPlaceholder.lessThan(xMaxPlaceholder);
         final BoolVertex elseIfConditionalAnd = elseIfConditionalFirstHalf.and(elseIfConditionalSecondHalf);
         final DoubleVertex elseIfConditionalResult = If
             .isTrue(elseIfConditionalAnd)
-            .then(ConstantVertex.of(2.).div(range).times(xMaxPlaceholder.minus(xPlaceholder)).div(xMaxPlaceholder.minus(cPlaceholder)))
+            .then(range.reverseDiv(2.).times(xMaxPlaceholder.minus(xPlaceholder)).div(xMaxPlaceholder.minus(cPlaceholder)))
             .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(elseIfConditionalAnd.getShape())));
 
         final DoubleVertex logProbOutput = conditionalResult.plus(elseIfConditionalResult.plus(elseIfConditionalResult)).log();

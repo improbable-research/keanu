@@ -197,7 +197,7 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
     }
 
     private DoubleVertex bodyHeight(DoubleVertex shoulderWidth, DoubleVertex bodyWidth) {
-        return ConstantVertex.of(1.).div(shoulderWidth.plus(bodyWidth));
+        return shoulderWidth.plus(bodyWidth).reverseDiv(1.);
     }
 
     private static DoubleVertex shoulder(DoubleVertex Sw, DoubleVertex Bw, DoubleVertex x) {
@@ -207,11 +207,11 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
     }
 
     private static DoubleVertex getCubeCoefficient(DoubleVertex Sw, DoubleVertex Bw) {
-        return ConstantVertex.of(-2.).div(Sw.pow(3).times(Sw.plus(Bw)));
+        return Sw.pow(3).times(Sw.plus(Bw)).reverseDiv(-2.);
     }
 
     private static DoubleVertex getSquareCoefficient(DoubleVertex Sw, DoubleVertex Bw) {
-        return ConstantVertex.of(3.).div(Sw.pow(2).times(Sw.plus(Bw)));
+        return Sw.pow(2).times(Sw.plus(Bw)).reverseDiv(3.);
     }
 
     @Override

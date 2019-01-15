@@ -76,11 +76,11 @@ public class StudentTVertex extends DoubleVertex implements Differentiable, Prob
         final LogProbGraph.IntegerPlaceHolderVertex tPlaceholder = new LogProbGraph.IntegerPlaceHolderVertex(this.getShape());
 
         DoubleVertex vAsDouble = tPlaceholder.toDouble();
-        DoubleVertex halfVPlusOne = vAsDouble.plus(1).div(2);
+        DoubleVertex halfVPlusOne = vAsDouble.plus(1.).div(2.);
 
         DoubleVertex logGammaHalfVPlusOne = halfVPlusOne.logGamma();
-        DoubleVertex logGammaHalfV = vAsDouble.div(2).logGamma();
-        DoubleVertex halfLogV = vAsDouble.log().div(2);
+        DoubleVertex logGammaHalfV = vAsDouble.div(2.).logGamma();
+        DoubleVertex halfLogV = vAsDouble.log().div(2.);
 
         DoubleVertex logProbOutput = logGammaHalfVPlusOne
             .minus(halfLogV)
@@ -88,7 +88,7 @@ public class StudentTVertex extends DoubleVertex implements Differentiable, Prob
             .minus(logGammaHalfV)
             .minus(
                 halfVPlusOne.times(
-                    xPlaceholder.pow(2).div(vAsDouble).plus(1).log()
+                    xPlaceholder.pow(2.).div(vAsDouble).plus(1.).log()
                 )
             );
 

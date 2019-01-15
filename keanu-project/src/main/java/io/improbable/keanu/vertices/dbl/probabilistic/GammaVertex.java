@@ -104,7 +104,7 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
 
         final DoubleVertex xOverTheta = xPlaceholder.div(thetaPlaceholder);
         final DoubleVertex kLnTheta = kPlaceholder.times(thetaPlaceholder.log());
-        final DoubleVertex kMinus1LogX = kPlaceholder.minus(1).times(xPlaceholder.log());
+        final DoubleVertex kMinus1LogX = kPlaceholder.minus(1.).times(xPlaceholder.log());
         final DoubleVertex lgammaK = kPlaceholder.logGamma();
 
         final DoubleVertex logProbOutput = kMinus1LogX.minus(lgammaK).minus(xOverTheta).minus(kLnTheta);
