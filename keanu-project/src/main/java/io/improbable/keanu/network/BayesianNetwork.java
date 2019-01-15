@@ -151,14 +151,6 @@ public class BayesianNetwork {
             isObserved && maxIndentation >= indentation);
     }
 
-    /**
-     * @return a list of all vertices that are not differentiable (i.e., there are points at which they do not have a derivative).
-     */
-    public List<Vertex> getNonDifferentiableVertices() {
-        return vertices.stream().filter(vertex -> !(((Vertex) vertex).isDifferentiable()))
-            .collect(Collectors.toList());
-    }
-
     public double getLogOfMasterP() {
         return ProbabilityCalculator.calculateLogProbFor(getLatentOrObservedVertices());
     }
