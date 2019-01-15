@@ -67,6 +67,7 @@ public class MetropolisHastingsStepTest {
             graph,
             ProposalDistribution.usePrior(),
             new RollBackOnRejection(bayesNet.getLatentVertices()),
+            new LambdaSectionOptimizedLogProbCalculator(bayesNet.getLatentVertices()),
             alwaysAccept
         );
 
@@ -136,10 +137,13 @@ public class MetropolisHastingsStepTest {
     }
 
     private MetropolisHastingsStep stepFunctionWithConstantProposal(ProbabilisticGraph network, double constant, KeanuRandom random) {
+        List<Vertex> latentVertices = (List<Vertex>) network.getLatentVariables();
+
         return new MetropolisHastingsStep(
             network,
             constantProposal(constant),
-            new RollBackOnRejection((List<Vertex>) network.getLatentVariables()),
+            new RollBackOnRejection(latentVertices),
+            new LambdaSectionOptimizedLogProbCalculator(latentVertices),
             random
         );
     }

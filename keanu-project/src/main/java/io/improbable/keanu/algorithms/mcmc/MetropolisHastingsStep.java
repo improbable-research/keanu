@@ -21,22 +21,25 @@ public class MetropolisHastingsStep {
     private final ProbabilisticGraph graph;
     private final ProposalDistribution proposalDistribution;
     private final ProposalRejectionStrategy rejectionStrategy;
+    private final LogProbCalculationStrategy logProbCalculationStrategy;
     private final KeanuRandom random;
 
     /**
      * @param proposalDistribution The proposal distribution
      * @param rejectionStrategy What to do when a proposal is rejected.
      *                         Options include {@link CascadeOnRejection} and {@link RollBackOnRejection}.
+     * @param logProbCalculationStrategy
      * @param random               Source of randomness
      */
     MetropolisHastingsStep(ProbabilisticGraph graph,
                            ProposalDistribution proposalDistribution,
                            ProposalRejectionStrategy rejectionStrategy,
-                           KeanuRandom random) {
+                           LogProbCalculationStrategy logProbCalculationStrategy, KeanuRandom random) {
 
         this.graph = graph;
         this.proposalDistribution = proposalDistribution;
         this.rejectionStrategy = rejectionStrategy;
+        this.logProbCalculationStrategy = logProbCalculationStrategy;
         this.random = random;
     }
 
@@ -59,7 +62,7 @@ public class MetropolisHastingsStep {
         log.trace(String.format("Chosen vertices: %s", chosenVertices.stream()
             .map(Variable::toString)
             .collect(Collectors.toList())));
-        final double affectedVerticesLogProbOld = graph.downstreamLogProb(chosenVertices);
+        final double affectedVerticesLogProbOld = logProbCalculationStrategy.calculate(graph, chosenVertices);
 
         rejectionStrategy.prepare(chosenVertices);
 
@@ -67,7 +70,7 @@ public class MetropolisHastingsStep {
         proposal.apply();
         graph.cascadeUpdate(chosenVertices);
 
-        final double affectedVerticesLogProbNew = graph.downstreamLogProb(chosenVertices);
+        final double affectedVerticesLogProbNew = logProbCalculationStrategy.calculate(graph, chosenVertices);
 
         if (!ProbabilityCalculator.isImpossibleLogProb(affectedVerticesLogProbNew)) {
 

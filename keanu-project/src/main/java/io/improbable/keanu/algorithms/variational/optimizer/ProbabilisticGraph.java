@@ -18,21 +18,6 @@ public interface ProbabilisticGraph {
 
     double logProb(Map<VariableReference, ?> inputs);
 
-    /**
-     * An optimisation on top of logProb.
-     *
-     * This method can be used to save computation by computing log prob only
-     * for the variables in the graph that are affected (down stream) of the provided variables.
-     *
-     * This defaults to calling logProb().
-     *
-     * @param variables the variables from which we calculate the logProb of each of their downstream variables
-     * @return log prob of the affected variables
-     */
-    default double downstreamLogProb(Set<? extends Variable> variables) {
-        return logProb();
-    }
-
     default double logLikelihood() {
         return logLikelihood(Collections.emptyMap());
     }

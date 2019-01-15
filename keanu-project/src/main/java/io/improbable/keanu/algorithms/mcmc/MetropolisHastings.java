@@ -25,6 +25,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = ProposalDistribution.usePrior();
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
     public static final CascadeOnRejection DEFAULT_REJECTION_STRATEGY = new CascadeOnRejection();
+    private static final LogProbCalculationStrategy DEFAULT_LOG_PROB_CALCULATION_STRATEGY = new SimpleLogProbCalculationStrategy();
 
     public static MetropolisHastings withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
@@ -35,6 +36,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             .random(random)
             .build();
     }
+
 
     @Getter
     @Setter
@@ -55,6 +57,11 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     @Setter
     @Builder.Default
     private ProposalRejectionStrategy rejectionStrategy = DEFAULT_REJECTION_STRATEGY;
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private LogProbCalculationStrategy logProbCalculationStrategy = DEFAULT_LOG_PROB_CALCULATION_STRATEGY;
 
     /**
      * @param bayesianNetwork      a bayesian network containing latent vertices
@@ -83,6 +90,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             bayesianNetwork,
             proposalDistribution,
             rejectionStrategy,
+            logProbCalculationStrategy,
             random
         );
 

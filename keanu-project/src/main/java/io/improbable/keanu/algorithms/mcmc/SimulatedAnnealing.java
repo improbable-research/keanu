@@ -88,22 +88,25 @@ public class SimulatedAnnealing {
         }
 
         Map<VariableReference, ?> maxSamplesByVertex = new HashMap<>();
-        List<? extends Variable> latentVertices = bayesNet.getLatentVariables();
+        List<? extends Variable> latentVariables = bayesNet.getLatentVariables();
+        List<Vertex> latentVertices = (List<Vertex>) latentVariables;
 
         double logProbabilityBeforeStep = bayesNet.logProb();
         double maxLogP = logProbabilityBeforeStep;
-        setSamplesAsMax(maxSamplesByVertex, latentVertices);
+        setSamplesAsMax(maxSamplesByVertex, latentVariables);
+
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             bayesNet,
             proposalDistribution,
-            new RollBackOnRejection((List<Vertex>)latentVertices),
+            new RollBackOnRejection(latentVertices),
+            new LambdaSectionOptimizedLogProbCalculator(latentVertices),
             random
         );
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-            Variable<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
+            Variable<?> chosenVertex = latentVariables.get(sampleNum % latentVariables.size());
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
             logProbabilityBeforeStep = mhStep.step(
@@ -114,7 +117,7 @@ public class SimulatedAnnealing {
 
             if (logProbabilityBeforeStep > maxLogP) {
                 maxLogP = logProbabilityBeforeStep;
-                setSamplesAsMax(maxSamplesByVertex, latentVertices);
+                setSamplesAsMax(maxSamplesByVertex, latentVariables);
             }
         }
 

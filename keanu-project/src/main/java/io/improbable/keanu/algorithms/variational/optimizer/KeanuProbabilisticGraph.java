@@ -29,8 +29,6 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
 
     private final List<Vertex> latentOrObservedVertices;
 
-    private final LambdaSectionSnapshot lambdaSectionSnapshot;
-
     public KeanuProbabilisticGraph(Set<Vertex> variables) {
         this(new BayesianNetwork(variables));
     }
@@ -43,19 +41,12 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
-        lambdaSectionSnapshot = new LambdaSectionSnapshot(latentVertices);
-
-    }
+            }
 
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
         cascadeValues(inputs);
         return ProbabilityCalculator.calculateLogProbFor(this.latentOrObservedVertices);
-    }
-
-    @Override
-    public double downstreamLogProb(Set<? extends Variable> vertices) {
-        return lambdaSectionSnapshot.logProb(vertices);
     }
 
     @Override
