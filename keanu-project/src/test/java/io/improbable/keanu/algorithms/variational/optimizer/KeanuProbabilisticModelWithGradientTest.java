@@ -21,7 +21,7 @@ public class KeanuProbabilisticModelWithGradientTest {
     GaussianVertex B;
     BernoulliVertex C;
 
-    KeanuProbabilisticModelWithGradient graph;
+    KeanuProbabilisticModelWithGradient model;
 
     @Before
     public void setup() {
@@ -33,7 +33,7 @@ public class KeanuProbabilisticModelWithGradientTest {
         C = new BernoulliVertex(A.times(B));
         C.observe(true);
 
-        graph = new KeanuProbabilisticModelWithGradient(
+        model = new KeanuProbabilisticModelWithGradient(
             new BayesianNetwork(C.getConnectedGraph())
         );
     }
@@ -41,7 +41,7 @@ public class KeanuProbabilisticModelWithGradientTest {
     @Test
     public void canCalculateLogProbGradient() {
 
-        Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients = graph.logLikelihoodGradients();
+        Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients = model.logLikelihoodGradients();
 
         LogProbGradientCalculator logLikelihoodGradientCalculator = new LogProbGradientCalculator(
             Collections.singletonList(C), Arrays.asList(A, B)
@@ -53,7 +53,7 @@ public class KeanuProbabilisticModelWithGradientTest {
     @Test
     public void canCalculateLogLikelihoodGradient() {
 
-        Map<? extends VariableReference, DoubleTensor> logProbGradients = graph.logProbGradients();
+        Map<? extends VariableReference, DoubleTensor> logProbGradients = model.logProbGradients();
         LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(
             Arrays.asList(C, A, B), Arrays.asList(A, B)
         );

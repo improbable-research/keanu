@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class SimpleLogProbCalculationStrategy implements LogProbCalculationStrategy {
     @Override
-    public double calculate(ProbabilisticModel graph, Set<Variable> variables) {
-        return graph.logProb();
+    public double calculate(ProbabilisticModel model, Set<Variable> variables) {
+        return model.logProb();
     }
 }

@@ -17,7 +17,7 @@ public class LambdaSectionOptimizedLogProbCalculator implements LogProbCalculati
     }
 
     @Override
-    public double calculate(ProbabilisticModel graph, Set<Variable> variables) {
+    public double calculate(ProbabilisticModel model, Set<Variable> variables) {
         return lambdaSectionSnapshot.logProb(variables);
     }
 }

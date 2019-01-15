@@ -60,11 +60,11 @@ public class MetropolisHastingsStepTest {
         observedB.observe(5);
 
         BayesianNetwork bayesNet = new BayesianNetwork(A.getConnectedGraph());
-        KeanuProbabilisticModel graph = new KeanuProbabilisticModel(bayesNet);
-        double logProbBeforeStep = graph.logProb();
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
+        double logProbBeforeStep = model.logProb();
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
-            graph,
+            model,
             ProposalDistribution.usePrior(),
             new RollBackOnRejection(bayesNet.getLatentVertices()),
             new LambdaSectionOptimizedLogProbCalculator(bayesNet.getLatentVertices()),
@@ -78,7 +78,7 @@ public class MetropolisHastingsStepTest {
         );
 
         assertTrue(result.isAccepted());
-        assertEquals(graph.logProb(), result.getLogProbabilityAfterStep(), 1e-10);
+        assertEquals(model.logProb(), result.getLogProbabilityAfterStep(), 1e-10);
     }
 
     @Category(Slow.class)

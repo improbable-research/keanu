@@ -36,8 +36,8 @@ public class FitnessFunctionWithGradientTest {
         GaussianVertex dObservation = new GaussianVertex(D, 1.0);
         dObservation.observe(Nd4jDoubleTensor.scalar(3.0));
 
-        KeanuProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
-        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(graph, false);
+        KeanuProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
+        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(model, false);
 
         assert2DGradientEqualsApproxGradient(
             new double[]{5, 5},
@@ -66,8 +66,8 @@ public class FitnessFunctionWithGradientTest {
         GaussianVertex dObservation = new GaussianVertex(D, 5.0);
         dObservation.observe(Nd4jDoubleTensor.scalar(18.0));
 
-        KeanuProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
-        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(graph, false);
+        KeanuProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
+        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(model, false);
 
         assert2DGradientEqualsApproxGradient(
             new double[]{10, 10},
@@ -99,8 +99,8 @@ public class FitnessFunctionWithGradientTest {
         GaussianVertex fObservation = new GaussianVertex(F, C);
         fObservation.observe(Nd4jDoubleTensor.scalar(1.0));
 
-        KeanuProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
-        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(graph, false);
+        KeanuProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
+        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(model, false);
 
         assert2DGradientEqualsApproxGradient(
             new double[]{5, 5},

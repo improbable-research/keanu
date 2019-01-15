@@ -44,19 +44,19 @@ public class StepsizeTest {
     private double calculateStepsize(DoubleVertex vertex, double startingValue) {
         List<DoubleVertex> vertices = Arrays.asList(vertex);
         BayesianNetwork bayesianNetwork = new BayesianNetwork(vertex.getConnectedGraph());
-        KeanuProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
+        KeanuProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
 
         VertexId vertexId = vertex.getId();
 
         vertex.setValue(DoubleTensor.scalar(startingValue));
         Map<VariableReference, DoubleTensor> position = Collections.singletonMap(vertexId, vertex.getValue());
-        Map<? extends VariableReference, DoubleTensor> gradient = graph.logProbGradients();
+        Map<? extends VariableReference, DoubleTensor> gradient = model.logProbGradients();
 
         return Stepsize.findStartingStepSize(
             position,
             gradient,
             Collections.singletonList(vertex),
-            graph,
+            model,
             ProbabilityCalculator.calculateLogProbFor(vertices),
             random
         );

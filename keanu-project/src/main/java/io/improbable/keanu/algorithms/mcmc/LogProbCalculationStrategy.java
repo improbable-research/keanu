@@ -6,5 +6,5 @@ import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import java.util.Set;
 
 public interface LogProbCalculationStrategy {
-    double calculate(ProbabilisticModel graph, Set<Variable> variables);
+    double calculate(ProbabilisticModel model, Set<Variable> variables);
 }

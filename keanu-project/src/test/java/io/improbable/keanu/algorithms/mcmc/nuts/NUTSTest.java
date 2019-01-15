@@ -45,7 +45,7 @@ public class NUTSTest {
         double initStepSize = 1;
         int maxTreeHeight = 4;
         BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
-        ProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(simpleGaussian);
+        ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()
             .adaptEnabled(false)
@@ -56,8 +56,8 @@ public class NUTSTest {
             .build();
 
         nuts.getPosteriorSamples(
-            graph,
-            graph.getLatentVariables(),
+            model,
+            model.getLatentVariables(),
             2
         );
 
@@ -80,7 +80,7 @@ public class NUTSTest {
         double mu = 0.0;
         double sigma = 1.0;
         BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
-        ProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(simpleGaussian);
+        ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()
             .adaptCount(2000)
@@ -89,8 +89,8 @@ public class NUTSTest {
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
-            graph,
-            graph.getLatentVariables(),
+            model,
+            model.getLatentVariables(),
             2000
         );
 
@@ -103,7 +103,7 @@ public class NUTSTest {
     public void samplesContinuousPrior() {
 
         BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 18.0);
-        ProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(bayesNet);
+        ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(bayesNet);
 
         int sampleCount = 2000;
         NUTS nuts = NUTS.builder()
@@ -114,8 +114,8 @@ public class NUTSTest {
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
-            graph,
-            graph.getLatentVariables(),
+            model,
+            model.getLatentVariables(),
             sampleCount
         ).drop(sampleCount / 4);
 
@@ -129,7 +129,7 @@ public class NUTSTest {
     @Test
     public void samplesFromDonut() {
         BayesianNetwork donutBayesNet = MCMCTestDistributions.create2DDonutDistribution();
-        ProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(donutBayesNet);
+        ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(donutBayesNet);
 
         NUTS nuts = NUTS.builder()
             .adaptCount(1000)
@@ -137,8 +137,8 @@ public class NUTSTest {
             .build();
 
         NetworkSamples samples = nuts.getPosteriorSamples(
-            graph,
-            graph.getLatentVariables(),
+            model,
+            model.getLatentVariables(),
             1000
         );
 
@@ -153,7 +153,7 @@ public class NUTSTest {
 
         GaussianVertex A = new GaussianVertex(0.0, 1.0);
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
-        ProbabilisticModelWithGradient graph = new KeanuProbabilisticModelWithGradient(net);
+        ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(net);
         net.probeForNonZeroProbability(100, random);
 
         NUTS nuts = NUTS.builder()
@@ -164,8 +164,8 @@ public class NUTSTest {
         assertNotNull(nuts.getRandom());
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
-            graph,
-            graph.getLatentVariables(),
+            model,
+            model.getLatentVariables(),
             2
         );
 

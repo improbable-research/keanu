@@ -47,10 +47,10 @@ public class MetropolisHastingsTest {
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
         bayesNet.probeForNonZeroProbability(100);
-        ProbabilisticModel graph = new KeanuProbabilisticModel(bayesNet);
+        ProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            graph,
+            model,
             Arrays.asList(A, B),
             5000
         );

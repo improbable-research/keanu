@@ -18,7 +18,7 @@ public class MetropolisHastingsStep {
     //Temperature for standard MH step accept/reject calculation
     private static final double DEFAULT_TEMPERATURE = 1.0;
 
-    private final ProbabilisticModel graph;
+    private final ProbabilisticModel model;
     private final ProposalDistribution proposalDistribution;
     private final ProposalRejectionStrategy rejectionStrategy;
     private final LogProbCalculationStrategy logProbCalculationStrategy;
@@ -32,14 +32,14 @@ public class MetropolisHastingsStep {
      * @param logProbCalculationStrategy
      * @param random               Source of randomness
      */
-    MetropolisHastingsStep(ProbabilisticModel graph,
+    MetropolisHastingsStep(ProbabilisticModel model,
                            ProposalDistribution proposalDistribution,
                            ProposalRejectionStrategy rejectionStrategy,
                            LogProbCalculationStrategy logProbCalculationStrategy,
                            ProposalApplicationStrategy proposalApplicationStrategy,
                            KeanuRandom random) {
 
-        this.graph = graph;
+        this.model = model;
         this.proposalDistribution = proposalDistribution;
         this.rejectionStrategy = rejectionStrategy;
         this.logProbCalculationStrategy = logProbCalculationStrategy;
@@ -66,7 +66,7 @@ public class MetropolisHastingsStep {
         log.trace(String.format("Chosen vertices: %s", chosenVertices.stream()
             .map(Variable::toString)
             .collect(Collectors.toList())));
-        final double affectedVerticesLogProbOld = logProbCalculationStrategy.calculate(graph, chosenVertices);
+        final double affectedVerticesLogProbOld = logProbCalculationStrategy.calculate(model, chosenVertices);
 
         rejectionStrategy.prepare(chosenVertices);
 
@@ -74,7 +74,7 @@ public class MetropolisHastingsStep {
         proposal.apply();
         proposalApplicationStrategy.apply(proposal, chosenVertices);
 
-        final double affectedVerticesLogProbNew = logProbCalculationStrategy.calculate(graph, chosenVertices);
+        final double affectedVerticesLogProbNew = logProbCalculationStrategy.calculate(model, chosenVertices);
 
         if (!ProbabilityCalculator.isImpossibleLogProb(affectedVerticesLogProbNew)) {
 
