@@ -59,9 +59,9 @@ public class StatusBar {
     public StatusBar(PrintStream printStream, ScheduledExecutorService scheduler) {
         this.printStream = printStream;
         this.scheduler = scheduler;
-        // Progress bar is disabled for testing.
-        String disableProgressBar = System.getProperty("io.improbable.keanu.util.ProgressBar.disableProgressBar");
-        if (disableProgressBar != null && disableProgressBar.equals("true")) {
+        // Status bar is disabled for testing.
+        String disableStatusBar = System.getProperty("io.improbable.keanu.util.status.StatusBar.disableStatusBar");
+        if (disableStatusBar != null && disableStatusBar.equals("true")) {
             StatusBar.disable();
         }
         addDefaultComponents();
