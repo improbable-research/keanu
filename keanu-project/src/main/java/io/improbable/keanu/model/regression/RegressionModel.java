@@ -1,7 +1,7 @@
 package io.improbable.keanu.model.regression;
 
-import io.improbable.keanu.model.PredictiveModel;
 import io.improbable.keanu.model.ModelFitter;
+import io.improbable.keanu.model.PredictiveModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;

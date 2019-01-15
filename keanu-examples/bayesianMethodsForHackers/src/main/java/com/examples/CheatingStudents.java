@@ -3,6 +3,7 @@ package com.examples;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -40,9 +41,10 @@ public class CheatingStudents {
         answerTotal.observe(numberOfYesAnswers);
 
         BayesianNetwork network = new BayesianNetwork(answerTotal.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(network);
 
         NetworkSamplesGenerator samplesGenerator = MetropolisHastings.withDefaultConfig()
-            .generatePosteriorSamples(network, singletonList(probabilityOfCheating));
+            .generatePosteriorSamples(model, singletonList(probabilityOfCheating));
 
         NetworkSamples networkSamples = samplesGenerator
             .dropCount(numberOfSamples / 2)
@@ -66,9 +68,10 @@ public class CheatingStudents {
         answerTotal.observe(numberOfYesAnswers);
 
         BayesianNetwork network = new BayesianNetwork(answerTotal.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(network);
 
         NetworkSamplesGenerator samplesGenerator = MetropolisHastings.withDefaultConfig()
-            .generatePosteriorSamples(network, singletonList(probabilityOfCheating));
+            .generatePosteriorSamples(model, singletonList(probabilityOfCheating));
 
         NetworkSamples networkSamples = samplesGenerator.dropCount(numberOfSamples / 10)
             .downSampleInterval(network.getLatentVertices().size())
