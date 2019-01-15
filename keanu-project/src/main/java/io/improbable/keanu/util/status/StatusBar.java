@@ -41,7 +41,7 @@ public class StatusBar {
         ENABLED.set(true);
     }
 
-    protected static ScheduledExecutorService getDefaultScheduledExecutorService() {
+    private static ScheduledExecutorService getDefaultScheduledExecutorService() {
         return Executors.newScheduledThreadPool(1, r -> {
             Thread t = Executors.defaultThreadFactory().newThread(r);
             t.setDaemon(true);
