@@ -59,11 +59,13 @@ public class StatusBar {
     public StatusBar(PrintStream printStream, ScheduledExecutorService scheduler) {
         this.printStream = printStream;
         this.scheduler = scheduler;
+
         // Status bar is disabled for testing.
         String disableStatusBar = System.getProperty("io.improbable.keanu.util.status.StatusBar.disableStatusBar");
         if (disableStatusBar != null && disableStatusBar.equals("true")) {
             StatusBar.disable();
         }
+
         addDefaultComponents();
         startUpdateThread();
     }
@@ -101,6 +103,17 @@ public class StatusBar {
 
     private boolean shouldUpdate() {
         return ENABLED.get();
+    }
+
+    private String formatComponents() {
+        StringBuilder sb = new StringBuilder();
+        for (StatusBarComponent component : components) {
+            String render = component.render();
+            if (render != "") {
+                sb.append(component.render()).append(" ");
+            }
+        }
+        return sb.toString();
     }
 
     private void appendSpacesToClearPreviousContent(StringBuilder sb) {
@@ -142,16 +155,5 @@ public class StatusBar {
 
     public void removeComponent(StatusBarComponent component) {
         components.remove(component);
-    }
-
-    private String formatComponents() {
-        StringBuilder sb = new StringBuilder();
-        for (StatusBarComponent component : components) {
-            String render = component.render();
-            if (render != "") {
-                sb.append(component.render()).append(" ");
-            }
-        }
-        return sb.toString();
     }
 }
