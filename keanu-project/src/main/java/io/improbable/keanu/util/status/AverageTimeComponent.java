@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * {@link StatusBarComponent} that renders the average time algorithm steps are taking, also shows elapsed time.
  */
 public class AverageTimeComponent extends TimeComponent {
+
     private final ElapsedTimeComponent elapsedTime = new ElapsedTimeComponent();
 
     @Getter
