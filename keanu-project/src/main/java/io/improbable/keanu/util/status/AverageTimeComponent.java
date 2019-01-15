@@ -16,13 +16,14 @@ public class AverageTimeComponent extends TimeComponent {
 
     @Override
     public String render() {
-        String result = elapsedTime.render();
+        StringBuilder renderedString = new StringBuilder(elapsedTime.render());
         long currentStepNow = currentStep.get();
         if (currentStepNow != 0) {
             averageStepTime = Duration.between(elapsedTime.getStartTime(), Instant.now()).dividedBy(currentStepNow);
-            result += ", Average step time: " + formatDuration(averageStepTime);
+            renderedString.append(", Average step time: ");
+            renderedString.append(formatDuration(averageStepTime));
         }
-        return result;
+        return renderedString.toString();
     }
 
     public void step() {

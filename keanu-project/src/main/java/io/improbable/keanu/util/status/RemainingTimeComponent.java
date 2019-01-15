@@ -12,11 +12,12 @@ public class RemainingTimeComponent extends TimeComponent {
 
     @Override
     public String render() {
-        String result = averageTime.render();
+        StringBuilder renderedString = new StringBuilder(averageTime.render());
         long remainingSteps = totalSteps - averageTime.getCurrentStep().get();
         Duration timeRemaining = averageTime.getAverageStepTime().multipliedBy(remainingSteps);
-        result += ", Time remaining: " + formatDuration(timeRemaining);
-        return result;
+        renderedString.append(", Time remaining: ");
+        renderedString.append(formatDuration(timeRemaining));
+        return renderedString.toString();
     }
 
     public void step() {
