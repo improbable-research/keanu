@@ -7,5 +7,4 @@ public interface StatusBarComponent {
      * @return a String for the rendered component.
      */
     public String render();
-
 }
