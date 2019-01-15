@@ -81,8 +81,6 @@ public class SimulatedAnnealing {
                                           int sampleCount,
                                           AnnealingSchedule annealingSchedule) {
 
-        bayesNet.cascadeFixedVariables();
-
         if (ProbabilityCalculator.isImpossibleLogProb(bayesNet.logProb())) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }

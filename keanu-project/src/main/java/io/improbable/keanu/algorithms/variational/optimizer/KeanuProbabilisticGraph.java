@@ -34,14 +34,15 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     public KeanuProbabilisticGraph(BayesianNetwork bayesianNetwork) {
-
         this.vertexLookup = bayesianNetwork.getLatentOrObservedVertices().stream()
             .collect(toMap(Vertex::getId, v -> v));
 
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
-            }
+
+        cascadeObservations();
+    }
 
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
@@ -74,11 +75,6 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
-    public void cascadeFixedVariables() {
-        VertexValuePropagation.cascadeUpdate(this.observedVertices);
-    }
-
-    @Override
     public MetropolisHastingsSampler metropolisHastingsSampler(
         List<? extends Variable> verticesToSampleFrom,
         MetropolisHastingsStep mhStep,
@@ -89,12 +85,15 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     private void checkBayesNetInHealthyState() {
-        cascadeFixedVariables();
         if (latentOrObservedVertices.isEmpty()) {
             throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
         } else if (ProbabilityCalculator.isImpossibleLogProb(this.logProb())) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
+    }
+
+    private void cascadeObservations() {
+        VertexValuePropagation.cascadeUpdate(this.observedVertices);
     }
 
     public void cascadeValues(Map<VariableReference, ?> inputs) {

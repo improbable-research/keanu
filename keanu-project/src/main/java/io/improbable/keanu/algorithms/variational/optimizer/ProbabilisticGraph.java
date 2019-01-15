@@ -30,7 +30,5 @@ public interface ProbabilisticGraph {
 
     void cascadeUpdate(Set<? extends Variable> inputs);
 
-    void cascadeFixedVariables();
-
     MetropolisHastingsSampler metropolisHastingsSampler(List<? extends Variable> verticesToSampleFrom, MetropolisHastingsStep mhStep, MHStepVariableSelector variableSelector);
 }
