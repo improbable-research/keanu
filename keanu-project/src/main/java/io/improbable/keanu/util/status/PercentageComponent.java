@@ -2,6 +2,9 @@ package io.improbable.keanu.util.status;
 
 import com.google.common.util.concurrent.AtomicDouble;
 
+/**
+ * {@link StatusBarComponent} that renders a percentage bar which can be updated.
+ */
 public class PercentageComponent implements StatusBarComponent {
 
     private AtomicDouble percentage = new AtomicDouble(0.0);

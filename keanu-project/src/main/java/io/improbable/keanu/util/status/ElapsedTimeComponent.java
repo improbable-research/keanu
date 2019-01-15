@@ -5,6 +5,9 @@ import lombok.Getter;
 import java.time.Duration;
 import java.time.Instant;
 
+/**
+ * {@link StatusBarComponent} that renders the elapsed time since its creation.
+ */
 public class ElapsedTimeComponent extends TimeComponent {
 
     @Getter

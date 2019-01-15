@@ -2,6 +2,9 @@ package io.improbable.keanu.util.status;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * {@link StatusBarComponent} that renders the Keanu animation.
+ */
 public class KeanuAnimationComponent implements StatusBarComponent {
 
     private final AtomicInteger nextFrameIndex = new AtomicInteger(0);

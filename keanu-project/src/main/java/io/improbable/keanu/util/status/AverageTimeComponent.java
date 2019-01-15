@@ -6,6 +6,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * {@link StatusBarComponent} that renders the average time algorithm steps are taking, also shows elapsed time.
+ */
 public class AverageTimeComponent extends TimeComponent {
     private final ElapsedTimeComponent elapsedTime = new ElapsedTimeComponent();
 
@@ -29,6 +32,9 @@ public class AverageTimeComponent extends TimeComponent {
         return renderedString.toString();
     }
 
+    /**
+     * Advances the step counter which is used to calculate the average step time.
+     */
     public void step() {
         currentStep.getAndIncrement();
     }
