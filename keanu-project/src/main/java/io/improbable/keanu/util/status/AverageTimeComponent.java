@@ -1,5 +1,7 @@
 package io.improbable.keanu.util.status;
 
+import lombok.Getter;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
@@ -9,8 +11,11 @@ public class AverageTimeComponent implements StatusBarComponent {
     private final ElapsedTimeComponent elapsedTime = new ElapsedTimeComponent();
     private AtomicLong currentStep = new AtomicLong(0);
 
-    private static TemporalUnit DEFAULT_UNIT = ChronoUnit.MILLIS;
+    private static TemporalUnit DEFAULT_UNIT = ChronoUnit.MICROS;
     private final TemporalUnit unit;
+
+    @Getter
+    private double averageStepTime = 0;
 
     public static void setDefaultUnit(TemporalUnit temporalUnit) {
         AverageTimeComponent.DEFAULT_UNIT = temporalUnit;
@@ -28,8 +33,8 @@ public class AverageTimeComponent implements StatusBarComponent {
     public String render() {
         String result = elapsedTime.render();
         if (currentStep.get() != 0) {
-            long averageStepTime = unit.between(elapsedTime.getStartTime(), Instant.now());
-            result += " Average step time: " + averageStepTime + " " + unit.toString();
+            averageStepTime = (double) unit.between(elapsedTime.getStartTime(), Instant.now()) / currentStep.get();
+            result += ", Average step time: " + String.format(" %.2f", averageStepTime) + " " + unit.toString();
         }
         return result;
     }
