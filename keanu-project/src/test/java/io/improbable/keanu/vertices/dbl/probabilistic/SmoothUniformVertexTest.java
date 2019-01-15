@@ -12,11 +12,11 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import umontreal.ssj.probdist.UniformDist;
 
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import umontreal.ssj.probdist.UniformDist;
 
 public class SmoothUniformVertexTest {
 

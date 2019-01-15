@@ -7,6 +7,8 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -22,9 +24,11 @@ import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import static java.lang.Math.PI;
 
-public class StudentTVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class StudentTVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
+    private static final double HALF_LOG_PI = java.lang.Math.log(PI) / 2;
     private final IntegerVertex v;
     private static final String V_NAME = "v";
 
@@ -64,6 +68,35 @@ public class StudentTVertex extends DoubleVertex implements Differentiable, Prob
     @Override
     public double logProb(DoubleTensor t) {
         return StudentT.withParameters(v.getValue()).logProb(t).sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.IntegerPlaceHolderVertex tPlaceholder = new LogProbGraph.IntegerPlaceHolderVertex(this.getShape());
+
+        DoubleVertex vAsDouble = tPlaceholder.toDouble();
+        DoubleVertex halfVPlusOne = vAsDouble.plus(1).div(2);
+
+        DoubleVertex logGammaHalfVPlusOne = halfVPlusOne.logGamma();
+        DoubleVertex logGammaHalfV = vAsDouble.div(2).logGamma();
+        DoubleVertex halfLogV = vAsDouble.log().div(2);
+
+        DoubleVertex logProbOutput = logGammaHalfVPlusOne
+            .minus(halfLogV)
+            .minus(HALF_LOG_PI)
+            .minus(logGammaHalfV)
+            .minus(
+                halfVPlusOne.times(
+                    xPlaceholder.pow(2).div(vAsDouble).plus(1).log()
+                )
+            );
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(v, tPlaceholder)
+            .logProbOutput(logProbOutput)
+            .build();
     }
 
     @Override
