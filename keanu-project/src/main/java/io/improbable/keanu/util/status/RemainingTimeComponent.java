@@ -15,6 +15,7 @@ public class RemainingTimeComponent extends TimeComponent {
         StringBuilder renderedString = new StringBuilder(averageTime.render());
         long remainingSteps = totalSteps - averageTime.getCurrentStep().get();
         Duration timeRemaining = averageTime.getAverageStepTime().multipliedBy(remainingSteps);
+
         renderedString.append(", Time remaining: ");
         renderedString.append(formatDuration(timeRemaining));
         return renderedString.toString();

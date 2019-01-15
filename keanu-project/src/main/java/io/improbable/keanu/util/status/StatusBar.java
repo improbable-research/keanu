@@ -8,27 +8,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class StatusBar {
-    private final AtomicReference<String> latestMessage = new AtomicReference<>();
-
     private static final AtomicBoolean ENABLED = new AtomicBoolean(true);
     private static final long FRAME_PERIOD_MS = 500;
-    private final AtomicInteger nextFrameIndex = new AtomicInteger(0);
     private int previouslyPrintedUpdateLength = 0;
     private final TextComponent textComponent = new TextComponent();
 
     private List<StatusBarComponent> components = new ArrayList<>();
     private static PrintStream defaultPrintStream = System.out;
-    private static final String MIDDLE_MESSAGE = "Keanu";
-    private static final String[] FRAMES = new String[]{
-        "|" + MIDDLE_MESSAGE + "|",
-        "\\" + MIDDLE_MESSAGE + "/",
-        "-" + MIDDLE_MESSAGE + "-",
-        "/" + MIDDLE_MESSAGE + "\\"
-    };
 
     /**
      * Override the default print stream globally
