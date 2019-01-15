@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms;
 
+import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 
@@ -21,5 +22,8 @@ public interface PosteriorSamplingAlgorithm {
     default NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork, int sampleCount) {
         return getPosteriorSamples(bayesianNetwork, bayesianNetwork.getTopLevelLatentVertices(), sampleCount);
     }
+
+    NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
+                                                     final List<? extends Vertex> verticesToSampleFrom);
 
 }

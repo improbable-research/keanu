@@ -77,6 +77,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
             .generate(sampleCount);
     }
 
+    @Override
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesNet,
                                                             final List<? extends Vertex> fromVertices) {
 

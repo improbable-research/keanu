@@ -99,6 +99,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             .generate(sampleCount);
     }
 
+    @Override
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesNet,
                                                             final List<? extends Vertex> fromVertices) {
 
