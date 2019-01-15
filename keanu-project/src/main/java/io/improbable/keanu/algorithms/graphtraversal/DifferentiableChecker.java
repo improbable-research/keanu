@@ -31,6 +31,8 @@ public class DifferentiableChecker {
      * @return whether all the vertices are differentiable w.r.t latents
      */
     public static boolean isDifferentiableWrtLatents(Collection<Vertex> vertices) {
+        // All probabilistic need to be double or observed to ensure that the dLogProb can be calculated, for example
+        // the dLogProb of BernoulliVertex can only be calculated when it is observed.
         if (!allProbabilisticAreDoubleOrObserved(vertices)) {
             return false;
         }
