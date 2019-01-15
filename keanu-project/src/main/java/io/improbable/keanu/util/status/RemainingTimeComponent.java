@@ -2,7 +2,7 @@ package io.improbable.keanu.util.status;
 
 import java.time.Duration;
 
-public class RemainingTimeComponent implements StatusBarComponent{
+public class RemainingTimeComponent extends TimeComponent {
     private final AverageTimeComponent averageTime = new AverageTimeComponent();
     private final long totalSteps;
 
@@ -15,7 +15,7 @@ public class RemainingTimeComponent implements StatusBarComponent{
         String result = averageTime.render();
         long remainingSteps = totalSteps - averageTime.getCurrentStep().get();
         Duration timeRemaining = averageTime.getAverageStepTime().multipliedBy(remainingSteps);
-        result += ", Time remaining: " + timeRemaining.toString().substring(2);
+        result += ", Time remaining: " + formatDuration(timeRemaining);
         return result;
     }
 

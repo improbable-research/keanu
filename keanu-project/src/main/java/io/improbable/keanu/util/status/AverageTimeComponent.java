@@ -6,7 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class AverageTimeComponent implements StatusBarComponent {
+public class AverageTimeComponent extends TimeComponent {
     private final ElapsedTimeComponent elapsedTime = new ElapsedTimeComponent();
     @Getter
     private AtomicLong currentStep = new AtomicLong(0);
@@ -19,7 +19,7 @@ public class AverageTimeComponent implements StatusBarComponent {
         String result = elapsedTime.render();
         if (currentStep.get() != 0) {
             averageStepTime = Duration.between(elapsedTime.getStartTime(), Instant.now()).dividedBy(currentStep.get());
-            result += ", Average step time: " + averageStepTime.toString().substring(2);
+            result += ", Average step time: " + formatDuration(averageStepTime);
         }
         return result;
     }
