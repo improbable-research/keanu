@@ -10,6 +10,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -21,6 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -57,13 +59,14 @@ public class MetropolisHastingsStepTest {
         DoubleVertex observedB = new GaussianVertex(B, 1);
         observedB.observe(5);
 
-        KeanuProbabilisticGraph graph = new KeanuProbabilisticGraph(new BayesianNetwork(A.getConnectedGraph()));
+        BayesianNetwork bayesNet = new BayesianNetwork(A.getConnectedGraph());
+        KeanuProbabilisticGraph graph = new KeanuProbabilisticGraph(bayesNet);
         double logProbBeforeStep = graph.logProb();
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             graph,
             ProposalDistribution.usePrior(),
-            true,
+            new RollBackOnRejection(bayesNet.getLatentVertices()),
             alwaysAccept
         );
 
@@ -136,7 +139,7 @@ public class MetropolisHastingsStepTest {
         return new MetropolisHastingsStep(
             network,
             constantProposal(constant),
-            true,
+            new RollBackOnRejection((List<Vertex>) network.getLatentVariables()),
             random
         );
     }

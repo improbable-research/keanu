@@ -6,7 +6,6 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastingsSampler;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastingsStep;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.network.NetworkSnapshot;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
@@ -86,11 +85,6 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     @Override
     public void cascadeFixedVariables() {
         VertexValuePropagation.cascadeUpdate(this.observedVertices);
-    }
-
-    @Override
-    public NetworkSnapshot getSnapshotOfAllAffectedVariables(Set<? extends Variable> variables) {
-        return NetworkSnapshot.create(lambdaSectionSnapshot.getAllVerticesAffectedBy(variables));
     }
 
     @Override

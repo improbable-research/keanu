@@ -8,6 +8,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
@@ -96,7 +97,7 @@ public class SimulatedAnnealing {
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             bayesNet,
             proposalDistribution,
-            true,
+            new RollBackOnRejection((List<Vertex>)latentVertices),
             random
         );
 

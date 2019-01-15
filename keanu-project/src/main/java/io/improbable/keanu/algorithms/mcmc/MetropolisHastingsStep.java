@@ -4,7 +4,6 @@ import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.network.NetworkSnapshot;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Value;
@@ -21,23 +20,23 @@ public class MetropolisHastingsStep {
 
     private final ProbabilisticGraph graph;
     private final ProposalDistribution proposalDistribution;
-    private final boolean useCacheOnRejection;
+    private final ProposalRejectionStrategy rejectionStrategy;
     private final KeanuRandom random;
 
     /**
      * @param proposalDistribution The proposal distribution
-     * @param useCacheOnRejection  True if caching values of the network such that recalculation isn't required
-     *                             on step rejection
+     * @param rejectionStrategy What to do when a proposal is rejected.
+     *                         Options include {@link CascadeOnRejection} and {@link RollBackOnRejection}.
      * @param random               Source of randomness
      */
     MetropolisHastingsStep(ProbabilisticGraph graph,
                            ProposalDistribution proposalDistribution,
-                           boolean useCacheOnRejection,
+                           ProposalRejectionStrategy rejectionStrategy,
                            KeanuRandom random) {
 
         this.graph = graph;
         this.proposalDistribution = proposalDistribution;
-        this.useCacheOnRejection = useCacheOnRejection;
+        this.rejectionStrategy = rejectionStrategy;
         this.random = random;
     }
 
@@ -62,10 +61,7 @@ public class MetropolisHastingsStep {
             .collect(Collectors.toList())));
         final double affectedVerticesLogProbOld = graph.downstreamLogProb(chosenVertices);
 
-        NetworkSnapshot preProposalSnapshot = null;
-        if (useCacheOnRejection) {
-            preProposalSnapshot = graph.getSnapshotOfAllAffectedVariables(chosenVertices);
-        }
+        rejectionStrategy.prepare(chosenVertices);
 
         Proposal proposal = proposalDistribution.getProposal(chosenVertices, random);
         proposal.apply();
@@ -99,11 +95,7 @@ public class MetropolisHastingsStep {
 
         proposal.reject();
 
-        if (useCacheOnRejection) {
-            preProposalSnapshot.apply();
-        } else {
-            graph.cascadeUpdate(chosenVertices);
-        }
+        rejectionStrategy.handle();
 
         return new StepResult(false, logProbabilityBeforeStep);
     }

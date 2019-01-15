@@ -3,7 +3,6 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastingsSampler;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastingsStep;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
-import io.improbable.keanu.network.NetworkSnapshot;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Collections;
@@ -47,8 +46,6 @@ public interface ProbabilisticGraph {
     void cascadeUpdate(Set<? extends Variable> inputs);
 
     void cascadeFixedVariables();
-
-    NetworkSnapshot getSnapshotOfAllAffectedVariables(Set<? extends Variable> variables);
 
     MetropolisHastingsSampler metropolisHastingsSampler(List<? extends Variable> verticesToSampleFrom, MetropolisHastingsStep mhStep, MHStepVariableSelector variableSelector);
 }

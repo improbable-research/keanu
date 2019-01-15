@@ -239,7 +239,10 @@ public class MetropolisHastingsTest {
         int sampleCount = 100;
         BayesianNetwork network = new BayesianNetwork(start.getConnectedGraph());
 
-        MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+        MetropolisHastings.builder()
+            .rejectionStrategy(new RollBackOnRejection(network.getLatentVertices()))
+            .build()
+            .getPosteriorSamples(
             new KeanuProbabilisticGraph(network),
             network.getLatentVertices(),
             sampleCount
@@ -256,7 +259,7 @@ public class MetropolisHastingsTest {
         net.probeForNonZeroProbability(100);
 
         MetropolisHastings algo = MetropolisHastings.builder()
-            .useCacheOnRejection(false)
+            .rejectionStrategy(new CascadeOnRejection())
             .build();
 
         assertNotNull(algo.getProposalDistribution());
