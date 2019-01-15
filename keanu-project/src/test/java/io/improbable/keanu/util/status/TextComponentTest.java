@@ -13,6 +13,5 @@ public class TextComponentTest {
         String testText = "Loading";
         textComponent.setText(testText);
         assertThat(textComponent.render(), equalTo(testText));
-
     }
 }

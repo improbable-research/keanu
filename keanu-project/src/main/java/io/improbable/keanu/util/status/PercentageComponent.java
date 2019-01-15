@@ -3,6 +3,7 @@ package io.improbable.keanu.util.status;
 import com.google.common.util.concurrent.AtomicDouble;
 
 public class PercentageComponent implements StatusBarComponent {
+
     private AtomicDouble percentage = new AtomicDouble(0.0);
 
     public void progress(double percentage) {

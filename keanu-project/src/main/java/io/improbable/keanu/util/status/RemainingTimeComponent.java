@@ -3,6 +3,7 @@ package io.improbable.keanu.util.status;
 import java.time.Duration;
 
 public class RemainingTimeComponent extends TimeComponent {
+
     private final AverageTimeComponent averageTime = new AverageTimeComponent();
     private final long totalSteps;
 

@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 public class ElapsedTimeComponent extends TimeComponent {
+
     @Getter
     private final Instant startTime = Instant.now();
 
