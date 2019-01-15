@@ -8,8 +8,8 @@ import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
-
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;

@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.GenericVertex;
+
 import java.io.PrintStream;
 
 public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic<T> {

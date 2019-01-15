@@ -49,7 +49,7 @@ def cast_to_string(input: Any) -> str:
     return str(input)
 
 
-def cast_to_boolean(input: Any) -> str:
+def cast_to_boolean(input: Any) -> bool:
     return bool(input)
 
 
