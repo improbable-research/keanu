@@ -16,7 +16,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -135,6 +138,33 @@ public class StatusBarTest {
         statusBar.setMessage("");
         statusBar.finish();
         verify(mockStream, atLeastOnce()).print(anyString());
+    }
+
+    @Test
+    public void addedComponentIsRendered() {
+        StatusBarComponent mockComponent = mock(StatusBarComponent.class);
+        when(mockComponent.render()).thenReturn("RenderTest");
+
+        statusBar.addComponent(mockComponent);
+        progressUpdateCall.get().run();
+        statusBar.finish();
+
+        String result = getResultWithNewLinesInsteadOfCR();
+        assertThat(result, containsString("RenderTest"));
+    }
+
+    @Test
+    public void removedComponentIsNotRendered() {
+        StatusBarComponent mockComponent = mock(StatusBarComponent.class);
+        when(mockComponent.render()).thenReturn("RenderTest");
+
+        statusBar.addComponent(mockComponent);
+        statusBar.removeComponent(mockComponent);
+        progressUpdateCall.get().run();
+        statusBar.finish();
+
+        String result = getResultWithNewLinesInsteadOfCR();
+        assertThat(result, not(containsString("RenderTest")));
     }
 
     @After
