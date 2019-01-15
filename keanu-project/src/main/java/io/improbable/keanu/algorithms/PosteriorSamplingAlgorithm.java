@@ -9,9 +9,9 @@ import java.util.List;
 public interface PosteriorSamplingAlgorithm {
 
     default NetworkSamples getPosteriorSamples(ProbabilisticModel bayesianNetwork,
-                                               Variable vertexToSampleFrom,
+                                               Variable variableToSampleFrom,
                                                int sampleCount) {
-        return getPosteriorSamples(bayesianNetwork, Collections.singletonList(vertexToSampleFrom), sampleCount);
+        return getPosteriorSamples(bayesianNetwork, Collections.singletonList(variableToSampleFrom), sampleCount);
     }
 
     default NetworkSamples getPosteriorSamples(ProbabilisticModel bayesianNetwork, int sampleCount) {
@@ -19,7 +19,7 @@ public interface PosteriorSamplingAlgorithm {
     }
 
     NetworkSamples getPosteriorSamples(ProbabilisticModel bayesNet,
-                                       List<? extends Variable> verticesToSampleFrom,
+                                       List<? extends Variable> variablesToSampleFrom,
                                        int sampleCount);
 
 }

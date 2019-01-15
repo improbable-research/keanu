@@ -80,7 +80,7 @@ public class BayesianNetwork {
     }
 
     public void setState(NetworkState state) {
-        for (VariableReference vertexId : state.getVertexIds()) {
+        for (VariableReference vertexId : state.getVariableReferences()) {
             this.vertices.stream()
                 .filter(v -> v.getId() == vertexId)
                 .forEach(v -> v.setValue(state.get(vertexId)));

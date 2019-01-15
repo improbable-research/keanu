@@ -21,8 +21,8 @@ import java.util.Map;
 class NUTSSampler implements SamplingAlgorithm {
 
     private final KeanuRandom random;
-    private final List<? extends Variable<DoubleTensor>> latentVertices;
-    private final List<? extends Variable> sampleFromVertices;
+    private final List<? extends Variable<DoubleTensor>> latentVariables;
+    private final List<? extends Variable> sampleFromVariables;
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
     private final Stepsize stepsize;
@@ -33,8 +33,8 @@ class NUTSSampler implements SamplingAlgorithm {
     private int sampleNum;
 
     /**
-     * @param sampleFromVertices        vertices to sample from
-     * @param latentVertices            vertices that represent latent variables
+     * @param sampleFromVariables        variables to sample from
+     * @param latentVariables            variables that represent latent variables
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
      * @param adaptEnabled              enable the NUTS step size adaptation
      * @param stepsize                  configuration for tuning the stepsize, if adaptEnabled
@@ -44,8 +44,8 @@ class NUTSSampler implements SamplingAlgorithm {
      * @param statistics                the sampler statistics
      * @param saveStatistics            whether to record statistics
      */
-    public NUTSSampler(List<? extends Variable> sampleFromVertices,
-                       List<? extends Variable<DoubleTensor>> latentVertices,
+    public NUTSSampler(List<? extends Variable> sampleFromVariables,
+                       List<? extends Variable<DoubleTensor>> latentVariables,
                        ProbabilisticModelWithGradient logProbGradientCalculator,
                        boolean adaptEnabled,
                        Stepsize stepsize,
@@ -55,8 +55,8 @@ class NUTSSampler implements SamplingAlgorithm {
                        Statistics statistics,
                        boolean saveStatistics) {
 
-        this.sampleFromVertices = sampleFromVertices;
-        this.latentVertices = latentVertices;
+        this.sampleFromVariables = sampleFromVariables;
+        this.latentVariables = latentVariables;
         this.logProbGradientCalculator = logProbGradientCalculator;
 
         this.tree = tree;
@@ -87,7 +87,7 @@ class NUTSSampler implements SamplingAlgorithm {
     @Override
     public void step() {
 
-        initializeMomentumForEachVariable(latentVertices, tree.getForwardMomentum(), random);
+        initializeMomentumForEachVariable(latentVariables, tree.getForwardMomentum(), random);
         cache(tree.getForwardMomentum(), tree.getBackwardMomentum());
 
         double logOfMasterPMinusMomentumBeforeLeapfrog = tree.getLogOfMasterPAtAcceptedPosition() - 0.5 * dotProduct(tree.getForwardMomentum());
@@ -104,9 +104,9 @@ class NUTSSampler implements SamplingAlgorithm {
 
             Tree otherHalfTree = Tree.buildOtherHalfOfTree(
                 tree,
-                latentVertices,
+                latentVariables,
                 logProbGradientCalculator,
-                sampleFromVertices,
+                sampleFromVariables,
                 logU,
                 buildDirection,
                 treeHeight,
@@ -151,11 +151,11 @@ class NUTSSampler implements SamplingAlgorithm {
         tree.save(statistics);
     }
 
-    private static void initializeMomentumForEachVariable(List<? extends Variable<DoubleTensor>> vertices,
+    private static void initializeMomentumForEachVariable(List<? extends Variable<DoubleTensor>> variables,
                                                           Map<VariableReference, DoubleTensor> momentums,
                                                           KeanuRandom random) {
-        for (Variable<DoubleTensor> vertex : vertices) {
-            momentums.put(vertex.getReference(), random.nextGaussian(vertex.getShape()));
+        for (Variable<DoubleTensor> variable : variables) {
+            momentums.put(variable.getReference(), random.nextGaussian(variable.getShape()));
         }
     }
 

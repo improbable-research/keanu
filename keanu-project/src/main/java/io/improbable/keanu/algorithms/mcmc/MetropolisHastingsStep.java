@@ -47,38 +47,38 @@ public class MetropolisHastingsStep {
         this.random = random;
     }
 
-    public StepResult step(final Set<Variable> chosenVertices,
+    public StepResult step(final Set<Variable> chosenVariables,
                            final double logProbabilityBeforeStep) {
-        return step(chosenVertices, logProbabilityBeforeStep, DEFAULT_TEMPERATURE);
+        return step(chosenVariables, logProbabilityBeforeStep, DEFAULT_TEMPERATURE);
     }
 
     /**
-     * @param chosenVertices           vertices to get a proposed change for
+     * @param chosenVariables           variables to get a proposed change for
      * @param logProbabilityBeforeStep The log of the previous state's probability
      * @param temperature              Temperature for simulated annealing. This
      *                                 should be constant if no annealing is wanted
      * @return the log probability of the network after either accepting or rejecting the sample
      */
-    public StepResult step(final Set<Variable> chosenVertices,
+    public StepResult step(final Set<Variable> chosenVariables,
                            final double logProbabilityBeforeStep,
                            final double temperature) {
 
-        log.trace(String.format("Chosen vertices: %s", chosenVertices.stream()
+        log.trace(String.format("Chosen variables: %s", chosenVariables.stream()
             .map(Variable::toString)
             .collect(Collectors.toList())));
-        final double affectedVerticesLogProbOld = logProbCalculationStrategy.calculate(model, chosenVertices);
+        final double affectedVariablesLogProbOld = logProbCalculationStrategy.calculate(model, chosenVariables);
 
-        rejectionStrategy.prepare(chosenVertices);
+        rejectionStrategy.prepare(chosenVariables);
 
-        Proposal proposal = proposalDistribution.getProposal(chosenVertices, random);
+        Proposal proposal = proposalDistribution.getProposal(chosenVariables, random);
         proposal.apply();
-        proposalApplicationStrategy.apply(proposal, chosenVertices);
+        proposalApplicationStrategy.apply(proposal, chosenVariables);
 
-        final double affectedVerticesLogProbNew = logProbCalculationStrategy.calculate(model, chosenVertices);
+        final double affectedVariablesLogProbNew = logProbCalculationStrategy.calculate(model, chosenVariables);
 
-        if (!ProbabilityCalculator.isImpossibleLogProb(affectedVerticesLogProbNew)) {
+        if (!ProbabilityCalculator.isImpossibleLogProb(affectedVariablesLogProbNew)) {
 
-            final double logProbabilityDelta = affectedVerticesLogProbNew - affectedVerticesLogProbOld;
+            final double logProbabilityDelta = affectedVariablesLogProbNew - affectedVariablesLogProbOld;
             final double logProbabilityAfterStep = logProbabilityBeforeStep + logProbabilityDelta;
 
             final double pqxOld = proposalDistribution.logProbAtFromGivenTo(proposal);

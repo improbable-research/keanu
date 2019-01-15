@@ -26,18 +26,18 @@ public class GaussianProposalDistribution implements ProposalDistribution {
     }
 
     @Override
-    public Proposal getProposal(Set<Variable> vertices, KeanuRandom random) {
+    public Proposal getProposal(Set<Variable> variables, KeanuRandom random) {
         Proposal proposal = new Proposal();
         proposal.addListeners(listeners);
-        for (Variable vertex : vertices) {
-            ContinuousDistribution proposalDistribution = Gaussian.withParameters((DoubleTensor) vertex.getValue(), sigma);
-            proposal.setProposal(vertex, proposalDistribution.sample(vertex.getShape(), random));
+        for (Variable variable : variables) {
+            ContinuousDistribution proposalDistribution = Gaussian.withParameters((DoubleTensor) variable.getValue(), sigma);
+            proposal.setProposal(variable, proposalDistribution.sample(variable.getShape(), random));
         }
         return proposal;
     }
 
     @Override
-    public <T> double logProb(Probabilistic<T> vertex, T ofValue, T givenValue) {
+    public <T> double logProb(Probabilistic<T> variable, T ofValue, T givenValue) {
         if (!(ofValue instanceof DoubleTensor)) {
             throw new ClassCastException("Only DoubleTensor values are supported - not " + ofValue.getClass().getSimpleName());
         }

@@ -15,8 +15,8 @@ public final class SingleVariableSelector implements MHStepVariableSelector {
     }
 
     @Override
-    public Set<Variable> select(List<? extends Variable> latentVertices, int sampleNumber) {
-        Variable chosenVertex = latentVertices.get(sampleNumber % latentVertices.size());
-        return Collections.singleton(chosenVertex);
+    public Set<Variable> select(List<? extends Variable> latentVariables, int sampleNumber) {
+        Variable chosenVariable = latentVariables.get(sampleNumber % latentVariables.size());
+        return Collections.singleton(chosenVariable);
     }
 }

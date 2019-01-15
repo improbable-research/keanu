@@ -72,7 +72,7 @@ public class SimulatedAnnealingTest {
         algo.setVariableSelector(null);
         assertNull(algo.getVariableSelector());
 
-        assertFalse(networkMAP.getVertexIds().isEmpty());
+        assertFalse(networkMAP.getVariableReferences().isEmpty());
     }
 
     private NetworkState findMAPWithOptimizer() {

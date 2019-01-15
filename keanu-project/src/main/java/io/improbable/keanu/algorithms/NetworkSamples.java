@@ -24,7 +24,7 @@ import static java.util.stream.Collectors.toMap;
 
 /**
  * An immutable collection of network samples. A network sample is a collection
- * of values from vertices in a network at a given point in time.
+ * of values from variables in a network at a given point in time.
  */
 @Slf4j
 public class NetworkSamples {
@@ -49,13 +49,13 @@ public class NetworkSamples {
     }
 
     private static void addSamplesForNetworkSample(NetworkSample networkSample, Map<VariableReference, List<?>> samplesByVertex) {
-        for (VariableReference vertexId : networkSample.getVertexIds()) {
-            addSampleForVertex(vertexId, networkSample.get(vertexId), samplesByVertex);
+        for (VariableReference variableReference : networkSample.getVariableReferences()) {
+            addSampleForVertex(variableReference, networkSample.get(variableReference), samplesByVertex);
         }
     }
 
-    private static <T> void addSampleForVertex(VariableReference vertexId, T value, Map<VariableReference, List<?>> samples) {
-        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertexId, v -> new ArrayList<T>());
+    private static <T> void addSampleForVertex(VariableReference variableReference, T value, Map<VariableReference, List<?>> samples) {
+        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(variableReference, v -> new ArrayList<T>());
         samplesForVertex.add(value);
     }
 
@@ -63,28 +63,28 @@ public class NetworkSamples {
         return this.size;
     }
 
-    public <T> VertexSamples<T> get(Variable<T> vertex) {
-        return get(vertex.getReference());
+    public <T> VertexSamples<T> get(Variable<T> variable) {
+        return get(variable.getReference());
     }
 
-    public <T> VertexSamples<T> get(VariableReference vertexId) {
-        return new VertexSamples<>((List<T>) samplesByVertex.get(vertexId));
+    public <T> VertexSamples<T> get(VariableReference variableReference) {
+        return new VertexSamples<>((List<T>) samplesByVertex.get(variableReference));
     }
 
-    public DoubleVertexSamples getDoubleTensorSamples(Variable<DoubleTensor> vertex) {
-        return getDoubleTensorSamples(vertex.getReference());
+    public DoubleVertexSamples getDoubleTensorSamples(Variable<DoubleTensor> variable) {
+        return getDoubleTensorSamples(variable.getReference());
     }
 
-    public DoubleVertexSamples getDoubleTensorSamples(VariableReference vertexId) {
-        return new DoubleVertexSamples(samplesByVertex.get(vertexId));
+    public DoubleVertexSamples getDoubleTensorSamples(VariableReference variableReference) {
+        return new DoubleVertexSamples(samplesByVertex.get(variableReference));
     }
 
-    public IntegerVertexSamples getIntegerTensorSamples(Variable<IntegerTensor> vertex) {
-        return getIntegerTensorSamples(vertex.getReference());
+    public IntegerVertexSamples getIntegerTensorSamples(Variable<IntegerTensor> variable) {
+        return getIntegerTensorSamples(variable.getReference());
     }
 
-    public IntegerVertexSamples getIntegerTensorSamples(VariableReference vertexId) {
-        return new IntegerVertexSamples(samplesByVertex.get(vertexId));
+    public IntegerVertexSamples getIntegerTensorSamples(VariableReference variableReference) {
+        return new IntegerVertexSamples(samplesByVertex.get(variableReference));
     }
 
     public NetworkSamples drop(int dropCount) {
@@ -178,17 +178,17 @@ public class NetworkSamples {
         }
 
         @Override
-        public <T> T get(Variable<T> vertex) {
-            return ((List<T>) samplesByVertex.get(vertex.getReference())).get(index);
+        public <T> T get(Variable<T> variable) {
+            return ((List<T>) samplesByVertex.get(variable.getReference())).get(index);
         }
 
         @Override
-        public <T> T get(VariableReference vertexId) {
-            return ((List<T>) samplesByVertex.get(vertexId)).get(index);
+        public <T> T get(VariableReference variableReference) {
+            return ((List<T>) samplesByVertex.get(variableReference)).get(index);
         }
 
         @Override
-        public Set<VariableReference> getVertexIds() {
+        public Set<VariableReference> getVariableReferences() {
             return new HashSet<>(samplesByVertex.keySet());
         }
     }

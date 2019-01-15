@@ -149,7 +149,7 @@ public class KLDivergenceTest {
 
         @Override
         public double getLogOfMasterP(NetworkState state) {
-            DoubleTensor vertexValue = state.get(Iterables.getOnlyElement(state.getVertexIds()));
+            DoubleTensor vertexValue = state.get(Iterables.getOnlyElement(state.getVariableReferences()));
             return logPdf(vertexValue);
         }
     }

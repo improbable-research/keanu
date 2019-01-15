@@ -20,22 +20,22 @@ public class PriorProposalDistribution implements ProposalDistribution {
     }
 
     @Override
-    public Proposal getProposal(Set<Variable> vertices, KeanuRandom random) {
+    public Proposal getProposal(Set<Variable> variables, KeanuRandom random) {
         Proposal proposal = new Proposal();
         proposal.addListeners(listeners);
-        for (Variable<?> vertex : vertices) {
-            setFor(vertex, random, proposal);
+        for (Variable<?> variable : variables) {
+            setFor(variable, random, proposal);
         }
         return proposal;
     }
 
     @Override
-    public <T> double logProb(Probabilistic<T> vertex, T ofValue, T givenValue) {
-        return vertex.logProb(ofValue);
+    public <T> double logProb(Probabilistic<T> variable, T ofValue, T givenValue) {
+        return variable.logProb(ofValue);
     }
 
-    private <T> void setFor(Variable<T> vertex, KeanuRandom random, Proposal proposal) {
-        proposal.setProposal(vertex, vertex.sample(random));
+    private <T> void setFor(Variable<T> variable, KeanuRandom random, Proposal proposal) {
+        proposal.setProposal(variable, variable.sample(random));
     }
 
 }

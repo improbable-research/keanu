@@ -22,9 +22,9 @@ class Leapfrog {
     private final Map<? extends VariableReference, DoubleTensor> gradient;
 
     /**
-     * @param position the position of the vertices
-     * @param momentum the momentum of the vertices
-     * @param gradient the gradient of the vertices
+     * @param position the position of the variables
+     * @param momentum the momentum of the variables
+     * @param gradient the gradient of the variables
      */
     Leapfrog(Map<VariableReference, DoubleTensor> position,
              Map<VariableReference, DoubleTensor> momentum,
@@ -35,24 +35,24 @@ class Leapfrog {
     }
 
     /**
-     * Performs one leapfrog of the vertices with a time delta as defined by epsilon
+     * Performs one leapfrog of the variables with a time delta as defined by epsilon
      *
-     * @param latentVertices                the latent vertices
+     * @param latentVariables                the latent variables
      * @param logProbGradientCalculator     the calculator for the log prob gradient
      * @param epsilon                       the time delta
 
      * @return a new leapfrog having taken one step through space
      */
-    public Leapfrog step(final List<? extends Variable<DoubleTensor>> latentVertices,
+    public Leapfrog step(final List<? extends Variable<DoubleTensor>> latentVariables,
                          final ProbabilisticModelWithGradient logProbGradientCalculator,
                          final double epsilon) {
 
         final double halfTimeStep = epsilon / 2.0;
 
         Map<VariableReference, DoubleTensor> nextMomentum = stepMomentum(halfTimeStep, momentum, gradient);
-        Map<VariableReference, DoubleTensor> nextPosition = stepPosition(latentVertices, halfTimeStep, nextMomentum, position);
+        Map<VariableReference, DoubleTensor> nextPosition = stepPosition(latentVariables, halfTimeStep, nextMomentum, position);
 
-        Map<VariableReference, ?> latentMap = asMap(latentVertices);
+        Map<VariableReference, ?> latentMap = asMap(latentVariables);
         Map<? extends VariableReference, DoubleTensor> nextPositionGradient = logProbGradientCalculator.logProbGradients(latentMap);
 
         nextMomentum = stepMomentum(halfTimeStep, nextMomentum, nextPositionGradient);
@@ -60,13 +60,13 @@ class Leapfrog {
         return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient);
     }
 
-    private Map<VariableReference, ?> asMap(List<? extends Variable<DoubleTensor>> latentVertices) {
-        return latentVertices.stream().collect(Collectors.toMap(Variable::getReference, v -> v.getValue()));
+    private Map<VariableReference, ?> asMap(List<? extends Variable<DoubleTensor>> latentVariables) {
+        return latentVariables.stream().collect(Collectors.toMap(Variable::getReference, v -> v.getValue()));
     }
 
-    private Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor>> latentVertices, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<? extends VariableReference, DoubleTensor> position) {
+    private Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor>> latentVariables, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<? extends VariableReference, DoubleTensor> position) {
         Map<VariableReference, DoubleTensor> nextPosition = new HashMap<>();
-        for (Variable<DoubleTensor> latent : latentVertices) {
+        for (Variable<DoubleTensor> latent : latentVariables) {
             final DoubleTensor nextPositionForLatent = nextMomentum.get(latent.getReference()).
                 times(halfTimeStep).
                 plusInPlace(

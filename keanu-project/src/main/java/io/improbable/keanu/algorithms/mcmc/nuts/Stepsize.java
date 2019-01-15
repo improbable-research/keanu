@@ -49,7 +49,7 @@ class Stepsize implements SaveStatistics {
      *
      * @param position                  the starting position
      * @param gradient                  the gradient at the starting position
-     * @param vertices                  the vertices
+     * @param variables                  the variables
      * @param logProbGradientCalculator the log prob gradient calculator
      * @param initialLogOfMasterP       the initial master log prob
      * @param random                    the source of randomness
@@ -57,12 +57,12 @@ class Stepsize implements SaveStatistics {
      */
     public static double findStartingStepSize(Map<VariableReference, DoubleTensor> position,
                                               Map<? extends VariableReference, DoubleTensor> gradient,
-                                              List<? extends Variable<DoubleTensor>> vertices,
+                                              List<? extends Variable<DoubleTensor>> variables,
                                               ProbabilisticModelWithGradient logProbGradientCalculator,
                                               double initialLogOfMasterP,
                                               KeanuRandom random) {
         double stepsize = STARTING_STEPSIZE;
-        Map<VariableReference, DoubleTensor> momentums = vertices.stream()
+        Map<VariableReference, DoubleTensor> momentums = variables.stream()
             .collect(Collectors.toMap(
                 Variable::getReference,
                 v -> random.nextGaussian(v.getShape())
@@ -71,7 +71,7 @@ class Stepsize implements SaveStatistics {
         Leapfrog leapfrog = new Leapfrog(position, momentums, gradient);
         double pThetaR = initialLogOfMasterP - leapfrog.halfDotProductMomentum();
 
-        Leapfrog delta = leapfrog.step(vertices, logProbGradientCalculator, STARTING_STEPSIZE);
+        Leapfrog delta = leapfrog.step(variables, logProbGradientCalculator, STARTING_STEPSIZE);
 
         double probAfterLeapfrog = logProbGradientCalculator.logProb();
         double pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
@@ -82,7 +82,7 @@ class Stepsize implements SaveStatistics {
         while (scalingFactor * logLikelihoodRatio > -scalingFactor * Math.log(2)) {
             stepsize = stepsize * Math.pow(2, scalingFactor);
 
-            delta = leapfrog.step(vertices, logProbGradientCalculator, stepsize);
+            delta = leapfrog.step(variables, logProbGradientCalculator, stepsize);
             probAfterLeapfrog = logProbGradientCalculator.logProb();
             pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
 
