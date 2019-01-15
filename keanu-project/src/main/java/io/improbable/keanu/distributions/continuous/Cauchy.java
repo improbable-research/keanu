@@ -22,7 +22,7 @@ public class Cauchy implements ContinuousDistribution {
 
     private Cauchy(DoubleTensor location, DoubleTensor scale) {
         Preconditions.checkArgument(scale.greaterThan(0.).allTrue(),
-            "Invalid argument for Scale. It must be greater than 0. Scale: " + scale);
+            "scale must be greater than 0. scale: " + scale);
 
         this.location = location;
         this.scale = scale;

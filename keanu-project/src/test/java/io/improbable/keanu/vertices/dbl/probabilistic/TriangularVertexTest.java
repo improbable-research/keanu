@@ -61,6 +61,15 @@ public class TriangularVertexTest {
         triangularVertex.logPdf(0.1);
     }
 
+    @Test
+    public void cEqualToXMinOrXMaxDoesNotThrowException() {
+        DoubleVertex xMin = ConstantVertex.of(0., 0.);
+        DoubleVertex xMax = ConstantVertex.of(1., 1.);
+        DoubleVertex c = ConstantVertex.of(0., 1.);
+        TriangularVertex triangularVertex = new TriangularVertex(xMin, xMax, c);
+        triangularVertex.logPdf(0.3);
+    }
+
     @Category(Slow.class)
     @Test
     public void gaussianSampleMethodMatchesLogProbMethod() {
