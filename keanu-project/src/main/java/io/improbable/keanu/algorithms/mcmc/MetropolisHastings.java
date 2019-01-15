@@ -101,7 +101,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             random
         );
 
-        return bayesianNetwork.metropolisHastingsSampler(verticesToSampleFrom, mhStep, variableSelector);
+        return new MetropolisHastingsSampler(bayesianNetwork.getLatentVariables(), verticesToSampleFrom, mhStep, variableSelector, bayesianNetwork.logProb());
     }
 
 }

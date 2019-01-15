@@ -2,9 +2,6 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastingsSampler;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastingsStep;
-import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -41,6 +38,7 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
 
         cascadeObservations();
+        checkBayesNetInHealthyState();
     }
 
     @Override
@@ -66,16 +64,6 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
             .filter(v -> v.getValue() instanceof DoubleTensor)
             .map(v -> (Variable<DoubleTensor>) v)
             .collect(Collectors.toList());
-    }
-
-    @Override
-    public MetropolisHastingsSampler metropolisHastingsSampler(
-        List<? extends Variable> verticesToSampleFrom,
-        MetropolisHastingsStep mhStep,
-        MHStepVariableSelector variableSelector) {
-
-        checkBayesNetInHealthyState();
-        return new MetropolisHastingsSampler(getLatentVariables(), verticesToSampleFrom, mhStep, variableSelector, logProb());
     }
 
     private void checkBayesNetInHealthyState() {

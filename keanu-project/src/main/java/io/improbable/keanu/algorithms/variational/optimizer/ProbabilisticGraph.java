@@ -26,6 +26,4 @@ public interface ProbabilisticGraph {
     List<? extends Variable> getLatentVariables();
 
     List<? extends Variable<DoubleTensor>> getContinuousLatentVariables();
-
-    MetropolisHastingsSampler metropolisHastingsSampler(List<? extends Variable> verticesToSampleFrom, MetropolisHastingsStep mhStep, MHStepVariableSelector variableSelector);
 }
