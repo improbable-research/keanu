@@ -125,7 +125,8 @@ public class SmoothUniform implements ContinuousDistribution {
 
         return firstConditional.timesInPlace(firstConditionalResult)
             .plusInPlace(secondConditional.timesInPlace(secondConditionalResult))
-            .plusInPlace(thirdConditional.timesInPlace(thirdConditionalResult));
+            .plusInPlace(thirdConditional.timesInPlace(thirdConditionalResult))
+            .logInPlace();
     }
 
     @Override

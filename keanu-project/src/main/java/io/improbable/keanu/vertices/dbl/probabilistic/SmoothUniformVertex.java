@@ -4,11 +4,15 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -21,9 +25,10 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import static java.util.Collections.singletonMap;
 
-public class SmoothUniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class SmoothUniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private static final double DEFAULT_EDGE_SHARPNESS = 0.01;
 
@@ -143,7 +148,70 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor density = SmoothUniform.withParameters(min, max, this.edgeSharpness).logProb(value);
-        return density.logInPlace().sum();
+        return density.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
+        final LogProbGraph.DoublePlaceholderVertex xMinPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMin.getShape());
+        final LogProbGraph.DoublePlaceholderVertex xMaxPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMax.getShape());
+
+        final DoubleVertex bodyWidth = xMaxPlaceholder.minus(xMinPlaceholder);
+        final DoubleVertex shoulderWidth = bodyWidth.times(edgeSharpness);
+        final DoubleVertex rightCutoff = xMaxPlaceholder.plus(shoulderWidth);
+        final DoubleVertex leftCutoff = xMinPlaceholder.minus(shoulderWidth);
+
+        BoolVertex firstConditional = xPlaceholder.greaterThanOrEqualTo(xMinPlaceholder)
+            .and(xPlaceholder.lessThanOrEqualTo(xMaxPlaceholder));
+        final DoubleVertex firstConditionalResult = If
+            .isTrue(firstConditional)
+            .then(bodyHeight(shoulderWidth, bodyWidth))
+            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(firstConditional.getShape())));
+
+        BoolVertex secondConditional = xPlaceholder.lessThan(xMinPlaceholder)
+            .and(xPlaceholder.greaterThan(leftCutoff));
+        final DoubleVertex secondConditionalResult = If
+            .isTrue(secondConditional)
+            .then(shoulder(shoulderWidth, bodyWidth, xPlaceholder.minus(leftCutoff)))
+            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(firstConditional.getShape())));
+
+        BoolVertex thirdConditional = xPlaceholder.greaterThan(xMaxPlaceholder)
+            .and(xPlaceholder.lessThan(rightCutoff));
+        final DoubleVertex thirdConditionalResult = If
+            .isTrue(thirdConditional)
+            .then(shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(xPlaceholder).plus(xMaxPlaceholder)))
+            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(firstConditional.getShape())));
+
+        final DoubleVertex logProbOutput = firstConditionalResult
+            .plus(secondConditionalResult)
+            .plus(thirdConditionalResult)
+            .log();
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(xMin, xMinPlaceholder)
+            .input(xMax, xMaxPlaceholder)
+            .logProbOutput(logProbOutput)
+            .build();
+    }
+
+    private DoubleVertex bodyHeight(DoubleVertex shoulderWidth, DoubleVertex bodyWidth) {
+        return ConstantVertex.of(1.).div(shoulderWidth.plus(bodyWidth));
+    }
+
+    private static DoubleVertex shoulder(DoubleVertex Sw, DoubleVertex Bw, DoubleVertex x) {
+        final DoubleVertex A = getCubeCoefficient(Sw, Bw);
+        final DoubleVertex B = getSquareCoefficient(Sw, Bw);
+        return x.pow(3).times(A).plus(x.pow(2).times(B));
+    }
+
+    private static DoubleVertex getCubeCoefficient(DoubleVertex Sw, DoubleVertex Bw) {
+        return ConstantVertex.of(-2.).div(Sw.pow(3).times(Sw.plus(Bw)));
+    }
+
+    private static DoubleVertex getSquareCoefficient(DoubleVertex Sw, DoubleVertex Bw) {
+        return ConstantVertex.of(3.).div(Sw.pow(2).times(Sw.plus(Bw)));
     }
 
     @Override

@@ -19,6 +19,8 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolRe
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.utility.AssertVertex;
 
 import java.util.Arrays;
@@ -98,7 +100,7 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> implements Boolea
         return new NotEqualsVertex<>(this, rhs);
     }
 
-    public <T extends Tensor> BoolVertex allTrue() {
+    public BoolVertex allTrue() {
         return new AllTrueVertex(this);
     }
 
