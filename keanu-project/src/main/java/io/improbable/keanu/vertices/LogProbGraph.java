@@ -52,11 +52,12 @@ public class LogProbGraph {
     }
 
     private interface PlaceholderVertex<T> {
-        default T getPlaceholderVertexValue(Vertex<T> vertex) {
-            if (!vertex.hasValue()) {
-                throw new IllegalStateException("Cannot get value because PlaceholderVertex has not been initialized.");
-            }
-            return vertex.getValue();
+    }
+
+    private static <T> T getPlaceholderVertexValue(Vertex<T> vertex) {
+        if (!vertex.hasValue()) {
+            throw new IllegalStateException("Cannot get value because PlaceholderVertex has not been initialized.");
         }
+        return vertex.getValue();
     }
 }
