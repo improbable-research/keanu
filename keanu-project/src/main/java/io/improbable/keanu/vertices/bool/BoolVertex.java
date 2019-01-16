@@ -98,10 +98,6 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> implements Boolea
         return new NotEqualsVertex<>(this, rhs);
     }
 
-    public BoolVertex allTrue() {
-        return new AllTrueVertex(this);
-    }
-
     private List<Vertex<BooleanTensor>> inputList(Vertex<BooleanTensor>[] those) {
         return ImmutableList.<Vertex<BooleanTensor>>builder()
             .addAll(Arrays.asList(those))

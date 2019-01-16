@@ -111,22 +111,19 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
         final LogProbGraph.DoublePlaceholderVertex locationPlaceholder = new LogProbGraph.DoublePlaceholderVertex(location.getShape());
         final LogProbGraph.DoublePlaceholderVertex scalePlaceholder = new LogProbGraph.DoublePlaceholderVertex(scale.getShape());
 
+        final DoubleVertex zero = ConstantVertex.of(0.);
+        final BoolVertex paramsAreValid = locationPlaceholder.greaterThan(zero)
+            .and(scalePlaceholder.greaterThan(zero))
+            .assertTrue("Location and scale must be strictly positive");
+
         final BoolVertex invalidXMask = xPlaceholder.lessThanOrEqualTo(locationPlaceholder);
         final DoubleVertex ifValid = scalePlaceholder.log().plus(locationPlaceholder.log().times(scalePlaceholder))
             .minus(scalePlaceholder.plus(1.).times(xPlaceholder.log()));
         final DoubleVertex ifInValid = ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, invalidXMask.getShape()));
-        final DoubleVertex resultIfAllParamValuesAreValid = If
+        final DoubleVertex logProbOutput = If
             .isTrue(invalidXMask)
             .then(ifInValid)
             .orElse(ifValid);
-
-        final DoubleVertex zero = ConstantVertex.of(0.);
-        final BoolVertex validParamMask = locationPlaceholder.greaterThan(zero).and(scalePlaceholder.greaterThan(zero));
-        final DoubleVertex zeroProb = ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, validParamMask.getShape()));
-        final DoubleVertex logProbOutput = If
-            .isTrue(validParamMask.allTrue())
-            .then(resultIfAllParamValuesAreValid)
-            .orElse(zeroProb);
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)

@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.apache.commons.math3.distribution.ParetoDistribution;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,18 +85,16 @@ public class ParetoVertexTest {
         LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expected);
     }
 
-    @Test
+    @Test(expected = GraphAssertionException.class)
     public void logProbGraphIsNegInfIfLocationOrScaleIsNotPositive() {
         DoubleVertex location = ConstantVertex.of(-1., 1.);
         DoubleVertex scale = ConstantVertex.of(0., 3.);
         ParetoVertex paretoVertex = new ParetoVertex(location, scale);
         LogProbGraph logProbGraph = paretoVertex.logProbGraph();
 
-        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
-
-        LogProbGraphContract.equalFlatArray(logProbGraph, new double[] {Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY});
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
     }
 
     @Test
