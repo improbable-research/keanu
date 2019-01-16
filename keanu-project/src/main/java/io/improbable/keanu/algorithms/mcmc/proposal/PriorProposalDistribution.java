@@ -23,7 +23,7 @@ public class PriorProposalDistribution implements ProposalDistribution {
     public Proposal getProposal(Set<Variable> variables, KeanuRandom random) {
         Proposal proposal = new Proposal();
         proposal.addListeners(listeners);
-        for (Variable<?> variable : variables) {
+        for (Variable<?, ?> variable : variables) {
             setFor(variable, random, proposal);
         }
         return proposal;
@@ -34,7 +34,7 @@ public class PriorProposalDistribution implements ProposalDistribution {
         return variable.logProb(ofValue);
     }
 
-    private <T> void setFor(Variable<T> variable, KeanuRandom random, Proposal proposal) {
+    private <T> void setFor(Variable<T, ?> variable, KeanuRandom random, Proposal proposal) {
         proposal.setProposal(variable, variable.sample(random));
     }
 

@@ -43,7 +43,7 @@ class Leapfrog {
 
      * @return a new leapfrog having taken one step through space
      */
-    public Leapfrog step(final List<? extends Variable<DoubleTensor>> latentVariables,
+    public Leapfrog step(final List<? extends Variable<DoubleTensor, ?>> latentVariables,
                          final ProbabilisticModelWithGradient logProbGradientCalculator,
                          final double epsilon) {
 
@@ -60,13 +60,13 @@ class Leapfrog {
         return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient);
     }
 
-    private Map<VariableReference, ?> asMap(List<? extends Variable<DoubleTensor>> latentVariables) {
+    private Map<VariableReference, ?> asMap(List<? extends Variable<DoubleTensor, ?>> latentVariables) {
         return latentVariables.stream().collect(Collectors.toMap(Variable::getReference, v -> v.getValue()));
     }
 
-    private Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor>> latentVariables, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<? extends VariableReference, DoubleTensor> position) {
+    private Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor, ?>> latentVariables, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<? extends VariableReference, DoubleTensor> position) {
         Map<VariableReference, DoubleTensor> nextPosition = new HashMap<>();
-        for (Variable<DoubleTensor> latent : latentVariables) {
+        for (Variable<DoubleTensor, ?> latent : latentVariables) {
             final DoubleTensor nextPositionForLatent = nextMomentum.get(latent.getReference()).
                 times(halfTimeStep).
                 plusInPlace(

@@ -15,7 +15,7 @@ public class SimpleNetworkState implements NetworkState {
     }
 
     @Override
-    public <T> T get(Variable<T> variable) {
+    public <T> T get(Variable<T, ?> variable) {
         return (T) variableValues.get(variable.getReference());
     }
 

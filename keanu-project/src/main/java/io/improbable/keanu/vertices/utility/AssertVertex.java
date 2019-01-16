@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.utility;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -24,6 +25,7 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
      * @param errorMessage a message to include in the {@link AssertionError}
      * @throws AssertionError if any element of the predicate is false when calculated.
      */
+    @ExportVertexToPythonBindings
     public AssertVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
                         @LoadVertexParam(ERROR_MESSAGE_NAME) String errorMessage) {
         super(predicate.getShape());

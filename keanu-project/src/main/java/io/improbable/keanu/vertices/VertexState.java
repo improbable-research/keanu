@@ -10,7 +10,7 @@ public class VertexState<T> implements VariableState {
     private T value;
     private boolean isObserved;
 
-    public static final <T> VertexState<T> nullState() {
+    public static <T> VertexState<T> nullState() {
         return new VertexState<>(null, false);
     }
 

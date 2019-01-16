@@ -21,7 +21,7 @@ import java.util.Map;
 class NUTSSampler implements SamplingAlgorithm {
 
     private final KeanuRandom random;
-    private final List<? extends Variable<DoubleTensor>> latentVariables;
+    private final List<? extends Variable<DoubleTensor, ?>> latentVariables;
     private final List<? extends Variable> sampleFromVariables;
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
@@ -45,7 +45,7 @@ class NUTSSampler implements SamplingAlgorithm {
      * @param saveStatistics            whether to record statistics
      */
     public NUTSSampler(List<? extends Variable> sampleFromVariables,
-                       List<? extends Variable<DoubleTensor>> latentVariables,
+                       List<? extends Variable<DoubleTensor, ?>> latentVariables,
                        ProbabilisticModelWithGradient logProbGradientCalculator,
                        boolean adaptEnabled,
                        Stepsize stepsize,
@@ -151,10 +151,10 @@ class NUTSSampler implements SamplingAlgorithm {
         tree.save(statistics);
     }
 
-    private static void initializeMomentumForEachVariable(List<? extends Variable<DoubleTensor>> variables,
+    private static void initializeMomentumForEachVariable(List<? extends Variable<DoubleTensor, ?>> variables,
                                                           Map<VariableReference, DoubleTensor> momentums,
                                                           KeanuRandom random) {
-        for (Variable<DoubleTensor> variable : variables) {
+        for (Variable<DoubleTensor, ?> variable : variables) {
             momentums.put(variable.getReference(), random.nextGaussian(variable.getShape()));
         }
     }

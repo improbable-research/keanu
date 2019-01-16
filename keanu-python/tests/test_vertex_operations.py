@@ -6,7 +6,7 @@ import math
 
 from keanu.vartypes import numpy_types
 from keanu.vertex import Const
-from keanu.vertex.base import Vertex, Double, Integer, Bool
+from keanu.vertex.base import Vertex, Double, Integer, Boolean
 
 ### Comparisons
 

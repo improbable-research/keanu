@@ -110,7 +110,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         Preconditions.checkArgument(!sampleFromVariables.isEmpty(), "List of variables to sample from is empty");
 
-        final List<? extends Variable<DoubleTensor>> latentVariables = model.getContinuousLatentVariables();
+        final List<? extends Variable<DoubleTensor, ?>> latentVariables = model.getContinuousLatentVariables();
 
         Map<VariableReference, DoubleTensor> startingSample = SamplingAlgorithm.takeSample(latentVariables);
         Map<VariableReference, DoubleTensor> position = startingSample.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (DoubleTensor) e.getValue()));
@@ -136,7 +136,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         resetVariableValue(sampleFromVariables, position);
 
-        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample((List<? extends Variable<Object>>)sampleFromVariables));
+        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample((List<? extends Variable<Object, ?>>)sampleFromVariables));
 
         return new NUTSSampler(
             sampleFromVariables,

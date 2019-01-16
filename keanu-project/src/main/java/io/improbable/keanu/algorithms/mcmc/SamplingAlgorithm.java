@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public interface SamplingAlgorithm {
 
-    static <T> Map<VariableReference, T> takeSample(List<? extends Variable<T>> sampleFromVariables) {
+    static <T> Map<VariableReference, T> takeSample(List<? extends Variable<T, ?>> sampleFromVariables) {
         return sampleFromVariables.stream().collect(Collectors.toMap(Variable::getReference, Variable::getValue));
     }
 

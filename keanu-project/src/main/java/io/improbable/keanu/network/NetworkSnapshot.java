@@ -16,21 +16,21 @@ public class NetworkSnapshot {
         return new NetworkSnapshot(variables);
     }
 
-    private final Map<Variable, VariableState> values;
+    private final Map<Variable, VariableState> variableStates;
 
     private NetworkSnapshot(Collection<? extends Variable> variables) {
-        values = new HashMap<>();
+        variableStates = new HashMap<>();
         for (Variable v : variables) {
-            values.put(v, v.getState());
+            variableStates.put(v, v.getState());
         }
     }
 
     /**
-     * Revert the state of the network to the previously saved values
+     * Revert the state of the network to the previously saved state
      */
     public void apply() {
-        for (Variable v : values.keySet()) {
-            v.setState(values.get(v));
+        for (Variable v : variableStates.keySet()) {
+            v.setState(variableStates.get(v));
         }
     }
 

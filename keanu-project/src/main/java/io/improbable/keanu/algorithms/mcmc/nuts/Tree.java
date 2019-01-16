@@ -97,7 +97,7 @@ class Tree implements SaveStatistics {
     }
 
     public static Tree buildOtherHalfOfTree(Tree currentTree,
-                                            List<? extends Variable<DoubleTensor>> latentVariables,
+                                            List<? extends Variable<DoubleTensor, ?>> latentVariables,
                                             ProbabilisticModelWithGradient logProbGradientCalculator,
                                             final List<? extends Variable> sampleFromVariables,
                                             double logU,
@@ -129,7 +129,7 @@ class Tree implements SaveStatistics {
         return otherHalfTree;
     }
 
-    private static Tree buildTree(List<? extends Variable<DoubleTensor>> latentVariables,
+    private static Tree buildTree(List<? extends Variable<DoubleTensor, ?>> latentVariables,
                                   ProbabilisticModelWithGradient logProbGradientCalculator,
                                   final List<? extends Variable> sampleFromVariables,
                                   Leapfrog leapfrog,
@@ -207,7 +207,7 @@ class Tree implements SaveStatistics {
 
     }
 
-    private static Tree treeBuilderBaseCase(List<? extends Variable<DoubleTensor>> latentVariables,
+    private static Tree treeBuilderBaseCase(List<? extends Variable<DoubleTensor, ?>> latentVariables,
                                             ProbabilisticModelWithGradient logProbGradientCalculator,
                                             final List<? extends Variable> sampleFromVariables,
                                             Leapfrog leapfrog,
@@ -224,7 +224,7 @@ class Tree implements SaveStatistics {
         final int acceptedLeapfrogCount = logU <= logOfMasterPMinusMomentum ? 1 : 0;
         final boolean shouldContinueFlag = logU < DELTA_MAX + logOfMasterPMinusMomentum;
 
-        final Map<VariableReference, ?> sampleAtAcceptedPosition = takeSample((List<? extends Variable<Object>>)sampleFromVariables);
+        final Map<VariableReference, ?> sampleAtAcceptedPosition = takeSample((List<? extends Variable<Object, ?>>)sampleFromVariables);
 
         final double deltaLikelihoodOfLeapfrog = Math.min(
             1.0,

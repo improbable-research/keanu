@@ -2,7 +2,7 @@ import sys
 import io
 import os
 import logging
-from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView
+from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView, java_import
 from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
 from py4j.protocol import Py4JError
 from typing import Dict, Any, Iterable, List, Collection, Set
@@ -114,6 +114,13 @@ class KeanuContext(metaclass=Singleton):
 
     def to_java_long_array(self, l: Collection[Any]) -> JavaArray:
         return self.to_java_array(l, self._gateway.jvm.long)
+
+    def to_java_int_array(self, l: Collection[Any]) -> JavaArray:
+        return self.to_java_array(l, self._gateway.jvm.int)
+
+    def to_java_vertex_array(self, l: Collection[Any]) -> JavaArray:
+        java_import(self.jvm_view(), "io.improbable.keanu.vertices.Vertex")
+        return self.to_java_array(list(map(lambda x: x.unwrap(), l)), self.jvm_view().Vertex)
 
     def __infer_class_from_array(self, l: Collection[Any]) -> JavaClass:
         if len(l) == 0:

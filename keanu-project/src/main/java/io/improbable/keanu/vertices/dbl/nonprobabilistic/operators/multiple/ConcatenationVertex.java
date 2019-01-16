@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -43,6 +44,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         setParents(operands);
     }
 
+    @ExportVertexToPythonBindings
     public ConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
                                @LoadVertexParam(OPERANDS_NAME) Vertex[] operands) {
         this(dimension, convertFromVertexToDoubleVertex(operands));
