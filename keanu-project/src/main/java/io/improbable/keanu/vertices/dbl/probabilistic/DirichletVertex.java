@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -94,7 +94,7 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
         LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
         LogProbGraph.DoublePlaceholderVertex concentrationPlaceholder = new LogProbGraph.DoublePlaceholderVertex(concentration.getShape());
 
-        final BoolVertex xIsLessThanOrEqualToEpsilon = xPlaceholder
+        final BooleanVertex xIsLessThanOrEqualToEpsilon = xPlaceholder
             .sum().minus(1.).abs().lessThanOrEqualTo(ConstantVertex.of(EPSILON))
             .assertTrue("Sum of values to calculate Dirichlet likelihood for must equal 1");
 

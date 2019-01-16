@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMatch;
 
-public class OrMultipleVertex extends BoolReduceVertex {
+public class OrMultipleVertex extends BooleanReduceVertex {
 
     public OrMultipleVertex(Collection<Vertex<BooleanTensor>> input) {
         super(checkAllShapesMatch(

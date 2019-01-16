@@ -8,7 +8,7 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
@@ -271,15 +271,15 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return multiply(-1.0);
     }
 
-    public BoolVertex equalTo(DoubleVertex rhs) {
+    public BooleanVertex equalTo(DoubleVertex rhs) {
         return new EqualsVertex<>(this, rhs);
     }
 
-    public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
+    public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);
     }
 
-    public <T extends NumberTensor> BoolVertex greaterThan(Vertex<T> rhs) {
+    public <T extends NumberTensor> BooleanVertex greaterThan(Vertex<T> rhs) {
         return new GreaterThanVertex<>(this, rhs);
     }
 
@@ -291,7 +291,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new DoubleGreaterThanMaskVertex(this, new ConstantDoubleVertex(rhs));
     }
 
-    public <T extends NumberTensor> BoolVertex greaterThanOrEqualTo(Vertex<T> rhs) {
+    public <T extends NumberTensor> BooleanVertex greaterThanOrEqualTo(Vertex<T> rhs) {
         return new GreaterThanOrEqualVertex<>(this, rhs);
     }
 
@@ -303,7 +303,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new DoubleGreaterThanOrEqualToMaskVertex(this, new ConstantDoubleVertex(rhs));
     }
 
-    public <T extends NumberTensor> BoolVertex lessThan(Vertex<T> rhs) {
+    public <T extends NumberTensor> BooleanVertex lessThan(Vertex<T> rhs) {
         return new LessThanVertex<>(this, rhs);
     }
 
@@ -315,7 +315,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new DoubleLessThanMaskVertex(this, new ConstantDoubleVertex(rhs));
     }
 
-    public <T extends NumberTensor> BoolVertex lessThanOrEqualTo(Vertex<T> rhs) {
+    public <T extends NumberTensor> BooleanVertex lessThanOrEqualTo(Vertex<T> rhs) {
         return new LessThanOrEqualVertex<>(this, rhs);
     }
 

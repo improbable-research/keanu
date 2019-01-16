@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 
-public class NotVertex extends BoolUnaryOpVertex<BooleanTensor> {
+public class NotVertex extends BooleanUnaryOpVertex<BooleanTensor> {
 
     @ExportVertexToPythonBindings
     public NotVertex(@LoadVertexParam(INPUT_NAME) Vertex<BooleanTensor> a) {

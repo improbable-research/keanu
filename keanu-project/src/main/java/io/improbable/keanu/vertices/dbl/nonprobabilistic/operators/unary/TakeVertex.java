@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -26,6 +27,7 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
      * @param inputVertex the input vertex to extract from
      * @param index       the index to extract at
      */
+    @ExportVertexToPythonBindings
     public TakeVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                       @LoadVertexParam(INDEX_NAME) long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
@@ -45,7 +47,7 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
         DoubleTensor newValue = this.getValue();
 
         DoubleTensor atIndexTensor = takeFromPartial(derivativeOfParentWithRespectToInputs.get(), index);
-        int desiredRank = atIndexTensor.getShape().length + newValue.getShape().length;
+        int desiredRank = atIndexTensor.getRank() + newValue.getRank();
         long[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
         atIndexTensor = atIndexTensor.reshape(paddedShape);
 
@@ -70,7 +72,7 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
 
         DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
         long[] newPartialShape = TensorShape.concat(
-            TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
+            TensorShape.selectDimensions(0, partial.getRank() - getRank(), partial.getShape()),
             inputVertex.getShape()
         );
         DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);

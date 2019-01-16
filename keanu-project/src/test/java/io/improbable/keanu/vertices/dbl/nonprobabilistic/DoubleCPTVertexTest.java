@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -24,9 +24,9 @@ public class DoubleCPTVertexTest {
         DoubleVertex B = new GaussianVertex(0, 1);
         B.observe(bValue);
 
-        BoolVertex leftPredicate = new BernoulliVertex(0.5);
+        BooleanVertex leftPredicate = new BernoulliVertex(0.5);
         leftPredicate.observe(left);
-        BoolVertex rightPredicate = new BernoulliVertex(0.5);
+        BooleanVertex rightPredicate = new BernoulliVertex(0.5);
         rightPredicate.observe(right);
 
         return ConditionalProbabilityTable.of(leftPredicate, rightPredicate)

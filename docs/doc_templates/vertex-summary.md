@@ -63,7 +63,7 @@ The currently available integer vertices are:
 
 ### The Boolean (true/false) Family
 
-A `BoolVertex` can be used by most boolean operators. These can be observed directly and used in [MCMC]({{ site.baseurl }}/docs/inference-posterior-sampling/).
+A `BooleanVertex` can be used by most boolean operators. These can be observed directly and used in [MCMC]({{ site.baseurl }}/docs/inference-posterior-sampling/).
 
 The currently available boolean vertices are:
 - [Probabilistic](https://static.javadoc.io/io.improbable/keanu/{{ site.current_version }}/io/improbable/keanu/vertices/bool/probabilistic/package-summary.html)

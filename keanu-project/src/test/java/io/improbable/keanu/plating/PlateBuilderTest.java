@@ -11,8 +11,8 @@ import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexMatchers;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -154,7 +154,7 @@ public class PlateBuilderTest {
         Plates plates = new PlateBuilder<Bean>()
             .count(10)
             .withFactory((plate) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta);
+                BooleanVertex flip = new BernoulliVertex(commonTheta);
                 flip.observe(false);
                 plate.add(label, flip);
             })
@@ -176,7 +176,7 @@ public class PlateBuilderTest {
         Plates plates = new PlateBuilder<Bean>()
             .count(10)
             .withFactory((plate) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta);
+                BooleanVertex flip = new BernoulliVertex(commonTheta);
                 flip.observe(false);
                 plate.add(label, flip);
             })
@@ -194,7 +194,7 @@ public class PlateBuilderTest {
         new PlateBuilder<Bean>()
             .count(10)
             .withFactory((plate) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta);
+                BooleanVertex flip = new BernoulliVertex(commonTheta);
                 flip.observe(false);
                 plate.add(thetaLabel, commonTheta);
                 plate.add(flipLabel, flip);
@@ -214,7 +214,7 @@ public class PlateBuilderTest {
         Plates plates = new PlateBuilder<Bean>()
             .fromIterator(ROWS.iterator())
             .withFactory((plate, bean) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta);
+                BooleanVertex flip = new BernoulliVertex(commonTheta);
                 flip.observe(false);
                 plate.add(label, flip);
             })
@@ -340,7 +340,7 @@ public class PlateBuilderTest {
 
         // base case
         DoubleVertex initialSum = ConstantVertex.of(0.);
-        BoolVertex tru = ConstantVertex.of(true);
+        BooleanVertex tru = ConstantVertex.of(true);
         DoubleVertex initialValue = ConstantVertex.of(0.);
 
         int maximumLoopLength = 100;
@@ -359,19 +359,19 @@ public class PlateBuilderTest {
             .withFactory((plate) -> {
                 // inputs
                 DoubleVertex runningTotal = new DoubleProxyVertex(runningTotalLabel);
-                BoolVertex stillLooping = new BoolProxyVertex(stillLoopingLabel);
+                BooleanVertex stillLooping = new BooleanProxyVertex(stillLoopingLabel);
                 DoubleVertex valueIn = new DoubleProxyVertex(valueInLabel);
                 plate.addAll(ImmutableSet.of(runningTotal, stillLooping, valueIn));
 
                 // intermediate
                 DoubleVertex one = ConstantVertex.of(1.);
-                BoolVertex condition = new BernoulliVertex(0.5);
+                BooleanVertex condition = new BernoulliVertex(0.5);
                 plate.add(oneLabel, one);
                 plate.add(conditionLabel, condition);
 
                 // outputs
                 DoubleVertex plus = runningTotal.plus(one);
-                BoolVertex loopAgain = stillLooping.and(condition);
+                BooleanVertex loopAgain = stillLooping.and(condition);
                 DoubleVertex result = If.isTrue(loopAgain).then(plus).orElse(valueIn);
                 plate.add(plusLabel, plus);
                 plate.add(loopLabel, loopAgain);
@@ -381,19 +381,19 @@ public class PlateBuilderTest {
 
 
         DoubleVertex previousPlus = initialSum;
-        BoolVertex previousLoop = tru;
+        BooleanVertex previousLoop = tru;
         DoubleVertex previousValueOut = initialValue;
 
         for (Plate plate : plates) {
             DoubleVertex runningTotal = plate.get(runningTotalLabel);
-            BoolVertex stillLooping = plate.get(stillLoopingLabel);
+            BooleanVertex stillLooping = plate.get(stillLoopingLabel);
             DoubleVertex valueIn = plate.get(valueInLabel);
 
             DoubleVertex one = plate.get(oneLabel);
-            BoolVertex condition = plate.get(conditionLabel);
+            BooleanVertex condition = plate.get(conditionLabel);
 
             DoubleVertex plus = plate.get(plusLabel);
-            BoolVertex loop = plate.get(loopLabel);
+            BooleanVertex loop = plate.get(loopLabel);
             DoubleVertex valueOut = plate.get(valueOutLabel);
 
             assertThat(runningTotal.getParents(), contains(previousPlus));
@@ -420,10 +420,10 @@ public class PlateBuilderTest {
 
         for (int firstFailure : new int[]{0, 1, 2, 10, 99}) {
             for (Plate plate : plates) {
-                BoolVertex condition = plate.get(conditionLabel);
+                BooleanVertex condition = plate.get(conditionLabel);
                 condition.setAndCascade(true);
             }
-            BoolVertex condition = plates.asList().get(firstFailure).get(conditionLabel);
+            BooleanVertex condition = plates.asList().get(firstFailure).get(conditionLabel);
             condition.setAndCascade(false);
             Double expectedOutput = new Double(firstFailure);
             assertThat(output, VertexMatchers.hasValue(expectedOutput));

@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -40,9 +40,9 @@ public class DescribingTheModel {
 
     public void booleanExample() {
         //%%SNIPPET_START%% DescribeAnd
-        BoolVertex A = new BernoulliVertex(0.5);
-        BoolVertex B = new BernoulliVertex(0.5);
-        BoolVertex C = A.and(B);
+        BooleanVertex A = new BernoulliVertex(0.5);
+        BooleanVertex B = new BernoulliVertex(0.5);
+        BooleanVertex C = A.and(B);
         //%%SNIPPET_END%% DescribeAnd
 
         //%%SNIPPET_START%% DescribeObserve

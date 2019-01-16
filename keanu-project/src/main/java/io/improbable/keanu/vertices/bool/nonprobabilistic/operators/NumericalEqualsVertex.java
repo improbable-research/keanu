@@ -8,13 +8,13 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
  * Returns true if a vertex value is equal to another vertex value within an epsilon.
  */
-public class NumericalEqualsVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
+public class NumericalEqualsVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
 
     protected Vertex<? extends NumberTensor> a;
     protected Vertex<? extends NumberTensor> b;

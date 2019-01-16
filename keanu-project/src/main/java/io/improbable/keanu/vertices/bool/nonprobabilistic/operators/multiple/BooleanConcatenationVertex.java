@@ -1,11 +1,12 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.lang.reflect.Array;
@@ -14,12 +15,12 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class BoolConcatenationVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
+public class BooleanConcatenationVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
 
     private static final String DIMENSION_NAME = "dimension";
     private static final String INPUT_NAME = "inputArray";
     private final int dimension;
-    private final BoolVertex[] input;
+    private final BooleanVertex[] input;
 
     /**
      * A vertex that can concatenate any amount of vertices along a given dimension.
@@ -27,20 +28,21 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
      * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
      * @param input     the input vertices to concatenate
      */
-    public BoolConcatenationVertex(int dimension, BoolVertex... input) {
+    public BooleanConcatenationVertex(int dimension, BooleanVertex... input) {
         super(checkShapesCanBeConcatenated(dimension, extractFromInputs(long[].class, Vertex::getShape, input)));
         this.dimension = dimension;
         this.input = input;
         setParents(input);
     }
 
-    public BoolConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
-                                   @LoadVertexParam(INPUT_NAME) Vertex[] input) {
-        this(dimension, convertVertexArrayToBoolVertex(input));
+    @ExportVertexToPythonBindings
+    public BooleanConcatenationVertex(@LoadVertexParam(DIMENSION_NAME) int dimension,
+                                      @LoadVertexParam(INPUT_NAME) Vertex[] input) {
+        this(dimension, convertVertexArrayToBooleanVertex(input));
     }
 
-    private static BoolVertex[] convertVertexArrayToBoolVertex(Vertex[] input) {
-        return Arrays.stream(input).toArray(BoolVertex[]::new);
+    private static BooleanVertex[] convertVertexArrayToBooleanVertex(Vertex[] input) {
+        return Arrays.stream(input).toArray(BooleanVertex[]::new);
     }
 
     @Override
@@ -57,7 +59,7 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
         return BooleanTensor.concat(dimension, inputs);
     }
 
-    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<BooleanTensor>, T> func, BoolVertex[] input) {
+    private static <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<BooleanTensor>, T> func, BooleanVertex[] input) {
         T[] extract = (T[]) Array.newInstance(clazz, input.length);
         for (int i = 0; i < input.length; i++) {
             extract[i] = func.apply(input[i]);
@@ -71,7 +73,7 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
     }
 
     @SaveVertexParam(INPUT_NAME)
-    public BoolVertex[] getInput() {
+    public BooleanVertex[] getInput() {
         return input;
     }
 }

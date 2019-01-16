@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -112,11 +112,11 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
         final LogProbGraph.DoublePlaceholderVertex scalePlaceholder = new LogProbGraph.DoublePlaceholderVertex(scale.getShape());
 
         final DoubleVertex zero = ConstantVertex.of(0.);
-        final BoolVertex paramsAreValid = locationPlaceholder.greaterThan(zero)
+        final BooleanVertex paramsAreValid = locationPlaceholder.greaterThan(zero)
             .and(scalePlaceholder.greaterThan(zero))
             .assertTrue("Location and scale must be strictly positive");
 
-        final BoolVertex invalidXMask = xPlaceholder.lessThanOrEqualTo(locationPlaceholder);
+        final BooleanVertex invalidXMask = xPlaceholder.lessThanOrEqualTo(locationPlaceholder);
         final DoubleVertex ifValid = scalePlaceholder.log().plus(locationPlaceholder.log().times(scalePlaceholder))
             .minus(scalePlaceholder.plus(1.).times(xPlaceholder.log()));
         final DoubleVertex ifInValid = ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, invalidXMask.getShape()));
