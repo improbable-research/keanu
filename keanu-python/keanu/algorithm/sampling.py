@@ -68,12 +68,15 @@ class NUTSSampler(PosteriorSamplingAlgorithm):
 
 def sample(net: BayesNet,
            sample_from: Iterable[Vertex],
-           sampling_algorithm: PosteriorSamplingAlgorithm = MetropolisHastingsSampler(),
+           sampling_algorithm: PosteriorSamplingAlgorithm = None,
            draws: int = 500,
            drop: int = 0,
            down_sample_interval: int = 1,
            plot: bool = False,
            ax: Any = None) -> sample_types:
+
+    if sampling_algorithm is None:
+        sampling_algorithm = MetropolisHastingsSampler()
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
@@ -94,12 +97,15 @@ def sample(net: BayesNet,
 
 def generate_samples(net: BayesNet,
                      sample_from: Iterable[Vertex],
-                     sampling_algorithm: PosteriorSamplingAlgorithm = MetropolisHastingsSampler(),
+                     sampling_algorithm: PosteriorSamplingAlgorithm = None,
                      drop: int = 0,
                      down_sample_interval: int = 1,
                      live_plot: bool = False,
                      refresh_every: int = 100,
                      ax: Any = None) -> sample_generator_types:
+
+    if sampling_algorithm is None:
+        sampling_algorithm = MetropolisHastingsSampler()
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 

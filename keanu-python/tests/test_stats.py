@@ -65,18 +65,13 @@ def test_autocorrelation_same_for_streaming_as_batch() -> None:
     net = model.to_bayes_net()
     draws = 15
     set_starting_state(model)
-    print(model.uniform.get_value())
     samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=draws)
     set_starting_state(model)
-    print(model.uniform.get_value())
     iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices())
-    print(samples)
 
     samples_dataframe = pd.DataFrame()
     for next_sample in islice(iter_samples, draws):
         samples_dataframe = samples_dataframe.append(next_sample, ignore_index=True)
-
-    print(samples_dataframe)
 
     for vertex_id in samples_dataframe:
         autocorr_streaming = stats.autocorrelation(list(samples_dataframe[vertex_id].values))
