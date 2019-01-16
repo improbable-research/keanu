@@ -162,7 +162,7 @@ def test_it_throws_if_you_pass_in_a_proposal_listener_but_you_didnt_specify_the_
     assert str(excinfo.value) == "If you pass in proposal_listeners you must also specify proposal_distribution"
 
 
-def test_can_specify_nuts_params(net: BayesNet):
+def test_can_specify_nuts_params(net: BayesNet) -> None:
     algo = NUTSSampler(1000, 0.65, True, 0.1, 10)
 
     samples = sample(net, list(net.get_latent_vertices()), algo, draws=500, drop=100)
