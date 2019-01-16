@@ -70,7 +70,7 @@ public class MultimodalSimulatedAnnealingTest {
             .then(B)
             .orElse(D);
 
-        DoubleVertex G = new GaussianVertex(new CastToDoubleVertex(F), 1.5);
+        DoubleVertex G = new GaussianVertex(F, 1.5);
         G.observe(4.0);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
