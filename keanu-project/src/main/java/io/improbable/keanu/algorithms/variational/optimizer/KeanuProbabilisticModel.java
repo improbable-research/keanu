@@ -78,7 +78,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
         VertexValuePropagation.cascadeUpdate(this.observedVertices);
     }
 
-    public void cascadeValues(Map<VariableReference, ?> inputs) {
+    protected void cascadeValues(Map<VariableReference, ?> inputs) {
 
         List<Vertex> updatedVertices = new ArrayList<>();
         for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {
