@@ -21,15 +21,15 @@ public class Cauchy implements ContinuousDistribution {
     }
 
     private Cauchy(DoubleTensor location, DoubleTensor scale) {
-        Preconditions.checkArgument(scale.greaterThan(0.).allTrue(),
-            "scale must be greater than 0. scale: " + scale);
-
         this.location = location;
         this.scale = scale;
     }
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
+        Preconditions.checkArgument(scale.greaterThan(0.).allTrue(),
+            "scale must be greater than 0. scale: " + scale);
+
         DoubleTensor unityCauchy = random.nextDouble(shape);
         return unityCauchy.minusInPlace(0.5).timesInPlace(Math.PI).tanInPlace().timesInPlace(scale).plusInPlace(location);
     }

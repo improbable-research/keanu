@@ -61,7 +61,7 @@ public class CauchyVertexTest {
         CauchyVertex cauchyVertex = new CauchyVertex(0., scale);
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("scale must be greater than 0. scale: " + scale.getValue());
-        cauchyVertex.logPdf(0.4);
+        cauchyVertex.sample();
     }
 
     @Test

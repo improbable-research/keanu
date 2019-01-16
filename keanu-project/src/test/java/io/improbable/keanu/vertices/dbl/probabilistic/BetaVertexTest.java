@@ -61,7 +61,7 @@ public class BetaVertexTest {
         BetaVertex betaVertex = new BetaVertex(alpha, beta);
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("alpha and beta must be positive. alpha: " + alpha.getValue() + " beta: " + beta.getValue());
-        betaVertex.logPdf(0.1);
+        betaVertex.sample();
     }
 
     @Test
@@ -71,7 +71,7 @@ public class BetaVertexTest {
         BetaVertex betaVertex = new BetaVertex(alpha, beta);
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("alpha and beta must be positive. alpha: " + alpha.getValue() + " beta: " + beta.getValue());
-        betaVertex.logPdf(0.1);
+        betaVertex.sample();
     }
 
     @Test
