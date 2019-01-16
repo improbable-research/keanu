@@ -58,8 +58,31 @@ class HamiltonianSampler(PosteriorSamplingAlgorithm):
 
 class NUTSSampler(PosteriorSamplingAlgorithm):
 
-    def __init__(self) -> None:
-        super().__init__(k.jvm_view().NUTS.withDefaultConfig())
+    def __init__(self,
+                 adapt_count: int = None,
+                 target_acceptance_prob: float = None,
+                 adapt_enabled: bool = None,
+                 initial_step_size: float = None,
+                 max_tree_height: int = None):
+
+        builder: JavaObject = k.jvm_view().NUTS.builder()
+
+        if adapt_count is not None:
+            builder.adaptCount(adapt_count)
+
+        if target_acceptance_prob is not None:
+            builder.targetAcceptanceProb(target_acceptance_prob)
+
+        if adapt_enabled is not None:
+            builder.adaptEnabled(adapt_enabled)
+
+        if initial_step_size is not None:
+            builder.initialStepSize(initial_step_size)
+
+        if max_tree_height is not None:
+            builder.maxTreeHeight(max_tree_height)
+
+        super().__init__(builder.build())
 
 
 def sample(net: BayesNet,
