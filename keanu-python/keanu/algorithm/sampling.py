@@ -2,7 +2,6 @@ from py4j.java_gateway import java_import, JavaObject
 from py4j.java_collections import JavaList
 
 from keanu.algorithm._proposal_distribution import ProposalDistribution
-from keanu.algorithm.proposal_listeners import proposal_listener_types
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
@@ -38,7 +37,8 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
     def __init__(self,
                  proposal_distribution: str = None,
                  proposal_distribution_sigma: numpy_types = None,
-                 proposal_listeners=[]):
+                 proposal_listeners=[],
+                 use_cache_on_rejection: bool = None):
 
         if (proposal_distribution is None and len(proposal_listeners) > 0):
             raise TypeError("If you pass in proposal_listeners you must also specify proposal_distribution")
@@ -50,19 +50,21 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
                 type_=proposal_distribution, sigma=proposal_distribution_sigma, listeners=proposal_listeners)
             builder = builder.proposalDistribution(proposal_distribution_object.unwrap())
 
-        sampling_algorithm: JavaObject = builder.build()
-        super().__init__(sampling_algorithm)
+        if use_cache_on_rejection is not None:
+            builder.useCacheOnRejection(use_cache_on_rejection)
+
+        super().__init__(builder.build())
 
 
 class HamiltonianSampler(PosteriorSamplingAlgorithm):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(k.jvm_view().Hamiltonian.withDefaultConfig())
 
 
 class NUTSSampler(PosteriorSamplingAlgorithm):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(k.jvm_view().NUTS.withDefaultConfig())
 
 

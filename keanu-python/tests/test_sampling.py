@@ -8,14 +8,10 @@ import pytest
 
 from examples import thermometers
 from keanu import BayesNet, KeanuRandom, Model
-from keanu.algorithm import (sample,
-                             generate_samples,
-                             AcceptanceRateTracker,
-                             MetropolisHastingsSampler,
-                             HamiltonianSampler,
-                             NUTSSampler)
+from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler,
+                             HamiltonianSampler, NUTSSampler, PosteriorSamplingAlgorithm)
 from keanu.vertex import Gamma, Exponential, Cauchy, KeanuContext, Bernoulli
-from typing import Any
+from typing import Any, Callable
 
 
 @pytest.fixture
@@ -29,7 +25,8 @@ def net() -> BayesNet:
 
 
 @pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler()), (HamiltonianSampler())])
-def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: str, net: BayesNet) -> None:
+def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: PosteriorSamplingAlgorithm,
+                                                                               net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]
@@ -82,15 +79,15 @@ def test_sample_with_plot(net: BayesNet) -> None:
 
 
 def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
-    algo = MetropolisHastingsSampler(proposal_distribution="gaussian",
-                                     proposal_distribution_sigma=np.array(1.))
+    algo = MetropolisHastingsSampler(proposal_distribution="gaussian", proposal_distribution_sigma=np.array(1.))
     generate_samples(net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=algo)
 
 
 @pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (HamiltonianSampler())])
-def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
+def test_can_iter_through_samples(algo: PosteriorSamplingAlgorithm, net: BayesNet) -> None:
     draws = 10
-    samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=algo, down_sample_interval=1)
+    samples = generate_samples(
+        net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=algo, down_sample_interval=1)
     count = 0
     for sample in islice(samples, draws):
         count += 1
@@ -98,7 +95,7 @@ def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
 
 
 @pytest.mark.parametrize("algo", [MetropolisHastingsSampler, HamiltonianSampler])
-def test_iter_returns_same_result_as_sample(algo: str) -> None:
+def test_iter_returns_same_result_as_sample(algo: Callable) -> None:
     draws = 100
     model = thermometers.model()
     net = BayesNet(model.temperature.get_connected_graph())
@@ -136,13 +133,8 @@ def test_can_get_acceptance_rates(net: BayesNet) -> None:
     acceptance_rate_tracker = AcceptanceRateTracker()
     latents = list(net.get_latent_vertices())
 
-    algo = MetropolisHastingsSampler(proposal_distribution='prior',
-                                     proposal_listeners=[acceptance_rate_tracker])
-    samples = sample(
-        net = net,
-        sample_from = latents,
-        sampling_algorithm = algo,
-        drop = 3)
+    algo = MetropolisHastingsSampler(proposal_distribution='prior', proposal_listeners=[acceptance_rate_tracker])
+    samples = sample(net=net, sample_from=latents, sampling_algorithm=algo, drop=3)
 
     for latent in latents:
         rate = acceptance_rate_tracker.get_acceptance_rate(latent)
@@ -154,11 +146,7 @@ def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
     latents = list(net.get_latent_vertices())
 
     algo = MetropolisHastingsSampler(proposal_distribution='prior', proposal_listeners=[acceptance_rate_tracker])
-    samples = generate_samples(
-        net=net,
-        sample_from=latents,
-        sampling_algorithm=algo,
-        drop=3)
+    samples = generate_samples(net=net, sample_from=latents, sampling_algorithm=algo, drop=3)
 
     draws = 100
     for _ in islice(samples, draws):
