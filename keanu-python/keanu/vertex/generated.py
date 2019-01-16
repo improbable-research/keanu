@@ -12,6 +12,7 @@ from keanu.cast import cast_to_double, cast_to_integer, cast_to_bool
 context = KeanuContext()
 
 
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.AllTrueVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex")
@@ -33,6 +34,10 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanOrEqualToMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanMaskVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanOrEqualToMaskVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex")
@@ -89,6 +94,10 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.MultinomialVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
+
+
+def AllTrue(bool_vertex: vertex_constructor_param_types) -> Vertex:
+    return Bool(context.jvm_view().AllTrueVertex, bool_vertex)
 
 
 def BooleanIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
@@ -203,6 +212,22 @@ def Division(left: vertex_constructor_param_types, right: vertex_constructor_par
     :param right: the vertex to divide
     """
     return Double(context.jvm_view().DivisionVertex, cast_to_double(left), cast_to_double(right))
+
+
+def DoubleGreaterThanMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+    return Double(context.jvm_view().DoubleGreaterThanMaskVertex, cast_to_double(left), cast_to_double(right))
+
+
+def DoubleGreaterThanOrEqualToMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+    return Double(context.jvm_view().DoubleGreaterThanOrEqualToMaskVertex, cast_to_double(left), cast_to_double(right))
+
+
+def DoubleLessThanMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+    return Double(context.jvm_view().DoubleLessThanMaskVertex, cast_to_double(left), cast_to_double(right))
+
+
+def DoubleLessThanOrEqualToMask(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+    return Double(context.jvm_view().DoubleLessThanOrEqualToMaskVertex, cast_to_double(left), cast_to_double(right))
 
 
 def MatrixMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:

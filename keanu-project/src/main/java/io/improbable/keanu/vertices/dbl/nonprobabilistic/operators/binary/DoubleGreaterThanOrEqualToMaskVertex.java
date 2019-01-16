@@ -1,11 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 public class DoubleGreaterThanOrEqualToMaskVertex extends DoubleBinaryOpVertex {
-    public DoubleGreaterThanOrEqualToMaskVertex(DoubleVertex left, DoubleVertex right) {
+
+    @ExportVertexToPythonBindings
+    public DoubleGreaterThanOrEqualToMaskVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
+                                                @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
         super(left, right);
     }
 

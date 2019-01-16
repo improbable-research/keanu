@@ -1,12 +1,18 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+
 public class DoubleLessThanMaskVertex extends DoubleBinaryOpVertex {
-    public DoubleLessThanMaskVertex(DoubleVertex left, DoubleVertex right) {
+
+    @ExportVertexToPythonBindings
+    public DoubleLessThanMaskVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
+                                    @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
         super(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right);
     }
 
@@ -20,4 +26,3 @@ public class DoubleLessThanMaskVertex extends DoubleBinaryOpVertex {
         return null;
     }
 }
-
