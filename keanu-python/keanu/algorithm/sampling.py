@@ -39,8 +39,7 @@ def sample(net: BayesNet,
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
-    probabilistic_model = ProbabilisticModel(
-        net) if algo == 'metropolis' else ProbabilisticModelWithGradient(net)
+    probabilistic_model = ProbabilisticModel(net) if algo == 'metropolis' else ProbabilisticModelWithGradient(net)
     network_samples: JavaObject = sampling_algorithm.getPosteriorSamples(
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
@@ -73,8 +72,7 @@ def generate_samples(net: BayesNet,
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
-    probabilistic_model = ProbabilisticModel(
-        net) if algo == 'metropolis' else ProbabilisticModelWithGradient(net)
+    probabilistic_model = ProbabilisticModel(net) if algo == 'metropolis' else ProbabilisticModelWithGradient(net)
     samples: JavaObject = sampling_algorithm.generatePosteriorSamples(probabilistic_model.unwrap(), vertices_unwrapped)
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
