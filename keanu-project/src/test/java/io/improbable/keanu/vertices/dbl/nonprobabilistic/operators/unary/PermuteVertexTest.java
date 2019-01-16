@@ -26,6 +26,11 @@ public class PermuteVertexTest {
     }
 
     @Test
+    public void canPermuteAutoDiff() {
+
+    }
+
+    @Test
     public void changesMatchGradient() {
         UniformVertex inputVertex = new UniformVertex(new long[]{4, 4}, -10.0, 10.0);
         PermuteVertex outputVertex = inputVertex.permute(1, 0);
