@@ -23,7 +23,7 @@ def net() -> BayesNet:
     return m.to_bayes_net()
 
 
-@pytest.mark.parametrize("algo", [("metropolis"), ("NUTS"), ("hamiltonian")])
+@pytest.mark.parametrize("algo", [("metropolis"), ("NUTS")])
 def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: str, net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
@@ -90,7 +90,7 @@ def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
         proposal_distribution_sigma=np.array(1.))
 
 
-@pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
+@pytest.mark.parametrize("algo", [("metropolis")])
 def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
     draws = 10
     samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
@@ -100,7 +100,7 @@ def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
     assert count == draws
 
 
-@pytest.mark.parametrize("algo", [("metropolis"), ("hamiltonian")])
+@pytest.mark.parametrize("algo", [("metropolis")])
 def test_iter_returns_same_result_as_sample(algo: str) -> None:
     draws = 100
     model = thermometers.model()
