@@ -55,7 +55,7 @@ public class BetaVertexTest {
     }
 
     @Test
-    public void alphaMustBePositive() {
+    public void alphaMustBeStrictlyPositive() {
         DoubleVertex alpha = ConstantVertex.of(0.);
         DoubleVertex beta = ConstantVertex.of(1.);
         BetaVertex betaVertex = new BetaVertex(alpha, beta);
@@ -65,7 +65,7 @@ public class BetaVertexTest {
     }
 
     @Test
-    public void betaMustBePositive() {
+    public void betaMustBeStrictlyPositive() {
         DoubleVertex alpha = ConstantVertex.of(1.);
         DoubleVertex beta = ConstantVertex.of(0.);
         BetaVertex betaVertex = new BetaVertex(alpha, beta);

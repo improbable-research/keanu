@@ -47,18 +47,18 @@ public class TriangularVertexTest {
         TriangularVertex triangularVertex = new TriangularVertex(xMin, xMax, c);
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("center must be between xMin and xMax. c: " + c.getValue() + " xMin: " + xMin.getValue() + " xMax: " + xMax.getValue());
-        triangularVertex.logPdf(0.1);
+        triangularVertex.sample();
     }
 
     @Test
-    public void cGreaterThanXMinThrowsException() {
+    public void cGreaterThanXMaxThrowsException() {
         DoubleVertex xMin = ConstantVertex.of(0.);
         DoubleVertex xMax = ConstantVertex.of(1.);
         DoubleVertex c = ConstantVertex.of(2.);
         TriangularVertex triangularVertex = new TriangularVertex(xMin, xMax, c);
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("center must be between xMin and xMax. c: " + c.getValue() + " xMin: " + xMin.getValue() + " xMax: " + xMax.getValue());
-        triangularVertex.logPdf(0.1);
+        triangularVertex.sample();
     }
 
     @Test
@@ -67,7 +67,7 @@ public class TriangularVertexTest {
         DoubleVertex xMax = ConstantVertex.of(1., 1.);
         DoubleVertex c = ConstantVertex.of(0., 1.);
         TriangularVertex triangularVertex = new TriangularVertex(xMin, xMax, c);
-        triangularVertex.logPdf(0.3);
+        triangularVertex.sample();
     }
 
     @Category(Slow.class)

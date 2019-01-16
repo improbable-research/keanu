@@ -56,7 +56,7 @@ public class CauchyVertexTest {
     }
 
     @Test
-    public void scaleMustBePositive() {
+    public void scaleMustBeStrictlyPositive() {
         DoubleVertex scale = ConstantVertex.of(0.);
         CauchyVertex cauchyVertex = new CauchyVertex(0., scale);
         thrown.expect(IllegalArgumentException.class);
