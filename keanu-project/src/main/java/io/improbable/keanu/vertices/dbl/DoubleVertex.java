@@ -49,7 +49,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ToIntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -273,7 +273,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new EqualsVertex<>(this, rhs);
     }
 
-    public IntegerVertex toInteger() { return new ToIntegerVertex(this); }
+    public IntegerVertex toInteger() { return new CastIntegerVertex(this); }
 
     public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);
