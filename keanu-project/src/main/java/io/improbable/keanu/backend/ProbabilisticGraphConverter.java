@@ -1,8 +1,8 @@
 package io.improbable.keanu.backend;
 
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.LogProbAsAGraphable;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.experimental.UtilityClass;
 
@@ -33,8 +33,8 @@ public class ProbabilisticGraphConverter {
                                                                      List<Vertex> probabilisticVertices) {
         List<VariableReference> logProbOps = probabilisticVertices.stream()
             .map(visiting -> {
-                if (visiting instanceof LogProbAsAGraphable) {
-                    LogProbGraph logProbGraph = ((LogProbAsAGraphable) visiting).logProbGraph();
+                if (visiting instanceof LogProbGraphSupplier) {
+                    LogProbGraph logProbGraph = ((LogProbGraphSupplier) visiting).logProbGraph();
                     return addLogProbGraph(logProbGraph, graphBuilder);
                 } else {
                     throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " logProb as a graph not supported");

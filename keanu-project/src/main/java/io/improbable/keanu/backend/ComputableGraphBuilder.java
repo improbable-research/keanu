@@ -1,6 +1,6 @@
 package io.improbable.keanu.backend;
 
-import io.improbable.keanu.vertices.PlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 
@@ -17,7 +17,7 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
 
     void create(Vertex visiting);
 
-    void connect(Map<Vertex<?>, Vertex<?>> connections);
+    void connect(Map<? extends Vertex<?>, ? extends Vertex<?>> connections);
 
     Collection<VariableReference> getLatentVariables();
 
@@ -36,7 +36,7 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
         Vertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
 
-            if (visiting instanceof PlaceHolderVertex) {
+            if (visiting instanceof LogProbGraph.PlaceholderVertex) {
                 continue;
             }
 
