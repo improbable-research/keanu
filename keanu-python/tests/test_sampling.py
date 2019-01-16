@@ -97,15 +97,17 @@ def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
     assert count == draws
 
 
-@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (HamiltonianSampler())])
+@pytest.mark.parametrize("algo", [MetropolisHastingsSampler, HamiltonianSampler])
 def test_iter_returns_same_result_as_sample(algo: str) -> None:
     draws = 100
     model = thermometers.model()
     net = BayesNet(model.temperature.get_connected_graph())
     set_starting_state(model)
-    samples = sample(net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=algo, draws=draws)
+    sampler = algo()
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=sampler, draws=draws)
     set_starting_state(model)
-    iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo)
+    sampler = algo()
+    iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=sampler)
 
     samples_dataframe = pd.DataFrame()
     for iter_sample in islice(iter_samples, draws):
