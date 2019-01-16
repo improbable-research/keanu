@@ -93,6 +93,7 @@ A.setValue(20.0);
 B.setValue(20.0);
 
 BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
+ProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 ```
 
 Now let's use Metropolis Hastings to sample from this network.
@@ -107,7 +108,7 @@ We will be taking 100,000 samples from the distributions of A and B.
 
 ```java
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-    bayesNet,
+    model,
     bayesNet.getLatentVertices(),
     100000
 );
@@ -147,6 +148,8 @@ actual = average_posterior_a + average_posterior_b
 ```
 
 ### Hamiltonian Monte Carlo
+
+HMC is not available in Keanu but it's a very important concept to understand before utilising NUTS.
 
 #### Algorithm
 
@@ -192,22 +195,6 @@ The parameters are:
 * The vertices in the network to return samples for (latent vertices)
 * The number of samples to take
 
-##### Java
-
-```java
-NetworkSamples posteriorSamples = Hamiltonian.withDefaultConfig().getPosteriorSamples(
-    bayesNet,
-    bayesNet.getLatentVertices(),
-    2000
-);
-```
-
-##### Python
-
-```python
-posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
-                           algo="hamiltonian", draws=2000)
-```
 
 ### NUTS
 
@@ -225,8 +212,8 @@ It also attempts to calculate and auto-tune those difficult leapfrog and step si
 
 ```java
 NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
-    bayesNet,
-    bayesNet.getLatentVertices(),
+    model,
+    model.getLatentVariables(),
     2000
 );
 ```

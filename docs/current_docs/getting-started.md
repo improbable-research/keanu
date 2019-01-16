@@ -117,8 +117,10 @@ Now you can infer that A and B are also both true by sampling from the posterior
 A.observe(true);
 B.observe(true);
 
+BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
+ProbabilisticModel model = new KeanuProbabilisticModel(net);
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-    new BayesianNetwork(C.getConnectedGraph()),
+    model,
     Arrays.asList(A, B),
     100000
 ).drop(10000).downSample(2);
@@ -146,8 +148,8 @@ There are a couple of techniques that solve this problem so that we can leverage
 Firstly, you might choose to use the `ParticleFilter` class in order to find the most probable state to start your algorithm from.
 Alternatively, you can create a new Bayesian network and use this to probe some random configurations a certain number of times to see if it can find a possible one. 
 ```java
-BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
-net.probeForNonZeroProbability(10);
+BayesianNetwork bayesianNetwork = new BayesianNetwork(C.getConnectedGraph());
+bayesianNetwork.probeForNonZeroProbability(10);
 ```
 Now you can run MCMC on the BayesNet as it will start off in the correct configuration.
 

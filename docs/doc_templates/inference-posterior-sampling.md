@@ -117,6 +117,8 @@ We can perform the same steps in Python.
 
 ### Hamiltonian Monte Carlo
 
+HMC is not available in Keanu but it's a very important concept to understand before utilising NUTS.
+
 #### Algorithm
 
 Hamiltonian Monte Carlo (HMC) brings two new concepts to Metropolis Hastings: Hamiltonian physics and gradient calculations.
@@ -161,17 +163,6 @@ The parameters are:
 * The vertices in the network to return samples for (latent vertices)
 * The number of samples to take
 
-##### Java
-
-```java
-{% snippet InfHamiltonian %}
-```
-
-##### Python
-
-```python
-{% snippet PythonHamiltonianExample %}
-```
 
 ### NUTS
 
