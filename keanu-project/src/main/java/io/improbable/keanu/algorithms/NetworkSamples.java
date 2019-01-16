@@ -29,32 +29,32 @@ import static java.util.stream.Collectors.toMap;
 @Slf4j
 public class NetworkSamples {
 
-    private final Map<VariableReference, ? extends List> samplesByVertex;
+    private final Map<VariableReference, ? extends List> samplesByVariable;
     private final List<Double> logOfMasterPForEachSample;
     private final int size;
 
     public NetworkSamples(Map<VariableReference, ? extends List> samplesByVertex, List<Double> logOfMasterPForEachSample, int size) {
-        this.samplesByVertex = samplesByVertex;
+        this.samplesByVariable = samplesByVertex;
         this.logOfMasterPForEachSample = logOfMasterPForEachSample;
         this.size = size;
     }
 
     public static NetworkSamples from(List<NetworkSample> networkSamples) {
-        Map<VariableReference, List<?>> samplesByVertex = new HashMap<>();
+        Map<VariableReference, List<?>> samplesByVariable = new HashMap<>();
         List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
-        networkSamples.forEach(networkSample -> addSamplesForNetworkSample(networkSample, samplesByVertex));
+        networkSamples.forEach(networkSample -> addSamplesForNetworkSample(networkSample, samplesByVariable));
         networkSamples.forEach(networkSample -> logOfMasterPForEachSample.add(networkSample.getLogOfMasterP()));
-        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, networkSamples.size());
+        return new NetworkSamples(samplesByVariable, logOfMasterPForEachSample, networkSamples.size());
     }
 
-    private static void addSamplesForNetworkSample(NetworkSample networkSample, Map<VariableReference, List<?>> samplesByVertex) {
+    private static void addSamplesForNetworkSample(NetworkSample networkSample, Map<VariableReference, List<?>> samplesByVariable) {
         for (VariableReference variableReference : networkSample.getVariableReferences()) {
-            addSampleForVertex(variableReference, networkSample.get(variableReference), samplesByVertex);
+            addSampleForVariable(variableReference, networkSample.get(variableReference), samplesByVariable);
         }
     }
 
-    private static <T> void addSampleForVertex(VariableReference variableReference, T value, Map<VariableReference, List<?>> samples) {
+    private static <T> void addSampleForVariable(VariableReference variableReference, T value, Map<VariableReference, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(variableReference, v -> new ArrayList<T>());
         samplesForVertex.add(value);
     }
@@ -68,7 +68,7 @@ public class NetworkSamples {
     }
 
     public <T> VertexSamples<T> get(VariableReference variableReference) {
-        return new VertexSamples<>((List<T>) samplesByVertex.get(variableReference));
+        return new VertexSamples<>((List<T>) samplesByVariable.get(variableReference));
     }
 
     public DoubleVertexSamples getDoubleTensorSamples(Variable<DoubleTensor> variable) {
@@ -76,7 +76,7 @@ public class NetworkSamples {
     }
 
     public DoubleVertexSamples getDoubleTensorSamples(VariableReference variableReference) {
-        return new DoubleVertexSamples(samplesByVertex.get(variableReference));
+        return new DoubleVertexSamples(samplesByVariable.get(variableReference));
     }
 
     public IntegerVertexSamples getIntegerTensorSamples(Variable<IntegerTensor> variable) {
@@ -84,7 +84,7 @@ public class NetworkSamples {
     }
 
     public IntegerVertexSamples getIntegerTensorSamples(VariableReference variableReference) {
-        return new IntegerVertexSamples(samplesByVertex.get(variableReference));
+        return new IntegerVertexSamples(samplesByVariable.get(variableReference));
     }
 
     public NetworkSamples drop(int dropCount) {
@@ -93,7 +93,7 @@ public class NetworkSamples {
             return this;
         }
 
-        final Map<VariableReference, List<?>> withSamplesDropped = samplesByVertex.entrySet().parallelStream()
+        final Map<VariableReference, List<?>> withSamplesDropped = samplesByVariable.entrySet().parallelStream()
             .collect(toMap(
                 Map.Entry::getKey,
                 e -> e.getValue().subList(dropCount, size))
@@ -106,7 +106,7 @@ public class NetworkSamples {
     public NetworkSamples downSample(final int downSampleInterval) {
         Preconditions.checkArgument(downSampleInterval > 0, "Down sample interval of %s is invalid. Sample interval must be positive.", downSampleInterval);
 
-        final Map<VariableReference, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
+        final Map<VariableReference, List<?>> withSamplesDownSampled = samplesByVariable.entrySet().parallelStream()
             .collect(toMap(
                 Map.Entry::getKey,
                 e -> downSample((List<?>) e.getValue(), downSampleInterval)
@@ -142,7 +142,7 @@ public class NetworkSamples {
     }
 
     public NetworkState getNetworkState(int sample) {
-        return new SamplesBackedNetworkState(samplesByVertex, sample);
+        return new SamplesBackedNetworkState(samplesByVariable, sample);
     }
 
     public double getLogOfMasterP(int sample) {
@@ -169,27 +169,27 @@ public class NetworkSamples {
 
     private static class SamplesBackedNetworkState implements NetworkState {
 
-        private final Map<VariableReference, ? extends List> samplesByVertex;
+        private final Map<VariableReference, ? extends List> samplesByVariable;
         private final int index;
 
-        public SamplesBackedNetworkState(Map<VariableReference, ? extends List> samplesByVertex, int index) {
-            this.samplesByVertex = samplesByVertex;
+        public SamplesBackedNetworkState(Map<VariableReference, ? extends List> samplesByVariable, int index) {
+            this.samplesByVariable = samplesByVariable;
             this.index = index;
         }
 
         @Override
         public <T> T get(Variable<T> variable) {
-            return ((List<T>) samplesByVertex.get(variable.getReference())).get(index);
+            return ((List<T>) samplesByVariable.get(variable.getReference())).get(index);
         }
 
         @Override
         public <T> T get(VariableReference variableReference) {
-            return ((List<T>) samplesByVertex.get(variableReference)).get(index);
+            return ((List<T>) samplesByVariable.get(variableReference)).get(index);
         }
 
         @Override
         public Set<VariableReference> getVariableReferences() {
-            return new HashSet<>(samplesByVertex.keySet());
+            return new HashSet<>(samplesByVariable.keySet());
         }
     }
 }
