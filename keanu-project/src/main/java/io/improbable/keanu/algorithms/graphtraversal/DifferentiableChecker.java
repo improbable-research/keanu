@@ -5,14 +5,10 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import lombok.experimental.UtilityClass;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Queue;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Utility class for checking whether the given vertices are all differentiable w.r.t latents.
@@ -22,43 +18,42 @@ import java.util.function.Predicate;
  * differentiable or constant valued.
  * If there is a non differentiable vertex on this path, then if it is constant valued (0 gradient) it has no effect
  * and therefore will return true.
- *
- *
+ * <p>
  * -- Examples --
  * RV = Random Variable
  * (G) = A vertex we want to check whether differentiable
  * ND = Non-differentiable vertex
  * D = Differentiable vertex
  * C = Constant valued vertex
- *
+ * <p>
  * - Differentiable -
- *
- *      RV  RV
- *       \  /
- *        D    RV
- *         \  /
- *         RV(G)
- *
+ * <p>
+ * RV  RV
+ * \  /
+ * D    RV
+ * \  /
+ * RV(G)
+ * <p>
  * This graph is differentiable as traversing up each of the vertex's parent to the next RV is a differentiable path.
- *
- *      C    C
- *       \  /
- *        ND    RV
- *         \  /
- *         RV(G)
- *
+ * <p>
+ * C    C
+ * \  /
+ * ND    RV
+ * \  /
+ * RV(G)
+ * <p>
  * This graph is differentiable as the path that is non differentiable is constant valued.
- *
+ * <p>
  * - Not Differentiable -
- *
- *      RV  RV     - Both RV not observed
- *       \  /
- *        ND    RV
- *         \  /
- *         RV(G)
- *
+ * <p>
+ * RV  RV     - Both RV not observed
+ * \  /
+ * ND    RV
+ * \  /
+ * RV(G)
+ * <p>
  * This is not differentiable as there is a non differentiable path which does not have a constant value.
- *
+ * <p>
  * For more examples see DifferentiableCheckerTest.java.
  */
 @UtilityClass
@@ -97,45 +92,10 @@ public class DifferentiableChecker {
     }
 
     private static boolean diffableOrConstantUptoNextRV(Collection<Vertex> vertices, Set<Vertex> constantValueVerticesCache) {
-        return bfs(vertices,
+        return BreadthFirstSearch.bfs(vertices,
             vertex -> isNonDiffableAndNotConstant(vertex, constantValueVerticesCache),
             vertex -> !vertex.isProbabilistic(),
-            doNothing -> {
-            });
-    }
-
-    private static boolean bfs(Collection<Vertex> vertices,
-                               Predicate<Vertex> failureCondition,
-                               Predicate<Vertex> shouldAddParents,
-                               Consumer<Collection<Vertex>> successfullyVisitedConsumer) {
-
-        Queue<Vertex> queue = new ArrayDeque<>(vertices);
-        Set<Vertex> visited = new HashSet<>(vertices);
-
-        while (!queue.isEmpty()) {
-            Vertex visiting = queue.poll();
-
-            if (failureCondition.test(visiting)) {
-                return false;
-            }
-
-            if (shouldAddParents.test(visiting)) {
-                queueUnvisitedParents(visiting, queue, visited);
-            }
-        }
-
-        successfullyVisitedConsumer.accept(visited);
-        return true;
-    }
-
-    private static void queueUnvisitedParents(Vertex vertex, Queue<Vertex> queue, Set<Vertex> visited) {
-        Collection<Vertex> nextVertices = vertex.getParents();
-        for (Vertex next : nextVertices) {
-            if (!visited.contains(next)) {
-                queue.offer(next);
-                visited.add(next);
-            }
-        }
+            BreadthFirstSearch::doNothing);
     }
 
     private static boolean isNonDiffableAndNotConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
@@ -148,7 +108,7 @@ public class DifferentiableChecker {
             return true;
         }
 
-        return bfs(Collections.singletonList(vertex),
+        return BreadthFirstSearch.bfs(Collections.singletonList(vertex),
             DifferentiableChecker::isUnobservedProbabilistic,
             visiting -> !isValueKnownToBeConstant(visiting, constantValueVerticesCache),
             constantValueVerticesCache::addAll);
