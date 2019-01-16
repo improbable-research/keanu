@@ -26,7 +26,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
     public static final CascadeOnRejection DEFAULT_REJECTION_STRATEGY = new CascadeOnRejection();
     private static final LogProbCalculationStrategy DEFAULT_LOG_PROB_CALCULATION_STRATEGY = new SimpleLogProbCalculationStrategy();
-    private static final ProposalApplicationStrategy DEFAULT_PROPOSAL_APPLICATION_STRATEGY = new CascadingApplicationStrategy();
+    private static final ProposalApplicationStrategy DEFAULT_PROPOSAL_APPLICATION_STRATEGY = new CascadeOnApplication();
 
     public static MetropolisHastings withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());

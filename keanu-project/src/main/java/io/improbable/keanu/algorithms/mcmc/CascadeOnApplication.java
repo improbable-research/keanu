@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Set;
 
-public class CascadingApplicationStrategy implements ProposalApplicationStrategy {
+public class CascadeOnApplication implements ProposalApplicationStrategy {
 
     @Override
     public void apply(Proposal proposal, Set<? extends Variable> inputs) {
