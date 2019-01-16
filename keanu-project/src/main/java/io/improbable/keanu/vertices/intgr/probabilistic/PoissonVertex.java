@@ -13,7 +13,7 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastToDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -60,7 +60,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
     }
 
     public PoissonVertex(Vertex<? extends NumberTensor> mu) {
-        this(mu.getShape(), new CastDoubleVertex(mu));
+        this(mu.getShape(), new CastToDoubleVertex(mu));
     }
 
     public PoissonVertex(double mu) {

@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastToDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
@@ -70,7 +70,7 @@ public class MultimodalSimulatedAnnealingTest {
             .then(B)
             .orElse(D);
 
-        DoubleVertex G = new GaussianVertex(new CastDoubleVertex(F), 1.5);
+        DoubleVertex G = new GaussianVertex(new CastToDoubleVertex(F), 1.5);
         G.observe(4.0);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());

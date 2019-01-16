@@ -10,13 +10,13 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class CastIntegerVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
+public class CastToIntegerVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     private final Vertex<? extends NumberTensor> inputVertex;
     private static final String INPUT_NAME = "inputVertex";
 
     @ExportVertexToPythonBindings
-    public CastIntegerVertex(@LoadVertexParam(INPUT_NAME) Vertex<? extends NumberTensor> inputVertex) {
+    public CastToIntegerVertex(@LoadVertexParam(INPUT_NAME) Vertex<? extends NumberTensor> inputVertex) {
         super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
