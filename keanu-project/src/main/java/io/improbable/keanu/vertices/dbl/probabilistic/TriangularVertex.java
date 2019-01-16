@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -11,12 +10,10 @@ import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Map;
 import java.util.Set;
@@ -150,23 +147,19 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
 
         final DoubleVertex range = xMaxPlaceholder.minus(xMinPlaceholder);
 
-        final BoolVertex conditionalFirstHalf = xPlaceholder.greaterThan(xMinPlaceholder);
-        final BoolVertex conditionalSecondHalf = xPlaceholder.lessThan(cPlaceholder);
-        final BoolVertex conditionalAnd = conditionalFirstHalf.and(conditionalSecondHalf);
-        final DoubleVertex conditionalResult = If
-            .isTrue(conditionalAnd)
-            .then(range.reverseDiv(1.).times(2.).times(xPlaceholder.minus(xMinPlaceholder)).div(cPlaceholder.minus(xMinPlaceholder)))
-            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(conditionalAnd.getShape())));
+        final DoubleVertex conditionalFirstHalf = xPlaceholder.toGreaterThanMask(xMinPlaceholder);
+        final DoubleVertex conditionalSecondHalf = xPlaceholder.toLessThanMask(cPlaceholder);
+        final DoubleVertex conditionalAnd = conditionalFirstHalf.times(conditionalSecondHalf);
+        final DoubleVertex conditionalAndResult = conditionalAnd.times(
+            range.reverseDiv(1.).times(2.).times(xPlaceholder.minus(xMinPlaceholder)).div(cPlaceholder.minus(xMinPlaceholder)));
 
-        final BoolVertex elseIfConditionalFirstHalf = xPlaceholder.greaterThan(cPlaceholder);
-        final BoolVertex elseIfConditionalSecondHalf = xPlaceholder.lessThan(xMaxPlaceholder);
-        final BoolVertex elseIfConditionalAnd = elseIfConditionalFirstHalf.and(elseIfConditionalSecondHalf);
-        final DoubleVertex elseIfConditionalResult = If
-            .isTrue(elseIfConditionalAnd)
-            .then(range.reverseDiv(2.).times(xMaxPlaceholder.minus(xPlaceholder)).div(xMaxPlaceholder.minus(cPlaceholder)))
-            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(elseIfConditionalAnd.getShape())));
+        final DoubleVertex elseIfConditionalFirstHalf = xPlaceholder.toGreaterThanMask(cPlaceholder);
+        final DoubleVertex elseIfConditionalSecondHalf = xPlaceholder.toLessThanMask(xMaxPlaceholder);
+        final DoubleVertex elseIfConditionalAnd = elseIfConditionalFirstHalf.times(elseIfConditionalSecondHalf);
+        final DoubleVertex elseIfConditionalResult = elseIfConditionalAnd
+            .times(range.reverseDiv(2.).times(xMaxPlaceholder.minus(xPlaceholder)).div(xMaxPlaceholder.minus(cPlaceholder)));
 
-        final DoubleVertex logProbOutput = conditionalResult.plus(elseIfConditionalResult.plus(elseIfConditionalResult)).log();
+        final DoubleVertex logProbOutput = conditionalAndResult.plus(elseIfConditionalResult.plus(elseIfConditionalResult)).log();
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)

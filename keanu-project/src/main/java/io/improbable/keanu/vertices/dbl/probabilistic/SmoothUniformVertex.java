@@ -4,7 +4,6 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -12,12 +11,10 @@ import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Collections;
 import java.util.Map;
@@ -162,26 +159,19 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
         final DoubleVertex rightCutoff = xMaxPlaceholder.plus(shoulderWidth);
         final DoubleVertex leftCutoff = xMinPlaceholder.minus(shoulderWidth);
 
-        BoolVertex firstConditional = xPlaceholder.greaterThanOrEqualTo(xMinPlaceholder)
-            .and(xPlaceholder.lessThanOrEqualTo(xMaxPlaceholder));
-        final DoubleVertex firstConditionalResult = If
-            .isTrue(firstConditional)
-            .then(bodyHeight(shoulderWidth, bodyWidth))
-            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(firstConditional.getShape())));
+        final DoubleVertex firstConditional = xPlaceholder
+            .toGreaterThanOrEqualToMask(xMinPlaceholder)
+            .times(xPlaceholder.toLessThanOrEqualToMask(xMaxPlaceholder));
+        final DoubleVertex firstConditionalResult = firstConditional.times(bodyHeight(shoulderWidth, bodyWidth));
 
-        BoolVertex secondConditional = xPlaceholder.lessThan(xMinPlaceholder)
-            .and(xPlaceholder.greaterThan(leftCutoff));
-        final DoubleVertex secondConditionalResult = If
-            .isTrue(secondConditional)
-            .then(shoulder(shoulderWidth, bodyWidth, xPlaceholder.minus(leftCutoff)))
-            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(secondConditional.getShape())));
+        final DoubleVertex secondConditional = xPlaceholder
+            .toLessThanMask(xMinPlaceholder)
+            .times(xPlaceholder.toGreaterThanMask(leftCutoff));
+        final DoubleVertex secondConditionalResult = secondConditional.times(shoulder(shoulderWidth, bodyWidth, xPlaceholder.minus(leftCutoff)));
 
-        BoolVertex thirdConditional = xPlaceholder.greaterThan(xMaxPlaceholder)
-            .and(xPlaceholder.lessThan(rightCutoff));
-        final DoubleVertex thirdConditionalResult = If
-            .isTrue(thirdConditional)
-            .then(shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(xPlaceholder).plus(xMaxPlaceholder)))
-            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(thirdConditional.getShape())));
+        final DoubleVertex thirdConditional = xPlaceholder.toGreaterThanMask(xMaxPlaceholder)
+            .times(xPlaceholder.toLessThanMask(rightCutoff));
+        final DoubleVertex thirdConditionalResult = thirdConditional.times(shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(xPlaceholder).plus(xMaxPlaceholder)));
 
         final DoubleVertex logProbOutput = firstConditionalResult
             .plus(secondConditionalResult)
