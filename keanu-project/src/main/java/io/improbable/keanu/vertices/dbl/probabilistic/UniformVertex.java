@@ -109,9 +109,10 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
         final LogProbGraph.DoublePlaceholderVertex xMinPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMin.getShape());
         final LogProbGraph.DoublePlaceholderVertex xMaxPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMax.getShape());
 
-        final DoubleVertex logOfWithinBounds = xMaxPlaceholder.minus(xMinPlaceholder).log().unaryMinus();
-        final DoubleVertex logOfOutOfBounds = new ConstantDoubleVertex(DoubleTensor.create(Double.NEGATIVE_INFINITY, logOfWithinBounds.getShape()));
         final BoolVertex xOutOfBounds = xPlaceholder.greaterThanOrEqualTo(xMaxPlaceholder).or(xPlaceholder.lessThan(xMinPlaceholder));
+        final DoubleVertex logOfWithinBounds = xMaxPlaceholder.minus(xMinPlaceholder).log().unaryMinus();
+        final DoubleVertex logOfOutOfBounds = new ConstantDoubleVertex(DoubleTensor.create(Double.NEGATIVE_INFINITY, xOutOfBounds.getShape()));
+
         final DoubleVertex logProbOutput = If
             .isTrue(xOutOfBounds)
             .then(logOfOutOfBounds)

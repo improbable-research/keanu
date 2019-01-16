@@ -114,7 +114,7 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
         final BoolVertex invalidXMask = xPlaceholder.lessThanOrEqualTo(locationPlaceholder);
         final DoubleVertex ifValid = scalePlaceholder.log().plus(locationPlaceholder.log().times(scalePlaceholder))
             .minus(scalePlaceholder.plus(1.).times(xPlaceholder.log()));
-        final DoubleVertex ifInValid = ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, ifValid.getShape()));
+        final DoubleVertex ifInValid = ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, invalidXMask.getShape()));
         final DoubleVertex resultIfAllParamValuesAreValid = If
             .isTrue(invalidXMask)
             .then(ifInValid)
@@ -122,7 +122,7 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
 
         final DoubleVertex zero = ConstantVertex.of(0.);
         final BoolVertex validParamMask = locationPlaceholder.greaterThan(zero).and(scalePlaceholder.greaterThan(zero));
-        final DoubleVertex zeroProb = ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, xPlaceholder.getShape()));
+        final DoubleVertex zeroProb = ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, validParamMask.getShape()));
         final DoubleVertex logProbOutput = If
             .isTrue(validParamMask.allTrue())
             .then(resultIfAllParamValuesAreValid)

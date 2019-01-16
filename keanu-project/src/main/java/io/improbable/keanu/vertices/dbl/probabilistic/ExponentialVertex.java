@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -85,12 +86,14 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
         final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
         final LogProbGraph.DoublePlaceholderVertex ratePlaceholder = new LogProbGraph.DoublePlaceholderVertex(rate.getShape());
 
+        final BoolVertex xLessThanZero = xPlaceholder.lessThan(ConstantVertex.of(DoubleTensor.ZERO_SCALAR));
         final DoubleVertex negXMinusADivB = xPlaceholder.unaryMinus().div(ratePlaceholder);
         final DoubleVertex negXMinusADivBMinusLogB = negXMinusADivB.minus(rate.log());
+        final DoubleVertex negInf = new ConstantDoubleVertex(DoubleTensor.create(Double.NEGATIVE_INFINITY, xLessThanZero.getShape()));
 
         final DoubleVertex logProbOutput = If
-            .isTrue(xPlaceholder.lessThan(ConstantVertex.of(DoubleTensor.ZERO_SCALAR)))
-            .then(new ConstantDoubleVertex(DoubleTensor.create(Double.NEGATIVE_INFINITY, negXMinusADivBMinusLogB.getShape())))
+            .isTrue(xLessThanZero)
+            .then(negInf)
             .orElse(negXMinusADivBMinusLogB);
 
         return LogProbGraph.builder()

@@ -174,14 +174,14 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
         final DoubleVertex secondConditionalResult = If
             .isTrue(secondConditional)
             .then(shoulder(shoulderWidth, bodyWidth, xPlaceholder.minus(leftCutoff)))
-            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(firstConditional.getShape())));
+            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(secondConditional.getShape())));
 
         BoolVertex thirdConditional = xPlaceholder.greaterThan(xMaxPlaceholder)
             .and(xPlaceholder.lessThan(rightCutoff));
         final DoubleVertex thirdConditionalResult = If
             .isTrue(thirdConditional)
             .then(shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(xPlaceholder).plus(xMaxPlaceholder)))
-            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(firstConditional.getShape())));
+            .orElse(new ConstantDoubleVertex(DoubleTensor.zeros(thirdConditional.getShape())));
 
         final DoubleVertex logProbOutput = firstConditionalResult
             .plus(secondConditionalResult)
