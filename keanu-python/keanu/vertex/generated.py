@@ -64,6 +64,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.ToDoubleVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex")
@@ -117,6 +118,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.ToIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex")
@@ -246,6 +248,10 @@ def DoubleIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_
 
 def DoubleProxy(shape: Collection[int], label: str) -> Vertex:
     return Double(context.jvm_view().DoubleProxyVertex, cast_to_long_array(shape), cast_to_string(label))
+
+
+def ToDouble(input_vertex: vertex_constructor_param_types) -> Vertex:
+    return Double(context.jvm_view().ToDoubleVertex, cast_to_vertex(input_vertex))
 
 
 def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
@@ -667,6 +673,10 @@ def ConstantInteger(constant: tensor_arg_types) -> Vertex:
 
 def IntegerProxy(tensor_shape: Collection[int], label: str) -> Vertex:
     return Integer(context.jvm_view().IntegerProxyVertex, cast_to_long_array(tensor_shape), cast_to_string(label))
+
+
+def ToInteger(input_vertex: vertex_constructor_param_types) -> Vertex:
+    return Integer(context.jvm_view().ToIntegerVertex, cast_to_vertex(input_vertex))
 
 
 def IntegerAddition(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
