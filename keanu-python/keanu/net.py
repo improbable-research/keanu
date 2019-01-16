@@ -38,15 +38,14 @@ class BayesNet(JavaObjectWrapper):
         self.unwrap().probeForNonZeroProbability(attempts, random.unwrap())
 
 
-
 class ProbabilisticModel(JavaObjectWrapper):
 
     def __init__(self, net: BayesNet) -> None:
         super(ProbabilisticModel, self).__init__(k.jvm_view().KeanuProbabilisticModel(net.unwrap()))
 
 
-
 class ProbabilisticModelWithGradient(JavaObjectWrapper):
 
     def __init__(self, net: BayesNet) -> None:
-        super(ProbabilisticModelWithGradient, self).__init__(k.jvm_view().KeanuProbabilisticModelWithGradient(net.unwrap()))
+        super(ProbabilisticModelWithGradient,
+              self).__init__(k.jvm_view().KeanuProbabilisticModelWithGradient(net.unwrap()))
