@@ -49,6 +49,10 @@ def cast_to_string(input: Any) -> str:
     return str(input)
 
 
+def cast_to_boolean(input: Any) -> bool:
+    return bool(input)
+
+
 def cast_to_long_array(input: Collection[int]) -> JavaArray:
     return k.to_java_long_array(input)
 
