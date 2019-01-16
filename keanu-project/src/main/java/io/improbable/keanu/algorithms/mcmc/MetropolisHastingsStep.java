@@ -26,11 +26,14 @@ public class MetropolisHastingsStep {
     private final KeanuRandom random;
 
     /**
-     * @param proposalDistribution The proposal distribution
-     * @param rejectionStrategy What to do when a proposal is rejected.
-     *                         Options include {@link CascadeOnRejection} and {@link RollBackOnRejection}.
-     * @param logProbCalculationStrategy
-     * @param random               Source of randomness
+     * @param proposalDistribution        The proposal distribution
+     * @param rejectionStrategy           What to do when a proposal is rejected.
+     *                                    Options include {@link CascadeOnRejection} and {@link RollBackOnRejection}.
+     * @param logProbCalculationStrategy  How to calculate log probability.
+     *                                    Options include {@link SimpleLogProbCalculationStrategy} and {@link LambdaSectionOptimizedLogProbCalculator}
+     * @param proposalApplicationStrategy What to do when a proposal is applied.
+     *                                    Options include {@link CascadeOnApplication} and {@link NoActionOnApplication}
+     * @param random                      Source of randomness
      */
     MetropolisHastingsStep(ProbabilisticModel model,
                            ProposalDistribution proposalDistribution,
@@ -53,7 +56,7 @@ public class MetropolisHastingsStep {
     }
 
     /**
-     * @param chosenVariables           variables to get a proposed change for
+     * @param chosenVariables          variables to get a proposed change for
      * @param logProbabilityBeforeStep The log of the previous state's probability
      * @param temperature              Temperature for simulated annealing. This
      *                                 should be constant if no annealing is wanted
