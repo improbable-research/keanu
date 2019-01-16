@@ -31,14 +31,13 @@ public class Inference {
         A.setValue(20.0);
         B.setValue(20.0);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
-        ProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
+        ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
         //%%SNIPPET_END%% InfStartState
 
         //%%SNIPPET_START%% InfMetropolisHastings
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             model,
-            bayesNet.getLatentVertices(),
+            model.getLatentVariables(),
             100000
         );
         //%%SNIPPET_END%% InfMetropolisHastings

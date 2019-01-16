@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -33,9 +32,7 @@ public class KeanuProbabilisticModelWithGradientTest {
         C = new BernoulliVertex(A.times(B));
         C.observe(true);
 
-        model = new KeanuProbabilisticModelWithGradient(
-            new BayesianNetwork(C.getConnectedGraph())
-        );
+        model = new KeanuProbabilisticModelWithGradient(C.getConnectedGraph());
     }
 
     @Test

@@ -54,25 +54,25 @@ public class KeanuProbabilisticModelTest {
 
     @Test
     public void canCalculateLogProbOnKeanuProbabilisticModel() {
-        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(D.getConnectedGraph());
         canCalculateLogProb(probabilisticModel);
     }
 
     @Test
     public void canCalculateLogProbOnKeanuProbabilisticModelWithGradient() {
-        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModelWithGradient(D.getConnectedGraph());
         canCalculateLogProb(probabilisticModel);
     }
 
     @Test
     public void canCalculateLogLikelihoodOnKeanuProbabilisticModel() {
-        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(D.getConnectedGraph());
         canCalculateLogLikelihood(probabilisticModel);
     }
 
     @Test
     public void canCalculateLogLikelihoodOnKeanuProbabilisticModelWithGradient() {
-        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModelWithGradient(D.getConnectedGraph());
         canCalculateLogLikelihood(probabilisticModel);
     }
 

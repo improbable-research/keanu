@@ -22,8 +22,7 @@ public class AutocorrelationExample {
         C.observe(43.0);
         A.setValue(20.0);
         B.setValue(20.0);
-        BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
-        ProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
+        ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
 
         //%%SNIPPET_START%% ScalarAutocorrelation
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(

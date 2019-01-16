@@ -56,13 +56,12 @@ public class Model {
      * Runs the MetropolisHastings algorithm and saves the resulting samples to results
      */
     public void run() {
-        BayesianNetwork net = buildBayesianNetwork();
-        ProbabilisticModel model = new KeanuProbabilisticModel(net);
+        ProbabilisticModel model = new KeanuProbabilisticModel(buildBayesianNetwork());
         Integer numSamples = 500;
 
         results = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
             model,
-            net.getLatentVertices()
+            model.getLatentVariables()
         ).dropCount(numSamples/5).downSampleInterval(3).generate(numSamples);
     }
 

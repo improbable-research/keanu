@@ -285,7 +285,7 @@ public class MetropolisHastingsTest {
         int dropCount = 100;
         int downSampleInterval = 2;
         GaussianVertex A = new GaussianVertex(0, 1);
-        ProbabilisticModel model = new KeanuProbabilisticModel(new BayesianNetwork(A.getConnectedGraph()));
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
@@ -304,7 +304,7 @@ public class MetropolisHastingsTest {
         int dropCount = 100;
         int downSampleInterval = 1;
         GaussianVertex A = new GaussianVertex(0, 1);
-        ProbabilisticModel model = new KeanuProbabilisticModel(new BayesianNetwork(A.getConnectedGraph()));
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         double averageA = algo.generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(dropCount)

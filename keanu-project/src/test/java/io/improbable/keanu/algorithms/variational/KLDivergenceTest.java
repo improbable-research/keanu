@@ -87,7 +87,7 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(new BayesianNetwork(v3.getConnectedGraph()));
+        ProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
             .withDefaultConfig()
             .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
@@ -104,7 +104,7 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(new BayesianNetwork(v3.getConnectedGraph()));
+        ProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
             .withDefaultConfig()
             .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
@@ -121,7 +121,7 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(new BayesianNetwork(v3.getConnectedGraph()));
+        ProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
             .withDefaultConfig()
             .getPosteriorSamples(model, Arrays.asList(v1, v3), 1000);

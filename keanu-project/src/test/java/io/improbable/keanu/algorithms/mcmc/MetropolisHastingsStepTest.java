@@ -86,7 +86,7 @@ public class MetropolisHastingsStepTest {
     public void doesAllowCustomProposalDistribution() {
         DoubleVertex A = new GaussianVertex(0, 1);
         A.setValue(0.0);
-        ProbabilisticModel model = new KeanuProbabilisticModel(new BayesianNetwork(A.getConnectedGraph()));
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         MetropolisHastingsStep mhStep = stepFunctionWithConstantProposal(model, 1.0, alwaysAccept);
 
@@ -103,7 +103,7 @@ public class MetropolisHastingsStepTest {
     public void doesRejectOnImpossibleProposal() {
         DoubleVertex A = new UniformVertex(0, 1);
         A.setValue(0.5);
-        ProbabilisticModel model = new KeanuProbabilisticModel(new BayesianNetwork(A.getConnectedGraph()));
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         MetropolisHastingsStep mhStep = stepFunctionWithConstantProposal(model, -1, alwaysAccept);
 
@@ -124,7 +124,7 @@ public class MetropolisHastingsStepTest {
         DoubleVertex B = A.times(2);
         DoubleVertex C = new GaussianVertex(B, 1);
         C.observe(5.0);
-        ProbabilisticModel model = new KeanuProbabilisticModel(new BayesianNetwork(A.getConnectedGraph()));
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         MetropolisHastingsStep mhStep = stepFunctionWithConstantProposal(model, 10, alwaysReject);
 

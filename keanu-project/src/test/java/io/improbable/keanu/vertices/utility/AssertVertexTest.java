@@ -153,7 +153,7 @@ public class AssertVertexTest {
         firstThermometer.observe(25.);
         secondThermometer.observe(30.);
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(new BayesianNetwork(temperature.getConnectedGraph()));
+        ProbabilisticModel model = new KeanuProbabilisticModel(temperature.getConnectedGraph());
         MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             model,
             model.getLatentVariables(),

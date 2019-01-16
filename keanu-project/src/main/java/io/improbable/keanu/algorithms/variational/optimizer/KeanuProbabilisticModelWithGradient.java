@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCal
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class KeanuProbabilisticModelWithGradient extends KeanuProbabilisticModel implements ProbabilisticModelWithGradient {
 
@@ -27,6 +28,10 @@ public class KeanuProbabilisticModelWithGradient extends KeanuProbabilisticModel
             bayesianNetwork.getObservedVertices(),
             continuousLatentVertices
         );
+    }
+
+    public KeanuProbabilisticModelWithGradient(Set<Vertex> variables) {
+        this(new BayesianNetwork(variables));
     }
 
     @Override

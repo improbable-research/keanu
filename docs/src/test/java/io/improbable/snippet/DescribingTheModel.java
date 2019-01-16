@@ -55,8 +55,7 @@ public class DescribingTheModel {
         A.observe(true);
         B.observe(true);
 
-        BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
-        ProbabilisticModel model = new KeanuProbabilisticModel(net);
+        ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             model,
             Arrays.asList(A, B),
