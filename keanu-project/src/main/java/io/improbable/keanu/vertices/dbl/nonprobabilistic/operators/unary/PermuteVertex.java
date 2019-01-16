@@ -3,7 +3,10 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -32,13 +35,21 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        return derivativeOfParentWithRespectToInputs.permute(rearrange);
+        int[] range = TensorShape.dimensionRange(0, derivativeOfParentWithRespectToInputs.get().getRank());
+        for (int i = 0; i < rearrange.length; i++) {
+            range[i] = rearrange[i];
+        }
+        return derivativeOfParentWithRespectToInputs.permute(range);
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.permute(rearrange));
+        int[] range = TensorShape.dimensionRange(0, derivativeOfOutputWithRespectToSelf.get().getRank());
+        for (int i = 0; i < rearrange.length; i++) {
+            range[i] = rearrange[i];
+        }
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.permute(range));
         return partials;
     }
 }

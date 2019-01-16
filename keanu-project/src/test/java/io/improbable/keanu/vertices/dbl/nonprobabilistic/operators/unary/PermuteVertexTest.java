@@ -28,7 +28,7 @@ public class PermuteVertexTest {
     @Test
     public void changesMatchGradient() {
         UniformVertex inputVertex = new UniformVertex(new long[]{4, 4}, -10.0, 10.0);
-        PermuteVertex outputVertex = inputVertex.times(1.5).permute(1, 0);
+        PermuteVertex outputVertex = inputVertex.permute(1, 0);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-10, 1e-10);
     }
