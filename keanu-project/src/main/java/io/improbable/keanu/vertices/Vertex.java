@@ -7,7 +7,6 @@ import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
-import io.improbable.keanu.network.VariableState;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -18,7 +17,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable<T> {
+public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable<T, VertexState<T>> {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
@@ -116,15 +115,11 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
     }
 
     @Override
-    public VertexState getState() {
+    public VertexState<T> getState() {
         return state;
     }
 
     @Override
-    public void setState(VariableState newState) {
-        setState((VertexState<T>) newState);
-    }
-
     public void setState(VertexState<T> newState) {
         state = newState;
     }

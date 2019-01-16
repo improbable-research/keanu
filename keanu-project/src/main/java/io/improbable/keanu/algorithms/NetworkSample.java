@@ -27,7 +27,7 @@ public class NetworkSample implements NetworkState {
      * @return the values of the specified vertex
      */
     @Override
-    public <T> T get(Variable<T> variable) {
+    public <T> T get(Variable<T, ?> variable) {
         return (T) variableStates.get(variable.getReference());
     }
 

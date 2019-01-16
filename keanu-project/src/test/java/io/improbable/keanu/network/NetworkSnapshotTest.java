@@ -38,8 +38,8 @@ public class NetworkSnapshotTest {
         Vertex<Object> v2 = mock(Vertex.class);
         when(v1.getState()).thenReturn(s1);
         when(v2.getState()).thenReturn(s2);
-        doCallRealMethod().when(v1).setState(any(VariableState.class));
-        doCallRealMethod().when(v2).setState(any(VariableState.class));
+        doCallRealMethod().when(v1).setState(any(VertexState.class));
+        doCallRealMethod().when(v2).setState(any(VertexState.class));
 
         NetworkSnapshot snapshot = NetworkSnapshot.create(ImmutableSet.of(v1, v2));
         verify(v1).getState();

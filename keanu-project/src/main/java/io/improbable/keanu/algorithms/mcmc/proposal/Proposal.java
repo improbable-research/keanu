@@ -19,7 +19,7 @@ public class Proposal {
         this.perVariableProposalFrom = new HashMap<>();
     }
 
-    public <T> void setProposal(Variable<T> variable, T to) {
+    public <T> void setProposal(Variable<T, ?> variable, T to) {
         perVariableProposalFrom.put(variable, variable.getValue());
         perVariableProposalTo.put(variable, to);
     }
@@ -32,11 +32,11 @@ public class Proposal {
         this.listeners.addAll(listeners);
     }
 
-    public <T> T getProposalTo(Variable<T> variable) {
+    public <T> T getProposalTo(Variable<T, ?> variable) {
         return (T) perVariableProposalTo.get(variable);
     }
 
-    public <T> T getProposalFrom(Variable<T> variable) {
+    public <T> T getProposalFrom(Variable<T, ?> variable) {
         return (T) perVariableProposalFrom.get(variable);
     }
 

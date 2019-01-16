@@ -105,7 +105,7 @@ public class SimulatedAnnealing {
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-            Variable<?> chosenVariable = latentVariables.get(sampleNum % latentVariables.size());
+            Variable<?, ?> chosenVariable = latentVariables.get(sampleNum % latentVariables.size());
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
             logProbabilityBeforeStep = mhStep.step(
@@ -128,10 +128,10 @@ public class SimulatedAnnealing {
     }
 
     private static void setSamplesAsMax(Map<VariableReference, ?> samples, List<? extends Variable> fromVariables) {
-        fromVariables.forEach(variable -> setSampleForVariable((Variable<?>) variable, samples));
+        fromVariables.forEach(variable -> setSampleForVariable((Variable<?, ?>) variable, samples));
     }
 
-    private static <T> void setSampleForVariable(Variable<T> variable, Map<VariableReference, ?> samples) {
+    private static <T> void setSampleForVariable(Variable<T, ?> variable, Map<VariableReference, ?> samples) {
         ((Map<VariableReference, ? super T>) samples).put(variable.getReference(), variable.getValue());
     }
 

@@ -57,7 +57,7 @@ class Stepsize implements SaveStatistics {
      */
     public static double findStartingStepSize(Map<VariableReference, DoubleTensor> position,
                                               Map<? extends VariableReference, DoubleTensor> gradient,
-                                              List<? extends Variable<DoubleTensor>> variables,
+                                              List<? extends Variable<DoubleTensor, ?>> variables,
                                               ProbabilisticModelWithGradient logProbGradientCalculator,
                                               double initialLogOfMasterP,
                                               KeanuRandom random) {

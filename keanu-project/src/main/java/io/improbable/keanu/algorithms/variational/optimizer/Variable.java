@@ -3,17 +3,17 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import io.improbable.keanu.network.VariableState;
 import io.improbable.keanu.vertices.Samplable;
 
-public interface Variable<T> extends Samplable<T> {
+public interface Variable<VALUE, STATE extends VariableState> extends Samplable<VALUE> {
 
     VariableReference getReference();
 
-    T getValue();
+    VALUE getValue();
 
-    void setValue(T tensor);
+    void setValue(VALUE value);
 
     long[] getShape();
 
-    VariableState getState();
+    STATE getState();
 
-    void setState(VariableState variableState);
+    void setState(STATE state);
 }

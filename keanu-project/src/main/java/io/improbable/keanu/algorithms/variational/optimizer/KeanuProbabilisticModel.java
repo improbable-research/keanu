@@ -59,10 +59,10 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
     }
 
     @Override
-    public List<? extends Variable<DoubleTensor>> getContinuousLatentVariables() {
+    public List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
         return getLatentVariables().stream()
             .filter(v -> v.getValue() instanceof DoubleTensor)
-            .map(v -> (Variable<DoubleTensor>) v)
+            .map(v -> (Variable<DoubleTensor, ?>) v)
             .collect(Collectors.toList());
     }
 

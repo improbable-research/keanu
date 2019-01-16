@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public interface NetworkState {
 
-    <T> T get(Variable<T> variable);
+    <T> T get(Variable<T, ?> variable);
 
     <T> T get(VariableReference variableReference);
 
