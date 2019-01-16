@@ -14,15 +14,15 @@ public class LambdaSectionSnapshot {
     private static final boolean USE_CACHE_ON_REJECTION = true;
 
     private final List<Vertex> latentVertices;
-    private Map<Variable, LambdaSection> affectedVerticesCache;
+    private Map<Variable, LambdaSection> affectedVariablesCache;
 
     public LambdaSectionSnapshot(List<Vertex> latentVertices) {
         this.latentVertices = latentVertices;
     }
 
     private void update() {
-        if (affectedVerticesCache == null) {
-            affectedVerticesCache = createVerticesAffectedByCache(
+        if (affectedVariablesCache == null) {
+            affectedVariablesCache = createVariablesAffectedByCache(
                 latentVertices,
                 USE_CACHE_ON_REJECTION
             );
@@ -33,16 +33,16 @@ public class LambdaSectionSnapshot {
         update();
         double sumLogProb = 0.0;
         for (Variable v : vertices) {
-            sumLogProb += ProbabilityCalculator.calculateLogProbFor(affectedVerticesCache.get(v).getLatentAndObservedVertices());
+            sumLogProb += ProbabilityCalculator.calculateLogProbFor(affectedVariablesCache.get(v).getLatentAndObservedVertices());
         }
         return sumLogProb;
     }
 
-    public Set<Variable> getAllVerticesAffectedBy(Set<? extends Variable> variables) {
+    public Set<Variable> getAllVariablesAffectedBy(Set<? extends Variable> variables) {
         update();
         Set<Variable> allAffectedVertices = new HashSet<>();
         for (Variable variable : variables) {
-            allAffectedVertices.addAll(affectedVerticesCache.get(variable).getAllVertices());
+            allAffectedVertices.addAll(affectedVariablesCache.get(variable).getAllVertices());
         }
         return allAffectedVertices;
     }
@@ -57,8 +57,8 @@ public class LambdaSectionSnapshot {
      * @return A vertex to Lambda Section map that represents the downstream Lambda Section for each latent vertex.
      * This Lambda Section may include all of the nonprobabilistic vertices if useCacheOnRejection is enabled.
      */
-    private static Map<Variable, LambdaSection> createVerticesAffectedByCache(List<Vertex> latentVertices,
-                                                                              boolean useCacheOnRejection) {
+    private static Map<Variable, LambdaSection> createVariablesAffectedByCache(List<Vertex> latentVertices,
+                                                                               boolean useCacheOnRejection) {
         return latentVertices.stream()
             .collect(Collectors.toMap(
                 v -> v,

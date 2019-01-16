@@ -97,9 +97,9 @@ class Tree implements SaveStatistics {
     }
 
     public static Tree buildOtherHalfOfTree(Tree currentTree,
-                                            List<? extends Variable<DoubleTensor>> latentVertices,
+                                            List<? extends Variable<DoubleTensor>> latentVariables,
                                             ProbabilisticModelWithGradient logProbGradientCalculator,
-                                            final List<? extends Variable> sampleFromVertices,
+                                            final List<? extends Variable> sampleFromVariables,
                                             double logU,
                                             int buildDirection,
                                             int treeHeight,
@@ -108,9 +108,9 @@ class Tree implements SaveStatistics {
                                             KeanuRandom random) {
 
         Tree otherHalfTree = buildTree(
-            latentVertices,
+            latentVariables,
             logProbGradientCalculator,
-            sampleFromVertices,
+            sampleFromVariables,
             buildDirection == -1 ? currentTree.leapfrogBackward : currentTree.leapfrogForward,
             logU,
             buildDirection,
@@ -129,9 +129,9 @@ class Tree implements SaveStatistics {
         return otherHalfTree;
     }
 
-    private static Tree buildTree(List<? extends Variable<DoubleTensor>> latentVertices,
+    private static Tree buildTree(List<? extends Variable<DoubleTensor>> latentVariables,
                                   ProbabilisticModelWithGradient logProbGradientCalculator,
-                                  final List<? extends Variable> sampleFromVertices,
+                                  final List<? extends Variable> sampleFromVariables,
                                   Leapfrog leapfrog,
                                   double logU,
                                   int buildDirection,
@@ -144,9 +144,9 @@ class Tree implements SaveStatistics {
             //Base case-take one leapfrog step in the build direction
 
             return treeBuilderBaseCase(
-                latentVertices,
+                latentVariables,
                 logProbGradientCalculator,
-                sampleFromVertices,
+                sampleFromVariables,
                 leapfrog,
                 logU,
                 buildDirection,
@@ -158,9 +158,9 @@ class Tree implements SaveStatistics {
             //Recursion-implicitly build the left and right subtrees.
 
             Tree tree = buildTree(
-                latentVertices,
+                latentVariables,
                 logProbGradientCalculator,
-                sampleFromVertices,
+                sampleFromVariables,
                 leapfrog,
                 logU,
                 buildDirection,
@@ -175,9 +175,9 @@ class Tree implements SaveStatistics {
 
                 Tree otherHalfTree = buildOtherHalfOfTree(
                     tree,
-                    latentVertices,
+                    latentVariables,
                     logProbGradientCalculator,
-                    sampleFromVertices,
+                    sampleFromVariables,
                     logU,
                     buildDirection,
                     treeHeight - 1,
@@ -207,16 +207,16 @@ class Tree implements SaveStatistics {
 
     }
 
-    private static Tree treeBuilderBaseCase(List<? extends Variable<DoubleTensor>> latentVertices,
+    private static Tree treeBuilderBaseCase(List<? extends Variable<DoubleTensor>> latentVariables,
                                             ProbabilisticModelWithGradient logProbGradientCalculator,
-                                            final List<? extends Variable> sampleFromVertices,
+                                            final List<? extends Variable> sampleFromVariables,
                                             Leapfrog leapfrog,
                                             double logU,
                                             int buildDirection,
                                             double epsilon,
                                             double logOfMasterPMinusMomentumBeforeLeapfrog) {
 
-        leapfrog = leapfrog.step(latentVertices, logProbGradientCalculator, epsilon * buildDirection);
+        leapfrog = leapfrog.step(latentVariables, logProbGradientCalculator, epsilon * buildDirection);
 
         final double logOfMasterPAfterLeapfrog = logProbGradientCalculator.logProb();
 
@@ -224,7 +224,7 @@ class Tree implements SaveStatistics {
         final int acceptedLeapfrogCount = logU <= logOfMasterPMinusMomentum ? 1 : 0;
         final boolean shouldContinueFlag = logU < DELTA_MAX + logOfMasterPMinusMomentum;
 
-        final Map<VariableReference, ?> sampleAtAcceptedPosition = takeSample((List<? extends Variable<Object>>)sampleFromVertices);
+        final Map<VariableReference, ?> sampleAtAcceptedPosition = takeSample((List<? extends Variable<Object>>)sampleFromVariables);
 
         final double deltaLikelihoodOfLeapfrog = Math.min(
             1.0,

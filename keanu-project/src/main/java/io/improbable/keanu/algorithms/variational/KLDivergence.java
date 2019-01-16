@@ -18,7 +18,7 @@ public class KLDivergence {
 
     public static double compute(ProbabilisticDouble q, NetworkSamples p) {
         return compute(p, networkState -> {
-            Set<VariableReference> vertexIds = networkState.getVertexIds();
+            Set<VariableReference> vertexIds = networkState.getVariableReferences();
             if (vertexIds.size() != 1) {
                 throw new IllegalArgumentException("A NetworkState does not contain exactly 1 vertex and ProbabilisticDouble can only compute the log probability of one value. Try computing KL divergence against a QDistribution instead.");
             }

@@ -10,39 +10,39 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A network sample contains the state of the network (vertex values) and the logOfMasterP at
+ * A network sample contains the state of the network (variable values) and the logOfMasterP at
  * a given point in time.
  */
 @AllArgsConstructor
 public class NetworkSample implements NetworkState {
 
-    private final Map<VariableReference, ?> vertexValues;
+    private final Map<VariableReference, ?> variableStates;
 
     @Getter
     private final double logOfMasterP;
 
     /**
-     * @param vertex the vertex to get the values of
+     * @param variable the vertex to get the values of
      * @param <T>    the type of the values that the vertex contains
      * @return the values of the specified vertex
      */
     @Override
-    public <T> T get(Variable<T> vertex) {
-        return (T) vertexValues.get(vertex.getReference());
+    public <T> T get(Variable<T> variable) {
+        return (T) variableStates.get(variable.getReference());
     }
 
     /**
-     * @param vertexId the ID of the vertex to get the values of
+     * @param variableReference the ID of the vertex to get the values of
      * @param <T>      the type of the values that the vertex contains
      * @return the values of the specified vertex
      */
     @Override
-    public <T> T get(VariableReference vertexId) {
-        return (T) vertexValues.get(vertexId);
+    public <T> T get(VariableReference variableReference) {
+        return (T) variableStates.get(variableReference);
     }
 
     @Override
-    public Set<VariableReference> getVertexIds() {
-        return vertexValues.keySet();
+    public Set<VariableReference> getVariableReferences() {
+        return variableStates.keySet();
     }
 }

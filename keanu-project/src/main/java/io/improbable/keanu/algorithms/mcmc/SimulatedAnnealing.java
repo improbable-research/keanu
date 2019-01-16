@@ -63,39 +63,39 @@ public class SimulatedAnnealing {
     @Builder.Default
     private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
 
-    public NetworkState getMaxAPosteriori(ProbabilisticModel bayesNet,
+    public NetworkState getMaxAPosteriori(ProbabilisticModel model,
                                           int sampleCount) {
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule);
+        return getMaxAPosteriori(model, sampleCount, schedule);
     }
 
     /**
      * Finds the MAP using the default annealing schedule, which is an exponential decay schedule.
      *
-     * @param bayesNet          a bayesian network containing latent vertices
+     * @param model          a probabilistic model containing latent variables
      * @param sampleCount       the number of samples to take
      * @param annealingSchedule the schedule to update T (temperature) as a function of sample number.
      * @return the NetworkState that represents the Max A Posteriori
      */
-    public NetworkState getMaxAPosteriori(ProbabilisticModel bayesNet,
+    public NetworkState getMaxAPosteriori(ProbabilisticModel model,
                                           int sampleCount,
                                           AnnealingSchedule annealingSchedule) {
 
-        if (ProbabilityCalculator.isImpossibleLogProb(bayesNet.logProb())) {
+        if (ProbabilityCalculator.isImpossibleLogProb(model.logProb())) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        Map<VariableReference, ?> maxSamplesByVertex = new HashMap<>();
-        List<? extends Variable> latentVariables = bayesNet.getLatentVariables();
+        Map<VariableReference, ?> maxSamplesByVariable = new HashMap<>();
+        List<? extends Variable> latentVariables = model.getLatentVariables();
         List<Vertex> latentVertices = (List<Vertex>) latentVariables;
 
-        double logProbabilityBeforeStep = bayesNet.logProb();
+        double logProbabilityBeforeStep = model.logProb();
         double maxLogP = logProbabilityBeforeStep;
-        setSamplesAsMax(maxSamplesByVertex, latentVariables);
+        setSamplesAsMax(maxSamplesByVariable, latentVariables);
 
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
-            bayesNet,
+            model,
             proposalDistribution,
             new RollBackOnRejection(latentVertices),
             new LambdaSectionOptimizedLogProbCalculator(latentVertices),
@@ -105,34 +105,34 @@ public class SimulatedAnnealing {
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-            Variable<?> chosenVertex = latentVariables.get(sampleNum % latentVariables.size());
+            Variable<?> chosenVariable = latentVariables.get(sampleNum % latentVariables.size());
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
             logProbabilityBeforeStep = mhStep.step(
-                Collections.singleton(chosenVertex),
+                Collections.singleton(chosenVariable),
                 logProbabilityBeforeStep,
                 temperature
             ).getLogProbabilityAfterStep();
 
             if (logProbabilityBeforeStep > maxLogP) {
                 maxLogP = logProbabilityBeforeStep;
-                setSamplesAsMax(maxSamplesByVertex, latentVariables);
+                setSamplesAsMax(maxSamplesByVariable, latentVariables);
             }
         }
 
-        return new SimpleNetworkState(mapByVariableReference(maxSamplesByVertex));
+        return new SimpleNetworkState(mapByVariableReference(maxSamplesByVariable));
     }
 
     private <T> Map<VariableReference, T> mapByVariableReference(Map<VariableReference, T> legacyMap) {
         return legacyMap.entrySet().stream().collect(Collectors.toMap(k -> (VariableReference) k.getKey(), Map.Entry::getValue));
     }
 
-    private static void setSamplesAsMax(Map<VariableReference, ?> samples, List<? extends Variable> fromVertices) {
-        fromVertices.forEach(vertex -> setSampleForVertex((Variable<?>) vertex, samples));
+    private static void setSamplesAsMax(Map<VariableReference, ?> samples, List<? extends Variable> fromVariables) {
+        fromVariables.forEach(variable -> setSampleForVariable((Variable<?>) variable, samples));
     }
 
-    private static <T> void setSampleForVertex(Variable<T> vertex, Map<VariableReference, ?> samples) {
-        ((Map<VariableReference, ? super T>) samples).put(vertex.getReference(), vertex.getValue());
+    private static <T> void setSampleForVariable(Variable<T> variable, Map<VariableReference, ?> samples) {
+        ((Map<VariableReference, ? super T>) samples).put(variable.getReference(), variable.getValue());
     }
 
     /**

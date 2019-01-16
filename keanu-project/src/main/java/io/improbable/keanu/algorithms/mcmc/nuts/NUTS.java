@@ -85,45 +85,45 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     private boolean saveStatistics = false;
 
     /**
-     * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
+     * Sample from the posterior of a probabilistic model using the No-U-Turn-Sampling algorithm
      *
-     * @param bayesNet           the bayesian network to sample from
-     * @param sampleFromVertices the vertices inside the bayesNet to sample from
+     * @param model           the probabilistic model to sample from
+     * @param variablesToSampleFrom the variables inside the probabilistic model to sample from
      * @return Samples taken with NUTS
      */
     @Override
-    public NetworkSamples getPosteriorSamples(final ProbabilisticModel bayesNet,
-                                              final List<? extends Variable> sampleFromVertices,
+    public NetworkSamples getPosteriorSamples(final ProbabilisticModel model,
+                                              final List<? extends Variable> variablesToSampleFrom,
                                               final int sampleCount) {
-        return generatePosteriorSamples((ProbabilisticModelWithGradient) bayesNet, sampleFromVertices)
+        return generatePosteriorSamples((ProbabilisticModelWithGradient) model, variablesToSampleFrom)
             .generate(sampleCount);
     }
 
-    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModelWithGradient bayesNet,
-                                                            final List<? extends Variable> fromVertices) {
+    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModelWithGradient model,
+                                                            final List<? extends Variable> fromVariables) {
 
-        return new NetworkSamplesGenerator(setupSampler(bayesNet, fromVertices), ProgressBar::new);
+        return new NetworkSamplesGenerator(setupSampler(model, fromVariables), ProgressBar::new);
     }
 
-    private NUTSSampler setupSampler(final ProbabilisticModelWithGradient bayesNet,
-                                     final List<? extends Variable> sampleFromVertices) {
+    private NUTSSampler setupSampler(final ProbabilisticModelWithGradient model,
+                                     final List<? extends Variable> sampleFromVariables) {
 
-        Preconditions.checkArgument(!sampleFromVertices.isEmpty(), "List of vertices to sample from is empty");
+        Preconditions.checkArgument(!sampleFromVariables.isEmpty(), "List of variables to sample from is empty");
 
-        final List<? extends Variable<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVariables();
+        final List<? extends Variable<DoubleTensor>> latentVariables = model.getContinuousLatentVariables();
 
-        Map<VariableReference, DoubleTensor> startingSample = SamplingAlgorithm.takeSample(latentVertices);
+        Map<VariableReference, DoubleTensor> startingSample = SamplingAlgorithm.takeSample(latentVariables);
         Map<VariableReference, DoubleTensor> position = startingSample.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (DoubleTensor) e.getValue()));
         Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
-        Map<? extends VariableReference, DoubleTensor> gradient = bayesNet.logProbGradients();
+        Map<? extends VariableReference, DoubleTensor> gradient = model.logProbGradients();
 
-        double initialLogOfMasterP = bayesNet.logProb();
+        double initialLogOfMasterP = model.logProb();
 
         double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(
             position,
             gradient,
-            latentVertices,
-            bayesNet,
+            latentVariables,
+            model,
             initialLogOfMasterP,
             random
         ) : initialStepSize;
@@ -134,14 +134,14 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        resetVariableValue(sampleFromVertices, position);
+        resetVariableValue(sampleFromVariables, position);
 
-        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample((List<? extends Variable<Object>>)sampleFromVertices));
+        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample((List<? extends Variable<Object>>)sampleFromVariables));
 
         return new NUTSSampler(
-            sampleFromVertices,
-            latentVertices,
-            bayesNet,
+            sampleFromVariables,
+            latentVariables,
+            model,
             adaptEnabled,
             stepsize,
             tree,
@@ -156,8 +156,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         return statistics;
     }
 
-    private static void resetVariableValue(List<? extends Variable> sampleFromVertices, Map<? extends VariableReference, DoubleTensor> previousPosition) {
-        for (Variable variable : sampleFromVertices) {
+    private static void resetVariableValue(List<? extends Variable> sampleFromVariables, Map<? extends VariableReference, DoubleTensor> previousPosition) {
+        for (Variable variable : sampleFromVariables) {
             variable.setValue(previousPosition.get(variable.getReference()));
         }
     }

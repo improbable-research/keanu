@@ -165,10 +165,10 @@ public class LambdaModelVertexTest {
         humidityObservation.observe(60.0);
         chanceOfRainObservation.observe(3.0);
 
-        ProbabilisticModel bayesianNetwork = new KeanuProbabilisticModel(new BayesianNetwork(chanceOfRainObservation.getConnectedGraph()));
+        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(new BayesianNetwork(chanceOfRainObservation.getConnectedGraph()));
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(
-            bayesianNetwork,
+            probabilisticModel,
             inputToModel,
             200
         );

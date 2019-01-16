@@ -11,8 +11,8 @@ public class CascadeOnRejection implements ProposalRejectionStrategy {
     private Set<? extends Variable> variables;
 
     @Override
-    public void prepare(Set<Variable> variables) {
-        this.variables = variables;
+    public void prepare(Set<Variable> chosenVariables) {
+        this.variables = chosenVariables;
     }
 
     @Override

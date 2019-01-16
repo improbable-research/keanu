@@ -84,7 +84,7 @@ public class NetworkSamplesGenerator {
 
         ProgressBar progressBar = progressBarSupplier.get();
 
-        Map<VariableReference, List<?>> samplesByVertex = new HashMap<>();
+        Map<VariableReference, List<?>> samplesByVariable = new HashMap<>();
         List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
         dropSamples(dropCount, progressBar);
@@ -93,7 +93,7 @@ public class NetworkSamplesGenerator {
         int samplesLeft = totalSampleCount - dropCount;
         for (int i = 0; i < samplesLeft; i++) {
             if (i % downSampleInterval == 0) {
-                algorithm.sample(samplesByVertex, logOfMasterPForEachSample);
+                algorithm.sample(samplesByVariable, logOfMasterPForEachSample);
                 sampleCount++;
             } else {
                 algorithm.step();
@@ -103,7 +103,7 @@ public class NetworkSamplesGenerator {
         }
 
         progressBar.finish();
-        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, sampleCount);
+        return new NetworkSamples(samplesByVariable, logOfMasterPForEachSample, sampleCount);
     }
 
     /**

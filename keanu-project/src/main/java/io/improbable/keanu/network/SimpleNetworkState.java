@@ -8,24 +8,24 @@ import java.util.Set;
 
 public class SimpleNetworkState implements NetworkState {
 
-    private final Map<VariableReference, ?> vertexValues;
+    private final Map<VariableReference, ?> variableValues;
 
-    public SimpleNetworkState(Map<VariableReference, ?> vertexValues) {
-        this.vertexValues = vertexValues;
+    public SimpleNetworkState(Map<VariableReference, ?> variableValues) {
+        this.variableValues = variableValues;
     }
 
     @Override
-    public <T> T get(Variable<T> vertex) {
-        return (T) vertexValues.get(vertex.getReference());
+    public <T> T get(Variable<T> variable) {
+        return (T) variableValues.get(variable.getReference());
     }
 
     @Override
-    public <T> T get(VariableReference vertexId) {
-        return (T) vertexValues.get(vertexId);
+    public <T> T get(VariableReference variableReference) {
+        return (T) variableValues.get(variableReference);
     }
 
     @Override
-    public Set<VariableReference> getVertexIds() {
-        return vertexValues.keySet();
+    public Set<VariableReference> getVariableReferences() {
+        return variableValues.keySet();
     }
 }

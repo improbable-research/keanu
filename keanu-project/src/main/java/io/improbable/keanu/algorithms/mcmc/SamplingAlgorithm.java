@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 public interface SamplingAlgorithm {
 
-    static <T> Map<VariableReference, T> takeSample(List<? extends Variable<T>> sampleFromVertices) {
-        return sampleFromVertices.stream().collect(Collectors.toMap(Variable::getReference, Variable::getValue));
+    static <T> Map<VariableReference, T> takeSample(List<? extends Variable<T>> sampleFromVariables) {
+        return sampleFromVariables.stream().collect(Collectors.toMap(Variable::getReference, Variable::getValue));
     }
 
     /**
@@ -21,9 +21,9 @@ public interface SamplingAlgorithm {
 
     /**
      * Takes a sample with the algorithm and saves it in the supplied map (creating a new entry in the list if the
-     * Vertex already exists).
+     * Variable already exists).
      *
-     * @param samples                   map to store sampled vertex values
+     * @param samples                   map to store sampled variable values
      * @param logOfMasterPForEachSample list of log of master probability for each sample
      */
     void sample(Map<VariableReference, List<?>> samples, List<Double> logOfMasterPForEachSample);

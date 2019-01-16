@@ -13,23 +13,23 @@ public class AcceptanceRateTracker implements ProposalListener {
 
     @Override
     public void onProposalApplied(Proposal proposal) {
-        for (Variable vertex : proposal.getVerticesWithProposal()) {
-            numApplied.computeIfAbsent(vertex.getReference(), i -> new Counter()).increment();
+        for (Variable variable : proposal.getVariablesWithProposal()) {
+            numApplied.computeIfAbsent(variable.getReference(), i -> new Counter()).increment();
         }
     }
 
     @Override
     public void onProposalRejected(Proposal proposal) {
-        for (Variable vertex : proposal.getVerticesWithProposal()) {
-            numRejected.computeIfAbsent(vertex.getReference(), i -> new Counter()).increment();
+        for (Variable variable : proposal.getVariablesWithProposal()) {
+            numRejected.computeIfAbsent(variable.getReference(), i -> new Counter()).increment();
         }
     }
 
-    public double getAcceptanceRate(VariableReference vertexId) {
-        if (!numApplied.keySet().contains(vertexId)) {
-            throw new IllegalStateException("No proposals have been registered for " + vertexId);
+    public double getAcceptanceRate(VariableReference variableReference) {
+        if (!numApplied.keySet().contains(variableReference)) {
+            throw new IllegalStateException("No proposals have been registered for " + variableReference);
         }
-        return 1. - (double) numRejected.getOrDefault(vertexId, new Counter()).getValue() / numApplied.get(vertexId).getValue();
+        return 1. - (double) numRejected.getOrDefault(variableReference, new Counter()).getValue() / numApplied.get(variableReference).getValue();
     }
 
     private class Counter {

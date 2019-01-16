@@ -8,19 +8,19 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Saves the state (value and observed) of a specified collection of vertices.
+ * Saves the state (value and observed) of a specified collection of variables.
  */
 public class NetworkSnapshot {
 
-    public static NetworkSnapshot create(Set<? extends Variable> vertices) {
-        return new NetworkSnapshot(vertices);
+    public static NetworkSnapshot create(Set<? extends Variable> variables) {
+        return new NetworkSnapshot(variables);
     }
 
     private final Map<Variable, VariableState> values;
 
-    private NetworkSnapshot(Collection<? extends Variable> vertices) {
+    private NetworkSnapshot(Collection<? extends Variable> variables) {
         values = new HashMap<>();
-        for (Variable v : vertices) {
+        for (Variable v : variables) {
             values.put(v, v.getState());
         }
     }

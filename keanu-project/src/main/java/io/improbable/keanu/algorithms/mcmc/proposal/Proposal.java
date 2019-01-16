@@ -10,18 +10,18 @@ import java.util.Set;
 
 public class Proposal {
 
-    private final Map<Variable, Object> perVertexProposalTo;
-    private final Map<Variable, Object> perVertexProposalFrom;
+    private final Map<Variable, Object> perVariableProposalTo;
+    private final Map<Variable, Object> perVariableProposalFrom;
     private final List<ProposalListener> listeners = Lists.newArrayList();
 
     public Proposal() {
-        this.perVertexProposalTo = new HashMap<>();
-        this.perVertexProposalFrom = new HashMap<>();
+        this.perVariableProposalTo = new HashMap<>();
+        this.perVariableProposalFrom = new HashMap<>();
     }
 
-    public <T> void setProposal(Variable<T> vertex, T to) {
-        perVertexProposalFrom.put(vertex, vertex.getValue());
-        perVertexProposalTo.put(vertex, to);
+    public <T> void setProposal(Variable<T> variable, T to) {
+        perVariableProposalFrom.put(variable, variable.getValue());
+        perVariableProposalTo.put(variable, to);
     }
 
     public void addListener(ProposalListener listener) {
@@ -32,21 +32,21 @@ public class Proposal {
         this.listeners.addAll(listeners);
     }
 
-    public <T> T getProposalTo(Variable<T> vertex) {
-        return (T) perVertexProposalTo.get(vertex);
+    public <T> T getProposalTo(Variable<T> variable) {
+        return (T) perVariableProposalTo.get(variable);
     }
 
-    public <T> T getProposalFrom(Variable<T> vertex) {
-        return (T) perVertexProposalFrom.get(vertex);
+    public <T> T getProposalFrom(Variable<T> variable) {
+        return (T) perVariableProposalFrom.get(variable);
     }
 
-    public Set<Variable> getVerticesWithProposal() {
-        return perVertexProposalTo.keySet();
+    public Set<Variable> getVariablesWithProposal() {
+        return perVariableProposalTo.keySet();
     }
 
     public void apply() {
-        Set<Variable> vertices = perVertexProposalTo.keySet();
-        for (Variable v : vertices) {
+        Set<Variable> variables = perVariableProposalTo.keySet();
+        for (Variable v : variables) {
             v.setValue(getProposalTo(v));
         }
         for (ProposalListener listener : listeners) {
@@ -55,8 +55,8 @@ public class Proposal {
     }
 
     public void reject() {
-        Set<Variable> vertices = perVertexProposalTo.keySet();
-        for (Variable v : vertices) {
+        Set<Variable> variables = perVariableProposalTo.keySet();
+        for (Variable v : variables) {
             v.setValue(getProposalFrom(v));
         }
         for (ProposalListener listener : listeners) {

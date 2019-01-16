@@ -14,21 +14,21 @@ import java.util.Set;
 @Slf4j
 public class MetropolisHastingsSampler implements SamplingAlgorithm {
 
-    private final List<? extends Variable> latentVertices;
-    private final List<? extends Variable> verticesToSampleFrom;
+    private final List<? extends Variable> latentVariables;
+    private final List<? extends Variable> variablesToSampleFrom;
     private final MetropolisHastingsStep mhStep;
     private final MHStepVariableSelector variableSelector;
 
     private double logProbabilityBeforeStep;
     private int sampleNum;
 
-    public MetropolisHastingsSampler(List<? extends Variable> latentVertices,
-                                     List<? extends Variable> verticesToSampleFrom,
+    public MetropolisHastingsSampler(List<? extends Variable> latentVariables,
+                                     List<? extends Variable> variablesToSampleFrom,
                                      MetropolisHastingsStep mhStep,
                                      MHStepVariableSelector variableSelector,
                                      double logProbabilityBeforeStep) {
-        this.latentVertices = latentVertices;
-        this.verticesToSampleFrom = verticesToSampleFrom;
+        this.latentVariables = latentVariables;
+        this.variablesToSampleFrom = variablesToSampleFrom;
         this.mhStep = mhStep;
         this.variableSelector = variableSelector;
         this.logProbabilityBeforeStep = logProbabilityBeforeStep;
@@ -37,10 +37,10 @@ public class MetropolisHastingsSampler implements SamplingAlgorithm {
 
     @Override
     public void step() {
-        Set<Variable> chosenVertices = variableSelector.select(latentVertices, sampleNum);
+        Set<Variable> chosenVariables = variableSelector.select(latentVariables, sampleNum);
 
         logProbabilityBeforeStep = mhStep.step(
-            chosenVertices,
+            chosenVariables,
             logProbabilityBeforeStep
         ).getLogProbabilityAfterStep();
 
@@ -48,25 +48,25 @@ public class MetropolisHastingsSampler implements SamplingAlgorithm {
     }
 
     @Override
-    public void sample(Map<VariableReference, List<?>> samplesByVertex, List<Double> logOfMasterPForEachSample) {
+    public void sample(Map<VariableReference, List<?>> samplesByVariable, List<Double> logOfMasterPForEachSample) {
         step();
-        takeSamples(samplesByVertex, verticesToSampleFrom);
+        takeSamples(samplesByVariable, variablesToSampleFrom);
         logOfMasterPForEachSample.add(logProbabilityBeforeStep);
     }
 
     @Override
     public NetworkSample sample() {
         step();
-        return new NetworkSample(SamplingAlgorithm.takeSample((List<? extends Variable<Object>>) verticesToSampleFrom), logProbabilityBeforeStep);
+        return new NetworkSample(SamplingAlgorithm.takeSample((List<? extends Variable<Object>>) variablesToSampleFrom), logProbabilityBeforeStep);
     }
-    private static void takeSamples(Map<VariableReference, List<?>> samples, List<? extends Variable> fromVertices) {
-        fromVertices.forEach(vertex -> addSampleForVertex((Variable<?>) vertex, samples));
+    private static void takeSamples(Map<VariableReference, List<?>> samples, List<? extends Variable> fromVariables) {
+        fromVariables.forEach(variable -> addSampleForVariable((Variable<?>) variable, samples));
     }
 
-    private static <T> void addSampleForVertex(Variable<T> vertex, Map<VariableReference, List<?>> samples) {
-        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getReference(), v -> new ArrayList<T>());
-        T value = vertex.getValue();
-        samplesForVertex.add(value);
+    private static <T> void addSampleForVariable(Variable<T> variable, Map<VariableReference, List<?>> samples) {
+        List<T> samplesForVariable = (List<T>) samples.computeIfAbsent(variable.getReference(), v -> new ArrayList<T>());
+        T value = variable.getValue();
+        samplesForVariable.add(value);
         log.trace(String.format("Sampled %s", value));
     }
 

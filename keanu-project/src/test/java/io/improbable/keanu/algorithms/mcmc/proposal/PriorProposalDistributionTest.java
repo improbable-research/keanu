@@ -43,8 +43,8 @@ public class PriorProposalDistributionTest {
         ProposalListener listener2 = mock(ProposalListener.class);
         List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
         proposalDistribution = new PriorProposalDistribution(listeners);
-        Set<Variable> vertices = ImmutableSet.of(vertex1, vertex2);
-        Proposal proposal = proposalDistribution.getProposal(vertices, KeanuRandom.getDefaultRandom());
+        Set<Variable> variables = ImmutableSet.of(vertex1, vertex2);
+        Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
         proposal.apply();
         verify(listener1).onProposalApplied(proposal);
         verify(listener2).onProposalApplied(proposal);
