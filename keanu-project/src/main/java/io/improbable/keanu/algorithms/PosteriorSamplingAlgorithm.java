@@ -15,9 +15,17 @@ public interface PosteriorSamplingAlgorithm {
         return getPosteriorSamples(bayesianNetwork, Collections.singletonList(vertexToSampleFrom), sampleCount);
     }
 
-    NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
-                                       List<? extends Vertex> verticesToSampleFrom,
-                                       int sampleCount);
+    /**
+     * @param bayesNet      a bayesian network containing latent vertices
+     * @param verticesToSampleFrom the vertices to include in the returned samples
+     * @param sampleCount          number of samples to take using the algorithm
+     * @return Samples for each vertex ordered by MCMC iteration
+     */
+    default NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
+                                               List<? extends Vertex> verticesToSampleFrom,
+                                               int sampleCount) {
+        return generatePosteriorSamples(bayesNet, verticesToSampleFrom).generate(sampleCount);
+    }
 
     default NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork, int sampleCount) {
         return getPosteriorSamples(bayesianNetwork, bayesianNetwork.getTopLevelLatentVertices(), sampleCount);

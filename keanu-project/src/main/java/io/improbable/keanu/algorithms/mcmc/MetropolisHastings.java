@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSample;
-import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
@@ -63,20 +62,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     @Setter
     @Builder.Default
     private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
-
-    /**
-     * @param bayesianNetwork      a bayesian network containing latent vertices
-     * @param verticesToSampleFrom the vertices to include in the returned samples
-     * @param sampleCount          number of samples to take using the algorithm
-     * @return Samples for each vertex ordered by MCMC iteration
-     */
-    @Override
-    public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
-                                              List<? extends Vertex> verticesToSampleFrom,
-                                              int sampleCount) {
-        return generatePosteriorSamples(bayesianNetwork, verticesToSampleFrom)
-            .generate(sampleCount);
-    }
 
     @Override
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
