@@ -57,13 +57,13 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
 class HamiltonianSampler(PosteriorSamplingAlgorithm):
 
     def __init__(self):
-        pass
+        super().__init__(k.jvm_view().Hamiltonian.withDefaultConfig())
 
 
 class NUTSSampler(PosteriorSamplingAlgorithm):
 
     def __init__(self):
-        pass
+        super().__init__(k.jvm_view().NUTS.withDefaultConfig())
 
 
 def sample(net: BayesNet,
