@@ -4,7 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.backend.keanu.KeanuProbabilisticGraph;
 import io.improbable.keanu.backend.keanu.KeanuProbabilisticWithGradientGraph;
-import io.improbable.keanu.backend.tensorflow.TensorflowGraphConverter;
+import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticGraph;
+import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticGraphWithGradient;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -81,25 +82,25 @@ public class ProbabilisticGraphTest {
 
     @Test
     public void canCalculateLogProbOnTensorflowProbabilisticGraph() {
-        ProbabilisticGraph probabilisticGraph = TensorflowGraphConverter.convert(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticGraph probabilisticGraph = TensorflowProbabilisticGraph.convert(new BayesianNetwork(D.getConnectedGraph()));
         canCalculateLogProb(probabilisticGraph);
     }
 
     @Test
     public void canCalculateLogProbOnTensorflowProbabilisticWithGradientGraph() {
-        ProbabilisticGraph probabilisticGraph = TensorflowGraphConverter.convertWithGradient(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticGraph probabilisticGraph = TensorflowProbabilisticGraphWithGradient.convert(new BayesianNetwork(D.getConnectedGraph()));
         canCalculateLogProb(probabilisticGraph);
     }
 
     @Test
     public void canCalculateLogLikelihoodOnTensorflowProbabilisticGraph() {
-        ProbabilisticGraph probabilisticGraph = TensorflowGraphConverter.convert(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticGraph probabilisticGraph = TensorflowProbabilisticGraph.convert(new BayesianNetwork(D.getConnectedGraph()));
         canCalculateLogLikelihood(probabilisticGraph);
     }
 
     @Test
     public void canCalculateLogLikelihoodOnTensorflowProbabilisticWithGradientGraph() {
-        ProbabilisticGraph probabilisticGraph = TensorflowGraphConverter.convertWithGradient(new BayesianNetwork(D.getConnectedGraph()));
+        ProbabilisticGraph probabilisticGraph = TensorflowProbabilisticGraphWithGradient.convert(new BayesianNetwork(D.getConnectedGraph()));
         canCalculateLogLikelihood(probabilisticGraph);
     }
 

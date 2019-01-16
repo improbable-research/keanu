@@ -3,13 +3,14 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
+import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticGraph;
+import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticGraphWithGradient;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -25,31 +26,63 @@ public class OptimizerTest {
     public DeterministicRule deterministicRule = new DeterministicRule();
 
     @Test
-    public void gradientOptimizerCanMLE() {
-        assertCanCalculateMaxLikelihood(getGradientOptimizer());
+    public void keanuGradientOptimizerCanMLE() {
+        assertCanCalculateMaxLikelihood(getKeanuGradientOptimizer());
     }
 
     @Test
-    public void nonGradientOptimizerCanMLE() {
-        assertCanCalculateMaxLikelihood(getNonGradientOptimizer());
+    public void tensorflowGradientOptimizerCanMLE() {
+        assertCanCalculateMaxLikelihood(getTensorflowGradientOptimizer());
     }
 
     @Test
-    public void gradientOptimizerCanMAP() {
-        assertCanCalculateMaxAPosteriori(getGradientOptimizer());
+    public void keanuNonGradientOptimizerCanMLE() {
+        assertCanCalculateMaxLikelihood(getKeanuNonGradientOptimizer());
     }
 
     @Test
-    public void nonGradientOptimizerCanMAP() {
-        assertCanCalculateMaxAPosteriori(getNonGradientOptimizer());
+    public void tensorflowNonGradientOptimizerCanMLE() {
+        assertCanCalculateMaxLikelihood(getTensorflowNonGradientOptimizer());
     }
 
-    private Function<BayesianNetwork, Optimizer> getGradientOptimizer() {
+    @Test
+    public void keanuGradientOptimizerCanMAP() {
+        assertCanCalculateMaxAPosteriori(getKeanuGradientOptimizer());
+    }
+
+    @Test
+    public void tensorflowGradientOptimizerCanMAP() {
+        assertCanCalculateMaxAPosteriori(getTensorflowGradientOptimizer());
+    }
+
+    @Test
+    public void keanuNonGradientOptimizerCanMAP() {
+        assertCanCalculateMaxAPosteriori(getKeanuNonGradientOptimizer());
+    }
+
+    @Test
+    public void tensorflowNonGradientOptimizerCanMAP() {
+        assertCanCalculateMaxAPosteriori(getTensorflowNonGradientOptimizer());
+    }
+
+    private Function<BayesianNetwork, Optimizer> getKeanuGradientOptimizer() {
         return (bayesNet) -> KeanuOptimizer.Gradient.of(bayesNet);
     }
 
-    private Function<BayesianNetwork, Optimizer> getNonGradientOptimizer() {
+    private Function<BayesianNetwork, Optimizer> getKeanuNonGradientOptimizer() {
         return (bayesNet) -> KeanuOptimizer.NonGradient.of(bayesNet);
+    }
+
+    private Function<BayesianNetwork, Optimizer> getTensorflowGradientOptimizer() {
+        return (bayesNet) -> GradientOptimizer.builder()
+            .bayesianNetwork(TensorflowProbabilisticGraphWithGradient.convert(bayesNet))
+            .build();
+    }
+
+    private Function<BayesianNetwork, Optimizer> getTensorflowNonGradientOptimizer() {
+        return (bayesNet) -> NonGradientOptimizer.builder()
+            .bayesianNetwork(TensorflowProbabilisticGraph.convert(bayesNet))
+            .build();
     }
 
     private void assertCanCalculateMaxLikelihood(Function<BayesianNetwork, Optimizer> optimizerMapper) {
@@ -64,13 +97,13 @@ public class OptimizerTest {
 
         Cobserved.observe(44.0);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
+        BayesianNetwork bayesNet = new BayesianNetwork(A.getConnectedGraph());
 
         Optimizer optimizer = optimizerMapper.apply(bayesNet);
 
-        optimizer.maxLikelihood();
-        double maxA = A.getValue().scalar();
-        double maxB = B.getValue().scalar();
+        OptimizedResult optimizedResult = optimizer.maxLikelihood();
+        double maxA = optimizedResult.get(A.getReference()).scalar();
+        double maxB = optimizedResult.get(B.getReference()).scalar();
 
         assertEquals(44, maxA + maxB, 0.1);
     }
@@ -87,13 +120,13 @@ public class OptimizerTest {
 
         Cobserved.observe(46.0);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
+        BayesianNetwork bayesNet = new BayesianNetwork(A.getConnectedGraph());
 
         Optimizer optimizer = optimizerMapper.apply(bayesNet);
 
-        optimizer.maxAPosteriori();
-        double maxA = A.getValue().scalar();
-        double maxB = B.getValue().scalar();
+        OptimizedResult optimizedResult = optimizer.maxAPosteriori();
+        double maxA = optimizedResult.get(A.getReference()).scalar();
+        double maxB = optimizedResult.get(B.getReference()).scalar();
 
         assertEquals(22, maxA, 0.1);
         assertEquals(22, maxB, 0.1);

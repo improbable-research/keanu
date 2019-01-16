@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -22,6 +23,7 @@ public class IntegerSliceVertex extends IntegerUnaryOpVertex {
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
+    @ExportVertexToPythonBindings
     public IntegerSliceVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
                               @LoadVertexParam(DIMENSION_NAME) int dimension,
                               @LoadVertexParam(INDEX_NAME) int index) {

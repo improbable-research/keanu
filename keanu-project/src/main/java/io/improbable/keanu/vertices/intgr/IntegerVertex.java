@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
@@ -126,6 +126,10 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerSumVertex(this);
     }
 
+    public IntegerVertex sum(int... overDimensions) {
+        return new IntegerSumVertex(this, overDimensions);
+    }
+
     public IntegerVertex lambda(long[] shape, Function<IntegerTensor, IntegerTensor> op) {
         return new IntegerUnaryOpLambda<>(shape, this, op);
     }
@@ -175,27 +179,27 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerReshapeVertex(this, proposedShape);
     }
 
-    public BoolVertex equalTo(IntegerVertex rhs) {
+    public BooleanVertex equalTo(IntegerVertex rhs) {
         return new EqualsVertex<>(this, rhs);
     }
 
-    public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
+    public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);
     }
 
-    public <T extends NumberTensor> BoolVertex greaterThan(Vertex<T> rhs) {
+    public <T extends NumberTensor> BooleanVertex greaterThan(Vertex<T> rhs) {
         return new GreaterThanVertex<>(this, rhs);
     }
 
-    public <T extends NumberTensor> BoolVertex greaterThanOrEqualTo(Vertex<T> rhs) {
+    public <T extends NumberTensor> BooleanVertex greaterThanOrEqualTo(Vertex<T> rhs) {
         return new GreaterThanOrEqualVertex<>(this, rhs);
     }
 
-    public <T extends NumberTensor> BoolVertex lessThan(Vertex<T> rhs) {
+    public <T extends NumberTensor> BooleanVertex lessThan(Vertex<T> rhs) {
         return new LessThanVertex<>(this, rhs);
     }
 
-    public <T extends NumberTensor> BoolVertex lessThanOrEqualTo(Vertex<T> rhs) {
+    public <T extends NumberTensor> BooleanVertex lessThanOrEqualTo(Vertex<T> rhs) {
         return new LessThanOrEqualVertex<>(this, rhs);
     }
 

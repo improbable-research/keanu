@@ -1,21 +1,49 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.backend.Variable;
 import io.improbable.keanu.backend.VariableReference;
-import io.improbable.keanu.backend.LogProbWithSample;
-import io.improbable.keanu.backend.ProbabilisticGraph;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbObservation;
+import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbPrior;
 
 @AllArgsConstructor
 public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
+
+    public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
+        TensorflowComputableGraphBuilder builder = new TensorflowComputableGraphBuilder();
+
+        builder.convert(network.getVertices());
+
+        Optional<VariableReference> logLikelihoodReference = convertLogProbObservation(network, builder);
+        VariableReference priorLogProbReference = convertLogProbPrior(network, builder);
+
+        VariableReference logProbReference = logLikelihoodReference
+            .map(ll -> builder.add(ll, priorLogProbReference))
+            .orElse(priorLogProbReference);
+
+        TensorflowComputableGraph computableGraph = builder.build();
+
+        List<Variable<?>> latentVariables = builder.getLatentVariables().stream()
+            .map(v -> new TensorflowVariable<>(computableGraph, v))
+            .collect(Collectors.toList());
+
+        return new TensorflowProbabilisticGraph(
+            computableGraph,
+            latentVariables,
+            logProbReference,
+            logLikelihoodReference.orElse(null)
+        );
+    }
 
     @Getter
     private final TensorflowComputableGraph computableGraph;
@@ -37,32 +65,13 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
 
     @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
-        DoubleTensor logLikelihood = computableGraph.compute(inputs, logLikelihoodOp);
-        return logLikelihood.scalar();
-    }
 
-    @Override
-    public LogProbWithSample logProbWithSample(Map<VariableReference, ?> inputs, List<VariableReference> sampleFrom) {
-
-        List<VariableReference> allOutputs = new ArrayList<>(sampleFrom);
-        allOutputs.add(logProbOp);
-
-        Map<VariableReference, ?> results = computableGraph.compute(inputs, allOutputs);
-        double logProb = ((DoubleTensor) results.get(logProbOp)).scalar();
-        results.remove(logProbOp);
-
-        return new LogProbWithSample(logProb, results);
-    }
-
-    @Override
-    public Map<VariableReference, ?> getLatentVariablesValues() {
-
-        Map<VariableReference, ?> values = new HashMap<>();
-        for (Variable latent : latentVariables) {
-            values.put(latent.getReference(), computableGraph.getInput(latent.getReference()));
+        if (logLikelihoodOp == null) {
+            throw new IllegalStateException("Likelihood is undefined");
         }
 
-        return values;
+        DoubleTensor logLikelihood = computableGraph.compute(inputs, logLikelihoodOp);
+        return logLikelihood.scalar();
     }
 
     @Override

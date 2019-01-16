@@ -11,7 +11,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -106,7 +106,7 @@ public class ProcessModelVertexTest {
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValuesMultipleTypes);
 
         IntegerVertex suggestedFactorSuncream = model.getIntegerModelOutputVertex(new VertexLabel("suggestedFactorSuncream"));
-        BoolVertex isSunny = model.getBoolModelOutputVertex(new VertexLabel("isSunny"));
+        BooleanVertex isSunny = model.getBooleanModelOutputVertex(new VertexLabel("isSunny"));
 
         double inputValue = 20.0;
 

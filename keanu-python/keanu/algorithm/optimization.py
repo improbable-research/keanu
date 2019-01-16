@@ -2,6 +2,9 @@ from py4j.java_gateway import java_import, JavaObject, JavaClass
 from keanu.context import KeanuContext
 from keanu.net import BayesNet
 from keanu.vertex.base import Vertex
+from keanu.tensor import Tensor
+from keanu.base import JavaObjectWrapper
+from keanu.vartypes import numpy_types
 from typing import Union, Optional, Tuple
 
 k = KeanuContext()
@@ -11,17 +14,29 @@ java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer")
 
 
+class OptimizedResult(JavaObjectWrapper):
+
+    def __init__(self, saver_object: JavaObject):
+        super().__init__(saver_object)
+
+    def optimized_fitness(self) -> float:
+        return self.unwrap().getOptimizedFitness()
+
+    def optimized_value(self, v: Vertex) -> numpy_types:
+        return Tensor._to_ndarray(self.unwrap().get(v.unwrap().getReference()))
+
+
 class Optimizer:
 
     def __init__(self, optimizer: JavaObject, net: Union[BayesNet, Vertex]) -> None:
         self.optimizer = optimizer
         self.net = net
 
-    def max_a_posteriori(self) -> float:
-        return self.optimizer.maxAPosteriori()
+    def max_a_posteriori(self) -> OptimizedResult:
+        return OptimizedResult(self.optimizer.maxAPosteriori())
 
-    def max_likelihood(self) -> float:
-        return self.optimizer.maxLikelihood()
+    def max_likelihood(self) -> OptimizedResult:
+        return OptimizedResult(self.optimizer.maxLikelihood())
 
     @staticmethod
     def _build_bayes_net(factory_class: JavaClass,

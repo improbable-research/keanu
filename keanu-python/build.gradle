@@ -6,7 +6,7 @@ import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
 task installPipenv {
     doLast {
         exec {
-            commandLine 'pip', 'install', 'pipenv==2018.10.13'
+            commandLine 'pip', 'install', 'pipenv==2018.11.26'
         }
     }
 }
@@ -43,7 +43,6 @@ task installDependencies {
 
 task preparePythonEnvironment {
     dependsOn(installPipenv)
-    dependsOn(pythonVersionInfo)
     dependsOn(installDependencies)
     dependsOn(":keanu-project:preparePythonClasspath")
     dependsOn(":codegen:runCodeGeneration")
@@ -101,27 +100,13 @@ task generateDocumentation {
     }
 }
 
-def keanuVertexGeneratedPath
-def keanuVertexInitPath
-
-task populateExclusionPaths {
-    def keanuVertexPath = Paths.get("keanu", "vertex")
-    if(isFamily(FAMILY_WINDOWS)) {
-        keanuVertexPath = Paths.get(".").resolve(keanuVertexPath)
-    }
-    keanuVertexGeneratedPath = keanuVertexPath.resolve("generated.py")
-    keanuVertexInitPath = keanuVertexPath.resolve("__init__.py")
-}
-
 task formatApply {
     mustRunAfter preparePythonEnvironment // this is a dependency but only needs to be run once
     mustRunAfter ':spotlessPythonApply'   // spotless does some checks of the python code too
-    dependsOn populateExclusionPaths
 
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel',
-            '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
+            commandLine 'pipenv', 'run', 'yapf', '--in-place', '--recursive', '--parallel', project.relativeProjectPath(".")
         }
     }
 }
@@ -129,12 +114,21 @@ task formatApply {
 task formatCheck {
     mustRunAfter preparePythonEnvironment // this is a dependency but only needs to be run once
     mustRunAfter ':spotlessPythonCheck'   // spotless does some checks of the python code too
-    dependsOn populateExclusionPaths
 
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel',
-            '--exclude', keanuVertexGeneratedPath, '--exclude', keanuVertexInitPath, '.'
+            commandLine 'pipenv', 'run', 'yapf', '--diff', '--recursive', '--parallel', project.relativeProjectPath(".")
+        }
+    }
+}
+
+task buildWheelDistribution {
+    mustRunAfter preparePythonEnvironment
+    mustRunAfter preparePythonEnvironment
+
+    doLast {
+        exec {
+            commandLine 'pipenv', 'run', 'python', project.file("setup.py"), 'sdist', 'bdist_wheel'
         }
     }
 }
@@ -146,3 +140,4 @@ test.dependsOn(preparePythonEnvironment)
 test.dependsOn(formatCheck)
 test.dependsOn(pytest)
 
+buildWheelDistribution.dependsOn(test)

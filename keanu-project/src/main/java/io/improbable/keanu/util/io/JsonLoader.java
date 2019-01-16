@@ -5,7 +5,7 @@ import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.apache.commons.io.IOUtils;
@@ -40,7 +40,7 @@ public class JsonLoader implements NetworkLoader {
     }
 
     @Override
-    public void loadValue(BoolVertex vertex) {
+    public void loadValue(BooleanVertex vertex) {
         protobufLoader.loadValue(vertex);
     }
 

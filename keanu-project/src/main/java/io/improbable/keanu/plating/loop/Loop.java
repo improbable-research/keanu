@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -123,7 +123,7 @@ public class Loop {
     }
 
     private void checkIfMaxCountHasBeenReached(Plate plate) throws LoopDidNotTerminateException {
-        BoolVertex stillLooping = plate.get(STILL_LOOPING_LABEL);
+        BooleanVertex stillLooping = plate.get(STILL_LOOPING_LABEL);
         if (!stillLooping.getValue().allFalse()) {
             String errorMessage = "Loop has exceeded its max count " + plates.size();
             if (throwWhenMaxCountIsReached) {

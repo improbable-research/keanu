@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -16,6 +17,7 @@ public class ReshapeVertex extends DoubleUnaryOpVertex implements Differentiable
 
     private static final String PROPOSED_SHAPE_NAME = "proposedShape";
 
+    @ExportVertexToPythonBindings
     public ReshapeVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                          @LoadVertexParam(PROPOSED_SHAPE_NAME) long... proposedShape) {
         super(proposedShape, inputVertex);

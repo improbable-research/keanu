@@ -28,7 +28,7 @@ dependencies {
     compile 'org.apache.commons:commons-math3:3.6.1'
     compile 'org.nd4j:nd4j-native-platform:1.0.0-beta3'
 
-    compile 'org.tensorflow:tensorflow:1.12.0-rc0'
+    compile 'org.tensorflow:tensorflow:1.12.0'
 
     compile 'org.jooq:joor-java-8:0.9.10'
 
@@ -36,15 +36,15 @@ dependencies {
     compile 'com.google.guava:guava:20.0'
     compile 'com.google.protobuf:protobuf-java:3.6.1'
     compile 'com.google.protobuf:protobuf-java-util:3.6.1'
-    compile group: 'com.opencsv', name: 'opencsv', version: '4.2'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta2'
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.8.0-beta2'
+    compile 'com.opencsv:opencsv:4.2'
+    compile 'org.slf4j:slf4j-api:1.8.0-beta2'
+    compile 'org.slf4j:slf4j-log4j12:1.8.0-beta2'
 
     //testing
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.19.1'
     testCompile 'org.jfree:jfreechart:1.0.19'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
+    testCompile 'org.mockito:mockito-core:2.15.0'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'ca.umontreal.iro.simul:ssj:3.2.1'
     testCompile 'org.reflections:reflections:0.9.11'
@@ -82,6 +82,16 @@ if (!hasProperty('nexusUser')) {
 
 if (!hasProperty('nexusPassword')) {
     ext.nexusPassword = ''
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
 }
 
 publishing {
@@ -151,18 +161,8 @@ compileTestKotlin {
 if (project.hasProperty("signing.keyId")) {
     apply plugin: 'signing'
     signing {
-        sign configurations.archives
+        sign publishing.publications.mavenJava
     }
-}
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
 }
 
 task deletePythonClasspath(type: Delete) {

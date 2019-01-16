@@ -6,8 +6,8 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -74,7 +74,7 @@ public class JsonSaver implements NetworkSaver{
     }
 
     @Override
-    public void save(ConstantBoolVertex vertex) {
+    public void save(ConstantBooleanVertex vertex) {
         protobufSaver.save(vertex);
     }
 
@@ -94,7 +94,7 @@ public class JsonSaver implements NetworkSaver{
     }
 
     @Override
-    public void saveValue(BoolVertex vertex) {
+    public void saveValue(BooleanVertex vertex) {
         protobufSaver.save(vertex);
     }
 }

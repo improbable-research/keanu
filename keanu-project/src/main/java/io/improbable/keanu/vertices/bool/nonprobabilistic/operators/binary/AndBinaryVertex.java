@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 
 @DisplayInformationForOutput(displayName = "AND")
-public class AndBinaryVertex extends BoolBinaryOpVertex<BooleanTensor, BooleanTensor> {
+public class AndBinaryVertex extends BooleanBinaryOpVertex<BooleanTensor, BooleanTensor> {
 
     @ExportVertexToPythonBindings
     public AndBinaryVertex(@LoadVertexParam(A_NAME) Vertex<BooleanTensor> a,

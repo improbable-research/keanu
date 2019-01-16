@@ -45,6 +45,12 @@ public class BayesianNetwork {
         return vertexLabels.get(label);
     }
 
+    public List<Vertex> getVerticesInNamespace(String... namespace) {
+        return vertices.stream()
+            .filter(v -> v.getLabel() != null && v.getLabel().isInNamespace(namespace))
+            .collect(Collectors.toList());
+    }
+
     private Map<VertexLabel, Vertex> buildLabelMap(Set<? extends Vertex> vertices) {
         Map<VertexLabel, Vertex> labelMap = new HashMap<>();
         for (Vertex v : vertices) {
@@ -59,10 +65,6 @@ public class BayesianNetwork {
         }
 
         return labelMap;
-    }
-
-    public List<? extends Vertex> getVertices() {
-        return vertices;
     }
 
     public int getVertexCount() {
@@ -86,6 +88,10 @@ public class BayesianNetwork {
      */
     public List<Vertex> getAllVertices() {
         return Collections.unmodifiableList(vertices);
+    }
+
+    public List<? extends Vertex> getVertices() {
+        return vertices;
     }
 
     private interface VertexFilter {
@@ -243,12 +249,11 @@ public class BayesianNetwork {
     }
 
     public void save(NetworkSaver networkSaver) {
-        if(isSaveable()) {
+        if (isSaveable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
                 vertex.save(networkSaver);
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Trying to save a BayesianNetwork that isn't Saveable");
         }
     }

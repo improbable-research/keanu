@@ -29,7 +29,7 @@ public class KeanuComputableGraphTest {
         DoubleVertex C = A.plus(B);
         C.setLabel(cLabel);
 
-        KeanuComputableGraph computableGraph = KeanuGraphConverter.convert(C.getConnectedGraph());
+        KeanuComputableGraph computableGraph = new KeanuComputableGraph(C.getConnectedGraph());
 
         DoubleTensor evaluatedC = computableGraph.compute(ImmutableMap.of(
             A.getReference(), DoubleTensor.scalar(2),

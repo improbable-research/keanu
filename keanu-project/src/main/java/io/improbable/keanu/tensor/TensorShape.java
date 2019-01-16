@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -23,6 +24,10 @@ public class TensorShape {
 
     public boolean isLengthOne() {
         return isLengthOne(shape);
+    }
+
+    public int getRank() {
+        return shape.length;
     }
 
     @Override
@@ -179,6 +184,10 @@ public class TensorShape {
         return increaseRankByPaddingValue(lowRankTensorShape, desiredRank, false);
     }
 
+    public static long[] calculateShapeForLengthOneBroadcast(long[] shape1, long[] shape2) {
+        return (shape1.length >= shape2.length) ? shape1 : shape2;
+    }
+
     private static long[] increaseRankByPaddingValue(long[] lowRankTensorShape, int desiredRank, boolean append) {
         long[] paddedShape = new long[desiredRank];
         if (lowRankTensorShape.length > desiredRank) {
@@ -228,7 +237,6 @@ public class TensorShape {
      *
      * @param dimension the negative or positive dimension to find the absolute of
      * @param rank      the rank
-     *
      * @return an absolute dimension from a shape
      */
     public static int getAbsoluteDimension(int dimension, int rank) {
@@ -239,6 +247,15 @@ public class TensorShape {
             dimension += rank;
         }
         return dimension;
+    }
+
+    public static long[] getSummationResultShape(long[] inputShape, int[] sumOverDimensions) {
+        if (inputShape.length > 0) {
+            return ArrayUtils.removeAll(inputShape, sumOverDimensions);
+        } else {
+            Preconditions.checkArgument(sumOverDimensions.length == 0);
+            return inputShape;
+        }
     }
 
 }

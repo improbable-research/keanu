@@ -5,21 +5,13 @@ import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadShape;
-import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.LogProbAsAGraphable;
-import io.improbable.keanu.vertices.LogProbGraph;
-import io.improbable.keanu.vertices.SamplableWithManyScalars;
-import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.*;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.PlaceHolderBoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.PlaceHolderDoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Collections;
@@ -28,7 +20,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor>, LogProbAsAGraphable {
+public class BernoulliVertex extends BooleanVertex implements ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex probTrue;
     private final static String PROBTRUE_NAME = "probTrue";
@@ -79,7 +71,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
 
     public LogProbGraph logProbGraph() {
         final PlaceHolderBoolVertex xInput = new PlaceHolderBoolVertex(this.getShape());
-        final PlaceHolderDoubleVertex probTrueInput = new PlaceHolderDoubleVertex(probTrue.getShape());
+        final LogProbGraph.DoublePlaceholderVertex probTrueInput = new LogProbGraph.DoublePlaceholderVertex(probTrue.getShape());
 
         final DoubleVertex logProb = If.isTrue(xInput)
             .then(probTrueInput)

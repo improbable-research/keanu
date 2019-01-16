@@ -18,11 +18,7 @@ public interface ProbabilisticGraph extends AutoCloseable {
 
     double logLikelihood(Map<VariableReference, ?> inputs);
 
-    LogProbWithSample logProbWithSample(Map<VariableReference, ?> inputs, List<VariableReference> outputs);
-
     List<? extends Variable> getLatentVariables();
-
-    Map<VariableReference, ?> getLatentVariablesValues();
 
     @Override
     default void close() {

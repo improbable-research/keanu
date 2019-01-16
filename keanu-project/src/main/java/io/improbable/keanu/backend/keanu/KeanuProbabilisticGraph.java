@@ -1,9 +1,8 @@
 package io.improbable.keanu.backend.keanu;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.backend.VariableReference;
-import io.improbable.keanu.backend.LogProbWithSample;
 import io.improbable.keanu.backend.ProbabilisticGraph;
+import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
@@ -42,30 +41,8 @@ public class KeanuProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
-    public LogProbWithSample logProbWithSample(Map<VariableReference, ?> inputs, List<VariableReference> outputs) {
-
-        double logProb = logProb(inputs);
-        Map<VariableReference, Object> sample = outputs.stream()
-            .collect(toMap(
-                output -> output,
-                output -> vertexLookup.get(output).getValue()
-            ));
-
-        return new LogProbWithSample(logProb, sample);
-    }
-
-    @Override
     public List<Vertex> getLatentVariables() {
         return bayesianNetwork.getLatentVertices();
-    }
-
-    @Override
-    public Map<VariableReference, ?> getLatentVariablesValues() {
-        return bayesianNetwork.getLatentVertices().stream()
-            .collect(toMap(
-                Vertex::getReference,
-                Vertex::getValue)
-            );
     }
 
     public void cascadeUpdate(Map<VariableReference, ?> inputs) {
