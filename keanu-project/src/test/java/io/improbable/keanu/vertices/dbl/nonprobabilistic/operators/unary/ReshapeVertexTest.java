@@ -122,7 +122,7 @@ public class ReshapeVertexTest {
         UniformVertex inputVertex = new UniformVertex(new long[]{4, 4}, -10.0, 10.0);
         ReshapeVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
 
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-10, 1e-10);
     }
 
 }

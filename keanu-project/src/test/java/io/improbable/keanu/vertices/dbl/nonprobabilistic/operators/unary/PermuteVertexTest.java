@@ -1,7 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -21,5 +25,11 @@ public class PermuteVertexTest {
         Assert.assertArrayEquals(a.getValue().transpose().asFlatDoubleArray(), PermuteVertex.getValue().asFlatDoubleArray(), 1e-6);
     }
 
+    @Test
+    public void changesMatchGradient() {
+        UniformVertex inputVertex = new UniformVertex(new long[]{4, 4}, -10.0, 10.0);
+        PermuteVertex outputVertex = inputVertex.times(1.5).permute(1, 0);
 
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-10, 1e-10);
+    }
 }
