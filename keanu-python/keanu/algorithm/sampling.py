@@ -16,12 +16,6 @@ java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.MetropolisHasting
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.nuts.NUTS")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.Hamiltonian")
 
-algorithms = {
-    'metropolis': k.jvm_view().MetropolisHastings,
-    'NUTS': k.jvm_view().NUTS,
-    'hamiltonian': k.jvm_view().Hamiltonian
-}
-
 
 class PosteriorSamplingAlgorithm:
 
