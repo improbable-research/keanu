@@ -4,7 +4,6 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -12,12 +11,10 @@ import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -86,15 +83,11 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
         final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
         final LogProbGraph.DoublePlaceholderVertex ratePlaceholder = new LogProbGraph.DoublePlaceholderVertex(rate.getShape());
 
-        final BooleanVertex xLessThanZero = xPlaceholder.lessThan(ConstantVertex.of(DoubleTensor.ZERO_SCALAR));
+        final DoubleVertex xLessThanZero = xPlaceholder.toLessThanMask(0.);
         final DoubleVertex negXMinusADivB = xPlaceholder.unaryMinus().div(ratePlaceholder);
         final DoubleVertex negXMinusADivBMinusLogB = negXMinusADivB.minus(rate.log());
-        final DoubleVertex negInf = new ConstantDoubleVertex(DoubleTensor.create(Double.NEGATIVE_INFINITY, xLessThanZero.getShape()));
 
-        final DoubleVertex logProbOutput = If
-            .isTrue(xLessThanZero)
-            .then(negInf)
-            .orElse(negXMinusADivBMinusLogB);
+        final DoubleVertex logProbOutput = negXMinusADivBMinusLogB.setWithMask(xLessThanZero, Double.NEGATIVE_INFINITY);
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)

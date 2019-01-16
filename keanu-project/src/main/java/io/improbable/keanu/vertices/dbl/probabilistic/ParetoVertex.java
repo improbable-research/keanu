@@ -17,7 +17,6 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -116,14 +115,10 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
             .and(scalePlaceholder.greaterThan(zero))
             .assertTrue("Location and scale must be strictly positive");
 
-        final BooleanVertex invalidXMask = xPlaceholder.lessThanOrEqualTo(locationPlaceholder);
+        final DoubleVertex invalidXMask = xPlaceholder.toLessThanOrEqualToMask(locationPlaceholder);
         final DoubleVertex ifValid = scalePlaceholder.log().plus(locationPlaceholder.log().times(scalePlaceholder))
             .minus(scalePlaceholder.plus(1.).times(xPlaceholder.log()));
-        final DoubleVertex ifInValid = ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, invalidXMask.getShape()));
-        final DoubleVertex logProbOutput = If
-            .isTrue(invalidXMask)
-            .then(ifInValid)
-            .orElse(ifValid);
+        final DoubleVertex logProbOutput = ifValid.setWithMask(invalidXMask, Double.NEGATIVE_INFINITY);
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)

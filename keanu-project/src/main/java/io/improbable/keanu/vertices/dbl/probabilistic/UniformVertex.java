@@ -10,12 +10,10 @@ import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Collections;
 import java.util.Map;
@@ -109,14 +107,11 @@ public class UniformVertex extends DoubleVertex implements Differentiable, Proba
         final LogProbGraph.DoublePlaceholderVertex xMinPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMin.getShape());
         final LogProbGraph.DoublePlaceholderVertex xMaxPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMax.getShape());
 
-        final BooleanVertex xOutOfBounds = xPlaceholder.greaterThanOrEqualTo(xMaxPlaceholder).or(xPlaceholder.lessThan(xMinPlaceholder));
+        final DoubleVertex xOutOfBounds = xPlaceholder.toGreaterThanOrEqualToMask(xMaxPlaceholder)
+            .plus(xPlaceholder.toLessThanMask(xMinPlaceholder));
         final DoubleVertex logOfWithinBounds = xMaxPlaceholder.minus(xMinPlaceholder).log().unaryMinus();
-        final DoubleVertex logOfOutOfBounds = new ConstantDoubleVertex(DoubleTensor.create(Double.NEGATIVE_INFINITY, xOutOfBounds.getShape()));
 
-        final DoubleVertex logProbOutput = If
-            .isTrue(xOutOfBounds)
-            .then(logOfOutOfBounds)
-            .orElse(logOfWithinBounds);
+        final DoubleVertex logProbOutput = logOfWithinBounds.setWithMask(xOutOfBounds, Double.NEGATIVE_INFINITY);
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)

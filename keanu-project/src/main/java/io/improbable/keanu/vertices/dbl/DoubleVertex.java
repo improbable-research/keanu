@@ -31,6 +31,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVer
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.DoubleSetWithMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
@@ -313,6 +314,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public DoubleVertex toLessThanMask(double rhs) {
         return new DoubleLessThanMaskVertex(this, new ConstantDoubleVertex(rhs));
+    }
+
+    public DoubleVertex setWithMask(DoubleVertex mask, double value) {
+        return new DoubleSetWithMaskVertex(this, mask, value);
     }
 
     public <T extends NumberTensor> BooleanVertex lessThanOrEqualTo(Vertex<T> rhs) {
