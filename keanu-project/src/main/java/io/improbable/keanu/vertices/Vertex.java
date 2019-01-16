@@ -9,6 +9,8 @@ import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.network.VariableState;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -172,10 +174,17 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
      */
     @Override
     public void observe(T value) {
-        if (!Observable.isObservable(this.getClass())) {
+        if (!isObservable(this.getClass())) {
             throw new UnsupportedOperationException("This type of vertex does not support being observed");
         }
         state = new VertexState<>(value, true);
+    }
+
+    private static boolean isObservable(Class<? extends Vertex> v) {
+        boolean isProbabilistic = Probabilistic.class.isAssignableFrom(v);
+        boolean isNotDoubleOrIntegerVertex = !IntegerVertex.class.isAssignableFrom(v) && !DoubleVertex.class.isAssignableFrom(v);
+
+        return isProbabilistic || isNotDoubleOrIntegerVertex;
     }
 
     /**
