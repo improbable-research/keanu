@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
@@ -11,7 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
+public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements Differentiable {
     /**
      * Matrix multiplies one vertex by another. C = AB
      *
@@ -56,22 +57,28 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        try {
+            PartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
+            PartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
 
-        // dc = A * db + da * B;
-        PartialDerivative partialsFromLeft = PartialDerivative.matrixMultiplyAlongOfDimensions(
-            dLeftWrtInput,
-            right.getValue(),
-            true
-        );
+            // dc = A * db + da * B;
+            PartialDerivative partialsFromLeft = PartialDerivative.matrixMultiplyAlongOfDimensions(
+                dLeftWrtInput,
+                right.getValue(),
+                true
+            );
 
-        PartialDerivative partialsFromRight = PartialDerivative.matrixMultiplyAlongOfDimensions(
-            dRightWrtInput,
-            left.getValue(),
-            false
-        );
+            PartialDerivative partialsFromRight = PartialDerivative.matrixMultiplyAlongOfDimensions(
+                dRightWrtInput,
+                left.getValue(),
+                false
+            );
 
-        return partialsFromLeft.add(partialsFromRight);
+            return partialsFromLeft.add(partialsFromRight);
+        } catch (UnsupportedOperationException e) {
+            return Differentiable.super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
+        }
     }
 
     private static long[] getResultingShape(long[] left, long[] right) {

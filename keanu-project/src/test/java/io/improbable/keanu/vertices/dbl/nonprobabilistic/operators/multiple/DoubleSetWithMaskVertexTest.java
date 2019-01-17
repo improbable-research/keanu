@@ -2,9 +2,10 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import static org.junit.Assert.assertArrayEquals;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertArrayEquals;
 
 public class DoubleSetWithMaskVertexTest {
 

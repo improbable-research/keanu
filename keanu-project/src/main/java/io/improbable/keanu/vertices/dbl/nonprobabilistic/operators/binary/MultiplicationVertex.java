@@ -5,6 +5,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
@@ -15,7 +16,7 @@ import java.util.Map;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkIsBroadcastable;
 
 @DisplayInformationForOutput(displayName = "*")
-public class MultiplicationVertex extends DoubleBinaryOpVertex {
+public class MultiplicationVertex extends DoubleBinaryOpVertex implements Differentiable {
 
     /**
      * Multiplies one vertex by another
@@ -35,16 +36,22 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dLeftWrtInput, PartialDerivative dRightWrtInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        try {
+            PartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
+            PartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
 
-        PartialDerivative fromLeft = AutoDiffBroadcast.correctForBroadcastPartialForward(dLeftWrtInput, left.getShape(), this.getShape());
-        PartialDerivative fromRight = AutoDiffBroadcast.correctForBroadcastPartialForward(dRightWrtInput, right.getShape(), this.getShape());
+            PartialDerivative fromLeft = AutoDiffBroadcast.correctForBroadcastPartialForward(dLeftWrtInput, left.getShape(), this.getShape());
+            PartialDerivative fromRight = AutoDiffBroadcast.correctForBroadcastPartialForward(dRightWrtInput, right.getShape(), this.getShape());
 
-        // dc = A * db + da * B;
-        PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue(), this.getRank());
-        PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue(), this.getRank());
+            // dc = A * db + da * B;
+            PartialDerivative partialsFromLeft = fromLeft.multiplyAlongOfDimensions(right.getValue(), this.getRank());
+            PartialDerivative partialsFromRight = fromRight.multiplyAlongOfDimensions(left.getValue(), this.getRank());
 
-        return partialsFromLeft.add(partialsFromRight);
+            return partialsFromLeft.add(partialsFromRight);
+        } catch (UnsupportedOperationException e) {
+            return Differentiable.super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
+        }
     }
 
     @Override

@@ -4,7 +4,6 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 public class DoubleLessThanOrEqualToMaskVertex extends DoubleBinaryOpVertex {
 
@@ -19,8 +18,4 @@ public class DoubleLessThanOrEqualToMaskVertex extends DoubleBinaryOpVertex {
         return l.getLessThanOrEqualToMask(r);
     }
 
-    @Override
-    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative l, PartialDerivative r) {
-        return null;
-    }
 }

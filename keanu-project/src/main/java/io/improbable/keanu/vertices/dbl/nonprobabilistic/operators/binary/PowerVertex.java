@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
@@ -11,7 +12,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PowerVertex extends DoubleBinaryOpVertex {
+public class PowerVertex extends DoubleBinaryOpVertex implements Differentiable {
 
     private static final String BASE_NAME = LEFT_NAME;
     private static final String EXPONENT_NAME = RIGHT_NAME;
@@ -42,32 +43,38 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dBaseWrtInput, PartialDerivative dExponentWrtInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        try {
+            PartialDerivative dBaseWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
+            PartialDerivative dExponentWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
 
-        PartialDerivative fromBase = AutoDiffBroadcast.correctForBroadcastPartialForward(dBaseWrtInput, left.getShape(), this.getShape());
-        PartialDerivative fromExponent = AutoDiffBroadcast.correctForBroadcastPartialForward(dExponentWrtInput, right.getShape(), this.getShape());
+            PartialDerivative fromBase = AutoDiffBroadcast.correctForBroadcastPartialForward(dBaseWrtInput, left.getShape(), this.getShape());
+            PartialDerivative fromExponent = AutoDiffBroadcast.correctForBroadcastPartialForward(dExponentWrtInput, right.getShape(), this.getShape());
 
-        // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
-        PartialDerivative partialsFromBase;
-        PartialDerivative partialsFromExponent;
+            // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
+            PartialDerivative partialsFromBase;
+            PartialDerivative partialsFromExponent;
 
-        if (fromBase.isPresent()) {
-            partialsFromBase = fromBase.multiplyAlongOfDimensions(
-                right.getValue().times(left.getValue().pow(right.getValue().minus(1)))
-            );
-        } else {
-            partialsFromBase = PartialDerivative.EMPTY;
+            if (fromBase.isPresent()) {
+                partialsFromBase = fromBase.multiplyAlongOfDimensions(
+                    right.getValue().times(left.getValue().pow(right.getValue().minus(1)))
+                );
+            } else {
+                partialsFromBase = PartialDerivative.EMPTY;
+            }
+
+            if (fromExponent.isPresent()) {
+                partialsFromExponent = fromExponent.multiplyAlongOfDimensions(
+                    left.getValue().log().timesInPlace(this.getValue())
+                );
+            } else {
+                partialsFromExponent = PartialDerivative.EMPTY;
+            }
+
+            return partialsFromBase.add(partialsFromExponent);
+        } catch (UnsupportedOperationException e) {
+            return Differentiable.super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
         }
-
-        if (fromExponent.isPresent()) {
-            partialsFromExponent = fromExponent.multiplyAlongOfDimensions(
-                left.getValue().log().timesInPlace(this.getValue())
-            );
-        } else {
-            partialsFromExponent = PartialDerivative.EMPTY;
-        }
-
-        return partialsFromBase.add(partialsFromExponent);
     }
 
     @Override
