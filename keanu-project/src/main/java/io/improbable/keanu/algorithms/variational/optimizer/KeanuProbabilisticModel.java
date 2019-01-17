@@ -37,7 +37,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
 
-        cascadeObservations();
+        resetModelToObservedState();
         checkBayesNetInHealthyState();
     }
 
@@ -74,7 +74,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
         }
     }
 
-    private void cascadeObservations() {
+    private void resetModelToObservedState() {
         VertexValuePropagation.cascadeUpdate(this.observedVertices);
     }
 
