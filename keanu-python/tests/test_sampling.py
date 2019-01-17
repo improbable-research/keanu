@@ -8,8 +8,8 @@ import pytest
 
 from examples import thermometers
 from keanu import BayesNet, KeanuRandom, Model
-from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler,
-                             HamiltonianSampler, NUTSSampler, PosteriorSamplingAlgorithm)
+from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler, NUTSSampler,
+                             PosteriorSamplingAlgorithm)
 from keanu.vertex import Gamma, Exponential, Cauchy, KeanuContext, Bernoulli
 from typing import Any, Callable
 
@@ -24,7 +24,7 @@ def net() -> BayesNet:
     return m.to_bayes_net()
 
 
-@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler()), (HamiltonianSampler())])
+@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler())])
 def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: PosteriorSamplingAlgorithm,
                                                                                net: BayesNet) -> None:
     draws = 5
@@ -83,7 +83,7 @@ def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
     generate_samples(net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=algo)
 
 
-@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (HamiltonianSampler())])
+@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler())])
 def test_can_iter_through_samples(algo: PosteriorSamplingAlgorithm, net: BayesNet) -> None:
     draws = 10
     samples = generate_samples(
@@ -94,7 +94,7 @@ def test_can_iter_through_samples(algo: PosteriorSamplingAlgorithm, net: BayesNe
     assert count == draws
 
 
-@pytest.mark.parametrize("algo", [MetropolisHastingsSampler, HamiltonianSampler])
+@pytest.mark.parametrize("algo", [MetropolisHastingsSampler, NUTSSampler])
 def test_iter_returns_same_result_as_sample(algo: Callable) -> None:
     draws = 100
     model = thermometers.model()
