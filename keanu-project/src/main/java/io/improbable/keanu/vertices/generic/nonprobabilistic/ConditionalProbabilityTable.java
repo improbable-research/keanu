@@ -6,6 +6,8 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleCPTVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerCPTVertex;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,6 +67,16 @@ public class ConditionalProbabilityTable {
         public DoubleCPTBuilder then(double thn) {
             return then(ConstantVertex.of(thn));
         }
+
+        public IntegerCPTBuilder then(IntegerVertex thn) {
+            Map<CPTCondition, IntegerVertex> conditions = new HashMap<>();
+            conditions.put(condition, thn);
+            return new IntegerCPTBuilder(inputs, conditions);
+        }
+
+        public IntegerCPTBuilder then(int thn) {
+            return then(ConstantVertex.of(thn));
+        }
     }
 
     public static class DoubleCPTBuilder {
@@ -107,6 +119,51 @@ public class ConditionalProbabilityTable {
             }
 
             public DoubleCPTBuilder then(double thn) {
+                return then(ConstantVertex.of(thn));
+            }
+        }
+    }
+
+    public static class IntegerCPTBuilder {
+        private final List<Vertex<? extends Tensor<Boolean>>> inputs;
+        private final Map<CPTCondition, IntegerVertex> conditions;
+
+        public IntegerCPTBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs, Map<CPTCondition, IntegerVertex> conditions) {
+            this.inputs = inputs;
+            this.conditions = conditions;
+        }
+
+        public IntegerCPTWhenBuilder when(Boolean... condition) {
+            if (condition.length != inputs.size()) {
+                throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
+            }
+            return new IntegerCPTWhenBuilder(new CPTCondition(ImmutableList.copyOf(condition)), this);
+        }
+
+        public IntegerCPTVertex orDefault(IntegerVertex defaultResult) {
+            return new IntegerCPTVertex(inputs, conditions, defaultResult);
+        }
+
+        public IntegerCPTVertex orDefault(int defaultResult) {
+            return orDefault(ConstantVertex.of(defaultResult));
+        }
+
+        public static class IntegerCPTWhenBuilder {
+
+            private final CPTCondition condition;
+            private final IntegerCPTBuilder builder;
+
+            private IntegerCPTWhenBuilder(CPTCondition condition, IntegerCPTBuilder builder) {
+                this.condition = condition;
+                this.builder = builder;
+            }
+
+            public IntegerCPTBuilder then(IntegerVertex thn) {
+                builder.conditions.put(condition, thn);
+                return builder;
+            }
+
+            public IntegerCPTBuilder then(int thn) {
                 return then(ConstantVertex.of(thn));
             }
         }
