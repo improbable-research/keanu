@@ -92,7 +92,7 @@ public class DifferentiableChecker {
     }
 
     private static boolean diffableOrConstantUptoNextRV(Collection<Vertex> vertices, Set<Vertex> constantValueVerticesCache) {
-        return BreadthFirstSearch.bfs(vertices,
+        return BreadthFirstSearch.bfsWithFailureCondition(vertices,
             vertex -> isNonDiffableAndNotConstant(vertex, constantValueVerticesCache),
             DifferentiableChecker::getParentsIfVertexIsNotProbabilistic,
             BreadthFirstSearch::doNothing);
@@ -112,7 +112,7 @@ public class DifferentiableChecker {
             return true;
         }
 
-        return BreadthFirstSearch.bfs(Collections.singletonList(vertex),
+        return BreadthFirstSearch.bfsWithFailureCondition(Collections.singletonList(vertex),
             DifferentiableChecker::isUnobservedProbabilistic,
             visiting -> getParentsIfValueNotKnownToBeConstant(visiting, constantValueVerticesCache),
             constantValueVerticesCache::addAll);

@@ -13,10 +13,10 @@ import java.util.function.Predicate;
 
 public class BreadthFirstSearch {
 
-    public static boolean bfs(Collection<Vertex> vertices,
-                              Predicate<Vertex> failureCondition,
-                              Function<Vertex, Collection<Vertex>> nextVertices,
-                              Consumer<Collection<Vertex>> successfullyVisitedConsumer) {
+    public static boolean bfsWithFailureCondition(Collection<Vertex> vertices,
+                                                  Predicate<Vertex> failureCondition,
+                                                  Function<Vertex, Collection<Vertex>> nextVertices,
+                                                  Consumer<Collection<Vertex>> successfullyVisitedConsumer) {
 
         Queue<Vertex> queue = new ArrayDeque<>(vertices);
         Set<Vertex> visited = new HashSet<>(vertices);
