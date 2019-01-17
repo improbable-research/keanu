@@ -240,12 +240,11 @@ public class BayesianNetwork {
     }
 
     public void save(NetworkSaver networkSaver) {
-        if(isSaveable()) {
+        if (isSaveable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
                 vertex.save(networkSaver);
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Trying to save a BayesianNetwork that isn't Saveable");
         }
     }

@@ -301,6 +301,9 @@ public class ProtobufLoader implements NetworkLoader {
             case STRINGPARAM:
                 return parameter.getStringParam();
 
+            case BOOLPARAM:
+                return parameter.getBoolParam();
+
             case LONGARRAYPARAM:
                 return Longs.toArray(parameter.getLongArrayParam().getValuesList());
 

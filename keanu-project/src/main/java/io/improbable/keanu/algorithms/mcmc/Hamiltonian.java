@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -61,22 +60,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
     //the amount of distance to move each leapfrog
     private double stepSize = DEFAULT_STEP_SIZE;
 
-    /**
-     * Sample from the posterior of a Bayesian Network using the Hamiltonian Monte Carlo algorithm
-     *
-     * @param bayesNet     The bayesian network to sample from
-     * @param fromVertices the vertices to sample from
-     * @param sampleCount  the number of samples to take
-     * @return Samples taken with Hamiltonian Monte Carlo
-     */
     @Override
-    public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                              final List<? extends Vertex> fromVertices,
-                                              final int sampleCount) {
-        return generatePosteriorSamples(bayesNet, fromVertices)
-            .generate(sampleCount);
-    }
-
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesNet,
                                                             final List<? extends Vertex> fromVertices) {
 

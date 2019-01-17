@@ -36,7 +36,7 @@ def test_autocorr_returns_ndarray_of_correct_dtype() -> None:
     with Model() as m:
         m.uniform = Uniform(0, 1000)
     net = m.to_bayes_net()
-    samples = sample(net=net, sample_from=net.get_latent_vertices(), algo="metropolis", draws=1000)
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=1000)
     valid_key = list(samples.keys())[0]
     sample_ = samples.get(valid_key)
     assert sample_ is not None
@@ -65,9 +65,9 @@ def test_autocorrelation_same_for_streaming_as_batch() -> None:
     net = model.to_bayes_net()
     draws = 15
     set_starting_state(model)
-    samples = sample(net=net, sample_from=net.get_latent_vertices(), algo="metropolis", draws=draws)
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=draws)
     set_starting_state(model)
-    iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo="metropolis")
+    iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices())
 
     samples_dataframe = pd.DataFrame()
     for next_sample in islice(iter_samples, draws):
