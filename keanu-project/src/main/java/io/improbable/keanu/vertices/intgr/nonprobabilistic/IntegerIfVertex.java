@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerIfVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
+
     protected static final String PREDICATE_NAME = "predicate";
     protected static final String THEN_NAME = "then";
     protected static final String ELSE_NAME = "else";
