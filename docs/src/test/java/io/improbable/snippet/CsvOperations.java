@@ -2,7 +2,8 @@ package io.improbable.snippet;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.util.csv.WriteCsv;
@@ -95,8 +96,9 @@ public class CsvOperations {
 
         DoubleVertex aVertex = null;
         //%%SNIPPET_START%% WriteGetSamples
+        ProbabilisticModel model = new KeanuProbabilisticModel(aVertex.getConnectedGraph());
         NetworkSamples samples = NUTS.withDefaultConfig().getPosteriorSamples(
-            new BayesianNetwork(aVertex.getConnectedGraph()),
+            model,
             aVertex,
             1000
         );

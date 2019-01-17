@@ -130,8 +130,9 @@ wetGrass.observe(true);
 
 //What does that observation say about the probability that it rained or that
 //the sprinkler was on?
+ProbabilisticModel model = new KeanuProbabilisticModel(wetGrass.getConnectedGraph());
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-    new BayesianNetwork(wetGrass.getConnectedGraph()),
+    model,
     Arrays.asList(sprinkler, rain),
     100000
 ).drop(10000).downSample(2);

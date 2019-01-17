@@ -2,11 +2,13 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
@@ -60,70 +63,76 @@ public class SimulatedAnnealing {
     @Builder.Default
     private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
 
-    public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
+    public NetworkState getMaxAPosteriori(ProbabilisticModel model,
                                           int sampleCount) {
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule);
+        return getMaxAPosteriori(model, sampleCount, schedule);
     }
 
     /**
      * Finds the MAP using the default annealing schedule, which is an exponential decay schedule.
      *
-     * @param bayesNet          a bayesian network containing latent vertices
+     * @param model          a probabilistic model containing latent variables
      * @param sampleCount       the number of samples to take
      * @param annealingSchedule the schedule to update T (temperature) as a function of sample number.
      * @return the NetworkState that represents the Max A Posteriori
      */
-    public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
+    public NetworkState getMaxAPosteriori(ProbabilisticModel model,
                                           int sampleCount,
                                           AnnealingSchedule annealingSchedule) {
 
-        bayesNet.cascadeObservations();
-
-        if (bayesNet.isInImpossibleState()) {
+        if (ProbabilityCalculator.isImpossibleLogProb(model.logProb())) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        Map<VertexId, ?> maxSamplesByVertex = new HashMap<>();
-        List<Vertex> latentVertices = bayesNet.getLatentVertices();
+        Map<VariableReference, ?> maxSamplesByVariable = new HashMap<>();
+        List<? extends Variable> latentVariables = model.getLatentVariables();
+        List<Vertex> latentVertices = (List<Vertex>) latentVariables;
 
-        double logProbabilityBeforeStep = bayesNet.getLogOfMasterP();
+        double logProbabilityBeforeStep = model.logProb();
         double maxLogP = logProbabilityBeforeStep;
-        setSamplesAsMax(maxSamplesByVertex, latentVertices);
+        setSamplesAsMax(maxSamplesByVariable, latentVariables);
+
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
-            latentVertices,
+            model,
             proposalDistribution,
-            true,
+            new RollBackOnRejection(latentVertices),
+            new LambdaSectionOptimizedLogProbCalculator(latentVertices),
+            new CascadeOnApplication(),
             random
         );
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-            Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
+            Variable<?, ?> chosenVariable = latentVariables.get(sampleNum % latentVariables.size());
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
             logProbabilityBeforeStep = mhStep.step(
-                Collections.singleton(chosenVertex),
+                Collections.singleton(chosenVariable),
                 logProbabilityBeforeStep,
                 temperature
             ).getLogProbabilityAfterStep();
 
             if (logProbabilityBeforeStep > maxLogP) {
                 maxLogP = logProbabilityBeforeStep;
-                setSamplesAsMax(maxSamplesByVertex, latentVertices);
+                setSamplesAsMax(maxSamplesByVariable, latentVariables);
             }
         }
 
-        return new SimpleNetworkState(maxSamplesByVertex);
+        return new SimpleNetworkState(mapByVariableReference(maxSamplesByVariable));
     }
 
-    private static void setSamplesAsMax(Map<VertexId, ?> samples, List<? extends Vertex> fromVertices) {
-        fromVertices.forEach(vertex -> setSampleForVertex((Vertex<?>) vertex, samples));
+    private <T> Map<VariableReference, T> mapByVariableReference(Map<VariableReference, T> legacyMap) {
+        return legacyMap.entrySet().stream().collect(Collectors.toMap(k -> (VariableReference) k.getKey(), Map.Entry::getValue));
     }
 
-    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<VertexId, ?> samples) {
-        ((Map<VertexId, ? super T>) samples).put(vertex.getId(), vertex.getValue());
+    private static void setSamplesAsMax(Map<VariableReference, ?> samples, List<? extends Variable> fromVariables) {
+        fromVariables.forEach(variable -> setSampleForVariable((Variable<?, ?>) variable, samples));
+    }
+
+    private static <T> void setSampleForVariable(Variable<T, ?> variable, Map<VariableReference, ?> samples) {
+        ((Map<VariableReference, ? super T>) samples).put(variable.getReference(), variable.getValue());
     }
 
     /**

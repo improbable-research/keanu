@@ -97,7 +97,7 @@ public class KeanuOptimizer {
 
         public NonGradientOptimizer.NonGradientOptimizerBuilder builderFor(BayesianNetwork network) {
             initializeNetworkForOptimization(network);
-            return NonGradientOptimizer.builder().bayesianNetwork(new KeanuProbabilisticGraph(network));
+            return NonGradientOptimizer.builder().bayesianNetwork(new KeanuProbabilisticModel(network));
         }
 
     }
@@ -147,7 +147,7 @@ public class KeanuOptimizer {
 
         public GradientOptimizer.GradientOptimizerBuilder builderFor(BayesianNetwork network) {
             initializeNetworkForOptimization(network);
-            return GradientOptimizer.builder().bayesianNetwork(new KeanuProbabilisticWithGradientGraph(network));
+            return GradientOptimizer.builder().bayesianNetwork(new KeanuProbabilisticModelWithGradient(network));
         }
     }
 

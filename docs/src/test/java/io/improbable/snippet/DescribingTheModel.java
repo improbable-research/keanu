@@ -3,6 +3,8 @@ package io.improbable.snippet;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -53,8 +55,9 @@ public class DescribingTheModel {
         A.observe(true);
         B.observe(true);
 
+        ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            new BayesianNetwork(C.getConnectedGraph()),
+            model,
             Arrays.asList(A, B),
             100000
         ).drop(10000).downSample(2);
@@ -69,8 +72,8 @@ public class DescribingTheModel {
         System.out.println(A.getValue().scalar());
         //%%SNIPPET_END%% DescribeInferIncorrect
         //%%SNIPPET_START%% ProbeInfer
-        BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
-        net.probeForNonZeroProbability(10);
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(C.getConnectedGraph());
+        bayesianNetwork.probeForNonZeroProbability(10);
         //%%SNIPPET_END%% ProbeInfer
     }
 }

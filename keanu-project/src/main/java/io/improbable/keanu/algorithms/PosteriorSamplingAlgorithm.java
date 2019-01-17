@@ -1,37 +1,36 @@
 package io.improbable.keanu.algorithms;
 
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 
 import java.util.Collections;
 import java.util.List;
 
 public interface PosteriorSamplingAlgorithm {
 
-    default NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
-                                               Vertex vertexToSampleFrom,
+    default NetworkSamples getPosteriorSamples(ProbabilisticModel model,
+                                               Variable variableToSampleFrom,
                                                int sampleCount) {
-        return getPosteriorSamples(bayesianNetwork, Collections.singletonList(vertexToSampleFrom), sampleCount);
+        return getPosteriorSamples(model, Collections.singletonList(variableToSampleFrom), sampleCount);
+    }
+
+    default NetworkSamples getPosteriorSamples(ProbabilisticModel model, int sampleCount) {
+        return getPosteriorSamples(model, model.getLatentVariables(), sampleCount);
     }
 
     /**
-     * @param bayesNet      a bayesian network containing latent vertices
-     * @param verticesToSampleFrom the vertices to include in the returned samples
-     * @param sampleCount          number of samples to take using the algorithm
-     * @return Samples for each vertex ordered by MCMC iteration
+     * @param model                     a model containing latent variables
+     * @param variablesToSampleFrom     the variables to include in the returned samples
+     * @param sampleCount               the number of samples to take
+     * @return samples for each variable
      */
-    default NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
-                                               List<? extends Vertex> verticesToSampleFrom,
-                                               int sampleCount) {
-        return generatePosteriorSamples(bayesNet, verticesToSampleFrom).generate(sampleCount);
-    }
+    NetworkSamples getPosteriorSamples(ProbabilisticModel model,
+                                       List<? extends Variable> variablesToSampleFrom,
+                                       int sampleCount);
 
-    default NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork, int sampleCount) {
-        return getPosteriorSamples(bayesianNetwork, bayesianNetwork.getTopLevelLatentVertices(), sampleCount);
-    }
+    NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
+                                                     final List<? extends Variable> variableToSampleFrom);
 
-    NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
-                                                     final List<? extends Vertex> verticesToSampleFrom);
 
 }

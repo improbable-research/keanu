@@ -3,6 +3,8 @@ package io.improbable.snippet;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -29,13 +31,13 @@ public class Inference {
         A.setValue(20.0);
         B.setValue(20.0);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
+        ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
         //%%SNIPPET_END%% InfStartState
 
         //%%SNIPPET_START%% InfMetropolisHastings
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
+            model,
+            model.getLatentVariables(),
             100000
         );
         //%%SNIPPET_END%% InfMetropolisHastings
@@ -50,12 +52,13 @@ public class Inference {
 
     private static void nutsExample() {
         BayesianNetwork bayesNet = null;
+        ProbabilisticModel model = null;
         KeanuRandom random = null;
 
         //%%SNIPPET_START%% InfNuts
         NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
+            model,
+            model.getLatentVariables(),
             2000
         );
         //%%SNIPPET_END%% InfNuts

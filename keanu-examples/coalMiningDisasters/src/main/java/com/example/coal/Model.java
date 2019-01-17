@@ -2,6 +2,8 @@ package com.example.coal;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
@@ -54,12 +56,12 @@ public class Model {
      * Runs the MetropolisHastings algorithm and saves the resulting samples to results
      */
     public void run() {
-        BayesianNetwork net = buildBayesianNetwork();
+        ProbabilisticModel model = new KeanuProbabilisticModel(buildBayesianNetwork());
         Integer numSamples = 500;
 
         results = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
-            net,
-            net.getLatentVertices()
+            model,
+            model.getLatentVariables()
         ).dropCount(numSamples/5).downSampleInterval(3).generate(numSamples);
     }
 

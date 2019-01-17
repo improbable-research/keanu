@@ -1,17 +1,18 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -83,34 +84,46 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     @Builder.Default
     private boolean saveStatistics = false;
 
+    /**
+     * Sample from the posterior of a probabilistic model using the No-U-Turn-Sampling algorithm
+     *
+     * @param model           the probabilistic model to sample from
+     * @param variablesToSampleFrom the variables inside the probabilistic model to sample from
+     * @return Samples taken with NUTS
+     */
     @Override
-    public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesNet,
-                                                            final List<? extends Vertex> fromVertices) {
-
-        return new NetworkSamplesGenerator(setupSampler(bayesNet, fromVertices), ProgressBar::new);
+    public NetworkSamples getPosteriorSamples(final ProbabilisticModel model,
+                                              final List<? extends Variable> variablesToSampleFrom,
+                                              final int sampleCount) {
+        return generatePosteriorSamples(model, variablesToSampleFrom).generate(sampleCount);
     }
 
-    private NUTSSampler setupSampler(final BayesianNetwork bayesNet,
-                                     final List<? extends Vertex> sampleFromVertices) {
+    @Override
+    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
+                                                            final List<? extends Variable> fromVariables) {
 
-        Preconditions.checkArgument(!sampleFromVertices.isEmpty(), "List of vertices to sample from is empty");
-        bayesNet.cascadeObservations();
+        return new NetworkSamplesGenerator(setupSampler((ProbabilisticModelWithGradient) model, fromVariables), ProgressBar::new);
+    }
 
-        final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesNet.getLatentOrObservedVertices(), latentVertices);
-        List<Vertex> probabilisticVertices = bayesNet.getLatentOrObservedVertices();
+    private NUTSSampler setupSampler(final ProbabilisticModelWithGradient model,
+                                     final List<? extends Variable> sampleFromVariables) {
 
-        Map<VertexId, DoubleTensor> position = latentVertices.stream().collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
-        Map<VertexId, DoubleTensor> momentum = new HashMap<>();
-        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+        Preconditions.checkArgument(!sampleFromVariables.isEmpty(), "List of variables to sample from is empty");
 
-        double initialLogOfMasterP = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
+        final List<? extends Variable<DoubleTensor, ?>> latentVariables = model.getContinuousLatentVariables();
 
-        double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(position,
+        Map<VariableReference, DoubleTensor> startingSample = SamplingAlgorithm.takeSample(latentVariables);
+        Map<VariableReference, DoubleTensor> position = startingSample.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (DoubleTensor) e.getValue()));
+        Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
+        Map<? extends VariableReference, DoubleTensor> gradient = model.logProbGradients();
+
+        double initialLogOfMasterP = model.logProb();
+
+        double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(
+            position,
             gradient,
-            latentVertices,
-            probabilisticVertices,
-            logProbGradientCalculator,
+            latentVariables,
+            model,
             initialLogOfMasterP,
             random
         ) : initialStepSize;
@@ -121,15 +134,14 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        resetVertexValue(sampleFromVertices, position);
+        resetVariableValue(sampleFromVariables, position);
 
-        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
+        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample((List<? extends Variable<Object, ?>>)sampleFromVariables));
 
         return new NUTSSampler(
-            sampleFromVertices,
-            latentVertices,
-            probabilisticVertices,
-            logProbGradientCalculator,
+            sampleFromVariables,
+            latentVariables,
+            model,
             adaptEnabled,
             stepsize,
             tree,
@@ -144,10 +156,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         return statistics;
     }
 
-    private static void resetVertexValue(List<? extends Vertex> sampleFromVertices, Map<VertexId, DoubleTensor> previousPosition) {
-        for (Vertex vertex : sampleFromVertices) {
-            vertex.setValue(previousPosition.get(vertex.getId()));
+    private static void resetVariableValue(List<? extends Variable> sampleFromVariables, Map<? extends VariableReference, DoubleTensor> previousPosition) {
+        for (Variable variable : sampleFromVariables) {
+            variable.setValue(previousPosition.get(variable.getReference()));
         }
     }
+
+
 
 }

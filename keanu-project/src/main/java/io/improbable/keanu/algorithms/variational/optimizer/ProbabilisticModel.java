@@ -1,10 +1,12 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public interface ProbabilisticGraph {
+public interface ProbabilisticModel {
 
     default double logProb() {
         return logProb(Collections.emptyMap());
@@ -20,4 +22,5 @@ public interface ProbabilisticGraph {
 
     List<? extends Variable> getLatentVariables();
 
+    List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables();
 }

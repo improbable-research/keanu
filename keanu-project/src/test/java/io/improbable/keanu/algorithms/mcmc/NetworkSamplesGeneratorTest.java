@@ -2,8 +2,8 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.VertexId;
 import lombok.Value;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -155,7 +155,7 @@ public class NetworkSamplesGeneratorTest {
         }
 
         @Override
-        public void sample(Map<VertexId, List<?>> samples, List<Double> logOfMasterPForEachSample) {
+        public void sample(Map<VariableReference, List<?>> samples, List<Double> logOfMasterPForEachSample) {
             sampleCount.incrementAndGet();
         }
 
@@ -164,5 +164,6 @@ public class NetworkSamplesGeneratorTest {
             sampleCount.incrementAndGet();
             return new NetworkSample(Collections.emptyMap(), 0.0);
         }
+
     }
 }

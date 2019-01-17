@@ -28,7 +28,7 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
             .divInPlace(samples.size())
             .minusInPlace(getAverages().pow(2))
             .timesInPlace(samples.size())
-            .divInPlace(samples.size() - 1);
+            .divInPlace(samples.size() - 1.);
     }
 
     /**

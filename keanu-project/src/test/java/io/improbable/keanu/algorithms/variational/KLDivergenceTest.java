@@ -3,7 +3,9 @@ package io.improbable.keanu.algorithms.variational;
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
@@ -84,10 +86,10 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        BayesianNetwork network = new BayesianNetwork(v3.getConnectedGraph());
+        ProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
             .withDefaultConfig()
-            .getPosteriorSamples(network, Collections.singletonList(v1), 1000);
+            .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
 
         ProbabilisticDouble q1 = new GaussianVertex(0.1, 1.);
         ProbabilisticDouble q2 = new GaussianVertex(10.0, 1.);
@@ -101,10 +103,10 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        BayesianNetwork network = new BayesianNetwork(v3.getConnectedGraph());
+        ProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
             .withDefaultConfig()
-            .getPosteriorSamples(network, Collections.singletonList(v1), 1000);
+            .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
 
         QDistribution q1 = new TestGaussianQDistribution(0.1, 1.);
         QDistribution q2 = new TestGaussianQDistribution(10.0, 1.);
@@ -118,10 +120,10 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        BayesianNetwork network = new BayesianNetwork(v3.getConnectedGraph());
+        ProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
             .withDefaultConfig()
-            .getPosteriorSamples(network, Arrays.asList(v1, v3), 1000);
+            .getPosteriorSamples(model, Arrays.asList(v1, v3), 1000);
         ProbabilisticDouble q = new GaussianVertex(0.1, 1.);
 
         thrown.expect(IllegalArgumentException.class);
@@ -131,7 +133,7 @@ public class KLDivergenceTest {
     }
 
     private NetworkSamples createNetworkSamplesWithOneVertexAndOneSample(double p) {
-        Map<VertexId, List<DoubleTensor>> samplesByVertex = new HashMap<>();
+        Map<VariableReference, List<DoubleTensor>> samplesByVertex = new HashMap<>();
         samplesByVertex.put(new VertexId(), Collections.singletonList(DoubleTensor.scalar(1.)));
         List<Double> logOfMasterPForEachSample = Collections.singletonList(p);
 
@@ -146,7 +148,7 @@ public class KLDivergenceTest {
 
         @Override
         public double getLogOfMasterP(NetworkState state) {
-            DoubleTensor vertexValue = state.get(Iterables.getOnlyElement(state.getVertexIds()));
+            DoubleTensor vertexValue = state.get(Iterables.getOnlyElement(state.getVariableReferences()));
             return logPdf(vertexValue);
         }
     }

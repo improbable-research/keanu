@@ -1,37 +1,32 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.NetworkSample;
+import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
 import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
 /**
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
  */
 @Builder
-@Slf4j
 public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = ProposalDistribution.usePrior();
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
-    private static final boolean DEFAULT_USE_CACHE_ON_REJECTION = true;
+    public static final CascadeOnRejection DEFAULT_REJECTION_STRATEGY = new CascadeOnRejection();
+    private static final LogProbCalculationStrategy DEFAULT_LOG_PROB_CALCULATION_STRATEGY = new SimpleLogProbCalculationStrategy();
+    private static final ProposalApplicationStrategy DEFAULT_PROPOSAL_APPLICATION_STRATEGY = new CascadeOnApplication();
 
     public static MetropolisHastings withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
@@ -42,6 +37,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             .random(random)
             .build();
     }
+
 
     @Getter
     @Setter
@@ -61,100 +57,52 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     @Getter
     @Setter
     @Builder.Default
-    private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
+    private ProposalRejectionStrategy rejectionStrategy = DEFAULT_REJECTION_STRATEGY;
 
+    @Getter
+    @Setter
+    @Builder.Default
+    private LogProbCalculationStrategy logProbCalculationStrategy = DEFAULT_LOG_PROB_CALCULATION_STRATEGY;
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private ProposalApplicationStrategy proposalApplicationStrategy = DEFAULT_PROPOSAL_APPLICATION_STRATEGY;
+
+    /**
+     * @param model      a probabilistic model containing latent variables
+     * @param variablesToSampleFrom the variables to include in the returned samples
+     * @param sampleCount          number of samples to take using the algorithm
+     * @return Samples for each variable ordered by MCMC iteration
+     */
     @Override
-    public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
-                                                            final List<? extends Vertex> verticesToSampleFrom) {
-
-        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom), ProgressBar::new);
+    public NetworkSamples getPosteriorSamples(ProbabilisticModel model,
+                                              List<? extends Variable> variablesToSampleFrom,
+                                              int sampleCount) {
+        return generatePosteriorSamples(model, variablesToSampleFrom)
+            .generate(sampleCount);
     }
 
-    private SamplingAlgorithm setupSampler(final BayesianNetwork bayesianNetwork,
-                                           final List<? extends Vertex> verticesToSampleFrom) {
-        checkBayesNetInHealthyState(bayesianNetwork);
+    @Override
+    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
+                                                            final List<? extends Variable> variablesToSampleFrom) {
 
-        List<Vertex> latentVertices = bayesianNetwork.getLatentVertices();
+        return new NetworkSamplesGenerator(setupSampler(model, variablesToSampleFrom), ProgressBar::new);
+    }
+
+    private SamplingAlgorithm setupSampler(final ProbabilisticModel model,
+                                           final List<? extends Variable> variablesToSampleFrom) {
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
-            latentVertices,
+            model,
             proposalDistribution,
-            useCacheOnRejection,
+            rejectionStrategy,
+            logProbCalculationStrategy,
+            proposalApplicationStrategy,
             random
         );
 
-        double logProbabilityBeforeStep = bayesianNetwork.getLogOfMasterP();
-
-        return new MetropolisHastingsSampler(latentVertices, verticesToSampleFrom, mhStep, variableSelector, logProbabilityBeforeStep);
-    }
-
-    public static class MetropolisHastingsSampler implements SamplingAlgorithm {
-
-        private final List<Vertex> latentVertices;
-        private final List<? extends Vertex> verticesToSampleFrom;
-        private final MetropolisHastingsStep mhStep;
-        private final MHStepVariableSelector variableSelector;
-
-        private double logProbabilityBeforeStep;
-        private int sampleNum;
-
-        public MetropolisHastingsSampler(List<Vertex> latentVertices,
-                                         List<? extends Vertex> verticesToSampleFrom,
-                                         MetropolisHastingsStep mhStep,
-                                         MHStepVariableSelector variableSelector,
-                                         double logProbabilityBeforeStep) {
-            this.latentVertices = latentVertices;
-            this.verticesToSampleFrom = verticesToSampleFrom;
-            this.mhStep = mhStep;
-            this.variableSelector = variableSelector;
-            this.logProbabilityBeforeStep = logProbabilityBeforeStep;
-            this.sampleNum = 0;
-        }
-
-        @Override
-        public void step() {
-            Set<Vertex> chosenVertices = variableSelector.select(latentVertices, sampleNum);
-
-            logProbabilityBeforeStep = mhStep.step(
-                chosenVertices,
-                logProbabilityBeforeStep
-            ).getLogProbabilityAfterStep();
-
-            sampleNum++;
-        }
-
-        @Override
-        public void sample(Map<VertexId, List<?>> samplesByVertex, List<Double> logOfMasterPForEachSample) {
-            step();
-            takeSamples(samplesByVertex, verticesToSampleFrom);
-            logOfMasterPForEachSample.add(logProbabilityBeforeStep);
-        }
-
-        @Override
-        public NetworkSample sample() {
-            step();
-            return new NetworkSample(takeSample(verticesToSampleFrom), logProbabilityBeforeStep);
-        }
-    }
-
-    private static void takeSamples(Map<VertexId, List<?>> samples, List<? extends Vertex> fromVertices) {
-        fromVertices.forEach(vertex -> addSampleForVertex((Vertex<?>) vertex, samples));
-    }
-
-    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<VertexId, List<?>> samples) {
-        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
-        T value = vertex.getValue();
-        samplesForVertex.add(value);
-        log.trace(String.format("Sampled %s", value));
-    }
-
-    private static void checkBayesNetInHealthyState(BayesianNetwork bayesNet) {
-        bayesNet.cascadeObservations();
-        if (bayesNet.getLatentOrObservedVertices().isEmpty()) {
-            throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
-        } else if (bayesNet.isInImpossibleState()) {
-            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
-        }
+        return new MetropolisHastingsSampler(model.getLatentVariables(), variablesToSampleFrom, mhStep, variableSelector, model.logProb());
     }
 
 }

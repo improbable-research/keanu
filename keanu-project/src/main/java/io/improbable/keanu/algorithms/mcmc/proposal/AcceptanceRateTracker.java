@@ -1,35 +1,35 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import com.google.common.collect.Maps;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 
 import java.util.Map;
 
 public class AcceptanceRateTracker implements ProposalListener {
 
-    private Map<VertexId, Counter> numApplied = Maps.newHashMap();
-    private Map<VertexId, Counter> numRejected = Maps.newHashMap();
+    private Map<VariableReference, Counter> numApplied = Maps.newHashMap();
+    private Map<VariableReference, Counter> numRejected = Maps.newHashMap();
 
     @Override
     public void onProposalApplied(Proposal proposal) {
-        for (Vertex vertex : proposal.getVerticesWithProposal()) {
-            numApplied.computeIfAbsent(vertex.getId(), i -> new Counter()).increment();
+        for (Variable variable : proposal.getVariablesWithProposal()) {
+            numApplied.computeIfAbsent(variable.getReference(), i -> new Counter()).increment();
         }
     }
 
     @Override
     public void onProposalRejected(Proposal proposal) {
-        for (Vertex vertex : proposal.getVerticesWithProposal()) {
-            numRejected.computeIfAbsent(vertex.getId(), i -> new Counter()).increment();
+        for (Variable variable : proposal.getVariablesWithProposal()) {
+            numRejected.computeIfAbsent(variable.getReference(), i -> new Counter()).increment();
         }
     }
 
-    public double getAcceptanceRate(VertexId vertexId) {
-        if (!numApplied.keySet().contains(vertexId)) {
-            throw new IllegalStateException("No proposals have been registered for " + vertexId);
+    public double getAcceptanceRate(VariableReference variableReference) {
+        if (!numApplied.keySet().contains(variableReference)) {
+            throw new IllegalStateException("No proposals have been registered for " + variableReference);
         }
-        return 1. - (double) numRejected.getOrDefault(vertexId, new Counter()).getValue() / numApplied.get(vertexId).getValue();
+        return 1. - (double) numRejected.getOrDefault(variableReference, new Counter()).getValue() / numApplied.get(variableReference).getValue();
     }
 
     private class Counter {

@@ -1,44 +1,36 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Saves the state (value and observed) of a specified collection of vertices.
+ * Saves the state (value and observed) of a specified collection of variables.
  */
 public class NetworkSnapshot {
 
-    public static NetworkSnapshot create(Set<Vertex> vertices) {
-        return new NetworkSnapshot(vertices);
+    public static NetworkSnapshot create(Set<? extends Variable> variables) {
+        return new NetworkSnapshot(variables);
     }
 
-    private final Map<Vertex, Object> values;
-    private final Set<Vertex> observed;
+    private final Map<Variable, VariableState> variableStates;
 
-    private NetworkSnapshot(Collection<Vertex> vertices) {
-        values = new HashMap<>();
-        observed = new HashSet<>();
-        for (Vertex v : vertices) {
-            values.put(v, v.getValue());
-            if (v.isObserved()) {
-                observed.add(v);
-            }
+    private NetworkSnapshot(Collection<? extends Variable> variables) {
+        variableStates = new HashMap<>();
+        for (Variable v : variables) {
+            variableStates.put(v, v.getState());
         }
     }
 
     /**
-     * Revert the state of the network to the previously saved values
+     * Revert the state of the network to the previously saved state
      */
     public void apply() {
-        for (Vertex v : values.keySet()) {
-            if (observed.contains(v)) {
-                v.observe(values.get(v));
-            } else {
-                v.unobserve();
-                v.setValue(values.get(v));
-            }
-
+        for (Variable v : variableStates.keySet()) {
+            v.setState(variableStates.get(v));
         }
     }
 

@@ -92,7 +92,7 @@ First we create a Bayesian Network from our distributions and find a non-zero st
 A.setValue(20.0);
 B.setValue(20.0);
 
-BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
+ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
 ```
 
 Now let's use Metropolis Hastings to sample from this network.
@@ -107,8 +107,8 @@ We will be taking 100,000 samples from the distributions of A and B.
 
 ```java
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-    bayesNet,
-    bayesNet.getLatentVertices(),
+    model,
+    model.getLatentVariables(),
     100000
 );
 ```
@@ -147,6 +147,55 @@ average_posterior_b = np.average(posterior_samples.get('b'))
 actual = average_posterior_a + average_posterior_b
 ```
 
+### Hamiltonian Monte Carlo
+
+HMC is not available in Keanu but it's a very important concept to understand before utilising NUTS.
+
+#### Algorithm
+
+Hamiltonian Monte Carlo (HMC) brings two new concepts to Metropolis Hastings: Hamiltonian physics and gradient calculations.
+
+Hamiltonian physics introduces the idea of a position and a momentum for a sample. Put simply, by knowing the gradient, we
+can understand if the distribution is steep or shallow at our current position. We can then use Hamiltonian physics to move 
+our samples around using this information.
+
+This is crucial to understand in order to tweak the parameters of HMC, it's very sensitive to two parameters in particular:
+
+* Leapfrog count
+* Step size
+
+A leapfrog is how a sample moves around the distribution. 
+It's where the position and momentum of a sample are updated for a timestep.
+The step size is how much time will pass between timesteps. 
+The larger the stepsize, the more the position will change during each timestep.
+The leapfrog count determines how many leapfrogs we will take in one sample. 
+If we have a larger leapfrog count, the position will change a lot more than if we had a smaller leapfrog count.
+
+If your stepsize and leapfrog parameters are not high enough, then you will not be able to effectively explore the distribution in time.
+However, if your stepsize or leapfrog count are too high, then you will
+move too large a distance each timestep and not gain any precise information about the shape of the distribution.
+
+The trick is to find the largest step size and the smallest leapfrog count that return an effective sampling of the distribution.
+
+But how does that look in practice? Well let's take an example - let's say you set the following parameters:
+
+* Leapfrog count: 20
+* Step size: 0.1
+
+At each sample you have made 20 leapfrogs at a distance of 0.1 each. 
+Therefore, you have covered a total distance of 2 before the likelihood is calculated. 
+If your problem domain is a simple Gaussian that has a sigma of 1, then this will obviously be a problem as
+we will be covering too large a distance and will never explore the Gaussian effectively.
+
+If you are not receiving accurate samples, try lowering your step size to explore the space in finer detail.
+
+The parameters are:
+
+* The Bayesian network to sample from
+* The vertices in the network to return samples for (latent vertices)
+* The number of samples to take
+
+
 ### NUTS
 
 #### Algorithm
@@ -163,8 +212,8 @@ It also attempts to calculate and auto-tune those difficult leapfrog and step si
 
 ```java
 NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
-    bayesNet,
-    bayesNet.getLatentVertices(),
+    model,
+    model.getLatentVariables(),
     2000
 );
 ```

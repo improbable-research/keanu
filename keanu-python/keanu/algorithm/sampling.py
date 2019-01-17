@@ -5,7 +5,7 @@ from keanu.algorithm._proposal_distribution import ProposalDistribution
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
-from keanu.net import BayesNet
+from keanu.net import BayesNet, ProbabilisticModel, ProbabilisticModelWithGradient
 from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 from keanu.plots import traceplot
@@ -14,7 +14,6 @@ k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.MetropolisHastings")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.nuts.NUTS")
-java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.Hamiltonian")
 
 
 class PosteriorSamplingAlgorithm:
@@ -93,8 +92,11 @@ def sample(net: BayesNet,
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
+    probabilistic_model = ProbabilisticModel(net) if isinstance(
+        sampling_algorithm, MetropolisHastingsSampler) else ProbabilisticModelWithGradient(net)
+
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
-        net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
+        probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
     vertex_samples = {
         Vertex._get_python_label(vertex_unwrapped): list(
@@ -122,7 +124,10 @@ def generate_samples(net: BayesNet,
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
-    samples: JavaObject = sampling_algorithm.get_sampler().generatePosteriorSamples(net.unwrap(), vertices_unwrapped)
+    probabilistic_model = ProbabilisticModel(net) if isinstance(
+        sampling_algorithm, MetropolisHastingsSampler) else ProbabilisticModelWithGradient(net)
+    samples: JavaObject = sampling_algorithm.get_sampler().generatePosteriorSamples(probabilistic_model.unwrap(),
+                                                                                    vertices_unwrapped)
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
 

@@ -7,13 +7,14 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCal
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph implements ProbabilisticWithGradientGraph {
+public class KeanuProbabilisticModelWithGradient extends KeanuProbabilisticModel implements ProbabilisticModelWithGradient {
 
     private LogProbGradientCalculator logProbGradientCalculator;
     private LogProbGradientCalculator logLikelihoodGradientCalculator;
 
-    public KeanuProbabilisticWithGradientGraph(BayesianNetwork bayesianNetwork) {
+    public KeanuProbabilisticModelWithGradient(BayesianNetwork bayesianNetwork) {
         super(bayesianNetwork);
 
         List<Vertex<DoubleTensor>> continuousLatentVertices = bayesianNetwork.getContinuousLatentVertices();
@@ -27,6 +28,10 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
             bayesianNetwork.getObservedVertices(),
             continuousLatentVertices
         );
+    }
+
+    public KeanuProbabilisticModelWithGradient(Set<Vertex> variables) {
+        this(new BayesianNetwork(variables));
     }
 
     @Override
@@ -51,7 +56,7 @@ public class KeanuProbabilisticWithGradientGraph extends KeanuProbabilisticGraph
 
     private Map<? extends VariableReference, DoubleTensor> gradients(Map<VariableReference, ?> inputs, LogProbGradientCalculator gradientCalculator) {
         if (inputs != null && !inputs.isEmpty()) {
-            cascadeUpdate(inputs);
+            cascadeValues(inputs);
         }
 
         return gradientCalculator.getJointLogProbGradientWrtLatents();

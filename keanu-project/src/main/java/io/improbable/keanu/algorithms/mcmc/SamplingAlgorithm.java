@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSample;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 
 import java.util.List;
 import java.util.Map;
@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 public interface SamplingAlgorithm {
 
-    static Map<VertexId, Object> takeSample(List<? extends Vertex> sampleFromVertices) {
-        return sampleFromVertices.stream().collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
+    static <T> Map<VariableReference, T> takeSample(List<? extends Variable<T, ?>> sampleFromVariables) {
+        return sampleFromVariables.stream().collect(Collectors.toMap(Variable::getReference, Variable::getValue));
     }
 
     /**
@@ -21,12 +21,12 @@ public interface SamplingAlgorithm {
 
     /**
      * Takes a sample with the algorithm and saves it in the supplied map (creating a new entry in the list if the
-     * Vertex already exists).
+     * Variable already exists).
      *
-     * @param samples                   map to store sampled vertex values
+     * @param samples                   map to store sampled variable values
      * @param logOfMasterPForEachSample list of log of master probability for each sample
      */
-    void sample(Map<VertexId, List<?>> samples, List<Double> logOfMasterPForEachSample);
+    void sample(Map<VariableReference, List<?>> samples, List<Double> logOfMasterPForEachSample);
 
     /**
      * Takes a sample with the algorithm and returns the state of the network for that sample.
