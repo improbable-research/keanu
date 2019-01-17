@@ -83,7 +83,7 @@ def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
     generate_samples(net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=algo)
 
 
-@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler())])
+@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler())])
 def test_can_iter_through_samples(algo: PosteriorSamplingAlgorithm, net: BayesNet) -> None:
     draws = 10
     samples = generate_samples(
@@ -94,7 +94,7 @@ def test_can_iter_through_samples(algo: PosteriorSamplingAlgorithm, net: BayesNe
     assert count == draws
 
 
-@pytest.mark.parametrize("algo", [MetropolisHastingsSampler])
+@pytest.mark.parametrize("algo", [MetropolisHastingsSampler, NUTSSampler])
 def test_iter_returns_same_result_as_sample(algo: Callable) -> None:
     draws = 100
     model = thermometers.model()
