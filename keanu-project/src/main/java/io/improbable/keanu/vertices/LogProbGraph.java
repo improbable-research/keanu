@@ -38,7 +38,7 @@ public class LogProbGraph {
 
     static public class DoublePlaceholderVertex extends DoubleVertex implements PlaceholderVertex<DoubleTensor>, NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
 
-        public DoublePlaceholderVertex(long[] initialShape) {
+        public DoublePlaceholderVertex(long... initialShape) {
             super(initialShape);
         }
 
@@ -55,7 +55,7 @@ public class LogProbGraph {
 
     static public class IntegerPlaceHolderVertex extends IntegerVertex implements PlaceholderVertex<IntegerTensor>, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
 
-        public IntegerPlaceHolderVertex(long[] initialShape) {
+        public IntegerPlaceHolderVertex(long... initialShape) {
             super(initialShape);
         }
 
