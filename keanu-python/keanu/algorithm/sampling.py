@@ -50,12 +50,6 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
         super().__init__(builder.build())
 
 
-class HamiltonianSampler(PosteriorSamplingAlgorithm):
-
-    def __init__(self) -> None:
-        super().__init__(k.jvm_view().Hamiltonian.withDefaultConfig())
-
-
 class NUTSSampler(PosteriorSamplingAlgorithm):
 
     def __init__(self,

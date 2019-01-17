@@ -1,7 +1,6 @@
 package io.improbable.snippet;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.Hamiltonian;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -47,19 +46,6 @@ public class Inference {
 
         double actual = averagePosteriorA + averagePosteriorB; //42.0
         //%%SNIPPET_END%% InfAverage
-    }
-
-    private static void inferenceExample2() {
-        BayesianNetwork bayesNet = null;
-        KeanuRandom random = null;
-
-        //%%SNIPPET_START%% InfHamiltonian
-        NetworkSamples posteriorSamples = Hamiltonian.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
-            2000
-        );
-        //%%SNIPPET_END%% InfHamiltonian
     }
 
     private static void nutsExample() {
