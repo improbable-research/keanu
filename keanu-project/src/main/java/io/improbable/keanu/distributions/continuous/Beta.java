@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -29,6 +30,8 @@ public class Beta implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
+        Preconditions.checkArgument(alpha.greaterThan(0.).allTrue() && beta.greaterThan(0.).allTrue(),
+            "alpha and beta must be positive. alpha: " + alpha + " beta: " + beta);
 
         final DoubleTensor y1 = random.nextGamma(shape, DoubleTensor.ONE_SCALAR, alpha);
         final DoubleTensor y2 = random.nextGamma(shape, DoubleTensor.ONE_SCALAR, beta);
