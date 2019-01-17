@@ -123,6 +123,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex")
@@ -694,6 +695,10 @@ def CastInteger(input_vertex: vertex_constructor_param_types) -> Vertex:
 
 def ConstantInteger(constant: tensor_arg_types) -> Vertex:
     return Integer(context.jvm_view().ConstantIntegerVertex, cast_to_integer_tensor(constant))
+
+
+def IntegerIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
+    return Integer(context.jvm_view().IntegerIfVertex, cast_to_vertex(predicate), cast_to_integer_vertex(thn), cast_to_integer_vertex(els))
 
 
 def IntegerProxy(tensor_shape: Collection[int], label: str) -> Vertex:
