@@ -48,7 +48,7 @@ public class Differentiator {
             }
 
             for (Vertex child : (Set<Vertex<?>>) visiting.getChildren()) {
-                if (!child.isProbabilistic() && !alreadyQueued.contains(child) && child instanceof Differentiable) {
+                if (!child.isProbabilistic() && !alreadyQueued.contains(child) && child.isDifferentiable()) {
                     priorityQueue.offer((V) child);
                     alreadyQueued.add(child);
                 }
@@ -95,7 +95,7 @@ public class Differentiator {
 
             if (!visiting.isProbabilistic()) {
 
-                if (visiting instanceof Differentiable) {
+                if (visiting.isDifferentiable()) {
 
                     Differentiable visitingDifferentiable = ((Differentiable) visiting);
                     PartialDerivative derivativeOfOutputWrtVisiting = dwrtOf.get(visiting);
@@ -106,7 +106,7 @@ public class Differentiator {
                         collectPartials(partialDerivatives, dwrtOf);
 
                         for (Vertex parent : visiting.getParents()) {
-                            if (!alreadyQueued.contains(parent) && parent instanceof Differentiable) {
+                            if (!alreadyQueued.contains(parent) && parent.isDifferentiable()) {
                                 priorityQueue.offer(parent);
                                 alreadyQueued.add(parent);
                             }
