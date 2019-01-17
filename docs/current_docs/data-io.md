@@ -250,8 +250,7 @@ First, you'll need some samples - let's take some from a network using the NUTS 
 To learn more about the parameters being used here, head over to the [NUTS documentation]({{ site.baseurl }}/docs/inference-posterior-sampling#nuts).
 
 ```java
-BayesianNetwork net = new BayesianNetwork(aVertex.getConnectedGraph());
-ProbabilisticModel model = new KeanuProbabilisticModel(net);
+ProbabilisticModel model = new KeanuProbabilisticModel(aVertex.getConnectedGraph());
 NetworkSamples samples = NUTS.withDefaultConfig().getPosteriorSamples(
     model,
     aVertex,

@@ -9,6 +9,7 @@ import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.Arrays;
@@ -144,6 +145,17 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     public int getRank() {
         return getShape().length;
+    }
+
+    public <V extends Vertex<T>> V print() {
+        new PrintVertex<>(this);
+        return (V) this;
+    }
+
+
+    public <V extends Vertex<T>> V print(final String message, final boolean printData) {
+        new PrintVertex<>(this, message, printData);
+        return (V) this;
     }
 
     /**

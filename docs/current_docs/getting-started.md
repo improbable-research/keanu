@@ -117,8 +117,7 @@ Now you can infer that A and B are also both true by sampling from the posterior
 A.observe(true);
 B.observe(true);
 
-BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
-ProbabilisticModel model = new KeanuProbabilisticModel(net);
+ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
     model,
     Arrays.asList(A, B),

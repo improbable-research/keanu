@@ -92,8 +92,7 @@ First we create a Bayesian Network from our distributions and find a non-zero st
 A.setValue(20.0);
 B.setValue(20.0);
 
-BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
-ProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
+ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
 ```
 
 Now let's use Metropolis Hastings to sample from this network.
@@ -109,7 +108,7 @@ We will be taking 100,000 samples from the distributions of A and B.
 ```java
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
     model,
-    bayesNet.getLatentVertices(),
+    model.getLatentVariables(),
     100000
 );
 ```

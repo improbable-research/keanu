@@ -95,14 +95,14 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     public NetworkSamples getPosteriorSamples(final ProbabilisticModel model,
                                               final List<? extends Variable> variablesToSampleFrom,
                                               final int sampleCount) {
-        return generatePosteriorSamples((ProbabilisticModelWithGradient) model, variablesToSampleFrom)
-            .generate(sampleCount);
+        return generatePosteriorSamples(model, variablesToSampleFrom).generate(sampleCount);
     }
 
-    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModelWithGradient model,
+    @Override
+    public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
                                                             final List<? extends Variable> fromVariables) {
 
-        return new NetworkSamplesGenerator(setupSampler(model, fromVariables), ProgressBar::new);
+        return new NetworkSamplesGenerator(setupSampler((ProbabilisticModelWithGradient) model, fromVariables), ProgressBar::new);
     }
 
     private NUTSSampler setupSampler(final ProbabilisticModelWithGradient model,

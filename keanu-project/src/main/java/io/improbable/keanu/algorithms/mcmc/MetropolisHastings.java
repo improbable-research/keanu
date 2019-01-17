@@ -83,6 +83,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             .generate(sampleCount);
     }
 
+    @Override
     public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
                                                             final List<? extends Variable> variablesToSampleFrom) {
 

@@ -199,7 +199,9 @@ public class DotSaver implements NetworkSaver {
                 try {
                     Vertex parentVertex = (Vertex) method.invoke(vertex);
                     GraphEdge parentEdge = new GraphEdge(vertex, parentVertex);
-                    edges.stream().filter(parentEdge::equals).findFirst().get().appendToLabel(parentName);
+                    GraphEdge foundEdge = edges.stream().filter(parentEdge::equals).findFirst()
+                        .orElseThrow(() -> new IllegalStateException("Did not find parent edge " + parentName));
+                    foundEdge.appendToLabel(parentName);
                 } catch (Exception e) {
                     throw new IllegalArgumentException("Invalid parent retrieval function specified", e);
                 }

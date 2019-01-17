@@ -8,9 +8,10 @@ import pytest
 
 from examples import thermometers
 from keanu import BayesNet, KeanuRandom, Model
-from keanu.algorithm import sample, generate_samples, AcceptanceRateTracker
+from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler, NUTSSampler,
+                             PosteriorSamplingAlgorithm)
 from keanu.vertex import Gamma, Exponential, Cauchy, KeanuContext, Bernoulli
-from typing import Any
+from typing import Any, Callable
 
 
 @pytest.fixture
@@ -23,13 +24,14 @@ def net() -> BayesNet:
     return m.to_bayes_net()
 
 
-@pytest.mark.parametrize("algo", [("metropolis"), ("NUTS")])
-def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: str, net: BayesNet) -> None:
+@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler())])
+def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: PosteriorSamplingAlgorithm,
+                                                                               net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]
 
-    samples = sample(net=net, sample_from=sample_from, algo=algo, draws=draws)
+    samples = sample(net=net, sample_from=sample_from, sampling_algorithm=algo, draws=draws)
     assert len(samples) == len(sample_from)
     assert type(samples) == dict
 
@@ -77,32 +79,32 @@ def test_sample_with_plot(net: BayesNet) -> None:
 
 
 def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
-    generate_samples(
-        net=net,
-        sample_from=net.get_latent_vertices(),
-        proposal_distribution="gaussian",
-        proposal_distribution_sigma=np.array(1.))
+    algo = MetropolisHastingsSampler(proposal_distribution="gaussian", proposal_distribution_sigma=np.array(1.))
+    generate_samples(net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=algo)
 
 
-@pytest.mark.parametrize("algo", [("metropolis")])
-def test_can_iter_through_samples(algo: str, net: BayesNet) -> None:
+@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler())])
+def test_can_iter_through_samples(algo: PosteriorSamplingAlgorithm, net: BayesNet) -> None:
     draws = 10
-    samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo, down_sample_interval=1)
+    samples = generate_samples(
+        net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=algo, down_sample_interval=1)
     count = 0
     for sample in islice(samples, draws):
         count += 1
     assert count == draws
 
 
-@pytest.mark.parametrize("algo", [("metropolis")])
-def test_iter_returns_same_result_as_sample(algo: str) -> None:
+@pytest.mark.parametrize("algo", [MetropolisHastingsSampler])
+def test_iter_returns_same_result_as_sample(algo: Callable) -> None:
     draws = 100
     model = thermometers.model()
     net = BayesNet(model.temperature.get_connected_graph())
     set_starting_state(model)
-    samples = sample(net=net, sample_from=net.get_latent_vertices(), algo=algo, draws=draws)
+    sampler = algo()
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=sampler, draws=draws)
     set_starting_state(model)
-    iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), algo=algo)
+    sampler = algo()
+    iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=sampler)
 
     samples_dataframe = pd.DataFrame()
     for iter_sample in islice(iter_samples, draws):
@@ -131,12 +133,8 @@ def test_can_get_acceptance_rates(net: BayesNet) -> None:
     acceptance_rate_tracker = AcceptanceRateTracker()
     latents = list(net.get_latent_vertices())
 
-    samples = sample(
-        net=net,
-        sample_from=latents,
-        proposal_distribution='prior',
-        proposal_listeners=[acceptance_rate_tracker],
-        drop=3)
+    algo = MetropolisHastingsSampler(proposal_distribution='prior', proposal_listeners=[acceptance_rate_tracker])
+    samples = sample(net=net, sample_from=latents, sampling_algorithm=algo, drop=3)
 
     for latent in latents:
         rate = acceptance_rate_tracker.get_acceptance_rate(latent)
@@ -147,12 +145,8 @@ def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
     acceptance_rate_tracker = AcceptanceRateTracker()
     latents = list(net.get_latent_vertices())
 
-    samples = generate_samples(
-        net=net,
-        sample_from=latents,
-        proposal_distribution='prior',
-        proposal_listeners=[acceptance_rate_tracker],
-        drop=3)
+    algo = MetropolisHastingsSampler(proposal_distribution='prior', proposal_listeners=[acceptance_rate_tracker])
+    samples = generate_samples(net=net, sample_from=latents, sampling_algorithm=algo, drop=3)
 
     draws = 100
     for _ in islice(samples, draws):
@@ -161,28 +155,17 @@ def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
             assert 0 <= rate <= 1
 
 
-def test_it_throws_if_you_pass_in_a_proposal_distribution_but_the_algo_isnt_metropolis(net: BayesNet) -> None:
-    with pytest.raises(TypeError) as excinfo:
-        sample(
-            net=net, sample_from=net.get_latent_vertices(), algo="hamiltonian", proposal_distribution="prior", drop=3)
-    assert str(excinfo.value) == "Only Metropolis Hastings supports the proposal_distribution parameter"
-
-
-def test_it_throws_if_you_pass_in_a_proposal_listener_but_the_algo_isnt_metropolis(net: BayesNet) -> None:
-    with pytest.raises(TypeError) as excinfo:
-        sample(
-            net=net,
-            sample_from=net.get_latent_vertices(),
-            algo="hamiltonian",
-            proposal_listeners=[AcceptanceRateTracker()],
-            drop=3)
-    assert str(excinfo.value) == "Only Metropolis Hastings supports the proposal_listeners parameter"
-
-
 def test_it_throws_if_you_pass_in_a_proposal_listener_but_you_didnt_specify_the_proposal_type(net: BayesNet) -> None:
     with pytest.raises(TypeError) as excinfo:
-        sample(net=net, sample_from=net.get_latent_vertices(), proposal_listeners=[AcceptanceRateTracker()], drop=3)
+        algo = MetropolisHastingsSampler(proposal_listeners=[AcceptanceRateTracker()])
+
     assert str(excinfo.value) == "If you pass in proposal_listeners you must also specify proposal_distribution"
+
+
+def test_can_specify_nuts_params(net: BayesNet) -> None:
+    algo = NUTSSampler(1000, 0.65, True, 0.1, 10)
+
+    samples = sample(net, list(net.get_latent_vertices()), algo, draws=500, drop=100)
 
 
 def set_starting_state(model: Model) -> None:
