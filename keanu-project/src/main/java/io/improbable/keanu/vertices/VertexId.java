@@ -54,7 +54,7 @@ public class VertexId implements Comparable<VertexId>, VariableReference {
         }
 
         if (comparisonValue == 0) {
-            comparisonValue = this.idValues.length - that.idValues.length;
+            comparisonValue = (long) this.idValues.length - that.idValues.length;
         }
 
         return Ints.saturatedCast(comparisonValue);

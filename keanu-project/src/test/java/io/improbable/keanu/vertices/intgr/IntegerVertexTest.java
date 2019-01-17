@@ -172,5 +172,4 @@ public class IntegerVertexTest {
         assertArrayEquals(new int[]{1, 2, 1, 4}, min.getValue().asFlatIntegerArray());
         assertArrayEquals(new int[]{2, 4, 3, 5}, max.getValue().asFlatIntegerArray());
     }
-
 }

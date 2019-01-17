@@ -7,8 +7,6 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.*;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.PlaceHolderBoolVertex;
-import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -70,7 +68,7 @@ public class BernoulliVertex extends BooleanVertex implements ProbabilisticBoole
     }
 
     public LogProbGraph logProbGraph() {
-        final PlaceHolderBoolVertex xInput = new PlaceHolderBoolVertex(this.getShape());
+        final LogProbGraph.PlaceHolderBoolVertex xInput = new LogProbGraph.PlaceHolderBoolVertex(this.getShape());
         final LogProbGraph.DoublePlaceholderVertex probTrueInput = new LogProbGraph.DoublePlaceholderVertex(probTrue.getShape());
 
         final DoubleVertex logProb = If.isTrue(xInput)
@@ -88,7 +86,7 @@ public class BernoulliVertex extends BooleanVertex implements ProbabilisticBoole
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(BooleanTensor value, Set<? extends Vertex> withRespectTo) {
 
-        if (!(probTrue instanceof Differentiable)) {
+        if (!(probTrue.isDifferentiable())) {
             throw new UnsupportedOperationException("The probability of the Bernoulli being true must be differentiable");
         }
 

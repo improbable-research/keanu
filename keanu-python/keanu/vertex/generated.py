@@ -17,6 +17,7 @@ from .vertex_casting import (
     cast_to_double,
     cast_to_integer,
     cast_to_string,
+    cast_to_boolean,
     cast_to_long_array,
     cast_to_int_array,
     cast_to_vertex_array,
@@ -114,8 +115,10 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.StudentTVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.TriangularVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex")
@@ -657,12 +660,20 @@ def Uniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_par
     return Double(context.jvm_view().UniformVertex, cast_to_double_vertex(x_min), cast_to_double_vertex(x_max))
 
 
+def Print(parent: vertex_constructor_param_types, message: str, print_data: bool) -> Vertex:
+    return Vertex(context.jvm_view().PrintVertex, cast_to_vertex(parent), cast_to_string(message), cast_to_boolean(print_data))
+
+
 def CastInteger(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Integer(context.jvm_view().CastIntegerVertex, cast_to_vertex(input_vertex))
 
 
 def ConstantInteger(constant: tensor_arg_types) -> Vertex:
     return Integer(context.jvm_view().ConstantIntegerVertex, cast_to_integer_tensor(constant))
+
+
+def IntegerIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
+    return Integer(context.jvm_view().IntegerIfVertex, cast_to_vertex(predicate), cast_to_integer_vertex(thn), cast_to_integer_vertex(els))
 
 
 def IntegerProxy(tensor_shape: Collection[int], label: str) -> Vertex:

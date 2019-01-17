@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import com.google.common.base.Preconditions;
-import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
@@ -84,21 +83,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     @Builder.Default
     private boolean saveStatistics = false;
 
-    /**
-     * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
-     *
-     * @param bayesNet           the bayesian network to sample from
-     * @param sampleFromVertices the vertices inside the bayesNet to sample from
-     * @return Samples taken with NUTS
-     */
     @Override
-    public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                              final List<? extends Vertex> sampleFromVertices,
-                                              final int sampleCount) {
-        return generatePosteriorSamples(bayesNet, sampleFromVertices)
-            .generate(sampleCount);
-    }
-
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesNet,
                                                             final List<? extends Vertex> fromVertices) {
 
