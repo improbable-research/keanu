@@ -36,7 +36,7 @@ task pythonVersionInfo {
 task installDependencies {
     doLast {
         exec {
-            commandLine 'pipenv', 'install', '--dev', '--python', '3.7'
+            commandLine 'pipenv', 'install', '--dev', '--python', '3.6'
         }
     }
 }
