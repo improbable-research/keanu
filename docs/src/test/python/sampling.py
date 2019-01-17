@@ -31,10 +31,6 @@ def inference_example_hmc_nuts():
     m.a.set_value(20.)
     m.b.set_value(20.)
     bayes_net = m.to_bayes_net()
-    # %%SNIPPET_START%% PythonHamiltonianExample
-    posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
-                               algo="hamiltonian", draws=2000)
-    # %%SNIPPET_END%% PythonHamiltonianExample
     # %%SNIPPET_START%% PythonNUTSExample
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
                                algo="NUTS", draws=2000)
