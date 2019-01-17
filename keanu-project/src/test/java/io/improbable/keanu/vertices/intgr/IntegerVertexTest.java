@@ -1,15 +1,21 @@
 package io.improbable.keanu.vertices.intgr;
 
+import io.improbable.keanu.algorithms.NetworkSample;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -171,5 +177,18 @@ public class IntegerVertexTest {
 
         assertArrayEquals(new int[]{1, 2, 1, 4}, min.getValue().asFlatIntegerArray());
         assertArrayEquals(new int[]{2, 4, 3, 5}, max.getValue().asFlatIntegerArray());
+    }
+
+    public static double calculateMeanOfVertex(IntegerVertex vertex) {
+        return calculateMeanOfVertex(vertex, KeanuRandom.getDefaultRandom());
+    }
+
+    public static double calculateMeanOfVertex(IntegerVertex vertex, KeanuRandom random) {
+        BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
+
+        return MetropolisHastings.withDefaultConfig(random)
+            .generatePosteriorSamples(net, Collections.singletonList(vertex)).stream()
+            .limit(2000)
+            .collect(Collectors.averagingInt((NetworkSample state) -> state.get(vertex).scalar()));
     }
 }
