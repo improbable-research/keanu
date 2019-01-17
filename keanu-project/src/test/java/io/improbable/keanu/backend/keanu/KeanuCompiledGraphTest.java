@@ -74,4 +74,5 @@ public class KeanuCompiledGraphTest {
 
         assertEquals(C.getValue(), result.get(C.getReference()));
     }
+
 }
