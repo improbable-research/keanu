@@ -94,8 +94,12 @@ public class DifferentiableChecker {
     private static boolean diffableOrConstantUptoNextRV(Collection<Vertex> vertices, Set<Vertex> constantValueVerticesCache) {
         return BreadthFirstSearch.bfs(vertices,
             vertex -> isNonDiffableAndNotConstant(vertex, constantValueVerticesCache),
-            vertex -> !vertex.isProbabilistic(),
+            DifferentiableChecker::getParentsIfVertexIsNotProbabilistic,
             BreadthFirstSearch::doNothing);
+    }
+
+    private static Collection<Vertex> getParentsIfVertexIsNotProbabilistic(Vertex visiting) {
+        return visiting.isProbabilistic() ? Collections.emptySet() : visiting.getParents();
     }
 
     private static boolean isNonDiffableAndNotConstant(Vertex vertex, Set<Vertex> constantValueVerticesCache) {
@@ -110,12 +114,18 @@ public class DifferentiableChecker {
 
         return BreadthFirstSearch.bfs(Collections.singletonList(vertex),
             DifferentiableChecker::isUnobservedProbabilistic,
-            visiting -> !isValueKnownToBeConstant(visiting, constantValueVerticesCache),
+            visiting -> getParentsIfValueNotKnownToBeConstant(visiting, constantValueVerticesCache),
             constantValueVerticesCache::addAll);
     }
 
     private static boolean isUnobservedProbabilistic(Vertex vertex) {
         return vertex.isProbabilistic() && !vertex.isObserved();
+    }
+
+    private static Collection<Vertex> getParentsIfValueNotKnownToBeConstant(Vertex visiting,
+                                                                            Set<Vertex> constantValueVerticesCache) {
+
+        return isValueKnownToBeConstant(visiting, constantValueVerticesCache) ? Collections.emptySet() : visiting.getParents();
     }
 
     // We know whether these are constant. For cases such as a MultiplicationVertex we would need to
