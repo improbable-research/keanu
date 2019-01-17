@@ -24,7 +24,7 @@ public class DoubleSetWithMaskVertex extends DoubleVertex implements NonProbabil
     public DoubleSetWithMaskVertex(@LoadVertexParam(OPERAND_NAME) DoubleVertex operand,
                                    @LoadVertexParam(MASK_NAME) DoubleVertex mask,
                                    @LoadVertexParam(SET_VALUE_NAME) DoubleVertex setValue) {
-        super(checkHasOneNonLengthOneShapeOrAllLengthOne(operand.getShape(), mask.getShape(), setValue.getShape()));
+        super(checkHasOneNonLengthOneShapeOrAllLengthOne(operand.getShape(), mask.getShape()));
         this.operand = operand;
         this.mask = mask;
         this.setValue = setValue;

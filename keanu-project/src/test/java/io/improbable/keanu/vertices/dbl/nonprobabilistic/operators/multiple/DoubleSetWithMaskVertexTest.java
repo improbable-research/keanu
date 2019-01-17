@@ -8,25 +8,33 @@ import org.junit.Test;
 
 public class DoubleSetWithMaskVertexTest {
 
-    DoubleVertex vertexA;
+    private DoubleVertex vertex;
 
     @Before
     public void setup() {
-        vertexA = ConstantVertex.of(new double[] {1., 2., 3., 4.}, 2, 2);
+        vertex = ConstantVertex.of(new double[] {1., 2., 3., 4.}, 2, 2);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void operandAndMaskMustBeSameShape() {
+        DoubleVertex mask = ConstantVertex.of(new double[] {1., 2., 3., 4.}, 4, 1);
+        DoubleVertex result = new DoubleSetWithMaskVertex(vertex, mask, ConstantVertex.of(-.2));
     }
 
     @Test
     public void canSetWithMaskGivenScalar() {
-        DoubleVertex mask = vertexA.toGreaterThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
-        DoubleVertex result = new DoubleSetWithMaskVertex(vertexA, mask, ConstantVertex.of(-2.));
+        DoubleVertex mask = vertex.toGreaterThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
+        DoubleVertex result = new DoubleSetWithMaskVertex(vertex, mask, ConstantVertex.of(-2.));
 
         assertArrayEquals(new double[]{1., 2., -2, -2}, result.getValue().asFlatDoubleArray(), 0.0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotSetWithMaskGivenMatrix() {
-        DoubleVertex mask = vertexA.toGreaterThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
-        DoubleVertex result = new DoubleSetWithMaskVertex(vertexA, mask, ConstantVertex.of(4., -2.));
+    @Test
+    public void canSetWithMaskGivenMatrixButOnlyTakesItsScalarValue() {
+        DoubleVertex mask = vertex.toGreaterThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
+        DoubleVertex result = new DoubleSetWithMaskVertex(vertex, mask, ConstantVertex.of(4., -2.));
+
+        assertArrayEquals(new double[]{1., 2., 4., 4.}, result.getValue().asFlatDoubleArray(), 0.0);
     }
 
     /**
@@ -34,8 +42,8 @@ public class DoubleSetWithMaskVertexTest {
      */
     @Test
     public void canSetToZero() {
-        DoubleVertex mask = vertexA.toLessThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
-        DoubleVertex result = new DoubleSetWithMaskVertex(vertexA, mask, ConstantVertex.of(0.));
+        DoubleVertex mask = vertex.toLessThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
+        DoubleVertex result = new DoubleSetWithMaskVertex(vertex, mask, ConstantVertex.of(0.));
 
         assertArrayEquals(new double[]{0., 2., 3., 4.}, result.getValue().asFlatDoubleArray(), 0.0);
     }
