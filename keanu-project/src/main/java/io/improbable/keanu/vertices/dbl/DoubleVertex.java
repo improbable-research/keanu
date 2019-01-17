@@ -316,12 +316,12 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return toLessThanMask(new ConstantDoubleVertex(rhs));
     }
 
-    public DoubleVertex setWithMask(DoubleVertex mask, double value) {
-        return new DoubleSetWithMaskVertex(this, mask, new ConstantDoubleVertex(value));
-    }
-
     public DoubleVertex setWithMask(DoubleVertex mask, DoubleVertex value) {
         return new DoubleSetWithMaskVertex(this, mask, value);
+    }
+
+    public DoubleVertex setWithMask(DoubleVertex mask, double value) {
+        return setWithMask(mask, new ConstantDoubleVertex(value));
     }
 
     public <T extends NumberTensor> BooleanVertex lessThanOrEqualTo(Vertex<T> rhs) {
