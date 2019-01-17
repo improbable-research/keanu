@@ -9,13 +9,18 @@ import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 import umontreal.ssj.probdist.TriangularDist;
 
 public class TriangularVertexTest {
 
     private KeanuRandom random;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -73,6 +78,37 @@ public class TriangularVertexTest {
         TriangularDist triangularDist = new TriangularDist(0., 20., 10.);
         double expectedDensity = Math.log(triangularDist.density(2.5) * triangularDist.density(7.5));
         LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void cLessThanXMinThrowsException() {
+        DoubleVertex xMin = ConstantVertex.of(0.);
+        DoubleVertex xMax = ConstantVertex.of(1.);
+        DoubleVertex c = ConstantVertex.of(-1.);
+        TriangularVertex triangularVertex = new TriangularVertex(xMin, xMax, c);
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("center must be between xMin and xMax. c: " + c.getValue() + " xMin: " + xMin.getValue() + " xMax: " + xMax.getValue());
+        triangularVertex.sample();
+    }
+
+    @Test
+    public void cGreaterThanXMaxThrowsException() {
+        DoubleVertex xMin = ConstantVertex.of(0.);
+        DoubleVertex xMax = ConstantVertex.of(1.);
+        DoubleVertex c = ConstantVertex.of(2.);
+        TriangularVertex triangularVertex = new TriangularVertex(xMin, xMax, c);
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("center must be between xMin and xMax. c: " + c.getValue() + " xMin: " + xMin.getValue() + " xMax: " + xMax.getValue());
+        triangularVertex.sample();
+    }
+
+    @Test
+    public void cEqualToXMinOrXMaxDoesNotThrowException() {
+        DoubleVertex xMin = ConstantVertex.of(0., 0.);
+        DoubleVertex xMax = ConstantVertex.of(1., 1.);
+        DoubleVertex c = ConstantVertex.of(0., 1.);
+        TriangularVertex triangularVertex = new TriangularVertex(xMin, xMax, c);
+        triangularVertex.sample();
     }
 
     @Category(Slow.class)

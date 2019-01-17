@@ -17,6 +17,7 @@ from .vertex_casting import (
     cast_to_double,
     cast_to_integer,
     cast_to_string,
+    cast_to_boolean,
     cast_to_long_array,
     cast_to_int_array,
     cast_to_vertex_array,
@@ -78,6 +79,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.DoubleSetWithMaskVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex")
@@ -118,6 +120,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.StudentTVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.TriangularVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex")
@@ -360,6 +363,10 @@ def Power(base: vertex_constructor_param_types, exponent: vertex_constructor_par
 
 def Concatenation(dimension: int, operands: Collection[Vertex]) -> Vertex:
     return Double(context.jvm_view().ConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_array(operands))
+
+
+def DoubleSetWithMask(operand: vertex_constructor_param_types, mask: vertex_constructor_param_types, set_value: vertex_constructor_param_types) -> Vertex:
+    return Double(context.jvm_view().DoubleSetWithMaskVertex, cast_to_double_vertex(operand), cast_to_double_vertex(mask), cast_to_double_vertex(set_value))
 
 
 def Abs(input_vertex: vertex_constructor_param_types) -> Vertex:
@@ -675,6 +682,10 @@ def Uniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_par
     :param x_max: the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
     """
     return Double(context.jvm_view().UniformVertex, cast_to_double_vertex(x_min), cast_to_double_vertex(x_max))
+
+
+def Print(parent: vertex_constructor_param_types, message: str, print_data: bool) -> Vertex:
+    return Vertex(context.jvm_view().PrintVertex, cast_to_vertex(parent), cast_to_string(message), cast_to_boolean(print_data))
 
 
 def CastInteger(input_vertex: vertex_constructor_param_types) -> Vertex:

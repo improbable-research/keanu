@@ -13,8 +13,10 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.CauchyDistribution;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,9 @@ public class CauchyVertexTest {
     private static final double DELTA = 0.0001;
 
     private KeanuRandom random;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -83,6 +88,15 @@ public class CauchyVertexTest {
         CauchyDistribution distribution = new CauchyDistribution(0., 1.);
         double expectedDensity = distribution.logDensity(0.25) + distribution.logDensity(-0.75);
         LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void scaleMustBeStrictlyPositive() {
+        DoubleVertex scale = ConstantVertex.of(0.);
+        CauchyVertex cauchyVertex = new CauchyVertex(0., scale);
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("scale must be greater than 0. scale: " + scale.getValue());
+        cauchyVertex.sample();
     }
 
     @Test

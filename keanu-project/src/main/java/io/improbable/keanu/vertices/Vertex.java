@@ -8,6 +8,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -84,6 +85,18 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
     public final T eval() {
         VertexValuePropagation.eval(this);
         return this.getValue();
+    }
+
+
+    public <V extends Vertex<T>> V print() {
+        new PrintVertex<>(this);
+        return (V) this;
+    }
+
+
+    public <V extends Vertex<T>> V print(final String message, final boolean printData) {
+        new PrintVertex<>(this, message, printData);
+        return (V) this;
     }
 
     /**
