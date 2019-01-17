@@ -46,10 +46,30 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         int[] range = TensorShape.dimensionRange(0, derivativeOfOutputWithRespectToSelf.get().getRank());
-        for (int i = 0; i < rearrange.length; i++) {
-            range[i] = rearrange[i];
+        int rank = inputVertex.getRank();
+
+        for (int i = 0; i < rank; i++) {
+            range[i] = i + rank;
         }
+
+        int[] reversePermute = reversePermute();
+        for (int i = rank; i < reversePermute.length + rank; i++) {
+            range[i] = reversePermute[i - rank];
+        }
+
         partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.permute(range));
         return partials;
+    }
+
+    private int[] reversePermute() {
+        int[] reversedPermute = new int[rearrange.length];
+        for (int i = 0; i < reversedPermute.length; i++) {
+            for (int j = 0; j < rearrange.length; j++) {
+                if (i == rearrange[j]) {
+                    reversedPermute[i] = j;
+                }
+            }
+        }
+        return reversedPermute;
     }
 }
