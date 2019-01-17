@@ -289,7 +289,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public DoubleVertex toGreaterThanMask(double rhs) {
-        return new DoubleGreaterThanMaskVertex(this, new ConstantDoubleVertex(rhs));
+        return toGreaterThanMask(new ConstantDoubleVertex(rhs));
     }
 
     public <T extends NumberTensor> BooleanVertex greaterThanOrEqualTo(Vertex<T> rhs) {
@@ -301,7 +301,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public DoubleVertex toGreaterThanOrEqualToMask(double rhs) {
-        return new DoubleGreaterThanOrEqualToMaskVertex(this, new ConstantDoubleVertex(rhs));
+        return toGreaterThanOrEqualToMask(new ConstantDoubleVertex(rhs));
     }
 
     public <T extends NumberTensor> BooleanVertex lessThan(Vertex<T> rhs) {
@@ -313,7 +313,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public DoubleVertex toLessThanMask(double rhs) {
-        return new DoubleLessThanMaskVertex(this, new ConstantDoubleVertex(rhs));
+        return toLessThanMask(new ConstantDoubleVertex(rhs));
     }
 
     public DoubleVertex setWithMask(DoubleVertex mask, double value) {
@@ -333,7 +333,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public DoubleVertex toLessThanOrEqualToMask(double rhs) {
-        return new DoubleLessThanOrEqualToMaskVertex(this, new ConstantDoubleVertex(rhs));
+        return toLessThanOrEqualToMask(new ConstantDoubleVertex(rhs));
     }
 
     public TakeVertex take(long... index) {
