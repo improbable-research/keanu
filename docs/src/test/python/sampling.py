@@ -15,7 +15,7 @@ def test_inference_example_metropolis():
     bayes_net = m.to_bayes_net()
     algo = MetropolisHastingsSampler()
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
-                               sampling_algorithm=algo, draws=100000)
+                               sampling_algorithm=algo, draws=30000)
 
     average_posterior_a = np.average(posterior_samples.get('a'))
     average_posterior_b = np.average(posterior_samples.get('b'))
