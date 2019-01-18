@@ -28,8 +28,12 @@ public class CastToIntegerVertex extends IntegerVertex implements NonProbabilist
     }
 
     @Override
-    public IntegerTensor calculate() { return inputVertex.getValue().toInteger(); }
+    public IntegerTensor calculate() {
+        return inputVertex.getValue().toInteger();
+    }
 
     @SaveVertexParam(INPUT_NAME)
-    public Vertex<? extends NumberTensor> getInputVertex() { return inputVertex; }
+    public Vertex<? extends NumberTensor> getInputVertex() {
+        return inputVertex;
+    }
 }
