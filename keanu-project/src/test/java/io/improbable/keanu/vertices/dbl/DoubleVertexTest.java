@@ -96,6 +96,6 @@ public class DoubleVertexTest {
     public void canCastToIntegerVertex() {
         DoubleVertex v1 = new ConstantDoubleVertex(3.6);
         IntegerVertex intV1 = v1.toInteger();
-        assertEquals(3, intV1.getValue().scalar(), 0.0);
+        assertEquals(3, intV1.getValue().scalar().longValue());
     }
 }
