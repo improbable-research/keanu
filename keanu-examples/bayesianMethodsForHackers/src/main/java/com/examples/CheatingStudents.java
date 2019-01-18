@@ -28,12 +28,12 @@ public class CheatingStudents {
         DoubleVertex answer = If.isTrue(answerIsTrue)
             .then(
                 If.isTrue(studentCheated)
-                    .then(1)
-                    .orElse(0)
+                    .then(1.0)
+                    .orElse(0.0)
             ).orElse(
                 If.isTrue(randomAnswer)
-                    .then(1)
-                    .orElse(0)
+                    .then(1.0)
+                    .orElse(0.0)
             );
 
         DoubleVertex answerTotal = new GaussianVertex(answer.sum(), 1);

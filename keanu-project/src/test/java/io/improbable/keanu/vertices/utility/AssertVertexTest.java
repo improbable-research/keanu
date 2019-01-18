@@ -1,7 +1,10 @@
 package io.improbable.keanu.vertices.utility;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.mcmc.MCMC;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
@@ -203,6 +206,24 @@ public class AssertVertexTest {
 
         assertEquals(22, maxA, 0.1);
         assertEquals(22, maxB, 0.1);
+    }
+
+    @Test
+    public void canUseGradientBasedSamplingWithAssertVertex() {
+        DoubleVertex A = new GaussianVertex(20.0, 1.0);
+        DoubleVertex B = new GaussianVertex(20.0, 1.0);
+        A.setValue(21.5);
+        B.setAndCascade(21.5);
+
+        A.greaterThan(new ConstantDoubleVertex(20)).assertTrue();
+        B.greaterThan(new ConstantDoubleVertex(20)).assertTrue();
+
+        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
+        Cobserved.observe(46.0);
+
+        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
+        PosteriorSamplingAlgorithm samplingAlgorithm = MCMC.withDefaultConfig().forNetwork(bayesNet);
+        assertThat(samplingAlgorithm, instanceOf(NUTS.class));
     }
 
     @Test

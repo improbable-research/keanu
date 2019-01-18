@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -143,7 +143,7 @@ public class BooleanVertexTest {
 
         BernoulliVertex f = new BernoulliVertex(0.5);
 
-        CastBooleanVertex a = new CastBooleanVertex(f);
+        CastToBooleanVertex a = new CastToBooleanVertex(f);
 
         assertEquals(priorProbabilityTrue(a, 10000, random), p, 0.01);
     }
