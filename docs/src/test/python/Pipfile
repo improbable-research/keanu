@@ -7,6 +7,7 @@ verify_ssl = true
 
 [packages]
 keanu = {editable = true,path = "./../../../../keanu-python"}
+pytest = "*"
 
 [requires]
 python_version = "3.6"
