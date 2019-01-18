@@ -9,13 +9,13 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class CastBooleanVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
+public class CastToBooleanVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
 
     private final Vertex<? extends BooleanTensor> inputVertex;
     private final static String INPUT_NAME = "inputVertex";
 
     @ExportVertexToPythonBindings
-    public CastBooleanVertex(@LoadVertexParam(INPUT_NAME) Vertex<? extends BooleanTensor> inputVertex) {
+    public CastToBooleanVertex(@LoadVertexParam(INPUT_NAME) Vertex<? extends BooleanTensor> inputVertex) {
         super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);

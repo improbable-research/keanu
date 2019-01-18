@@ -48,6 +48,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastToIntegerVertex;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -225,14 +227,14 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public DoubleUnaryOpLambda<DoubleTensor> lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
-                               Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
-                               Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
+                                                    Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
+                                                    Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
     public DoubleUnaryOpLambda<DoubleTensor> lambda(Function<DoubleTensor, DoubleTensor> op,
-                               Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
-                               Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
+                                                    Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
+                                                    Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
@@ -270,6 +272,8 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     public BooleanVertex equalTo(DoubleVertex rhs) {
         return new EqualsVertex<>(this, rhs);
     }
+
+    public IntegerVertex toInteger() { return new CastToIntegerVertex(this); }
 
     public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);
