@@ -3,7 +3,7 @@ from keanu import BayesNet, KeanuRandom, Model
 from keanu.vertex import Gamma, Exponential, Cauchy, Gaussian
 import numpy as np
 
-def inference_example_metropolis():
+def test_inference_example_metropolis():
     # %%SNIPPET_START%% PythonMetropolisExample
     with Model() as m:
         m.a = Gaussian(20.,1.)
@@ -23,7 +23,7 @@ def inference_example_metropolis():
     actual = average_posterior_a + average_posterior_b
     # %%SNIPPET_END%% PythonMetropolisExample
 
-def inference_example_hmc_nuts():
+def test_inference_example_hmc_nuts():
     with Model() as m:
         m.a = Gaussian(20., 1.)
         m.b = Gaussian(20., 1.)
@@ -42,6 +42,3 @@ def inference_example_hmc_nuts():
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
                                sampling_algorithm=algo, draws=2000)
     # %%SNIPPET_END%% PythonNUTSExample
-
-inference_example_metropolis()
-inference_example_hmc_nuts()
