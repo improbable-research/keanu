@@ -105,7 +105,7 @@ public class NetworkSamplesGenerator {
                 algorithm.step();
             }
             remainingTimeComponent.step();
-            statusPercentage.progress((double) (i+1) / samplesLeft);
+            statusPercentage.progress((double) (i + 1) / samplesLeft);
         }
 
         statusBar.finish();
@@ -145,7 +145,7 @@ public class NetworkSamplesGenerator {
     }
 
     private void dropSamples(int dropCount, StatusBar statusBar) {
-        if(dropCount == 0) {
+        if (dropCount == 0) {
             return;
         }
         statusBar.setMessage("Dropping samples...");
