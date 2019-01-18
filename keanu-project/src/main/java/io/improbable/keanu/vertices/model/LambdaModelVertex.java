@@ -58,6 +58,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
      *                     the models output values.
      * @return a process model vertex
      */
+    @SuppressWarnings("squid:S2142")    // "InterruptedException" should not be ignored
     public static LambdaModelVertex createFromProcess(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                                                       String command,
                                                       Supplier<Map<VertexLabel, Vertex<? extends Tensor>>> updateValues) {

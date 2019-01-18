@@ -28,7 +28,7 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
             .divInPlace(samples.size())
             .minusInPlace(getAverages().pow(2))
             .timesInPlace(samples.size())
-            .divInPlace(samples.size() - 1);
+            .divInPlace(samples.size() - 1.);
     }
 
     /**
@@ -51,4 +51,8 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
         return sampleShape.length == 0 ? new long[]{0} : index;
     }
 
+
+    public DoubleTensor asTensor() {
+        return DoubleTensor.stack(0, samples.stream().toArray(DoubleTensor[]::new));
+    }
 }

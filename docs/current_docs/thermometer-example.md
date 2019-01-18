@@ -60,7 +60,7 @@ Let's assume we're on a distant planet and have no prior knowledge about what th
 we define the temperature as a Uniform Distribution between 20° and 30°.
 
 ```java
-        UniformVertex temperature = new UniformVertex(20., 30.);
+UniformVertex temperature = new UniformVertex(20., 30.);
 ```
 
 Let's now define our two thermometers. Looking at the graph we made earlier, we can see that each thermometer
@@ -70,26 +70,26 @@ Let's represent each thermometer as a Gaussian distribution with a mu of the roo
 As the first thermometer is more accurate, its sigma will be smaller.
 
 ```java
-        GaussianVertex firstThermometer = new GaussianVertex(temperature, 2.5);
-        GaussianVertex secondThermometer = new GaussianVertex(temperature, 5.);
+GaussianVertex firstThermometer = new GaussianVertex(temperature, 2.5);
+GaussianVertex secondThermometer = new GaussianVertex(temperature, 5.);
 ```
 
 Now we can take the readings of each thermometer.
 
 ```java
-        firstThermometer.observe(25.);
-        secondThermometer.observe(30.);
+firstThermometer.observe(25.);
+secondThermometer.observe(30.);
 ```
 
 Now that we have taken our thermometer readings, let's calculate the most probable value for the 
 room temperature.
 
 ```java
-        BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        Optimizer optimizer = KeanuOptimizer.of(bayesNet);
-        optimizer.maxAPosteriori();
+BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
+Optimizer optimizer = KeanuOptimizer.of(bayesNet);
+optimizer.maxAPosteriori();
 
-        double calculatedTemperature = temperature.getValue().scalar();
+double calculatedTemperature = temperature.getValue().scalar();
 ```
 
 Given our graph and observed values, this will attempt to calculate the most likely value for each vertex.
@@ -113,6 +113,8 @@ Here is the completed code if you'd like to run it yourself.
 
 Experiment with the size of the sigma in each thermometer (the inaccuracy) and see how it affects the 
 estimated temperature.
+
+#### Java
 
 ```java
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
@@ -142,4 +144,23 @@ public class ThermometerExample {
         System.out.println("Calculated Room Temperature: " + calculatedTemperature);
     }
 }
+```
+
+#### Python
+
+```python
+with Model() as m:
+    m.temperature = Uniform(20., 30.)
+    m.first_thermometer = Gaussian(m.temperature, 2.5)
+    m.second_thermometer = Gaussian(m.temperature, 5.)
+
+m.first_thermometer.observe(25.)
+m.second_thermometer.observe(30.)
+
+bayes_net = m.to_bayes_net()
+optimizer = GradientOptimizer(bayes_net)
+optimizer.max_a_posteriori()
+
+calculated_temperature = m.temperature.get_value()
+print(calculated_temperature)
 ```

@@ -1,10 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
@@ -17,15 +16,17 @@ public class DoubleCPTVertexTest {
     private DoubleTensor aValue = DoubleTensor.create(0.5, 0.25);
     private DoubleTensor bValue = DoubleTensor.create(-0.5, -0.25);
 
+    GaussianVertex A;
+
     private DoubleCPTVertex doubleCPTNetwork(boolean left, boolean right) {
-        DoubleVertex A = new GaussianVertex(new long[]{2}, 0, 1);
+        A = new GaussianVertex(new long[]{2}, 0, 1);
         A.setValue(aValue);
         DoubleVertex B = new GaussianVertex(0, 1);
         B.observe(bValue);
 
-        BoolVertex leftPredicate = new BernoulliVertex(0.5);
+        BooleanVertex leftPredicate = new BernoulliVertex(0.5);
         leftPredicate.observe(left);
-        BoolVertex rightPredicate = new BernoulliVertex(0.5);
+        BooleanVertex rightPredicate = new BernoulliVertex(0.5);
         rightPredicate.observe(right);
 
         return ConditionalProbabilityTable.of(leftPredicate, rightPredicate)
@@ -60,13 +61,12 @@ public class DoubleCPTVertexTest {
 
     private void assertDiffFromACondition(boolean left, boolean right, DoubleTensor expected) {
         DoubleCPTVertex doubleCPTVertex = doubleCPTNetwork(left, right);
-        BayesianNetwork network = new BayesianNetwork(doubleCPTVertex.getConnectedGraph());
 
-        Vertex<DoubleTensor> A = network.getContinuousLatentVertices().get(0);
+        DoubleTensor actualReverse = Differentiator.reverseModeAutoDiff(doubleCPTVertex, A).withRespectTo(A);
+        DoubleTensor actualForward = Differentiator.forwardModeAutoDiff(A, doubleCPTVertex).of(doubleCPTVertex);
 
-        DoubleTensor actual = doubleCPTVertex.getDerivativeWrtLatents().withRespectTo(A);
-
-        assertEquals(expected, actual);
+        assertEquals(expected, actualReverse);
+        assertEquals(expected, actualForward);
     }
 
 }

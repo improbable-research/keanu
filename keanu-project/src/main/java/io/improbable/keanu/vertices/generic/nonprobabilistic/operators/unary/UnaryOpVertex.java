@@ -5,8 +5,9 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericVertex;
 
-public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> implements NonProbabilistic<OUT> {
+public abstract class UnaryOpVertex<IN, OUT> extends GenericVertex<OUT> implements NonProbabilistic<OUT> {
 
     protected static final String INPUT_NAME = "inputVertex";
 

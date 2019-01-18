@@ -100,9 +100,9 @@ In the interest of keeping this simple, take for example the case where instead 
 In this example, A and B contain boolean values and C is true only if both A and B are true. To describe this network in Keanu:
 
 ```java
-BoolVertex A = new BernoulliVertex(0.5);
-BoolVertex B = new BernoulliVertex(0.5);
-BoolVertex C = A.and(B);
+BooleanVertex A = new BernoulliVertex(0.5);
+BooleanVertex B = new BernoulliVertex(0.5);
+BooleanVertex C = A.and(B);
 ```
 
 To observe that C is true:
@@ -118,9 +118,9 @@ A.observe(true);
 B.observe(true);
 
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-        new BayesianNetwork(C.getConnectedGraph()),
-        Arrays.asList(A, B),
-        100000
+    new BayesianNetwork(C.getConnectedGraph()),
+    Arrays.asList(A, B),
+    100000
 ).drop(10000).downSample(2);
 double probabilityOfA = posteriorSamples.get(A).probability(isTrue -> isTrue.scalar() == true);
 //probabilityOfA evaluates to 1.0

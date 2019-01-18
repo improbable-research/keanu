@@ -14,7 +14,7 @@ import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -88,8 +88,8 @@ public class ProtobufTest {
 
         assertThat(readNet.getLatentVertices().size(), is(1));
         assertThat(readNet.getLatentVertices().get(0), instanceOf(GaussianVertex.class));
-        GaussianVertex latentGaussianVertex = (GaussianVertex)readNet.getLatentVertices().get(0);
-        GaussianVertex labelGaussianVerted = (GaussianVertex)readNet.getVertexByLabel(new VertexLabel(gaussianLabel));
+        GaussianVertex latentGaussianVertex = (GaussianVertex) readNet.getLatentVertices().get(0);
+        GaussianVertex labelGaussianVerted = (GaussianVertex) readNet.getVertexByLabel(new VertexLabel(gaussianLabel));
         assertThat(latentGaussianVertex, equalTo(labelGaussianVerted));
         assertThat(latentGaussianVertex.getMu().getValue(0), closeTo(3.0, 1e-10));
         assertThat(labelGaussianVerted.getMu().getValue(2), closeTo(5.0, 1e-10));
@@ -99,8 +99,8 @@ public class ProtobufTest {
 
     @Test
     public void shapeIsCorrectlySavedAndLoaded() throws IOException {
-        long[] shape1 = new long[] {2, 3};
-        long[] shape2 = new long[] {3, 2};
+        long[] shape1 = new long[]{2, 3};
+        long[] shape2 = new long[]{3, 2};
         final VertexLabel LABEL_ONE = new VertexLabel("Vertex1");
         final VertexLabel LABEL_TWO = new VertexLabel("Vertex2");
 
@@ -131,17 +131,24 @@ public class ProtobufTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ProtobufSaver saver = new ProtobufSaver(complexNet);
         saver.save(outputStream, true);
-        DoubleIfVertex outputVertex = (DoubleIfVertex)complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        DoubleVertex inputVertex = (DoubleVertex)complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        DoubleIfVertex outputVertex = (DoubleIfVertex) complexNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        GaussianVertex inputVertex = (GaussianVertex) complexNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
         ByteArrayInputStream input = new ByteArrayInputStream(outputStream.toByteArray());
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork loadedNet = loader.loadNetwork(input);
-        DoubleIfVertex outputVertex2 = (DoubleIfVertex)loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
-        DoubleVertex inputVertex2 = (DoubleVertex)loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
+        DoubleIfVertex outputVertex2 = (DoubleIfVertex) loadedNet.getVertexByLabel(new VertexLabel(OUTPUT_NAME));
+        GaussianVertex inputVertex2 = (GaussianVertex) loadedNet.getVertexByLabel(new VertexLabel(INPUT_NAME));
 
-        DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(outputVertex).withRespectTo(inputVertex);
-        DoubleTensor dOutputAfter = Differentiator.forwardModeAutoDiff(outputVertex2).withRespectTo(inputVertex2);
+        DoubleTensor dOutputBefore = Differentiator.forwardModeAutoDiff(
+            inputVertex,
+            outputVertex
+        ).of(outputVertex);
+
+        DoubleTensor dOutputAfter = Differentiator.forwardModeAutoDiff(
+            inputVertex2,
+            outputVertex2
+        ).of(outputVertex2);
 
         assertEquals(dOutputBefore, dOutputAfter);
 
@@ -162,7 +169,7 @@ public class ProtobufTest {
         DoubleVertex G = E.log();
         DoubleVertex F = D.plus(B);
 
-        BoolVertex predicate = ConstantVertex.of(BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2}));
+        BooleanVertex predicate = ConstantVertex.of(BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2}));
         DoubleVertex H = If.isTrue(predicate).then(G).orElse(F).setLabel(OUTPUT_NAME);
 
         return new BayesianNetwork(H.getConnectedGraph());
@@ -297,7 +304,7 @@ public class ProtobufTest {
 
         ProtobufLoader loader = new ProtobufLoader();
         BayesianNetwork net = loader.loadNetwork(new ByteArrayInputStream(writer.toByteArray()));
-        GaussianVertex newGauss = (GaussianVertex)net.getVertexByLabel(new VertexLabel(GAUSS_LABEL));
+        GaussianVertex newGauss = (GaussianVertex) net.getVertexByLabel(new VertexLabel(GAUSS_LABEL));
         assertThat(newGauss.getValue().scalar(), is(GAUSS_VALUE));
     }
 
@@ -384,8 +391,8 @@ public class ProtobufTest {
     }
 
     private KeanuSavedBayesNet.Model createBasicNetworkProtobufWithValue(String labelForValue,
-                                                                                   String idForValue,
-                                                                                   Double valueToStore) {
+                                                                         String idForValue,
+                                                                         Double valueToStore) {
 
         KeanuSavedBayesNet.Vertex muVertex = KeanuSavedBayesNet.Vertex.newBuilder()
             .setId(KeanuSavedBayesNet.VertexID.newBuilder().setId("1"))
@@ -512,7 +519,7 @@ public class ProtobufTest {
 
         Arrays.stream(items)
             .filter(item -> item.isAnnotationPresent(annotation))
-            .forEach(item -> filteredList.add((A)item));
+            .forEach(item -> filteredList.add((A) item));
 
         return filteredList;
     }

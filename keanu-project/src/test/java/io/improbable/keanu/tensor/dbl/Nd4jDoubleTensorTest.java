@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorTestHelper;
 import io.improbable.keanu.tensor.TensorValueException;
@@ -66,7 +67,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor scalar = DoubleTensor.create(new double[]{2.0}, new long[]{});
         DoubleTensor expected = DoubleTensor.scalar(2.0);
         assertEquals(expected, scalar);
-        assertEquals(0, scalar.getShape().length);
+        assertEquals(0, scalar.getRank());
     }
 
     @Test
@@ -613,7 +614,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canFindMinAndMaxFromScalarToTensor() {
         DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
-        DoubleTensor b = DoubleTensor.create(3.);
+        DoubleTensor b = DoubleTensor.scalar(3.);
 
         DoubleTensor min = DoubleTensor.min(a, b);
         DoubleTensor max = DoubleTensor.max(a, b);
@@ -625,7 +626,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canFindMinFromScalarToTensorInPlace() {
         DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
-        DoubleTensor b = DoubleTensor.create(3.);
+        DoubleTensor b = DoubleTensor.scalar(3.);
 
         a.minInPlace(b);
 
@@ -635,7 +636,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canFindMaxFromScalarToTensorInPlace() {
         DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
-        DoubleTensor b = DoubleTensor.create(3.);
+        DoubleTensor b = DoubleTensor.scalar(3.);
 
         a.maxInPlace(b);
 
@@ -842,14 +843,6 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
-    public void comparesDoubleTensorWithLength1Vector() {
-        DoubleTensor value = DoubleTensor.create(new double[]{1.}, 1);
-        DoubleTensor vector = DoubleTensor.create(1., 2., 3.);
-        BooleanTensor result = value.elementwiseEquals(vector);
-        assertThat(result, hasValue(true, false, false));
-    }
-
-    @Test
     public void canSumOverSpecifiedDimensionOfRank3() {
         DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
         DoubleTensor summation = x.sum(2);
@@ -945,6 +938,67 @@ public class Nd4jDoubleTensorTest {
 
         DoubleTensor concat = DoubleTensor.concat(0, x, y);
         assertEquals(DoubleTensor.create(2, 3, 4, 5).reshape(2, 2), concat);
+    }
+
+    @Test
+    public void canStackScalars() {
+        DoubleTensor x = DoubleTensor.scalar(2);
+        DoubleTensor y = DoubleTensor.scalar(3);
+
+        assertThat(DoubleTensor.create(2, 3).reshape(2), TensorMatchers.valuesAndShapesMatch(DoubleTensor.stack(0, x, y)));
+    }
+
+    @Test
+    public void canStackVectors() {
+        DoubleTensor x = DoubleTensor.create(2, 3);
+        DoubleTensor y = DoubleTensor.create(4, 5);
+
+        assertEquals(DoubleTensor.create(2, 3, 4, 5).reshape(2, 2), DoubleTensor.stack(0, x, y));
+        assertEquals(DoubleTensor.create(2, 4, 3, 5).reshape(2, 2), DoubleTensor.stack(1, x, y));
+    }
+
+    @Test
+    public void canStackMatrices() {
+        DoubleTensor x = DoubleTensor.create(2, 3).reshape(1, 2);
+        DoubleTensor y = DoubleTensor.create(4, 5).reshape(1, 2);
+
+        assertThat(DoubleTensor.create(2, 3, 4, 5).reshape(2, 1, 2), valuesAndShapesMatch(DoubleTensor.stack(0, x, y)));
+        assertThat(DoubleTensor.create(2, 3, 4, 5).reshape(1, 2, 2), valuesAndShapesMatch(DoubleTensor.stack(1, x, y)));
+        /*
+        Result in numpy when dimension is equal to array length:
+        >>> a
+        array([[2, 3]])
+        >>> b
+        array([[4, 5]])
+        >>> np.stack([a, b], axis=2)
+        array([[[2, 4],
+                [3, 5]]])
+        */
+        assertThat(DoubleTensor.create(2, 4, 3, 5).reshape(1, 2, 2), valuesAndShapesMatch(DoubleTensor.stack(2, x, y)));
+    }
+
+    @Test
+    public void canStackIfDimensionIsNegative() {
+        DoubleTensor x = DoubleTensor.create(2, 3).reshape(1, 2);
+        DoubleTensor y = DoubleTensor.create(4, 5).reshape(1, 2);
+
+        assertThat(DoubleTensor.create(2, 3, 4, 5).reshape(2, 1, 2), valuesAndShapesMatch(DoubleTensor.stack(-3, x, y)));
+        assertThat(DoubleTensor.create(2, 3, 4, 5).reshape(1, 2, 2), valuesAndShapesMatch(DoubleTensor.stack(-2, x, y)));
+        assertThat(DoubleTensor.create(2, 4, 3, 5).reshape(1, 2, 2), valuesAndShapesMatch(DoubleTensor.stack(-1, x, y)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotStackIfPositiveDimensionIsOutOfBounds() {
+        DoubleTensor x = DoubleTensor.create(2, 3).reshape(1, 2);
+        DoubleTensor y = DoubleTensor.create(4, 5).reshape(1, 2);
+        DoubleTensor.stack(3, x, y);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotStackIfNegativeDimensionIsOutOfBounds() {
+        DoubleTensor x = DoubleTensor.create(2, 3).reshape(1, 2);
+        DoubleTensor y = DoubleTensor.create(4, 5).reshape(1, 2);
+        DoubleTensor.stack(-4, x, y);
     }
 
     @Test(expected = IllegalArgumentException.class)

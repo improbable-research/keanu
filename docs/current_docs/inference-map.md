@@ -60,11 +60,11 @@ Let's say you've described the [thermometer model]({{ site.baseurl }}/docs/examp
 whether to use the Gradient or Non-Gradient Optimizer. You can use the following code to let Keanu decide which one to use.
 
 ```java
-        BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        Optimizer optimizer = KeanuOptimizer.of(bayesNet);
-        optimizer.maxAPosteriori();
+BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
+Optimizer optimizer = KeanuOptimizer.of(bayesNet);
+optimizer.maxAPosteriori();
 
-        double calculatedTemperature = temperature.getValue().scalar();
+double calculatedTemperature = temperature.getValue().scalar();
 ```
 
 The Optimizer mutates the values of the graph while finding the most probable values and leaves the graph in its

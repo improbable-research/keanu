@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -169,7 +169,7 @@ public class DotSaver implements NetworkSaver {
     }
 
     @Override
-    public void saveValue(BoolVertex vertex) {
+    public void saveValue(BooleanVertex vertex) {
         setDotLabelWithValue(vertex);
         graphEdges.addAll(getParentEdges(vertex));
     }
@@ -199,7 +199,9 @@ public class DotSaver implements NetworkSaver {
                 try {
                     Vertex parentVertex = (Vertex) method.invoke(vertex);
                     GraphEdge parentEdge = new GraphEdge(vertex, parentVertex);
-                    edges.stream().filter(parentEdge::equals).findFirst().get().appendToLabel(parentName);
+                    GraphEdge foundEdge = edges.stream().filter(parentEdge::equals).findFirst()
+                        .orElseThrow(() -> new IllegalStateException("Did not find parent edge " + parentName));
+                    foundEdge.appendToLabel(parentName);
                 } catch (Exception e) {
                     throw new IllegalArgumentException("Invalid parent retrieval function specified", e);
                 }

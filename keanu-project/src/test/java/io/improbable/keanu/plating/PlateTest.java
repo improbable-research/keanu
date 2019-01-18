@@ -3,7 +3,7 @@ package io.improbable.keanu.plating;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 import org.junit.Before;
@@ -62,7 +62,7 @@ public class PlateTest {
     public void youCanGetAllTheProxyVertices() {
         DoubleProxyVertex proxy1 = new DoubleProxyVertex(new VertexLabel("proxy1"));
         IntegerProxyVertex proxy2 = new IntegerProxyVertex(new VertexLabel("proxy2"));
-        BoolProxyVertex proxy3 = new BoolProxyVertex(new VertexLabel("proxy3"));
+        BooleanProxyVertex proxy3 = new BooleanProxyVertex(new VertexLabel("proxy3"));
         plate.add(proxy1);
         plate.add(proxy2);
         plate.add(proxy3);

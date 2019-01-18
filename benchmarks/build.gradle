@@ -1,0 +1,28 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '4.0.3' apply false
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+dependencies {
+    compile project(":keanu-project")
+
+    compile 'org.openjdk.jmh:jmh-core:1.21'
+    compile 'org.openjdk.jmh:jmh-generator-annprocess:1.21'
+    
+    testCompile 'junit:junit:4.12'
+
+}
+
+shadowJar {
+    archiveName = 'benchmarks.jar'
+    classifier = 'benchmarks'
+    manifest.attributes('Main-Class': 'org.openjdk.jmh.Main')
+}
+
+task runAllBenchmarks(type: Exec) {
+    dependsOn(shadowJar)
+    commandLine 'java',
+        '-jar', 'build/libs/benchmarks.jar',
+        '-w', '1s', '-r', '1s', '-wi', '3', '-i', '5', '-f', '3'
+}

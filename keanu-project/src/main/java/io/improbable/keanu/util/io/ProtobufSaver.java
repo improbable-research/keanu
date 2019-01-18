@@ -11,7 +11,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -151,6 +151,8 @@ public class ProtobufSaver implements NetworkSaver {
             return getParam(paramName, builder -> builder.setLongParam((long) param));
         } else if (String.class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, builder -> builder.setStringParam((String) param));
+        } else if (Boolean.class.isAssignableFrom(param.getClass())) {
+            return getParam(paramName, builder -> builder.setBoolParam((boolean) param));
         } else if (Long[].class.isAssignableFrom(param.getClass())) {
             return getParam(paramName, (long[]) param);
         } else if (Vertex[].class.isAssignableFrom(param.getClass())) {
@@ -247,7 +249,7 @@ public class ProtobufSaver implements NetworkSaver {
     }
 
     @Override
-    public void saveValue(BoolVertex vertex) {
+    public void saveValue(BooleanVertex vertex) {
         if (vertex.hasValue()) {
             KeanuSavedBayesNet.StoredValue value = getValue(vertex);
             modelBuilder.getNetworkStateBuilder().addDefaultState(value);
@@ -288,7 +290,7 @@ public class ProtobufSaver implements NetworkSaver {
         return getStoredValue(vertex, value);
     }
 
-    private KeanuSavedBayesNet.StoredValue getValue(BoolVertex vertex) {
+    private KeanuSavedBayesNet.StoredValue getValue(BooleanVertex vertex) {
         KeanuSavedBayesNet.BooleanTensor savedValue = getTensor(vertex.getValue());
 
         KeanuSavedBayesNet.VertexValue value = KeanuSavedBayesNet.VertexValue.newBuilder()

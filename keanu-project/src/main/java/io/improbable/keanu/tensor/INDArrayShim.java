@@ -1,15 +1,27 @@
 package io.improbable.keanu.tensor;
 
 import com.google.common.primitives.Ints;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.BaseTransformOp;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.api.shape.Shape;
 import org.nd4j.linalg.factory.Broadcast;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.ops.transforms.Transforms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 
 /**
  * This class provides shim methods for the ND4J INDArray class.
@@ -25,81 +37,200 @@ import java.util.List;
  * subtract and minus, this requires a small change in the logic, as A - B != B - A and
  * A / B != B / A.
  */
+@Slf4j
 public class INDArrayShim {
 
-    public static INDArray muli(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.muli(right);
-        } else {
-            return broadcastMultiply(left, right);
+    /*
+     * We need to load ND4J in a separate thread as on load it sets the FTZ and DAZ flags in the processor for the
+     * thread that does the load.  This causes issues with Apache Math that makes use of Sub-normal values (in
+     * particular to initialisation values for the BrentOptimizer).
+     *
+     * We have raised https://github.com/deeplearning4j/deeplearning4j/issues/6690 to address this
+     */
+    @SuppressWarnings("squid:S2142")    // "InterruptedException" should not be ignored
+    public static void startNewThreadForNd4j() {
+        Thread nd4jInitThread = new Thread(() -> Nd4j.create(1));
+        nd4jInitThread.start();
+        try {
+            nd4jInitThread.join();
+        } catch (InterruptedException e) {
+            log.error("Failed to start new thread for ND4J", e);
         }
     }
 
-    private static INDArray broadcastMultiply(INDArray a, INDArray b) {
-        if (a.shape().length < b.shape().length) {
-            return broadcastMultiply(b, a);
+    private static INDArray applyInlineOperation(INDArray left,
+                                                 INDArray right,
+                                                 Function<INDArray, INDArray> inverseOperand,
+                                                 BiFunction<INDArray, INDArray, INDArray> baseInlineOp,
+                                                 BiFunction<INDArray, INDArray, INDArray> inverseInlineOp,
+                                                 QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp,
+                                                 QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> inverseBroadcastOp) {
+        if (Arrays.equals(left.shape(), right.shape())) {
+            return baseInlineOp.apply(left, right);
+        } else if (left.length() == 1) {
+            return applyScalarTensorOperationWithPreservedShape(inverseOperand.apply(right), left, inverseInlineOp);
+        } else if (right.length() == 1) {
+            return applyScalarTensorOperationWithPreservedShape(left, right, baseInlineOp);
+        } else if (shapeAIsSmallerThanShapeB(left.shape(), right.shape())) {
+            return applyBroadcastOperation(inverseOperand.apply(right), left, inverseBroadcastOp);
         } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
-            return Broadcast.mul(a, b, result, broadcastDimensions);
+            return applyBroadcastOperation(left, right, baseBroadcastOp);
         }
+    }
+
+    private static INDArray applyBroadcastOperation(INDArray left,
+                                                    INDArray right,
+                                                    QuadFunction<INDArray, INDArray, INDArray, List<Integer>, INDArray> baseBroadcastOp) {
+        List<Integer> broadcastDimensions = getBroadcastDimensions(left.shape(), right.shape());
+        INDArray result = Nd4j.create(Shape.broadcastOutputShape(left.shape(), right.shape()));
+        return baseBroadcastOp.apply(left, right, result, broadcastDimensions);
+    }
+
+    public static INDArray muli(INDArray left, INDArray right) {
+        return applyInlineOperation(
+            left, right,
+            a -> a,
+            INDArray::muli,
+            INDArray::muli,
+            (l, r, result, dims) -> Broadcast.mul(l, r, result, Ints.toArray(dims)),
+            (l, r, result, dims) -> Broadcast.mul(l, r, result, Ints.toArray(dims)));
     }
 
     public static INDArray divi(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.divi(right);
-        } else {
-            return broadcastDivide(left, right);
-        }
-    }
-
-    private static INDArray broadcastDivide(INDArray a, INDArray b) {
-        if (a.shape().length < b.shape().length) {
-            return broadcastMultiply(b.rdiv(1.0), a);
-        } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
-            return Broadcast.div(a, b, result, broadcastDimensions);
-        }
+        return applyInlineOperation(
+            left, right,
+            a -> a.rdiv(1.),
+            INDArray::divi,
+            INDArray::muli,
+            (l, r, result, dims) -> Broadcast.div(l, r, result, Ints.toArray(dims)),
+            (l, r, result, dims) -> Broadcast.mul(l, r, result, Ints.toArray(dims)));
     }
 
     public static INDArray addi(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.addi(right);
-        } else {
-            return broadcastPlus(left, right);
-        }
-    }
-
-    private static INDArray broadcastPlus(INDArray a, INDArray b) {
-        if (a.shape().length < b.shape().length) {
-            return broadcastPlus(b, a);
-        } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
-            return Broadcast.add(a, b, result, broadcastDimensions);
-        }
+        return applyInlineOperation(
+            left, right,
+            a -> a,
+            INDArray::addi,
+            INDArray::addi,
+            (l, r, result, dims) -> Broadcast.add(l, r, result, Ints.toArray(dims)),
+            (l, r, result, dims) -> Broadcast.add(l, r, result, Ints.toArray(dims)));
     }
 
     public static INDArray subi(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.subi(right);
+        return applyInlineOperation(
+            left, right,
+            a -> a.neg(),
+            INDArray::subi,
+            INDArray::addi,
+            (l, r, result, dims) -> Broadcast.sub(l, r, result, Ints.toArray(dims)),
+            (l, r, result, dims) -> Broadcast.add(l, r, result, Ints.toArray(dims)));
+    }
+
+    private static INDArray applyScalarTensorOperationWithPreservedShape(INDArray tensor, INDArray scalarTensor, BiFunction<INDArray, INDArray, INDArray> operation) {
+        INDArray result = operation.apply(tensor, scalarTensor.getScalar(0));
+        long[] resultShape = Shape.broadcastOutputShape(tensor.shape(), scalarTensor.shape());
+        return result.reshape(resultShape);
+    }
+
+    public static INDArray pow(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, Transforms::pow);
+    }
+
+    public static INDArray max(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, Transforms::max);
+    }
+
+    public static INDArray min(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, Transforms::min);
+    }
+
+    public static INDArray atan2(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, Transforms::atan2);
+    }
+
+    public static INDArray lt(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, INDArray::lt);
+    }
+
+    public static INDArray gt(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, INDArray::gt);
+    }
+
+    public static INDArray eq(INDArray left, INDArray right) {
+        return performOperationWithScalarTensorPreservingShape(left, right, INDArray::eq);
+    }
+
+    private static INDArray performOperationWithScalarTensorPreservingShape(INDArray left, INDArray right, BiFunction<INDArray, INDArray, INDArray> operation) {
+        if (left.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(left.shape(), right.shape());
+            INDArray result = (left.length() == 1) ?
+                operation.apply(Nd4j.valueArrayOf(right.shape(), left.getDouble(0)), right) :
+                operation.apply(left, Nd4j.valueArrayOf(left.shape(), right.getDouble(0)));
+            return result.reshape(resultShape);
         } else {
-            return broadcastMinus(left, right);
+            return operation.apply(left, right);
         }
     }
 
-    private static INDArray broadcastMinus(INDArray a, INDArray b) {
-        if (a.shape().length < b.shape().length) {
-            return broadcastPlus(a, b.neg());
+    @FunctionalInterface
+    interface QuadFunction<First, Second, Third, Fourth, Result> {
+        Result apply(First one, Second two, Third three, Fourth four);
+    }
+
+    private static INDArray executeNd4jTransformOpWithPreservedScalarTensorShape(INDArray mask, INDArray right, DataBuffer.Type bufferType, QuadFunction<INDArray, INDArray, INDArray, Long, BaseTransformOp> baseTransformOpConstructor) {
+        if (mask.length() == 1 || right.length() == 1) {
+            long[] resultShape = Shape.broadcastOutputShape(mask.shape(), right.shape());
+            if (mask.length() == 1) {
+                mask = Nd4j.valueArrayOf(right.shape(), mask.getDouble(0));
+                Nd4j.getExecutioner().exec(
+                    baseTransformOpConstructor.apply(mask, right, mask, mask.length())
+                );
+            } else {
+                Nd4j.getExecutioner().exec(
+                    baseTransformOpConstructor.apply(mask,
+                        valueArrayOf(mask.shape(), right.getDouble(0), bufferType),
+                        mask,
+                        mask.length()
+                    )
+                );
+            }
+            return mask.reshape(resultShape);
         } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
-            return Broadcast.sub(a, b, result, broadcastDimensions);
+            Nd4j.getExecutioner().exec(
+                baseTransformOpConstructor.apply(mask, right, mask, mask.length())
+            );
+            return mask;
         }
     }
 
-    private static int[] getBroadcastDimensions(long[] shapeA, long[] shapeB) {
+    public static INDArray getGreaterThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldGreaterThan::new);
+    }
+
+    public static INDArray getGreaterThanOrEqualToMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldGreaterThanOrEqual::new);
+    }
+
+    public static INDArray getLessThanMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldLessThan::new);
+    }
+
+    public static INDArray getLessThanOrEqualToMask(INDArray mask, INDArray right, DataBuffer.Type bufferType) {
+        return executeNd4jTransformOpWithPreservedScalarTensorShape(mask, right, bufferType, OldLessThanOrEqual::new);
+    }
+
+    private static boolean shapeAIsSmallerThanShapeB(long[] shapeA, long[] shapeB) {
+        if (shapeA.length == shapeB.length) {
+            for (int ind = 0; ind < shapeA.length; ind++) {
+                if (shapeA[ind] < shapeB[ind]) {
+                    return true;
+                }
+            }
+        }
+        return shapeA.length < shapeB.length;
+    }
+
+    private static List<Integer> getBroadcastDimensions(long[] shapeA, long[] shapeB) {
         int minRank = Math.min(shapeA.length, shapeB.length);
         int maxRank = Math.max(shapeA.length, shapeB.length);
 
@@ -110,7 +241,7 @@ public class INDArrayShim {
                 along.add(maxRank - i - 1);
             }
         }
-        return Ints.toArray(along);
+        return along;
     }
 
     public static INDArray sum(INDArray tensor, int... overDimensions) {
@@ -138,6 +269,6 @@ public class INDArrayShim {
                 return result;
             }
         }
-
     }
+
 }

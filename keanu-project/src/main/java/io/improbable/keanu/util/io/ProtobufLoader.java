@@ -16,7 +16,7 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -139,7 +139,7 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     @Override
-    public void loadValue(BoolVertex vertex) {
+    public void loadValue(BooleanVertex vertex) {
         KeanuSavedBayesNet.StoredValue valueInformation = savedValues.get(vertex);
         KeanuSavedBayesNet.VertexValue value = valueInformation.getValue();
         BooleanTensor tensor = extractBoolValue(value);
@@ -300,6 +300,9 @@ public class ProtobufLoader implements NetworkLoader {
 
             case STRINGPARAM:
                 return parameter.getStringParam();
+
+            case BOOLPARAM:
+                return parameter.getBoolParam();
 
             case LONGARRAYPARAM:
                 return Longs.toArray(parameter.getLongArrayParam().getValuesList());
