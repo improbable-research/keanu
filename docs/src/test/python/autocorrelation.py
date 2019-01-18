@@ -1,6 +1,6 @@
 from keanu import BayesNet, KeanuRandom, Model
 from keanu.vertex import Gaussian, Uniform
-from keanu.algorithm import sample
+from keanu.algorithm import sample, MetropolisHastingsSampler
 from keanu import stats
 import numpy as np
 
@@ -14,8 +14,9 @@ def autocorrelation_example_scalar():
     m.b.set_value(20.)
     bayes_net = m.to_bayes_net()
     # %%SNIPPET_START%% PythonScalarAutocorrelation
+    algo = MetropolisHastingsSampler()
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
-                               algo="metropolis", draws=100)
+                               sampling_algorithm=algo, draws=100)
     vertex_samples = posterior_samples.get('a')
     ac = stats.autocorrelation(vertex_samples)
     # %%SNIPPET_END%% PythonScalarAutocorrelation
@@ -25,8 +26,9 @@ def autocorrelation_example_nd():
         m.a = Gaussian(np.array([[20., 30.], [40., 60.]]), np.array([[1., 1.], [1., 1.]]))
     bayes_net = m.to_bayes_net()
     # %%SNIPPET_START%% PythonNdAutocorrelation
+    algo = MetropolisHastingsSampler()
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
-                               algo="metropolis", draws=100)
+                               sampling_algorithm=algo, draws=100)
     vertex_samples = posterior_samples.get('a')
     ac = stats.autocorrelation(vertex_samples, (0,1))
     # %%SNIPPET_END%% PythonNdAutocorrelation
