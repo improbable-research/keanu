@@ -19,7 +19,7 @@ sys.path.insert(0, u'../')
 # -- Project information -----------------------------------------------------
 
 project = u'keanu'
-copyright = u'2019, Improbable'
+copyright = u'2018, Improbable'
 author = u'Improbable'
 
 # The short X.Y version
