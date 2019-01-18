@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,17 +47,19 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         int[] range = TensorShape.dimensionRange(0, derivativeOfOutputWithRespectToSelf.get().getRank());
-        int rank = inputVertex.getRank();
-
-        for (int i = 0; i < rank; i++) {
-            range[i] = i + rank;
-        }
 
         int[] reversePermute = reversePermute();
-        for (int i = rank; i < reversePermute.length + rank; i++) {
-            range[i] = reversePermute[i - rank];
+        int rank = inputVertex.getRank();
+
+        for (int i = 0; i < reversePermute.length; i++) {
+            range[i] = reversePermute[i];
         }
 
+        for (int i = rank; i < derivativeOfOutputWithRespectToSelf.get().getRank(); i++) {
+            range[i] = i;
+        }
+
+        System.out.println("Doing a: " + Arrays.toString(range));
         partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.permute(range));
         return partials;
     }

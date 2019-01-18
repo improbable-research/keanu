@@ -91,7 +91,7 @@ public class ReshapeVertexTest {
         MultiplicationVertex F = D.times(E);
 
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, F).of(F);
-        PartialsOf backward = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A, B));
+        PartialsOf backward = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A));
 
         Assert.assertArrayEquals(new long[]{4, 1, 2, 2}, forwardWrtA.getShape());
         Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backward.withRespectTo(A).asFlatDoubleArray(), 1e-6);

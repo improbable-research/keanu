@@ -45,7 +45,7 @@ public class PermuteVertexTest {
     }
 
     @Test
-    public void canPartialCorrectlyFlowThroughPermute() {
+    public void canPartialCorrectlyFlowThroughRankThreePermute() {
         UniformVertex A = new UniformVertex(0, 10);
         A.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
@@ -62,9 +62,35 @@ public class PermuteVertexTest {
         MultiplicationVertex F = D.times(E);
 
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, F).of(F);
-        DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A, B)).withRespectTo(A);
+        DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A)).withRespectTo(A);
 
         Assert.assertArrayEquals(new long[]{2, 2, 2, 2, 2, 2}, forwardWrtA.getShape());
+        Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void canPartialCorrectlyFlowThroughRankTwoPermute() {
+        UniformVertex A = new UniformVertex(0, 10);
+        A.setValue(DoubleTensor.arange(0, 4).reshape(2, 2));
+
+        UniformVertex B = new UniformVertex(0, 10);
+        B.setValue(DoubleTensor.arange(0, 4).reshape(2, 2));
+
+        DoubleVertex C = A.plus(B);
+
+        DoubleVertex D = C.permute(1, 0);
+
+        UniformVertex E = new UniformVertex(0, 10);
+        E.setValue(DoubleTensor.arange(0, 4).reshape(2, 2));
+
+        DoubleTensor x = DoubleTensor.arange(0, 16).reshape(2, 2, 2, 2);
+
+        MultiplicationVertex F = D.times(E);
+
+        DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, F).of(F);
+        DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A)).withRespectTo(A);
+
+        Assert.assertArrayEquals(new long[]{2, 2, 2, 2}, forwardWrtA.getShape());
         Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
     }
 
@@ -89,8 +115,23 @@ public class PermuteVertexTest {
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, C).of(C);
         DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(C, ImmutableSet.of(A)).withRespectTo(A);
 
+//        Assert.assertArrayEquals(reversedBackwardWrtA.asFlatDoubleArray(), reversedForwardWrtA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(reversedForwardWrtA.asFlatDoubleArray(), forwardWrtA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(reversedBackwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void x() {
+        DoubleTensor x = DoubleTensor.arange(0, 64).reshape(2, 2, 2, 2, 2, 2);
+
+        //2, 0, 1, 3, 4, 5
+        //2, 0, 1
+        //
+        //1, 2, 0, 3, 4, 5
+        DoubleTensor p1 = x.permute(2, 0, 1, 3, 4, 5);
+        DoubleTensor p2 = p1.permute(1, 2, 0, 3, 4, 5);
+
+        Assert.assertArrayEquals(p2.asFlatDoubleArray(), x.asFlatDoubleArray(), 1e-6);
     }
 
     @Test
