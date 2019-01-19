@@ -71,6 +71,11 @@ public class TensorflowComputableGraphBuilder implements ComputableGraphBuilder<
     }
 
     @Override
+    public void registerOutput(Vertex output) {
+        //TODO: use this!
+    }
+
+    @Override
     public VariableReference add(VariableReference left, VariableReference right) {
         Output<?> sum = opFactory.add((Output<Double>) lookup.get(left), (Output<Double>) lookup.get(right));
         VariableReference sumReference = new StringVariableReference(sum.op().name());

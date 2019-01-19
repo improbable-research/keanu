@@ -30,35 +30,34 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         variableValues = new HashMap<>();
         constantValues = new HashMap<>();
         outputs = new ArrayList<>();
-        startSource();
     }
 
-    private void startSource() {
+    private void startSource(StringBuilder sb) {
 
-        sourceBuilder.append("package io.improbable.keanu.backend.keanu;\n");
-        sourceBuilder.append("import io.improbable.keanu.backend.VariableReference;\n");
-        sourceBuilder.append("import java.util.Collection;\n");
-        sourceBuilder.append("import java.util.Collections;\n");
-        sourceBuilder.append("import java.util.HashMap;\n");
-        sourceBuilder.append("import java.util.Map;\n");
-        sourceBuilder.append("import io.improbable.keanu.tensor.dbl.DoubleTensor;\n");
+        sb.append("package io.improbable.keanu.backend.keanu;\n");
+        sb.append("import io.improbable.keanu.backend.VariableReference;\n");
+        sb.append("import java.util.Collection;\n");
+        sb.append("import java.util.Collections;\n");
+        sb.append("import java.util.HashMap;\n");
+        sb.append("import java.util.Map;\n");
+        sb.append("import io.improbable.keanu.tensor.dbl.DoubleTensor;\n");
 
-        sourceBuilder.append("public class " + className + " implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {\n");
-        sourceBuilder.append("public Map<String, ?> apply(Map<String, ?> inputs) {\n");
+        sb.append("public class " + className + " implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {\n");
+        sb.append("public Map<String, ?> apply(Map<String, ?> inputs) {\n");
     }
 
-    private void endSource() {
-        sourceBuilder.append("Map<String, Object>  results = new HashMap<>();\n");
-        sourceBuilder.append("\n");
+    private void endSource(StringBuilder sb) {
+        sb.append("Map<String, Object>  results = new HashMap<>();\n");
+        sb.append("\n");
 
         for (VariableReference out : outputs) {
             String outputVariableName = toSourceVariableName(out);
-            sourceBuilder.append("results.put(\"" + out.toStringReference() + "\", " + outputVariableName + ");\n");
+            sb.append("results.put(\"" + out.toStringReference() + "\", " + outputVariableName + ");\n");
         }
 
-        sourceBuilder.append("return results;\n");
+        sb.append("return results;\n");
 
-        sourceBuilder.append("}\n}\n");
+        sb.append("}\n}\n");
     }
 
     @Override
@@ -145,15 +144,19 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
     @Override
     public ComputableGraph build() {
-        endSource();
-        return compile();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        startSource(stringBuilder);
+        stringBuilder.append(sourceBuilder);
+        endSource(stringBuilder);
+
+        String source = stringBuilder.toString();
+//        System.out.println(source);
+
+        return compile(source);
     }
 
-    private ComputableGraph compile() {
-
-        String source = sourceBuilder.toString();
-
-        System.out.println(source);
+    private ComputableGraph compile(String source) {
 
         Function<Map<String, ?>, Map<String, ?>> computeFunction = Reflect.compile(
             "io.improbable.keanu.backend.keanu." + className,
@@ -173,7 +176,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
                 Map<String, Object> constantsByString = constantValues.entrySet().stream()
                     .collect(toMap(
-                        e -> toSourceVariableName(e.getKey()),
+                        e -> e.getKey().toStringReference(),
                         Map.Entry::getValue)
                     );
 

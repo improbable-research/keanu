@@ -1,5 +1,6 @@
 package io.improbable.keanu.backend.keanu;
 
+import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -61,8 +62,7 @@ public class KeanuCompiledGraphTest {
 
         DoubleVertex C = op.apply(A, B);
 
-        compiler.convert(C.getConnectedGraph());
-        compiler.registerOutput(C.getReference());
+        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
 
         ComputableGraph computableGraph = compiler.build();
 
