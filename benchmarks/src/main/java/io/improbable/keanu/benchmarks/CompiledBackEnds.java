@@ -17,10 +17,10 @@ import java.util.Map;
 public class CompiledBackEnds {
 
     public enum Backend {
-        KEANU_GRAPH, KEANU_COMPILED, TENSORFLOW
+        KEANU_GRAPH, KEANU_COMPILED, TENSORFLOW, PRECOMPILED_KEANU
     }
 
-    @Param({"TENSORFLOW", "KEANU_COMPILED", "KEANU_GRAPH"})
+    @Param({"PRECOMPILED_KEANU", "KEANU_COMPILED", "TENSORFLOW", "KEANU_GRAPH"})
     public Backend backend;
 
     public ComputableGraph computableGraph;
@@ -37,8 +37,8 @@ public class CompiledBackEnds {
         GaussianVertex A = new GaussianVertex(0, 1);
         GaussianVertex B = new GaussianVertex(0, 1);
 
-        valueA = DoubleTensor.scalar(0);
-        valueB = DoubleTensor.scalar(0.5);
+        valueA = DoubleTensor.zeros(100, 100);
+        valueB = DoubleTensor.create(0.5, new long[]{100, 100});
 
         inputs = new HashMap<>();
         inputs.put(A.getReference(), valueA);
@@ -49,6 +49,9 @@ public class CompiledBackEnds {
         output = outputNode.getReference();
 
         switch (backend) {
+            case PRECOMPILED_KEANU:
+                computableGraph = precompiledKeaunuGraph(outputNode);
+                break;
             case KEANU_GRAPH:
                 computableGraph = keaunuGraph(outputNode);
                 break;
@@ -57,6 +60,7 @@ public class CompiledBackEnds {
                 break;
             case TENSORFLOW:
                 computableGraph = tensorflowGraph(outputNode);
+                break;
         }
     }
 
@@ -78,6 +82,10 @@ public class CompiledBackEnds {
 
     public ComputableGraph keaunuGraph(DoubleVertex output) {
         return new KeanuComputableGraph(output.getConnectedGraph());
+    }
+
+    public ComputableGraph precompiledKeaunuGraph(DoubleVertex output) {
+        return new PreCompiledKeaunGraph(output.getReference());
     }
 
     public ComputableGraph tensorflowGraph(DoubleVertex output) {

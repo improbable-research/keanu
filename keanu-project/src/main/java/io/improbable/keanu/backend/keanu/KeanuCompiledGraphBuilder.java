@@ -153,7 +153,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
         String source = sourceBuilder.toString();
 
-//        System.out.println(source);
+        System.out.println(source);
 
         Function<Map<String, ?>, Map<String, ?>> computeFunction = Reflect.compile(
             "io.improbable.keanu.backend.keanu." + className,
@@ -162,7 +162,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
         return new ComputableGraph() {
 
-            Map<String, VariableReference> outputsByString = KeanuCompiledGraphBuilder.this.outputs.stream()
+            Map<String, VariableReference> outputsByString = outputs.stream()
                 .collect(toMap(output -> toSourceVariableName(output), output -> output));
 
             @Override
