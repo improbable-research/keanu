@@ -53,7 +53,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
         for (VariableReference out : outputs) {
             String outputVariableName = toSourceVariableName(out);
-            sourceBuilder.append("results.put(\"" + outputVariableName + "\", " + outputVariableName + ");\n");
+            sourceBuilder.append("results.put(\"" + out.toStringReference() + "\", " + outputVariableName + ");\n");
         }
 
         sourceBuilder.append("return results;\n");
@@ -68,7 +68,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         String constantType = getType(value);
         String constantName = toSourceVariableName(visiting.getReference());
 
-        declareInput(constantType, constantName);
+        declareInput(constantType, constantName, visiting.getReference().toStringReference());
 
         lookup.put(visiting.getReference(), constantName);
         constantValues.put(visiting.getReference(), value);
@@ -82,14 +82,14 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         String variableType = getType(value);
         String variableName = toSourceVariableName(visiting.getReference());
 
-        declareInput(variableType, variableName);
+        declareInput(variableType, variableName, visiting.getReference().toStringReference());
 
         lookup.put(visiting.getReference(), variableName);
         variableValues.put(visiting.getReference(), value);
     }
 
-    private void declareInput(String type, String name) {
-        sourceBuilder.append(type + " " + name + " = " + "(" + type + ")" + "inputs.get(\"" + name + "\");\n");
+    private void declareInput(String type, String name, String inputName) {
+        sourceBuilder.append(type + " " + name + " = " + "(" + type + ")" + "inputs.get(\"" + inputName + "\");\n");
     }
 
     @Override
@@ -121,8 +121,8 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         return "v_" + variableReference.toStringReference();
     }
 
-    public void registerOutput(VariableReference variableReference) {
-        outputs.add(variableReference);
+    public void registerOutput(Vertex output) {
+        outputs.add(output.getReference());
     }
 
     @Override
@@ -163,13 +163,13 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         return new ComputableGraph() {
 
             Map<String, VariableReference> outputsByString = outputs.stream()
-                .collect(toMap(output -> toSourceVariableName(output), output -> output));
+                .collect(toMap(VariableReference::toStringReference, output -> output));
 
             @Override
             public Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs, Collection<VariableReference> outputs) {
 
                 Map<String, Object> inputsByString = inputs.entrySet().stream()
-                    .collect(toMap(e -> toSourceVariableName(e.getKey()), Map.Entry::getValue));
+                    .collect(toMap(e -> e.getKey().toStringReference(), Map.Entry::getValue));
 
                 Map<String, Object> constantsByString = constantValues.entrySet().stream()
                     .collect(toMap(

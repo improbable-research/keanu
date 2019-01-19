@@ -20,8 +20,11 @@ public class CompiledBackEnds {
         KEANU_GRAPH, KEANU_COMPILED, TENSORFLOW, PRECOMPILED_KEANU
     }
 
-    @Param({"PRECOMPILED_KEANU", "KEANU_COMPILED", "TENSORFLOW", "KEANU_GRAPH"})
+    @Param({"KEANU_COMPILED", "KEANU_GRAPH"})
     public Backend backend;
+
+    @Param({"0", "100", "1000"})
+    public int linkCount;
 
     public ComputableGraph computableGraph;
     public Map<VariableReference, DoubleTensor> inputs;
@@ -37,14 +40,14 @@ public class CompiledBackEnds {
         GaussianVertex A = new GaussianVertex(0, 1);
         GaussianVertex B = new GaussianVertex(0, 1);
 
-        valueA = DoubleTensor.zeros(100, 100);
-        valueB = DoubleTensor.create(0.5, new long[]{100, 100});
+        valueA = DoubleTensor.scalar(0);
+        valueB = DoubleTensor.scalar(0.5);
 
         inputs = new HashMap<>();
         inputs.put(A.getReference(), valueA);
         inputs.put(B.getReference(), valueB);
 
-        DoubleVertex outputNode = getGraphOutputNode(A, B);
+        DoubleVertex outputNode = getGraphOutputNode(A, B, linkCount);
 
         output = outputNode.getReference();
 
@@ -64,18 +67,26 @@ public class CompiledBackEnds {
         }
     }
 
-    public DoubleVertex getGraphOutputNode(DoubleVertex A, DoubleVertex B) {
+    public DoubleVertex getGraphOutputNode(DoubleVertex A, DoubleVertex B, int links) {
 
-        DoubleVertex C = A.times(B);
+        DoubleVertex out = A.times(B);
+        DoubleVertex left = A;
+        DoubleVertex right = B;
 
-        return C;
+        for (int i = 0; i < links; i++) {
+            left = out.plus(left);
+            right = out.minus(right);
+            out = left.times(right);
+        }
+
+        return out;
     }
 
     public ComputableGraph compiledKeaunuGraph(DoubleVertex output) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
 
         compiler.convert(output.getConnectedGraph());
-        compiler.registerOutput(output.getReference());
+        compiler.registerOutput(output);
 
         return compiler.build();
     }
