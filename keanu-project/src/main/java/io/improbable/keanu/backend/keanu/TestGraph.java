@@ -7,15 +7,24 @@ import java.util.Map;
 
 public class TestGraph implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {
 
+    private final DoubleTensor v_4;
+
+    public TestGraph(Map<String, ?> constants) {
+
+        v_4 = (DoubleTensor) constants.get("4");
+    }
+
     public Map<String, ?> apply(Map<String, ?> inputs) {
 
-        DoubleTensor A = (DoubleTensor) inputs.get("A");
-        DoubleTensor B = (DoubleTensor) inputs.get("B");
+        DoubleTensor v_0 = (DoubleTensor) inputs.get("0");
+        DoubleTensor v_1 = (DoubleTensor) inputs.get("1");
 
-        DoubleTensor C = (DoubleTensor) A.times(B);
+        DoubleTensor v_2 = (DoubleTensor) v_0.times(v_1);
+
+        DoubleTensor v_3 = (DoubleTensor) v_2.plus(v_4);
 
         Map<String, Object> results = new HashMap<>();
-        results.put("C", C);
+        results.put("3", v_3);
 
         return results;
     }

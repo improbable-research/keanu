@@ -16,7 +16,9 @@ import static java.util.stream.Collectors.toMap;
 
 public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<ComputableGraph> {
 
-    private StringBuilder sourceBuilder;
+    private StringBuilder computeSourceBuilder;
+    private StringBuilder instanceVariableBuilder;
+    private StringBuilder constructorBuilder;
     private Map<VariableReference, String> lookup;
     private Map<VariableReference, Object> variableValues;
     private Map<VariableReference, Object> constantValues;
@@ -25,7 +27,9 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     private final String className = "CompiledKeanuGraph" + this.hashCode();
 
     public KeanuCompiledGraphBuilder() {
-        sourceBuilder = new StringBuilder();
+        computeSourceBuilder = new StringBuilder();
+        instanceVariableBuilder = new StringBuilder();
+        constructorBuilder = new StringBuilder();
         lookup = new HashMap<>();
         variableValues = new HashMap<>();
         constantValues = new HashMap<>();
@@ -42,8 +46,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         sb.append("import java.util.Map;\n");
         sb.append("import io.improbable.keanu.tensor.dbl.DoubleTensor;\n");
 
-        sb.append("public class " + className + " implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {\n");
-        sb.append("public Map<String, ?> apply(Map<String, ?> inputs) {\n");
+        sb.append("public final class " + className + " implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {\n");
     }
 
     private void endSource(StringBuilder sb) {
@@ -64,12 +67,16 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     public void createConstant(Vertex visiting) {
 
         Object value = visiting.getValue();
-        String constantType = getType(value);
-        String constantName = toSourceVariableName(visiting.getReference());
+        String type = getType(value);
+        String lookupName = visiting.getReference().toStringReference();
+        String name = toSourceVariableName(visiting.getReference());
 
-        declareInput(constantType, constantName, visiting.getReference().toStringReference());
+//        declareInput(constantType, constantName, visiting.getReference().toStringReference());
 
-        lookup.put(visiting.getReference(), constantName);
+        instanceVariableBuilder.append("private final " + type + " " + name + ";\n");
+        constructorBuilder.append(name + " = " + "(" + type + ")" + "constants.get(\"" + lookupName + "\");\n");
+
+        lookup.put(visiting.getReference(), name);
         constantValues.put(visiting.getReference(), value);
 
     }
@@ -88,7 +95,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     }
 
     private void declareInput(String type, String name, String inputName) {
-        sourceBuilder.append(type + " " + name + " = " + "(" + type + ")" + "inputs.get(\"" + inputName + "\");\n");
+        computeSourceBuilder.append("final " + type + " " + name + " = " + "(" + type + ")" + "inputs.get(\"" + inputName + "\");\n");
     }
 
     @Override
@@ -103,7 +110,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
         String variableType = getType(visiting);
         String name = toSourceVariableName(visiting.getReference());
-        sourceBuilder.append(variableType + " " + name + " = " + opMapperFor.apply(visiting, lookup) + ";\n");
+        computeSourceBuilder.append("final " + variableType + " " + name + " = " + opMapperFor.apply(visiting, lookup) + ";\n");
 
         lookup.put(visiting.getReference(), name);
     }
@@ -131,7 +138,6 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
     @Override
     public VariableReference add(VariableReference left, VariableReference right) {
-
         return null;
     }
 
@@ -147,10 +153,20 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         StringBuilder stringBuilder = new StringBuilder();
 
         startSource(stringBuilder);
-        stringBuilder.append(sourceBuilder);
+
+        stringBuilder.append(instanceVariableBuilder);
+
+        stringBuilder.append("public " + className + "(final Map<String, ?> constants) {\n");
+        stringBuilder.append(constructorBuilder);
+        stringBuilder.append("}\n");
+
+        stringBuilder.append("public Map<String, ?> apply(Map<String, ?> inputs) {\n");
+        stringBuilder.append(computeSourceBuilder);
+
         endSource(stringBuilder);
 
         String source = stringBuilder.toString();
+
 //        System.out.println(source);
 
         return compile(source);
@@ -158,45 +174,53 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
     private ComputableGraph compile(String source) {
 
+        Map<String, ?> constantsByString = constantValues.entrySet().stream()
+            .collect(toMap(e -> e.getKey().toStringReference(), Map.Entry::getValue));
+
         Function<Map<String, ?>, Map<String, ?>> computeFunction = Reflect.compile(
             "io.improbable.keanu.backend.keanu." + className,
             source
-        ).create().get();
+        ).create(constantsByString).get();
 
-        return new ComputableGraph() {
+        return new WrappedCompiledGraph(computeFunction, constantValues, outputs);
+    }
 
-            Map<String, VariableReference> outputsByString = outputs.stream()
+    private static class WrappedCompiledGraph implements ComputableGraph {
+
+        private Map<String, VariableReference> outputsByString;
+        private Function<Map<String, ?>, Map<String, ?>> computeFunction;
+
+        private WrappedCompiledGraph(Function<Map<String, ?>, Map<String, ?>> computeFunction,
+                                     Map<VariableReference, Object> constantValues,
+                                     List<VariableReference> outputs) {
+            this.computeFunction = computeFunction;
+            this.outputsByString = outputs.stream()
                 .collect(toMap(VariableReference::toStringReference, output -> output));
+        }
 
-            @Override
-            public Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs, Collection<VariableReference> outputs) {
+        @Override
+        public Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs, Collection<VariableReference> outputs) {
 
-                Map<String, Object> inputsByString = inputs.entrySet().stream()
-                    .collect(toMap(e -> e.getKey().toStringReference(), Map.Entry::getValue));
+            final Map<String, Object> inputsByString = new HashMap<>();
 
-                Map<String, Object> constantsByString = constantValues.entrySet().stream()
-                    .collect(toMap(
-                        e -> e.getKey().toStringReference(),
-                        Map.Entry::getValue)
-                    );
-
-                inputsByString.putAll(constantsByString);
-
-                Map<String, ?> results = computeFunction.apply(inputsByString);
-
-                Map<VariableReference, ?> computed = results.entrySet().stream()
-                    .collect(toMap(
-                        e -> outputsByString.get(e.getKey()),
-                        Map.Entry::getValue)
-                    );
-
-                return computed;
+            for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {
+                inputsByString.put(input.getKey().toStringReference(), input.getValue());
             }
 
-            @Override
-            public <T> T getInput(VariableReference input) {
-                return null;
+            final Map<String, ?> resultsByString = computeFunction.apply(inputsByString);
+
+            final Map<VariableReference, Object> results = new HashMap<>();
+
+            for (Map.Entry<String, ?> result : resultsByString.entrySet()) {
+                results.put(outputsByString.get(result.getKey()), result.getValue());
             }
-        };
+
+            return results;
+        }
+
+        @Override
+        public <T> T getInput(VariableReference input) {
+            return null;
+        }
     }
 }

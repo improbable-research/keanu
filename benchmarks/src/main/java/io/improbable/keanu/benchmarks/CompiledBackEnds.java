@@ -20,10 +20,10 @@ public class CompiledBackEnds {
         KEANU_GRAPH, KEANU_COMPILED, TENSORFLOW, PRECOMPILED_KEANU
     }
 
-    @Param({"KEANU_COMPILED", "KEANU_GRAPH"})
+    @Param({"KEANU_COMPILED", "KEANU_GRAPH", "TENSORFLOW"})
     public Backend backend;
 
-    @Param({"0", "100", "1000"})
+    @Param({"0", "100"})
     public int linkCount;
 
     public ComputableGraph computableGraph;
