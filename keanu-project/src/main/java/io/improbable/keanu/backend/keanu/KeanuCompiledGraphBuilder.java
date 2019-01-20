@@ -71,8 +71,6 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         String lookupName = visiting.getReference().toStringReference();
         String name = toSourceVariableName(visiting.getReference());
 
-//        declareInput(constantType, constantName, visiting.getReference().toStringReference());
-
         instanceVariableBuilder.append("private final " + type + " " + name + ";\n");
         constructorBuilder.append(name + " = " + "(" + type + ")" + "constants.get(\"" + lookupName + "\");\n");
 
