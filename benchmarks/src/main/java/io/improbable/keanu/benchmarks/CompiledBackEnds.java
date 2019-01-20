@@ -86,7 +86,7 @@ public class CompiledBackEnds {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
 
         compiler.convert(output.getConnectedGraph());
-        compiler.registerOutput(output);
+        compiler.registerOutput(output.getReference());
 
         return compiler.build();
     }

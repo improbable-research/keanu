@@ -18,7 +18,7 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
 
     void connect(Map<? extends Vertex<?>, ? extends Vertex<?>> connections);
 
-    void registerOutput(Vertex output);
+    void registerOutput(VariableReference output);
 
     Collection<VariableReference> getLatentVariables();
 
@@ -41,7 +41,7 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
             .collect(Collectors.toList());
 
         convert(requiredVertices);
-        outputs.forEach(this::registerOutput);
+        outputs.stream().map(v -> ((Vertex) v).getReference()).forEach(this::registerOutput);
     }
 
     default void convert(Collection<? extends Vertex> vertices) {

@@ -71,7 +71,7 @@ public class TensorflowComputableGraphBuilder implements ComputableGraphBuilder<
     }
 
     @Override
-    public void registerOutput(Vertex output) {
+    public void registerOutput(VariableReference output) {
         //TODO: use this!
     }
 

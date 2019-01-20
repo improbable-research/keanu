@@ -2,6 +2,7 @@ package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.ComputableGraphBuilder;
+import io.improbable.keanu.backend.StringVariableReference;
 import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
@@ -23,6 +24,8 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     private Map<VariableReference, Object> variableValues;
     private Map<VariableReference, Object> constantValues;
     private List<VariableReference> outputs;
+
+    private int internalOpCount = 0;
 
     private final String className = "CompiledKeanuGraph" + this.hashCode();
 
@@ -54,8 +57,8 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         sb.append("\n");
 
         for (VariableReference out : outputs) {
-            String outputVariableName = toSourceVariableName(out);
-            sb.append("results.put(\"" + out.toStringReference() + "\", " + outputVariableName + ");\n");
+            String name = lookup.get(out);
+            sb.append("results.put(\"" + out.toStringReference() + "\", " + name + ");\n");
         }
 
         sb.append("return results;\n");
@@ -125,8 +128,8 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         return "v_" + variableReference.toStringReference();
     }
 
-    public void registerOutput(Vertex output) {
-        outputs.add(output.getReference());
+    public void registerOutput(VariableReference output) {
+        outputs.add(output);
     }
 
     @Override
@@ -136,7 +139,21 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
     @Override
     public VariableReference add(VariableReference left, VariableReference right) {
-        return null;
+
+        String variableType = "DoubleTensor";
+
+        String leftName = lookup.get(left);
+        String rightName = lookup.get(right);
+
+        String name = "vv_" + internalOpCount;
+        internalOpCount++;
+
+        computeSourceBuilder.append("final " + variableType + " " + name + " = " + leftName + ".plus(" + rightName + ");\n");
+
+        StringVariableReference reference = new StringVariableReference(name);
+        lookup.put(reference, name);
+
+        return reference;
     }
 
     @Override
@@ -180,7 +197,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
             source
         ).create(constantsByString).get();
 
-        return new WrappedCompiledGraph(computeFunction, constantValues, outputs);
+        return new WrappedCompiledGraph(computeFunction, outputs);
     }
 
 }

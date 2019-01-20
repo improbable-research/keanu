@@ -83,6 +83,32 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canAddDirectlyToGraph() {
+        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
+
+        GaussianVertex A = new GaussianVertex( 0, 1);
+        GaussianVertex B = new GaussianVertex( 0, 1);
+
+        DoubleVertex C = A.times(B);
+
+        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
+
+        VariableReference summation = compiler.add(A.getReference(), C.getReference());
+        compiler.registerOutput(summation);
+
+        ComputableGraph computableGraph = compiler.build();
+
+        Map<VariableReference, Object> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
+
+        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+
+        assertEquals(C.getValue(), result.get(C.getReference()));
+        assertEquals(C.getValue().plus(A.getValue()), result.get(summation));
+    }
+
+    @Test
     public void compilesSum() {
         assertUnaryMatches(new long[]{2, 2}, DoubleVertex::sum);
         assertUnaryMatches(new long[]{2, 2}, (a) -> a.sum(0));

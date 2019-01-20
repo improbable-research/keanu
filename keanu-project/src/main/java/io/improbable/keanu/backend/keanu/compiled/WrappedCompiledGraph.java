@@ -17,7 +17,6 @@ class WrappedCompiledGraph implements ComputableGraph {
     private Function<Map<String, ?>, Map<String, ?>> computeFunction;
 
     WrappedCompiledGraph(Function<Map<String, ?>, Map<String, ?>> computeFunction,
-                         Map<VariableReference, Object> constantValues,
                          List<VariableReference> outputs) {
         this.computeFunction = computeFunction;
         this.outputsByString = outputs.stream()
