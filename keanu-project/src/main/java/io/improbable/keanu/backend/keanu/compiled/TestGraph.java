@@ -1,4 +1,4 @@
-package io.improbable.keanu.backend.keanu;
+package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
