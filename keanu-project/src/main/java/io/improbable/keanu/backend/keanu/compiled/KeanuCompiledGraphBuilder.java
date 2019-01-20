@@ -183,42 +183,4 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         return new WrappedCompiledGraph(computeFunction, constantValues, outputs);
     }
 
-    private static class WrappedCompiledGraph implements ComputableGraph {
-
-        private Map<String, VariableReference> outputsByString;
-        private Function<Map<String, ?>, Map<String, ?>> computeFunction;
-
-        private WrappedCompiledGraph(Function<Map<String, ?>, Map<String, ?>> computeFunction,
-                                     Map<VariableReference, Object> constantValues,
-                                     List<VariableReference> outputs) {
-            this.computeFunction = computeFunction;
-            this.outputsByString = outputs.stream()
-                .collect(toMap(VariableReference::toStringReference, output -> output));
-        }
-
-        @Override
-        public Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs, Collection<VariableReference> outputs) {
-
-            final Map<String, Object> inputsByString = new HashMap<>();
-
-            for (Map.Entry<VariableReference, ?> input : inputs.entrySet()) {
-                inputsByString.put(input.getKey().toStringReference(), input.getValue());
-            }
-
-            final Map<String, ?> resultsByString = computeFunction.apply(inputsByString);
-
-            final Map<VariableReference, Object> results = new HashMap<>();
-
-            for (Map.Entry<String, ?> result : resultsByString.entrySet()) {
-                results.put(outputsByString.get(result.getKey()), result.getValue());
-            }
-
-            return results;
-        }
-
-        @Override
-        public <T> T getInput(VariableReference input) {
-            return null;
-        }
-    }
 }
