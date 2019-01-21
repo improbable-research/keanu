@@ -95,8 +95,8 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
         LogProbGraph.DoublePlaceholderVertex concentrationPlaceholder = new LogProbGraph.DoublePlaceholderVertex(concentration.getShape());
 
         final BooleanVertex xIsLessThanOrEqualToEpsilon = xPlaceholder
-            .sum().minus(1.).abs().lessThanOrEqualTo(ConstantVertex.of(EPSILON))
-            .assertTrue("Sum of values to calculate Dirichlet likelihood for must equal 1");
+            .sum().minus(1.).abs().lessThanOrEqualTo(ConstantVertex.of(EPSILON));
+        xIsLessThanOrEqualToEpsilon.assertTrue("Sum of values to calculate Dirichlet likelihood for must equal 1");
 
         final DoubleVertex sumConcentrationLogged = concentrationPlaceholder.minus(1.).times(xPlaceholder.log()).sum();
         final DoubleVertex sumLogGammaConcentration = concentrationPlaceholder.logGamma().sum();
