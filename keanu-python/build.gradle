@@ -78,7 +78,7 @@ task generateDocumentation {
     doLast {
         exec {
             workingDir("../docs/")
-            commandLine "rm", "-rf", "python/"
+            commandLine "rm", "-rf", "python/latest/"
         }
         exec {
             workingDir("docs/")
@@ -91,7 +91,7 @@ task generateDocumentation {
             commandLine "pipenv", "run", 'python', 'remove_underscores.py'
         }
         exec {
-            commandLine 'mv', 'docs/_build/html/', '../docs/python/'
+            commandLine 'mv', 'docs/_build/html/', '../docs/python/latest/'
         }
         exec {
             workingDir("docs/")
