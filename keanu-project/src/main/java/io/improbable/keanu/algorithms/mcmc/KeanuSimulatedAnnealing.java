@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.experimental.UtilityClass;
 

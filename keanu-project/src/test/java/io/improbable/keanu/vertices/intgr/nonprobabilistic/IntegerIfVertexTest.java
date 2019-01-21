@@ -4,8 +4,6 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;

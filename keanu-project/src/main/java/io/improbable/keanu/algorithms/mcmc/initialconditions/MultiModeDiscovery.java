@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.mcmc.initialconditions;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.mcmc.KeanuSimulatedAnnealing;
-import io.improbable.keanu.algorithms.mcmc.SimulatedAnnealing;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
