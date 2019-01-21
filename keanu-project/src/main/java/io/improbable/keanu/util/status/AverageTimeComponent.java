@@ -7,11 +7,13 @@ import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * {@link StatusBarComponent} that renders the average time algorithm steps are taking, also shows elapsed time.
+ * {@link StatusBarComponent} that renders the average time algorithm steps are taking
+ * in the form of steps per second, also shows elapsed time.
  */
 public class AverageTimeComponent extends TimeComponent {
 
     private final ElapsedTimeComponent elapsedTime = new ElapsedTimeComponent();
+    private static final long NANOS_IN_SECOND = 1000000000;
 
     @Getter
     private AtomicLong currentStep = new AtomicLong(0);
@@ -26,8 +28,9 @@ public class AverageTimeComponent extends TimeComponent {
 
         if (currentStepNow != 0) {
             averageStepTime = Duration.between(elapsedTime.getStartTime(), Instant.now()).dividedBy(currentStepNow);
-            renderedString.append(", Average step time: ");
-            renderedString.append(formatDuration(averageStepTime));
+            long stepsSecond = NANOS_IN_SECOND / averageStepTime.toNanos();
+            renderedString.append(", Steps per second: ");
+            renderedString.append(stepsSecond);
         }
 
         return renderedString.toString();
