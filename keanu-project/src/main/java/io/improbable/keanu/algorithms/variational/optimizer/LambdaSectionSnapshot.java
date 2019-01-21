@@ -38,7 +38,7 @@ public class LambdaSectionSnapshot {
         return sumLogProb;
     }
 
-    public Set<Variable> getAllVariablesAffectedBy(Set<? extends Variable> variables) {
+    public Set<? extends Variable> getAllVariablesAffectedBy(Set<? extends Variable> variables) {
         update();
         Set<Variable> allAffectedVertices = new HashSet<>();
         for (Variable variable : variables) {

@@ -13,6 +13,4 @@ public interface Variable<VALUE, STATE extends VariableState> {
     long[] getShape();
 
     STATE getState();
-
-    void setState(STATE state);
 }

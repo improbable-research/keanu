@@ -18,7 +18,8 @@ public class RollBackOnRejection implements ProposalRejectionStrategy {
 
     @Override
     public void prepare(Set<Variable> chosenVariables) {
-        networkSnapshot = NetworkSnapshot.create(lambdaSectionSnapshot.getAllVariablesAffectedBy(chosenVariables));
+        Set<? extends Variable> affectedVariables = lambdaSectionSnapshot.getAllVariablesAffectedBy(chosenVariables);
+        networkSnapshot = NetworkSnapshot.create((Set<Vertex>) affectedVariables);
     }
 
     @Override

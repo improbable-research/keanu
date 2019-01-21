@@ -126,7 +126,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
         return state;
     }
 
-    @Override
     public void setState(VertexState<T> newState) {
         state = newState;
     }
