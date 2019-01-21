@@ -1,19 +1,20 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.Differentiator;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Assert;
-import org.junit.Test;
-
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 
 import java.util.Arrays;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.Differentiator;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 public class PermuteVertexTest {
 
@@ -27,34 +28,6 @@ public class PermuteVertexTest {
 
         Assert.assertArrayEquals(new long[]{2, 2}, permute.getShape());
         Assert.assertArrayEquals(a.getValue().transpose().asFlatDoubleArray(), permute.getValue().asFlatDoubleArray(), 1e-6);
-    }
-
-    @Test
-    public void canPermute() {
-        DoubleTensor a = DoubleTensor.arange(0, 4).reshape(2, 2);
-        DoubleTensor transposeA = a.permute(1, 0);
-        System.out.println("Transpose: " + Arrays.toString(transposeA.asFlatDoubleArray()));
-
-        DoubleTensor c = DoubleTensor.arange(0, 16).reshape(2, 2, 2, 2);
-        DoubleTensor transposeC = c.permute(1, 0, 2, 3);
-        System.out.println("Transpose: " + Arrays.toString(transposeC.asFlatDoubleArray()));
-
-        DoubleTensor reversedTranspose = transposeC.permute(1, 0, 2, 3);
-        System.out.println("Transpose: " + Arrays.toString(reversedTranspose.asFlatDoubleArray()));
-    }
-
-    @Test
-    public void canPermuteRankThree() {
-        DoubleTensor a = DoubleTensor.arange(0, 8).reshape(2, 2, 2);
-        DoubleTensor transposeA = a.permute(1, 2, 0);
-        System.out.println("Transpose: " + Arrays.toString(transposeA.asFlatDoubleArray()));
-
-        DoubleTensor c = DoubleTensor.arange(0, 64).reshape(2, 2, 2, 2, 2, 2);
-        DoubleTensor transposeC = c.permute(1, 2, 0, 3, 4, 5);
-        System.out.println("Transpose: " + Arrays.toString(transposeC.asFlatDoubleArray()));
-
-        DoubleTensor reversedTranspose = transposeC.permute(2, 0, 1, 3, 4, 5);
-        System.out.println("Transpose: " + Arrays.toString(reversedTranspose.asFlatDoubleArray()));
     }
 
     @Test
@@ -76,14 +49,13 @@ public class PermuteVertexTest {
         Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
     }
 
-
     @Test
     public void canPermuteRankFourVertex() {
         UniformVertex a = new UniformVertex(0, 10);
-        a.setValue(DoubleTensor.arange(0, 16).reshape(2, 2, 2, 2));
+        a.setValue(DoubleTensor.arange(0, 16).reshape(2, 1, 4, 2));
 
         UniformVertex b = new UniformVertex(0, 10);
-        b.setValue(DoubleTensor.arange(0, 16).reshape(2, 2, 2, 2));
+        b.setValue(DoubleTensor.arange(0, 16).reshape(2, 1, 4, 2));
 
         DoubleVertex c = a.times(b);
 
@@ -98,24 +70,25 @@ public class PermuteVertexTest {
     @Test
     public void canPartialCorrectlyFlowThroughRankThreePermute() {
         UniformVertex A = new UniformVertex(0, 10);
-        A.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+        A.setValue(DoubleTensor.arange(0, 8).reshape(4, 1, 2));
 
         UniformVertex B = new UniformVertex(0, 10);
-        B.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+        B.setValue(DoubleTensor.arange(0, 8).reshape(4, 1, 2));
 
         DoubleVertex C = A.plus(B);
 
         DoubleVertex D = C.permute(2, 0, 1);
 
         UniformVertex E = new UniformVertex(0, 10);
-        E.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+        E.setValue(DoubleTensor.arange(0, 8).reshape(2, 4, 1));
 
         MultiplicationVertex F = D.times(E);
 
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, F).of(F);
         DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A)).withRespectTo(A);
 
-        Assert.assertArrayEquals(new long[]{2, 2, 2, 2, 2, 2}, forwardWrtA.getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 1, 4, 1, 2}, forwardWrtA.getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 1, 4, 1, 2}, backwardWrtA.getShape());
         Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
     }
 
@@ -164,7 +137,7 @@ public class PermuteVertexTest {
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, C).of(C);
         DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(C, ImmutableSet.of(A)).withRespectTo(A);
 
-//        Assert.assertArrayEquals(reversedBackwardWrtA.asFlatDoubleArray(), reversedForwardWrtA.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(reversedBackwardWrtA.asFlatDoubleArray(), reversedForwardWrtA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(reversedForwardWrtA.asFlatDoubleArray(), forwardWrtA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(reversedBackwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
     }
