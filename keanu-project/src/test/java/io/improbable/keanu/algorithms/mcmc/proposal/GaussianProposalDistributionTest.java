@@ -7,8 +7,11 @@ import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -29,6 +32,9 @@ public class GaussianProposalDistributionTest {
     public Proposal proposal;
     DoubleTensor currentState = DoubleTensor.create(4.2, 42.0).transpose();
     DoubleTensor proposedState = DoubleTensor.create(4.3, 43.0).transpose();
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Mock
     public GaussianVertex vertex1;
@@ -90,5 +96,13 @@ public class GaussianProposalDistributionTest {
         verify(listener1).onProposalRejected(proposal);
         verify(listener2).onProposalRejected(proposal);
         verifyNoMoreInteractions(listener1, listener2);
+    }
+
+    @Test
+    public void itThrowsIfYouUseItOnADiscreteVariable() {
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage("Gaussian proposal function cannot be used for discrete variable");
+        PoissonVertex poisson = new PoissonVertex(1.);
+        proposalDistribution.getProposal(ImmutableSet.of(poisson), KeanuRandom.getDefaultRandom());
     }
 }
