@@ -133,7 +133,10 @@ def test_can_get_acceptance_rates(net: BayesNet) -> None:
     acceptance_rate_tracker = AcceptanceRateTracker()
     latents = list(net.get_latent_vertices())
 
-    algo = MetropolisHastingsSampler(proposal_distribution='prior', proposal_listeners=[acceptance_rate_tracker])
+    algo = MetropolisHastingsSampler(
+        proposal_distribution='gaussian',
+        proposal_distribution_sigma=np.array(1.),
+        proposal_listeners=[acceptance_rate_tracker])
     samples = sample(net=net, sample_from=latents, sampling_algorithm=algo, drop=3)
 
     for latent in latents:
@@ -145,7 +148,10 @@ def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
     acceptance_rate_tracker = AcceptanceRateTracker()
     latents = list(net.get_latent_vertices())
 
-    algo = MetropolisHastingsSampler(proposal_distribution='prior', proposal_listeners=[acceptance_rate_tracker])
+    algo = MetropolisHastingsSampler(
+        proposal_distribution='gaussian',
+        proposal_distribution_sigma=np.array(1.),
+        proposal_listeners=[acceptance_rate_tracker])
     samples = generate_samples(net=net, sample_from=latents, sampling_algorithm=algo, drop=3)
 
     draws = 100

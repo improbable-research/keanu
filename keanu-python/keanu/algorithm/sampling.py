@@ -30,6 +30,7 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
     def __init__(self,
                  proposal_distribution: str = None,
                  proposal_distribution_sigma: numpy_types = None,
+                 proposal_distribution_latents: Iterable[Vertex] = None,
                  proposal_listeners=[],
                  use_cache_on_rejection: bool = None):
 
@@ -40,7 +41,10 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
 
         if proposal_distribution is not None:
             proposal_distribution_object = ProposalDistribution(
-                type_=proposal_distribution, sigma=proposal_distribution_sigma, listeners=proposal_listeners)
+                type_=proposal_distribution,
+                sigma=proposal_distribution_sigma,
+                latents=proposal_distribution_latents,
+                listeners=proposal_listeners)
             builder = builder.proposalDistribution(proposal_distribution_object.unwrap())
 
         if use_cache_on_rejection is not None:
@@ -88,7 +92,8 @@ def sample(net: BayesNet,
            ax: Any = None) -> sample_types:
 
     if sampling_algorithm is None:
-        sampling_algorithm = MetropolisHastingsSampler()
+        sampling_algorithm = MetropolisHastingsSampler(
+            proposal_distribution="prior", proposal_distribution_latents=net.get_latent_or_observed_vertices())
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
@@ -120,7 +125,8 @@ def generate_samples(net: BayesNet,
                      ax: Any = None) -> sample_generator_types:
 
     if sampling_algorithm is None:
-        sampling_algorithm = MetropolisHastingsSampler()
+        sampling_algorithm = MetropolisHastingsSampler(
+            proposal_distribution="prior", proposal_distribution_latents=net.get_latent_or_observed_vertices())
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
