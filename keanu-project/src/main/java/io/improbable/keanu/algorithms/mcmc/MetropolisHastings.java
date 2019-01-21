@@ -2,10 +2,12 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
@@ -22,21 +24,11 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
 @Builder
 public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
-    private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = ProposalDistribution.usePrior();
+    private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
     public static final CascadeOnRejection DEFAULT_REJECTION_STRATEGY = new CascadeOnRejection();
     private static final LogProbCalculationStrategy DEFAULT_LOG_PROB_CALCULATION_STRATEGY = new SimpleLogProbCalculationStrategy();
     private static final ProposalApplicationStrategy DEFAULT_PROPOSAL_APPLICATION_STRATEGY = new CascadeOnApplication();
-
-    public static MetropolisHastings withDefaultConfig() {
-        return withDefaultConfig(KeanuRandom.getDefaultRandom());
-    }
-
-    public static MetropolisHastings withDefaultConfig(KeanuRandom random) {
-        return MetropolisHastings.builder()
-            .random(random)
-            .build();
-    }
 
 
     @Getter

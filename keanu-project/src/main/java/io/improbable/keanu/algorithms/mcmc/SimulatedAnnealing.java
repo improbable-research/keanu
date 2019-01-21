@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
@@ -7,6 +8,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -29,19 +31,9 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
 @Builder
 public class SimulatedAnnealing {
 
-    private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = ProposalDistribution.usePrior();
+    private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
     private static final boolean DEFAULT_USE_CACHE_ON_REJECTION = true;
-
-    public static SimulatedAnnealing withDefaultConfig() {
-        return withDefaultConfig(KeanuRandom.getDefaultRandom());
-    }
-
-    public static SimulatedAnnealing withDefaultConfig(KeanuRandom random) {
-        return SimulatedAnnealing.builder()
-            .random(random)
-            .build();
-    }
 
     @Getter
     @Setter

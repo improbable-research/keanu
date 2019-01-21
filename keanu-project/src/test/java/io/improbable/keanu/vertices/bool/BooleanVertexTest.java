@@ -1,8 +1,9 @@
 package io.improbable.keanu.vertices.bool;
 
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -249,9 +250,9 @@ public class BooleanVertexTest {
     }
 
     public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean>> vertex, int sampleCount, KeanuRandom random) {
-        ProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
 
-        long trueCount = MetropolisHastings.withDefaultConfig(random)
+        long trueCount = KeanuMetropolisHastings.withDefaultConfigFor(model, random)
             .generatePosteriorSamples(model, Collections.singletonList(vertex)).stream()
             .limit(sampleCount)
             .filter(state -> state.get(vertex).scalar())

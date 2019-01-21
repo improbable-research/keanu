@@ -1,7 +1,7 @@
 package io.improbable.snippet;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -22,10 +22,10 @@ public class AutocorrelationExample {
         C.observe(43.0);
         A.setValue(20.0);
         B.setValue(20.0);
-        ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
 
         //%%SNIPPET_START%% ScalarAutocorrelation
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100
@@ -41,10 +41,10 @@ public class AutocorrelationExample {
         BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
         C.observe(new double[]{1, 4, 5, 7, 8});
         bayesNet.probeForNonZeroProbability(100);
-        ProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
         //%%SNIPPET_START%% TensorAutocorrelation
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100

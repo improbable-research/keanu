@@ -1,21 +1,28 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PriorProposalDistribution implements ProposalDistribution {
+    private final Map<VariableReference, Vertex> vertexLookup;
     private final List<ProposalListener> listeners;
 
-    public PriorProposalDistribution() {
-        this(Collections.emptyList());
+    public PriorProposalDistribution(Collection<Vertex> vertices) {
+        this(vertices, Collections.emptyList());
     }
 
-    public PriorProposalDistribution(List<ProposalListener> listeners) {
+    public PriorProposalDistribution(Collection<Vertex> vertices, List<ProposalListener> listeners) {
+        vertexLookup = vertices.stream().collect(Collectors.toMap(v -> v.getReference(), v -> v));
         this.listeners = listeners;
     }
 
@@ -35,7 +42,8 @@ public class PriorProposalDistribution implements ProposalDistribution {
     }
 
     private <T> void setFor(Variable<T, ?> variable, KeanuRandom random, Proposal proposal) {
-        proposal.setProposal(variable, variable.sample(random));
+        Vertex<T> vertex = vertexLookup.get(variable.getReference());
+        proposal.setProposal(variable, vertex.sample(random));
     }
 
 }

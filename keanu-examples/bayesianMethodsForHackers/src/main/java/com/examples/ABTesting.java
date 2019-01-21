@@ -1,8 +1,9 @@
 package com.examples;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -42,7 +43,7 @@ public class ABTesting {
         //infer the most probable probabilities
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(probabilityA.getConnectedGraph());
         int sampleCount = 100;
-        NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig()
+        NetworkSamples networkSamples = KeanuMetropolisHastings.withDefaultConfigFor(model)
             .getPosteriorSamples(model, Arrays.asList(probabilityA, probabilityB, delta), sampleCount)
             .drop(sampleCount/2).downSample(model.getLatentVariables().size());
 

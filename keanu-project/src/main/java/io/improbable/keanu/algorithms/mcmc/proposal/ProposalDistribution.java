@@ -8,10 +8,6 @@ import java.util.Set;
 
 public interface ProposalDistribution {
 
-    static ProposalDistribution usePrior() {
-        return new PriorProposalDistribution();
-    }
-
     Proposal getProposal(Set<Variable> variables, KeanuRandom random);
 
     <T> double logProb(Probabilistic<T> variable, T ofValue, T givenValue);

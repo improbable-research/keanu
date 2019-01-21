@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -143,12 +143,11 @@ public class PrintVertexTest {
 
         new PrintVertex<>(temperature);
 
-        final BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        ProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(temperature.getConnectedGraph());
 
         final int nSamples = 100;
-        MetropolisHastings
-            .withDefaultConfig()
+        KeanuMetropolisHastings
+            .withDefaultConfigFor(model)
             .getPosteriorSamples(model, model.getLatentVariables(), nSamples);
 
         verify(printStream, atLeast(nSamples)).print(anyString());

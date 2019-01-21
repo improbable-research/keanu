@@ -2,13 +2,12 @@ package io.improbable.keanu.vertices.utility;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.MCMC;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -78,8 +77,8 @@ public class AssertVertexTest {
         GaussianVertex gaussian = new GaussianVertex(5, 1);
         gaussian.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(gaussian.getConnectedGraph());
-        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(model, model.getLatentVariables()).generate(10);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(gaussian.getConnectedGraph());
+        KeanuMetropolisHastings.withDefaultConfigFor(model).generatePosteriorSamples(model, model.getLatentVariables()).generate(10);
     }
 
     @Test
@@ -156,8 +155,8 @@ public class AssertVertexTest {
         firstThermometer.observe(25.);
         secondThermometer.observe(30.);
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(temperature.getConnectedGraph());
-        MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(temperature.getConnectedGraph());
+        KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100

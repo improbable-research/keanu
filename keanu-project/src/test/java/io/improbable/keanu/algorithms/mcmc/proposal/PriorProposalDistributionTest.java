@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import java.util.Set;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PriorProposalDistributionTest {
@@ -29,7 +31,9 @@ public class PriorProposalDistributionTest {
 
     @Before
     public void setUpProposalDistribution() throws Exception {
-        proposalDistribution = new PriorProposalDistribution();
+        when(vertex1.getReference()).thenReturn(new VertexId(1));
+        when(vertex2.getReference()).thenReturn(new VertexId(2));
+        proposalDistribution = new PriorProposalDistribution(ImmutableList.of(vertex1, vertex2));
     }
 
     @Before
@@ -42,7 +46,7 @@ public class PriorProposalDistributionTest {
         ProposalListener listener1 = mock(ProposalListener.class);
         ProposalListener listener2 = mock(ProposalListener.class);
         List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
-        proposalDistribution = new PriorProposalDistribution(listeners);
+        proposalDistribution = new PriorProposalDistribution(ImmutableList.of(vertex1, vertex2), listeners);
         Set<Variable> variables = ImmutableSet.of(vertex1, vertex2);
         Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
         proposal.apply();

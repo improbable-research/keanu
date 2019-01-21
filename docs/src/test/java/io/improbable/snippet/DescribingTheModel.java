@@ -2,7 +2,7 @@ package io.improbable.snippet;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -55,8 +55,8 @@ public class DescribingTheModel {
         A.observe(true);
         B.observe(true);
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
+        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             Arrays.asList(A, B),
             100000

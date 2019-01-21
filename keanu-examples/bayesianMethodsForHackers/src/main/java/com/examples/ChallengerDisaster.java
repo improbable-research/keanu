@@ -1,7 +1,7 @@
 package com.examples;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -46,7 +46,7 @@ public class ChallengerDisaster {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
         final int sampleCount = 3000;
-        NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig()
+        NetworkSamples networkSamples = KeanuMetropolisHastings.withDefaultConfigFor(model)
             .generatePosteriorSamples(model, net.getLatentVertices())
             .dropCount(sampleCount / 2)
             .downSampleInterval(net.getLatentVertices().size())

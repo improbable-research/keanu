@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import io.improbable.keanu.network.VariableState;
 import io.improbable.keanu.vertices.Samplable;
 
-public interface Variable<VALUE, STATE extends VariableState> extends Samplable<VALUE> {
+public interface Variable<VALUE, STATE extends VariableState> {
 
     VariableReference getReference();
 

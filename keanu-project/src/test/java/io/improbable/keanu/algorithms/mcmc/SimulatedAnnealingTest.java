@@ -45,8 +45,9 @@ public class SimulatedAnnealingTest {
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         network.probeForNonZeroProbability(100, random);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(network);
 
-        NetworkState maxAPosterioriSamples = SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(new KeanuProbabilisticModel(network), 10000);
+        NetworkState maxAPosterioriSamples = KeanuSimulatedAnnealing.withDefaultConfigFor(model, random).getMaxAPosteriori(model, 10000);
         NetworkState maxValuesFromVariational = findMAPWithOptimizer();
 
         assertEquals(maxValuesFromVariational.get(A).scalar(), maxAPosterioriSamples.get(A).scalar(), 0.05);

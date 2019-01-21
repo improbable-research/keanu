@@ -21,6 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -65,7 +66,7 @@ public class MetropolisHastingsStepTest {
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             model,
-            ProposalDistribution.usePrior(),
+            new PriorProposalDistribution(bayesNet.getAllVertices()),
             new RollBackOnRejection(bayesNet.getLatentVertices()),
             new LambdaSectionOptimizedLogProbCalculator(bayesNet.getLatentVertices()),
             new CascadeOnApplication(),
@@ -154,10 +155,14 @@ public class MetropolisHastingsStepTest {
         return new ConstantProposalDistribution(constant);
     }
 
-    @AllArgsConstructor
     private static class ConstantProposalDistribution extends PriorProposalDistribution {
 
         private final double constant;
+
+        public ConstantProposalDistribution(double constant) {
+            super(Collections.emptyList());
+            this.constant = constant;
+        }
 
         @Override
         public Proposal getProposal(Set<Variable> variables, KeanuRandom random) {

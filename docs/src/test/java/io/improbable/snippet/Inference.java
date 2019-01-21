@@ -1,7 +1,7 @@
 package io.improbable.snippet;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
@@ -31,11 +31,11 @@ public class Inference {
         A.setValue(20.0);
         B.setValue(20.0);
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
         //%%SNIPPET_END%% InfStartState
 
         //%%SNIPPET_START%% InfMetropolisHastings
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100000

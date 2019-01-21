@@ -1,9 +1,11 @@
 package io.improbable.snippet;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -13,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -56,8 +59,8 @@ public class WetGrass {
 
         //What does that observation say about the probability that it rained or that
         //the sprinkler was on?
-        ProbabilisticModel model = new KeanuProbabilisticModel(wetGrass.getConnectedGraph());
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(wetGrass.getConnectedGraph());
+        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             Arrays.asList(sprinkler, rain),
             100000

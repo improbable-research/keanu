@@ -2,10 +2,11 @@ package io.improbable.keanu.algorithms.variational;
 
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
@@ -86,9 +87,9 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
-        NetworkSamples samples = MetropolisHastings
-            .withDefaultConfig()
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
+        NetworkSamples samples = KeanuMetropolisHastings
+            .withDefaultConfigFor(model)
             .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
 
         ProbabilisticDouble q1 = new GaussianVertex(0.1, 1.);
@@ -103,9 +104,9 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
-        NetworkSamples samples = MetropolisHastings
-            .withDefaultConfig()
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
+        NetworkSamples samples = KeanuMetropolisHastings
+            .withDefaultConfigFor(model)
             .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
 
         QDistribution q1 = new TestGaussianQDistribution(0.1, 1.);
@@ -120,9 +121,9 @@ public class KLDivergenceTest {
         ConstantDoubleVertex v2 = new ConstantDoubleVertex(0.1);
         DoubleVertex v3 = v1.plus(v2);
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
-        NetworkSamples samples = MetropolisHastings
-            .withDefaultConfig()
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
+        NetworkSamples samples = KeanuMetropolisHastings
+            .withDefaultConfigFor(model)
             .getPosteriorSamples(model, Arrays.asList(v1, v3), 1000);
         ProbabilisticDouble q = new GaussianVertex(0.1, 1.);
 

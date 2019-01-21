@@ -58,6 +58,10 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
         return this.latentVertices;
     }
 
+    public List<Vertex> getLatentVertices() {
+        return this.latentVertices;
+    }
+
     @Override
     public List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
         return getLatentVariables().stream()
