@@ -1,11 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -14,6 +8,10 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable {
 
@@ -36,40 +34,36 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        int[] range = TensorShape.dimensionRange(0, derivativeOfParentWithRespectToInputs.get().getRank());
-        for (int i = 0; i < rearrange.length; i++) {
-            range[i] = rearrange[i];
-        }
-        return derivativeOfParentWithRespectToInputs.permute(range);
+        int[] permute = forwardPermute(derivativeOfParentWithRespectToInputs);
+        return derivativeOfParentWithRespectToInputs.permute(permute);
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        int[] range = TensorShape.dimensionRange(0, derivativeOfOutputWithRespectToSelf.get().getRank());
-
-        int[] reversePermute = reversePermute();
-        int rank = inputVertex.getRank();
-
-        for (int i = 0; i < reversePermute.length; i++) {
-            range[i] = reversePermute[i];
-        }
-
-        for (int i = rank; i < derivativeOfOutputWithRespectToSelf.get().getRank(); i++) {
-            range[i] = i;
-        }
-
-        System.out.println("Doing a: " + Arrays.toString(range));
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.permute(range));
+        int[] reversePermute = reversePermute(derivativeOfOutputWithRespectToSelf);
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.permute(reversePermute));
         return partials;
     }
 
-    private int[] reversePermute() {
-        int[] reversedPermute = new int[rearrange.length];
-        for (int i = 0; i < reversedPermute.length; i++) {
+    private int[] forwardPermute(PartialDerivative partial) {
+
+        int[] permute = new int[partial.get().getRank()];
+        for (int i = 0; i < rearrange.length; i++) {
+            permute[i] = rearrange[i];
+            permute[i + rearrange.length] = i + rearrange.length;
+        }
+        return permute;
+    }
+
+    private int[] reversePermute(PartialDerivative partial) {
+
+        int[] reversedPermute = new int[partial.get().getRank()];
+        for (int i = 0; i < rearrange.length; i++) {
             for (int j = 0; j < rearrange.length; j++) {
                 if (i == rearrange[j]) {
-                    reversedPermute[i] = j;
+                    reversedPermute[i] = i + rearrange.length;
+                    reversedPermute[i + rearrange.length] = j;
                 }
             }
         }
