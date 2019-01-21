@@ -58,27 +58,23 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements 
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        try {
-            PartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
-            PartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
+        PartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
+        PartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
 
-            // dc = A * db + da * B;
-            PartialDerivative partialsFromLeft = PartialDerivative.matrixMultiplyAlongOfDimensions(
-                dLeftWrtInput,
-                right.getValue(),
-                true
-            );
+        // dc = A * db + da * B;
+        PartialDerivative partialsFromLeft = PartialDerivative.matrixMultiplyAlongOfDimensions(
+            dLeftWrtInput,
+            right.getValue(),
+            true
+        );
 
-            PartialDerivative partialsFromRight = PartialDerivative.matrixMultiplyAlongOfDimensions(
-                dRightWrtInput,
-                left.getValue(),
-                false
-            );
+        PartialDerivative partialsFromRight = PartialDerivative.matrixMultiplyAlongOfDimensions(
+            dRightWrtInput,
+            left.getValue(),
+            false
+        );
 
-            return partialsFromLeft.add(partialsFromRight);
-        } catch (UnsupportedOperationException e) {
-            return Differentiable.super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
-        }
+        return partialsFromLeft.add(partialsFromRight);
     }
 
     private static long[] getResultingShape(long[] left, long[] right) {

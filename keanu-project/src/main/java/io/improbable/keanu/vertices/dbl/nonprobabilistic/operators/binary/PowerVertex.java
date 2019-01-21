@@ -44,37 +44,33 @@ public class PowerVertex extends DoubleBinaryOpVertex implements Differentiable 
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        try {
-            PartialDerivative dBaseWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
-            PartialDerivative dExponentWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
+        PartialDerivative dBaseWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
+        PartialDerivative dExponentWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
 
-            PartialDerivative fromBase = AutoDiffBroadcast.correctForBroadcastPartialForward(dBaseWrtInput, left.getShape(), this.getShape());
-            PartialDerivative fromExponent = AutoDiffBroadcast.correctForBroadcastPartialForward(dExponentWrtInput, right.getShape(), this.getShape());
+        PartialDerivative fromBase = AutoDiffBroadcast.correctForBroadcastPartialForward(dBaseWrtInput, left.getShape(), this.getShape());
+        PartialDerivative fromExponent = AutoDiffBroadcast.correctForBroadcastPartialForward(dExponentWrtInput, right.getShape(), this.getShape());
 
-            // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
-            PartialDerivative partialsFromBase;
-            PartialDerivative partialsFromExponent;
+        // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
+        PartialDerivative partialsFromBase;
+        PartialDerivative partialsFromExponent;
 
-            if (fromBase.isPresent()) {
-                partialsFromBase = fromBase.multiplyAlongOfDimensions(
-                    right.getValue().times(left.getValue().pow(right.getValue().minus(1)))
-                );
-            } else {
-                partialsFromBase = PartialDerivative.EMPTY;
-            }
-
-            if (fromExponent.isPresent()) {
-                partialsFromExponent = fromExponent.multiplyAlongOfDimensions(
-                    left.getValue().log().timesInPlace(this.getValue())
-                );
-            } else {
-                partialsFromExponent = PartialDerivative.EMPTY;
-            }
-
-            return partialsFromBase.add(partialsFromExponent);
-        } catch (UnsupportedOperationException e) {
-            return Differentiable.super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
+        if (fromBase.isPresent()) {
+            partialsFromBase = fromBase.multiplyAlongOfDimensions(
+                right.getValue().times(left.getValue().pow(right.getValue().minus(1)))
+            );
+        } else {
+            partialsFromBase = PartialDerivative.EMPTY;
         }
+
+        if (fromExponent.isPresent()) {
+            partialsFromExponent = fromExponent.multiplyAlongOfDimensions(
+                left.getValue().log().timesInPlace(this.getValue())
+            );
+        } else {
+            partialsFromExponent = PartialDerivative.EMPTY;
+        }
+
+        return partialsFromBase.add(partialsFromExponent);
     }
 
     @Override

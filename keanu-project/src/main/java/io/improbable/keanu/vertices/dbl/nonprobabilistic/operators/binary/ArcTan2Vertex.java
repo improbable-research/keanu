@@ -36,24 +36,20 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex implements Differentiabl
 
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        try {
-            PartialDerivative dxWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
-            PartialDerivative dyWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
+        PartialDerivative dxWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
+        PartialDerivative dyWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
 
-            DoubleTensor yValue = right.getValue();
-            DoubleTensor xValue = left.getValue();
-            DoubleTensor denominator = yValue.pow(2).plusInPlace(xValue.pow(2));
+        DoubleTensor yValue = right.getValue();
+        DoubleTensor xValue = left.getValue();
+        DoubleTensor denominator = yValue.pow(2).plusInPlace(xValue.pow(2));
 
-            PartialDerivative fromX = AutoDiffBroadcast.correctForBroadcastPartialForward(dxWrtInput, left.getShape(), this.getShape());
-            PartialDerivative fromY = AutoDiffBroadcast.correctForBroadcastPartialForward(dyWrtInput, right.getShape(), this.getShape());
+        PartialDerivative fromX = AutoDiffBroadcast.correctForBroadcastPartialForward(dxWrtInput, left.getShape(), this.getShape());
+        PartialDerivative fromY = AutoDiffBroadcast.correctForBroadcastPartialForward(dyWrtInput, right.getShape(), this.getShape());
 
-            PartialDerivative diffFromX = fromX.multiplyAlongOfDimensions(yValue.div(denominator).unaryMinusInPlace());
-            PartialDerivative diffFromY = fromY.multiplyAlongOfDimensions(xValue.div(denominator));
+        PartialDerivative diffFromX = fromX.multiplyAlongOfDimensions(yValue.div(denominator).unaryMinusInPlace());
+        PartialDerivative diffFromY = fromY.multiplyAlongOfDimensions(xValue.div(denominator));
 
-            return diffFromX.add(diffFromY);
-         } catch (UnsupportedOperationException e) {
-            return Differentiable.super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
-        }
+        return diffFromX.add(diffFromY);
     }
 
     @Override
