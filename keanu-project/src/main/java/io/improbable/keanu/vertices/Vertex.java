@@ -8,6 +8,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 
 import java.util.Arrays;
@@ -108,6 +109,11 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
     public final boolean isProbabilistic() {
         return this instanceof Probabilistic;
     }
+
+    /**
+     * @return True if the vertex is differentiable, false otherwise.
+     */
+    public final boolean isDifferentiable() {return this instanceof Differentiable; }
 
     /**
      * Sets the value if the vertex isn't already observed.
