@@ -22,7 +22,7 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     @ExportVertexToPythonBindings
     public PermuteVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                          @LoadVertexParam(REARRANGE_NAME) int... rearrange) {
-        super(inputVertex);
+        super(DoubleTensor.create(Arrays.stream(inputVertex.getShape()).asDoubleStream().toArray(), inputVertex.getShape()).permute(rearrange).getShape(), inputVertex);
         this.rearrange = rearrange;
     }
 
@@ -62,8 +62,8 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
         for (int i = 0; i < rearrange.length; i++) {
             for (int j = 0; j < rearrange.length; j++) {
                 if (i == rearrange[j]) {
-                    reversedPermute[i] = i + rearrange.length;
-                    reversedPermute[i + rearrange.length] = j;
+                    reversedPermute[i] = i;
+                    reversedPermute[i + rearrange.length] = j + rearrange.length;
                 }
             }
         }

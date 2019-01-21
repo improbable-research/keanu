@@ -60,10 +60,10 @@ public class PermuteVertexTest {
     @Test
     public void canPermuteRankThreeVertex() {
         UniformVertex a = new UniformVertex(0, 10);
-        a.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+        a.setValue(DoubleTensor.arange(0, 6).reshape(1, 2, 3));
 
         UniformVertex b = new UniformVertex(0, 10);
-        b.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+        b.setValue(DoubleTensor.arange(0, 6).reshape(1, 2, 3));
 
         DoubleVertex c = a.times(b);
 
@@ -72,6 +72,7 @@ public class PermuteVertexTest {
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(a, permute).of(permute);
         DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(permute, a).withRespectTo(a);
 
+        System.out.println(Arrays.toString(forwardWrtA.getShape()));
         Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
     }
 
