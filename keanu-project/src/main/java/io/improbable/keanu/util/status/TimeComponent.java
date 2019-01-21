@@ -1,11 +1,12 @@
 package io.improbable.keanu.util.status;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
+
 import java.time.Duration;
 
 public abstract class TimeComponent implements StatusBarComponent {
 
     protected String formatDuration(Duration duration) {
-        // Duration.toString() uses the ISO-8601. This strips the `PT` at the start off.
-        return duration.toString().substring(2);
+        return DurationFormatUtils.formatDuration(duration.toMillis(), "H:mm:ss", true);
     }
 }
