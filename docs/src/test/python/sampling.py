@@ -37,3 +37,6 @@ def inference_example_hmc_nuts():
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
                                sampling_algorithm=algo, draws=2000)
     # %%SNIPPET_END%% PythonNUTSExample
+
+inference_example_metropolis()
+inference_example_hmc_nuts()
