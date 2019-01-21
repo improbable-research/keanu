@@ -14,7 +14,9 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastToDoubleVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastToIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
@@ -78,19 +80,19 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
     }
 
     public IntegerVertex minus(Vertex<IntegerTensor> that) {
-        return new IntegerDifferenceVertex(this, new CastIntegerVertex(that));
+        return new IntegerDifferenceVertex(this, new CastToIntegerVertex(that));
     }
 
     public IntegerVertex plus(Vertex<IntegerTensor> that) {
-        return new IntegerAdditionVertex(this, new CastIntegerVertex(that));
+        return new IntegerAdditionVertex(this, new CastToIntegerVertex(that));
     }
 
     public IntegerVertex multiply(Vertex<IntegerTensor> that) {
-        return new IntegerMultiplicationVertex(this, new CastIntegerVertex(that));
+        return new IntegerMultiplicationVertex(this, new CastToIntegerVertex(that));
     }
 
     public IntegerVertex divideBy(Vertex<IntegerTensor> that) {
-        return new IntegerDivisionVertex(this, new CastIntegerVertex(that));
+        return new IntegerDivisionVertex(this, new CastToIntegerVertex(that));
     }
 
     @Override
@@ -182,6 +184,8 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
     public BooleanVertex equalTo(IntegerVertex rhs) {
         return new EqualsVertex<>(this, rhs);
     }
+
+    public DoubleVertex toDouble() { return new CastToDoubleVertex(this); }
 
     public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);

@@ -3,9 +3,9 @@
 import argparse
 import fileinput
 import os
-from shutil import copyfile
+from shutil import copytree
 
-def updateFile(destination, version):
+def update_file(destination, version):
     versiondots = version.replace('_', '.')
     with fileinput.FileInput(destination, inplace=True) as file:
         for line in file: 
@@ -14,26 +14,24 @@ def updateFile(destination, version):
         for line in file:
             print(line.replace("/docs", "/docs/" + version), end='')
 
-def performFreeze(version):
-    directory = "current_docs"
-    version = version.replace(".", "_")
-    for file in os.listdir(directory):
+def freeze_shiny(version):
+    dest_dir = copy_to_versioned_legacy_path("current_docs/", "legacy_docs/", version)
+    for file in os.listdir(dest_dir):
         if not os.path.isdir(file):
-            path = "current_docs/"
-            legacy_path = "legacy_docs/"
-            file_src = path + file
-            dest_dir = legacy_path + version + "/"
-            destination = dest_dir + file
-            if not os.path.exists(dest_dir):
-                os.makedirs(dest_dir)
-            if not os.path.exists(destination):
-                open(destination, "w").close()
-            copyfile(file_src, destination)
-            updateFile(destination, version)
+            update_file(dest_dir + file, version)
 
+def copy_to_versioned_legacy_path(source_path, legacy_root, version):
+    dest_dir = legacy_root + version + "/"
+    copytree(source_path, dest_dir)
+    return dest_dir
+
+def freeze_python(version):
+    copy_to_versioned_legacy_path("python/latest/", "python/", version)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--version")
 args = parser.parse_args()
-performFreeze(args.version)
+formatted_version = args.version.replace(".", "_")
+freeze_shiny(formatted_version)
+freeze_python(formatted_version)
 print("Freezing has now been performed - please make sure to update the _data/previous_versions.yml file to reflect these changes and then check in to source control.")
