@@ -162,5 +162,4 @@ optimizer = GradientOptimizer(bayes_net)
 optimizer.max_a_posteriori()
 
 calculated_temperature = m.temperature.get_value()
-print(calculated_temperature)
 ```
