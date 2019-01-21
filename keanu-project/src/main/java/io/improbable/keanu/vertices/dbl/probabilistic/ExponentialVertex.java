@@ -85,7 +85,7 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
 
         final DoubleVertex xLessThanZero = xPlaceholder.toLessThanMask(0.);
         final DoubleVertex negXMinusADivB = xPlaceholder.unaryMinus().div(ratePlaceholder);
-        final DoubleVertex negXMinusADivBMinusLogB = negXMinusADivB.minus(rate.log());
+        final DoubleVertex negXMinusADivBMinusLogB = negXMinusADivB.minus(ratePlaceholder.log());
 
         final DoubleVertex logProbOutput = negXMinusADivBMinusLogB.setWithMask(xLessThanZero, Double.NEGATIVE_INFINITY);
 
