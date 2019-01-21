@@ -117,7 +117,7 @@ public class PermuteVertexTest {
     }
 
     @Test
-    public void canPartialCorrectlyFlowThroughReversedPermute() {
+    public void canPartialCorrectlyFlowThroughPermuteAndReversedPermuteRankThree() {
         UniformVertex A = new UniformVertex(0, 10);
         A.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
@@ -143,7 +143,7 @@ public class PermuteVertexTest {
     }
 
     @Test
-    public void canPartialCorrectlyFlowThroughRankTwoReversedPermute() {
+    public void canPartialCorrectlyFlowThroughPermuteAndReversedPermuteRankTwo() {
         UniformVertex A = new UniformVertex(0, 10);
         A.setValue(DoubleTensor.arange(0, 4).reshape(2, 2));
 
