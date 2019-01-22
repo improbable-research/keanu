@@ -23,7 +23,7 @@ vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_
 class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
     def __init__(self, val_or_ctor: Union[JavaMember, JavaObject],
-            *args: Union[vertex_constructor_param_types, shape_types], **kwargs: Dict[str, Any]) -> None:
+                 *args: Union[vertex_constructor_param_types, shape_types], **kwargs: Dict[str, Any]) -> None:
         val: JavaObject
         if args:
             ctor = val_or_ctor
