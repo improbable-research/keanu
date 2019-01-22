@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import pandas as pd
-from keanu.vertex import IntegerIf, BooleanIf, DoubleIf, Bernoulli, Gaussian, Const, Double, Poisson, Integer, Boolean
+from keanu.vertex import If, Bernoulli, Gaussian, Const, Double, Poisson, Integer, Boolean
 
 
 @pytest.fixture
@@ -12,7 +12,7 @@ def predicate():
 def test_you_can_create_a_double_valued_if(data, predicate) -> None:
     thn = Gaussian(data, data)
     els = Const(data)
-    result = DoubleIf(predicate, thn, els)
+    result = If(predicate, thn, els)
     assert type(result) == Double
     assert result.unwrap().getClass().getSimpleName() == "DoubleIfVertex"
 
@@ -21,7 +21,7 @@ def test_you_can_create_a_double_valued_if(data, predicate) -> None:
 def test_you_can_create_an_integer_valued_if(data, predicate) -> None:
     thn = Poisson(data)
     els = Const(data)
-    result = IntegerIf(predicate, thn, els)
+    result = If(predicate, thn, els)
     assert type(result) == Integer
     assert result.unwrap().getClass().getSimpleName() == "IntegerIfVertex"
 
@@ -30,6 +30,6 @@ def test_you_can_create_an_integer_valued_if(data, predicate) -> None:
 def test_you_can_create_a_boolean_valued_if(data, predicate) -> None:
     thn = Const(data)
     els = Const(data)
-    result = BooleanIf(predicate, thn, els)
+    result = If(predicate, thn, els)
     assert type(result) == Boolean
     assert result.unwrap().getClass().getSimpleName() == "BooleanIfVertex"

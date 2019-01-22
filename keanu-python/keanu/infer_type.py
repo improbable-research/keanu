@@ -8,10 +8,10 @@ from keanu.vartypes import (numpy_types, tensor_arg_types, runtime_numpy_types, 
 
 
 def infer_type_and_execute(value: tensor_arg_types, actions: Dict[type, Callable]) -> Any:
-    return actions[__get_type_of_value(value)](value)
+    return actions[get_type_of_value(value)](value)
 
 
-def __get_type_of_value(t: tensor_arg_types) -> type:
+def get_type_of_value(t: tensor_arg_types) -> type:
     if isinstance(t, runtime_numpy_types):
         return __infer_type_from_ndarray(t)
     elif isinstance(t, runtime_pandas_types):
