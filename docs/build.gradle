@@ -28,19 +28,23 @@ compileTestKotlin {
         jvmTarget = "1.8"
     }
 }
-
 task writeSnippets(type:Exec) {
     commandLine 'python', 'bin/snippet_writer.py'
 }
 
-task prepareKeanuPipenv {
-    dependsOn(":keanu-python:build")
+task installDependencies {
     doLast {
         exec {
             workingDir("src/test/python/")
             commandLine 'pipenv', 'install'
         }
     }
+}
+
+task prepareKeanuPipenv {
+    dependsOn(":keanu-python:installPipenv")
+    dependsOn(":keanu-python:build")
+    dependsOn(installDependencies)
 }
 
 task runPythonSnippets {
