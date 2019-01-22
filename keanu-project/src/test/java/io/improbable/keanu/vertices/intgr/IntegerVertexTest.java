@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.intgr;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
@@ -18,8 +19,8 @@ import static org.junit.Assert.assertTrue;
 
 public class IntegerVertexTest {
 
-    IntegerVertex v1;
-    IntegerVertex v2;
+    private IntegerVertex v1;
+    private IntegerVertex v2;
 
     @Before
     public void setup() {
@@ -171,6 +172,12 @@ public class IntegerVertexTest {
 
         assertArrayEquals(new int[]{1, 2, 1, 4}, min.getValue().asFlatIntegerArray());
         assertArrayEquals(new int[]{2, 4, 3, 5}, max.getValue().asFlatIntegerArray());
+    }
+
+    @Test
+    public void canCastToDoubleVertex() {
+        DoubleVertex doubleV1 = v1.toDouble();
+        assertEquals(3., doubleV1.getValue().scalar(), 0.0);
     }
 
 }

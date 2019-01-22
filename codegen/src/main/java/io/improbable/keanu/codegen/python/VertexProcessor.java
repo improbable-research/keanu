@@ -139,6 +139,8 @@ class VertexProcessor {
             return "cast_to_integer(" + pythonParameter + ")";
         } else if (String.class.isAssignableFrom(parameterType)) {
             return "cast_to_string(" + pythonParameter + ")";
+        } else if (Boolean.class.isAssignableFrom(parameterType)) {
+            return "cast_to_boolean(" + pythonParameter + ")";
         } else if (Long[].class.isAssignableFrom(parameterType) || long[].class.isAssignableFrom(parameterType)) {
             return "cast_to_long_array(" + pythonParameter + ")";
         } else if (Integer[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
@@ -171,6 +173,8 @@ class VertexProcessor {
             return "tensor_arg_types";
         } else if (Double.class.isAssignableFrom(parameterType)) {
             return "float";
+        } else if (Boolean.class.isAssignableFrom(parameterType)) {
+            return "bool";
         } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
             return "int";
         } else if (String.class.isAssignableFrom(parameterType)) {

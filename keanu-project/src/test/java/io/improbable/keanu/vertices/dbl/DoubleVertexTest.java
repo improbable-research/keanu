@@ -2,8 +2,10 @@ package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -88,5 +90,12 @@ public class DoubleVertexTest {
 
         DoubleVertex concatDimOne = DoubleVertex.concat(1, A, B);
         assertArrayEquals(concatDimOne.getShape(), new long[]{2, 4});
+    }
+
+    @Test
+    public void canCastToIntegerVertex() {
+        DoubleVertex v1 = new ConstantDoubleVertex(3.6);
+        IntegerVertex intV1 = v1.toInteger();
+        assertEquals(3, intV1.getValue().scalar().longValue());
     }
 }

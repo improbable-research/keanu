@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
@@ -152,14 +151,6 @@ public class BayesianNetwork {
             isObserved && maxIndentation >= indentation);
     }
 
-    /**
-     * @return a list of all vertices that are not differentiable (i.e., there are points at which they do not have a derivative).
-     */
-    public List<Vertex> getNonDifferentiableVertices() {
-        return vertices.stream().filter(vertex -> !(vertex instanceof Differentiable))
-            .collect(Collectors.toList());
-    }
-
     public double getLogOfMasterP() {
         return ProbabilityCalculator.calculateLogProbFor(getLatentOrObservedVertices());
     }
@@ -249,12 +240,11 @@ public class BayesianNetwork {
     }
 
     public void save(NetworkSaver networkSaver) {
-        if(isSaveable()) {
+        if (isSaveable()) {
             for (Vertex vertex : TopologicalSort.sort(vertices)) {
                 vertex.save(networkSaver);
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Trying to save a BayesianNetwork that isn't Saveable");
         }
     }
