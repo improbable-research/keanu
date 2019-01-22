@@ -52,6 +52,10 @@ def test_get_outer_namespace(label1: VertexLabel) -> None:
     assert label1.get_outer_namespace() == "outer"
 
 
+def test_get_none_outer_namespace() -> None:
+    assert VertexLabel("label without namespace").get_outer_namespace() is None
+
+
 def test_unqualified_name(label1: VertexLabel) -> None:
     assert label1.get_unqualified_name() == "label1"
 

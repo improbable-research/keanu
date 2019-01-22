@@ -9,7 +9,7 @@ from keanu.context import KeanuContext
 from keanu.vartypes import tensor_arg_types, primitive_types, numpy_types, pandas_types
 from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli, IntegerProxy
 from keanu.vertex.base import Vertex
-from keanu.vertex.vertex_label import VertexLabel
+from keanu.vertex.label import VertexLabel
 
 
 @pytest.fixture

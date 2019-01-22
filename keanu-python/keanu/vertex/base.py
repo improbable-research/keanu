@@ -10,7 +10,7 @@ import keanu as kn
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
-from keanu.vertex.vertex_label import _VertexLabel
+from keanu.vertex.label import _VertexLabel
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_wrapped_java_types,
                             runtime_primitive_types, runtime_numpy_types, runtime_pandas_types)
 
@@ -196,7 +196,6 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             val = label
         else:
             raise TypeError("label must be str or VertexLabel.")
-
         java_vertex.setLabel(val)
 
     @staticmethod

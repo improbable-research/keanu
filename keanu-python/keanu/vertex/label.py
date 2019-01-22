@@ -24,10 +24,10 @@ class _VertexLabel(JavaObjectWrapper):
     def is_in_namespace(self, namespace: List[str]) -> bool:
         return self.unwrap().isInNamespace(k.to_java_string_array(namespace))
 
-    def with_extra_namespace(self, top_level_namespace: str) -> 'VertexLabel':
+    def with_extra_namespace(self, top_level_namespace: str) -> '_VertexLabel':
         return _VertexLabel(self.unwrap().withExtraNamespace(top_level_namespace))
 
-    def without_outer_namespace(self) -> 'VertexLabel':
+    def without_outer_namespace(self) -> '_VertexLabel':
         return _VertexLabel(self.unwrap().withoutOuterNamespace())
 
     def get_outer_namespace(self) -> str:

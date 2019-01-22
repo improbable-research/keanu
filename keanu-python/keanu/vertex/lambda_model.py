@@ -6,7 +6,7 @@ from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from keanu.functional import Consumer, Supplier
 from keanu.vertex.base import Vertex
-from keanu.vertex.vertex_label import VertexLabel
+from keanu.vertex.label import VertexLabel
 
 context = KeanuContext()
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.model.LambdaModelVertex")
