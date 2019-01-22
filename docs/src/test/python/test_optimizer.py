@@ -9,7 +9,7 @@ def build_model():
         m.second_thermometer = Gaussian(m.temperature, 5.)
     return m
 
-def gradient_optimzer_example():
+def test_gradient_optimzer_example():
     model = build_model()
     model.first_thermometer.observe(25)
     bayes_net = model.to_bayes_net()
@@ -20,7 +20,7 @@ def gradient_optimzer_example():
     calculated_temperature = model.temperature.get_value()
     # %%SNIPPET_END%% PythonGradientOptimizer
 
-def non_gradient_optimizer_example():
+def test_non_gradient_optimizer_example():
     model = build_model()
     model.first_thermometer.observe(25)
     bayes_net = model.to_bayes_net()
