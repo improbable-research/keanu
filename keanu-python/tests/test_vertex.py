@@ -7,8 +7,9 @@ from py4j.java_gateway import JVMView
 
 from keanu.context import KeanuContext
 from keanu.vartypes import tensor_arg_types, primitive_types, numpy_types, pandas_types
-from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli
+from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli, IntegerProxy
 from keanu.vertex.base import Vertex
+from keanu.vertex.vertex_label import VertexLabel
 
 
 @pytest.fixture
@@ -320,7 +321,20 @@ def test_you_can_observe_scalar(ctor, args, expected_type, value) -> None:
     test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals_scalar)
 
 
-def test_set_label_in_kwargs() -> None:
+def test_set_str_label_in_kwargs() -> None:
     label = "gaussian_vertex"
     vertex = Gaussian(0., 1., label=label)
     assert vertex.get_label() == label
+
+
+def test_set_object_label_in_kwargs() -> None:
+    label = VertexLabel("gaussian_vertex")
+    vertex = Gaussian(0., 1., label=label)
+    assert vertex.get_label() == label
+
+
+def test_cannot_set_label_in_kwargs_for_proxy_vertices() -> None:
+    intended_label = "intended_label"
+    redundant_label = VertexLabel("redundant label")
+    with pytest.raises(TypeError):
+        IntegerProxy([1], intended_label, label=redundant_label)
