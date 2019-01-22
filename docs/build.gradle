@@ -32,19 +32,19 @@ task writeSnippets(type:Exec) {
     commandLine 'python', 'bin/snippet_writer.py'
 }
 
+task installPipenv {
+    doLast {
+        exec {
+            commandLine 'pip', 'install', 'pipenv==2018.11.26'
+        }
+    }
+}
+
 task installDependencies {
     dependsOn(installPipenv)
     doLast {
         exec {
             commandLine 'pipenv', 'install'
-        }
-    }
-}
-
-task installPipenv {
-    doLast {
-        exec {
-            commandLine 'pip', 'install', 'pipenv==2018.11.26'
         }
     }
 }
