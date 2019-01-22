@@ -14,4 +14,4 @@ def If(predicate: tensor_arg_types, thn: tensor_arg_types, els: tensor_arg_types
     elif type_ == float:
         return DoubleIf(predicate, thn, els)
     else:
-        raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(thn))
+        raise NotImplementedError("Unexpected type {} for vertex {}".format(type_, thn))
