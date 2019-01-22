@@ -21,6 +21,9 @@ class _VertexLabel(JavaObjectWrapper):
         else:
             return False
 
+    def __hash__(self) -> int:
+        return hash(self.get_qualified_name())
+
     def is_in_namespace(self, namespace: List[str]) -> bool:
         return self.unwrap().isInNamespace(k.to_java_string_array(namespace))
 

@@ -337,4 +337,4 @@ def test_cannot_set_label_in_kwargs_for_proxy_vertices() -> None:
     intended_label = "intended_label"
     redundant_label = VertexLabel("redundant label")
     with pytest.raises(TypeError):
-        IntegerProxy([1], intended_label, label=redundant_label)
+        IntegerProxy([1], intended_label, label=redundant_label)  # type: ignore

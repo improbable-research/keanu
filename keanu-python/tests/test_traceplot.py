@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 
 from keanu.plots import traceplot
 from keanu.vartypes import sample_types
+from keanu.vertex import VertexLabel
 from numpy import array
 from numpy.testing import assert_array_equal
 import pytest
@@ -10,15 +11,26 @@ from collections import OrderedDict
 
 
 @pytest.fixture
-def trace() -> sample_types:
-    return OrderedDict([("gamma", [array([[1., 2.], [3., 4.]]),
-                                   array([[2., 3.], [4., 5.]])]),
-                        ("gaussian", [array([[0.1, 0.2], [0.3, 0.4]]),
-                                      array([[0.2, 0.3], [0.4, 0.5]])])])
+def gamma_label() -> VertexLabel:
+    return VertexLabel("gamma")
 
 
-def test_traceplot_returns_axesplot_with_correct_data(trace: sample_types) -> None:
-    ax = traceplot(trace, labels=['gamma', 'gaussian'])
+@pytest.fixture
+def gaussian_label() -> VertexLabel:
+    return VertexLabel("gaussian")
+
+
+@pytest.fixture
+def trace(gamma_label: VertexLabel, gaussian_label: VertexLabel) -> sample_types:
+    return OrderedDict([(gamma_label, [array([[1., 2.], [3., 4.]]),
+                                       array([[2., 3.], [4., 5.]])]),
+                        (gaussian_label, [array([[0.1, 0.2], [0.3, 0.4]]),
+                                          array([[0.2, 0.3], [0.4, 0.5]])])])
+
+
+def test_traceplot_returns_axesplot_with_correct_data(gamma_label: VertexLabel, gaussian_label: VertexLabel,
+                                                      trace: sample_types) -> None:
+    ax = traceplot(trace, labels=[gamma_label, gaussian_label])
 
     gamma_ax = ax[0][0]
     gaussian_ax = ax[1][0]
