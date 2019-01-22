@@ -263,8 +263,8 @@ class Integer(Vertex):
 
     def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
         if type(other) == Double:
-            return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(self),
-                                                kn.vertex.generated.CastToDouble(other))
+            return kn.vertex.generated.Division(
+                kn.vertex.generated.CastToDouble(self), kn.vertex.generated.CastToDouble(other))
 
         return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(self), other)
 
@@ -280,7 +280,7 @@ class Integer(Vertex):
 
     def __rfloordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
         if isinstance(other, runtime_float_types):
-            intermediate =  kn.vertex.generated.Division(other, kn.vertex.generated.CastToDouble(self))
+            intermediate = kn.vertex.generated.Division(other, kn.vertex.generated.CastToDouble(self))
             return kn.vertex.generated.Floor(intermediate)
 
         return kn.vertex.generated.IntegerDivision(other, self)

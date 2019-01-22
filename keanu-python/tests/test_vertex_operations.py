@@ -146,8 +146,8 @@ def test_can_do_less_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, nump
     (Const(np.array([10, 20])),                       2.   , np.array([12, 22]), Double),
 ])
 # yapf: enable
-def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, numpy_types, float],
-                         expected_result: numpy_types, vertex_type: Any) -> None:
+def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
+                         vertex_type: Any) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs + rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -170,8 +170,8 @@ def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, numpy_types, flo
 
 ])
 # yapf: enable
-def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
-                            expected_result: numpy_types, vertex_type: Any) -> None:
+def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
+                            vertex_type: Any) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs - rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -192,8 +192,8 @@ def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
     (Const(np.array([3, 2])),                   5.       , np.array([15, 10]), Double),
 ])
 # yapf: enable
-def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
-                               expected_result: numpy_types, vertex_type: Any) -> None:
+def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
+                               vertex_type: Any) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs * rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -214,8 +214,8 @@ def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, floa
 
 ])
 # yapf: enable
-def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
-                         expected_result: numpy_types, vertex_type: Any) -> None:
+def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
+                         vertex_type: Any) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs / rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -234,8 +234,8 @@ def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
     (Const(np.array([15, 10])),          Const(2.)     , np.array([7, 5]), Double),
 ])
 # yapf: enable
-def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
-                                 expected_result: numpy_types, vertex_type: Any) -> None:
+def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
+                                 vertex_type: Any) -> None:
     result = lhs // rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -243,10 +243,9 @@ def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, fl
 
 
 @pytest.mark.parametrize("lhs, rhs, expected_result, vertex_type", [
-    (np.array([15, 10])   ,    Const(np.array([2, 4])), np.array([7, 2]), Integer),
-    (15                   ,    Const(np.array([2, 4])), np.array([7, 3]), Integer),
-    (15.                   ,                  Const(2),                7, Double),
-
+    (np.array([15, 10]), Const(np.array([2, 4])), np.array([7, 2]), Integer),
+    (15, Const(np.array([2, 4])), np.array([7, 3]), Integer),
+    (15., Const(2), 7, Double),
 ])
 # yapf: enable
 def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
@@ -269,8 +268,8 @@ def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, numpy_typ
     (Const(np.array([3, 2])),                   2.        ,  np.array([9, 4                 ]),Double),
 ])
 # yapf: enable
-def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
-                    expected_result: numpy_types, vertex_type: Any) -> None:
+def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
+                    vertex_type: Any) -> None:
     result = lhs ** rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
