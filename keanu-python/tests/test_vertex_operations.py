@@ -226,28 +226,32 @@ def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
 
 
 # yapf: disable
-@pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([15, 10])), Const(np.array([2, 4])), np.array([7, 2])),
-    (Const(np.array([15, 10])),       np.array([2, 4]) , np.array([7, 2])),
-    (Const(np.array([15, 10])),                 2      , np.array([7, 5])),
+@pytest.mark.parametrize("lhs, rhs, expected_result, vertex_type", [
+    (Const(np.array([15, 10])), Const(np.array([2, 4])), np.array([7, 2]), Integer),
+    (Const(np.array([15, 10])),       np.array([2, 4]) , np.array([7, 2]), Integer),
+    (Const(np.array([15, 10])),                 2      , np.array([7, 5]), Integer),
+    (Const(np.array([15, 10])),                 2.     , np.array([7, 5]), Double),
+    (Const(np.array([15, 10])),          Const(2.)     , np.array([7, 5]), Double),
 ])
 # yapf: enable
 def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
-                                 expected_result: numpy_types) -> None:
+                                 expected_result: numpy_types, vertex_type: Any) -> None:
     result = lhs // rhs
     assert isinstance(result, Vertex)
+    assert type(result) == vertex_type
     assert (result.get_value() == expected_result).all()
 
 
-@pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (np.array([15, 10]), Const(np.array([2, 4])), np.array([7, 2])),
-    (15, Const(np.array([2, 4])), np.array([7, 3])),
+@pytest.mark.parametrize("lhs, rhs, expected_result, vertex_type", [
+    (np.array([15, 10])   ,    Const(np.array([2, 4])), np.array([7, 2]), Integer),
+    (15                   ,    Const(np.array([2, 4])), np.array([7, 3]), Integer),
 ])
 # yapf: enable
 def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
-                                                    expected_result: numpy_types) -> None:
+                                                    expected_result: numpy_types, vertex_type: Any) -> None:
     result = lhs // rhs
     assert isinstance(result, Vertex)
+    assert type(result) == vertex_type
     assert (result.get_value() == expected_result).all()
 
 
