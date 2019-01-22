@@ -16,8 +16,10 @@ import org.apache.commons.math3.distribution.BetaDistribution;
 import org.apache.commons.math3.util.Pair;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 import umontreal.ssj.probdistmulti.DirichletDist;
 
 import java.util.HashMap;
@@ -33,6 +35,9 @@ import static org.junit.Assert.assertEquals;
 public class DirichletVertexTest {
 
     private KeanuRandom random;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -137,7 +142,7 @@ public class DirichletVertexTest {
     }
 
 
-    @Test(expected = GraphAssertionException.class)
+    @Test
     public void logProbGraphThrowsExceptionIfSumOfXIsNotEqualTo1WithEpsilon() {
         DoubleVertex concentration = ConstantVertex.of(3., 4., 5.);
         DirichletVertex vertex = new DirichletVertex(concentration);
@@ -146,6 +151,10 @@ public class DirichletVertexTest {
 
         LogProbGraph logProbGraph = vertex.logProbGraph();
         LogProbGraphValueFeeder.feedValue(logProbGraph, concentration, concentration.getValue());
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("Sum of values to calculate Dirichlet likelihood for must equal 1");
+
         LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, vertex, x);
     }
 
