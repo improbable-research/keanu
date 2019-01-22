@@ -4,7 +4,7 @@ from .base import Vertex
 from .generated import BooleanIf, DoubleIf, IntegerIf
 
 
-def If(predicate: tensor_arg_types, thn: tensor_arg_types, els: tensor_arg_types) -> Vertex:
+def If(predicate: Vertex, thn: Vertex, els: Vertex) -> Vertex:
     type_ = get_type_of_value(thn.get_value())
 
     if type_ == bool:
