@@ -110,8 +110,9 @@ public class ParetoVertexTest {
 
         ParetoDistribution distribution = new ParetoDistribution(1., 10.);
         double expectedDensity = distribution.logDensity(2.);
+        DoubleTensor expected = DoubleTensor.create(expectedDensity, Double.NEGATIVE_INFINITY);
 
-        LogProbGraphContract.equalFlatArray(logProbGraph, new double[] {expectedDensity, Double.NEGATIVE_INFINITY});
+        LogProbGraphContract.equalTensor(logProbGraph, expected);
     }
 
     @Test

@@ -1,7 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.tensor.TensorMatchers;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,16 +30,16 @@ public class DoubleSetWithMaskVertexTest {
     public void canSetWithMaskGivenScalar() {
         DoubleVertex mask = vertex.toGreaterThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
         DoubleVertex result = new DoubleSetWithMaskVertex(vertex, mask, ConstantVertex.of(-2.));
-
-        assertArrayEquals(new double[]{1., 2., -2, -2}, result.getValue().asFlatDoubleArray(), 0.0);
+        DoubleTensor expected = DoubleTensor.create(new double[] {1., 2., -2., -2.}, 2, 2);
+        assertThat(expected, TensorMatchers.valuesAndShapesMatch(result.getValue()));
     }
 
     @Test
     public void canSetWithMaskGivenMatrixButOnlyTakesItsScalarValue() {
         DoubleVertex mask = vertex.toGreaterThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
         DoubleVertex result = new DoubleSetWithMaskVertex(vertex, mask, ConstantVertex.of(4., -2.));
-
-        assertArrayEquals(new double[]{1., 2., 4., 4.}, result.getValue().asFlatDoubleArray(), 0.0);
+        DoubleTensor expected = DoubleTensor.create(new double[] {1., 2., 4., 4.}, 2, 2);
+        assertThat(expected, TensorMatchers.valuesAndShapesMatch(result.getValue()));
     }
 
     /**
@@ -45,7 +49,7 @@ public class DoubleSetWithMaskVertexTest {
     public void canSetToZero() {
         DoubleVertex mask = vertex.toLessThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
         DoubleVertex result = new DoubleSetWithMaskVertex(vertex, mask, ConstantVertex.of(0.));
-
-        assertArrayEquals(new double[]{0., 2., 3., 4.}, result.getValue().asFlatDoubleArray(), 0.0);
+        DoubleTensor expected = DoubleTensor.create(new double[] {0., 2., 3., 4.}, 2, 2);
+        assertThat(expected, TensorMatchers.valuesAndShapesMatch(result.getValue()));
     }
 }

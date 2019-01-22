@@ -52,7 +52,8 @@ public class ExponentialVertexTest {
         LogProbGraphValueFeeder.feedValue(logProbGraph, rate, rate.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, tensorExponentialVertex, DoubleTensor.create(1., -2.));
 
-        LogProbGraphContract.equalFlatArray(logProbGraph, new double[]{-1, Double.NEGATIVE_INFINITY});
+        DoubleTensor expected = DoubleTensor.create(-1., Double.NEGATIVE_INFINITY);
+        LogProbGraphContract.equalTensor(logProbGraph, expected);
     }
 
     @Test

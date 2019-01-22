@@ -1,9 +1,10 @@
 package io.improbable.keanu.vertices;
 
+import io.improbable.keanu.tensor.TensorMatchers;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -19,8 +20,8 @@ public class LogProbGraphContract {
         assertThat(actual.getLogProbOutput().getValue(), equalTo(expected.getLogProbOutput().getValue()));
     }
 
-    public static void equalFlatArray(LogProbGraph logProbGraph, double[] flatArray) {
-        DoubleVertex logProbGraphOutput = logProbGraph.getLogProbOutput();
-        assertArrayEquals(logProbGraphOutput.getValue().asFlatDoubleArray(), flatArray, 1e-5);
+    public static void equalTensor(LogProbGraph logProbGraph, DoubleTensor expectedLogDensityTensor) {
+        DoubleTensor logProbGraphOutputTensor = logProbGraph.getLogProbOutput().getValue();
+        assertThat(expectedLogDensityTensor, TensorMatchers.valuesAndShapesMatch(logProbGraphOutputTensor));
     }
 }
