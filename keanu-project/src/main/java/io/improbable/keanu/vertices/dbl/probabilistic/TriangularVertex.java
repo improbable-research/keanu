@@ -151,13 +151,18 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
         final DoubleVertex conditionalSecondHalf = xPlaceholder.toLessThanMask(cPlaceholder);
         final DoubleVertex conditionalAnd = conditionalFirstHalf.times(conditionalSecondHalf);
         final DoubleVertex conditionalAndResult = conditionalAnd.times(
-            range.reverseDiv(1.).times(2.).times(xPlaceholder.minus(xMinPlaceholder)).div(cPlaceholder.minus(xMinPlaceholder)));
+            range.reverseDiv(1.)
+                .times(2.)
+                .times(xPlaceholder.minus(xMinPlaceholder))
+                .div(cPlaceholder.minus(xMinPlaceholder)));
 
         final DoubleVertex elseIfConditionalFirstHalf = xPlaceholder.toGreaterThanMask(cPlaceholder);
         final DoubleVertex elseIfConditionalSecondHalf = xPlaceholder.toLessThanMask(xMaxPlaceholder);
         final DoubleVertex elseIfConditionalAnd = elseIfConditionalFirstHalf.times(elseIfConditionalSecondHalf);
-        final DoubleVertex elseIfConditionalResult = elseIfConditionalAnd
-            .times(range.reverseDiv(2.).times(xMaxPlaceholder.minus(xPlaceholder)).div(xMaxPlaceholder.minus(cPlaceholder)));
+        final DoubleVertex elseIfConditionalResult = elseIfConditionalAnd.times(
+            range.reverseDiv(2.)
+                .times(xMaxPlaceholder.minus(xPlaceholder))
+                .div(xMaxPlaceholder.minus(cPlaceholder)));
 
         final DoubleVertex logProbOutput = conditionalAndResult.plus(elseIfConditionalResult.plus(elseIfConditionalResult)).log();
 

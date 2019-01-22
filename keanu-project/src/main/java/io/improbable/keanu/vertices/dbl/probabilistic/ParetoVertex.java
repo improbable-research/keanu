@@ -112,8 +112,8 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
 
         final DoubleVertex zero = ConstantVertex.of(0.);
         final BooleanVertex paramsAreValid = locationPlaceholder.greaterThan(zero)
-            .and(scalePlaceholder.greaterThan(zero))
-            .assertTrue("Location and scale must be strictly positive");
+            .and(scalePlaceholder.greaterThan(zero));
+        paramsAreValid.assertTrue("Location and scale must be strictly positive");
 
         final DoubleVertex invalidXMask = xPlaceholder.toLessThanOrEqualToMask(locationPlaceholder);
         final DoubleVertex ifValid = scalePlaceholder.log().plus(locationPlaceholder.log().times(scalePlaceholder))
