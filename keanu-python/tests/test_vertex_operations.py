@@ -164,6 +164,10 @@ def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, numpy_types, flo
     (Const(np.array([10., 20.])),       np.array([1., 2.]) , np.array([9, 18]), Double),
     (Const(np.array([10., 20.])),                     2.   , np.array([8, 18]), Double),
     (Const(np.array([10, 20])),                       2    , np.array([8, 18]), Integer),
+    (Const(np.array([10, 20])),               Const(2.)    , np.array([8, 18]), Double),
+    (Const(np.array([10, 20])),                       2.   , np.array([8, 18]), Double),
+
+
 ])
 # yapf: enable
 def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
@@ -184,7 +188,8 @@ def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
     (Const(np.array([3., 2.])),       np.array([5., 7.]) , np.array([15, 14]), Double),
     (Const(np.array([3., 2.])),                 5.       , np.array([15, 10]), Double),
     (Const(np.array([3, 2])),                   5        , np.array([15, 10]), Integer),
-
+    (Const(np.array([3, 2])),                   Const(5.), np.array([15, 10]), Double),
+    (Const(np.array([3, 2])),                   5.       , np.array([15, 10]), Double),
 ])
 # yapf: enable
 def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
@@ -205,6 +210,7 @@ def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, floa
     (Const(np.array([15., 10.])),       np.array([2., 4.]) , np.array([7.5, 2.5 ]), Double),
     (Const(np.array([15., 10.])),                 2.       , np.array([7.5, 5.  ]), Double),
     (Const(np.array([15, 10])),                   2        , np.array([7.5, 5.  ]), Double),
+    (Const(np.array([15, 10])),                   2.       , np.array([7.5, 5.  ]), Double),
 
 ])
 # yapf: enable
@@ -253,6 +259,8 @@ def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, numpy_typ
     (Const(np.array([3., 2.])), Const(np.array([2., 0.5])), np.array([9, 1.4142135623730951]), Double),
     (Const(np.array([3., 2.])),       np.array([2., 0.5]) , np.array([9, 1.4142135623730951]), Double),
     (Const(np.array([3., 2.])),                 2.        , np.array([9, 4                 ]), Double),
+    (Const(np.array([3, 2])),                   2        ,  np.array([9, 4                 ]), Integer),
+    (Const(np.array([3, 2])),                   2.        ,  np.array([9, 4                 ]),Double),
 ])
 # yapf: enable
 def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
@@ -264,15 +272,18 @@ def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
 
 
 # yapf: disable
-@pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (np.array([3., 2.]), Const(np.array([2., 0.5])), np.array([9, 1.4142135623730951])),
-    (3.                , Const(np.array([2., 0.5])), np.array([9, 1.7320508075688772])),
+@pytest.mark.parametrize("lhs, rhs, expected_result, vertex_type", [
+    (np.array([3., 2.]), Const(np.array([2., 0.5])), np.array([9, 1.4142135623730951]), Double),
+    (3.                , Const(np.array([2., 0.5])), np.array([9, 1.7320508075688772]), Double),
+    (3.                , Const(2)                  , 9.                               , Double),
+    (3                 , Const(2)                  , 9.                               , Integer),
 ])
 # yapf: enable
 def test_can_do_pow_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
-                                       expected_result: numpy_types) -> None:
+                                       expected_result: numpy_types, vertex_type: Any) -> None:
     result = lhs ** rhs
     assert isinstance(result, Vertex)
+    assert type(result) == vertex_type
     assert (result.get_value() == expected_result).all()
 
 
