@@ -245,6 +245,8 @@ def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, fl
 @pytest.mark.parametrize("lhs, rhs, expected_result, vertex_type", [
     (np.array([15, 10])   ,    Const(np.array([2, 4])), np.array([7, 2]), Integer),
     (15                   ,    Const(np.array([2, 4])), np.array([7, 3]), Integer),
+    (15.                   ,                  Const(2),                7, Double),
+
 ])
 # yapf: enable
 def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
