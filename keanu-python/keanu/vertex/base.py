@@ -189,14 +189,15 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             Vertex.__set_label_to_java_vertex(val, kwargs["label"])
 
     @staticmethod
-    def __set_label_to_java_vertex(java_vertex, label: Union[str, _VertexLabel]) -> None:
+    def __set_label_to_java_vertex(java_vertex, label: Any) -> None:
+        label_val: Union[JavaObject, str]
         if isinstance(label, _VertexLabel):
-            val = label.unwrap()
+            label_val = label.unwrap()
         elif isinstance(label, str):
-            val = label
+            label_val = label
         else:
             raise TypeError("label must be str or VertexLabel.")
-        java_vertex.setLabel(val)
+        java_vertex.setLabel(label_val)
 
     @staticmethod
     def _to_generator(java_vertices: Union[JavaList, JavaArray]) -> Iterator['Vertex']:
