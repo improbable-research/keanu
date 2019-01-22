@@ -3,13 +3,12 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertThat;
+
 
 public class DoubleSetWithMaskVertexTest {
 
