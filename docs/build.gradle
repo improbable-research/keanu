@@ -41,8 +41,16 @@ task installDependencies {
     }
 }
 
+task installPipenv {
+    doLast {
+        exec {
+            commandLine 'pip', 'install', 'pipenv==2018.11.26'
+        }
+    }
+}
+
 task prepareKeanuPipenv {
-    dependsOn(":keanu-python:installPipenv")
+    dependsOn(installPipenv)
     dependsOn(":keanu-python:build")
     dependsOn(installDependencies)
 }
