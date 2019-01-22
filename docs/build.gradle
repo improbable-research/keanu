@@ -33,6 +33,7 @@ task writeSnippets(type:Exec) {
 }
 
 task installDependencies {
+    dependsOn(installPipenv)
     doLast {
         exec {
             commandLine 'pipenv', 'install'
@@ -49,7 +50,6 @@ task installPipenv {
 }
 
 task prepareKeanuPipenv {
-    dependsOn(installPipenv)
     dependsOn(":keanu-python:build")
     dependsOn(installDependencies)
 }
