@@ -140,67 +140,67 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilisti
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.utility.AssertVertex")
 
 
-def BooleanIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
+def BooleanIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().BooleanIfVertex, cast_to_vertex(predicate), cast_to_vertex(thn), cast_to_vertex(els))
 
 
-def BooleanProxy(shape: Collection[int], label: str) -> Vertex:
+def BooleanProxy(shape: Collection[int], label: str, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().BooleanProxyVertex, cast_to_long_array(shape), cast_to_string(label))
 
 
-def CastToBoolean(input_vertex: vertex_constructor_param_types) -> Vertex:
+def CastToBoolean(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().CastToBooleanVertex, cast_to_vertex(input_vertex))
 
 
-def ConstantBoolean(constant: tensor_arg_types) -> Vertex:
+def ConstantBoolean(constant: tensor_arg_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().ConstantBooleanVertex, cast_to_boolean_tensor(constant))
 
 
-def NumericalEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, epsilon: vertex_constructor_param_types) -> Vertex:
+def NumericalEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, epsilon: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().NumericalEqualsVertex, cast_to_vertex(a), cast_to_vertex(b), cast_to_vertex(epsilon))
 
 
-def AndBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
+def AndBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().AndBinaryVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
-def OrBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
+def OrBinary(a: vertex_constructor_param_types, b: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().OrBinaryVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
-def Equals(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
+def Equals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().EqualsVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
-def GreaterThanOrEqual(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
+def GreaterThanOrEqual(a: vertex_constructor_param_types, b: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().GreaterThanOrEqualVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
-def GreaterThan(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
+def GreaterThan(a: vertex_constructor_param_types, b: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().GreaterThanVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
-def LessThanOrEqual(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
+def LessThanOrEqual(a: vertex_constructor_param_types, b: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().LessThanOrEqualVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
-def LessThan(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
+def LessThan(a: vertex_constructor_param_types, b: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().LessThanVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
-def NotEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types) -> Vertex:
+def NotEquals(a: vertex_constructor_param_types, b: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().NotEqualsVertex, cast_to_vertex(a), cast_to_vertex(b))
 
 
-def BooleanConcatenation(dimension: int, input: Collection[Vertex]) -> Vertex:
+def BooleanConcatenation(dimension: int, input: Collection[Vertex], **kwargs) -> Vertex:
     return Boolean(context.jvm_view().BooleanConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_array(input))
 
 
-def BooleanReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int]) -> Vertex:
+def BooleanReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], **kwargs) -> Vertex:
     return Boolean(context.jvm_view().BooleanReshapeVertex, cast_to_vertex(input_vertex), cast_to_long_array(proposed_shape))
 
 
-def BooleanSlice(input_vertex: vertex_constructor_param_types, dimension: int, index: int) -> Vertex:
+def BooleanSlice(input_vertex: vertex_constructor_param_types, dimension: int, index: int, **kwargs) -> Vertex:
     """
     Takes the slice along a given dimension and index of a vertex
     
@@ -211,7 +211,7 @@ def BooleanSlice(input_vertex: vertex_constructor_param_types, dimension: int, i
     return Boolean(context.jvm_view().BooleanSliceVertex, cast_to_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
 
 
-def BooleanTake(input_vertex: vertex_constructor_param_types, index: Collection[int]) -> Vertex:
+def BooleanTake(input_vertex: vertex_constructor_param_types, index: Collection[int], **kwargs) -> Vertex:
     """
     A vertex that extracts a scalar at a given index
     
@@ -221,11 +221,11 @@ def BooleanTake(input_vertex: vertex_constructor_param_types, index: Collection[
     return Boolean(context.jvm_view().BooleanTakeVertex, cast_to_vertex(input_vertex), cast_to_long_array(index))
 
 
-def Not(a: vertex_constructor_param_types) -> Vertex:
+def Not(a: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Boolean(context.jvm_view().NotVertex, cast_to_vertex(a))
 
 
-def Bernoulli(prob_true: vertex_constructor_param_types) -> Vertex:
+def Bernoulli(prob_true: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     One to one constructor for mapping some shape of probTrue to
     a matching shaped Bernoulli.
@@ -235,23 +235,23 @@ def Bernoulli(prob_true: vertex_constructor_param_types) -> Vertex:
     return Boolean(context.jvm_view().BernoulliVertex, cast_to_double_vertex(prob_true))
 
 
-def CastToDouble(input_vertex: vertex_constructor_param_types) -> Vertex:
+def CastToDouble(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().CastToDoubleVertex, cast_to_vertex(input_vertex))
 
 
-def ConstantDouble(constant: tensor_arg_types) -> Vertex:
+def ConstantDouble(constant: tensor_arg_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().ConstantDoubleVertex, cast_to_double_tensor(constant))
 
 
-def DoubleIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
+def DoubleIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().DoubleIfVertex, cast_to_vertex(predicate), cast_to_double_vertex(thn), cast_to_double_vertex(els))
 
 
-def DoubleProxy(shape: Collection[int], label: str) -> Vertex:
+def DoubleProxy(shape: Collection[int], label: str, **kwargs) -> Vertex:
     return Double(context.jvm_view().DoubleProxyVertex, cast_to_long_array(shape), cast_to_string(label))
 
 
-def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Adds one vertex to another
     
@@ -261,7 +261,7 @@ def Addition(left: vertex_constructor_param_types, right: vertex_constructor_par
     return Double(context.jvm_view().AdditionVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
-def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types) -> Vertex:
+def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin
     
@@ -271,7 +271,7 @@ def ArcTan2(x: vertex_constructor_param_types, y: vertex_constructor_param_types
     return Double(context.jvm_view().ArcTan2Vertex, cast_to_double_vertex(x), cast_to_double_vertex(y))
 
 
-def Difference(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def Difference(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Subtracts one vertex from another
     
@@ -281,7 +281,7 @@ def Difference(left: vertex_constructor_param_types, right: vertex_constructor_p
     return Double(context.jvm_view().DifferenceVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
-def Division(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def Division(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Divides one vertex by another
     
@@ -291,7 +291,7 @@ def Division(left: vertex_constructor_param_types, right: vertex_constructor_par
     return Double(context.jvm_view().DivisionVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
-def MatrixMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def MatrixMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Matrix multiplies one vertex by another. C = AB
     
@@ -301,7 +301,7 @@ def MatrixMultiplication(left: vertex_constructor_param_types, right: vertex_con
     return Double(context.jvm_view().MatrixMultiplicationVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
-def Max(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def Max(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Finds the maximum between two vertices
     
@@ -311,7 +311,7 @@ def Max(left: vertex_constructor_param_types, right: vertex_constructor_param_ty
     return Double(context.jvm_view().MaxVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
-def Min(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def Min(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Finds the minimum between two vertices
     
@@ -321,7 +321,7 @@ def Min(left: vertex_constructor_param_types, right: vertex_constructor_param_ty
     return Double(context.jvm_view().MinVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
-def Multiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def Multiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Multiplies one vertex by another
     
@@ -331,7 +331,7 @@ def Multiplication(left: vertex_constructor_param_types, right: vertex_construct
     return Double(context.jvm_view().MultiplicationVertex, cast_to_double_vertex(left), cast_to_double_vertex(right))
 
 
-def Power(base: vertex_constructor_param_types, exponent: vertex_constructor_param_types) -> Vertex:
+def Power(base: vertex_constructor_param_types, exponent: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Raises a vertex to the power of another
     
@@ -341,11 +341,11 @@ def Power(base: vertex_constructor_param_types, exponent: vertex_constructor_par
     return Double(context.jvm_view().PowerVertex, cast_to_double_vertex(base), cast_to_double_vertex(exponent))
 
 
-def Concatenation(dimension: int, operands: Collection[Vertex]) -> Vertex:
+def Concatenation(dimension: int, operands: Collection[Vertex], **kwargs) -> Vertex:
     return Double(context.jvm_view().ConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_array(operands))
 
 
-def Abs(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Abs(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Takes the absolute of a vertex
     
@@ -354,7 +354,7 @@ def Abs(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().AbsVertex, cast_to_double_vertex(input_vertex))
 
 
-def ArcCos(input_vertex: vertex_constructor_param_types) -> Vertex:
+def ArcCos(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Takes the inverse cosine of a vertex, Arccos(vertex)
     
@@ -363,7 +363,7 @@ def ArcCos(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().ArcCosVertex, cast_to_double_vertex(input_vertex))
 
 
-def ArcSin(input_vertex: vertex_constructor_param_types) -> Vertex:
+def ArcSin(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Takes the inverse sin of a vertex, Arcsin(vertex)
     
@@ -372,7 +372,7 @@ def ArcSin(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().ArcSinVertex, cast_to_double_vertex(input_vertex))
 
 
-def ArcTan(input_vertex: vertex_constructor_param_types) -> Vertex:
+def ArcTan(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Takes the inverse tan of a vertex, Arctan(vertex)
     
@@ -381,7 +381,7 @@ def ArcTan(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().ArcTanVertex, cast_to_double_vertex(input_vertex))
 
 
-def Ceil(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Ceil(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Applies the Ceiling operator to a vertex.
     This maps a vertex to the smallest integer greater than or equal to its value
@@ -391,7 +391,7 @@ def Ceil(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().CeilVertex, cast_to_double_vertex(input_vertex))
 
 
-def Cos(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Cos(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Takes the cosine of a vertex, Cos(vertex)
     
@@ -400,7 +400,7 @@ def Cos(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().CosVertex, cast_to_double_vertex(input_vertex))
 
 
-def Exp(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Exp(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Calculates the exponential of an input vertex
     
@@ -409,7 +409,7 @@ def Exp(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().ExpVertex, cast_to_double_vertex(input_vertex))
 
 
-def Floor(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Floor(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Applies the Floor operator to a vertex.
     This maps a vertex to the biggest integer less than or equal to its value
@@ -419,7 +419,7 @@ def Floor(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().FloorVertex, cast_to_double_vertex(input_vertex))
 
 
-def LogGamma(input_vertex: vertex_constructor_param_types) -> Vertex:
+def LogGamma(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Returns the log of the gamma of the inputVertex
     
@@ -428,7 +428,7 @@ def LogGamma(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().LogGammaVertex, cast_to_double_vertex(input_vertex))
 
 
-def Log(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Log(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Returns the natural logarithm, base e, of a vertex
     
@@ -437,19 +437,19 @@ def Log(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().LogVertex, cast_to_double_vertex(input_vertex))
 
 
-def MatrixDeterminant(vertex: vertex_constructor_param_types) -> Vertex:
+def MatrixDeterminant(vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().MatrixDeterminantVertex, cast_to_double_vertex(vertex))
 
 
-def MatrixInverse(input_vertex: vertex_constructor_param_types) -> Vertex:
+def MatrixInverse(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().MatrixInverseVertex, cast_to_double_vertex(input_vertex))
 
 
-def Reshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int]) -> Vertex:
+def Reshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], **kwargs) -> Vertex:
     return Double(context.jvm_view().ReshapeVertex, cast_to_double_vertex(input_vertex), cast_to_long_array(proposed_shape))
 
 
-def Round(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Round(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Applies the Rounding operator to a vertex.
     This maps a vertex to the nearest integer value
@@ -459,7 +459,7 @@ def Round(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().RoundVertex, cast_to_double_vertex(input_vertex))
 
 
-def Sigmoid(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Sigmoid(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Applies the sigmoid function to a vertex.
     The sigmoid function is a special case of the Logistic function.
@@ -469,7 +469,7 @@ def Sigmoid(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().SigmoidVertex, cast_to_double_vertex(input_vertex))
 
 
-def Sin(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Sin(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Takes the sine of a vertex. Sin(vertex).
     
@@ -478,7 +478,7 @@ def Sin(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().SinVertex, cast_to_double_vertex(input_vertex))
 
 
-def Slice(input_vertex: vertex_constructor_param_types, dimension: int, index: int) -> Vertex:
+def Slice(input_vertex: vertex_constructor_param_types, dimension: int, index: int, **kwargs) -> Vertex:
     """
     Takes the slice along a given dimension and index of a vertex
     
@@ -489,7 +489,7 @@ def Slice(input_vertex: vertex_constructor_param_types, dimension: int, index: i
     return Double(context.jvm_view().SliceVertex, cast_to_double_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
 
 
-def Sum(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Sum(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Performs a sum across all dimensions
     
@@ -498,7 +498,7 @@ def Sum(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().SumVertex, cast_to_double_vertex(input_vertex))
 
 
-def Take(input_vertex: vertex_constructor_param_types, index: Collection[int]) -> Vertex:
+def Take(input_vertex: vertex_constructor_param_types, index: Collection[int], **kwargs) -> Vertex:
     """
     A vertex that extracts a scalar at a given index
     
@@ -508,7 +508,7 @@ def Take(input_vertex: vertex_constructor_param_types, index: Collection[int]) -
     return Double(context.jvm_view().TakeVertex, cast_to_double_vertex(input_vertex), cast_to_long_array(index))
 
 
-def Tan(input_vertex: vertex_constructor_param_types) -> Vertex:
+def Tan(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Takes the tangent of a vertex. Tan(vertex).
     
@@ -517,7 +517,7 @@ def Tan(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().TanVertex, cast_to_double_vertex(input_vertex))
 
 
-def Beta(alpha: vertex_constructor_param_types, beta: vertex_constructor_param_types) -> Vertex:
+def Beta(alpha: vertex_constructor_param_types, beta: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     One to one constructor for mapping some tensorShape of alpha and beta to
     a matching tensorShaped Beta.
@@ -528,11 +528,11 @@ def Beta(alpha: vertex_constructor_param_types, beta: vertex_constructor_param_t
     return Double(context.jvm_view().BetaVertex, cast_to_double_vertex(alpha), cast_to_double_vertex(beta))
 
 
-def Cauchy(location: vertex_constructor_param_types, scale: vertex_constructor_param_types) -> Vertex:
+def Cauchy(location: vertex_constructor_param_types, scale: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().CauchyVertex, cast_to_double_vertex(location), cast_to_double_vertex(scale))
 
 
-def ChiSquared(k: vertex_constructor_param_types) -> Vertex:
+def ChiSquared(k: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     One to one constructor for mapping some shape of k to
     a matching shaped ChiSquared.
@@ -542,7 +542,7 @@ def ChiSquared(k: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().ChiSquaredVertex, cast_to_integer_vertex(k))
 
 
-def Dirichlet(concentration: vertex_constructor_param_types) -> Vertex:
+def Dirichlet(concentration: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Matches a vector of concentration values to a Dirichlet distribution
     
@@ -551,7 +551,7 @@ def Dirichlet(concentration: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().DirichletVertex, cast_to_double_vertex(concentration))
 
 
-def Exponential(rate: vertex_constructor_param_types) -> Vertex:
+def Exponential(rate: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     One to one constructor for mapping some shape of rate to matching shaped exponential.
     
@@ -560,7 +560,7 @@ def Exponential(rate: vertex_constructor_param_types) -> Vertex:
     return Double(context.jvm_view().ExponentialVertex, cast_to_double_vertex(rate))
 
 
-def Gamma(theta: vertex_constructor_param_types, k: vertex_constructor_param_types) -> Vertex:
+def Gamma(theta: vertex_constructor_param_types, k: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     One to one constructor for mapping some shape of theta and k to matching shaped gamma.
     
@@ -570,19 +570,19 @@ def Gamma(theta: vertex_constructor_param_types, k: vertex_constructor_param_typ
     return Double(context.jvm_view().GammaVertex, cast_to_double_vertex(theta), cast_to_double_vertex(k))
 
 
-def Gaussian(mu: vertex_constructor_param_types, sigma: vertex_constructor_param_types) -> Vertex:
+def Gaussian(mu: vertex_constructor_param_types, sigma: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().GaussianVertex, cast_to_double_vertex(mu), cast_to_double_vertex(sigma))
 
 
-def HalfCauchy(scale: vertex_constructor_param_types) -> Vertex:
+def HalfCauchy(scale: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().HalfCauchyVertex, cast_to_double_vertex(scale))
 
 
-def HalfGaussian(sigma: vertex_constructor_param_types) -> Vertex:
+def HalfGaussian(sigma: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().HalfGaussianVertex, cast_to_double_vertex(sigma))
 
 
-def InverseGamma(alpha: vertex_constructor_param_types, beta: vertex_constructor_param_types) -> Vertex:
+def InverseGamma(alpha: vertex_constructor_param_types, beta: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     One to one constructor for mapping some shape of alpha and beta to
     alpha matching shaped Inverse Gamma.
@@ -593,11 +593,11 @@ def InverseGamma(alpha: vertex_constructor_param_types, beta: vertex_constructor
     return Double(context.jvm_view().InverseGammaVertex, cast_to_double_vertex(alpha), cast_to_double_vertex(beta))
 
 
-def KDE(samples: tensor_arg_types, bandwidth: float) -> Vertex:
+def KDE(samples: tensor_arg_types, bandwidth: float, **kwargs) -> Vertex:
     return Double(context.jvm_view().KDEVertex, cast_to_double_tensor(samples), cast_to_double(bandwidth))
 
 
-def Laplace(mu: vertex_constructor_param_types, beta: vertex_constructor_param_types) -> Vertex:
+def Laplace(mu: vertex_constructor_param_types, beta: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     One to one constructor for mapping some shape of mu and sigma to
     a matching shaped Laplace.
@@ -608,15 +608,15 @@ def Laplace(mu: vertex_constructor_param_types, beta: vertex_constructor_param_t
     return Double(context.jvm_view().LaplaceVertex, cast_to_double_vertex(mu), cast_to_double_vertex(beta))
 
 
-def LogNormal(mu: vertex_constructor_param_types, sigma: vertex_constructor_param_types) -> Vertex:
+def LogNormal(mu: vertex_constructor_param_types, sigma: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().LogNormalVertex, cast_to_double_vertex(mu), cast_to_double_vertex(sigma))
 
 
-def Logistic(mu: vertex_constructor_param_types, s: vertex_constructor_param_types) -> Vertex:
+def Logistic(mu: vertex_constructor_param_types, s: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().LogisticVertex, cast_to_double_vertex(mu), cast_to_double_vertex(s))
 
 
-def MultivariateGaussian(mu: vertex_constructor_param_types, covariance: vertex_constructor_param_types) -> Vertex:
+def MultivariateGaussian(mu: vertex_constructor_param_types, covariance: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Matches a mu and covariance of some shape to a Multivariate Gaussian
     
@@ -626,19 +626,19 @@ def MultivariateGaussian(mu: vertex_constructor_param_types, covariance: vertex_
     return Double(context.jvm_view().MultivariateGaussianVertex, cast_to_double_vertex(mu), cast_to_double_vertex(covariance))
 
 
-def Pareto(location: vertex_constructor_param_types, scale: vertex_constructor_param_types) -> Vertex:
+def Pareto(location: vertex_constructor_param_types, scale: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().ParetoVertex, cast_to_double_vertex(location), cast_to_double_vertex(scale))
 
 
-def SmoothUniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_param_types) -> Vertex:
+def SmoothUniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().SmoothUniformVertex, cast_to_double_vertex(x_min), cast_to_double_vertex(x_max))
 
 
-def StudentT(v: vertex_constructor_param_types) -> Vertex:
+def StudentT(v: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().StudentTVertex, cast_to_integer_vertex(v))
 
 
-def Triangular(x_min: vertex_constructor_param_types, x_max: vertex_constructor_param_types, c: vertex_constructor_param_types) -> Vertex:
+def Triangular(x_min: vertex_constructor_param_types, x_max: vertex_constructor_param_types, c: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     One to one constructor for mapping some shape of xMin, xMax and c to a matching shaped triangular.
     
@@ -649,7 +649,7 @@ def Triangular(x_min: vertex_constructor_param_types, x_max: vertex_constructor_
     return Double(context.jvm_view().TriangularVertex, cast_to_double_vertex(x_min), cast_to_double_vertex(x_max), cast_to_double_vertex(c))
 
 
-def Uniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_param_types) -> Vertex:
+def Uniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     One to one constructor for mapping some shape of mu and sigma to
     a matching shaped Uniform Vertex
@@ -660,27 +660,27 @@ def Uniform(x_min: vertex_constructor_param_types, x_max: vertex_constructor_par
     return Double(context.jvm_view().UniformVertex, cast_to_double_vertex(x_min), cast_to_double_vertex(x_max))
 
 
-def Print(parent: vertex_constructor_param_types, message: str, print_data: bool) -> Vertex:
+def Print(parent: vertex_constructor_param_types, message: str, print_data: bool, **kwargs) -> Vertex:
     return Vertex(context.jvm_view().PrintVertex, cast_to_vertex(parent), cast_to_string(message), cast_to_boolean(print_data))
 
 
-def CastToInteger(input_vertex: vertex_constructor_param_types) -> Vertex:
+def CastToInteger(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Integer(context.jvm_view().CastToIntegerVertex, cast_to_vertex(input_vertex))
 
 
-def ConstantInteger(constant: tensor_arg_types) -> Vertex:
+def ConstantInteger(constant: tensor_arg_types, **kwargs) -> Vertex:
     return Integer(context.jvm_view().ConstantIntegerVertex, cast_to_integer_tensor(constant))
 
 
-def IntegerIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
+def IntegerIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Integer(context.jvm_view().IntegerIfVertex, cast_to_vertex(predicate), cast_to_integer_vertex(thn), cast_to_integer_vertex(els))
 
 
-def IntegerProxy(tensor_shape: Collection[int], label: str) -> Vertex:
+def IntegerProxy(tensor_shape: Collection[int], label: str, **kwargs) -> Vertex:
     return Integer(context.jvm_view().IntegerProxyVertex, cast_to_long_array(tensor_shape), cast_to_string(label))
 
 
-def IntegerAddition(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def IntegerAddition(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Adds one vertex to another
     
@@ -690,7 +690,7 @@ def IntegerAddition(left: vertex_constructor_param_types, right: vertex_construc
     return Integer(context.jvm_view().IntegerAdditionVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerDifference(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def IntegerDifference(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Subtracts one vertex from another
     
@@ -700,7 +700,7 @@ def IntegerDifference(left: vertex_constructor_param_types, right: vertex_constr
     return Integer(context.jvm_view().IntegerDifferenceVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerDivision(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def IntegerDivision(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Divides one vertex by another
     
@@ -710,7 +710,7 @@ def IntegerDivision(left: vertex_constructor_param_types, right: vertex_construc
     return Integer(context.jvm_view().IntegerDivisionVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerMax(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def IntegerMax(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Finds the maximum between two vertices
     
@@ -720,7 +720,7 @@ def IntegerMax(left: vertex_constructor_param_types, right: vertex_constructor_p
     return Integer(context.jvm_view().IntegerMaxVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerMin(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def IntegerMin(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Finds the minimum between two vertices
     
@@ -730,7 +730,7 @@ def IntegerMin(left: vertex_constructor_param_types, right: vertex_constructor_p
     return Integer(context.jvm_view().IntegerMinVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def IntegerMultiplication(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Multiplies one vertex by another
     
@@ -740,7 +740,7 @@ def IntegerMultiplication(left: vertex_constructor_param_types, right: vertex_co
     return Integer(context.jvm_view().IntegerMultiplicationVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerPower(left: vertex_constructor_param_types, right: vertex_constructor_param_types) -> Vertex:
+def IntegerPower(left: vertex_constructor_param_types, right: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Raises one vertex to the power of another
     
@@ -750,11 +750,11 @@ def IntegerPower(left: vertex_constructor_param_types, right: vertex_constructor
     return Integer(context.jvm_view().IntegerPowerVertex, cast_to_integer_vertex(left), cast_to_integer_vertex(right))
 
 
-def IntegerConcatenation(dimension: int, input: Collection[Vertex]) -> Vertex:
+def IntegerConcatenation(dimension: int, input: Collection[Vertex], **kwargs) -> Vertex:
     return Integer(context.jvm_view().IntegerConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_array(input))
 
 
-def IntegerAbs(input_vertex: vertex_constructor_param_types) -> Vertex:
+def IntegerAbs(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Takes the absolute value of a vertex
     
@@ -763,11 +763,11 @@ def IntegerAbs(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Integer(context.jvm_view().IntegerAbsVertex, cast_to_integer_vertex(input_vertex))
 
 
-def IntegerReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int]) -> Vertex:
+def IntegerReshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], **kwargs) -> Vertex:
     return Integer(context.jvm_view().IntegerReshapeVertex, cast_to_integer_vertex(input_vertex), cast_to_long_array(proposed_shape))
 
 
-def IntegerSlice(input_vertex: vertex_constructor_param_types, dimension: int, index: int) -> Vertex:
+def IntegerSlice(input_vertex: vertex_constructor_param_types, dimension: int, index: int, **kwargs) -> Vertex:
     """
     Takes the slice along a given dimension and index of a vertex
     
@@ -778,7 +778,7 @@ def IntegerSlice(input_vertex: vertex_constructor_param_types, dimension: int, i
     return Integer(context.jvm_view().IntegerSliceVertex, cast_to_integer_vertex(input_vertex), cast_to_integer(dimension), cast_to_integer(index))
 
 
-def IntegerSum(input_vertex: vertex_constructor_param_types) -> Vertex:
+def IntegerSum(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     Performs a sum across each value stored in a vertex
     
@@ -787,7 +787,7 @@ def IntegerSum(input_vertex: vertex_constructor_param_types) -> Vertex:
     return Integer(context.jvm_view().IntegerSumVertex, cast_to_integer_vertex(input_vertex))
 
 
-def IntegerTake(input_vertex: vertex_constructor_param_types, index: Collection[int]) -> Vertex:
+def IntegerTake(input_vertex: vertex_constructor_param_types, index: Collection[int], **kwargs) -> Vertex:
     """
     A vertex that extracts a scalar at a given index
     
@@ -797,15 +797,15 @@ def IntegerTake(input_vertex: vertex_constructor_param_types, index: Collection[
     return Integer(context.jvm_view().IntegerTakeVertex, cast_to_integer_vertex(input_vertex), cast_to_long_array(index))
 
 
-def Binomial(p: vertex_constructor_param_types, n: vertex_constructor_param_types) -> Vertex:
+def Binomial(p: vertex_constructor_param_types, n: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Integer(context.jvm_view().BinomialVertex, cast_to_double_vertex(p), cast_to_integer_vertex(n))
 
 
-def Multinomial(n: vertex_constructor_param_types, p: vertex_constructor_param_types) -> Vertex:
+def Multinomial(n: vertex_constructor_param_types, p: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Integer(context.jvm_view().MultinomialVertex, cast_to_integer_vertex(n), cast_to_double_vertex(p))
 
 
-def Poisson(mu: vertex_constructor_param_types) -> Vertex:
+def Poisson(mu: vertex_constructor_param_types, **kwargs) -> Vertex:
     """
     One to one constructor for mapping some shape of mu to
     a matching shaped Poisson.
@@ -815,11 +815,11 @@ def Poisson(mu: vertex_constructor_param_types) -> Vertex:
     return Integer(context.jvm_view().PoissonVertex, cast_to_double_vertex(mu))
 
 
-def UniformInt(min: vertex_constructor_param_types, max: vertex_constructor_param_types) -> Vertex:
+def UniformInt(min: vertex_constructor_param_types, max: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Integer(context.jvm_view().UniformIntVertex, cast_to_integer_vertex(min), cast_to_integer_vertex(max))
 
 
-def Assert(predicate: vertex_constructor_param_types, error_message: str) -> Vertex:
+def Assert(predicate: vertex_constructor_param_types, error_message: str, **kwargs) -> Vertex:
     """
     A vertex that asserts a {@link BooleanVertex} is all true on calculation.
     

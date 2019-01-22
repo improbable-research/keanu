@@ -279,7 +279,7 @@ def test_you_can_set_and_cascade(ctor: Callable, args: Union[Tuple[float, ...], 
 @pytest.mark.parametrize("ctor, args, expected_type, value", [(Gaussian, (0., 1.), float, 4.),
                                                               (UniformInt, (0, 10), int, 5),
                                                               (Bernoulli, (0.5,), bool, True)])
-def test_you_can_set_and_cascade_scalar(ctor, args, expected_type, value):
+def test_you_can_set_and_cascade_scalar(ctor, args, expected_type, value) -> None:
     test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex_value_equals_scalar)
 
 
@@ -316,5 +316,11 @@ def test_you_can_observe(ctor: Callable, args: Union[Tuple[float, ...], Tuple[in
 @pytest.mark.parametrize("ctor, args, expected_type, value", [(Gaussian, (0., 1.), float, 4.),
                                                               (UniformInt, (0, 10), int, 5),
                                                               (Bernoulli, (0.5,), bool, True)])
-def test_you_can_observe_scalar(ctor, args, expected_type, value):
+def test_you_can_observe_scalar(ctor, args, expected_type, value) -> None:
     test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals_scalar)
+
+
+def test_set_label_in_kwargs() -> None:
+    label = "gaussian_vertex"
+    vertex = Gaussian(0., 1., label=label)
+    assert vertex.get_label() == label
