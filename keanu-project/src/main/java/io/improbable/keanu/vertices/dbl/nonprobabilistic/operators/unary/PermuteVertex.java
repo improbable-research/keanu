@@ -22,7 +22,7 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     @ExportVertexToPythonBindings
     public PermuteVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                          @LoadVertexParam(REARRANGE_NAME) int... rearrange) {
-        super(DoubleTensor.create(Arrays.stream(inputVertex.getShape()).asDoubleStream().toArray(), inputVertex.getShape()).permute(rearrange).getShape(), inputVertex);
+        super(calculatePermutedShape(inputVertex, rearrange), inputVertex);
         this.rearrange = rearrange;
     }
 
@@ -34,39 +34,55 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
-        int[] permute = forwardPermute(derivativeOfParentWithRespectToInputs);
-        return derivativeOfParentWithRespectToInputs.permute(permute);
+        int[] permuteToApply = forwardPermute(derivativeOfParentWithRespectToInputs);
+        return derivativeOfParentWithRespectToInputs.permute(permuteToApply);
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        int[] reversePermute = reversePermute(derivativeOfOutputWithRespectToSelf);
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.permute(reversePermute));
+        int[] permuteToApply = reversePermute(derivativeOfOutputWithRespectToSelf);
+        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.permute(permuteToApply));
         return partials;
     }
 
     private int[] forwardPermute(PartialDerivative partial) {
+        long[] wrtShape = partial.getWrtShape(inputVertex.getShape());
+        int[] permuteToApply = new int[partial.get().getRank()];
 
-        int[] permute = new int[partial.get().getRank()];
         for (int i = 0; i < rearrange.length; i++) {
-            permute[i] = rearrange[i];
-            permute[i + rearrange.length] = i + rearrange.length;
+            permuteToApply[i] = rearrange[i];
         }
-        return permute;
+
+        for (int j = 0; j < wrtShape.length; j++) {
+            permuteToApply[j + rearrange.length] = j + rearrange.length;
+        }
+
+        return permuteToApply;
     }
 
     private int[] reversePermute(PartialDerivative partial) {
-
+        long[] ofShape = partial.getOfShape(inputVertex.getShape());
+        long[] wrtShape = partial.getWrtShape(ofShape);
         int[] reversedPermute = new int[partial.get().getRank()];
-        for (int i = 0; i < rearrange.length; i++) {
-            for (int j = 0; j < rearrange.length; j++) {
-                if (i == rearrange[j]) {
-                    reversedPermute[i] = i;
-                    reversedPermute[i + rearrange.length] = j + rearrange.length;
+
+        for (int i = 0; i < ofShape.length; i++) {
+            reversedPermute[i] = i;
+        }
+
+        for (int j = 0; j < wrtShape.length; j++) {
+            for (int k = 0; k < wrtShape.length; k++) {
+                if (j == rearrange[k]) {
+                    reversedPermute[j + ofShape.length] = k + ofShape.length;
                 }
             }
         }
+
         return reversedPermute;
+    }
+
+    private static long[] calculatePermutedShape(DoubleVertex inputVertex, int... rearrange) {
+        DoubleTensor inputShape = DoubleTensor.create(Arrays.stream(inputVertex.getShape()).asDoubleStream().toArray(), inputVertex.getShape());
+        return inputShape.permute(rearrange).getShape();
     }
 }
