@@ -11,7 +11,8 @@ from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_wrapped_java_types,
-                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types)
+                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, runtime_float_types,
+                            runtime_int_types)
 
 k = KeanuContext()
 
@@ -94,6 +95,9 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
 
     def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
+        if type(other) == Integer:
+            return kn.vertex.generated.Addition(self, kn.vertex.generated.CastToDouble(other))
+
         return kn.vertex.generated.Addition(self, other)
 
     def __radd__(self, other: vertex_operation_param_types) -> 'Vertex':
@@ -200,9 +204,14 @@ class Double(Vertex):
 class Integer(Vertex):
 
     def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
+        if type(other) ==  Double or isinstance(other, runtime_float_types):
+            return kn.vertex.generated.Addition(kn.vertex.generated.CastToDouble(self), other)
+
         return kn.vertex.generated.IntegerAddition(self, other)
 
     def __radd__(self, other: vertex_operation_param_types) -> 'Vertex':
+        if isinstance(other, runtime_float_types):
+            return kn.vertex.generated.Addition(kn.vertex.generated.CastToDouble(self), other)
         return kn.vertex.generated.IntegerAddition(other, self)
 
     def __sub__(self, other: vertex_operation_param_types) -> 'Vertex':

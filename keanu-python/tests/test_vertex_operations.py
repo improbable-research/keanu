@@ -142,6 +142,8 @@ def test_can_do_less_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, nump
     (Const(np.array([10., 20.])),       np.array([1., 2.]) , np.array([11, 22]), Double),
     (Const(np.array([10., 20.])),                     2.   , np.array([12, 22]), Double),
     (Const(np.array([10, 20])),                       2    , np.array([12, 22]), Integer),
+    (Const(np.array([10, 20])),               Const(2.)    , np.array([12, 22]), Double),
+    (Const(np.array([10, 20])),                       2.   , np.array([12, 22]), Double),
 ])
 # yapf: enable
 def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, numpy_types, float],
