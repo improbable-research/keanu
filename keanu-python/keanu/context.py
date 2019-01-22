@@ -122,6 +122,9 @@ class KeanuContext(metaclass=Singleton):
         java_import(self.jvm_view(), "io.improbable.keanu.vertices.Vertex")
         return self.to_java_array(list(map(lambda x: x.unwrap(), l)), self.jvm_view().Vertex)
 
+    def to_java_string_array(self, l: Collection[Any]) -> JavaArray:
+        return self.to_java_array(l, self._gateway.jvm.String)
+
     def __infer_class_from_array(self, l: Collection[Any]) -> JavaClass:
         if len(l) == 0:
             raise ValueError("Cannot infer type because array is empty")

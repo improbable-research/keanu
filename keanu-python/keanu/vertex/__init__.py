@@ -7,3 +7,4 @@ from .generated import *
 from .const import Const
 from .lambda_model import LambdaModel
 from . import generated, const
+from .vertex_label import VertexLabel

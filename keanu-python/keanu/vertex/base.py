@@ -1,5 +1,5 @@
 import collections
-from typing import List, Tuple, Iterator, Union, SupportsRound, Optional
+from typing import List, Tuple, Iterator, Union, SupportsRound, Optional, Any, Dict
 from typing import cast as typing_cast
 
 import numpy as np
@@ -10,7 +10,7 @@ import keanu as kn
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
-from keanu.vertex.vertex_label import VertexLabel
+from keanu.vertex.vertex_label import _VertexLabel
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_wrapped_java_types,
                             runtime_primitive_types, runtime_numpy_types, runtime_pandas_types)
 
@@ -18,15 +18,12 @@ k = KeanuContext()
 
 vertex_operation_param_types = Union['Vertex', tensor_arg_types]
 vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_types, str]
-vertex_label_param_types = Union[str, VertexLabel]
 
 
 class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
-    def __init__(self,
-                 val_or_ctor: Union[JavaMember, JavaObject],
-                 *args: Union[vertex_constructor_param_types, shape_types],
-                 label: Optional[vertex_label_param_types] = None) -> None:
+    def __init__(self, val_or_ctor: Union[JavaMember, JavaObject],
+            *args: Union[vertex_constructor_param_types, shape_types], **kwargs: Dict[str, Any]) -> None:
         val: JavaObject
         if args:
             ctor = val_or_ctor
@@ -34,9 +31,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         else:
             val = typing_cast(JavaObject, val_or_ctor)
 
-        if label:
-            self.set_label(label)
-
+        Vertex.__handle_optional_params(val, **kwargs)
         super(Vertex, self).__init__(val)
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
@@ -54,8 +49,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def set_and_cascade(self, v: tensor_arg_types) -> None:
         self.unwrap().setAndCascade(Tensor(self.cast(v)).unwrap())
 
-    def set_label(self, label: vertex_label_param_types) -> None:
-        self.unwrap().set_label(label)
+    def set_label(self, label: Union[str, _VertexLabel]) -> None:
+        Vertex.__set_label_to_java_vertex(self.unwrap(), label)
 
     def sample(self) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().sample())
@@ -69,8 +64,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def get_id(self) -> Tuple[JavaObject, ...]:
         return Vertex._get_python_id(self.unwrap())
 
-    def get_label(self) -> str:
-        return self.unwrap().getLabel().getQualifiedName()
+    def get_label(self) -> _VertexLabel:
+        return Vertex._get_python_label(self.unwrap())
 
     """
     __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.
@@ -189,6 +184,22 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
+    def __handle_optional_params(val: JavaObject, **kwargs: Dict[str, Any]) -> None:
+        if "label" in kwargs:
+            Vertex.__set_label_to_java_vertex(val, kwargs["label"])
+
+    @staticmethod
+    def __set_label_to_java_vertex(java_vertex, label: Union[str, _VertexLabel]) -> None:
+        if isinstance(label, _VertexLabel):
+            val = label.unwrap()
+        elif isinstance(label, str):
+            val = label
+        else:
+            raise TypeError("label must be str or VertexLabel.")
+
+        java_vertex.setLabel(val)
+
+    @staticmethod
     def _to_generator(java_vertices: Union[JavaList, JavaArray]) -> Iterator['Vertex']:
         return (Vertex(java_vertex) for java_vertex in java_vertices)
 
@@ -197,8 +208,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return tuple(java_vertex.getId().getValue())
 
     @staticmethod
-    def _get_python_label(java_vertex: JavaObject) -> str:
-        return java_vertex.getLabel().getQualifiedName()
+    def _get_python_label(java_vertex: JavaObject) -> _VertexLabel:
+        return _VertexLabel(java_vertex.getLabel())
 
 
 class Double(Vertex):
