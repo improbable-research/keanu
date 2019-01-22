@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -83,5 +84,10 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     private static long[] calculatePermutedShape(DoubleVertex inputVertex, int... rearrange) {
         DoubleTensor inputShape = DoubleTensor.create(Arrays.stream(inputVertex.getShape()).asDoubleStream().toArray(), inputVertex.getShape());
         return inputShape.permute(rearrange).getShape();
+    }
+
+    @SaveVertexParam(REARRANGE_NAME)
+    public int[] getRearrange() {
+        return rearrange;
     }
 }
