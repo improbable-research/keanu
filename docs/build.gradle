@@ -32,33 +32,23 @@ task writeSnippets(type:Exec) {
     commandLine 'python', 'bin/snippet_writer.py'
 }
 
-task installPipenv {
-    doLast {
-        exec {
-            commandLine 'pip', 'install', 'pipenv==2018.11.26'
-        }
-    }
-}
-
 task installDependencies {
-    dependsOn(installPipenv)
+    dependsOn(":keanu-python:installPipenv")
     doLast {
         exec {
+            workingDir("src/test/python")
             commandLine 'pipenv', 'install'
         }
     }
 }
 
-task prepareKeanuPipenv {
+task runPythonSnippets {
     dependsOn(":keanu-python:build")
     dependsOn(installDependencies)
-}
-
-task runPythonSnippets {
-    dependsOn(prepareKeanuPipenv)
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'pytest', 'src/test/python/'
+            workingDir("src/test/python")
+            commandLine 'pipenv', 'run', 'pytest', '.'
         }
     }
 }

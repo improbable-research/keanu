@@ -16,4 +16,4 @@ matrix:
         - PIPENV_IGNORE_VIRTUALENVS=1
         - PIPENV_YES=1
       script:
-        - ./gradlew keanu-python:clean keanu-python:build -i
+        - ci/buildPython.sh
