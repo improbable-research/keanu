@@ -199,6 +199,42 @@ class Double(Vertex):
 
 class Integer(Vertex):
 
+    def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerAddition(self, other)
+
+    def __radd__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerAddition(other, self)
+
+    def __sub__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerDifference(self, other)
+
+    def __rsub__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerDifference(other, self)
+
+    def __mul__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerMultiplication(self, other)
+
+    def __rmul__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerMultiplication(other, self)
+
+    def __pow__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerPower(self, other)
+
+    def __rpow__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerPower(other, self)
+
+    def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(self), kn.vertex.generated.CastToDouble(other))
+
+    def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(other), kn.vertex.generated.CastToDouble(self))
+
+    def __floordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerDivision(self, other)
+
+    def __rfloordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return kn.vertex.generated.IntegerDivision(other, self)
+
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return cast_tensor_arg_to_integer(v)
 
