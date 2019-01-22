@@ -36,8 +36,7 @@ task installDependencies {
     doLast {
         exec {
             workingDir("src/test/python/")
-            executable("pipenv")
-            args(["install"])
+            commandLine 'pipenv', 'install'
         }
     }
 }
@@ -53,8 +52,7 @@ task runPythonSnippets {
     doLast {
         exec {
             workingDir("src/test/python/")
-            executable("pipenv")
-            args(["run", "pytest", "."])
+            commandLine 'pipenv', 'run', 'pytest', '.'
         }
     }
 }
