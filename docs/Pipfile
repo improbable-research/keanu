@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-keanu = {editable = true,path = "./../../../../keanu-python"}
+keanu = {editable = true,path = "./../keanu-python"}
 pytest = "*"
 numpy = "*"
 
