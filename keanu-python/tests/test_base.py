@@ -27,7 +27,9 @@ def test_java_object_wrapper_cant_call_java_api_with_no_python_impl_if_camel_cas
 
 
 def test_java_object_wrapper_cant_call_java_api_with_python_impl_if_camel_case(java_list_wrapper) -> None:
-    with pytest.raises(AttributeError, match="{} has no attribute indexOf. Did you mean index_of?".format(type(java_list_wrapper))):
+    with pytest.raises(
+            AttributeError,
+            match="{} has no attribute indexOf. Did you mean index_of?".format(type(java_list_wrapper))):
         java_list_wrapper.indexOf(1)
 
 
