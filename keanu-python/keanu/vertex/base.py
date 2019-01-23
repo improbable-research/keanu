@@ -122,6 +122,9 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return kn.vertex.generated.Multiplication(other, self)
 
     def __pow__(self, other: vertex_operation_param_types) -> 'Vertex':
+        if type(other) == Integer:
+            other = kn.vertex.generated.CastToDouble(other)
+
         return kn.vertex.generated.Power(self, other)
 
     def __rpow__(self, other: vertex_operation_param_types) -> 'Vertex':

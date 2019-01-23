@@ -279,6 +279,7 @@ def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, numpy_typ
     (Const(np.array([3., 2.])),                         2., np.array([9, 4                 ]), Double),
     (Const(np.array([3, 2])),                            2, np.array([9, 4                 ]), Integer),
     (Const(np.array([3, 2])),                           2.,  np.array([9, 4                ]), Double),
+    (Const(np.array([3., 2.])),                   Const(2),  np.array([9, 4                ]), Double),
 ])
 # yapf: enable
 def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
