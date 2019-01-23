@@ -23,7 +23,7 @@ allprojects {
 }
 
 dependencies {
-    compile project(':keanu-project')
+    compile project(":keanu-project")
 }
 
 task formatApply {
