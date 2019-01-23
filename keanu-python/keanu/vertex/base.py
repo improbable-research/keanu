@@ -280,8 +280,7 @@ class Integer(Vertex):
 
     def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
         other = cast_to_double_vertex_if_integer_vertex(other)
-        return kn.vertex.generated.Division(
-            kn.vertex.generated.CastToDouble(self), other)
+        return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(self), other)
 
     def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.Division(other, kn.vertex.generated.CastToDouble(self))

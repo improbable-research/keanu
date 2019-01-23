@@ -8,6 +8,8 @@ from keanu.vartypes import numpy_types
 from keanu.vertex import Const
 from keanu.vertex.base import Vertex, Double, Integer, Boolean
 
+vertex_types = Union[Double, Boolean, Integer]
+
 ### Comparisons
 
 
@@ -150,7 +152,7 @@ def test_can_do_less_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, nump
 ])
 # yapf: enable
 def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
-                         vertex_type: Any) -> None:
+                         vertex_type: vertex_types) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs + rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -175,7 +177,7 @@ def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, numpy_types, flo
 ])
 # yapf: enable
 def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
-                            vertex_type: Any) -> None:
+                            vertex_type: vertex_types) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs - rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -200,7 +202,7 @@ def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
 ])
 # yapf: enable
 def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
-                               vertex_type: Any) -> None:
+                               vertex_type: vertex_types) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs * rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -227,7 +229,7 @@ def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, floa
 ])
 # yapf: enable
 def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
-                         vertex_type: Any) -> None:
+                         vertex_type: vertex_types) -> None:
     result: Union[Vertex, np._ArrayLike[Any]] = lhs / rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -251,7 +253,7 @@ def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], ex
 ])
 # yapf: enable
 def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
-                                 vertex_type: Any) -> None:
+                                 vertex_type: vertex_types) -> None:
     result = lhs // rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -266,7 +268,7 @@ def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, fl
                           (np.array([15., 10.]),              Const(2), np.array([7, 5]), Double)])
 # yapf: enable
 def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
-                                                    expected_result: numpy_types, vertex_type: Any) -> None:
+                                                    expected_result: numpy_types, vertex_type: vertex_types) -> None:
     result = lhs // rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -287,7 +289,7 @@ def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, numpy_typ
 ])
 # yapf: enable
 def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
-                    vertex_type: Any) -> None:
+                    vertex_type: vertex_types) -> None:
     result = lhs ** rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
@@ -303,7 +305,7 @@ def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expecte
 ])
 # yapf: enable
 def test_can_do_pow_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
-                                       expected_result: numpy_types, vertex_type: Any) -> None:
+                                       expected_result: numpy_types, vertex_type: vertex_types) -> None:
     result = lhs ** rhs
     assert isinstance(result, Vertex)
     assert type(result) == vertex_type
