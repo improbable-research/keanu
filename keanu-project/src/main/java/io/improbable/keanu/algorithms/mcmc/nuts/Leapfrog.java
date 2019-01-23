@@ -52,36 +52,34 @@ class Leapfrog {
         Map<VariableReference, DoubleTensor> nextMomentum = stepMomentum(halfTimeStep, momentum, gradient);
         Map<VariableReference, DoubleTensor> nextPosition = stepPosition(latentVariables, halfTimeStep, nextMomentum, position);
 
-        Map<VariableReference, ?> latentMap = asMap(latentVariables);
-        Map<? extends VariableReference, DoubleTensor> nextPositionGradient = logProbGradientCalculator.logProbGradients(latentMap);
+        Map<? extends VariableReference, DoubleTensor> nextPositionGradient = logProbGradientCalculator.logProbGradients(nextPosition);
 
         nextMomentum = stepMomentum(halfTimeStep, nextMomentum, nextPositionGradient);
 
         return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient);
     }
 
-    private Map<VariableReference, ?> asMap(List<? extends Variable<DoubleTensor, ?>> latentVariables) {
-        return latentVariables.stream().collect(Collectors.toMap(Variable::getReference, v -> v.getValue()));
-    }
-
     private Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor, ?>> latentVariables, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<? extends VariableReference, DoubleTensor> position) {
         Map<VariableReference, DoubleTensor> nextPosition = new HashMap<>();
+
         for (Variable<DoubleTensor, ?> latent : latentVariables) {
+
             final DoubleTensor nextPositionForLatent = nextMomentum.get(latent.getReference()).
                 times(halfTimeStep).
                 plusInPlace(
                     position.get(latent.getReference())
                 );
+
             nextPosition.put(latent.getReference(), nextPositionForLatent);
-            latent.setValue(nextPositionForLatent);
         }
+
         return nextPosition;
     }
 
     private Map<VariableReference, DoubleTensor> stepMomentum(double halfTimeStep, Map<? extends VariableReference, DoubleTensor> momentum, Map<? extends VariableReference, DoubleTensor> gradient) {
         Map<VariableReference, DoubleTensor> nextMomentum = new HashMap<>();
         for (Map.Entry<? extends VariableReference, DoubleTensor> rEntry : momentum.entrySet()) {
-            final DoubleTensor updatedMomentum = (gradient.get(rEntry.getKey()).times(halfTimeStep)).plusInPlace(rEntry.getValue());
+            final DoubleTensor updatedMomentum = gradient.get(rEntry.getKey()).times(halfTimeStep).plusInPlace(rEntry.getValue());
             nextMomentum.put(rEntry.getKey(), updatedMomentum);
         }
         return nextMomentum;
