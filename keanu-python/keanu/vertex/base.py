@@ -12,7 +12,7 @@ from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.label import _VertexLabel
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_wrapped_java_types,
-                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types)
+                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, vertex_label_types)
 
 k = KeanuContext()
 
@@ -49,7 +49,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def set_and_cascade(self, v: tensor_arg_types) -> None:
         self.unwrap().setAndCascade(Tensor(self.cast(v)).unwrap())
 
-    def set_label(self, label: Union[str, _VertexLabel]) -> None:
+    def set_label(self, label: vertex_label_types) -> None:
         Vertex.__set_label_to_java_vertex(self.unwrap(), label)
 
     def sample(self) -> numpy_types:
@@ -186,10 +186,11 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     @staticmethod
     def __handle_optional_params(val: JavaObject, **kwargs: Dict[str, Any]) -> None:
         if "label" in kwargs:
-            Vertex.__set_label_to_java_vertex(val, kwargs["label"])
+            casted_kwarg = typing_cast(vertex_label_types, kwargs["label"])
+            Vertex.__set_label_to_java_vertex(val, casted_kwarg)
 
     @staticmethod
-    def __set_label_to_java_vertex(java_vertex, label: Any) -> None:
+    def __set_label_to_java_vertex(java_vertex, label: vertex_label_types) -> None:
         label_val: Union[JavaObject, str]
         if isinstance(label, _VertexLabel):
             label_val = label.unwrap()

@@ -26,8 +26,9 @@ shape_types = Iterable[primitive_types]
 '''
 Sample types
 '''
-sample_types = Dict[_VertexLabel, List[numpy_types]]
-sample_generator_types = Generator[Dict[_VertexLabel, numpy_types], None, None]
+vertex_label_types = Union[str, _VertexLabel]
+sample_types = Dict[vertex_label_types, List[numpy_types]]
+sample_generator_types = Generator[Dict[vertex_label_types, numpy_types], None, None]
 '''
 Runtime types
 '''
