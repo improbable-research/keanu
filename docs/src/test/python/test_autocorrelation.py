@@ -4,7 +4,7 @@ from keanu.algorithm import sample, MetropolisHastingsSampler
 from keanu import stats
 import numpy as np
 
-def autocorrelation_example_scalar():
+def test_autocorrelation_example_scalar():
     with Model() as m:
         m.a = Gaussian(20, 1.)
         m.b = Gaussian(20, 1.)
@@ -21,7 +21,7 @@ def autocorrelation_example_scalar():
     ac = stats.autocorrelation(vertex_samples)
     # %%SNIPPET_END%% PythonScalarAutocorrelation
 
-def autocorrelation_example_nd():
+def test_autocorrelation_example_nd():
     with Model() as m:
         m.a = Gaussian(np.array([[20., 30.], [40., 60.]]), np.array([[1., 1.], [1., 1.]]))
     bayes_net = m.to_bayes_net()
@@ -33,5 +33,3 @@ def autocorrelation_example_nd():
     ac = stats.autocorrelation(vertex_samples, (0,1))
     # %%SNIPPET_END%% PythonNdAutocorrelation
 
-autocorrelation_example_scalar()
-autocorrelation_example_nd()
