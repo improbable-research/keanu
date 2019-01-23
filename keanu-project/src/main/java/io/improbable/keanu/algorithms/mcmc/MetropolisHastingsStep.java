@@ -66,9 +66,6 @@ public class MetropolisHastingsStep {
                            final double logProbabilityBeforeStep,
                            final double temperature) {
 
-        log.trace(String.format("Chosen variables: %s", chosenVariables.stream()
-            .map(Variable::toString)
-            .collect(Collectors.toList())));
         final double affectedVariablesLogProbOld = logProbCalculationStrategy.calculate(model, chosenVariables);
 
         rejectionStrategy.prepare(chosenVariables);
@@ -95,11 +92,7 @@ public class MetropolisHastingsStep {
             final boolean shouldAccept = r >= random.nextDouble();
 
             if (shouldAccept) {
-                log.trace(String.format("ACCEPT %.4f", logR));
-                log.trace(String.format("New log prob = %.4f", logProbabilityAfterStep));
                 return new StepResult(true, logProbabilityAfterStep);
-            } else {
-                log.trace(String.format("REJECT %.4f", logR));
             }
         }
 
