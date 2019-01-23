@@ -255,33 +255,6 @@ public class MetropolisHastingsTest {
     }
 
     @Test
-    public void canDefaultToSettingsInBuilderAndIsConfigurableAfterBuilding() {
-
-        GaussianVertex A = new GaussianVertex(0.0, 1.0);
-        BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
-        net.probeForNonZeroProbability(100);
-
-        MetropolisHastings algo = MetropolisHastings.builder()
-            .rejectionStrategy(new CascadeOnRejection())
-            .build();
-
-        assertNotNull(algo.getProposalDistribution());
-        assertNotNull(algo.getRandom());
-        assertNotNull(algo.getVariableSelector());
-
-        NetworkSamples posteriorSamples = algo.getPosteriorSamples(
-            new KeanuProbabilisticModel(net),
-            net.getLatentVertices(),
-            2
-        );
-
-        algo.setVariableSelector(null);
-        assertNull(algo.getVariableSelector());
-
-        assertFalse(posteriorSamples.get(A).asList().isEmpty());
-    }
-
-    @Test
     public void doesNotStoreSamplesThatWillBeDropped() {
 
         int sampleCount = 1000;

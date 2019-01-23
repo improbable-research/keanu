@@ -32,32 +32,26 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
 
     @Getter
-    @Setter
     @Builder.Default
     private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
     @Getter
-    @Setter
     @Builder.Default
     private ProposalDistribution proposalDistribution = DEFAULT_PROPOSAL_DISTRIBUTION;
 
     @Getter
-    @Setter
     @Builder.Default
     private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
 
     @Getter
-    @Setter
     @Builder.Default
     private ProposalRejectionStrategy rejectionStrategy = DEFAULT_REJECTION_STRATEGY;
 
     @Getter
-    @Setter
     @Builder.Default
     private LogProbCalculationStrategy logProbCalculationStrategy = DEFAULT_LOG_PROB_CALCULATION_STRATEGY;
 
     @Getter
-    @Setter
     @Builder.Default
     private ProposalApplicationStrategy proposalApplicationStrategy = DEFAULT_PROPOSAL_APPLICATION_STRATEGY;
 
