@@ -36,15 +36,15 @@ public class Gaussian implements ContinuousDistribution {
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor lnSigma = sigma.log();
-        final DoubleTensor xMinusMuSquared = x.minus(mu).powInPlace(2);
-        final DoubleTensor xMinusMuSquaredOver2Variance = xMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
+        final DoubleTensor xMinusMuSquared = x.minus(mu).powInPlace(2.);
+        final DoubleTensor xMinusMuSquaredOver2Variance = xMinusMuSquared.divInPlace(sigma.pow(2.).timesInPlace(2.));
         return xMinusMuSquaredOver2Variance.plusInPlace(lnSigma).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
     }
 
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex mu, DoublePlaceholderVertex sigma) {
         final DoubleVertex lnSigma = sigma.log();
-        final DoubleVertex xMinusMuSquared = x.minus(mu).pow(2);
-        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigma.pow(2).times(2.0));
+        final DoubleVertex xMinusMuSquared = x.minus(mu).pow(2.);
+        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigma.pow(2.).times(2.));
         return xMinusMuSquaredOver2Variance.plus(lnSigma).plus(LN_SQRT_2PI).unaryMinus();
     }
 

@@ -60,7 +60,7 @@ public class Laplace implements ContinuousDistribution {
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor muMinusXAbsNegDivBeta = mu.minus(x).abs().divInPlace(beta);
-        final DoubleTensor logTwoBeta = beta.times(2).logInPlace();
+        final DoubleTensor logTwoBeta = beta.times(2.).logInPlace();
         return muMinusXAbsNegDivBeta.plusInPlace(logTwoBeta).unaryMinus();
     }
 

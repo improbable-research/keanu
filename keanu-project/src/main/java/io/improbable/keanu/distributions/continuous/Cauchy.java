@@ -39,7 +39,7 @@ public class Cauchy implements ContinuousDistribution {
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor negLnScaleMinusLnPi = scale.log().unaryMinusInPlace().plusInPlace(NEG_LOG_PI);
-        final DoubleTensor xMinusLocationOverScalePow2Plus1 = x.minus(location).divInPlace(scale).powInPlace(2).plusInPlace(1);
+        final DoubleTensor xMinusLocationOverScalePow2Plus1 = x.minus(location).divInPlace(scale).powInPlace(2.).plusInPlace(1.);
         final DoubleTensor lnXMinusLocationOverScalePow2Plus1 = xMinusLocationOverScalePow2Plus1.logInPlace();
 
         return negLnScaleMinusLnPi.minusInPlace(lnXMinusLocationOverScalePow2Plus1);

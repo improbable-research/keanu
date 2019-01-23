@@ -107,7 +107,7 @@ public class Gamma implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor xOverTheta = x.div(theta);
         final DoubleTensor kLnTheta = k.times(theta.log());
-        final DoubleTensor kMinus1LogX = k.minus(1).timesInPlace(x.log());
+        final DoubleTensor kMinus1LogX = k.minus(1.).timesInPlace(x.log());
         final DoubleTensor lgammaK = k.logGamma();
         return kMinus1LogX.minusInPlace(lgammaK).minusInPlace(xOverTheta).minusInPlace(kLnTheta);
     }

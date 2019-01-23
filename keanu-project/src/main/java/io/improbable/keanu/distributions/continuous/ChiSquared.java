@@ -29,8 +29,8 @@ public class ChiSquared implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor halfK = k.toDouble().div(2);
-        final DoubleTensor numerator = halfK.minus(1).timesInPlace(x.log()).minusInPlace(x.div(2));
+        final DoubleTensor halfK = k.toDouble().div(2.);
+        final DoubleTensor numerator = halfK.minus(1.).timesInPlace(x.log()).minusInPlace(x.div(2.));
         final DoubleTensor denominator = halfK.times(LOG_TWO).plusInPlace(halfK.logGamma());
         return numerator.minusInPlace(denominator);
     }
