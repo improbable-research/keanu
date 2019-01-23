@@ -11,26 +11,15 @@ from collections import OrderedDict
 
 
 @pytest.fixture
-def gamma_label() -> VertexLabel:
-    return VertexLabel("gamma")
+def trace() -> sample_types:
+    return OrderedDict([('gamma', [array([[1., 2.], [3., 4.]]),
+                                   array([[2., 3.], [4., 5.]])]),
+                        ('gaussian', [array([[0.1, 0.2], [0.3, 0.4]]),
+                                      array([[0.2, 0.3], [0.4, 0.5]])])])
 
 
-@pytest.fixture
-def gaussian_label() -> VertexLabel:
-    return VertexLabel("gaussian")
-
-
-@pytest.fixture
-def trace(gamma_label: VertexLabel, gaussian_label: VertexLabel) -> sample_types:
-    return OrderedDict([(gamma_label, [array([[1., 2.], [3., 4.]]),
-                                       array([[2., 3.], [4., 5.]])]),
-                        (gaussian_label, [array([[0.1, 0.2], [0.3, 0.4]]),
-                                          array([[0.2, 0.3], [0.4, 0.5]])])])
-
-
-def test_traceplot_returns_axesplot_with_correct_data(gamma_label: VertexLabel, gaussian_label: VertexLabel,
-                                                      trace: sample_types) -> None:
-    ax = traceplot(trace, labels=[gamma_label, gaussian_label])
+def test_traceplot_returns_axesplot_with_correct_data(trace: sample_types) -> None:
+    ax = traceplot(trace, labels=[VertexLabel('gamma'), 'gaussian'])
 
     gamma_ax = ax[0][0]
     gaussian_ax = ax[1][0]

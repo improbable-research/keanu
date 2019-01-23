@@ -7,10 +7,10 @@ except ImportError:  # mpl is optional
 import numpy as np
 from keanu.vartypes import sample_types, numpy_types
 from keanu.vertex.label import _VertexLabel
-from typing import Any, List
+from typing import Any, List, Union
 
 
-def traceplot(trace: sample_types, labels: List[_VertexLabel] = None, ax: Any = None, x0: int = 0) -> Any:
+def traceplot(trace: sample_types, labels: List[Union[_VertexLabel, str]] = None, ax: Any = None, x0: int = 0) -> Any:
     """
     Plot samples values.
 
@@ -29,7 +29,7 @@ def traceplot(trace: sample_types, labels: List[_VertexLabel] = None, ax: Any = 
     for index, label in enumerate(labels):
         data = [__make_1d(sample) for sample in trace[label]]
 
-        ax[index][0].set_title(label.get_qualified_name())
+        ax[index][0].set_title(label)
         ax[index][0].plot(__integer_xaxis(ax[index][0], x0, len(data)), data)
 
         __pause_for_crude_animation()
