@@ -23,7 +23,7 @@ public class CompiledBackEnds {
     @Param({"KEANU_COMPILED", "KEANU_GRAPH", "TENSORFLOW"})
     public Backend backend;
 
-    @Param({"0", "100"})
+    @Param({"100", "0"})
     public int linkCount;
 
     public ComputableGraph computableGraph;
