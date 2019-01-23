@@ -1,3 +1,5 @@
 ### Version 0.0.19 ###
 
-Added the release notes text file to the repo
+* Added the release notes text file to the repo
+* Added better Python operator overloading support.
+  - Includes automatically casting to the correct datatype where possible.
