@@ -228,10 +228,9 @@ class Integer(Vertex):
         else:
             raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
 
-
     @staticmethod
     def __use_double_version(other: vertex_operation_param_types) -> bool:
-        if(isinstance(other, np.ndarray)):
+        if (isinstance(other, np.ndarray)):
             return np.issubdtype(other.dtype, np.floating)
 
         return type(other) == Double or isinstance(other, runtime_float_types)
