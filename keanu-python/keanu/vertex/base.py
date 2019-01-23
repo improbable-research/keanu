@@ -231,6 +231,9 @@ class Integer(Vertex):
 
     @staticmethod
     def __use_double_version(other: vertex_operation_param_types) -> bool:
+        if(isinstance(other, np.ndarray)):
+            return np.issubdtype(other.dtype, np.floating)
+
         return type(other) == Double or isinstance(other, runtime_float_types)
 
     def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
