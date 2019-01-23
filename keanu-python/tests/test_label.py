@@ -7,12 +7,8 @@ def label1() -> VertexLabel:
     return VertexLabel("label1", ["inner", "outer"])
 
 
-@pytest.fixture
-def label1_clone() -> VertexLabel:
-    return VertexLabel("label1", ["inner", "outer"])
-
-
-def test_equality(label1: VertexLabel, label1_clone: VertexLabel) -> None:
+def test_equality(label1: VertexLabel) -> None:
+    label1_clone = VertexLabel("label1", ["inner", "outer"])
     assert label1 == label1_clone
 
 
