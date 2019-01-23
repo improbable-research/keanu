@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
