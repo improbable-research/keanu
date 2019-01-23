@@ -7,7 +7,7 @@ import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -49,7 +49,7 @@ public class MetropolisHastingsTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
             Arrays.asList(A, B),
-            100000
+            5000
         );
 
         double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages().scalar();
@@ -79,7 +79,7 @@ public class MetropolisHastingsTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
             Arrays.asList(A, B),
-            100000
+            5000
         );
 
         DoubleTensor averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages();
@@ -126,7 +126,7 @@ public class MetropolisHastingsTest {
         BernoulliVertex A = new BernoulliVertex(0.5);
         BernoulliVertex B = new BernoulliVertex(0.5);
 
-        BoolVertex C = A.or(B);
+        BooleanVertex C = A.or(B);
 
         DoubleVertex D = If.isTrue(C)
             .then(0.9)
@@ -142,7 +142,7 @@ public class MetropolisHastingsTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
             Collections.singletonList(A),
-            100000
+            1000
         );
 
         double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());
@@ -155,7 +155,7 @@ public class MetropolisHastingsTest {
 
         BernoulliVertex A = new BernoulliVertex(0.5);
         BernoulliVertex B = new BernoulliVertex(0.5);
-        BoolVertex C = A.or(B);
+        BooleanVertex C = A.or(B);
         C.observe(false);
 
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());

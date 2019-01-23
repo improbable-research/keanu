@@ -1,7 +1,7 @@
 package io.improbable.snippet
 
 
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer
 import io.improbable.keanu.kotlin.times
 import io.improbable.keanu.network.BayesianNetwork
 import io.improbable.keanu.randomfactory.DoubleVertexFactory
@@ -17,53 +17,53 @@ private var error = Double.MAX_VALUE
 
 fun main(args: Array<String>) {
 
-//%%SNIPPET_START%% LorenzModel
-val model = LorenzModel()
-val lorenzCoordinates = model.runModel(maxWindows * windowSize)
-//%%SNIPPET_END%% LorenzModel
+    //%%SNIPPET_START%% LorenzModel
+    val model = LorenzModel()
+    val lorenzCoordinates = model.runModel(maxWindows * windowSize)
+    //%%SNIPPET_END%% LorenzModel
 
-//%%SNIPPET_START%% LorenzStartingPoint
-val random = DoubleVertexFactory()
-val origin = 0.0
-//%%SNIPPET_START%% LorenzStartValues
-var initX = random.nextGaussian(origin, 2.5)
-var initY = random.nextGaussian(origin, 2.5)
-var initZ = random.nextGaussian(origin, 2.5)
-//%%SNIPPET_END%% LorenzStartingPoint
-//%%SNIPPET_END%% LorenzStartValues
+    //%%SNIPPET_START%% LorenzStartingPoint
+    val random = DoubleVertexFactory()
+    val origin = 0.0
+    //%%SNIPPET_START%% LorenzStartValues
+    var initX = random.nextGaussian(origin, 2.5)
+    var initY = random.nextGaussian(origin, 2.5)
+    var initZ = random.nextGaussian(origin, 2.5)
+    //%%SNIPPET_END%% LorenzStartingPoint
+    //%%SNIPPET_END%% LorenzStartValues
 
-//%%SNIPPET_START%% LorenzIterate
-while (error > convergedError && window < maxWindows) {
-//%%SNIPPET_END%% LorenzIterate
+    //%%SNIPPET_START%% LorenzIterate
+    while (error > convergedError && window < maxWindows) {
+    //%%SNIPPET_END%% LorenzIterate
 
-val initialConditions = listOf(initX, initY, initZ)
-val graphTimeSteps = mutableListOf(initialConditions) as MutableList<List<DoubleVertex>>
+        val initialConditions = listOf(initX, initY, initZ)
+        val graphTimeSteps = mutableListOf(initialConditions) as MutableList<List<DoubleVertex>>
 
-calculateLorenzTimesteps(graphTimeSteps, windowSize)
+        calculateLorenzTimesteps(graphTimeSteps, windowSize)
 
-applyObservations(graphTimeSteps, windowSize, window, lorenzCoordinates, random)
+        applyObservations(graphTimeSteps, windowSize, window, lorenzCoordinates, random)
 
-//%%SNIPPET_START%% LorenzOptimise
-val net = BayesianNetwork(graphTimeSteps.first().first().connectedGraph)
-val optimiser = Optimizer.of(net)
-optimiser.maxAPosteriori()
-//%%SNIPPET_END%% LorenzOptimise
+        //%%SNIPPET_START%% LorenzOptimise
+        val net = BayesianNetwork(graphTimeSteps.first().first().connectedGraph)
+        val optimiser = KeanuOptimizer.of(net)
+        optimiser.maxAPosteriori()
+        //%%SNIPPET_END%% LorenzOptimise
 
-//%%SNIPPET_START%% LorenzNewStartValues
-val posterior = getTimestepValues(graphTimeSteps, windowSize - 1)
-val postTimestep = (window + 1) * (windowSize - 1)
-val coordinatesAtPostTimestep = lorenzCoordinates[postTimestep]
+        //%%SNIPPET_START%% LorenzNewStartValues
+        val posterior = getTimestepValues(graphTimeSteps, windowSize - 1)
+        val postTimestep = (window + 1) * (windowSize - 1)
+        val coordinatesAtPostTimestep = lorenzCoordinates[postTimestep]
 
-error = error(coordinatesAtPostTimestep, posterior)
-println("Error: " + error)
+        error = error(coordinatesAtPostTimestep, posterior)
+        println("Error: " + error)
 
-initX = random.nextGaussian(posterior[0], 2.5)
-initY = random.nextGaussian(posterior[1], 2.5)
-initZ = random.nextGaussian(posterior[2], 2.5)
-//%%SNIPPET_END%% LorenzNewStartValues
+        initX = random.nextGaussian(posterior[0], 2.5)
+        initY = random.nextGaussian(posterior[1], 2.5)
+        initZ = random.nextGaussian(posterior[2], 2.5)
+        //%%SNIPPET_END%% LorenzNewStartValues
 
-window++
-}
+        window++
+    }
 }
 
 //%%SNIPPET_START%% LorenzWindow
@@ -71,12 +71,12 @@ fun calculateLorenzTimesteps(graphTimeSteps: MutableList<List<DoubleVertex>>, wi
     for (i in 0.until(windowSize - 1)) {
         val startConditions = graphTimeSteps[i]
         val timesteppedCoordinates = lorenzTimestep(startConditions.first(),
-                startConditions[1],
-                startConditions.last(),
-                LorenzModel.timeStep,
-                LorenzModel.sigma,
-                LorenzModel.rho,
-                LorenzModel.beta)
+            startConditions[1],
+            startConditions.last(),
+            LorenzModel.timeStep,
+            LorenzModel.sigma,
+            LorenzModel.rho,
+            LorenzModel.beta)
         graphTimeSteps.add(timesteppedCoordinates)
     }
 }
@@ -116,9 +116,9 @@ fun getTimestepValues(graphTimeSteps: MutableList<List<DoubleVertex>>, time: Int
 
 fun error(coordinates: LorenzModel.Coordinates, posterior: List<Double>): Double {
     return Math.sqrt(
-            Math.pow(coordinates.x - posterior[0], 2.0) +
-                    Math.pow(coordinates.y - posterior[1], 2.0) +
-                    Math.pow(coordinates.z - posterior[2], 2.0)
+        Math.pow(coordinates.x - posterior[0], 2.0) +
+            Math.pow(coordinates.y - posterior[1], 2.0) +
+            Math.pow(coordinates.z - posterior[2], 2.0)
     )
 }
 //%%SNIPPET_END%% LorenzFull

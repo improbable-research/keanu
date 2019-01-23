@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -7,10 +8,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,6 +27,7 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
      * @param inputVertex the input vertex to extract from
      * @param index       the index to extract at
      */
+    @ExportVertexToPythonBindings
     public TakeVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                       @LoadVertexParam(INDEX_NAME) long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
@@ -40,21 +41,17 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        PartialDerivatives derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInputs.get(inputVertex);
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
 
-        Map<VertexId, DoubleTensor> partialsOf = new HashMap<>();
         DoubleTensor newValue = this.getValue();
 
-        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfParentWithRespectToInputs.asMap().entrySet()) {
-            DoubleTensor atIndexTensor = takeFromPartial(entry.getValue(), index);
-            int desiredRank = atIndexTensor.getShape().length + newValue.getShape().length;
-            long[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
-            atIndexTensor = atIndexTensor.reshape(paddedShape);
-            partialsOf.put(entry.getKey(), atIndexTensor);
-        }
+        DoubleTensor atIndexTensor = takeFromPartial(derivativeOfParentWithRespectToInputs.get(), index);
+        int desiredRank = atIndexTensor.getRank() + newValue.getRank();
+        long[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
+        atIndexTensor = atIndexTensor.reshape(paddedShape);
 
-        return new PartialDerivatives(partialsOf);
+        return new PartialDerivative(atIndexTensor);
     }
 
     private DoubleTensor takeFromPartial(DoubleTensor from, long... indices) {
@@ -70,22 +67,20 @@ public class TakeVertex extends DoubleUnaryOpVertex implements Differentiable {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> reshapedDerivatives = new HashMap<>();
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> reshapedDerivatives = new HashMap<>();
 
-        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            DoubleTensor partial = partialDerivative.getValue();
-            long[] newPartialShape = TensorShape.concat(
-                TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
-                inputVertex.getShape()
-            );
-            DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);
-            long[] partialUpRankShape = TensorShape.shapeDesiredToRankByAppendingOnes(partial.getShape(), newPartialShape.length);
-            DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial.reshape(partialUpRankShape));
-            DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
-            DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
-            reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), highRankMask));
-        }
+        DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
+        long[] newPartialShape = TensorShape.concat(
+            TensorShape.selectDimensions(0, partial.getRank() - getRank(), partial.getShape()),
+            inputVertex.getShape()
+        );
+        DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);
+        long[] partialUpRankShape = TensorShape.shapeDesiredToRankByAppendingOnes(partial.getShape(), newPartialShape.length);
+        DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial.reshape(partialUpRankShape));
+        DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
+        DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
+        reshapedDerivatives.put(inputVertex, new PartialDerivative(highRankMask));
 
         return reshapedDerivatives;
     }

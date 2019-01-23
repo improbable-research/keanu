@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.probabilistic;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -187,7 +188,7 @@ public class BernoulliVertexTest {
         observedVertex.observe(observation);
 
         BayesianNetwork network = new BayesianNetwork(observedVertex.getConnectedGraph());
-        GradientOptimizer optimizer = GradientOptimizer.of(network);
+        GradientOptimizer optimizer = KeanuOptimizer.Gradient.of(network);
 
         optimizer.maxAPosteriori();
 

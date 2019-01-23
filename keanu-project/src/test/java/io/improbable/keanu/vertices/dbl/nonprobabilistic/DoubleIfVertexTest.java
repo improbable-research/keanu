@@ -1,14 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
@@ -22,7 +24,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromTruePredicate() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true, true}, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, true, true, true}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
@@ -33,15 +35,17 @@ public class DoubleIfVertexTest {
         MatrixMultiplicationVertex c = a.matrixMultiply(b);
         DoubleVertex d = b.matrixMultiply(a);
 
-        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dCdb = c.getDerivativeWrtLatents().withRespectTo(b);
+        PartialsOf dC = Differentiator.reverseModeAutoDiff(c, a, b);
+        DoubleTensor dCda = dC.withRespectTo(a);
+        DoubleTensor dCdb = dC.withRespectTo(b);
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
-        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dIfdB = ifVertex.getDerivativeWrtLatents().withRespectTo(b);
+        PartialsOf dIfVertex = Differentiator.reverseModeAutoDiff(ifVertex, a, b);
+        DoubleTensor dIfdA = dIfVertex.withRespectTo(a);
+        DoubleTensor dIfdB = dIfVertex.withRespectTo(b);
 
         Assert.assertArrayEquals(dCda.asFlatDoubleArray(), dIfdA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(dCdb.asFlatDoubleArray(), dIfdB.asFlatDoubleArray(), 1e-6);
@@ -52,40 +56,42 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromTruePredicateDifferentRankOf() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true, false, true, true, true, false}, 2, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, true, true, false, true, true, true, false}, 2, 2, 2));
 
-        DoubleVertex a = new UniformVertex(0, 10);
+        UniformVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.scalar(5.0));
 
-        DoubleVertex b = new UniformVertex(0, 10);
+        UniformVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
         MultiplicationVertex c = a.times(b);
         DoubleVertex d = b.div(a);
 
-        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dCdb = c.getDerivativeWrtLatents().withRespectTo(b);
+        PartialsOf dC = Differentiator.reverseModeAutoDiff(c, a, b);
+        DoubleTensor dCda = dC.withRespectTo(a);
+        DoubleTensor dCdb = dC.withRespectTo(b);
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
-        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dIfdB = ifVertex.getDerivativeWrtLatents().withRespectTo(b);
+
+        DoubleTensor dIfdAForward = Differentiator.forwardModeAutoDiff(a, ifVertex).of(ifVertex);
+        DoubleTensor dIfdBForward = Differentiator.forwardModeAutoDiff(b, ifVertex).of(ifVertex);
 
         DoubleTensor dIfdAReverse = Differentiator.reverseModeAutoDiff(ifVertex, a).withRespectTo(a);
         DoubleTensor dIfdBReverse = Differentiator.reverseModeAutoDiff(ifVertex, b).withRespectTo(b);
 
-        Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
-        Assert.assertArrayEquals(dCdb.getShape(), dIfdB.getShape());
+        Assert.assertArrayEquals(dCda.getShape(), dIfdAForward.getShape());
+        Assert.assertArrayEquals(dCdb.getShape(), dIfdBForward.getShape());
 
-        Assert.assertArrayEquals(dIfdA.asFlatDoubleArray(), dIfdAReverse.asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(dIfdB.asFlatDoubleArray(), dIfdBReverse.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(dIfdAForward.asFlatDoubleArray(), dIfdAReverse.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(dIfdBForward.asFlatDoubleArray(), dIfdBReverse.asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void canExtractPartialFromFalsePredicate() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{false, false, false, false}, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{false, false, false, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
@@ -96,15 +102,17 @@ public class DoubleIfVertexTest {
         DoubleVertex c = a.matrixMultiply(b);
         MatrixMultiplicationVertex d = b.matrixMultiply(a);
 
-        DoubleTensor dDda = d.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dDdb = d.getDerivativeWrtLatents().withRespectTo(b);
+        PartialsOf dD = Differentiator.reverseModeAutoDiff(d, a, b);
+        DoubleTensor dDda = dD.withRespectTo(a);
+        DoubleTensor dDdb = dD.withRespectTo(b);
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
-        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dIfdB = ifVertex.getDerivativeWrtLatents().withRespectTo(b);
+        PartialsOf dIfVertex = Differentiator.reverseModeAutoDiff(ifVertex, a, b);
+        DoubleTensor dIfdA = dIfVertex.withRespectTo(a);
+        DoubleTensor dIfdB = dIfVertex.withRespectTo(b);
 
         Assert.assertArrayEquals(dDda.asFlatDoubleArray(), dIfdA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(dDdb.asFlatDoubleArray(), dIfdB.asFlatDoubleArray(), 1e-6);
@@ -115,7 +123,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromMixedPredicate() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
@@ -126,14 +134,14 @@ public class DoubleIfVertexTest {
         MatrixMultiplicationVertex c = a.matrixMultiply(b);
         MatrixMultiplicationVertex d = b.matrixMultiply(a);
 
-        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dDda = d.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a);
+        DoubleTensor dDda = Differentiator.reverseModeAutoDiff(d, a).withRespectTo(a);
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
-        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dIfdA = Differentiator.reverseModeAutoDiff(ifVertex, a).withRespectTo(a);
 
         Assert.assertArrayEquals(new double[]{
             5, 7,
@@ -152,7 +160,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromMixedPredicateWithDifferentParentsAndFillInZeroes() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
@@ -170,15 +178,16 @@ public class DoubleIfVertexTest {
 
         MatrixMultiplicationVertex f = d.matrixMultiply(e);
 
-        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dFdd = f.getDerivativeWrtLatents().withRespectTo(d);
+        DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a);
+        DoubleTensor dFdd = Differentiator.reverseModeAutoDiff(f, d).withRespectTo(d);
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(f);
 
-        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dIfdD = ifVertex.getDerivativeWrtLatents().withRespectTo(d);
+        PartialsOf dIfVertex = Differentiator.reverseModeAutoDiff(ifVertex, a, d);
+        DoubleTensor dIfdA = dIfVertex.withRespectTo(a);
+        DoubleTensor dIfdD = dIfVertex.withRespectTo(d);
 
         Assert.assertArrayEquals(new double[]{
             5, 7,
@@ -208,7 +217,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractPartialFromMixedPredicateWithDifferentParentsRankThree() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false, true, false, true, false}, 2, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, false, true, false, true, false, true, false}, 2, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
@@ -226,15 +235,16 @@ public class DoubleIfVertexTest {
 
         AdditionVertex f = d.plus(e);
 
-        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dFdd = f.getDerivativeWrtLatents().withRespectTo(d);
+        DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a);
+        DoubleTensor dFdd = Differentiator.reverseModeAutoDiff(f, d).withRespectTo(d);
 
         DoubleIfVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(f);
 
-        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
-        DoubleTensor dIfdD = ifVertex.getDerivativeWrtLatents().withRespectTo(d);
+        PartialsOf dIfVertex = Differentiator.reverseModeAutoDiff(ifVertex, a, d);
+        DoubleTensor dIfdA = dIfVertex.withRespectTo(a);
+        DoubleTensor dIfdD = dIfVertex.withRespectTo(d);
 
         Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
         Assert.assertArrayEquals(dFdd.getShape(), dIfdD.getShape());
@@ -242,7 +252,7 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractValueFromMixedPredicate() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
+        BooleanVertex bool = new ConstantBooleanVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
@@ -270,8 +280,8 @@ public class DoubleIfVertexTest {
         UniformVertex b = new UniformVertex(1, 1.5);
         b.setValue(1.1);
 
-        BoolVertex leftFlip = new BernoulliVertex(0.5);
-        BoolVertex rightFlip = new BernoulliVertex(0.5);
+        BooleanVertex leftFlip = new BernoulliVertex(0.5);
+        BooleanVertex rightFlip = new BernoulliVertex(0.5);
         leftFlip.observe(false);
         rightFlip.observe(true);
 
@@ -286,7 +296,7 @@ public class DoubleIfVertexTest {
         observedIf.observe(2.25);
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observedIf.getConnectedGraph());
-        GradientOptimizer gradientOptimizer = GradientOptimizer.of(bayesianNetwork);
+        GradientOptimizer gradientOptimizer = KeanuOptimizer.Gradient.of(bayesianNetwork);
 
         gradientOptimizer.maxLikelihood();
 
@@ -300,8 +310,8 @@ public class DoubleIfVertexTest {
         UniformVertex b = new UniformVertex(1, 1.5);
         b.setValue(1.1);
 
-        BoolVertex leftFlip = new BernoulliVertex(0.5);
-        BoolVertex rightFlip = new BernoulliVertex(0.5);
+        BooleanVertex leftFlip = new BernoulliVertex(0.5);
+        BooleanVertex rightFlip = new BernoulliVertex(0.5);
         leftFlip.observe(false);
         rightFlip.observe(false);
 
@@ -316,7 +326,7 @@ public class DoubleIfVertexTest {
         observedIf.observe(1.25);
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observedIf.getConnectedGraph());
-        GradientOptimizer gradientOptimizer = GradientOptimizer.of(bayesianNetwork);
+        GradientOptimizer gradientOptimizer = KeanuOptimizer.Gradient.of(bayesianNetwork);
 
         gradientOptimizer.maxLikelihood();
 

@@ -22,6 +22,20 @@ public class VertexLabel {
         this.namespace = ImmutableList.copyOf(namespace);
     }
 
+    public boolean isInNamespace(String... namespace) {
+
+        if (namespace.length > this.namespace.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < namespace.length; i++) {
+            if (!this.namespace.get(i).equals(namespace[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public VertexLabel withExtraNamespace(String topLevelNamespace) {
         List<String> newNamespace = ImmutableList.<String>builder().addAll(namespace).add(topLevelNamespace).build();
         return new VertexLabel(this.name, newNamespace);
@@ -35,7 +49,7 @@ public class VertexLabel {
     public Optional<String> getOuterNamespace() {
         try {
             return Optional.of(namespace.get(namespace.size() - 1));
-        } catch(IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             return Optional.empty();
         }
     }
@@ -44,10 +58,14 @@ public class VertexLabel {
         return name;
     }
 
-    @Override
-    public String toString() {
+    public String getQualifiedName() {
         ImmutableList<String> names = ImmutableList.<String>builder().add(name).addAll(namespace).build();
         return Joiner.on(NAMESPACE_SEPARATOR).join(Lists.reverse(names));
+    }
+
+    @Override
+    public String toString() {
+        return getQualifiedName();
     }
 
     @Override

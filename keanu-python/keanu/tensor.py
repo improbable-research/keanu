@@ -5,6 +5,7 @@ from py4j.java_gateway import java_import, JavaObject, JavaMember
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
+from keanu.functional import Function
 from .vartypes import (numpy_types, tensor_arg_types, primitive_types, runtime_int_types, runtime_float_types,
                        runtime_bool_types, runtime_numpy_types, runtime_pandas_types, runtime_primitive_types)
 
@@ -26,6 +27,17 @@ class Tensor(JavaObjectWrapper):
             super(Tensor, self).__init__(Tensor.__get_tensor_from_scalar(t))
         else:
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(t)))
+
+    def apply(self, lambda_function):
+        return self.unwrap().apply(Function(lambda_function))
+
+    def get_tensor_type(self) -> type:
+        if "Double" in self._class:
+            return float
+        elif "Integer" in self._class:
+            return int
+        else:
+            return bool
 
     @staticmethod
     def __get_tensor_from_ndarray(ndarray: numpy_types) -> JavaObject:

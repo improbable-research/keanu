@@ -12,30 +12,34 @@ buildscript {
 
 plugins {
     id 'io.franzbecker.gradle-lombok' version '1.14'
+    id "de.marcphilipp.nexus-publish" version "0.1.1"
     id 'maven'
     id 'jacoco'
 }
 
 apply plugin: 'com.google.protobuf'
+apply plugin: 'maven-publish'
+apply plugin: 'kotlin'
 
 archivesBaseName = "keanu"
 
 dependencies {
 
     compile 'org.apache.commons:commons-math3:3.6.1'
-    compile 'org.nd4j:nd4j-native-platform:1.0.0-beta2'
+    compile 'org.nd4j:nd4j-native-platform:1.0.0-beta3'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'com.google.guava:guava:20.0'
     compile 'com.google.protobuf:protobuf-java:3.6.1'
-    compile group: 'com.opencsv', name: 'opencsv', version: '4.2'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta2'
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.8.0-beta2'
+    compile 'com.google.protobuf:protobuf-java-util:3.6.1'
+    compile 'com.opencsv:opencsv:4.2'
+    compile 'org.slf4j:slf4j-api:1.8.0-beta2'
+    compile 'org.slf4j:slf4j-log4j12:1.8.0-beta2'
 
     //testing
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.19.1'
     testCompile 'org.jfree:jfreechart:1.0.19'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
+    testCompile 'org.mockito:mockito-core:2.15.0'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'ca.umontreal.iro.simul:ssj:3.2.1'
     testCompile 'org.reflections:reflections:0.9.11'
@@ -75,57 +79,74 @@ if (!hasProperty('nexusPassword')) {
     ext.nexusPassword = ''
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: nexusUser, password: nexusPassword)
-            }
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
 
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: nexusUser, password: nexusPassword)
-            }
-
-            pom.project {
-                name 'Keanu'
-                packaging 'jar'
-                description 'A probabilistic approach from an Improbabilistic company'
-                url 'https://github.com/improbable-research/keanu'
-
-                scm {
-                    connection 'scm:git@github.com:improbable-research/keanu.git'
-                    developerConnection 'scm:git@github.com:improbable-research/keanu.git'
-                    url 'https://github.com/improbable-research/keanu.git'
-                }
-
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'keanu'
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            pom {
+                name = 'Keanu'
+                description = 'A probabilistic approach from an Improbabilistic company'
+                url = 'https://github.com/improbable-research/keanu'
                 licenses {
                     license {
-                        name 'MIT'
-                        url 'http://www.opensource.org/licenses/mit-license.php'
+                        name = 'MIT'
+                        url = 'http://www.opensource.org/licenses/mit-license.php'
                     }
                 }
-
                 developers {
                     developer {
-                        id 'keanu-engineering'
-                        name 'Keanu Improbable'
-                        email 'keanu-engineering@improbable.io'
+                        id = 'keanu-engineering'
+                        name = 'Keanu Improbable'
+                        email = 'keanu-engineering@improbable.io'
                     }
+                }
+                scm {
+                    connection = 'scm:git@github.com:improbable-research/keanu.git'
+                    developerConnection = 'scm:git@github.com:improbable-research/keanu.git'
+                    url = 'https://github.com/improbable-research/keanu.git'
                 }
             }
         }
     }
+    repositories {
+        maven {
+            credentials {
+                username = nexusUser
+                password = nexusPassword
+            }
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
 }
 
-apply plugin: 'kotlin'
+nexusPublishing {
+    serverUrl = uri("https://oss.sonatype.org/service/local/")
+    snapshotRepositoryUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+    username = nexusUser
+    password = nexusPassword
+}
 
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
 }
+
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
@@ -135,18 +156,8 @@ compileTestKotlin {
 if (project.hasProperty("signing.keyId")) {
     apply plugin: 'signing'
     signing {
-        sign configurations.archives
+        sign publishing.publications.mavenJava
     }
-}
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
 }
 
 task deletePythonClasspath(type: Delete) {

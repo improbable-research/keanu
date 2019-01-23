@@ -1,8 +1,10 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import com.google.common.collect.Iterables;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
@@ -12,7 +14,7 @@ import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Collections;
 import java.util.Map;
@@ -38,8 +40,9 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
         this.setLabel(label);
     }
 
-    public DoubleProxyVertex(@LoadVertexParam(LABEL_PARAM_NAME) String label) {
-        this(new VertexLabel(label));
+    @ExportVertexToPythonBindings
+    public DoubleProxyVertex(@LoadShape long[] shape, @LoadVertexParam(LABEL_PARAM_NAME) String label) {
+        this(shape, new VertexLabel(label));
     }
 
     @Override
@@ -68,13 +71,13 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
     }
 
     @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        return derivativeOfParentsWithRespectToInputs.get(getParent());
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        return derivativeOfParentsWithRespectToInput.get(getParent());
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        return Collections.singletonMap(getParent(), derivativeOfOutputsWithRespectToSelf);
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        return Collections.singletonMap(getParent(), derivativeOfOutputWithRespectToSelf);
     }
 
     @SaveVertexParam(LABEL_PARAM_NAME)

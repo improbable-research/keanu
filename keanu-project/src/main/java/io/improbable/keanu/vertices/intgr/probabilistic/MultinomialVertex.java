@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -26,7 +27,9 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     private static final String P_NAME = "p";
     private static final String N_NAME = "n";
 
-    public MultinomialVertex(long[] tensorShape, IntegerVertex n, DoubleVertex p) {
+    public MultinomialVertex(@LoadShape long[] tensorShape,
+                             @LoadVertexParam(N_NAME) IntegerVertex n,
+                             @LoadVertexParam(P_NAME) DoubleVertex p) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, n.getShape());
         long[] pShapeExcludingFirstDimension = TensorShape.removeDimension(0, p.getShape());
@@ -40,7 +43,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     }
 
     @ExportVertexToPythonBindings
-    public MultinomialVertex(@LoadVertexParam(N_NAME) IntegerVertex n, @LoadVertexParam(P_NAME) DoubleVertex p) {
+    public MultinomialVertex(IntegerVertex n, DoubleVertex p) {
         this(n.getShape(), n, p);
     }
 

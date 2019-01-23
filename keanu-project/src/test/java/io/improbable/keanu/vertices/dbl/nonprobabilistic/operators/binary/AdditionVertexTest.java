@@ -1,12 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfAScalarAndVector;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfAVectorAndScalar;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfTwoMatricesElementWiseOperator;
@@ -81,11 +78,12 @@ public class AdditionVertexTest {
     }
 
     @Test
-    public void changesMatchGradient() {
-        DoubleVertex A = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex B = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
-        AdditionVertex C = A.plus(B);
+    public void finiteDifferenceMatchesElementwise() {
+        BinaryOperationTestHelpers.finiteDifferenceMatchesElementwise(DoubleVertex::plus);
+    }
 
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), C, 1e-6, 1e-10);
+    @Test
+    public void finiteDifferenceMatchesSimpleBroadcast() {
+        BinaryOperationTestHelpers.finiteDifferenceMatchesBroadcast(DoubleVertex::plus);
     }
 }

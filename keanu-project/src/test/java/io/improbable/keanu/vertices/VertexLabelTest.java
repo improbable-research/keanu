@@ -5,6 +5,8 @@ import org.junit.Test;
 import java.util.Optional;
 
 import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -111,6 +113,15 @@ public class VertexLabelTest {
     }
 
     @Test
+    public void youCanGetTheQualifiedName() {
+        String innerNamespace = "inner";
+        String outerNamespace = "outer";
+        String name = "foo";
+        VertexLabel foo = new VertexLabel(name, innerNamespace, outerNamespace);
+        assertThat(foo.getQualifiedName(), equalTo("outer.inner.foo"));
+    }
+
+    @Test
     public void itUsesADotToPrint() {
         VertexLabel foo = new VertexLabel("foo", "inner", "outer");
         assertThat(foo.toString(), equalTo("outer.inner.foo"));
@@ -130,5 +141,35 @@ public class VertexLabelTest {
     public void itThrowsIfYouDiminishTheNamespaceButThereIsNone() {
         VertexLabel foo = new VertexLabel("foo");
         foo.withoutOuterNamespace();
+    }
+
+    @Test
+    public void isInNamespaceOfEqualValue() {
+        VertexLabel label = new VertexLabel("foo", "root", "outer", "inner");
+        assertTrue(label.isInNamespace("root", "outer", "inner"));
+    }
+
+    @Test
+    public void isInSuperNamespace() {
+        VertexLabel label = new VertexLabel("foo", "root", "outer", "inner");
+        assertTrue(label.isInNamespace("root", "outer"));
+    }
+
+    @Test
+    public void isNotInNamespaceWithMorePrefix() {
+        VertexLabel label = new VertexLabel("foo", "outer", "inner");
+        assertFalse(label.isInNamespace("root", "outer", "inner"));
+    }
+
+    @Test
+    public void isNotInNamespaceWithMissingPrefix() {
+        VertexLabel label = new VertexLabel("foo", "root", "outer", "inner");
+        assertFalse(label.isInNamespace("outer", "inner"));
+    }
+
+    @Test
+    public void isNotInSubNamespace() {
+        VertexLabel label = new VertexLabel("foo", "root", "outer");
+        assertFalse(label.isInNamespace("root", "outer", "inner"));
     }
 }

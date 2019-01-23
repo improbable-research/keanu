@@ -1,13 +1,14 @@
 package io.improbable.keanu.codegen.python;
 
 import com.google.common.base.CaseFormat;
+import com.google.gson.internal.Primitives;
 import freemarker.template.Template;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import lombok.Getter;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 class VertexProcessor {
 
@@ -97,8 +99,8 @@ class VertexProcessor {
             return "Double";
         } else if (IntegerVertex.class.isAssignableFrom(javaClass)) {
             return "Integer";
-        } else if (BoolVertex.class.isAssignableFrom(javaClass)) {
-            return "Bool";
+        } else if (BooleanVertex.class.isAssignableFrom(javaClass)) {
+            return "Boolean";
         } else {
             return "Vertex";
         }
@@ -114,15 +116,39 @@ class VertexProcessor {
         return String.join(", ", pythonParams);
     }
 
-    private static String toCastedPythonParam(String pythonParameter, Class<?> parameterType) {
+    private static String toCastedPythonParam(String pythonParameter, Class<?> parameterClass) {
+        Class parameterType = Primitives.wrap(parameterClass);
+
         if (DoubleVertex.class.isAssignableFrom(parameterType)) {
-            return "cast_to_double(" + pythonParameter + ")";
+            return "cast_to_double_vertex(" + pythonParameter + ")";
         } else if (IntegerVertex.class.isAssignableFrom(parameterType)) {
+            return "cast_to_integer_vertex(" + pythonParameter + ")";
+        } else if (BooleanVertex.class.isAssignableFrom(parameterType)) {
+            return "cast_to_boolean_vertex(" + pythonParameter + ")";
+        } else if (Vertex.class.isAssignableFrom(parameterType)) {
+            return "cast_to_vertex(" + pythonParameter + ")";
+        } else if (DoubleTensor.class.isAssignableFrom(parameterType)) {
+            return "cast_to_double_tensor(" + pythonParameter + ")";
+        } else if (IntegerTensor.class.isAssignableFrom(parameterType)) {
+            return "cast_to_integer_tensor(" + pythonParameter + ")";
+        } else if (BooleanTensor.class.isAssignableFrom(parameterType)) {
+            return "cast_to_boolean_tensor(" + pythonParameter + ")";
+        } else if (Double.class.isAssignableFrom(parameterType)) {
+            return "cast_to_double(" + pythonParameter + ")";
+        } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
             return "cast_to_integer(" + pythonParameter + ")";
-        } else if (BoolVertex.class.isAssignableFrom(parameterType)) {
-            return "cast_to_bool(" + pythonParameter + ")";
+        } else if (String.class.isAssignableFrom(parameterType)) {
+            return "cast_to_string(" + pythonParameter + ")";
+        } else if (Boolean.class.isAssignableFrom(parameterType)) {
+            return "cast_to_boolean(" + pythonParameter + ")";
+        } else if (Long[].class.isAssignableFrom(parameterType) || long[].class.isAssignableFrom(parameterType)) {
+            return "cast_to_long_array(" + pythonParameter + ")";
+        } else if (Integer[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
+            return "cast_to_int_array(" + pythonParameter + ")";
+        } else if (Vertex[].class.isAssignableFrom(parameterType)) {
+            return "cast_to_vertex_array(" + pythonParameter + ")";
         } else {
-            return pythonParameter;
+            throw new IllegalArgumentException("Failed to Encode " + pythonParameter + " of type: " + parameterType);
         }
     }
 
@@ -136,25 +162,37 @@ class VertexProcessor {
         return String.join(", ", pythonParams);
     }
 
-    private static String toTypedPythonParam(Class<?> parameterType) {
+    private static String toTypedPythonParam(Class<?> parameterClass) {
+        Class parameterType = Primitives.wrap(parameterClass);
+
         if (Vertex.class.isAssignableFrom(parameterType)) {
             return "vertex_constructor_param_types";
         } else if (DoubleTensor.class.isAssignableFrom(parameterType) ||
                    IntegerTensor.class.isAssignableFrom(parameterType) ||
                    BooleanTensor.class.isAssignableFrom(parameterType)) {
             return "tensor_arg_types";
-        } else if (parameterType.isArray()) {
-            return "shape_types";
+        } else if (Double.class.isAssignableFrom(parameterType)) {
+            return "float";
+        } else if (Boolean.class.isAssignableFrom(parameterType)) {
+            return "bool";
+        } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
+            return "int";
+        } else if (String.class.isAssignableFrom(parameterType)) {
+            return "str";
+        } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
+            long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
+            return "Collection[int]";
+        } else if (Vertex[].class.isAssignableFrom(parameterType)) {
+            return "Collection[Vertex]";
         } else {
             throw new NotImplementedException(String.format("Mapping from Java type %s is not defined.", parameterType.getName()));
         }
     }
 
     private static List<Constructor> getSortedListOfAnnotatedVertexConstructors(Reflections reflections) {
-        List<Constructor> constructors = new ArrayList<>(reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class));
-        constructors.sort(Comparator.comparing(Constructor::getName));
-
-        return constructors;
+        return reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class).stream()
+            .sorted(Comparator.comparing(Constructor::getName))
+            .collect(Collectors.toList());
     }
 
     private static String toPythonClass(String javaClass) {

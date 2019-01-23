@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Pareto;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -12,7 +13,6 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,9 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
      * @param location    the location value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
      * @param scale       the scale value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
      */
-    public ParetoVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
+    public ParetoVertex(@LoadShape long[] tensorShape,
+                        @LoadVertexParam(LOCATION_NAME) DoubleVertex location,
+                        @LoadVertexParam(SCALE_NAME) DoubleVertex scale) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, location.getShape(), scale.getShape());
 
@@ -50,8 +52,7 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
     }
 
     @ExportVertexToPythonBindings
-    public ParetoVertex(@LoadVertexParam(LOCATION_NAME) DoubleVertex location,
-                        @LoadVertexParam(SCALE_NAME) DoubleVertex scale) {
+    public ParetoVertex(DoubleVertex location, DoubleVertex scale) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(location.getShape(), scale.getShape()), location, scale);
     }
 
@@ -125,12 +126,4 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
         return Pareto.withParameters(location.getValue(), scale.getValue()).sample(shape, random);
     }
 
-    @Override
-    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
-        if (isObserved()) {
-            return PartialDerivatives.OF_CONSTANT;
-        } else {
-            return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
-        }
-    }
 }

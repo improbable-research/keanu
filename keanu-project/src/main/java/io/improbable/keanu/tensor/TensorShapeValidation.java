@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor;
 
 
 import com.google.common.base.Preconditions;
+import org.nd4j.linalg.api.shape.Shape;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,7 +47,10 @@ public class TensorShapeValidation {
 
             if (nonLengthOneShapeDoesNotMatchProposal) {
                 throw new IllegalArgumentException(
-                    "Proposed shape " + Arrays.toString(proposalShape) + " does not match other non length one shapes"
+                    "Proposed shape "
+                        + Arrays.toString(proposalShape)
+                        + " does not match other non length one shapes "
+                        + Arrays.toString(nonLengthOneShape)
                 );
             }
         }
@@ -99,6 +103,10 @@ public class TensorShapeValidation {
         );
     }
 
+    public static long[] checkIsBroadcastable(long[] left, long[] right){
+        return Shape.broadcastOutputShape(left, right);
+    }
+
     /**
      * @param predicate shape of predicate
      * @param thn       shape of then
@@ -141,7 +149,7 @@ public class TensorShapeValidation {
         return Arrays.stream(shapes)
             .map(TensorShape::new)
             .filter(TensorShape::isLengthOne)
-            .sorted(Comparator.comparingInt(s -> ((TensorShape) s).getShape().length).reversed())
+            .sorted(Comparator.comparingInt(s -> ((TensorShape) s).getRank()).reversed())
             .collect(toList());
     }
 

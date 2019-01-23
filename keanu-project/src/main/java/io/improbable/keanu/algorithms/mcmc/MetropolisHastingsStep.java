@@ -20,8 +20,6 @@ import java.util.stream.Collectors;
 @Slf4j
 class MetropolisHastingsStep {
 
-    private static final double LOG_ZERO_PROBABILITY = Double.NEGATIVE_INFINITY;
-
     //Temperature for standard MH step accept/reject calculation
     private static final double DEFAULT_TEMPERATURE = 1.0;
 
@@ -83,7 +81,7 @@ class MetropolisHastingsStep {
 
         final double affectedVerticesLogProbNew = sumLogProbabilityOfAffected(chosenVertices, affectedVerticesCache);
 
-        if (affectedVerticesLogProbNew != LOG_ZERO_PROBABILITY) {
+        if (!ProbabilityCalculator.isImpossibleLogProb(affectedVerticesLogProbNew)) {
 
             final double logProbabilityDelta = affectedVerticesLogProbNew - affectedVerticesLogProbOld;
             final double logProbabilityAfterStep = logProbabilityBeforeStep + logProbabilityDelta;

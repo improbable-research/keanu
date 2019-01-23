@@ -3,9 +3,13 @@ package io.improbable.keanu.vertices;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,7 +17,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape {
+public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable<T> {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
@@ -84,6 +88,18 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         return this.getValue();
     }
 
+
+    public <V extends Vertex<T>> V print() {
+        new PrintVertex<>(this);
+        return (V) this;
+    }
+
+
+    public <V extends Vertex<T>> V print(final String message, final boolean printData) {
+        new PrintVertex<>(this, message, printData);
+        return (V) this;
+    }
+
     /**
      * @return True if the vertex is probabilistic, false otherwise.
      * A probabilistic vertex is defined as a vertex whose value is
@@ -93,6 +109,11 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     public final boolean isProbabilistic() {
         return this instanceof Probabilistic;
     }
+
+    /**
+     * @return True if the vertex is differentiable, false otherwise.
+     */
+    public final boolean isDifferentiable() {return this instanceof Differentiable; }
 
     /**
      * Sets the value if the vertex isn't already observed.
@@ -105,12 +126,9 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         }
     }
 
+    @Override
     public T getValue() {
         return hasValue() ? value : lazyEval();
-    }
-
-    protected T getRawValue() {
-        return value;
     }
 
     public boolean hasValue() {
@@ -128,6 +146,10 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
         } else {
             return initialShape;
         }
+    }
+
+    public int getRank() {
+        return getShape().length;
     }
 
     /**
@@ -177,6 +199,11 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     @Override
     public Optional<T> getObservedValue() {
         return observation.getObservedValue();
+    }
+
+    @Override
+    public VariableReference getReference() {
+        return getId();
     }
 
     public VertexId getId() {
@@ -264,6 +291,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape
     }
 
     public void loadValue(NetworkLoader loader) {
-       loader.loadValue(this);
+        loader.loadValue(this);
     }
 }

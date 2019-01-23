@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -39,7 +40,9 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
      * @param mu          the mu of the Laplace with either the same shape as specified for this vertex or a scalar
      * @param beta        the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
-    public LaplaceVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex beta) {
+    public LaplaceVertex(@LoadShape long[] tensorShape,
+                         @LoadVertexParam(MU_NAME) DoubleVertex mu,
+                         @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
         super(tensorShape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(tensorShape, mu.getShape(), beta.getShape());
 
@@ -68,8 +71,8 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
      * @param beta the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     @ExportVertexToPythonBindings
-    public LaplaceVertex(@LoadVertexParam(MU_NAME) DoubleVertex mu,
-                         @LoadVertexParam(BETA_NAME) DoubleVertex beta) {
+    public LaplaceVertex(DoubleVertex mu,
+                         DoubleVertex beta) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(mu.getShape(), beta.getShape()), mu, beta);
     }
 

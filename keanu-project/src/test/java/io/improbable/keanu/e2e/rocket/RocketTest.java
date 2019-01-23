@@ -1,10 +1,10 @@
 package io.improbable.keanu.e2e.rocket;
 
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -36,15 +36,15 @@ public class RocketTest {
             .when(true, false).then(0.94)
             .orDefault(0.001);
 
-        BoolVertex overHeated = new BernoulliVertex(overHeatProbability);
+        BooleanVertex overHeated = new BernoulliVertex(overHeatProbability);
 
         BernoulliVertex alarm1NotFalseNegative = new BernoulliVertex(0.99);
         BernoulliVertex alarm1FalsePositive = new BernoulliVertex(0.3);
-        BoolVertex alarm1 = overHeated.and(alarm1NotFalseNegative).or(alarm1FalsePositive);
+        BooleanVertex alarm1 = overHeated.and(alarm1NotFalseNegative).or(alarm1FalsePositive);
 
         BernoulliVertex alarm2NotFalseNegative = new BernoulliVertex(0.95);
         BernoulliVertex alarm2FalsePositive = new BernoulliVertex(0.1);
-        BoolVertex alarm2 = overHeated.and(alarm2NotFalseNegative).or(alarm2FalsePositive);
+        BooleanVertex alarm2 = overHeated.and(alarm2NotFalseNegative).or(alarm2FalsePositive);
 
         alarm1.observe(true);
         alarm2.observe(false);
@@ -52,12 +52,12 @@ public class RocketTest {
         BayesianNetwork net = new BayesianNetwork(oRingFailure.getConnectedGraph());
         net.probeForNonZeroProbability(1000);
 
-        Stream<NetworkState> networkSamples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
+        Stream<NetworkSample> networkSamples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
             net,
             Arrays.asList(oRingFailure, residualFuel, alarm1FalsePositive)
         ).stream();
 
-        long sampleCount = 100000;
+        long sampleCount = 10000;
         EventCounts eventCounts = networkSamples
             .limit(sampleCount)
             .map(state -> new EventCounts(

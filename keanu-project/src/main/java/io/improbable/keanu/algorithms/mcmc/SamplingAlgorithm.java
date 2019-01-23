@@ -1,12 +1,18 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.algorithms.NetworkSample;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public interface SamplingAlgorithm {
+
+    static Map<VertexId, Object> takeSample(List<? extends Vertex> sampleFromVertices) {
+        return sampleFromVertices.stream().collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
+    }
 
     /**
      * Move forward the state of the Sampling Algorithm by a single step but do not return anything.
@@ -27,5 +33,5 @@ public interface SamplingAlgorithm {
      *
      * @return a network state that represents the current state of the algorithm.
      */
-    NetworkState sample();
+    NetworkSample sample();
 }

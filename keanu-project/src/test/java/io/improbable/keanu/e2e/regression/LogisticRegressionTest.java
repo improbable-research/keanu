@@ -6,7 +6,7 @@ import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -17,7 +17,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
-import static io.improbable.keanu.tensor.TensorMatchers.lessThanOrEqualTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LogisticRegressionTest {
@@ -52,7 +51,7 @@ public class LogisticRegressionTest {
 
         double accuracy = ModelScoring.accuracy(model.predict(xTest), yTest);
         Assert.assertTrue(accuracy > 0.75);
-        assertWeightsAreCalculated(model.getWeights());
+        assertWeightsAreCalculated(model.getWeightVertex());
     }
 
     private DoubleTensor generateX(int nSamples) {
@@ -65,15 +64,12 @@ public class LogisticRegressionTest {
 
     private BooleanTensor generateY(DoubleTensor x) {
         DoubleTensor probabilities = x.matrixMultiply(TRUE_WEIGHTS).plus(TRUE_INTERCEPT).sigmoid();
-        BoolVertex yVertex = new BernoulliVertex(ConstantVertex.of(probabilities));
+        BooleanVertex yVertex = new BernoulliVertex(ConstantVertex.of(probabilities));
         return yVertex.getValue();
     }
 
-    private void assertWeightsAreCalculated(DoubleTensor weights) {
-        assertThat(weights, allCloseTo(0.15, TRUE_WEIGHTS));
+    private void assertWeightsAreCalculated(DoubleVertex weights) {
+        assertThat(weights.getValue(), allCloseTo(0.15, TRUE_WEIGHTS));
     }
 
-    private void assertRegularizedWeightsAreSmaller(DoubleVertex unregularizedWeights, DoubleVertex regularizedWeights) {
-        assertThat(regularizedWeights.getValue().abs(), lessThanOrEqualTo(unregularizedWeights.getValue().abs()));
-    }
 }

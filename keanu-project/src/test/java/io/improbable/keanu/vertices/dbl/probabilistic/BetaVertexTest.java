@@ -10,8 +10,10 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,9 @@ import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble
 import static org.junit.Assert.assertEquals;
 
 public class BetaVertexTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     private static final double DELTA = 0.0001;
 
@@ -47,6 +52,26 @@ public class BetaVertexTest {
         double expectedLogDensity = betaDistribution.logDensity(0.25) + betaDistribution.logDensity(0.1);
         BetaVertex ndBetaVertex = new BetaVertex(2, 3);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndBetaVertex, new double[]{0.25, 0.1}, expectedLogDensity);
+    }
+
+    @Test
+    public void alphaMustBeStrictlyPositive() {
+        DoubleVertex alpha = ConstantVertex.of(0.);
+        DoubleVertex beta = ConstantVertex.of(1.);
+        BetaVertex betaVertex = new BetaVertex(alpha, beta);
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("alpha and beta must be positive. alpha: " + alpha.getValue() + " beta: " + beta.getValue());
+        betaVertex.sample();
+    }
+
+    @Test
+    public void betaMustBeStrictlyPositive() {
+        DoubleVertex alpha = ConstantVertex.of(1.);
+        DoubleVertex beta = ConstantVertex.of(0.);
+        BetaVertex betaVertex = new BetaVertex(alpha, beta);
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("alpha and beta must be positive. alpha: " + alpha.getValue() + " beta: " + beta.getValue());
+        betaVertex.sample();
     }
 
     @Test
@@ -143,7 +168,7 @@ public class BetaVertexTest {
     @Test
     public void betaSampleMethodMatchesLogProbMethodForAlphaGreaterThanBeta() {
 
-        int sampleCount = 1000000;
+        int sampleCount = 500000;
         BetaVertex vertex = new BetaVertex(
             new long[]{sampleCount, 1},
             5.0,
@@ -161,7 +186,7 @@ public class BetaVertexTest {
     @Test
     public void betaSampleMethodMatchesLogProbMethodForAlphaLessThanBeta() {
 
-        int sampleCount = 1100000;
+        int sampleCount = 400000;
         BetaVertex vertex = new BetaVertex(
             new long[]{sampleCount, 1},
             2.0,

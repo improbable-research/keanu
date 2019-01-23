@@ -56,6 +56,8 @@ So how can we use Metropolis Hastings to sample from a distribution in Keanu?
 
 #### Example
 
+##### Java
+
 We define two normally distributed variables, A and B, that are centered around 20.0 with a sigma of 1.0.
 This is an expression of our prior belief that A and B both have values around 20.0.
 
@@ -105,9 +107,9 @@ We will be taking 100,000 samples from the distributions of A and B.
 
 ```java
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-        bayesNet,
-        bayesNet.getLatentVertices(),
-        100000
+    bayesNet,
+    bayesNet.getLatentVertices(),
+    30000
 );
 ```
 
@@ -122,6 +124,28 @@ double actual = averagePosteriorA + averagePosteriorB; //42.0
 ```
 
 As we can see, our prior belief and observations have combined and we've gained insight through sampling.
+
+##### Python
+
+We can perform the same steps in Python.
+```python
+with Model() as m:
+    m.a = Gaussian(20.,1.)
+    m.b = Gaussian(20.,1.)
+    m.c = Gaussian(m.a+m.b,1.)
+m.c.observe(43.)
+m.a.set_value(20.)
+m.b.set_value(20.)
+bayes_net = m.to_bayes_net()
+algo = MetropolisHastingsSampler()
+posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
+                           sampling_algorithm=algo, draws=30000)
+
+average_posterior_a = np.average(posterior_samples.get('a'))
+average_posterior_b = np.average(posterior_samples.get('b'))
+
+actual = average_posterior_a + average_posterior_b
+```
 
 ### Hamiltonian Monte Carlo
 
@@ -169,12 +193,22 @@ The parameters are:
 * The vertices in the network to return samples for (latent vertices)
 * The number of samples to take
 
+##### Java
+
 ```java
 NetworkSamples posteriorSamples = Hamiltonian.withDefaultConfig().getPosteriorSamples(
-        bayesNet,
-        bayesNet.getLatentVertices(),
-        2000
+    bayesNet,
+    bayesNet.getLatentVertices(),
+    2000
 );
+```
+
+##### Python
+
+```python
+algo = HamiltonianSampler()
+posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
+                           sampling_algorithm=algo, draws=2000)
 ```
 
 ### NUTS
@@ -187,13 +221,27 @@ a U-turn and re-exploring locations.
 Hence why it's called the 'No-U-Turn Sampler'. 
 It also attempts to calculate and auto-tune those difficult leapfrog and step size parameters we encountered in HMC.
 
+#### Example
+
+##### Java
+
 ```java
 NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
-        bayesNet,
-        bayesNet.getLatentVertices(),
-        2000
+    bayesNet,
+    bayesNet.getLatentVertices(),
+    2000
 );
 ```
+
+##### Python
+
+```python
+algo = NUTSSampler()
+posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
+                           sampling_algorithm=algo, draws=2000)
+```
+
+#### Parameters
 
 Let's explain the auto-tuning and target acceptance probability parameters a bit further.
 

@@ -1,16 +1,15 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,12 +36,14 @@ public class FitnessFunctionWithGradientTest {
         GaussianVertex dObservation = new GaussianVertex(D, 1.0);
         dObservation.observe(Nd4jDoubleTensor.scalar(3.0));
 
+        KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
+        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(graph, false);
+
         assert2DGradientEqualsApproxGradient(
             new double[]{5, 5},
             new double[]{0, 0},
-            0.1,
-            Arrays.asList(A, B, cObservation, dObservation),
-            Arrays.asList(A, B)
+            0.2,
+            fitness
         );
     }
 
@@ -65,12 +66,14 @@ public class FitnessFunctionWithGradientTest {
         GaussianVertex dObservation = new GaussianVertex(D, 5.0);
         dObservation.observe(Nd4jDoubleTensor.scalar(18.0));
 
+        KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
+        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(graph, false);
+
         assert2DGradientEqualsApproxGradient(
             new double[]{10, 10},
             new double[]{2, 2},
-            0.1,
-            Arrays.asList(A, B, cObservation, dObservation),
-            Arrays.asList(A, B)
+            0.2,
+            fitness
         );
     }
 
@@ -96,12 +99,14 @@ public class FitnessFunctionWithGradientTest {
         GaussianVertex fObservation = new GaussianVertex(F, C);
         fObservation.observe(Nd4jDoubleTensor.scalar(1.0));
 
+        KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
+        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(graph, false);
+
         assert2DGradientEqualsApproxGradient(
             new double[]{5, 5},
             new double[]{0.1, 0.1},
-            0.1,
-            Arrays.asList(A, B, eObservation, fObservation),
-            Arrays.asList(A, B)
+            0.2,
+            fitness
         );
     }
 
@@ -114,10 +119,7 @@ public class FitnessFunctionWithGradientTest {
     private void assert2DGradientEqualsApproxGradient(double[] topRight,
                                                       double[] bottomLeft,
                                                       double stepSize,
-                                                      List<Vertex> vertices,
-                                                      List<? extends Vertex<DoubleTensor>> latentVertices) {
-
-        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(vertices, latentVertices);
+                                                      FitnessFunctionWithGradient fitness) {
 
         double[] point = Arrays.copyOf(bottomLeft, bottomLeft.length);
 

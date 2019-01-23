@@ -2,8 +2,8 @@ package io.improbable.keanu.network;
 
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -11,10 +11,16 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 
 public interface NetworkSaver {
 
-    void save(OutputStream output, boolean saveValues) throws IOException;
+    void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException;
+
+    default void save(OutputStream output, boolean saveValues) throws IOException {
+        save(output, saveValues, null);
+    }
+
     void save(Vertex vertex);
 
     default void save(ConstantVertex vertex) {
@@ -29,7 +35,7 @@ public interface NetworkSaver {
         save((ConstantVertex)vertex);
     }
 
-    default void save(ConstantBoolVertex vertex) {
+    default void save(ConstantBooleanVertex vertex) {
         save((ConstantVertex)vertex);
     }
 
@@ -43,7 +49,7 @@ public interface NetworkSaver {
         saveValue((Vertex)vertex);
     }
 
-    default void saveValue(BoolVertex vertex)  {
+    default void saveValue(BooleanVertex vertex)  {
         saveValue((Vertex)vertex);
     }
 }

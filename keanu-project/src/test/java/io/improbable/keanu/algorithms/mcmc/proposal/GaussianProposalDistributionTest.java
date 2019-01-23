@@ -1,7 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
@@ -10,8 +13,14 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.List;
+import java.util.Set;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -44,6 +53,9 @@ public class GaussianProposalDistributionTest {
         when(vertex1.getValue()).thenReturn(DoubleTensor.scalar(currentState.getValue(0)));
         when(vertex2.getValue()).thenReturn(DoubleTensor.scalar(currentState.getValue(1)));
 
+        when(vertex1.getShape()).thenReturn(new long[] {});
+        when(vertex2.getShape()).thenReturn(new long[] {});
+
         proposal = new Proposal();
         proposal.setProposal(vertex1, DoubleTensor.scalar(proposedState.getValue(0)));
         proposal.setProposal(vertex2, DoubleTensor.scalar(proposedState.getValue(1)));
@@ -61,5 +73,22 @@ public class GaussianProposalDistributionTest {
         double logProb = proposalDistribution.logProbAtFromGivenTo(proposal);
         DoubleTensor expectedLogProb = Gaussian.withParameters(proposedState, sigma).logProb(currentState);
         assertThat(logProb, equalTo(expectedLogProb.sum()));
+    }
+
+    @Test
+    public void youCanAddProposalListeners() {
+        ProposalListener listener1 = mock(ProposalListener.class);
+        ProposalListener listener2 = mock(ProposalListener.class);
+        List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
+        proposalDistribution = new GaussianProposalDistribution(sigma, listeners);
+        Set<Vertex> vertices = ImmutableSet.of(vertex1, vertex2);
+        Proposal proposal = proposalDistribution.getProposal(vertices, KeanuRandom.getDefaultRandom());
+        proposal.apply();
+        verify(listener1).onProposalApplied(proposal);
+        verify(listener2).onProposalApplied(proposal);
+        proposal.reject();
+        verify(listener1).onProposalRejected(proposal);
+        verify(listener2).onProposalRejected(proposal);
+        verifyNoMoreInteractions(listener1, listener2);
     }
 }

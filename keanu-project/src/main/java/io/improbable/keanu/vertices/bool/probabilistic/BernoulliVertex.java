@@ -5,12 +5,12 @@ import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -21,7 +21,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor> {
+public class BernoulliVertex extends BooleanVertex implements ProbabilisticBoolean, SamplableWithManyScalars<BooleanTensor> {
 
     private final DoubleVertex probTrue;
     private final static String PROBTRUE_NAME = "probTrue";
@@ -34,7 +34,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
      * @param shape    the desired shape of the vertex
      * @param probTrue the probability the bernoulli returns true
      */
-    public BernoulliVertex(long[] shape, DoubleVertex probTrue) {
+    public BernoulliVertex(@LoadShape long[] shape, @LoadVertexParam(PROBTRUE_NAME) DoubleVertex probTrue) {
         super(shape);
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, probTrue.getShape());
         this.probTrue = probTrue;
@@ -48,7 +48,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
      * @param probTrue probTrue with same shape as desired Bernoulli tensor or scalar
      */
     @ExportVertexToPythonBindings
-    public BernoulliVertex(@LoadVertexParam(PROBTRUE_NAME) DoubleVertex probTrue) {
+    public BernoulliVertex(DoubleVertex probTrue) {
         this(probTrue.getShape(), probTrue);
     }
 
@@ -73,7 +73,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean,
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(BooleanTensor value, Set<? extends Vertex> withRespectTo) {
 
-        if (!(probTrue instanceof Differentiable)) {
+        if (!(probTrue.isDifferentiable())) {
             throw new UnsupportedOperationException("The probability of the Bernoulli being true must be differentiable");
         }
 

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import org.apache.commons.math3.random.MersenneTwister;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,5 +46,12 @@ public class KeanuRandomTest {
         assertEquals(1, random.nextLaplace(new long[]{1}, DoubleTensor.scalar(2), DoubleTensor.scalar(2)).getRank());
         assertEquals(2, random.nextLaplace(new long[]{1, 1}, DoubleTensor.scalar(2), DoubleTensor.scalar(2)).getRank());
         assertEquals(2, random.nextLaplace(new long[]{2, 3}, DoubleTensor.scalar(2), DoubleTensor.scalar(2)).getRank());
+    }
+
+    @Test
+    public void randomNumberGenerationIsPlatformIndependent() {
+        KeanuRandom keanuRandom = new KeanuRandom(1);
+        assertEquals(keanuRandom.nextDouble(), new MersenneTwister(1L).nextDouble());
+        assertEquals(keanuRandom.nextDouble(), 0.41782887182714457, 1e-16);
     }
 }

@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -23,12 +23,12 @@ public class LessThanVertexTest {
     }
 
     private void isLessThan(int a, int b, boolean expected) {
-        BoolVertex vertex = ConstantVertex.of(a).lessThan(ConstantVertex.of(b));
+        BooleanVertex vertex = ConstantVertex.of(a).lessThan(ConstantVertex.of(b));
         assertEquals(expected, vertex.eval().scalar());
     }
 
     private void isLessThan(double a, double b, boolean expected) {
-        BoolVertex vertex = ConstantVertex.of(a).lessThan(ConstantVertex.of(b));
+        BooleanVertex vertex = ConstantVertex.of(a).lessThan(ConstantVertex.of(b));
         assertEquals(expected, vertex.eval().scalar());
     }
 }

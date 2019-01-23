@@ -1,12 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -17,12 +15,11 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
 import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
 /**
@@ -66,27 +63,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     @Builder.Default
     private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
 
-    /**
-     * @param bayesianNetwork      a bayesian network containing latent vertices
-     * @param verticesToSampleFrom the vertices to include in the returned samples
-     * @param sampleCount          number of samples to take using the algorithm
-     * @return Samples for each vertex ordered by MCMC iteration
-     */
     @Override
-    public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
-                                              List<? extends Vertex> verticesToSampleFrom,
-                                              int sampleCount) {
-        return generatePosteriorSamples(bayesianNetwork, verticesToSampleFrom)
-            .generate(sampleCount);
-    }
-
-    public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
-                                              Vertex vertexToSampleFrom,
-                                              int sampleCount) {
-        return generatePosteriorSamples(bayesianNetwork, Collections.singletonList(vertexToSampleFrom))
-            .generate(sampleCount);
-    }
-
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
                                                             final List<? extends Vertex> verticesToSampleFrom) {
 
@@ -122,10 +99,10 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         private int sampleNum;
 
         public MetropolisHastingsSampler(List<Vertex> latentVertices,
-                       List<? extends Vertex> verticesToSampleFrom,
-                       MetropolisHastingsStep mhStep,
-                       MHStepVariableSelector variableSelector,
-                       double logProbabilityBeforeStep) {
+                                         List<? extends Vertex> verticesToSampleFrom,
+                                         MetropolisHastingsStep mhStep,
+                                         MHStepVariableSelector variableSelector,
+                                         double logProbabilityBeforeStep) {
             this.latentVertices = latentVertices;
             this.verticesToSampleFrom = verticesToSampleFrom;
             this.mhStep = mhStep;
@@ -154,18 +131,10 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         }
 
         @Override
-        public NetworkState sample() {
+        public NetworkSample sample() {
             step();
-            return new SimpleNetworkState(takeSample(verticesToSampleFrom));
+            return new NetworkSample(takeSample(verticesToSampleFrom), logProbabilityBeforeStep);
         }
-    }
-
-    private static Map<VertexId, ?> takeSample(List<? extends Vertex> fromVertices) {
-        Map<VertexId, Object> sample = new HashMap<>();
-        for (Vertex v : fromVertices) {
-            sample.put(v.getId(), v.getValue());
-        }
-        return sample;
     }
 
     private static void takeSamples(Map<VertexId, List<?>> samples, List<? extends Vertex> fromVertices) {

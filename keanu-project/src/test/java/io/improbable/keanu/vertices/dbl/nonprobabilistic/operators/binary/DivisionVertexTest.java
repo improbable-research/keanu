@@ -82,10 +82,20 @@ public class DivisionVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex A = new UniformVertex(new long[]{2, 2, 2}, 1.0, 10.0);
-        DoubleVertex B = new UniformVertex(new long[]{2, 2, 2}, 100.0, 150.0);
+        UniformVertex A = new UniformVertex(new long[]{2, 2, 2}, 1.0, 10.0);
+        UniformVertex B = new UniformVertex(new long[]{2, 2, 2}, 100.0, 150.0);
         MultiplicationVertex C = A.div(B).times(A);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), C, 0.001, 1e-5);
+    }
+
+    @Test
+    public void finiteDifferenceMatchesElementwise() {
+        BinaryOperationTestHelpers.finiteDifferenceMatchesElementwise(DoubleVertex::div);
+    }
+
+    @Test
+    public void finiteDifferenceMatchesSimpleBroadcast() {
+        BinaryOperationTestHelpers.finiteDifferenceMatchesBroadcast(DoubleVertex::div);
     }
 }

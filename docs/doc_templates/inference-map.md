@@ -24,7 +24,7 @@ page_nav:
 
 ## Model Fitting
 
-Now that we've learnt to describe and build a model in [describing your model]({{ site.baseurl }}/docs/describing-your-model), we want to put 
+Now that we've learnt to describe and build a model in [describing your model]({{ site.baseurl }}/docs/getting-started), we want to put 
 it to use! Keanu enables you to calculate the **most probable values** of components of your model given certain conditions
 or 'observations'. More formally, these are known as *posterior estimates*, and we are going to look at how we can obtain these
 through an optimization method called Maximum A Posteriori (MAP).
@@ -72,6 +72,8 @@ This section will focus on the parameters available to you on the Gradient Optim
 for the Gradient Optimizer that lets you change any combination of the default parameters. The snippet below demonstrates
 how to use the builder to change all of the available parameters.
 
+#### Java
+
 ```java
 {% snippet GradientOptimizerMostProbable %}
 ```
@@ -81,6 +83,11 @@ how to use the builder to change all of the available parameters.
 * `relativeThreshold` (default: 1e-8) - If the delta in the log prob is less than the log prob times relativeThreshold, the Optimizer has converged
 * `absoluteThreshold` (default: 1e-8) - If the delta in the log prob is less than absoluteThreshold, the Optimizer has converged
 
+#### Python
+
+```python
+{% snippet PythonGradientOptimizer %}
+```
 
 ### Non-Gradient Optimizer
 
@@ -92,6 +99,8 @@ This section will focus on the parameters available to you on the Non-Gradient O
 for the Non-Gradient Optimizer that lets you change any combination of the default parameters. The snippet below demonstrates
 how to use the builder to change all of the available parameters. 
 
+#### Java
+
 ```java
 {% snippet NonGradientOptimizerMostProbable %}
 ```
@@ -102,3 +111,9 @@ how to use the builder to change all of the available parameters.
 * `optimizerBounds` (default: no bounds) - a bounding box of 'allowed values' for a specific vertex 
 * `initialTrustRegionRadius` (default: 10) - initial trust region radius (refer to BOBYQA paper for detail)
 * `stoppingTrustRegionRadius` (default: 1e-8) - stopping trust region radius (refer to BOBYQA paper for detail) 
+
+#### Python
+
+```python
+{% snippet PythonNonGradientOptimizer %}
+```
