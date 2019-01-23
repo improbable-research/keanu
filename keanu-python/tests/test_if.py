@@ -53,3 +53,9 @@ def test_then_and_else_must_be_of_the_same_type():
         If(True, 1, 1.)
 
     assert str(excinfo.value) == "The \"then\" and \"else\" clauses must be of the same datatype: <class 'int'> vs <class 'float'>"
+
+def test_predicate_must_be_boolean():
+    with pytest.raises(TypeError) as excinfo:
+        If(1, 1, 1)
+
+    assert str(excinfo.value) == "Predicate must be boolean: got keanu.vertex.base.Integer"
