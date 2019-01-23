@@ -6,7 +6,7 @@ except ImportError:  # mpl is optional
 
 import numpy as np
 from keanu.vartypes import sample_types, numpy_types, vertex_label_types
-from typing import Any, List, Union
+from typing import Any, List
 
 
 def traceplot(trace: sample_types, labels: List[vertex_label_types] = None, ax: Any = None, x0: int = 0) -> Any:
