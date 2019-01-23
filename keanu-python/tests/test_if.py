@@ -1,7 +1,11 @@
+from typing import Union
+
 import pytest
 import numpy as np
 import pandas as pd
-from keanu.vertex import If, Bernoulli, Gaussian, Const, Double, Poisson, Integer, Boolean, Exponential
+
+from keanu.vartypes import tensor_arg_types
+from keanu.vertex import If, Bernoulli, Gaussian, Const, Double, Poisson, Integer, Boolean, Exponential, Vertex
 
 
 @pytest.mark.parametrize("predicate", [
@@ -11,7 +15,7 @@ from keanu.vertex import If, Bernoulli, Gaussian, Const, Double, Poisson, Intege
     1., np.array([1., 2.]), pd.Series([1., 2.]),
     Exponential(1.), Const(np.array([1., 2.]))
 ])
-def test_you_can_create_a_double_valued_if(data, predicate) -> None:
+def test_you_can_create_a_double_valued_if(predicate: Union[tensor_arg_types, Vertex], data: Union[tensor_arg_types, Vertex]) -> None:
     thn = data
     els = data
     result = If(predicate, thn, els)
@@ -26,7 +30,7 @@ def test_you_can_create_a_double_valued_if(data, predicate) -> None:
     1, np.array([1, 2]), pd.Series([1, 2]),
     Poisson(1), Const(np.array([1, 2]))
 ])
-def test_you_can_create_an_integer_valued_if(data, predicate) -> None:
+def test_you_can_create_an_integer_valued_if(predicate: Union[tensor_arg_types, Vertex], data: Union[tensor_arg_types, Vertex]) -> None:
     thn = data
     els = data
     result = If(predicate, thn, els)
@@ -41,7 +45,7 @@ def test_you_can_create_an_integer_valued_if(data, predicate) -> None:
     True, np.array([True, False]), pd.Series([True, False]),
     Bernoulli(True), Const(np.array([True, False]))
 ])
-def test_you_can_create_a_boolean_valued_if(data, predicate) -> None:
+def test_you_can_create_a_boolean_valued_if(predicate: Union[tensor_arg_types, Vertex], data: Union[tensor_arg_types, Vertex]) -> None:
     thn = data
     els = data
     result = If(predicate, thn, els)
