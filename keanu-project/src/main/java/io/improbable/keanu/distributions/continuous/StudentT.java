@@ -4,7 +4,8 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -65,7 +66,7 @@ public class StudentT implements ContinuousDistribution {
             );
     }
 
-    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex t, LogProbGraph.IntegerPlaceHolderVertex v) {
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex t, IntegerPlaceHolderVertex v) {
 
         DoubleVertex vAsDouble = v.toDouble();
         DoubleVertex halfVPlusOne = vAsDouble.plus(1.).div(2.);

@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -88,8 +89,8 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
 
     @Override
     public LogProbGraph logProbGraph() {
-        LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
-        LogProbGraph.DoublePlaceholderVertex concentrationPlaceholder = new LogProbGraph.DoublePlaceholderVertex(concentration.getShape());
+        DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        DoublePlaceholderVertex concentrationPlaceholder = new DoublePlaceholderVertex(concentration.getShape());
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)

@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -104,9 +105,9 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
 
     @Override
     public LogProbGraph logProbGraph() {
-        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
-        final LogProbGraph.DoublePlaceholderVertex locationPlaceholder = new LogProbGraph.DoublePlaceholderVertex(location.getShape());
-        final LogProbGraph.DoublePlaceholderVertex scalePlaceholder = new LogProbGraph.DoublePlaceholderVertex(scale.getShape());
+        final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex locationPlaceholder = new DoublePlaceholderVertex(location.getShape());
+        final DoublePlaceholderVertex scalePlaceholder = new DoublePlaceholderVertex(scale.getShape());
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)

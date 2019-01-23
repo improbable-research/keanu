@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -105,9 +106,9 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
 
     @Override
     public LogProbGraph logProbGraph() {
-        LogProbGraph.DoublePlaceholderVertex xPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
-        LogProbGraph.DoublePlaceholderVertex locationPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(location.getShape());
-        LogProbGraph.DoublePlaceholderVertex scalePlaceHolder = new LogProbGraph.DoublePlaceholderVertex(scale.getShape());
+        DoublePlaceholderVertex xPlaceHolder = new DoublePlaceholderVertex(this.getShape());
+        DoublePlaceholderVertex locationPlaceHolder = new DoublePlaceholderVertex(location.getShape());
+        DoublePlaceholderVertex scalePlaceHolder = new DoublePlaceholderVertex(scale.getShape());
 
         return LogProbGraph.builder()
             .input(this, xPlaceHolder)

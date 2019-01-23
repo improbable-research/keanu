@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -110,9 +111,9 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
 
     @Override
     public LogProbGraph logProbGraph() {
-        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
-        final LogProbGraph.DoublePlaceholderVertex alphaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(alpha.getShape());
-        final LogProbGraph.DoublePlaceholderVertex betaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(beta.getShape());
+        final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex alphaPlaceholder = new DoublePlaceholderVertex(alpha.getShape());
+        final DoublePlaceholderVertex betaPlaceholder = new DoublePlaceholderVertex(beta.getShape());
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)

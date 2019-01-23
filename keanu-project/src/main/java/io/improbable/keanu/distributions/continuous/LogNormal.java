@@ -3,7 +3,7 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -44,7 +44,7 @@ public class LogNormal implements ContinuousDistribution {
         return lnXMinusMuSquaredOver2Variance.plusInPlace(lnSigmaX).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
     }
 
-    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex x, LogProbGraph.DoublePlaceholderVertex mu, LogProbGraph.DoublePlaceholderVertex sigma) {
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex mu, DoublePlaceholderVertex sigma) {
         final DoubleVertex lnSigmaX = sigma.times(x).log();
         final DoubleVertex lnXMinusMuSquared = x.log().minus(mu).pow(2.);
         final DoubleVertex lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.div(sigma.pow(2.).times(2.));

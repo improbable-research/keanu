@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -63,7 +63,7 @@ public class Beta implements ContinuousDistribution {
         return alphaMinusOneTimesLnX.plusInPlace(betaMinusOneTimesOneMinusXLn).minusInPlace(betaFunction);
     }
 
-    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex x, LogProbGraph.DoublePlaceholderVertex alpha, LogProbGraph.DoublePlaceholderVertex beta) {
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex alpha, DoublePlaceholderVertex beta) {
         final DoubleVertex lnGammaAlpha = alpha.logGamma();
         final DoubleVertex lnGammaBeta = beta.logGamma();
         final DoubleVertex alphaPlusBetaLnGamma = (alpha.plus(beta)).logGamma();

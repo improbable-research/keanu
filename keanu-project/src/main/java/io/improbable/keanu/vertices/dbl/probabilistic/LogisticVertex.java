@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -92,9 +93,9 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
 
     @Override
     public LogProbGraph logProbGraph() {
-        final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
-        final LogProbGraph.DoublePlaceholderVertex muPlaceholder = new LogProbGraph.DoublePlaceholderVertex(mu.getShape());
-        final LogProbGraph.DoublePlaceholderVertex sPlaceholder = new LogProbGraph.DoublePlaceholderVertex(s.getShape());
+        final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex muPlaceholder = new DoublePlaceholderVertex(mu.getShape());
+        final DoublePlaceholderVertex sPlaceholder = new DoublePlaceholderVertex(s.getShape());
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)

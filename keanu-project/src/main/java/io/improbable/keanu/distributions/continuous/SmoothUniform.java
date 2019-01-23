@@ -3,7 +3,7 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -130,7 +130,7 @@ public class SmoothUniform implements ContinuousDistribution {
             .logInPlace();
     }
 
-    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex x, LogProbGraph.DoublePlaceholderVertex xMin, LogProbGraph.DoublePlaceholderVertex xMax, double edgeSharpness) {
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex xMin, DoublePlaceholderVertex xMax, double edgeSharpness) {
         final DoubleVertex bodyWidth = xMax.minus(xMin);
         final DoubleVertex shoulderWidth = bodyWidth.times(edgeSharpness);
         final DoubleVertex rightCutoff = xMax.plus(shoulderWidth);

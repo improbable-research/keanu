@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -112,9 +113,9 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
 
     @Override
     public LogProbGraph logProbGraph() {
-        final LogProbGraph.DoublePlaceholderVertex xPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
-        final LogProbGraph.DoublePlaceholderVertex alphaPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(alpha.getShape());
-        final LogProbGraph.DoublePlaceholderVertex betaPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(beta.getShape());
+        final DoublePlaceholderVertex xPlaceHolder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex alphaPlaceHolder = new DoublePlaceholderVertex(alpha.getShape());
+        final DoublePlaceholderVertex betaPlaceHolder = new DoublePlaceholderVertex(beta.getShape());
 
         return LogProbGraph.builder()
             .input(this, xPlaceHolder)

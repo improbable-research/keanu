@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -45,7 +45,7 @@ public class Cauchy implements ContinuousDistribution {
         return negLnScaleMinusLnPi.minusInPlace(lnXMinusLocationOverScalePow2Plus1);
     }
 
-    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex x, LogProbGraph.DoublePlaceholderVertex location, LogProbGraph.DoublePlaceholderVertex scale) {
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex location, DoublePlaceholderVertex scale) {
         final DoubleVertex negLnScaleMinusLnPi = scale.log().unaryMinus().plus(NEG_LOG_PI);
         final DoubleVertex xMinusLocationOverScalePow2Plus1 = x.minus(location).div(scale).pow(2.).plus(1.);
         final DoubleVertex lnXMinusLocationOverScalePow2Plus1 = xMinusLocationOverScalePow2Plus1.log();
