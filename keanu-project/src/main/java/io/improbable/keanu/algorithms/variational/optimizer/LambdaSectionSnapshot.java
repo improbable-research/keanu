@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class LambdaSectionSnapshot {
-    private static final boolean USE_CACHE_ON_REJECTION = true;
 
     private final List<Vertex> latentVertices;
     private Map<Variable, LambdaSection> affectedVariablesCache;
@@ -23,8 +22,7 @@ public class LambdaSectionSnapshot {
     private void update() {
         if (affectedVariablesCache == null) {
             affectedVariablesCache = createVariablesAffectedByCache(
-                latentVertices,
-                USE_CACHE_ON_REJECTION
+                latentVertices
             );
         }
     }
@@ -49,20 +47,17 @@ public class LambdaSectionSnapshot {
 
     /**
      * This creates a cache of potentially all vertices downstream to an observed or probabilistic vertex
-     * from each latent vertex. If useCacheOnRejection is false then only the downstream observed or probabilistic
-     * is cached.
+     * from each latent vertex.
      *
      * @param latentVertices      The latent vertices to create a cache for
-     * @param useCacheOnRejection Whether or not to cache the entire downstream set or just the observed/probabilistic
      * @return A variable to Lambda Section map that represents the downstream Lambda Section for each latent vertex.
      * This Lambda Section may include all of the nonprobabilistic vertices if useCacheOnRejection is enabled.
      */
-    private static Map<Variable, LambdaSection> createVariablesAffectedByCache(List<Vertex> latentVertices,
-                                                                               boolean useCacheOnRejection) {
+    private static Map<Variable, LambdaSection> createVariablesAffectedByCache(List<Vertex> latentVertices) {
         return latentVertices.stream()
             .collect(Collectors.toMap(
                 v -> v,
-                v -> LambdaSection.getDownstreamLambdaSection(v, useCacheOnRejection)
+                v -> LambdaSection.getDownstreamLambdaSection(v, true)
             ));
     }
 }
