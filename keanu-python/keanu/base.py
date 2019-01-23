@@ -22,7 +22,7 @@ class JavaObjectWrapper:
         self.__check_java_object_has_attr(attr, java_name)
 
         logging.getLogger("keanu").warning(
-                "\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(attr, java_name))
+            "\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(attr, java_name))
         return self.unwrap().__getattr__(java_name)
 
     def unwrap(self) -> JavaObject:
@@ -32,7 +32,8 @@ class JavaObjectWrapper:
         snake_case = _to_snake_case_name(attr)
         if attr != snake_case:
             if snake_case in self.__class__.__dict__:
-                raise AttributeError("{} has no attribute {}. Did you mean {}?".format(self.__class__, attr, snake_case))
+                raise AttributeError("{} has no attribute {}. Did you mean {}?".format(
+                    self.__class__, attr, snake_case))
             else:
                 raise AttributeError("{} has no attribute {}.".format(self.__class__, attr))
 
