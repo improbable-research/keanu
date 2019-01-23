@@ -92,8 +92,12 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     }
 
     private static long[] calculatePermutedShape(DoubleVertex inputVertex, int... rearrange) {
-        DoubleTensor inputShape = DoubleTensor.create(Arrays.stream(inputVertex.getShape()).asDoubleStream().toArray(), inputVertex.getShape());
-        return inputShape.permute(rearrange).getShape();
+        long[] shape = inputVertex.getShape();
+        long[] permutedShape = new long[shape.length];
+        for (int i = 0; i < shape.length; i++) {
+            permutedShape[i] = shape[rearrange[i]];
+        }
+        return permutedShape;
     }
 
     @SaveVertexParam(REARRANGE_NAME)
