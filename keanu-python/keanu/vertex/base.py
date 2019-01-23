@@ -209,6 +209,9 @@ class Double(Vertex):
 
 class Integer(Vertex):
 
+    def cast(self, v: tensor_arg_types) -> tensor_arg_types:
+        return cast_tensor_arg_to_integer(v)
+
     def __array_ufunc__(self, ufunc: np.ufunc, method: str, input0: numpy_types, input1: 'Vertex') -> 'Vertex':
         methods = {
             "add": Integer.__radd__,
@@ -228,57 +231,50 @@ class Integer(Vertex):
         else:
             raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
 
-    @staticmethod
-    def __use_double_version(other: vertex_operation_param_types) -> bool:
-        if (isinstance(other, np.ndarray)):
-            return np.issubdtype(other.dtype, np.floating)
-
-        return type(other) == Double or isinstance(other, runtime_float_types)
-
     def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if self.__use_double_version(other):
+        if is_floating_type(other):
             return kn.vertex.generated.Addition(kn.vertex.generated.CastToDouble(self), other)
 
         return kn.vertex.generated.IntegerAddition(self, other)
 
     def __radd__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if self.__use_double_version(other):
+        if is_floating_type(other):
             return kn.vertex.generated.Addition(kn.vertex.generated.CastToDouble(self), other)
 
         return kn.vertex.generated.IntegerAddition(other, self)
 
     def __sub__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if self.__use_double_version(other):
+        if is_floating_type(other):
             return kn.vertex.generated.Difference(kn.vertex.generated.CastToDouble(self), other)
 
         return kn.vertex.generated.IntegerDifference(self, other)
 
     def __rsub__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if self.__use_double_version(other):
+        if is_floating_type(other):
             return kn.vertex.generated.Difference(other, kn.vertex.generated.CastToDouble(self))
 
         return kn.vertex.generated.IntegerDifference(other, self)
 
     def __mul__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if self.__use_double_version(other):
+        if is_floating_type(other):
             return kn.vertex.generated.Multiplication(kn.vertex.generated.CastToDouble(self), other)
 
         return kn.vertex.generated.IntegerMultiplication(self, other)
 
     def __rmul__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if self.__use_double_version(other):
+        if is_floating_type(other):
             return kn.vertex.generated.Multiplication(other, kn.vertex.generated.CastToDouble(self))
 
         return kn.vertex.generated.IntegerMultiplication(other, self)
 
     def __pow__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if self.__use_double_version(other):
+        if is_floating_type(other):
             return kn.vertex.generated.Power(kn.vertex.generated.CastToDouble(self), other)
 
         return kn.vertex.generated.IntegerPower(self, other)
 
     def __rpow__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if self.__use_double_version(other):
+        if is_floating_type(other):
             return kn.vertex.generated.Power(other, kn.vertex.generated.CastToDouble(self))
 
         return kn.vertex.generated.IntegerPower(other, self)
@@ -306,9 +302,6 @@ class Integer(Vertex):
             return kn.vertex.generated.Floor(intermediate)
 
         return kn.vertex.generated.IntegerDivision(other, self)
-
-    def cast(self, v: tensor_arg_types) -> tensor_arg_types:
-        return cast_tensor_arg_to_integer(v)
 
 
 class Boolean(Vertex):
@@ -338,3 +331,10 @@ def cast_tensor_arg_to_integer(arg: tensor_arg_types) -> tensor_arg_types:
 
 def cast_tensor_arg_to_boolean(arg: tensor_arg_types) -> tensor_arg_types:
     return __cast_to(arg, bool)
+
+
+def is_floating_type(other: vertex_operation_param_types) -> bool:
+    if isinstance(other, np.ndarray):
+        return np.issubdtype(other.dtype, np.floating)
+
+    return type(other) == Double or isinstance(other, runtime_float_types)
