@@ -105,6 +105,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
         double initialLogOfMasterP = ProbabilityCalculator.calculateLogProbFor(probabilisticVertices);
+        Map<VertexId, Object> initialSample = takeSample(sampleFromVertices);
 
         double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(position,
             gradient,
@@ -121,9 +122,9 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        resetVertexValue(sampleFromVertices, position);
+        resetVertexValue(latentVertices, position);
 
-        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample(sampleFromVertices));
+        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, initialSample);
 
         return new NUTSSampler(
             sampleFromVertices,

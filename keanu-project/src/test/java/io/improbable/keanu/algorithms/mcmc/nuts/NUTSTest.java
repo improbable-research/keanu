@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static io.improbable.keanu.algorithms.mcmc.nuts.NUTS.Metrics.STEPSIZE;
@@ -88,9 +87,6 @@ public class NUTSTest {
         );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
-
-        posteriorSamples.get(vertex).asList().stream()
-            .forEach(v -> System.out.println(Arrays.toString(v.asFlatDoubleArray())));
 
         MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
     }
