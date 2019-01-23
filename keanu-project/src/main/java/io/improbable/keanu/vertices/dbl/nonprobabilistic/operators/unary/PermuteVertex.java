@@ -18,12 +18,14 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     private final static String REARRANGE_NAME = "rearrange";
 
     private final int[] rearrange;
+    private final int[] invertedRearrange;
 
     @ExportVertexToPythonBindings
     public PermuteVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                          @LoadVertexParam(REARRANGE_NAME) int... rearrange) {
         super(calculatePermutedShape(inputVertex, rearrange), inputVertex);
         this.rearrange = rearrange;
+        this.invertedRearrange = invertedPermute(rearrange);
     }
 
     @Override
@@ -35,50 +37,58 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
         PartialDerivative derivativeOfParentWithRespectToInputs = derivativeOfParentsWithRespectToInput.get(inputVertex);
         int[] permuteToApply = forwardPermute(derivativeOfParentWithRespectToInputs);
-        return derivativeOfParentWithRespectToInputs.permute(permuteToApply);
+        DoubleTensor result = derivativeOfParentWithRespectToInputs.get().permute(permuteToApply);
+        return new PartialDerivative(result);
     }
 
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
         int[] permuteToApply = reversePermute(derivativeOfOutputWithRespectToSelf);
-        partials.put(inputVertex, derivativeOfOutputWithRespectToSelf.permute(permuteToApply));
+        DoubleTensor result = derivativeOfOutputWithRespectToSelf.get().permute(permuteToApply);
+        partials.put(inputVertex, new PartialDerivative(result));
         return partials;
     }
 
     private int[] forwardPermute(PartialDerivative partial) {
-        long[] wrtShape = partial.getWrtShape(inputVertex.getShape());
         int[] permuteToApply = new int[partial.get().getRank()];
 
-        for (int i = 0; i < rearrange.length; i++) {
-            permuteToApply[i] = rearrange[i];
-        }
-
-        for (int j = 0; j < wrtShape.length; j++) {
-            permuteToApply[j + rearrange.length] = j + rearrange.length;
+        for (int i = 0; i < partial.get().getRank(); i++) {
+            if (i < rearrange.length) {
+                permuteToApply[i] = rearrange[i];
+            } else {
+                permuteToApply[i] = i;
+            }
         }
 
         return permuteToApply;
     }
 
     private int[] reversePermute(PartialDerivative partial) {
-        long[] ofShape = partial.getOfShape(inputVertex.getShape());
-        long[] wrtShape = partial.getWrtShape(ofShape);
-        int[] reversedPermute = new int[partial.get().getRank()];
 
-        for (int i = 0; i < ofShape.length; i++) {
-            reversedPermute[i] = i;
-        }
+        int partialRank = partial.get().getRank();
+        int[] permuteToApply = new int[partialRank];
+        int ofRank = partialRank - this.getRank();
 
-        for (int j = 0; j < wrtShape.length; j++) {
-            for (int k = 0; k < wrtShape.length; k++) {
-                if (j == rearrange[k]) {
-                    reversedPermute[j + ofShape.length] = k + ofShape.length;
-                }
+        for (int i = 0; i < partialRank; i++) {
+            if (i >= ofRank) {
+                permuteToApply[i] = invertedRearrange[i - ofRank] + ofRank;
+            } else {
+                permuteToApply[i] = i;
             }
         }
 
-        return reversedPermute;
+        return permuteToApply;
+    }
+
+    private static int[] invertedPermute(int[] rearrange) {
+        int[] inverted = new int[rearrange.length];
+
+        for (int i = 0; i < rearrange.length; i++) {
+            inverted[rearrange[i]] = i;
+        }
+
+        return inverted;
     }
 
     private static long[] calculatePermutedShape(DoubleVertex inputVertex, int... rearrange) {

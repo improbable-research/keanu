@@ -123,11 +123,6 @@ public class PartialDerivative {
         return new PartialDerivative(result);
     }
 
-    public PartialDerivative permute(int[] rearrange) {
-        DoubleTensor result = partial.permute(rearrange);
-        return new PartialDerivative(result);
-    }
-
     public static PartialDerivative matrixMultiplyAlongOfDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
 
         if (!partial.isPresent()) {

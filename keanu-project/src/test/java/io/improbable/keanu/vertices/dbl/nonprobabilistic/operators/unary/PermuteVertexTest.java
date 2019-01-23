@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
@@ -10,7 +9,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.testWithFiniteDifference;
 
 public class PermuteVertexTest {
 
@@ -27,18 +26,15 @@ public class PermuteVertexTest {
 
     @Test
     public void changesMatchGradientRankTwo() {
-        UniformVertex inputVertex = new UniformVertex(new long[]{4, 5}, -10.0, 10.0);
-        PermuteVertex outputVertex = inputVertex.permute(1, 0);
-
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-10, 1e-10);
+        testWithFiniteDifference(v -> v.permute(1, 0), new long[]{4, 5});
+        testWithFiniteDifference(v -> v.permute(0, 1), new long[]{4, 5});
     }
 
     @Test
     public void changesMatchGradientRankThree() {
-        UniformVertex inputVertex = new UniformVertex(new long[]{4, 3, 2}, -10.0, 10.0);
-        PermuteVertex outputVertex = inputVertex.permute(1, 2, 0);
-
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-10, 1e-10);
+        testWithFiniteDifference(v -> v.permute(1, 2, 0), new long[]{4, 3, 2});
+        testWithFiniteDifference(v -> v.permute(0, 1, 2), new long[]{4, 3, 2});
+        testWithFiniteDifference(v -> v.permute(2, 1, 0), new long[]{4, 3, 2});
     }
 
     @Test
