@@ -11,8 +11,7 @@ from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_wrapped_java_types,
-                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, runtime_float_types,
-                            runtime_int_types)
+                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, runtime_float_types)
 
 k = KeanuContext()
 
