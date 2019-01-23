@@ -209,6 +209,26 @@ class Double(Vertex):
 
 class Integer(Vertex):
 
+    def __array_ufunc__(self, ufunc: np.ufunc, method: str, input0: numpy_types, input1: 'Vertex') -> 'Vertex':
+        methods = {
+            "add": Integer.__radd__,
+            "subtract": Integer.__rsub__,
+            "multiply": Integer.__rmul__,
+            "power": Integer.__rpow__,
+            "true_divide": Integer.__rtruediv__,
+            "floor_divide": Integer.__rfloordiv__,
+        }
+        if method == "__call__":
+            try:
+                dispatch_method = methods[ufunc.__name__]
+                result = dispatch_method(input1, input0)
+                return result
+            except KeyError:
+                return super().__array_ufunc__(ufunc, method, input0, input1)
+        else:
+            raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
+
+
     @staticmethod
     def __use_double_version(other: vertex_operation_param_types) -> bool:
         return type(other) == Double or isinstance(other, runtime_float_types)
