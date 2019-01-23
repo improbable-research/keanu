@@ -223,6 +223,7 @@ def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, floa
     (       np.array([15., 10.]),     Const(np.array([2, 4])), np.array([7.5, 2.5 ]), Double),
     (         np.array([15, 10]),   Const(np.array([2., 4.])), np.array([7.5, 2.5 ]), Double),
     (  Const(np.array([15, 10])),     Const(np.array([2, 4])), np.array([7.5, 2.5 ]), Double),
+    (                        10.,                    Const(5),                     2, Double),
 ])
 # yapf: enable
 def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,

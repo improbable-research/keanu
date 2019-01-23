@@ -279,12 +279,9 @@ class Integer(Vertex):
         return kn.vertex.generated.IntegerPower(other, self)
 
     def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        # true div should always return a Double
-        if is_floating_type(other):
-            return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(self), other)
-
+        other = cast_to_double_vertex_if_integer_vertex(other)
         return kn.vertex.generated.Division(
-            kn.vertex.generated.CastToDouble(self), kn.vertex.generated.CastToDouble(other))
+            kn.vertex.generated.CastToDouble(self), other)
 
     def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.Division(other, kn.vertex.generated.CastToDouble(self))
