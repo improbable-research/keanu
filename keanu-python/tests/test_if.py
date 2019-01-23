@@ -47,3 +47,9 @@ def test_you_can_create_a_boolean_valued_if(data, predicate) -> None:
     result = If(predicate, thn, els)
     assert type(result) == Boolean
     assert result.unwrap().getClass().getSimpleName() == "BooleanIfVertex"
+
+def test_then_and_else_must_be_of_the_same_type():
+    with pytest.raises(TypeError) as excinfo:
+        If(True, 1, 1.)
+
+    assert str(excinfo.value) == "The \"then\" and \"else\" clauses must be of the same datatype: <class 'int'> vs <class 'float'>"

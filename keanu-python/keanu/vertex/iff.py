@@ -14,13 +14,16 @@ def If(predicate: Vertex, thn: Vertex, els: Vertex) -> Vertex:
     thn = __cast_to_vertex(thn)
     els = __cast_to_vertex(els)
 
-    type_ = get_type_of_value(thn.get_value())
+    then_type = get_type_of_value(thn.get_value())
+    else_type = get_type_of_value(els.get_value())
+    if (then_type != else_type):
+        raise TypeError('The "then" and "else" clauses must be of the same datatype: {} vs {}'.format(then_type, else_type))
 
-    if type_ == bool:
+    if then_type == bool:
         return BooleanIf(predicate, thn, els)
-    elif type_ == int:
+    elif then_type == int:
         return IntegerIf(predicate, thn, els)
-    elif type_ == float:
+    elif then_type == float:
         return DoubleIf(predicate, thn, els)
     else:
-        raise NotImplementedError("Unexpected type {} for vertex {}".format(type_, thn))
+        raise NotImplementedError("Unexpected type {} for vertex {}".format(then_type, thn))
