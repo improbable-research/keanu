@@ -33,8 +33,8 @@ public class NetworkSamples {
     private final List<Double> logOfMasterPForEachSample;
     private final int size;
 
-    public NetworkSamples(Map<VariableReference, ? extends List> samplesByVertex, List<Double> logOfMasterPForEachSample, int size) {
-        this.samplesByVariable = samplesByVertex;
+    public NetworkSamples(Map<VariableReference, ? extends List> samplesByVariable, List<Double> logOfMasterPForEachSample, int size) {
+        this.samplesByVariable = samplesByVariable;
         this.logOfMasterPForEachSample = logOfMasterPForEachSample;
         this.size = size;
     }

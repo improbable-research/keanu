@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
@@ -112,11 +111,7 @@ public class SimulatedAnnealing {
             }
         }
 
-        return new SimpleNetworkState(mapByVariableReference(maxSamplesByVariable));
-    }
-
-    private <T> Map<VariableReference, T> mapByVariableReference(Map<VariableReference, T> legacyMap) {
-        return legacyMap.entrySet().stream().collect(Collectors.toMap(k -> (VariableReference) k.getKey(), Map.Entry::getValue));
+        return new SimpleNetworkState(maxSamplesByVariable);
     }
 
     private static void setSamplesAsMax(Map<VariableReference, ?> samples, List<? extends Variable> fromVariables) {

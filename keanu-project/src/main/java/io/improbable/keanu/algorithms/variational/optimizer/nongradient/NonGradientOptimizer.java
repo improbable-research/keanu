@@ -157,7 +157,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
 
 
-        public NonGradientOptimizerBuilder bayesianNetwork(ProbabilisticModel probabilisticModel) {
+        public NonGradientOptimizerBuilder probabilisticModel(ProbabilisticModel probabilisticModel) {
             this.probabilisticModel = probabilisticModel;
             return this;
         }

@@ -72,7 +72,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     private void checkBayesNetInHealthyState() {
         if (latentOrObservedVertices.isEmpty()) {
-            throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
+            throw new IllegalArgumentException("Cannot run inference or sampling from a completely deterministic BayesNet");
         } else if (ProbabilityCalculator.isImpossibleLogProb(this.logProb())) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }

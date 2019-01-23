@@ -101,7 +101,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     @Override
     public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
                                                             final List<? extends Variable> fromVariables) {
-
+        Preconditions.checkArgument(model instanceof ProbabilisticModelWithGradient, "NUTS requires a model on which gradients can be calculated.");
         return new NetworkSamplesGenerator(setupSampler((ProbabilisticModelWithGradient) model, fromVariables), ProgressBar::new);
     }
 

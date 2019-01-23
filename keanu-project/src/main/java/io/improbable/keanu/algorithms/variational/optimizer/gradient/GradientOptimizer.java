@@ -195,7 +195,7 @@ public class GradientOptimizer implements Optimizer {
         GradientOptimizerBuilder() {
         }
 
-        public GradientOptimizerBuilder bayesianNetwork(ProbabilisticModelWithGradient probabilisticModel) {
+        public GradientOptimizerBuilder probabilisticModel(ProbabilisticModelWithGradient probabilisticModel) {
             this.probabilisticModel = probabilisticModel;
             return this;
         }

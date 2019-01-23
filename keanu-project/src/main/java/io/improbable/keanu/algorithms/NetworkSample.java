@@ -22,9 +22,9 @@ public class NetworkSample implements NetworkState {
     private final double logOfMasterP;
 
     /**
-     * @param variable the vertex to get the values of
+     * @param variable the variable to get the values of
      * @param <T>    the type of the values that the vertex contains
-     * @return the values of the specified vertex
+     * @return the values of the specified variable
      */
     @Override
     public <T> T get(Variable<T, ?> variable) {
@@ -32,9 +32,9 @@ public class NetworkSample implements NetworkState {
     }
 
     /**
-     * @param variableReference the ID of the vertex to get the values of
-     * @param <T>      the type of the values that the vertex contains
-     * @return the values of the specified vertex
+     * @param variableReference the reference to the variable to get the values of
+     * @param <T>      the type of the values that the variable contains
+     * @return the values of the specified variable
      */
     @Override
     public <T> T get(VariableReference variableReference) {

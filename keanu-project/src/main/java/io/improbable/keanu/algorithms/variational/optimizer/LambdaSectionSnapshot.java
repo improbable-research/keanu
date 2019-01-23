@@ -29,10 +29,10 @@ public class LambdaSectionSnapshot {
         }
     }
 
-    public double logProb(Set<? extends Variable> vertices) {
+    public double logProb(Set<? extends Variable> variables) {
         update();
         double sumLogProb = 0.0;
-        for (Variable v : vertices) {
+        for (Variable v : variables) {
             sumLogProb += ProbabilityCalculator.calculateLogProbFor(affectedVariablesCache.get(v).getLatentAndObservedVertices());
         }
         return sumLogProb;
@@ -40,11 +40,11 @@ public class LambdaSectionSnapshot {
 
     public Set<? extends Variable> getAllVariablesAffectedBy(Set<? extends Variable> variables) {
         update();
-        Set<Variable> allAffectedVertices = new HashSet<>();
+        Set<Variable> allAffectedVariables = new HashSet<>();
         for (Variable variable : variables) {
-            allAffectedVertices.addAll(affectedVariablesCache.get(variable).getAllVertices());
+            allAffectedVariables.addAll(affectedVariablesCache.get(variable).getAllVertices());
         }
-        return allAffectedVertices;
+        return allAffectedVariables;
     }
 
     /**
@@ -54,7 +54,7 @@ public class LambdaSectionSnapshot {
      *
      * @param latentVertices      The latent vertices to create a cache for
      * @param useCacheOnRejection Whether or not to cache the entire downstream set or just the observed/probabilistic
-     * @return A vertex to Lambda Section map that represents the downstream Lambda Section for each latent vertex.
+     * @return A variable to Lambda Section map that represents the downstream Lambda Section for each latent vertex.
      * This Lambda Section may include all of the nonprobabilistic vertices if useCacheOnRejection is enabled.
      */
     private static Map<Variable, LambdaSection> createVariablesAffectedByCache(List<Vertex> latentVertices,

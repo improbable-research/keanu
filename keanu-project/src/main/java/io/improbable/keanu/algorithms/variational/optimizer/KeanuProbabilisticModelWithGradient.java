@@ -11,8 +11,8 @@ import java.util.Set;
 
 public class KeanuProbabilisticModelWithGradient extends KeanuProbabilisticModel implements ProbabilisticModelWithGradient {
 
-    private LogProbGradientCalculator logProbGradientCalculator;
-    private LogProbGradientCalculator logLikelihoodGradientCalculator;
+    private final LogProbGradientCalculator logProbGradientCalculator;
+    private final LogProbGradientCalculator logLikelihoodGradientCalculator;
 
     public KeanuProbabilisticModelWithGradient(BayesianNetwork bayesianNetwork) {
         super(bayesianNetwork);
