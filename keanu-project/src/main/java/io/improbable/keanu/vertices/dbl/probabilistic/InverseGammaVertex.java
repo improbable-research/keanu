@@ -114,17 +114,11 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
         final LogProbGraph.DoublePlaceholderVertex alphaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(alpha.getShape());
         final LogProbGraph.DoublePlaceholderVertex betaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(beta.getShape());
 
-        final DoubleVertex aTimesLnB = alphaPlaceholder.times(betaPlaceholder.log());
-        final DoubleVertex negAMinus1TimesLnX = xPlaceholder.log().times(alphaPlaceholder.unaryMinus().minus(1.));
-        final DoubleVertex lnGammaA = alphaPlaceholder.logGamma();
-
-        final DoubleVertex logProbOutput = aTimesLnB.plus(negAMinus1TimesLnX).minus(lnGammaA).minus(betaPlaceholder.div(xPlaceholder));
-
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
             .input(alpha, alphaPlaceholder)
             .input(beta, betaPlaceholder)
-            .logProbOutput(logProbOutput)
+            .logProbOutput(InverseGamma.logProbOutput(xPlaceholder, alphaPlaceholder, betaPlaceholder))
             .build();
     }
 

@@ -154,54 +154,12 @@ public class SmoothUniformVertex extends DoubleVertex implements Differentiable,
         final LogProbGraph.DoublePlaceholderVertex xMinPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMin.getShape());
         final LogProbGraph.DoublePlaceholderVertex xMaxPlaceholder = new LogProbGraph.DoublePlaceholderVertex(xMax.getShape());
 
-        final DoubleVertex bodyWidth = xMaxPlaceholder.minus(xMinPlaceholder);
-        final DoubleVertex shoulderWidth = bodyWidth.times(edgeSharpness);
-        final DoubleVertex rightCutoff = xMaxPlaceholder.plus(shoulderWidth);
-        final DoubleVertex leftCutoff = xMinPlaceholder.minus(shoulderWidth);
-
-        final DoubleVertex firstConditional = xPlaceholder
-            .toGreaterThanOrEqualToMask(xMinPlaceholder)
-            .times(xPlaceholder.toLessThanOrEqualToMask(xMaxPlaceholder));
-        final DoubleVertex firstConditionalResult = firstConditional.times(bodyHeight(shoulderWidth, bodyWidth));
-
-        final DoubleVertex secondConditional = xPlaceholder
-            .toLessThanMask(xMinPlaceholder)
-            .times(xPlaceholder.toGreaterThanMask(leftCutoff));
-        final DoubleVertex secondConditionalResult = secondConditional.times(shoulder(shoulderWidth, bodyWidth, xPlaceholder.minus(leftCutoff)));
-
-        final DoubleVertex thirdConditional = xPlaceholder.toGreaterThanMask(xMaxPlaceholder)
-            .times(xPlaceholder.toLessThanMask(rightCutoff));
-        final DoubleVertex thirdConditionalResult = thirdConditional.times(shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(xPlaceholder).plus(xMaxPlaceholder)));
-
-        final DoubleVertex logProbOutput = firstConditionalResult
-            .plus(secondConditionalResult)
-            .plus(thirdConditionalResult)
-            .log();
-
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
             .input(xMin, xMinPlaceholder)
             .input(xMax, xMaxPlaceholder)
-            .logProbOutput(logProbOutput)
+            .logProbOutput(SmoothUniform.logProbOutput(xPlaceholder, xMinPlaceholder, xMaxPlaceholder, edgeSharpness))
             .build();
-    }
-
-    private DoubleVertex bodyHeight(DoubleVertex shoulderWidth, DoubleVertex bodyWidth) {
-        return shoulderWidth.plus(bodyWidth).reverseDiv(1.);
-    }
-
-    private static DoubleVertex shoulder(DoubleVertex Sw, DoubleVertex Bw, DoubleVertex x) {
-        final DoubleVertex A = getCubeCoefficient(Sw, Bw);
-        final DoubleVertex B = getSquareCoefficient(Sw, Bw);
-        return x.pow(3).times(A).plus(x.pow(2).times(B));
-    }
-
-    private static DoubleVertex getCubeCoefficient(DoubleVertex Sw, DoubleVertex Bw) {
-        return Sw.pow(3).times(Sw.plus(Bw)).reverseDiv(-2.);
-    }
-
-    private static DoubleVertex getSquareCoefficient(DoubleVertex Sw, DoubleVertex Bw) {
-        return Sw.pow(2).times(Sw.plus(Bw)).reverseDiv(3.);
     }
 
     @Override

@@ -24,11 +24,9 @@ import java.util.Set;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
-import static java.lang.Math.PI;
 
 public class StudentTVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
-    private static final double HALF_LOG_PI = java.lang.Math.log(PI) / 2;
     private final IntegerVertex v;
     private static final String V_NAME = "v";
 
@@ -73,29 +71,12 @@ public class StudentTVertex extends DoubleVertex implements Differentiable, Prob
     @Override
     public LogProbGraph logProbGraph() {
         final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
-        final LogProbGraph.IntegerPlaceHolderVertex tPlaceholder = new LogProbGraph.IntegerPlaceHolderVertex(this.getShape());
-
-        DoubleVertex vAsDouble = tPlaceholder.toDouble();
-        DoubleVertex halfVPlusOne = vAsDouble.plus(1.).div(2.);
-
-        DoubleVertex logGammaHalfVPlusOne = halfVPlusOne.logGamma();
-        DoubleVertex logGammaHalfV = vAsDouble.div(2.).logGamma();
-        DoubleVertex halfLogV = vAsDouble.log().div(2.);
-
-        DoubleVertex logProbOutput = logGammaHalfVPlusOne
-            .minus(halfLogV)
-            .minus(HALF_LOG_PI)
-            .minus(logGammaHalfV)
-            .minus(
-                halfVPlusOne.times(
-                    xPlaceholder.pow(2.).div(vAsDouble).plus(1.).log()
-                )
-            );
+        final LogProbGraph.IntegerPlaceHolderVertex vPlaceholder = new LogProbGraph.IntegerPlaceHolderVertex(v.getShape());
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
-            .input(v, tPlaceholder)
-            .logProbOutput(logProbOutput)
+            .input(v, vPlaceholder)
+            .logProbOutput(StudentT.logProbOutput(xPlaceholder, vPlaceholder))
             .build();
     }
 

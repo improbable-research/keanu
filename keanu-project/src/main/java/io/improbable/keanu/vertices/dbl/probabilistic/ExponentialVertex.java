@@ -83,16 +83,10 @@ public class ExponentialVertex extends DoubleVertex implements Differentiable, P
         final LogProbGraph.DoublePlaceholderVertex xPlaceholder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
         final LogProbGraph.DoublePlaceholderVertex ratePlaceholder = new LogProbGraph.DoublePlaceholderVertex(rate.getShape());
 
-        final DoubleVertex xLessThanZero = xPlaceholder.toLessThanMask(0.);
-        final DoubleVertex negXMinusADivB = xPlaceholder.unaryMinus().div(ratePlaceholder);
-        final DoubleVertex negXMinusADivBMinusLogB = negXMinusADivB.minus(ratePlaceholder.log());
-
-        final DoubleVertex logProbOutput = negXMinusADivBMinusLogB.setWithMask(xLessThanZero, Double.NEGATIVE_INFINITY);
-
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
             .input(rate, ratePlaceholder)
-            .logProbOutput(logProbOutput)
+            .logProbOutput(Exponential.logProbOutput(xPlaceholder, ratePlaceholder))
             .build();
     }
 

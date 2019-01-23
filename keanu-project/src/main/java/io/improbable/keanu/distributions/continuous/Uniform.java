@@ -3,6 +3,8 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
@@ -40,6 +42,15 @@ public class Uniform implements ContinuousDistribution {
         DoubleTensor logOfWithinBounds = xMax.minus(xMin).logInPlace().unaryMinusInPlace();
         logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getGreaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
         logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getLessThanMask(xMin), Double.NEGATIVE_INFINITY);
+
+        return logOfWithinBounds;
+    }
+
+    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex x, LogProbGraph.DoublePlaceholderVertex xMin, LogProbGraph.DoublePlaceholderVertex xMax) {
+
+        DoubleVertex logOfWithinBounds = xMax.minus(xMin).log().unaryMinus();
+        logOfWithinBounds = logOfWithinBounds.setWithMask(x.toGreaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMask(x.toLessThanMask(xMin), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
     }

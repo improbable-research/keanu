@@ -4,7 +4,6 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Pareto;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -12,7 +11,6 @@ import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -110,21 +108,11 @@ public class ParetoVertex extends DoubleVertex implements Differentiable, Probab
         final LogProbGraph.DoublePlaceholderVertex locationPlaceholder = new LogProbGraph.DoublePlaceholderVertex(location.getShape());
         final LogProbGraph.DoublePlaceholderVertex scalePlaceholder = new LogProbGraph.DoublePlaceholderVertex(scale.getShape());
 
-        final DoubleVertex zero = ConstantVertex.of(0.);
-        final BooleanVertex paramsAreValid = locationPlaceholder.greaterThan(zero)
-            .and(scalePlaceholder.greaterThan(zero));
-        paramsAreValid.assertTrue("Location and scale must be strictly positive");
-
-        final DoubleVertex invalidXMask = xPlaceholder.toLessThanOrEqualToMask(locationPlaceholder);
-        final DoubleVertex ifValid = scalePlaceholder.log().plus(locationPlaceholder.log().times(scalePlaceholder))
-            .minus(scalePlaceholder.plus(1.).times(xPlaceholder.log()));
-        final DoubleVertex logProbOutput = ifValid.setWithMask(invalidXMask, Double.NEGATIVE_INFINITY);
-
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
             .input(location, locationPlaceholder)
             .input(scale, scalePlaceholder)
-            .logProbOutput(logProbOutput)
+            .logProbOutput(Pareto.logProbOutput(xPlaceholder, locationPlaceholder, scalePlaceholder))
             .build();
     }
 

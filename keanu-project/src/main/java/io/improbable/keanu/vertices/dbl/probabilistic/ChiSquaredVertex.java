@@ -83,16 +83,10 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
         final LogProbGraph.DoublePlaceholderVertex xPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(this.getShape());
         final LogProbGraph.IntegerPlaceHolderVertex kPlaceHolder = new LogProbGraph.IntegerPlaceHolderVertex(k.getShape());
 
-        final DoubleVertex halfK = kPlaceHolder.toDouble().div(2.);
-        final DoubleVertex numerator = halfK.minus(1.).times(xPlaceHolder.log()).minus(xPlaceHolder.div(2.));
-        final DoubleVertex denominator = halfK.times(LOG_TWO).plus(halfK.logGamma());
-
-        final DoubleVertex logProbOutput = numerator.minus(denominator);
-
         return LogProbGraph.builder()
             .input(this, xPlaceHolder)
             .input(k, kPlaceHolder)
-            .logProbOutput(logProbOutput)
+            .logProbOutput(ChiSquared.logProbOutput(xPlaceHolder, kPlaceHolder))
             .build();
     }
 

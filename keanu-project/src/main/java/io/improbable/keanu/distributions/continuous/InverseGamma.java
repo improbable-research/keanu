@@ -3,6 +3,8 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
@@ -36,6 +38,14 @@ public class InverseGamma implements ContinuousDistribution {
         final DoubleTensor lnGammaA = alpha.logGamma();
 
         return aTimesLnB.plus(negAMinus1TimesLnX).minusInPlace(lnGammaA).minusInPlace(beta.div(x));
+    }
+
+    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex x, LogProbGraph.DoublePlaceholderVertex alpha, LogProbGraph.DoublePlaceholderVertex beta) {
+        final DoubleVertex aTimesLnB = alpha.times(beta.log());
+        final DoubleVertex negAMinus1TimesLnX = x.log().times(alpha.unaryMinus().minus(1.));
+        final DoubleVertex lnGammaA = alpha.logGamma();
+
+        return aTimesLnB.plus(negAMinus1TimesLnX).minus(lnGammaA).minus(beta.div(x));
     }
 
     @Override

@@ -117,16 +117,11 @@ public class LaplaceVertex extends DoubleVertex implements Differentiable, Proba
         final LogProbGraph.DoublePlaceholderVertex muPlaceholder = new LogProbGraph.DoublePlaceholderVertex(mu.getShape());
         final LogProbGraph.DoublePlaceholderVertex betaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(beta.getShape());
 
-        final DoubleVertex muMinusXAbsNegDivBeta = muPlaceholder.minus(xPlaceholder).abs().div(betaPlaceholder);
-        final DoubleVertex logTwoBeta = betaPlaceholder.times(2.).log();
-
-        final DoubleVertex logProbOutput = muMinusXAbsNegDivBeta.plus(logTwoBeta).unaryMinus();
-
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
             .input(mu, muPlaceholder)
             .input(beta, betaPlaceholder)
-            .logProbOutput(logProbOutput)
+            .logProbOutput(Laplace.logProbOutput(xPlaceholder, muPlaceholder, betaPlaceholder))
             .build();
     }
 

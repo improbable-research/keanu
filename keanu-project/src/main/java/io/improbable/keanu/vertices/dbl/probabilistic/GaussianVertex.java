@@ -28,9 +28,6 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 
 public class GaussianVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
-    public static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
-    public static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
-
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
     protected static final String MU_NAME = "mu";
@@ -112,17 +109,11 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
         final LogProbGraph.DoublePlaceholderVertex muPlaceholder = new LogProbGraph.DoublePlaceholderVertex(mu.getShape());
         final LogProbGraph.DoublePlaceholderVertex sigmaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(sigma.getShape());
 
-        final DoubleVertex lnSigma = sigmaPlaceholder.log();
-        final DoubleVertex xMinusMuSquared = xPlaceholder.minus(muPlaceholder).pow(2);
-        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigmaPlaceholder.pow(2).times(2.0));
-
-        final DoubleVertex logProbOutput = xMinusMuSquaredOver2Variance.plus(lnSigma).plus(LN_SQRT_2PI).unaryMinus().sum();
-
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
             .input(mu, muPlaceholder)
             .input(sigma, sigmaPlaceholder)
-            .logProbOutput(logProbOutput)
+            .logProbOutput(Gaussian.logProbOutput(xPlaceholder, muPlaceholder, sigmaPlaceholder).sum())
             .build();
     }
 

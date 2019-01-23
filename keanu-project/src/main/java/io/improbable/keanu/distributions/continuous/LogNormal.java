@@ -3,6 +3,8 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static io.improbable.keanu.distributions.continuous.Gaussian.LN_SQRT_2PI;
@@ -37,9 +39,16 @@ public class LogNormal implements ContinuousDistribution {
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor lnSigmaX = sigma.times(x).logInPlace();
-        final DoubleTensor lnXMinusMuSquared = x.log().minusInPlace(mu).powInPlace(2);
-        final DoubleTensor lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
+        final DoubleTensor lnXMinusMuSquared = x.log().minusInPlace(mu).powInPlace(2.);
+        final DoubleTensor lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.divInPlace(sigma.pow(2.).timesInPlace(2.));
         return lnXMinusMuSquaredOver2Variance.plusInPlace(lnSigmaX).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
+    }
+
+    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex x, LogProbGraph.DoublePlaceholderVertex mu, LogProbGraph.DoublePlaceholderVertex sigma) {
+        final DoubleVertex lnSigmaX = sigma.times(x).log();
+        final DoubleVertex lnXMinusMuSquared = x.log().minus(mu).pow(2.);
+        final DoubleVertex lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.div(sigma.pow(2.).times(2.));
+        return lnXMinusMuSquaredOver2Variance.plus(lnSigmaX).plus(LN_SQRT_2PI).unaryMinus();
     }
 
     @Override

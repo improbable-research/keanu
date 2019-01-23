@@ -5,6 +5,8 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.BETA;
@@ -60,6 +62,12 @@ public class Laplace implements ContinuousDistribution {
         final DoubleTensor muMinusXAbsNegDivBeta = mu.minus(x).abs().divInPlace(beta);
         final DoubleTensor logTwoBeta = beta.times(2).logInPlace();
         return muMinusXAbsNegDivBeta.plusInPlace(logTwoBeta).unaryMinus();
+    }
+
+    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex x, LogProbGraph.DoublePlaceholderVertex mu, LogProbGraph.DoublePlaceholderVertex beta) {
+        final DoubleVertex muMinusXAbsNegDivBeta = mu.minus(x).abs().div(beta);
+        final DoubleVertex logTwoBeta = beta.times(2.).log();
+        return muMinusXAbsNegDivBeta.plus(logTwoBeta).unaryMinus();
     }
 
     @Override

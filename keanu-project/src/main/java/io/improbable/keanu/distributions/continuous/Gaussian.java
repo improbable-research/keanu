@@ -3,6 +3,8 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
@@ -37,6 +39,13 @@ public class Gaussian implements ContinuousDistribution {
         final DoubleTensor xMinusMuSquared = x.minus(mu).powInPlace(2);
         final DoubleTensor xMinusMuSquaredOver2Variance = xMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
         return xMinusMuSquaredOver2Variance.plusInPlace(lnSigma).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
+    }
+
+    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex x, LogProbGraph.DoublePlaceholderVertex mu, LogProbGraph.DoublePlaceholderVertex sigma) {
+        final DoubleVertex lnSigma = sigma.log();
+        final DoubleVertex xMinusMuSquared = x.minus(mu).pow(2);
+        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigma.pow(2).times(2.0));
+        return xMinusMuSquaredOver2Variance.plus(lnSigma).plus(LN_SQRT_2PI).unaryMinus();
     }
 
     @Override

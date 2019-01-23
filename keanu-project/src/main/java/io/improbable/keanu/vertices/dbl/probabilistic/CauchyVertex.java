@@ -30,7 +30,6 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
 
     private final DoubleVertex location;
     private final DoubleVertex scale;
-    private static final double NEG_LOG_PI = -Math.log(Math.PI);
     private static final String LOCATION_NAME = "location";
     protected static final String SCALE_NAME = "scale";
 
@@ -110,17 +109,11 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
         LogProbGraph.DoublePlaceholderVertex locationPlaceHolder = new LogProbGraph.DoublePlaceholderVertex(location.getShape());
         LogProbGraph.DoublePlaceholderVertex scalePlaceHolder = new LogProbGraph.DoublePlaceholderVertex(scale.getShape());
 
-        final DoubleVertex negLnScaleMinusLnPi = scalePlaceHolder.log().unaryMinus().plus(NEG_LOG_PI);
-        final DoubleVertex xMinusLocationOverScalePow2Plus1 = xPlaceHolder.minus(locationPlaceHolder).div(scalePlaceHolder).pow(2.).plus(1.);
-        final DoubleVertex lnXMinusLocationOverScalePow2Plus1 = xMinusLocationOverScalePow2Plus1.log();
-
-        final DoubleVertex logProbOutput = negLnScaleMinusLnPi.minus(lnXMinusLocationOverScalePow2Plus1);
-
         return LogProbGraph.builder()
             .input(this, xPlaceHolder)
             .input(location, locationPlaceHolder)
             .input(scale, scalePlaceHolder)
-            .logProbOutput(logProbOutput)
+            .logProbOutput(Cauchy.logProbOutput(xPlaceHolder, locationPlaceHolder, scalePlaceHolder))
             .build();
     }
 

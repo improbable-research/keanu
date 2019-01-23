@@ -5,6 +5,8 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.K;
@@ -108,6 +110,14 @@ public class Gamma implements ContinuousDistribution {
         final DoubleTensor kMinus1LogX = k.minus(1).timesInPlace(x.log());
         final DoubleTensor lgammaK = k.logGamma();
         return kMinus1LogX.minusInPlace(lgammaK).minusInPlace(xOverTheta).minusInPlace(kLnTheta);
+    }
+
+    public static DoubleVertex logProbOutput(LogProbGraph.DoublePlaceholderVertex x, LogProbGraph.DoublePlaceholderVertex theta, LogProbGraph.DoublePlaceholderVertex k) {
+        final DoubleVertex xOverTheta = x.div(theta);
+        final DoubleVertex kLnTheta = k.times(theta.log());
+        final DoubleVertex kMinus1LogX = k.minus(1.).times(x.log());
+        final DoubleVertex lgammaK = k.logGamma();
+        return kMinus1LogX.minus(lgammaK).minus(xOverTheta).minus(kLnTheta);
     }
 
     @Override

@@ -102,18 +102,11 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
         final LogProbGraph.DoublePlaceholderVertex thetaPlaceholder = new LogProbGraph.DoublePlaceholderVertex(theta.getShape());
         final LogProbGraph.DoublePlaceholderVertex kPlaceholder = new LogProbGraph.DoublePlaceholderVertex(k.getShape());
 
-        final DoubleVertex xOverTheta = xPlaceholder.div(thetaPlaceholder);
-        final DoubleVertex kLnTheta = kPlaceholder.times(thetaPlaceholder.log());
-        final DoubleVertex kMinus1LogX = kPlaceholder.minus(1.).times(xPlaceholder.log());
-        final DoubleVertex lgammaK = kPlaceholder.logGamma();
-
-        final DoubleVertex logProbOutput = kMinus1LogX.minus(lgammaK).minus(xOverTheta).minus(kLnTheta);
-
         return LogProbGraph.builder()
             .input(this, xPlaceholder)
             .input(theta, thetaPlaceholder)
             .input(k, kPlaceholder)
-            .logProbOutput(logProbOutput)
+            .logProbOutput(Gamma.logProbOutput(xPlaceholder, thetaPlaceholder, kPlaceholder))
             .build();
     }
 
