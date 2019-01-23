@@ -144,6 +144,9 @@ def test_can_do_less_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, nump
     (Const(np.array([10, 20])),                       2    , np.array([12, 22]), Integer),
     (Const(np.array([10, 20])),               Const(2.)    , np.array([12, 22]), Double),
     (Const(np.array([10, 20])),                       2.   , np.array([12, 22]), Double),
+    (      np.array([10, 20]) ,                   Const(2) , np.array([12, 22]), Integer),
+    (      np.array([10., 20.]) ,                   Const(2) , np.array([12, 22]), Double),
+    (                      20. ,                   Const(2) , 22, Double),
 ])
 # yapf: enable
 def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
@@ -166,8 +169,9 @@ def test_can_do_addition(lhs: Union[Vertex], rhs: Union[Vertex, numpy_types, flo
     (Const(np.array([10, 20])),                       2    , np.array([8, 18]), Integer),
     (Const(np.array([10, 20])),               Const(2.)    , np.array([8, 18]), Double),
     (Const(np.array([10, 20])),                       2.   , np.array([8, 18]), Double),
-
-
+    (        np.array([10, 20]),                  Const(2) , np.array([8, 18]), Integer),
+    (        np.array([10., 20.]),                  Const(2) , np.array([8, 18]), Double),
+    (                          3.,                  Const(2) ,                 1, Double),
 ])
 # yapf: enable
 def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
@@ -190,6 +194,9 @@ def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
     (Const(np.array([3, 2])),                   5        , np.array([15, 10]), Integer),
     (Const(np.array([3, 2])),                   Const(5.), np.array([15, 10]), Double),
     (Const(np.array([3, 2])),                   5.       , np.array([15, 10]), Double),
+    (      np.array([3, 2]) ,                   Const(5) , np.array([15, 10]), Integer),
+    (      np.array([3., 2.]) ,                   Const(5) , np.array([15, 10]), Double),
+    (                      3.,                  Const(2) ,                 6, Double),
 ])
 # yapf: enable
 def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
@@ -211,7 +218,6 @@ def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, floa
     (Const(np.array([15., 10.])),                 2.       , np.array([7.5, 5.  ]), Double),
     (Const(np.array([15, 10])),                   2        , np.array([7.5, 5.  ]), Double),
     (Const(np.array([15, 10])),                   2.       , np.array([7.5, 5.  ]), Double),
-
 ])
 # yapf: enable
 def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types,
