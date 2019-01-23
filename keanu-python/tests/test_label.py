@@ -18,7 +18,6 @@ def test_inequality(label1: VertexLabel) -> None:
 
 
 def test_equality_str(label1: VertexLabel) -> None:
-    assert label1 == "label1"
     assert label1 == "outer.inner.label1"
 
 
