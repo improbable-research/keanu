@@ -9,7 +9,6 @@ import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
