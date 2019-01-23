@@ -95,54 +95,42 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
 
     def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if type(other) == Integer:
-            return kn.vertex.generated.Addition(self, kn.vertex.generated.CastToDouble(other))
-
+        other = cast_to_double_vertex_if_integer_vertex(other)
         return kn.vertex.generated.Addition(self, other)
 
     def __radd__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.Addition(other, self)
 
     def __sub__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if type(other) == Integer:
-            return kn.vertex.generated.Difference(self, kn.vertex.generated.CastToDouble(other))
-
+        other = cast_to_double_vertex_if_integer_vertex(other)
         return kn.vertex.generated.Difference(self, other)
 
     def __rsub__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.Difference(other, self)
 
     def __mul__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if type(other) == Integer:
-            return kn.vertex.generated.Multiplication(self, kn.vertex.generated.CastToDouble(other))
-
+        other = cast_to_double_vertex_if_integer_vertex(other)
         return kn.vertex.generated.Multiplication(self, other)
 
     def __rmul__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.Multiplication(other, self)
 
     def __pow__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if type(other) == Integer:
-            other = kn.vertex.generated.CastToDouble(other)
-
+        other = cast_to_double_vertex_if_integer_vertex(other)
         return kn.vertex.generated.Power(self, other)
 
     def __rpow__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.Power(other, self)
 
     def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if type(other) == Integer:
-            return kn.vertex.generated.Division(self, kn.vertex.generated.CastToDouble(other))
-
+        other = cast_to_double_vertex_if_integer_vertex(other)
         return kn.vertex.generated.Division(self, other)
 
     def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.Division(other, self)
 
     def __floordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if type(other) == Integer:
-            other = kn.vertex.generated.CastToDouble(other)
-
+        other = cast_to_double_vertex_if_integer_vertex(other)
         intermediate = kn.vertex.generated.Division(self, other)
 
         return kn.vertex.generated.Floor(intermediate)
@@ -292,11 +280,12 @@ class Integer(Vertex):
         return kn.vertex.generated.IntegerPower(other, self)
 
     def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        # true div should always return a Double
         if is_floating_type(other):
-            return kn.vertex.generated.Division(
-                kn.vertex.generated.CastToDouble(self), kn.vertex.generated.CastToDouble(other))
+            return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(self), other)
 
-        return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(self), other)
+        return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(self),
+                                            kn.vertex.generated.CastToDouble(other))
 
     def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.Division(other, kn.vertex.generated.CastToDouble(self))
@@ -350,3 +339,9 @@ def is_floating_type(other: vertex_operation_param_types) -> bool:
         return np.issubdtype(other.dtype, np.floating)
 
     return type(other) == Double or isinstance(other, runtime_float_types)
+
+
+def cast_to_double_vertex_if_integer_vertex(vertex: vertex_operation_param_types) -> vertex_operation_param_types:
+    if type(vertex) == Integer:
+        return kn.vertex.generated.CastToDouble(vertex)
+    return vertex
