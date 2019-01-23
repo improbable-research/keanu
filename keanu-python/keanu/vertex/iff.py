@@ -14,7 +14,8 @@ def __cast_to_vertex(input: vertex_constructor_param_types) -> Vertex:
 from keanu.vartypes import tensor_arg_types
 
 
-def If(predicate: Union[tensor_arg_types, Vertex], thn: Union[tensor_arg_types, Vertex], els: Union[tensor_arg_types, Vertex]) -> Vertex:
+def If(predicate: Union[tensor_arg_types, Vertex], thn: Union[tensor_arg_types, Vertex],
+       els: Union[tensor_arg_types, Vertex]) -> Vertex:
     predicate = __cast_to_vertex(predicate)
     thn = __cast_to_vertex(thn)
     els = __cast_to_vertex(els)
@@ -25,7 +26,8 @@ def If(predicate: Union[tensor_arg_types, Vertex], thn: Union[tensor_arg_types, 
     then_type = get_type_of_value(thn.get_value())
     else_type = get_type_of_value(els.get_value())
     if (then_type != else_type):
-        raise TypeError('The "then" and "else" clauses must be of the same datatype: {} vs {}'.format(then_type, else_type))
+        raise TypeError('The "then" and "else" clauses must be of the same datatype: {} vs {}'.format(
+            then_type, else_type))
 
     if then_type == bool:
         return BooleanIf(predicate, thn, els)
