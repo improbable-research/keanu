@@ -40,6 +40,7 @@ class Stepsize implements SaveStatistics {
     Stepsize(double stepsize, double targetAcceptanceProb, int adaptCount) {
         this.targetAcceptanceProb = targetAcceptanceProb;
         this.stepsize = stepsize;
+        this.averageAcceptanceProb = 0;
         this.logStepSizeFrozen = Math.log(stepsize);
         this.adaptCount = adaptCount;
         this.shrinkageTarget = Math.log(10 * stepsize);

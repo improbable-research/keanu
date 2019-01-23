@@ -13,16 +13,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.util.Arrays;
 import java.util.List;
 
+import static io.improbable.keanu.algorithms.mcmc.nuts.NUTS.Metrics.STEPSIZE;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
@@ -60,7 +57,7 @@ public class NUTSTest {
 
         Statistics statistics = nuts.getStatistics();
 
-        List<Double> stepSize = statistics.get(NUTS.Metrics.STEPSIZE);
+        List<Double> stepSize = statistics.get(STEPSIZE);
         List<Double> logProb = statistics.get(NUTS.Metrics.LOG_PROB);
         List<Double> meanTreeAccept = statistics.get(NUTS.Metrics.MEAN_TREE_ACCEPT);
         List<Double> treeSize = statistics.get(NUTS.Metrics.TREE_SIZE);
@@ -91,6 +88,9 @@ public class NUTSTest {
         );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
+
+        posteriorSamples.get(vertex).asList().stream()
+            .forEach(v -> System.out.println(Arrays.toString(v.asFlatDoubleArray())));
 
         MCMCTestDistributions.samplesMatchSimpleGaussian(mu, sigma, posteriorSamples.get(vertex).asList(), 0.1);
     }
