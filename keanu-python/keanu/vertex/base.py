@@ -134,16 +134,19 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return kn.vertex.generated.Division(self, other)
 
     def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if type(other) == Integer:
-            return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(other), self)
-
         return kn.vertex.generated.Division(other, self)
 
     def __floordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.IntegerDivision(self, other)
+        if type(other) == Integer:
+            other = kn.vertex.generated.CastToDouble(other)
+
+        intermediate = kn.vertex.generated.Division(self, other)
+
+        return kn.vertex.generated.Floor(intermediate)
 
     def __rfloordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        return kn.vertex.generated.IntegerDivision(other, self)
+        intermediate = kn.vertex.generated.Division(other, self)
+        return kn.vertex.generated.Floor(intermediate)
 
     def __eq__(  # type: ignore # see https://github.com/python/mypy/issues/2783
             self, other: vertex_operation_param_types) -> 'Vertex':
