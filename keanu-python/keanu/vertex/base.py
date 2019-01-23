@@ -284,8 +284,8 @@ class Integer(Vertex):
         if is_floating_type(other):
             return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(self), other)
 
-        return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(self),
-                                            kn.vertex.generated.CastToDouble(other))
+        return kn.vertex.generated.Division(
+            kn.vertex.generated.CastToDouble(self), kn.vertex.generated.CastToDouble(other))
 
     def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.Division(other, kn.vertex.generated.CastToDouble(self))
