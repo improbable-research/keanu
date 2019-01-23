@@ -224,7 +224,7 @@ class Integer(Vertex):
         if method == "__call__":
             try:
                 dispatch_method = methods[ufunc.__name__]
-                result = dispatch_method(input1, input0)
+                result = dispatch_method(input1, input0)  # type: ignore # Does not accept Vertex as an Integer
                 return result
             except KeyError:
                 return super().__array_ufunc__(ufunc, method, input0, input1)
