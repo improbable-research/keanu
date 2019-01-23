@@ -128,9 +128,15 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return kn.vertex.generated.Power(other, self)
 
     def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        if type(other) == Integer:
+            return kn.vertex.generated.Division(self, kn.vertex.generated.CastToDouble(other))
+
         return kn.vertex.generated.Division(self, other)
 
     def __rtruediv__(self, other: vertex_operation_param_types) -> 'Vertex':
+        if type(other) == Integer:
+            return kn.vertex.generated.Division(kn.vertex.generated.CastToDouble(other), self)
+
         return kn.vertex.generated.Division(other, self)
 
     def __floordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
