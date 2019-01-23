@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.variational;
 
 import com.google.common.collect.ImmutableList;
-import io.improbable.keanu.algorithms.VertexSamples;
+import io.improbable.keanu.algorithms.Samples;
 import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class GaussianKDE {
 
-    public static KDEVertex approximate(VertexSamples<DoubleTensor> vertexSamples) {
+    public static KDEVertex approximate(Samples<DoubleTensor> vertexSamples) {
 
         List<Double> samples = vertexSamples.asList().stream()
             .map(GaussianKDE::checkIfScalar)

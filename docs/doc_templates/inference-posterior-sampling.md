@@ -117,8 +117,6 @@ We can perform the same steps in Python.
 
 ### Hamiltonian Monte Carlo
 
-HMC is not available in Keanu but it's a very important concept to understand before utilising NUTS.
-
 #### Algorithm
 
 Hamiltonian Monte Carlo (HMC) brings two new concepts to Metropolis Hastings: Hamiltonian physics and gradient calculations.
@@ -166,9 +164,10 @@ The parameters are:
 
 ### NUTS
 
-#### Algorithm
+NUTS is an auto-tuning implementation of HMC.
 
-NUTS is built on top of HMC. 
+#### Algorithm
+ 
 As the sample moves through the distribution, there are features in place that stop it from performing 
 a U-turn and re-exploring locations. 
 Hence why it's called the 'No-U-Turn Sampler'. 

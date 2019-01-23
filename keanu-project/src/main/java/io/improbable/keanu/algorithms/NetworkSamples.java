@@ -63,12 +63,12 @@ public class NetworkSamples {
         return this.size;
     }
 
-    public <T> VertexSamples<T> get(Variable<T, ?> variable) {
+    public <T> Samples<T> get(Variable<T, ?> variable) {
         return get(variable.getReference());
     }
 
-    public <T> VertexSamples<T> get(VariableReference variableReference) {
-        return new VertexSamples<>((List<T>) samplesByVariable.get(variableReference));
+    public <T> Samples<T> get(VariableReference variableReference) {
+        return new Samples<>((List<T>) samplesByVariable.get(variableReference));
     }
 
     public DoubleVertexSamples getDoubleTensorSamples(Variable<DoubleTensor, ?> variable) {
