@@ -109,7 +109,7 @@ We will be taking 100,000 samples from the distributions of A and B.
 NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
     bayesNet,
     bayesNet.getLatentVertices(),
-    100000
+    30000
 );
 ```
 
@@ -139,7 +139,11 @@ m.b.set_value(20.)
 bayes_net = m.to_bayes_net()
 algo = MetropolisHastingsSampler()
 posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
+<<<<<<< HEAD
                            sampling_algorithm=algo, draws=100000)
+=======
+                           sampling_algorithm=algo, draws=30000)
+>>>>>>> develop
 
 average_posterior_a = np.average(posterior_samples.get('a'))
 average_posterior_b = np.average(posterior_samples.get('b'))
