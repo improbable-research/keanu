@@ -126,7 +126,7 @@ public class KLDivergenceTest {
         ProbabilisticDouble q = new GaussianVertex(0.1, 1.);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("A NetworkState does not contain exactly 1 vertex and ProbabilisticDouble can only compute the log probability of one value. Try computing KL divergence against a QDistribution instead.");
+        thrown.expectMessage("A NetworkState does not contain exactly 1 variable and ProbabilisticDouble can only compute the log probability of one value. Try computing KL divergence against a QDistribution instead.");
 
         KLDivergence.compute(q, samples);
     }
