@@ -8,9 +8,9 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
@@ -25,7 +25,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     private final List<Vertex> latentOrObservedVertices;
 
-    public KeanuProbabilisticModel(Set<Vertex> variables) {
+    public KeanuProbabilisticModel(Collection<? extends Vertex> variables) {
         this(new BayesianNetwork(variables));
     }
 
@@ -60,6 +60,10 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     public List<Vertex> getLatentVertices() {
         return this.latentVertices;
+    }
+
+    public List<Vertex> getLatentOrObservedVertices() {
+        return latentOrObservedVertices;
     }
 
     @Override
@@ -98,6 +102,5 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
         VertexValuePropagation.cascadeUpdate(updatedVertices);
     }
-
 
 }

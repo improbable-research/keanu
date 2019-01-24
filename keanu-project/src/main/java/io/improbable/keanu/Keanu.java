@@ -7,7 +7,6 @@ import io.improbable.keanu.algorithms.mcmc.LambdaSectionOptimizedLogProbCalculat
 import io.improbable.keanu.algorithms.mcmc.RollBackOnRejection;
 import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.experimental.UtilityClass;
@@ -24,23 +23,23 @@ public class Keanu {
         public static class MCMC {
 
             /**
-             * @param bayesianNetwork network for which to choose sampling algorithm.
+             * @param model network for which to choose sampling algorithm.
              * @return recommended sampling algorithm for this network.
              */
-            public PosteriorSamplingAlgorithm withDefaultConfigFor(BayesianNetwork bayesianNetwork) {
-                return withDefaultConfigFor(bayesianNetwork, KeanuRandom.getDefaultRandom());
+            public PosteriorSamplingAlgorithm withDefaultConfigFor(KeanuProbabilisticModel model) {
+                return withDefaultConfigFor(model, KeanuRandom.getDefaultRandom());
             }
 
             /**
-             * @param bayesianNetwork network for which to choose sampling algorithm.
-             * @param random          the random number generator.
+             * @param model  network for which to choose sampling algorithm.
+             * @param random the random number generator.
              * @return recommended sampling algorithm for this network.
              */
-            public PosteriorSamplingAlgorithm withDefaultConfigFor(BayesianNetwork bayesianNetwork, KeanuRandom random) {
-                if (DifferentiableChecker.isDifferentiableWrtLatents(bayesianNetwork.getLatentOrObservedVertices())) {
+            public PosteriorSamplingAlgorithm withDefaultConfigFor(KeanuProbabilisticModel model, KeanuRandom random) {
+                if (DifferentiableChecker.isDifferentiableWrtLatents(model.getLatentOrObservedVertices())) {
                     return Keanu.Sampling.NUTS.withDefaultConfig(random);
                 } else {
-                    return Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(new KeanuProbabilisticModel(bayesianNetwork), random);
+                    return Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model, random);
                 }
             }
         }

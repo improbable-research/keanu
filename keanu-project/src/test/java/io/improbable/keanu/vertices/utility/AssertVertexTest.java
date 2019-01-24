@@ -220,7 +220,7 @@ public class AssertVertexTest {
         DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
         Cobserved.observe(46.0);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
+        KeanuProbabilisticModel bayesNet = new KeanuProbabilisticModel(Arrays.asList(A, B, Cobserved));
         PosteriorSamplingAlgorithm samplingAlgorithm = Keanu.Sampling.MCMC.withDefaultConfigFor(bayesNet);
         assertThat(samplingAlgorithm, instanceOf(NUTS.class));
     }
