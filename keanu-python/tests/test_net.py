@@ -1,6 +1,8 @@
 from keanu.vertex import UniformInt, Gamma, Poisson, Cauchy
+from keanu.vertex.base import Vertex
 from keanu import BayesNet, KeanuRandom
 from keanu.network_io import ProtobufLoader, JsonLoader, ProtobufSaver, DotSaver, JsonSaver
+from typing import cast
 import pytest
 
 
@@ -100,3 +102,16 @@ def test_can_save_and_load(tmpdir) -> None:
     check_loaded_net(new_net_from_proto)
     new_net_from_json = json_loader.load(JSON_FILE)
     check_loaded_net(new_net_from_json)
+
+
+def test_get_vertex_by_label() -> None:
+    vertex = Gamma(1., 1., label="gamma")
+    net = BayesNet([vertex])
+    retrieved_vertex = cast(Vertex, net.get_vertex_by_label("gamma"))
+    assert retrieved_vertex.get_id() == vertex.get_id()
+
+
+def test_get_vertex_by_label_returns_none_if_not_found() -> None:
+    vertex = Gamma(1., 1., label="gamma")
+    net = BayesNet([vertex])
+    assert net.get_vertex_by_label("gaussian") is None
