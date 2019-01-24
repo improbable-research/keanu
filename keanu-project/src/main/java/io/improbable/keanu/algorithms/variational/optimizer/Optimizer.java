@@ -39,7 +39,7 @@ public interface Optimizer {
      *
      * @return the natural logarithm of the Maximum a posteriori (MAP)
      */
-    double maxAPosteriori();
+    OptimizedResult maxAPosteriori();
 
     /**
      * This method will use Maximum Likelihood estimation to optimize the values of latent vertices such that
@@ -48,7 +48,7 @@ public interface Optimizer {
      *
      * @return the natural logarithm of the maximum likelihood (MLE)
      */
-    double maxLikelihood();
+    OptimizedResult maxLikelihood();
 
     static double[] convertToPoint(List<? extends Variable<? extends NumberTensor>> latentVariables) {
 

@@ -1,14 +1,18 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -16,8 +20,12 @@ import java.util.function.BiConsumer;
 /**
  * https://arxiv.org/pdf/1412.6980.pdf
  */
-@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AdamOptimizer implements Optimizer {
+
+    public static AdamOptimizerBuilder builder() {
+        return new AdamOptimizerBuilder();
+    }
 
     private final BayesianNetwork bayesianNetwork;
 
@@ -26,15 +34,13 @@ public class AdamOptimizer implements Optimizer {
     private final double beta2;
     private final double epsilon;
 
-    private double optimize(LogProbGradientCalculator gradientCalculator) {
+    private OptimizedResult optimize(LogProbGradientCalculator gradientCalculator) {
 
         List<Vertex<DoubleTensor>> latentVariables = bayesianNetwork.getContinuousLatentVertices();
         DoubleTensor[] theta = getTheta(latentVariables);
         DoubleTensor[] thetaNext = getZeros(theta);
         DoubleTensor[] m = getZeros(theta);
         DoubleTensor[] v = getZeros(theta);
-        DoubleTensor[] mHat = getZeros(theta);
-        DoubleTensor[] vHat = getZeros(theta);
 
         int t = 0;
         boolean converged = false;
@@ -66,7 +72,9 @@ public class AdamOptimizer implements Optimizer {
             thetaNext = temp;
         }
 
-        return bayesianNetwork.getLogOfMasterP();
+        double logProb = bayesianNetwork.getLogOfMasterP();
+
+        return new OptimizedResult(toMap(theta, latentVariables), logProb);
     }
 
     private DoubleTensor[] getTheta(List<Vertex<DoubleTensor>> latentVertices) {
@@ -107,6 +115,16 @@ public class AdamOptimizer implements Optimizer {
         return array;
     }
 
+    private Map<VariableReference, DoubleTensor> toMap(DoubleTensor[] values, List<Vertex<DoubleTensor>> orderded) {
+
+        Map<VariableReference, DoubleTensor> asMap = new HashMap<>();
+        for (int i = 0; i < values.length; i++) {
+            asMap.put(orderded.get(i).getReference(), values[i]);
+        }
+
+        return asMap;
+    }
+
     private double magnitude(DoubleTensor[] values) {
 
         double magPow2 = 0;
@@ -122,7 +140,7 @@ public class AdamOptimizer implements Optimizer {
     }
 
     @Override
-    public double maxAPosteriori() {
+    public OptimizedResult maxAPosteriori() {
         LogProbGradientCalculator gradientCalculator = new LogProbGradientCalculator(
             bayesianNetwork.getLatentOrObservedVertices(),
             bayesianNetwork.getContinuousLatentVertices()
@@ -131,7 +149,7 @@ public class AdamOptimizer implements Optimizer {
     }
 
     @Override
-    public double maxLikelihood() {
+    public OptimizedResult maxLikelihood() {
         LogProbGradientCalculator gradientCalculator = new LogProbGradientCalculator(
             bayesianNetwork.getObservedVertices(),
             bayesianNetwork.getContinuousLatentVertices()
@@ -147,5 +165,50 @@ public class AdamOptimizer implements Optimizer {
     @Override
     public void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
 
+    }
+
+    public static class AdamOptimizerBuilder {
+        private BayesianNetwork bayesianNetwork;
+
+        private double alpha = 0.001;
+        private double beta1 = 0.9;
+        private double beta2 = 0.999;
+        private double epsilon = 1e-8;
+
+        AdamOptimizerBuilder() {
+        }
+
+        public AdamOptimizerBuilder bayesianNetwork(BayesianNetwork bayesianNetwork) {
+            this.bayesianNetwork = bayesianNetwork;
+            return this;
+        }
+
+        public AdamOptimizerBuilder alpha(double alpha) {
+            this.alpha = alpha;
+            return this;
+        }
+
+        public AdamOptimizerBuilder beta1(double beta1) {
+            this.beta1 = beta1;
+            return this;
+        }
+
+        public AdamOptimizerBuilder beta2(double beta2) {
+            this.beta2 = beta2;
+            return this;
+        }
+
+        public AdamOptimizerBuilder epsilon(double epsilon) {
+            this.epsilon = epsilon;
+            return this;
+        }
+
+        public AdamOptimizer build() {
+            return new AdamOptimizer(bayesianNetwork, alpha, beta1, beta2, epsilon);
+        }
+
+        public String toString() {
+            return "AdamOptimizer.AdamOptimizerBuilder(bayesianNetwork=" + this.bayesianNetwork + ", alpha=" + this.alpha + ", beta1=" + this.beta1 + ", beta2=" + this.beta2 + ", epsilon=" + this.epsilon + ")";
+        }
     }
 }

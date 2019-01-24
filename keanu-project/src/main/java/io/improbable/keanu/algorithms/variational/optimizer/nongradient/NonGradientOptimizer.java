@@ -1,8 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.*;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
@@ -16,6 +15,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -81,7 +81,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
     }
 
-    private double optimize(FitnessFunction fitnessFunction) {
+    private OptimizedResult optimize(FitnessFunction fitnessFunction) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
@@ -118,7 +118,11 @@ public class NonGradientOptimizer implements Optimizer {
         );
 
         progressBar.finish();
-        return pointValuePair.getValue();
+
+        Map<VariableReference, DoubleTensor> optimizedValues = Optimizer
+            .convertFromPoint(pointValuePair.getPoint(), probabilisticGraph.getLatentVariables());
+
+        return new OptimizedResult(optimizedValues, pointValuePair.getValue());
     }
 
     private int getNumInterpolationPoints(List<long[]> latentVariableShapes) {
@@ -126,7 +130,7 @@ public class NonGradientOptimizer implements Optimizer {
     }
 
     @Override
-    public double maxAPosteriori() {
+    public OptimizedResult maxAPosteriori() {
         return optimize(new FitnessFunction(
             probabilisticGraph,
             false,
@@ -135,7 +139,7 @@ public class NonGradientOptimizer implements Optimizer {
     }
 
     @Override
-    public double maxLikelihood() {
+    public OptimizedResult maxLikelihood() {
         return optimize(new FitnessFunction(
             probabilisticGraph,
             true,

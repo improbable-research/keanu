@@ -1,102 +1,95 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.AdamOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import org.junit.runner.RunWith;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+@RunWith(Theories.class)
 public class OptimizerTest {
 
     @Rule
     public DeterministicRule deterministicRule = new DeterministicRule();
 
-    @Test
-    public void gradientOptimizerCanMLE() {
-        assertCanCalculateMaxLikelihood(getGradientOptimizer());
+    @AllArgsConstructor
+    public enum OptimizerType {
+
+        ADAM(bayesianNetwork -> {
+
+            return AdamOptimizer.builder()
+                .bayesianNetwork(bayesianNetwork)
+                .build();
+        }),
+
+        APACHE_GRADIENT(KeanuOptimizer.Gradient::of),
+        APACHE_BOBYQA(KeanuOptimizer.NonGradient::of);
+
+        Function<BayesianNetwork, Optimizer> getOptimizer;
     }
 
-    @Test
-    public void nonGradientOptimizerCanMLE() {
-        assertCanCalculateMaxLikelihood(getNonGradientOptimizer());
+    @AllArgsConstructor
+    public enum FitnessFunction {
+        MAP(Optimizer::maxAPosteriori),
+        MLE(Optimizer::maxLikelihood);
+
+        @Getter
+        Function<Optimizer, OptimizedResult> getFitness;
     }
 
-    @Test
-    public void gradientOptimizerCanMAP() {
-        assertCanCalculateMaxAPosteriori(getGradientOptimizer());
+    @AllArgsConstructor
+    public enum TestCase {
+        SUM_GAUSSIAN(SumGaussianTestCase::new);
+
+        private Supplier<GradientOptimizerTestCase> supplier;
+
     }
 
-    @Test
-    public void nonGradientOptimizerCanMAP() {
-        assertCanCalculateMaxAPosteriori(getNonGradientOptimizer());
+    @DataPoints
+    public static OptimizerType[] getTypes() {
+        return OptimizerType.values();
     }
 
-    private Function<BayesianNetwork, Optimizer> getGradientOptimizer() {
-        return (bayesNet) -> KeanuOptimizer.Gradient.of(bayesNet);
+    @DataPoints
+    public static FitnessFunction[] getFitnessFunction() {
+        return FitnessFunction.values();
     }
 
-    private Function<BayesianNetwork, Optimizer> getNonGradientOptimizer() {
-        return (bayesNet) -> KeanuOptimizer.NonGradient.of(bayesNet);
+    @DataPoints
+    public static TestCase[] getTestCase() {
+        return TestCase.values();
     }
 
-    public static void assertCanCalculateMaxLikelihood(Function<BayesianNetwork, Optimizer> optimizerMapper) {
+    @Theory
+    public void canOptimize(OptimizerType type, FitnessFunction fitnessFunction, TestCase testCaseSupplier) {
+        GradientOptimizerTestCase testCase = testCaseSupplier.supplier.get();
+        BayesianNetwork model = testCase.getModel();
+        Optimizer optimizer = type.getOptimizer.apply(model);
+        OptimizedResult result = fitnessFunction.getFitness.apply(optimizer);
 
-        DoubleVertex A = new GaussianVertex(20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(20.0, 1.0);
-
-        A.setValue(20.0);
-        B.setAndCascade(20.0);
-
-        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
-
-        Cobserved.observe(44.0);
-
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-
-        Optimizer optimizer = optimizerMapper.apply(bayesNet);
-
-        optimizer.maxLikelihood();
-        double maxA = A.getValue().scalar();
-        double maxB = B.getValue().scalar();
-
-        assertEquals(44, maxA + maxB, 0.1);
-    }
-
-    public static void assertCanCalculateMaxAPosteriori(Function<BayesianNetwork, Optimizer> optimizerMapper) {
-
-        DoubleVertex A = new GaussianVertex(20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(20.0, 1.0);
-
-        A.setValue(21.5);
-        B.setAndCascade(21.5);
-
-        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
-
-        Cobserved.observe(46.0);
-
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-
-        Optimizer optimizer = optimizerMapper.apply(bayesNet);
-
-        optimizer.maxAPosteriori();
-        double maxA = A.getValue().scalar();
-        double maxB = B.getValue().scalar();
-
-        assertEquals(22, maxA, 0.1);
-        assertEquals(22, maxB, 0.1);
+        if (fitnessFunction == FitnessFunction.MAP) {
+            testCase.assertMAP(result);
+        } else if (fitnessFunction == FitnessFunction.MLE) {
+            testCase.assertMLE(result);
+        }
     }
 
     @Test
