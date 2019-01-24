@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -12,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
@@ -25,6 +25,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
     private final List<Vertex> observedVertices;
 
     private final List<Vertex> latentOrObservedVertices;
+    private final LambdaSectionSnapshot lambdaSectionSnapshot;
 
     public KeanuProbabilisticModel(Collection<? extends Vertex> variables) {
         this(new BayesianNetwork(variables));
@@ -37,6 +38,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
+        this.lambdaSectionSnapshot = new LambdaSectionSnapshot(latentVertices);
 
         resetModelToObservedState();
         checkBayesNetInHealthyState();
@@ -49,8 +51,13 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
     }
 
     @Override
-    public double logProb(Proposal proposal) {
-        return logProb(proposal.getProposalTo());
+    public double logProbAfter(Map<VariableReference, Object> newValues, double logProbBefore) {
+        Set<Vertex> affectedVertices = newValues.keySet().stream().map(ref -> vertexLookup.get(ref)).collect(Collectors.toSet());
+        double lambdaSectionLogProbBefore = lambdaSectionSnapshot.logProb(affectedVertices);
+        cascadeValues(newValues);
+        double lambdaSectionLogProbAfter = lambdaSectionSnapshot.logProb(affectedVertices);
+        double deltaLogProb = lambdaSectionLogProbAfter - lambdaSectionLogProbBefore;
+        return logProbBefore + deltaLogProb;
     }
 
     @Override

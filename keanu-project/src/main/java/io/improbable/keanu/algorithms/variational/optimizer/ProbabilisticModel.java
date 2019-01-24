@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
-import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Collections;
@@ -15,7 +14,7 @@ public interface ProbabilisticModel {
 
     double logProb(Map<VariableReference, ?> inputs);
 
-    double logProb(Proposal proposal);
+    double logProbAfter(Map<VariableReference, Object> newValues, double logProbBefore);
 
     default double logLikelihood() {
         return logLikelihood(Collections.emptyMap());

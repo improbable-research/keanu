@@ -13,23 +13,16 @@ import java.util.stream.Collectors;
 
 public class LambdaSectionSnapshot {
 
-    private final List<Vertex> latentVertices;
-    @Getter(lazy=true)
-    private final Map<Variable, LambdaSection> affectedVariablesCache = update();
+    private final Map<Variable, LambdaSection> affectedVariablesCache;
 
     public LambdaSectionSnapshot(List<Vertex> latentVertices) {
-        this.latentVertices = latentVertices;
-    }
-
-    private Map<Variable, LambdaSection> update() {
-        return createVariablesAffectedByCache(latentVertices);
+        this.affectedVariablesCache = createVariablesAffectedByCache(latentVertices);
     }
 
     public double logProb(Set<? extends Variable> variables) {
-        update();
         double sumLogProb = 0.0;
         for (Variable v : variables) {
-            sumLogProb += ProbabilityCalculator.calculateLogProbFor(this.getAffectedVariablesCache().get(v).getLatentAndObservedVertices());
+            sumLogProb += ProbabilityCalculator.calculateLogProbFor(affectedVariablesCache.get(v).getLatentAndObservedVertices());
         }
         return sumLogProb;
     }
@@ -37,7 +30,7 @@ public class LambdaSectionSnapshot {
     public Set<? extends Variable> getAllVariablesAffectedBy(Set<? extends Variable> variables) {
         Set<Variable> allAffectedVariables = new HashSet<>();
         for (Variable variable : variables) {
-            allAffectedVariables.addAll(this.getAffectedVariablesCache().get(variable).getAllVertices());
+            allAffectedVariables.addAll(affectedVariablesCache.get(variable).getAllVertices());
         }
         return allAffectedVariables;
     }
