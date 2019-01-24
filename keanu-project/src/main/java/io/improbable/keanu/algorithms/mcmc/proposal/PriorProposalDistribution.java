@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class PriorProposalDistribution implements ProposalDistribution {
     private final Map<VariableReference, Vertex> vertexLookup;
-    private final List<ProposalListener> listeners;
+    private final ProposalNotifier proposalNotifier;
 
     public PriorProposalDistribution(Collection<Vertex> vertices) {
         this(vertices, Collections.emptyList());
@@ -23,16 +23,17 @@ public class PriorProposalDistribution implements ProposalDistribution {
 
     public PriorProposalDistribution(Collection<Vertex> vertices, List<ProposalListener> listeners) {
         vertexLookup = vertices.stream().collect(Collectors.toMap(v -> v.getReference(), v -> v));
-        this.listeners = listeners;
+        this.proposalNotifier = new ProposalNotifier(listeners);
+
     }
 
     @Override
     public Proposal getProposal(Set<Variable> variables, KeanuRandom random) {
         Proposal proposal = new Proposal();
-        proposal.addListeners(listeners);
         for (Variable<?, ?> variable : variables) {
             setFor(variable, random, proposal);
         }
+        proposalNotifier.notifyProposalCreated(proposal);
         return proposal;
     }
 
@@ -46,4 +47,8 @@ public class PriorProposalDistribution implements ProposalDistribution {
         proposal.setProposal(variable, vertex.sample(random));
     }
 
+    @Override
+    public void onProposalRejected() {
+        proposalNotifier.notifyProposalRejected();
+    }
 }

@@ -89,10 +89,9 @@ public class GaussianProposalDistributionTest {
         proposalDistribution = new GaussianProposalDistribution(sigma, listeners);
         Set<Variable> variables = ImmutableSet.of(vertex1, vertex2);
         Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
-        proposal.apply();
-        verify(listener1).onProposalApplied(proposal);
-        verify(listener2).onProposalApplied(proposal);
-        proposal.reject();
+        verify(listener1).onProposalCreated(proposal);
+        verify(listener2).onProposalCreated(proposal);
+        proposalDistribution.onProposalRejected();
         verify(listener1).onProposalRejected(proposal);
         verify(listener2).onProposalRejected(proposal);
         verifyNoMoreInteractions(listener1, listener2);

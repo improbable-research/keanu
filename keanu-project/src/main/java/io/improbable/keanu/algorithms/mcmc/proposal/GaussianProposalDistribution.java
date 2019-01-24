@@ -14,7 +14,7 @@ import java.util.Set;
 public class GaussianProposalDistribution implements ProposalDistribution {
 
     private final DoubleTensor sigma;
-    private final List<ProposalListener> listeners;
+    private final ProposalNotifier proposalNotifier;
 
     public GaussianProposalDistribution(DoubleTensor sigma) {
         this(sigma, Collections.emptyList());
@@ -22,13 +22,12 @@ public class GaussianProposalDistribution implements ProposalDistribution {
 
     public GaussianProposalDistribution(DoubleTensor sigma, List<ProposalListener> listeners) {
         this.sigma = sigma;
-        this.listeners = listeners;
+        this.proposalNotifier = new ProposalNotifier(listeners);
     }
 
     @Override
     public Proposal getProposal(Set<Variable> variables, KeanuRandom random) {
         Proposal proposal = new Proposal();
-        proposal.addListeners(listeners);
         for (Variable variable : variables) {
             if (!(variable.getValue() instanceof DoubleTensor)) {
                 throw new IllegalStateException("Gaussian proposal function cannot be used for discrete variable " + variable);
@@ -36,6 +35,7 @@ public class GaussianProposalDistribution implements ProposalDistribution {
             ContinuousDistribution proposalDistribution = Gaussian.withParameters((DoubleTensor) variable.getValue(), sigma);
             proposal.setProposal(variable, proposalDistribution.sample(variable.getShape(), random));
         }
+        proposalNotifier.notifyProposalCreated(proposal);
         return proposal;
     }
 
@@ -49,4 +49,8 @@ public class GaussianProposalDistribution implements ProposalDistribution {
         return proposalDistribution.logProb((DoubleTensor) givenValue).sum();
     }
 
+    @Override
+    public void onProposalRejected() {
+        proposalNotifier.notifyProposalRejected();
+    }
 }

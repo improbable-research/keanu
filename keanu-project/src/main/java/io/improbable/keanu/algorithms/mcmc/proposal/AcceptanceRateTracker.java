@@ -12,7 +12,7 @@ public class AcceptanceRateTracker implements ProposalListener {
     private Map<VariableReference, Counter> numRejected = Maps.newHashMap();
 
     @Override
-    public void onProposalApplied(Proposal proposal) {
+    public void onProposalCreated(Proposal proposal) {
         for (Variable variable : proposal.getVariablesWithProposal()) {
             numApplied.computeIfAbsent(variable.getReference(), i -> new Counter()).increment();
         }

@@ -44,4 +44,5 @@ public interface ProposalDistribution {
         return sumLogProb;
     }
 
+    void onProposalRejected();
 }

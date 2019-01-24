@@ -79,6 +79,7 @@ public class MetropolisHastingsStep {
             }
         }
 
+        proposalDistribution.onProposalRejected();
         rejectionStrategy.handle();
 
         return new StepResult(false, logProbabilityBeforeStep);
