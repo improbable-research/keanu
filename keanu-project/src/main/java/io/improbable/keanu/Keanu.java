@@ -2,8 +2,6 @@ package io.improbable.keanu;
 
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.graphtraversal.DifferentiableChecker;
-import io.improbable.keanu.algorithms.mcmc.CascadeOnApplication;
-import io.improbable.keanu.algorithms.mcmc.LambdaSectionOptimizedLogProbCalculator;
 import io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection;
 import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
