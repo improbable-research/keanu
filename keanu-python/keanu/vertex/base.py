@@ -31,8 +31,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         else:
             val = typing_cast(JavaObject, val_or_ctor)
 
-        Vertex.__handle_optional_params(val, **kwargs)
         super(Vertex, self).__init__(val)
+        self.__handle_optional_params(**kwargs)
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return v
@@ -50,7 +50,17 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         self.unwrap().setAndCascade(Tensor(self.cast(v)).unwrap())
 
     def set_label(self, label: vertex_label_types) -> None:
-        Vertex.__set_label_to_java_vertex(self.unwrap(), label)
+        if isinstance(label, _VertexLabel):
+            self.unwrap().setLabel(label.unwrap())
+        elif isinstance(label, str):
+            self.unwrap().setLabel(label)
+        else:
+            raise TypeError("label must be str or VertexLabel.")
+
+    def __handle_optional_params(self, **kwargs: Dict[str, Any]) -> None:
+        if "label" in kwargs:
+            casted_kwarg = typing_cast(vertex_label_types, kwargs["label"])
+            self.set_label(casted_kwarg)
 
     def sample(self) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().sample())
@@ -182,21 +192,6 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             return arg
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
-
-    @staticmethod
-    def __handle_optional_params(val: JavaObject, **kwargs: Dict[str, Any]) -> None:
-        if "label" in kwargs:
-            casted_kwarg = typing_cast(vertex_label_types, kwargs["label"])
-            Vertex.__set_label_to_java_vertex(val, casted_kwarg)
-
-    @staticmethod
-    def __set_label_to_java_vertex(java_vertex, label: vertex_label_types) -> None:
-        if isinstance(label, _VertexLabel):
-            java_vertex.setLabel(label.unwrap())
-        elif isinstance(label, str):
-            java_vertex.setLabel(label)
-        else:
-            raise TypeError("label must be str or VertexLabel.")
 
     @staticmethod
     def _to_generator(java_vertices: Union[JavaList, JavaArray]) -> Iterator['Vertex']:
