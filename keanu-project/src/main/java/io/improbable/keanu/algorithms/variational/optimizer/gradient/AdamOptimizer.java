@@ -57,11 +57,6 @@ public class AdamOptimizer implements Optimizer {
                 v[i] = v[i].times(beta2).plus(gradientT[i].pow(2).times(1 - beta2));
 
                 thetaNext[i] = theta[i].plus(m[i].times(alpha).div(v[i].sqrt().times(b).plus(epsilon)));
-
-//                mHat[i] = m[i].div(beta1T);
-//                vHat[i] = v[i].div(beta2T);
-//
-//                thetaNext[i] = theta[i].plus(mHat[i].div(vHat[i].sqrt().plus(epsilon)).times(alpha));
             }
 
             converged = hasConverged(gradientT);
