@@ -1,14 +1,9 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.variational.optimizer.*;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
@@ -27,16 +22,16 @@ public class AdamOptimizer implements Optimizer {
         return new AdamOptimizerBuilder();
     }
 
-    private final BayesianNetwork bayesianNetwork;
+    private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
 
     private final double alpha;
     private final double beta1;
     private final double beta2;
     private final double epsilon;
 
-    private OptimizedResult optimize(LogProbGradientCalculator gradientCalculator) {
+    private OptimizedResult optimize(boolean isMLE) {
 
-        List<Vertex<DoubleTensor>> latentVariables = bayesianNetwork.getContinuousLatentVertices();
+        List<? extends Variable> latentVariables = probabilisticWithGradientGraph.getLatentVariables();
         DoubleTensor[] theta = getTheta(latentVariables);
         DoubleTensor[] thetaNext = getZeros(theta);
         DoubleTensor[] m = getZeros(theta);
@@ -50,38 +45,56 @@ public class AdamOptimizer implements Optimizer {
         while (!converged && t < maxIterations) {
             t++;
 
-            setTheta(theta, latentVariables);
-            DoubleTensor[] gradientT = toArray(gradientCalculator.getJointLogProbGradientWrtLatents(), latentVariables);
+            final DoubleTensor[] gradients = getGradients(theta, latentVariables, isMLE);
 
             final double beta1T = (1 - Math.pow(beta1, t));
             final double beta2T = (1 - Math.pow(beta2, t));
             final double b = beta1T / Math.sqrt(beta2T);
 
-            for (int i = 0; i < gradientT.length; i++) {
+            for (int i = 0; i < gradients.length; i++) {
 
-                m[i] = m[i].times(beta1).plus(gradientT[i].times(1 - beta1));
-                v[i] = v[i].times(beta2).plus(gradientT[i].pow(2).times(1 - beta2));
+                m[i] = m[i].times(beta1).plus(gradients[i].times(1 - beta1));
+                v[i] = v[i].times(beta2).plus(gradients[i].pow(2).times(1 - beta2));
 
                 thetaNext[i] = theta[i].plus(m[i].times(alpha).div(v[i].sqrt().times(b).plus(epsilon)));
             }
 
-            converged = hasConverged(gradientT);
+            converged = hasConverged(gradients);
 
-            DoubleTensor[] temp = theta;
+            final DoubleTensor[] temp = theta;
             theta = thetaNext;
             thetaNext = temp;
         }
 
-        double logProb = bayesianNetwork.getLogOfMasterP();
+        double logProb = probabilisticWithGradientGraph.logProb();
 
         return new OptimizedResult(toMap(theta, latentVariables), logProb);
     }
 
-    private DoubleTensor[] getTheta(List<Vertex<DoubleTensor>> latentVertices) {
+    private DoubleTensor[] getGradients(DoubleTensor[] theta, List<? extends Variable> latentVariables, boolean isMLE) {
+        Map<VariableReference, DoubleTensor> thetaMap = toMap(theta, latentVariables);
+
+        final DoubleTensor[] gradients;
+        if (isMLE) {
+            gradients = toArray(
+                probabilisticWithGradientGraph.logLikelihoodGradients(thetaMap),
+                latentVariables
+            );
+        } else {
+            gradients = toArray(
+                probabilisticWithGradientGraph.logProbGradients(thetaMap),
+                latentVariables
+            );
+        }
+
+        return gradients;
+    }
+
+    private DoubleTensor[] getTheta(List<? extends Variable> latentVertices) {
 
         DoubleTensor[] theta = new DoubleTensor[latentVertices.size()];
         for (int i = 0; i < theta.length; i++) {
-            theta[i] = latentVertices.get(i).getValue();
+            theta[i] = (DoubleTensor) latentVertices.get(i).getValue();
         }
 
         return theta;
@@ -105,17 +118,17 @@ public class AdamOptimizer implements Optimizer {
         return zeros;
     }
 
-    private DoubleTensor[] toArray(Map<VertexId, DoubleTensor> lookup, List<Vertex<DoubleTensor>> orderded) {
+    private DoubleTensor[] toArray(Map<? extends VariableReference, DoubleTensor> lookup, List<? extends Variable> orderded) {
 
         DoubleTensor[] array = new DoubleTensor[orderded.size()];
         for (int i = 0; i < orderded.size(); i++) {
-            array[i] = lookup.get(orderded.get(i).getId());
+            array[i] = lookup.get(orderded.get(i).getReference());
         }
 
         return array;
     }
 
-    private Map<VariableReference, DoubleTensor> toMap(DoubleTensor[] values, List<Vertex<DoubleTensor>> orderded) {
+    private Map<VariableReference, DoubleTensor> toMap(DoubleTensor[] values, List<? extends Variable> orderded) {
 
         Map<VariableReference, DoubleTensor> asMap = new HashMap<>();
         for (int i = 0; i < values.length; i++) {
@@ -141,20 +154,12 @@ public class AdamOptimizer implements Optimizer {
 
     @Override
     public OptimizedResult maxAPosteriori() {
-        LogProbGradientCalculator gradientCalculator = new LogProbGradientCalculator(
-            bayesianNetwork.getLatentOrObservedVertices(),
-            bayesianNetwork.getContinuousLatentVertices()
-        );
-        return optimize(gradientCalculator);
+        return optimize(false);
     }
 
     @Override
     public OptimizedResult maxLikelihood() {
-        LogProbGradientCalculator gradientCalculator = new LogProbGradientCalculator(
-            bayesianNetwork.getObservedVertices(),
-            bayesianNetwork.getContinuousLatentVertices()
-        );
-        return optimize(gradientCalculator);
+        return optimize(true);
     }
 
     @Override
@@ -168,7 +173,7 @@ public class AdamOptimizer implements Optimizer {
     }
 
     public static class AdamOptimizerBuilder {
-        private BayesianNetwork bayesianNetwork;
+        private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
 
         private double alpha = 0.001;
         private double beta1 = 0.9;
@@ -178,8 +183,8 @@ public class AdamOptimizer implements Optimizer {
         AdamOptimizerBuilder() {
         }
 
-        public AdamOptimizerBuilder bayesianNetwork(BayesianNetwork bayesianNetwork) {
-            this.bayesianNetwork = bayesianNetwork;
+        public AdamOptimizerBuilder bayesianNetwork(ProbabilisticWithGradientGraph probabilisticWithGradientGraph) {
+            this.probabilisticWithGradientGraph = probabilisticWithGradientGraph;
             return this;
         }
 
@@ -204,11 +209,11 @@ public class AdamOptimizer implements Optimizer {
         }
 
         public AdamOptimizer build() {
-            return new AdamOptimizer(bayesianNetwork, alpha, beta1, beta2, epsilon);
+            return new AdamOptimizer(probabilisticWithGradientGraph, alpha, beta1, beta2, epsilon);
         }
 
         public String toString() {
-            return "AdamOptimizer.AdamOptimizerBuilder(bayesianNetwork=" + this.bayesianNetwork + ", alpha=" + this.alpha + ", beta1=" + this.beta1 + ", beta2=" + this.beta2 + ", epsilon=" + this.epsilon + ")";
+            return "AdamOptimizer.AdamOptimizerBuilder(bayesianNetwork=" + this.probabilisticWithGradientGraph + ", alpha=" + this.alpha + ", beta1=" + this.beta1 + ", beta2=" + this.beta2 + ", epsilon=" + this.epsilon + ")";
         }
     }
 }

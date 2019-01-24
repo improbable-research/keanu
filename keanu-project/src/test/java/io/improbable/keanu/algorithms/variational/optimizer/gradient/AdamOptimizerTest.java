@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
@@ -15,8 +16,12 @@ public class AdamOptimizerTest {
         GaussianVertex A = new GaussianVertex(mu, 0.1);
         A.setValue(0);
 
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(A.getConnectedGraph());
+
+        KeanuProbabilisticWithGradientGraph model = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
+
         AdamOptimizer optimizer = AdamOptimizer.builder()
-            .bayesianNetwork(new BayesianNetwork(A.getConnectedGraph()))
+            .bayesianNetwork(model)
             .build();
 
         optimizer.maxAPosteriori();

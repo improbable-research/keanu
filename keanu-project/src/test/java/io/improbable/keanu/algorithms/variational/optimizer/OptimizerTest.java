@@ -36,7 +36,7 @@ public class OptimizerTest {
         ADAM(bayesianNetwork -> {
 
             return AdamOptimizer.builder()
-                .bayesianNetwork(bayesianNetwork)
+                .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
                 .build();
         }),
 

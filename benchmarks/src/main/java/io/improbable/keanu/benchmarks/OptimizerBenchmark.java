@@ -1,6 +1,7 @@
 package io.improbable.keanu.benchmarks;
 
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.AdamOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
@@ -39,11 +40,7 @@ public class OptimizerBenchmark {
         switch (optimizerType) {
             case ADAM:
                 optimizer = AdamOptimizer.builder()
-                    .alpha(0.001)
-                    .beta1(0.9)
-                    .beta2(0.999)
-                    .epsilon(1e-8)
-                    .bayesianNetwork(bayesianNetwork)
+                    .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
                     .build();
                 break;
 
@@ -61,7 +58,7 @@ public class OptimizerBenchmark {
     }
 
     @Benchmark
-    public double baseline() {
+    public OptimizedResult baseline() {
         return optimizer.maxAPosteriori();
     }
 
