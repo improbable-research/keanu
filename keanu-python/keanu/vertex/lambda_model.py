@@ -6,7 +6,7 @@ from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from keanu.functional import Consumer, Supplier
 from keanu.vertex.base import Vertex
-from keanu.vertex.label import VertexLabel
+from keanu.vertex.label import _VertexLabel
 
 context = KeanuContext()
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.model.LambdaModelVertex")
@@ -35,7 +35,7 @@ class LambdaModel(Vertex):
 
     @staticmethod
     def __to_java_map(inputs: Dict[str, Vertex]) -> JavaMap:
-        inputs_with_wrapped_keys = {VertexLabel(k): v for k, v in inputs.items()}
+        inputs_with_wrapped_keys = {_VertexLabel(k): v for k, v in inputs.items()}
         return context.to_java_map(inputs_with_wrapped_keys)
 
     @staticmethod
@@ -45,9 +45,9 @@ class LambdaModel(Vertex):
     @staticmethod
     def __update_unwrapped_vertices(vertices_wrapped: Dict[str, Vertex], vertices_unwrapped: JavaMap) -> None:
         for k, v in vertices_wrapped.items():
-            vertices_unwrapped[VertexLabel(k).unwrap()] = v.unwrap()
+            vertices_unwrapped[_VertexLabel(k).unwrap()] = v.unwrap()
 
     def get_double_model_output_vertex(self, label: str) -> Vertex:
-        label_unwrapped = VertexLabel(label).unwrap()
+        label_unwrapped = _VertexLabel(label).unwrap()
         result = self.unwrap().getDoubleModelOutputVertex(label_unwrapped)
         return Vertex(result)

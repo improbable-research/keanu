@@ -2,7 +2,6 @@ from typing import Iterable, Union, Type, Any, TYPE_CHECKING, Dict, Tuple, List,
 from numpy import integer, floating, bool_, ndarray
 from pandas import Series, DataFrame
 from .base import JavaObjectWrapper
-from .vertex.label import _VertexLabel
 from py4j.java_gateway import JavaObject
 
 # see numpy's scalar hierarchy: https://docs.scipy.org/doc/numpy/reference/arrays.scalars.html#scalars
@@ -26,9 +25,8 @@ shape_types = Iterable[primitive_types]
 '''
 Sample types
 '''
-vertex_label_types = Union[str, _VertexLabel]
-sample_types = Dict[vertex_label_types, List[numpy_types]]
-sample_generator_types = Generator[Dict[vertex_label_types, numpy_types], None, None]
+sample_types = Dict[str, List[numpy_types]]
+sample_generator_types = Generator[Dict[str, numpy_types], None, None]
 '''
 Runtime types
 '''

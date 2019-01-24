@@ -13,30 +13,23 @@ class JavaObjectWrapper:
     def __repr__(self) -> str:
         return "[{0} => {1}]".format(self._class, type(self))
 
-    def __getattr__(self, attr: str) -> Callable:
-        self.__check_attr_is_snake_case(attr)
+    def __getattr__(self, k: str) -> Callable:
+        python_name = _to_snake_case_name(k)
 
-        # AttributeError MUST be thrown here when java API does not implement given attr.
-        # Otherwise calls to this object may result in unexpected behaviours (e.g. with logic that depends on hasattr)
-        java_name = _to_camel_case_name(attr)
-        self.__check_java_object_has_attr(attr, java_name)
+        if k != python_name:
+            if python_name in self.__class__.__dict__:
+                raise AttributeError("{} has no attribute {}. Did you mean {}?".format(self.__class__, k, python_name))
 
+            raise AttributeError("{} has no attribute {}".format(self.__class__, k))
+
+        if python_name == "_get_object_id":
+            raise TypeError("Trying to call %s on a JavaObjectWrapper - did you forget to call %s.unwrap()?" %
+                            (python_name, self._class))
+
+        java_name = _to_camel_case_name(k)
         logging.getLogger("keanu").warning(
-            "\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(attr, java_name))
+            "\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
         return self.unwrap().__getattr__(java_name)
 
     def unwrap(self) -> JavaObject:
         return self._val
-
-    def __check_attr_is_snake_case(self, attr: str) -> None:
-        snake_case = _to_snake_case_name(attr)
-        if attr != snake_case:
-            if snake_case in self.__class__.__dict__:
-                raise AttributeError("{} has no attribute {}. Did you mean {}?".format(
-                    self.__class__, attr, snake_case))
-            else:
-                raise AttributeError("{} has no attribute {}.".format(self.__class__, attr))
-
-    def __check_java_object_has_attr(self, attr: str, java_name: str) -> None:
-        if not java_name in dir(self.unwrap()):
-            raise AttributeError("{} has no attribute {}.".format(self.__class__, attr))

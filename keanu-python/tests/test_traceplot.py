@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 
 from keanu.plots import traceplot
 from keanu.vartypes import sample_types
-from keanu.vertex import VertexLabel
 from numpy import array
 from numpy.testing import assert_array_equal
 import pytest
@@ -35,16 +34,3 @@ def test_traceplot_returns_axesplot_with_correct_data(trace: sample_types) -> No
 
     assert_array_equal(gamma_ax_data, [array([1., 2.]), array([2., 3.]), array([3., 4.]), array([4., 5.])])
     assert_array_equal(gaussian_ax_data, [array([0.1, 0.2]), array([0.2, 0.3]), array([0.3, 0.4]), array([0.4, 0.5])])
-
-
-def test_traceplot_takes_vertexlabel_objects(trace: sample_types) -> None:
-    gamma_label = VertexLabel('gamma')
-    gaussian_label = VertexLabel('gaussian')
-
-    ax = traceplot(trace, labels=[gamma_label, gaussian_label])
-
-    gamma_ax = ax[0][0]
-    gaussian_ax = ax[1][0]
-
-    assert gamma_ax.get_title() == 'gamma'
-    assert gaussian_ax.get_title() == 'gaussian'

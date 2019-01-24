@@ -7,7 +7,7 @@ from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
 from keanu.net import BayesNet
 from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional
-from keanu.vartypes import sample_types, sample_generator_types, numpy_types, vertex_label_types
+from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 from keanu.plots import traceplot
 
 k = KeanuContext()
@@ -102,7 +102,7 @@ def sample(net: BayesNet,
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
         net.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
-    vertex_samples: sample_types = {
+    vertex_samples = {
         Vertex._get_python_label(vertex_unwrapped): list(
             map(Tensor._to_ndarray,
                 network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped
@@ -142,7 +142,7 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
     x0 = 0
     while (True):
         network_sample = sample_iterator.next()
-        sample: Dict[vertex_label_types, numpy_types] = {
+        sample = {
             Vertex._get_python_label(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped))
             for vertex_unwrapped in vertices_unwrapped
         }
@@ -150,7 +150,7 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
         if live_plot:
             traces.append(sample)
             if len(traces) % refresh_every == 0:
-                joined_trace: sample_types = {k: [t[k] for t in traces] for k in sample.keys()}
+                joined_trace = {k: [t[k] for t in traces] for k in sample.keys()}
                 if ax is None:
                     ax = traceplot(joined_trace, x0=x0)
                 else:

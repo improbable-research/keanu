@@ -10,9 +10,8 @@ import keanu as kn
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
-from keanu.vertex.label import _VertexLabel
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_wrapped_java_types,
-                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, vertex_label_types)
+                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types)
 
 k = KeanuContext()
 
@@ -49,17 +48,12 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def set_and_cascade(self, v: tensor_arg_types) -> None:
         self.unwrap().setAndCascade(Tensor(self.cast(v)).unwrap())
 
-    def set_label(self, label: vertex_label_types) -> None:
-        if isinstance(label, _VertexLabel):
-            self.unwrap().setLabel(label.unwrap())
-        elif isinstance(label, str):
-            self.unwrap().setLabel(label)
-        else:
-            raise TypeError("label must be str or VertexLabel.")
+    def set_label(self, label: str) -> None:
+        self.unwrap().setLabel(label)
 
     def __handle_optional_params(self, **kwargs: Dict[str, Any]) -> None:
         if "label" in kwargs:
-            casted_kwarg = typing_cast(vertex_label_types, kwargs["label"])
+            casted_kwarg = typing_cast(str, kwargs["label"])
             self.set_label(casted_kwarg)
 
     def sample(self) -> numpy_types:
@@ -74,7 +68,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def get_id(self) -> Tuple[JavaObject, ...]:
         return Vertex._get_python_id(self.unwrap())
 
-    def get_label(self) -> _VertexLabel:
+    def get_label(self) -> str:
         return Vertex._get_python_label(self.unwrap())
 
     """
@@ -202,8 +196,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return tuple(java_vertex.getId().getValue())
 
     @staticmethod
-    def _get_python_label(java_vertex: JavaObject) -> _VertexLabel:
-        return _VertexLabel(java_vertex.getLabel())
+    def _get_python_label(java_vertex: JavaObject) -> str:
+        return java_vertex.getLabel().getQualifiedName()
 
 
 class Double(Vertex):
