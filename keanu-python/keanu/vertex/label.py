@@ -15,7 +15,7 @@ class _VertexLabel(JavaObjectWrapper):
 
     def __eq__(self, other) -> bool:
         if isinstance(other, str):
-            return other == self.get_unqualified_name()
+            return self.unwrap().equals(VertexLabel(other).unwrap())
         elif isinstance(other, _VertexLabel):
             return self.unwrap().equals(other.unwrap())
         else:
