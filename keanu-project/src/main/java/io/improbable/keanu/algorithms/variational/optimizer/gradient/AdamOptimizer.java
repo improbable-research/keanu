@@ -47,18 +47,21 @@ public class AdamOptimizer implements Optimizer {
             setTheta(theta, latentVariables);
             DoubleTensor[] gradientT = toArray(gradientCalculator.getJointLogProbGradientWrtLatents(), latentVariables);
 
-            double beta1T = (1 - Math.pow(beta1, t));
-            double beta2T = (1 - Math.pow(beta2, t));
+            final double beta1T = (1 - Math.pow(beta1, t));
+            final double beta2T = (1 - Math.pow(beta2, t));
+            final double b = beta1T / Math.sqrt(beta2T);
 
             for (int i = 0; i < gradientT.length; i++) {
 
                 m[i] = m[i].times(beta1).plus(gradientT[i].times(1 - beta1));
                 v[i] = v[i].times(beta2).plus(gradientT[i].pow(2).times(1 - beta2));
 
-                mHat[i] = m[i].div(beta1T);
-                vHat[i] = v[i].div(beta2T);
+                thetaNext[i] = theta[i].plus(m[i].times(alpha).div(v[i].sqrt().times(b).plus(epsilon)));
 
-                thetaNext[i] = theta[i].plus(mHat[i].div(vHat[i].sqrt().plus(epsilon)).times(alpha));
+//                mHat[i] = m[i].div(beta1T);
+//                vHat[i] = v[i].div(beta2T);
+//
+//                thetaNext[i] = theta[i].plus(mHat[i].div(vHat[i].sqrt().plus(epsilon)).times(alpha));
             }
 
             converged = hasConverged(gradientT);
