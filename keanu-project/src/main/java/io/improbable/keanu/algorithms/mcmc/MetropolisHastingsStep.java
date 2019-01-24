@@ -20,32 +20,22 @@ public class MetropolisHastingsStep {
     private final ProbabilisticModel model;
     private final ProposalDistribution proposalDistribution;
     private final ProposalRejectionStrategy rejectionStrategy;
-    private final LogProbCalculationStrategy logProbCalculationStrategy;
-    private final ProposalApplicationStrategy proposalApplicationStrategy;
     private final KeanuRandom random;
 
     /**
      * @param proposalDistribution        The proposal distribution
      * @param rejectionStrategy           What to do when a proposal is rejected.
      *                                    Options include {@link CascadeOnRejection} and {@link RollBackOnRejection}.
-     * @param logProbCalculationStrategy  How to calculate log probability.
-     *                                    Options include {@link SimpleLogProbCalculationStrategy} and {@link LambdaSectionOptimizedLogProbCalculator}
-     * @param proposalApplicationStrategy What to do when a proposal is applied.
-     *                                    Options include {@link CascadeOnApplication} and {@link NoActionOnApplication}
      * @param random                      Source of randomness
      */
     MetropolisHastingsStep(ProbabilisticModel model,
                            ProposalDistribution proposalDistribution,
                            ProposalRejectionStrategy rejectionStrategy,
-                           LogProbCalculationStrategy logProbCalculationStrategy,
-                           ProposalApplicationStrategy proposalApplicationStrategy,
                            KeanuRandom random) {
 
         this.model = model;
         this.proposalDistribution = proposalDistribution;
         this.rejectionStrategy = rejectionStrategy;
-        this.logProbCalculationStrategy = logProbCalculationStrategy;
-        this.proposalApplicationStrategy = proposalApplicationStrategy;
         this.random = random;
     }
 
@@ -65,20 +55,14 @@ public class MetropolisHastingsStep {
                            final double logProbabilityBeforeStep,
                            final double temperature) {
 
-        final double affectedVariablesLogProbOld = logProbCalculationStrategy.calculate(model, chosenVariables);
-
         rejectionStrategy.prepare(chosenVariables);
 
         Proposal proposal = proposalDistribution.getProposal(chosenVariables, random);
-        proposal.apply();
-        proposalApplicationStrategy.apply(proposal, chosenVariables);
+        final double logProbabilityAfterStep = model.logProb(proposal);
 
-        final double affectedVariablesLogProbNew = logProbCalculationStrategy.calculate(model, chosenVariables);
+        if (!ProbabilityCalculator.isImpossibleLogProb(logProbabilityAfterStep)) {
 
-        if (!ProbabilityCalculator.isImpossibleLogProb(affectedVariablesLogProbNew)) {
-
-            final double logProbabilityDelta = affectedVariablesLogProbNew - affectedVariablesLogProbOld;
-            final double logProbabilityAfterStep = logProbabilityBeforeStep + logProbabilityDelta;
+            final double logProbabilityDelta = logProbabilityAfterStep - logProbabilityBeforeStep;
 
             final double pqxOld = proposalDistribution.logProbAtFromGivenTo(proposal);
             final double pqxNew = proposalDistribution.logProbAtToGivenFrom(proposal);
@@ -94,8 +78,6 @@ public class MetropolisHastingsStep {
                 return new StepResult(true, logProbabilityAfterStep);
             }
         }
-
-        proposal.reject();
 
         rejectionStrategy.handle();
 

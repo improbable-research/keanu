@@ -89,8 +89,6 @@ public class SimulatedAnnealing {
             model,
             proposalDistribution,
             new RollBackOnRejection(latentVertices),
-            new LambdaSectionOptimizedLogProbCalculator(latentVertices),
-            new CascadeOnApplication(),
             random
         );
 

@@ -55,8 +55,6 @@ public class Keanu {
                 List<Vertex> latentVertices = model.getLatentVertices();
                 return builder()
                     .proposalDistribution(new PriorProposalDistribution(latentVertices))
-                    .logProbCalculationStrategy(new LambdaSectionOptimizedLogProbCalculator(latentVertices))
-                    .proposalApplicationStrategy(new CascadeOnApplication())
                     .rejectionStrategy(new RollBackOnRejection(latentVertices))
                     .random(random)
                     .build();

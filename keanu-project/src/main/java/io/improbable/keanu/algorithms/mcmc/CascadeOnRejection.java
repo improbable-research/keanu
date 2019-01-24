@@ -2,21 +2,30 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.vertices.Vertex;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CascadeOnRejection implements ProposalRejectionStrategy {
 
-    private Set<? extends Variable> variables;
+    private Map<Vertex, Object> fromValues;
 
     @Override
     public void prepare(Set<Variable> chosenVariables) {
-        this.variables = chosenVariables;
+        fromValues = chosenVariables.stream().collect(Collectors.toMap(v -> (Vertex) v, Variable::getValue));
     }
 
     @Override
     public void handle() {
-        VertexValuePropagation.cascadeUpdate((Set<Vertex>) variables);
+
+        for (Map.Entry<Vertex, Object> entry : fromValues.entrySet()) {
+            Object oldValue = entry.getValue();
+            Vertex vertex = entry.getKey();
+            vertex.setValue(oldValue);
+        }
+        VertexValuePropagation.cascadeUpdate(fromValues.keySet());
     }
 }

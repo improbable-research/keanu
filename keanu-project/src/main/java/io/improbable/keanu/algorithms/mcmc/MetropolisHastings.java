@@ -26,9 +26,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
     public static final ProposalRejectionStrategy DEFAULT_REJECTION_STRATEGY = new CascadeOnRejection();
-    private static final LogProbCalculationStrategy DEFAULT_LOG_PROB_CALCULATION_STRATEGY = new SimpleLogProbCalculationStrategy();
-    private static final ProposalApplicationStrategy DEFAULT_PROPOSAL_APPLICATION_STRATEGY = new CascadeOnApplication();
-
 
     @Getter
     @Builder.Default
@@ -45,14 +42,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     @Getter
     @Builder.Default
     private ProposalRejectionStrategy rejectionStrategy = DEFAULT_REJECTION_STRATEGY;
-
-    @Getter
-    @Builder.Default
-    private LogProbCalculationStrategy logProbCalculationStrategy = DEFAULT_LOG_PROB_CALCULATION_STRATEGY;
-
-    @Getter
-    @Builder.Default
-    private ProposalApplicationStrategy proposalApplicationStrategy = DEFAULT_PROPOSAL_APPLICATION_STRATEGY;
 
     /**
      * @param model      a probabilistic model containing latent variables
@@ -82,8 +71,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             model,
             proposalDistribution,
             rejectionStrategy,
-            logProbCalculationStrategy,
-            proposalApplicationStrategy,
             random
         );
 
