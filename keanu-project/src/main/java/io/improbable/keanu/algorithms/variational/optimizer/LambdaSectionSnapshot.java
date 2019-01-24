@@ -3,7 +3,6 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
-import lombok.Getter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,8 +26,8 @@ public class LambdaSectionSnapshot {
         return sumLogProb;
     }
 
-    public Set<? extends Variable> getAllVariablesAffectedBy(Set<? extends Variable> variables) {
-        Set<Variable> allAffectedVariables = new HashSet<>();
+    public Set<Vertex> getAllVerticesAffectedBy(Set<? extends Variable> variables) {
+        Set<Vertex> allAffectedVariables = new HashSet<>();
         for (Variable variable : variables) {
             allAffectedVariables.addAll(affectedVariablesCache.get(variable).getAllVertices());
         }
