@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.variational.optimizer.LambdaSectionSnapshot;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.network.NetworkSnapshot;
@@ -17,13 +18,13 @@ public class RollBackToCachedValuesOnRejection implements ProposalRejectionStrat
     }
 
     @Override
-    public void prepare(Set<Variable> chosenVariables) {
-        Set<? extends Variable> affectedVariables = lambdaSectionSnapshot.getAllVariablesAffectedBy(chosenVariables);
+    public void onProposalCreated(Proposal proposal) {
+        Set<? extends Variable> affectedVariables = lambdaSectionSnapshot.getAllVariablesAffectedBy(proposal.getVariablesWithProposal());
         networkSnapshot = NetworkSnapshot.create((Set<Vertex>) affectedVariables);
     }
 
     @Override
-    public void handle() {
+    public void onProposalRejected(Proposal proposal) {
         networkSnapshot.apply();
     }
 }

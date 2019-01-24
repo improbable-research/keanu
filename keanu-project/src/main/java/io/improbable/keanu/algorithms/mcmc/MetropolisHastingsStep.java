@@ -55,9 +55,9 @@ public class MetropolisHastingsStep {
                            final double logProbabilityBeforeStep,
                            final double temperature) {
 
-        rejectionStrategy.prepare(chosenVariables);
 
         Proposal proposal = proposalDistribution.getProposal(chosenVariables, random);
+        rejectionStrategy.onProposalCreated(proposal);
         final double logProbabilityAfterStep = model.logProbAfter(proposal.getProposalTo(), logProbabilityBeforeStep);
 
         if (!ProbabilityCalculator.isImpossibleLogProb(logProbabilityAfterStep)) {
@@ -80,7 +80,7 @@ public class MetropolisHastingsStep {
         }
 
         proposalDistribution.onProposalRejected();
-        rejectionStrategy.handle();
+        rejectionStrategy.onProposalRejected(proposal);
 
         return new StepResult(false, logProbabilityBeforeStep);
     }
