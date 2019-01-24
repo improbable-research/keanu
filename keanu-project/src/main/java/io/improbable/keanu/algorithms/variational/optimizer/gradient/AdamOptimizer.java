@@ -3,14 +3,12 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +32,11 @@ public class AdamOptimizer implements Optimizer {
 
         List<Vertex<DoubleTensor>> latentVariables = bayesianNetwork.getContinuousLatentVertices();
         List<DoubleTensor> theta = getTheta(latentVariables);
+        List<DoubleTensor> thetaNext = getZeros(theta);
         List<DoubleTensor> m = getZeros(theta);
         List<DoubleTensor> v = getZeros(theta);
+        List<DoubleTensor> mHat = getZeros(theta);
+        List<DoubleTensor> vHat = getZeros(theta);
 
         int t = 0;
         boolean converged = false;
@@ -48,22 +49,33 @@ public class AdamOptimizer implements Optimizer {
             setTheta(theta, latentVariables);
             List<DoubleTensor> gradientT = toList(gradientCalculator.getJointLogProbGradientWrtLatents(), latentVariables);
 
-            m = updateMomentEstimate(beta1, m, gradientT);
-            v = updateMomentEstimate(beta2, v, squared(gradientT));
+            double beta1T = (1 - Math.pow(beta1, t));
+            double beta2T = (1 - Math.pow(beta2, t));
 
-            List<DoubleTensor> mHat = div(m, (1 - Math.pow(beta1, t)));
-            List<DoubleTensor> vHat = div(v, (1 - Math.pow(beta2, t)));
+            for (int i = 0; i < gradientT.size(); i++) {
 
-            List<DoubleTensor> sqrtVHatPlusEps = add(sqrt(vHat), epsilon);
-            List<DoubleTensor> alphaTimesMHatDivVHatPlusEps = mul(div(mHat, sqrtVHatPlusEps), alpha);
+                m.set(i, m.get(i).times(beta1)
+                    .plus(gradientT.get(i).times(1 - beta1)));
 
-            List<DoubleTensor> thetaNext = add(theta, alphaTimesMHatDivVHatPlusEps);
+                v.set(i, v.get(i).times(beta2)
+                    .plus(gradientT.get(i).pow(2).times(1 - beta2)));
+
+                mHat.set(i, m.get(i).div(beta1T));
+                vHat.set(i, v.get(i).div(beta2T));
+
+                thetaNext.set(i,
+                    theta.get(i).plus(mHat.get(i).div(vHat.get(i).sqrt().plus(epsilon)).times(alpha))
+                );
+            }
 
             converged = hasConverged(gradientT, thetaNext, theta);
 
 //            print(gradientT);
 //            print(thetaNext);
+
+            List<DoubleTensor> temp = theta;
             theta = thetaNext;
+            thetaNext = temp;
         }
 
         return bayesianNetwork.getLogOfMasterP();
@@ -88,16 +100,6 @@ public class AdamOptimizer implements Optimizer {
             .collect(Collectors.toList());
     }
 
-    private List<DoubleTensor> updateMomentEstimate(double beta, List<DoubleTensor> moment, List<DoubleTensor> gradient) {
-
-        List<DoubleTensor> update = new ArrayList<>();
-        for (int i = 0; i < moment.size(); i++) {
-            update.add(moment.get(i).times(beta).plus(gradient.get(i).times(1 - beta)));
-        }
-
-        return update;
-    }
-
     private List<DoubleTensor> toList(Map<VertexId, DoubleTensor> gradients, List<Vertex<DoubleTensor>> latentOrder) {
         return latentOrder.stream().map(v -> gradients.get(v.getId())).collect(Collectors.toList());
     }
@@ -106,44 +108,14 @@ public class AdamOptimizer implements Optimizer {
         values.forEach(v -> System.out.println(Arrays.toString(v.asFlatDoubleArray())));
     }
 
-    private List<DoubleTensor> squared(List<DoubleTensor> values) {
-        return values.stream().map(v -> v.pow(2)).collect(Collectors.toList());
-    }
+    private double magnitude(List<DoubleTensor> values) {
 
-    private double sum(List<DoubleTensor> values) {
-        return values.stream().mapToDouble(NumberTensor::sum).sum();
-    }
-
-    private List<DoubleTensor> sqrt(List<DoubleTensor> values) {
-        return values.stream().map(DoubleTensor::sqrt).collect(Collectors.toList());
-    }
-
-    private List<DoubleTensor> div(List<DoubleTensor> values, double divisor) {
-        return values.stream().map(v -> v.div(divisor)).collect(Collectors.toList());
-    }
-
-    private List<DoubleTensor> div(List<DoubleTensor> numerators, List<DoubleTensor> denominators) {
-        List<DoubleTensor> result = new ArrayList<>();
-        for (int i = 0; i < numerators.size(); i++) {
-            result.add(numerators.get(i).div(denominators.get(i)));
+        double magPow2 = 0;
+        for (int i = 0; i < values.size(); i++) {
+            magPow2 += values.get(i).pow(2).sum();
         }
-        return result;
-    }
 
-    private List<DoubleTensor> add(List<DoubleTensor> left, List<DoubleTensor> right) {
-        List<DoubleTensor> result = new ArrayList<>();
-        for (int i = 0; i < left.size(); i++) {
-            result.add(left.get(i).plus(right.get(i)));
-        }
-        return result;
-    }
-
-    private List<DoubleTensor> mul(List<DoubleTensor> values, double factor) {
-        return values.stream().map(v -> v.times(factor)).collect(Collectors.toList());
-    }
-
-    private List<DoubleTensor> add(List<DoubleTensor> values, double addition) {
-        return values.stream().map(v -> v.plus(addition)).collect(Collectors.toList());
+        return Math.sqrt(magPow2);
     }
 
     private boolean hasConverged(List<DoubleTensor> gradient, List<DoubleTensor> thetaPrevious, List<DoubleTensor> theta) {
@@ -154,7 +126,7 @@ public class AdamOptimizer implements Optimizer {
 //            return true;
 //        }
 
-        double gradientMag = Math.sqrt(sum(squared(gradient)));
+        double gradientMag = magnitude(gradient);
 
         if (gradientMag < 1e-6) {
             return true;
