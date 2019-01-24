@@ -9,11 +9,9 @@ import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 /**
  * https://arxiv.org/pdf/1412.6980.pdf
@@ -31,12 +29,12 @@ public class AdamOptimizer implements Optimizer {
     private double optimize(LogProbGradientCalculator gradientCalculator) {
 
         List<Vertex<DoubleTensor>> latentVariables = bayesianNetwork.getContinuousLatentVertices();
-        List<DoubleTensor> theta = getTheta(latentVariables);
-        List<DoubleTensor> thetaNext = getZeros(theta);
-        List<DoubleTensor> m = getZeros(theta);
-        List<DoubleTensor> v = getZeros(theta);
-        List<DoubleTensor> mHat = getZeros(theta);
-        List<DoubleTensor> vHat = getZeros(theta);
+        DoubleTensor[] theta = getTheta(latentVariables);
+        DoubleTensor[] thetaNext = getZeros(theta);
+        DoubleTensor[] m = getZeros(theta);
+        DoubleTensor[] v = getZeros(theta);
+        DoubleTensor[] mHat = getZeros(theta);
+        DoubleTensor[] vHat = getZeros(theta);
 
         int t = 0;
         boolean converged = false;
@@ -47,33 +45,25 @@ public class AdamOptimizer implements Optimizer {
             t++;
 
             setTheta(theta, latentVariables);
-            List<DoubleTensor> gradientT = toList(gradientCalculator.getJointLogProbGradientWrtLatents(), latentVariables);
+            DoubleTensor[] gradientT = toArray(gradientCalculator.getJointLogProbGradientWrtLatents(), latentVariables);
 
             double beta1T = (1 - Math.pow(beta1, t));
             double beta2T = (1 - Math.pow(beta2, t));
 
-            for (int i = 0; i < gradientT.size(); i++) {
+            for (int i = 0; i < gradientT.length; i++) {
 
-                m.set(i, m.get(i).times(beta1)
-                    .plus(gradientT.get(i).times(1 - beta1)));
+                m[i] = m[i].times(beta1).plus(gradientT[i].times(1 - beta1));
+                v[i] = v[i].times(beta2).plus(gradientT[i].pow(2).times(1 - beta2));
 
-                v.set(i, v.get(i).times(beta2)
-                    .plus(gradientT.get(i).pow(2).times(1 - beta2)));
+                mHat[i] = m[i].div(beta1T);
+                vHat[i] = v[i].div(beta2T);
 
-                mHat.set(i, m.get(i).div(beta1T));
-                vHat.set(i, v.get(i).div(beta2T));
-
-                thetaNext.set(i,
-                    theta.get(i).plus(mHat.get(i).div(vHat.get(i).sqrt().plus(epsilon)).times(alpha))
-                );
+                thetaNext[i] = theta[i].plus(mHat[i].div(vHat[i].sqrt().plus(epsilon)).times(alpha));
             }
 
-            converged = hasConverged(gradientT, thetaNext, theta);
+            converged = hasConverged(gradientT);
 
-//            print(gradientT);
-//            print(thetaNext);
-
-            List<DoubleTensor> temp = theta;
+            DoubleTensor[] temp = theta;
             theta = thetaNext;
             thetaNext = temp;
         }
@@ -81,58 +71,56 @@ public class AdamOptimizer implements Optimizer {
         return bayesianNetwork.getLogOfMasterP();
     }
 
-    private List<DoubleTensor> getTheta(List<Vertex<DoubleTensor>> latentVertices) {
-        return latentVertices.stream()
-            .map(Vertex::getValue)
-            .collect(Collectors.toList());
+    private DoubleTensor[] getTheta(List<Vertex<DoubleTensor>> latentVertices) {
+
+        DoubleTensor[] theta = new DoubleTensor[latentVertices.size()];
+        for (int i = 0; i < theta.length; i++) {
+            theta[i] = latentVertices.get(i).getValue();
+        }
+
+        return theta;
     }
 
-    private void setTheta(List<DoubleTensor> theta, List<Vertex<DoubleTensor>> latentVertices) {
-        for (int i = 0; i < theta.size(); i++) {
-            latentVertices.get(i).setValue(theta.get(i));
+    private void setTheta(DoubleTensor[] theta, List<Vertex<DoubleTensor>> latentVertices) {
+
+        for (int i = 0; i < theta.length; i++) {
+            latentVertices.get(i).setValue(theta[i]);
         }
         VertexValuePropagation.cascadeUpdate(latentVertices);
     }
 
-    private List<DoubleTensor> getZeros(List<DoubleTensor> values) {
-        return values.stream()
-            .map(v -> DoubleTensor.zeros(v.getShape()))
-            .collect(Collectors.toList());
+    private DoubleTensor[] getZeros(DoubleTensor[] values) {
+
+        DoubleTensor[] zeros = new DoubleTensor[values.length];
+        for (int i = 0; i < zeros.length; i++) {
+            zeros[i] = DoubleTensor.zeros(values[i].getShape());
+        }
+
+        return zeros;
     }
 
-    private List<DoubleTensor> toList(Map<VertexId, DoubleTensor> gradients, List<Vertex<DoubleTensor>> latentOrder) {
-        return latentOrder.stream().map(v -> gradients.get(v.getId())).collect(Collectors.toList());
+    private DoubleTensor[] toArray(Map<VertexId, DoubleTensor> lookup, List<Vertex<DoubleTensor>> orderded) {
+
+        DoubleTensor[] array = new DoubleTensor[orderded.size()];
+        for (int i = 0; i < orderded.size(); i++) {
+            array[i] = lookup.get(orderded.get(i).getId());
+        }
+
+        return array;
     }
 
-    private void print(List<DoubleTensor> values) {
-        values.forEach(v -> System.out.println(Arrays.toString(v.asFlatDoubleArray())));
-    }
-
-    private double magnitude(List<DoubleTensor> values) {
+    private double magnitude(DoubleTensor[] values) {
 
         double magPow2 = 0;
-        for (int i = 0; i < values.size(); i++) {
-            magPow2 += values.get(i).pow(2).sum();
+        for (int i = 0; i < values.length; i++) {
+            magPow2 += values[i].pow(2).sum();
         }
 
         return Math.sqrt(magPow2);
     }
 
-    private boolean hasConverged(List<DoubleTensor> gradient, List<DoubleTensor> thetaPrevious, List<DoubleTensor> theta) {
-
-//        double thetaDeltaMag = Math.sqrt(sum(squared(sub(theta, thetaPrevious))));
-//
-//        if (thetaDeltaMag < 1e-6) {
-//            return true;
-//        }
-
-        double gradientMag = magnitude(gradient);
-
-        if (gradientMag < 1e-6) {
-            return true;
-        }
-
-        return false;
+    private boolean hasConverged(DoubleTensor[] gradient) {
+        return magnitude(gradient) < 1e-6;
     }
 
     @Override
