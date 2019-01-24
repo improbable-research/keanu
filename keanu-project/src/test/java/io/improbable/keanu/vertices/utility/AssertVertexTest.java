@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.utility;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
-import io.improbable.keanu.algorithms.mcmc.MCMC;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
@@ -221,7 +221,7 @@ public class AssertVertexTest {
         Cobserved.observe(46.0);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-        PosteriorSamplingAlgorithm samplingAlgorithm = MCMC.withDefaultConfig().forNetwork(bayesNet);
+        PosteriorSamplingAlgorithm samplingAlgorithm = Keanu.Sampling.MCMC.withDefaultConfigFor(bayesNet);
         assertThat(samplingAlgorithm, instanceOf(NUTS.class));
     }
 

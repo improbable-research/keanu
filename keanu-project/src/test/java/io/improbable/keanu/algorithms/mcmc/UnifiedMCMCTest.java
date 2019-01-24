@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -18,7 +19,7 @@ public class UnifiedMCMCTest {
         GaussianVertex postNonDiffLatent = new GaussianVertex(nonDiffable, 1.);
         BayesianNetwork network = new BayesianNetwork(postNonDiffLatent.getConnectedGraph());
 
-        PosteriorSamplingAlgorithm samplingAlgorithm = MCMC.withDefaultConfig().forNetwork(network);
+        PosteriorSamplingAlgorithm samplingAlgorithm = Keanu.Sampling.MCMC.withDefaultConfigFor(network);
         assertTrue(samplingAlgorithm instanceof MetropolisHastings);
     }
 
@@ -28,7 +29,7 @@ public class UnifiedMCMCTest {
         GaussianVertex gaussianB = new GaussianVertex(gaussianA, 1.);
         BayesianNetwork network = new BayesianNetwork(gaussianB.getConnectedGraph());
 
-        PosteriorSamplingAlgorithm samplingAlgorithm = MCMC.withDefaultConfig().forNetwork(network);
+        PosteriorSamplingAlgorithm samplingAlgorithm = Keanu.Sampling.MCMC.withDefaultConfigFor(network);
         assertTrue(samplingAlgorithm instanceof NUTS);
     }
 
