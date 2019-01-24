@@ -40,16 +40,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         STEPSIZE, LOG_PROB, MEAN_TREE_ACCEPT, TREE_SIZE
     }
 
-    public static NUTS withDefaultConfig() {
-        return withDefaultConfig(KeanuRandom.getDefaultRandom());
-    }
-
-    public static NUTS withDefaultConfig(KeanuRandom random) {
-        return NUTS.builder()
-            .random(random)
-            .build();
-    }
-
     @Getter
     @Builder.Default
     private KeanuRandom random = KeanuRandom.getDefaultRandom();

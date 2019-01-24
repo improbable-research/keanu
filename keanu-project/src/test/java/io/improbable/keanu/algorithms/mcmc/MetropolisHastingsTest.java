@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
@@ -45,7 +46,7 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
-        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             Arrays.asList(A, B),
             5000
@@ -76,7 +77,7 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
-        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             Arrays.asList(A, B),
             5000
@@ -109,7 +110,7 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
-        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             Collections.singletonList(A),
             10000
@@ -141,7 +142,7 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
-        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             Collections.singletonList(A),
             1000
@@ -164,7 +165,7 @@ public class MetropolisHastingsTest {
         net.probeForNonZeroProbability(100);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
-        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             Collections.singletonList(A),
             10000
@@ -259,7 +260,7 @@ public class MetropolisHastingsTest {
         int downSampleInterval = 2;
         GaussianVertex A = new GaussianVertex(0, 1);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
-        NetworkSamples samples = KeanuMetropolisHastings.withDefaultConfigFor(model).generatePosteriorSamples(model, model.getLatentVariables())
+        NetworkSamples samples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
             .generate(sampleCount);
@@ -276,7 +277,7 @@ public class MetropolisHastingsTest {
         int downSampleInterval = 1;
         GaussianVertex A = new GaussianVertex(0, 1);
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
-        MetropolisHastings algo = KeanuMetropolisHastings.withDefaultConfigFor(model);
+        MetropolisHastings algo = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model);
 
         double averageA = algo.generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(dropCount)

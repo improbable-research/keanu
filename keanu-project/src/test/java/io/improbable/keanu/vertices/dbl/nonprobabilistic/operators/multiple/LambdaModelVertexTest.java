@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
@@ -25,6 +24,8 @@ import org.junit.experimental.categories.Category;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 
 public class LambdaModelVertexTest {
 
@@ -165,7 +166,7 @@ public class LambdaModelVertexTest {
 
         KeanuProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(chanceOfRainObservation.getConnectedGraph());
 
-        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(probabilisticModel, random).getPosteriorSamples(
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfigFor(probabilisticModel, random).getPosteriorSamples(
             probabilisticModel,
             inputToModel,
             200

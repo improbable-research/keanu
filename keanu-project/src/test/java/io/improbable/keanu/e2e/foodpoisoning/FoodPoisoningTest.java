@@ -3,7 +3,6 @@ package io.improbable.keanu.e2e.foodpoisoning;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.Plate;
@@ -23,6 +22,7 @@ import org.junit.experimental.categories.Category;
 
 import java.util.function.Consumer;
 
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -88,7 +88,7 @@ public class FoodPoisoningTest {
         myNet.probeForNonZeroProbability(100, random);
         assertNotEquals(Double.NEGATIVE_INFINITY, myNet.getLogOfMasterP());
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(myNet);
-        return KeanuMetropolisHastings.withDefaultConfigFor(model, random).getPosteriorSamples(model, myNet.getLatentVertices(), n);
+        return MetropolisHastings.withDefaultConfigFor(model, random).getPosteriorSamples(model, myNet.getLatentVertices(), n);
     }
 
     public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) {

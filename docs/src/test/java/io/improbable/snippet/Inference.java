@@ -1,8 +1,7 @@
 package io.improbable.snippet;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
-import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -35,7 +34,7 @@ public class Inference {
         //%%SNIPPET_END%% InfStartState
 
         //%%SNIPPET_START%% InfMetropolisHastings
-        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100000
@@ -56,7 +55,7 @@ public class Inference {
         KeanuRandom random = null;
 
         //%%SNIPPET_START%% InfNuts
-        NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.NUTS.withDefaultConfig().getPosteriorSamples(
             model,
             model.getLatentVariables(),
             2000

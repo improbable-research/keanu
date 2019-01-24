@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.graphtraversal.DifferentiableChecker;
-import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -42,9 +42,9 @@ public class MCMC {
      */
     public PosteriorSamplingAlgorithm forNetwork(BayesianNetwork bayesianNetwork) {
         if (DifferentiableChecker.isDifferentiableWrtLatents(bayesianNetwork.getLatentOrObservedVertices())) {
-            return NUTS.withDefaultConfig(random);
+            return Keanu.Sampling.NUTS.withDefaultConfig(random);
         } else {
-            return KeanuMetropolisHastings.withDefaultConfigFor(new KeanuProbabilisticModel(bayesianNetwork), random);
+            return Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(new KeanuProbabilisticModel(bayesianNetwork), random);
         }
     }
 }

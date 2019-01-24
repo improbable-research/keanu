@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.variational;
 
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
@@ -23,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
@@ -86,7 +86,7 @@ public class KLDivergenceTest {
         DoubleVertex v3 = v1.plus(v2);
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
-        NetworkSamples samples = KeanuMetropolisHastings
+        NetworkSamples samples = MetropolisHastings
             .withDefaultConfigFor(model)
             .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
 
@@ -103,7 +103,7 @@ public class KLDivergenceTest {
         DoubleVertex v3 = v1.plus(v2);
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
-        NetworkSamples samples = KeanuMetropolisHastings
+        NetworkSamples samples = MetropolisHastings
             .withDefaultConfigFor(model)
             .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
 
@@ -120,7 +120,7 @@ public class KLDivergenceTest {
         DoubleVertex v3 = v1.plus(v2);
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
-        NetworkSamples samples = KeanuMetropolisHastings
+        NetworkSamples samples = MetropolisHastings
             .withDefaultConfigFor(model)
             .getPosteriorSamples(model, Arrays.asList(v1, v3), 1000);
         ProbabilisticDouble q = new GaussianVertex(0.1, 1.);

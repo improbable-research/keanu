@@ -1,7 +1,7 @@
 package io.improbable.snippet;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -24,7 +24,7 @@ public class AutocorrelationExample {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
 
         //%%SNIPPET_START%% ScalarAutocorrelation
-        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100
@@ -43,7 +43,7 @@ public class AutocorrelationExample {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
         //%%SNIPPET_START%% TensorAutocorrelation
-        NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100

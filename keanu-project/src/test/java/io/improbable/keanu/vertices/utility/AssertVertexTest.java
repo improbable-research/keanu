@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.utility;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
-import io.improbable.keanu.algorithms.mcmc.KeanuMetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.MCMC;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
@@ -23,6 +22,7 @@ import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
 
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -78,7 +78,7 @@ public class AssertVertexTest {
         gaussian.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(gaussian.getConnectedGraph());
-        KeanuMetropolisHastings.withDefaultConfigFor(model).generatePosteriorSamples(model, model.getLatentVariables()).generate(10);
+        MetropolisHastings.withDefaultConfigFor(model).generatePosteriorSamples(model, model.getLatentVariables()).generate(10);
     }
 
     @Test
@@ -156,7 +156,7 @@ public class AssertVertexTest {
         secondThermometer.observe(30.);
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(temperature.getConnectedGraph());
-        KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100
