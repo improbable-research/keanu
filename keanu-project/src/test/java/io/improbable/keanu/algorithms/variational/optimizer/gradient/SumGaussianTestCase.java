@@ -1,5 +1,7 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.GradientOptimizerTestCase;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;

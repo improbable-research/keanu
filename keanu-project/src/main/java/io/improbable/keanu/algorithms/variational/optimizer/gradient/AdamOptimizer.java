@@ -1,12 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.variational.optimizer.*;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +22,12 @@ public class AdamOptimizer implements Optimizer {
     }
 
     private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
-
     private final double alpha;
     private final double beta1;
     private final double beta2;
     private final double epsilon;
+
+    private final List<BiConsumer<DoubleTensor[], DoubleTensor[]>> onGradientCalculations = new ArrayList<>();
 
     private OptimizedResult optimize(boolean isMLE) {
 
@@ -87,6 +87,8 @@ public class AdamOptimizer implements Optimizer {
             );
         }
 
+        handleGradientCalculation(theta, gradients);
+
         return gradients;
     }
 
@@ -98,14 +100,6 @@ public class AdamOptimizer implements Optimizer {
         }
 
         return theta;
-    }
-
-    private void setTheta(DoubleTensor[] theta, List<Vertex<DoubleTensor>> latentVertices) {
-
-        for (int i = 0; i < theta.length; i++) {
-            latentVertices.get(i).setValue(theta[i]);
-        }
-        VertexValuePropagation.cascadeUpdate(latentVertices);
     }
 
     private DoubleTensor[] getZeros(DoubleTensor[] values) {
@@ -162,14 +156,27 @@ public class AdamOptimizer implements Optimizer {
         return optimize(true);
     }
 
+    public void addGradientCalculationHandler(BiConsumer<DoubleTensor[], DoubleTensor[]> gradientCalculationHandler) {
+        this.onGradientCalculations.add(gradientCalculationHandler);
+    }
+
+    public void removeGradientCalculationHandler(BiConsumer<DoubleTensor[], DoubleTensor[]> gradientCalculationHandler) {
+        this.onGradientCalculations.remove(gradientCalculationHandler);
+    }
+
+    private void handleGradientCalculation(DoubleTensor[] point, DoubleTensor[] gradients) {
+
+        for (BiConsumer<DoubleTensor[], DoubleTensor[]> gradientCalculationHandler : onGradientCalculations) {
+            gradientCalculationHandler.accept(point, gradients);
+        }
+    }
+
     @Override
     public void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
-
     }
 
     @Override
     public void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
-
     }
 
     public static class AdamOptimizerBuilder {
