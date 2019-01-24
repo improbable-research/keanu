@@ -118,7 +118,7 @@ A.observe(true);
 B.observe(true);
 
 KeanuProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
-NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
     model,
     Arrays.asList(A, B),
     100000

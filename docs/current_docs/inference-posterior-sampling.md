@@ -106,7 +106,7 @@ Metropolis Hastings accepts the following arguments:
 We will be taking 100,000 samples from the distributions of A and B.
 
 ```java
-NetworkSamples posteriorSamples = KeanuMetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
     model,
     model.getLatentVariables(),
     100000
@@ -139,7 +139,7 @@ m.b.set_value(20.)
 bayes_net = m.to_bayes_net()
 algo = MetropolisHastingsSampler()
 posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
-                           sampling_algorithm=algo, draws=100000)
+                           sampling_algorithm=algo, draws=30000)
 
 average_posterior_a = np.average(posterior_samples.get('a'))
 average_posterior_b = np.average(posterior_samples.get('b'))
@@ -148,8 +148,6 @@ actual = average_posterior_a + average_posterior_b
 ```
 
 ### Hamiltonian Monte Carlo
-
-HMC is not available in Keanu but it's a very important concept to understand before utilising NUTS.
 
 #### Algorithm
 
@@ -198,9 +196,10 @@ The parameters are:
 
 ### NUTS
 
-#### Algorithm
+NUTS is an auto-tuning implementation of HMC.
 
-NUTS is built on top of HMC. 
+#### Algorithm
+ 
 As the sample moves through the distribution, there are features in place that stop it from performing 
 a U-turn and re-exploring locations. 
 Hence why it's called the 'No-U-Turn Sampler'. 
@@ -211,7 +210,7 @@ It also attempts to calculate and auto-tune those difficult leapfrog and step si
 ##### Java
 
 ```java
-NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
+NetworkSamples posteriorSamples = Keanu.Sampling.NUTS.withDefaultConfig().getPosteriorSamples(
     model,
     model.getLatentVariables(),
     2000

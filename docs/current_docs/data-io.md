@@ -251,7 +251,7 @@ To learn more about the parameters being used here, head over to the [NUTS docum
 
 ```java
 ProbabilisticModel model = new KeanuProbabilisticModel(aVertex.getConnectedGraph());
-NetworkSamples samples = NUTS.withDefaultConfig().getPosteriorSamples(
+NetworkSamples samples = Keanu.Sampling.NUTS.withDefaultConfig().getPosteriorSamples(
     model,
     aVertex,
     1000
