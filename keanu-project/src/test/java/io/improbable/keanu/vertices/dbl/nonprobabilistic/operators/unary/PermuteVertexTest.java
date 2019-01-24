@@ -9,7 +9,9 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.testWithFiniteDifference;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class PermuteVertexTest {
 
@@ -38,7 +40,7 @@ public class PermuteVertexTest {
     }
 
     @Test
-    public void canCalculateAutoDiffOfRankThreePermute() {
+    public void canCalculatePermutedShapeOfAutoDiffRankThree() {
         UniformVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.arange(0, 6).reshape(1, 2, 3));
 
@@ -58,7 +60,7 @@ public class PermuteVertexTest {
     }
 
     @Test
-    public void canCalculateAutoDiffOfRankFourPermute() {
+    public void canCalculatePermutedShapeOfAutoDiffRankFour() {
         UniformVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.arange(0, 16).reshape(2, 1, 4, 2));
 
@@ -78,55 +80,7 @@ public class PermuteVertexTest {
     }
 
     @Test
-    public void canPartialCorrectlyFlowThroughRankThreePermute() {
-        UniformVertex A = new UniformVertex(0, 10);
-        A.setValue(DoubleTensor.arange(0, 8).reshape(4, 1, 2));
-
-        UniformVertex B = new UniformVertex(0, 10);
-        B.setValue(DoubleTensor.arange(0, 8).reshape(4, 1, 2));
-
-        DoubleVertex C = A.plus(B);
-
-        DoubleVertex permute = C.permute(2, 0, 1);
-
-        UniformVertex E = new UniformVertex(0, 10);
-        E.setValue(DoubleTensor.arange(0, 8).reshape(2, 4, 1));
-
-        MultiplicationVertex F = permute.times(E);
-
-        DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, F).of(F);
-        DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A)).withRespectTo(A);
-
-        Assert.assertArrayEquals(new long[]{2, 4, 1, 4, 1, 2}, forwardWrtA.getShape());
-        Assert.assertArrayEquals(new long[]{2, 4, 1, 4, 1, 2}, backwardWrtA.getShape());
-        Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
-    }
-
-    @Test
-    public void canPartialCorrectlyFlowThroughPermuteThenSumDownstream() {
-        UniformVertex A = new UniformVertex(0, 10);
-        A.setValue(DoubleTensor.arange(0, 6).reshape(1, 2, 3));
-
-        UniformVertex B = new UniformVertex(0, 10);
-        B.setValue(DoubleTensor.arange(0, 6).reshape(1, 2, 3));
-
-        DoubleVertex C = A.plus(B);
-
-        DoubleVertex permute = C.permute(0, 2, 1);
-
-        SumVertex sum = permute.sum(0);
-
-        DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, sum).of(sum);
-        DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(sum, ImmutableSet.of(A)).withRespectTo(A);
-
-        Assert.assertArrayEquals(new long[]{3, 2, 1, 2, 3}, forwardWrtA.getShape());
-        Assert.assertArrayEquals(new long[]{3, 2, 1, 2, 3}, backwardWrtA.getShape());
-        Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
-
-    }
-
-    @Test
-    public void canPartialCorrectlyFlowThroughSumThenPermute() {
+    public void canCalculateCorrectPermutedShapeWithUpstreamSum() {
         UniformVertex A = new UniformVertex(0, 10);
         A.setValue(DoubleTensor.arange(0, 6).reshape(1, 2, 3));
 
@@ -145,31 +99,27 @@ public class PermuteVertexTest {
         Assert.assertArrayEquals(new long[]{2, 1, 1, 2, 3}, forwardWrtA.getShape());
         Assert.assertArrayEquals(new long[]{2, 1, 1, 2, 3}, backwardWrtA.getShape());
         Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
-
     }
 
     @Test
-    public void canCalculateAutoDiffOfGraphWithRankTwoPermute() {
+    public void canCalculateCorrectPermutedShapeWithDownstreamSum() {
         UniformVertex A = new UniformVertex(0, 10);
-        A.setValue(DoubleTensor.arange(0, 2).reshape(2, 1));
+        A.setValue(DoubleTensor.arange(0, 6).reshape(1, 2, 3));
 
         UniformVertex B = new UniformVertex(0, 10);
-        B.setValue(DoubleTensor.arange(0, 2).reshape(2, 1));
+        B.setValue(DoubleTensor.arange(0, 6).reshape(1, 2, 3));
 
-        MultiplicationVertex C = A.times(B);
+        DoubleVertex C = A.plus(B);
 
-        PermuteVertex permute = C.permute(1, 0);
+        DoubleVertex permute = C.permute(0, 2, 1);
 
-        UniformVertex E = new UniformVertex(0, 10);
-        E.setValue(DoubleTensor.arange(0, 2).reshape(1, 2));
+        SumVertex sum = permute.sum(0);
 
-        MultiplicationVertex F = permute.times(E);
+        DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, sum).of(sum);
+        DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(sum, ImmutableSet.of(A)).withRespectTo(A);
 
-        DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, F).of(F);
-        DoubleTensor backwardWrtA = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A)).withRespectTo(A);
-
-        Assert.assertArrayEquals(new long[]{1, 2, 2, 1}, forwardWrtA.getShape());
-        Assert.assertArrayEquals(new long[]{1, 2, 2, 1}, backwardWrtA.getShape());
+        Assert.assertArrayEquals(new long[]{3, 2, 1, 2, 3}, forwardWrtA.getShape());
+        Assert.assertArrayEquals(new long[]{3, 2, 1, 2, 3}, backwardWrtA.getShape());
         Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backwardWrtA.asFlatDoubleArray(), 1e-6);
     }
 
@@ -186,7 +136,7 @@ public class PermuteVertexTest {
         PermuteVertex permute = C.permute(2, 0, 1);
         PermuteVertex revertThePermute = permute.permute(1, 2, 0);
 
-        Assert.assertArrayEquals(C.getValue().asFlatDoubleArray(), revertThePermute.getValue().asFlatDoubleArray(), 1e-6);
+        assertThat(C.getValue(), valuesAndShapesMatch(revertThePermute.getValue()));
 
         DoubleTensor reversedForwardWrtA = Differentiator.forwardModeAutoDiff(A, revertThePermute).of(revertThePermute);
         DoubleTensor reversedBackwardWrtA = Differentiator.reverseModeAutoDiff(revertThePermute, ImmutableSet.of(A)).withRespectTo(A);
