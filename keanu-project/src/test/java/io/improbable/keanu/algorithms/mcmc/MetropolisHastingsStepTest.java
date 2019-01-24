@@ -65,7 +65,7 @@ public class MetropolisHastingsStepTest {
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             model,
             new PriorProposalDistribution(bayesNet.getAllVertices()),
-            new RollBackOnRejection(bayesNet.getLatentVertices()),
+            new RollBackToCachedValuesOnRejection(bayesNet.getLatentVertices()),
             alwaysAccept
         );
 
@@ -140,7 +140,7 @@ public class MetropolisHastingsStepTest {
         return new MetropolisHastingsStep(
             model,
             constantProposal(constant),
-            new RollBackOnRejection(latentVertices),
+            new RollBackToCachedValuesOnRejection(latentVertices),
             random
         );
     }

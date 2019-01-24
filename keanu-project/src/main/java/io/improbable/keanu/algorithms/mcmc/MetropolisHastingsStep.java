@@ -25,7 +25,7 @@ public class MetropolisHastingsStep {
     /**
      * @param proposalDistribution        The proposal distribution
      * @param rejectionStrategy           What to do when a proposal is rejected.
-     *                                    Options include {@link CascadeOnRejection} and {@link RollBackOnRejection}.
+     *                                    Options include {@link RollbackAndCascadeOnRejection} and {@link RollBackToCachedValuesOnRejection}.
      * @param random                      Source of randomness
      */
     MetropolisHastingsStep(ProbabilisticModel model,

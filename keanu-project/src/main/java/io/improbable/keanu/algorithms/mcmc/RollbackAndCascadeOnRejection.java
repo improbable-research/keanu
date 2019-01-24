@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class CascadeOnRejection implements ProposalRejectionStrategy {
+public class RollbackAndCascadeOnRejection implements ProposalRejectionStrategy {
 
     private Map<Vertex, Object> fromValues;
 

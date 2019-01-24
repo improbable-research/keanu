@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.graphtraversal.DifferentiableChecker;
 import io.improbable.keanu.algorithms.mcmc.CascadeOnApplication;
 import io.improbable.keanu.algorithms.mcmc.LambdaSectionOptimizedLogProbCalculator;
-import io.improbable.keanu.algorithms.mcmc.RollBackOnRejection;
+import io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection;
 import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.vertices.Vertex;
@@ -55,7 +55,7 @@ public class Keanu {
                 List<Vertex> latentVertices = model.getLatentVertices();
                 return builder()
                     .proposalDistribution(new PriorProposalDistribution(latentVertices))
-                    .rejectionStrategy(new RollBackOnRejection(latentVertices))
+                    .rejectionStrategy(new RollBackToCachedValuesOnRejection(latentVertices))
                     .random(random)
                     .build();
             }

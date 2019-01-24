@@ -241,7 +241,7 @@ public class MetropolisHastingsTest {
         BayesianNetwork network = new BayesianNetwork(start.getConnectedGraph());
 
         MetropolisHastings.builder()
-            .rejectionStrategy(new RollBackOnRejection(network.getLatentVertices()))
+            .rejectionStrategy(new RollBackToCachedValuesOnRejection(network.getLatentVertices()))
             .build()
             .getPosteriorSamples(
             new KeanuProbabilisticModel(network),

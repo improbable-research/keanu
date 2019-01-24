@@ -25,7 +25,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
-    public static final ProposalRejectionStrategy DEFAULT_REJECTION_STRATEGY = new CascadeOnRejection();
+    public static final ProposalRejectionStrategy DEFAULT_REJECTION_STRATEGY = new RollbackAndCascadeOnRejection();
 
     @Getter
     @Builder.Default

@@ -8,11 +8,11 @@ import io.improbable.keanu.vertices.Vertex;
 import java.util.List;
 import java.util.Set;
 
-public class RollBackOnRejection implements ProposalRejectionStrategy {
+public class RollBackToCachedValuesOnRejection implements ProposalRejectionStrategy {
     private final LambdaSectionSnapshot lambdaSectionSnapshot;
     private NetworkSnapshot networkSnapshot;
 
-    public RollBackOnRejection(List<Vertex> latentVariables) {
+    public RollBackToCachedValuesOnRejection(List<Vertex> latentVariables) {
         lambdaSectionSnapshot = new LambdaSectionSnapshot(latentVariables);
     }
 

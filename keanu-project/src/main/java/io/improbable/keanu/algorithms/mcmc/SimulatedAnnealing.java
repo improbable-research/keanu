@@ -88,7 +88,7 @@ public class SimulatedAnnealing {
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             model,
             proposalDistribution,
-            new RollBackOnRejection(latentVertices),
+            new RollBackToCachedValuesOnRejection(latentVertices),
             random
         );
 
