@@ -29,6 +29,7 @@ public class AdamOptimizerTest {
         assertEquals(mu, A.getValue().scalar(), 1e-2);
     }
 
+    @Test
     public void calculateMaxLikelihood() {
 
         OptimizerTest.assertCanCalculateMaxLikelihood((bn) -> {
@@ -45,6 +46,7 @@ public class AdamOptimizerTest {
 
     }
 
+    @Test
     public void canCalculateMaxAPosteriori() {
 
         OptimizerTest.assertCanCalculateMaxAPosteriori((bn) -> {

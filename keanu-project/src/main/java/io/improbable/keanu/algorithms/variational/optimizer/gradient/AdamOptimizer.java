@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.NumberTensor;
@@ -78,6 +79,7 @@ public class AdamOptimizer implements Optimizer {
         for (int i = 0; i < theta.size(); i++) {
             latentVertices.get(i).setValue(theta.get(i));
         }
+        VertexValuePropagation.cascadeUpdate(latentVertices);
     }
 
     private List<DoubleTensor> getZeros(List<DoubleTensor> values) {
