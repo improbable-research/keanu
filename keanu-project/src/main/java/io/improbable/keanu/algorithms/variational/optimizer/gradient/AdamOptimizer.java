@@ -2,14 +2,18 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
-import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -18,43 +22,62 @@ import java.util.stream.Collectors;
 @Builder
 public class AdamOptimizer implements Optimizer {
 
-    @Getter
     private final BayesianNetwork bayesianNetwork;
 
     private final double alpha;
     private final double beta1;
     private final double beta2;
+    private final double epsilon;
 
-    private void optimize(Function<BayesianNetwork, List<DoubleTensor>> gradientCalculator) {
+    private double optimize(LogProbGradientCalculator gradientCalculator) {
 
-        List<DoubleTensor> theta = getTheta(bayesianNetwork);
+        List<Vertex<DoubleTensor>> latentVariables = bayesianNetwork.getContinuousLatentVertices();
+        List<DoubleTensor> theta = getTheta(latentVariables);
         List<DoubleTensor> m = getZeros(theta);
         List<DoubleTensor> v = getZeros(theta);
 
-        double eps = 1e-8;
-        double alpha = 0.001;
         int t = 0;
+        boolean converged = false;
 
-        while (t == 0 || !hasConverged()) {
+        int maxIterations = Integer.MAX_VALUE;
+
+        while (!converged && t < maxIterations) {
             t++;
-            List<DoubleTensor> gradientT = gradientCalculator.apply(bayesianNetwork);
-            List<DoubleTensor> mT = momentumUpdate(beta1, m, gradientT);
-            List<DoubleTensor> vT = momentumUpdate(beta2, v, squared(gradientT));
 
-            List<DoubleTensor> mHat = div(mT, (1 - Math.pow(beta1, t)));
-            List<DoubleTensor> vHat = div(vT, (1 - Math.pow(beta2, t)));
+            setTheta(theta, latentVariables);
+            List<DoubleTensor> gradientT = toList(gradientCalculator.getJointLogProbGradientWrtLatents(), latentVariables);
 
-            List<DoubleTensor> sqrtVHatPlusEps = add(sqrt(vHat), eps);
+            m = updateMomentEstimate(beta1, m, gradientT);
+            v = updateMomentEstimate(beta2, v, squared(gradientT));
+
+            List<DoubleTensor> mHat = div(m, (1 - Math.pow(beta1, t)));
+            List<DoubleTensor> vHat = div(v, (1 - Math.pow(beta2, t)));
+
+            List<DoubleTensor> sqrtVHatPlusEps = add(sqrt(vHat), epsilon);
             List<DoubleTensor> alphaTimesMHatDivVHatPlusEps = mul(div(mHat, sqrtVHatPlusEps), alpha);
 
-            theta = sub(theta, alphaTimesMHatDivVHatPlusEps);
+            List<DoubleTensor> thetaNext = add(theta, alphaTimesMHatDivVHatPlusEps);
+
+            converged = hasConverged(gradientT, thetaNext, theta);
+
+//            print(gradientT);
+//            print(thetaNext);
+            theta = thetaNext;
         }
+
+        return bayesianNetwork.getLogOfMasterP();
     }
 
-    private List<DoubleTensor> getTheta(BayesianNetwork bayesianNetwork) {
-        return bayesianNetwork.getLatentVertices().stream()
-            .map(v -> (DoubleTensor) v.getValue())
+    private List<DoubleTensor> getTheta(List<Vertex<DoubleTensor>> latentVertices) {
+        return latentVertices.stream()
+            .map(Vertex::getValue)
             .collect(Collectors.toList());
+    }
+
+    private void setTheta(List<DoubleTensor> theta, List<Vertex<DoubleTensor>> latentVertices) {
+        for (int i = 0; i < theta.size(); i++) {
+            latentVertices.get(i).setValue(theta.get(i));
+        }
     }
 
     private List<DoubleTensor> getZeros(List<DoubleTensor> values) {
@@ -63,18 +86,30 @@ public class AdamOptimizer implements Optimizer {
             .collect(Collectors.toList());
     }
 
-    private List<DoubleTensor> momentumUpdate(double beta, List<DoubleTensor> momentum, List<DoubleTensor> gradient) {
+    private List<DoubleTensor> updateMomentEstimate(double beta, List<DoubleTensor> moment, List<DoubleTensor> gradient) {
 
         List<DoubleTensor> update = new ArrayList<>();
-        for (int i = 0; i < momentum.size(); i++) {
-            update.add(momentum.get(i).times(beta).plus(gradient.get(i).times(1 - beta)));
+        for (int i = 0; i < moment.size(); i++) {
+            update.add(moment.get(i).times(beta).plus(gradient.get(i).times(1 - beta)));
         }
 
         return update;
     }
 
+    private List<DoubleTensor> toList(Map<VertexId, DoubleTensor> gradients, List<Vertex<DoubleTensor>> latentOrder) {
+        return latentOrder.stream().map(v -> gradients.get(v.getId())).collect(Collectors.toList());
+    }
+
+    private void print(List<DoubleTensor> values) {
+        values.forEach(v -> System.out.println(Arrays.toString(v.asFlatDoubleArray())));
+    }
+
     private List<DoubleTensor> squared(List<DoubleTensor> values) {
         return values.stream().map(v -> v.pow(2)).collect(Collectors.toList());
+    }
+
+    private double sum(List<DoubleTensor> values) {
+        return values.stream().mapToDouble(NumberTensor::sum).sum();
     }
 
     private List<DoubleTensor> sqrt(List<DoubleTensor> values) {
@@ -93,10 +128,10 @@ public class AdamOptimizer implements Optimizer {
         return result;
     }
 
-    private List<DoubleTensor> sub(List<DoubleTensor> left, List<DoubleTensor> right) {
+    private List<DoubleTensor> add(List<DoubleTensor> left, List<DoubleTensor> right) {
         List<DoubleTensor> result = new ArrayList<>();
         for (int i = 0; i < left.size(); i++) {
-            result.add(left.get(i).minus(right.get(i)));
+            result.add(left.get(i).plus(right.get(i)));
         }
         return result;
     }
@@ -109,18 +144,39 @@ public class AdamOptimizer implements Optimizer {
         return values.stream().map(v -> v.plus(addition)).collect(Collectors.toList());
     }
 
-    private boolean hasConverged() {
-        return true;
+    private boolean hasConverged(List<DoubleTensor> gradient, List<DoubleTensor> thetaPrevious, List<DoubleTensor> theta) {
+
+//        double thetaDeltaMag = Math.sqrt(sum(squared(sub(theta, thetaPrevious))));
+//
+//        if (thetaDeltaMag < 1e-6) {
+//            return true;
+//        }
+
+        double gradientMag = Math.sqrt(sum(squared(gradient)));
+
+        if (gradientMag < 1e-6) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public double maxAPosteriori() {
-        return 0;
+        LogProbGradientCalculator gradientCalculator = new LogProbGradientCalculator(
+            bayesianNetwork.getLatentOrObservedVertices(),
+            bayesianNetwork.getContinuousLatentVertices()
+        );
+        return optimize(gradientCalculator);
     }
 
     @Override
     public double maxLikelihood() {
-        return 0;
+        LogProbGradientCalculator gradientCalculator = new LogProbGradientCalculator(
+            bayesianNetwork.getObservedVertices(),
+            bayesianNetwork.getContinuousLatentVertices()
+        );
+        return optimize(gradientCalculator);
     }
 
     @Override

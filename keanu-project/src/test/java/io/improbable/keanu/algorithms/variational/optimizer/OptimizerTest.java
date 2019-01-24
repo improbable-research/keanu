@@ -52,7 +52,7 @@ public class OptimizerTest {
         return (bayesNet) -> KeanuOptimizer.NonGradient.of(bayesNet);
     }
 
-    private void assertCanCalculateMaxLikelihood(Function<BayesianNetwork, Optimizer> optimizerMapper) {
+    public static void assertCanCalculateMaxLikelihood(Function<BayesianNetwork, Optimizer> optimizerMapper) {
 
         DoubleVertex A = new GaussianVertex(20.0, 1.0);
         DoubleVertex B = new GaussianVertex(20.0, 1.0);
@@ -75,7 +75,7 @@ public class OptimizerTest {
         assertEquals(44, maxA + maxB, 0.1);
     }
 
-    public void assertCanCalculateMaxAPosteriori(Function<BayesianNetwork, Optimizer> optimizerMapper) {
+    public static void assertCanCalculateMaxAPosteriori(Function<BayesianNetwork, Optimizer> optimizerMapper) {
 
         DoubleVertex A = new GaussianVertex(20.0, 1.0);
         DoubleVertex B = new GaussianVertex(20.0, 1.0);
