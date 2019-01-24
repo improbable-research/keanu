@@ -72,6 +72,7 @@ def test_dict_distinguishes_label_namespaced_and_str_with_just_namespace_separat
     d[similar_to_label1] = 2
     d[label1] = 1
 
+    # TODO: how does this pass?
     assert len(d) == 2
     assert d[similar_to_label1] == 2
     assert d[label1] == 1

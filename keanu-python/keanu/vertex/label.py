@@ -22,7 +22,7 @@ class _VertexLabel(JavaObjectWrapper):
             return False
 
     def __hash__(self) -> int:
-        return self.unwrap().hashCode()
+        return hash(self.get_qualified_name())
 
     def __repr__(self) -> str:
         return self.get_qualified_name()
