@@ -190,7 +190,7 @@ task preparePythonClasspath {
 }
 //Break build on javadoc warnings
 tasks.withType(Javadoc) {
-    options.addStringOption('Xwerror', '-quiet')
+//    options.addStringOption('Xwerror', '-quiet')
 }
 
 artifacts {
