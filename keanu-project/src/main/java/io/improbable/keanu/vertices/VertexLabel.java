@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import org.nd4j.base.Preconditions;
 
 import java.util.Arrays;
 import java.util.List;
