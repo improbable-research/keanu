@@ -6,6 +6,8 @@ import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.testcases.MCMCTestCase;
+import io.improbable.keanu.algorithms.mcmc.testcases.MultiVariateDiscreteTestCase;
+import io.improbable.keanu.algorithms.mcmc.testcases.SingleVariateDiscreteTestCase;
 import io.improbable.keanu.algorithms.mcmc.testcases.SumGaussianTestCase;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -14,7 +16,6 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -104,61 +105,57 @@ public class MetropolisHastingsTest {
     }
 
     @Test
-    public void samplesSimpleDiscretePrior() {
+    public void samplesSimpleDiscretePriorWithDefaults() {
 
-        BernoulliVertex A = new BernoulliVertex(0.5);
+        MCMCTestCase testCase = new SingleVariateDiscreteTestCase();
 
-        DoubleVertex B = If.isTrue(A)
-            .then(0.9)
-            .orElse(0.1);
-
-        BernoulliVertex C = new BernoulliVertex(B);
-
-        C.observe(true);
-
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C));
-        bayesNet.probeForNonZeroProbability(100);
+        BayesianNetwork bayesNet = testCase.getModel();
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
-            Collections.singletonList(A),
+            bayesNet.getLatentVertices(),
             10000
         );
 
-        double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());
-
-        assertEquals(0.9, postProbTrue, 0.01);
+        testCase.assertExpected(posteriorSamples);
     }
 
     @Category(Slow.class)
     @Test
-    public void samplesComplexDiscretePrior() {
+    public void samplesComplexDiscretePriorWithDefaults() {
 
-        BernoulliVertex A = new BernoulliVertex(0.5);
-        BernoulliVertex B = new BernoulliVertex(0.5);
+        MCMCTestCase testCase = new MultiVariateDiscreteTestCase();
 
-        BooleanVertex C = A.or(B);
-
-        DoubleVertex D = If.isTrue(C)
-            .then(0.9)
-            .orElse(0.1);
-
-        BernoulliVertex E = new BernoulliVertex(D);
-
-        E.observe(true);
-
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C, D, E));
-        bayesNet.probeForNonZeroProbability(100);
+        BayesianNetwork bayesNet = testCase.getModel();
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
-            Collections.singletonList(A),
+            bayesNet.getLatentVertices(),
             1000
         );
 
-        double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());
+        testCase.assertExpected(posteriorSamples);
+    }
 
-        assertEquals(0.643, postProbTrue, 0.01);
+    @Category(Slow.class)
+    @Test
+    public void samplesComplexDiscreteWithMultipleVariableSelect() {
+
+        MCMCTestCase testCase = new MultiVariateDiscreteTestCase();
+
+        BayesianNetwork bayesNet = testCase.getModel();
+
+        NetworkSamples posteriorSamples = MetropolisHastings.builder()
+            .proposalDistribution(ProposalDistribution.usePrior())
+            .variableSelector(MHStepVariableSelector.FULL_VARIABLE_SELECTOR)
+            .build()
+            .getPosteriorSamples(
+                bayesNet,
+                bayesNet.getLatentVertices(),
+                1000
+            );
+
+        testCase.assertExpected(posteriorSamples);
     }
 
     @Test
