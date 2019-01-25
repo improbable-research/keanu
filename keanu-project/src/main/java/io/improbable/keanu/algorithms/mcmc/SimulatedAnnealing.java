@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
@@ -8,13 +7,11 @@ import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NonNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,29 +27,23 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
 @Builder
 public class SimulatedAnnealing {
 
-    private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
-    private static final boolean DEFAULT_USE_CACHE_ON_REJECTION = true;
 
     @Getter
-    @Setter
     @Builder.Default
     private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
     @Getter
-    @Setter
-    @Builder.Default
-    private ProposalDistribution proposalDistribution = DEFAULT_PROPOSAL_DISTRIBUTION;
+    @NonNull
+    private ProposalDistribution proposalDistribution;
 
     @Getter
-    @Setter
     @Builder.Default
     private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
 
     @Getter
-    @Setter
-    @Builder.Default
-    private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
+    @NonNull
+    private ProposalRejectionStrategy rejectionStrategy;
 
     public NetworkState getMaxAPosteriori(ProbabilisticModel model,
                                           int sampleCount) {
@@ -78,7 +69,6 @@ public class SimulatedAnnealing {
 
         Map<VariableReference, ?> maxSamplesByVariable = new HashMap<>();
         List<? extends Variable> latentVariables = model.getLatentVariables();
-        List<Vertex> latentVertices = (List<Vertex>) latentVariables;
 
         double logProbabilityBeforeStep = model.logProb();
         double maxLogP = logProbabilityBeforeStep;
@@ -88,7 +78,7 @@ public class SimulatedAnnealing {
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             model,
             proposalDistribution,
-            new RollBackToCachedValuesOnRejection(latentVertices),
+            rejectionStrategy,
             random
         );
 

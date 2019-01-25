@@ -15,6 +15,7 @@ public class KeanuSimulatedAnnealing {
     public static SimulatedAnnealing withDefaultConfigFor(KeanuProbabilisticModel model, KeanuRandom random) {
         return SimulatedAnnealing.builder()
             .proposalDistribution(new PriorProposalDistribution(model.getLatentVertices()))
+            .rejectionStrategy(new RollbackAndCascadeOnRejection(model.getLatentVertices()))
             .random(random)
             .build();
     }

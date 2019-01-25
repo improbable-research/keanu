@@ -54,28 +54,6 @@ public class SimulatedAnnealingTest {
         assertEquals(maxValuesFromVariational.get(B).scalar(), maxAPosterioriSamples.get(B).scalar(), 0.05);
     }
 
-    @Test
-    public void canDefaultToSettingsInBuilderAndIsConfigurableAfterBuilding() {
-
-        BayesianNetwork net = new BayesianNetwork(new GaussianVertex(0.0, 1.0).getConnectedGraph());
-        net.probeForNonZeroProbability(100, random);
-
-        SimulatedAnnealing algo = SimulatedAnnealing.builder()
-            .useCacheOnRejection(false)
-            .build();
-
-        assertNotNull(algo.getProposalDistribution());
-        assertNotNull(algo.getRandom());
-        assertNotNull(algo.getVariableSelector());
-
-        NetworkState networkMAP = algo.getMaxAPosteriori(new KeanuProbabilisticModel(net), 10);
-
-        algo.setVariableSelector(null);
-        assertNull(algo.getVariableSelector());
-
-        assertFalse(networkMAP.getVariableReferences().isEmpty());
-    }
-
     private NetworkState findMAPWithOptimizer() {
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         network.probeForNonZeroProbability(100, random);
