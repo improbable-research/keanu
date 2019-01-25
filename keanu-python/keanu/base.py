@@ -27,7 +27,9 @@ class JavaObjectWrapper:
 
     def __check_if_unwrapped(self, k: str) -> None:
         if _to_snake_case_name(k) == "_get_object_id":
-            raise TypeError("Trying to pass JavaObjectWrapper to a method that expects a JavaObject - did you forget to call unwrap()?")
+            raise TypeError(
+                "Trying to pass JavaObjectWrapper to a method that expects a JavaObject - did you forget to call unwrap()?"
+            )
 
     def __check_if_wrapped_java_object_has_camel_cased_attr(self, k: str) -> None:
         if not _to_camel_case_name(k) in dir(self.unwrap()):

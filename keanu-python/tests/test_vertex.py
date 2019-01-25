@@ -64,7 +64,7 @@ def test_can_pass_pandas_dataframe_to_vertex() -> None:
     assert sample.shape == (2, 1)
 
 
-def test_can_pass_pandas_series_to_vertex():
+def test_can_pass_pandas_series_to_vertex() -> None:
     gaussian = Gaussian(pd.Series(data=[0.1, 0.4]), pd.Series(data=[0.1, 0.4]))
     sample = gaussian.sample()
 
