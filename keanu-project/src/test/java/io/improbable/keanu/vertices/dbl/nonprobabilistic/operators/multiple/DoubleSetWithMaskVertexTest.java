@@ -32,14 +32,6 @@ public class DoubleSetWithMaskVertexTest {
         assertThat(expected, TensorMatchers.valuesAndShapesMatch(result.getValue()));
     }
 
-    @Test
-    public void canSetWithMaskGivenMatrixButOnlyTakesItsScalarValue() {
-        DoubleVertex mask = vertex.toGreaterThanMask(ConstantVertex.of(new double[]{2., 2., 2., 2.}, 2, 2));
-        DoubleVertex result = new DoubleSetWithMaskVertex(vertex, mask, 4.);
-        DoubleTensor expected = DoubleTensor.create(new double[] {1., 2., 4., 4.}, 2, 2);
-        assertThat(expected, TensorMatchers.valuesAndShapesMatch(result.getValue()));
-    }
-
     /**
      * Zero is a special case because it's usually the value that the mask uses to mean "false"
      */
