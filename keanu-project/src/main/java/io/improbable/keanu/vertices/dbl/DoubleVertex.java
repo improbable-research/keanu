@@ -332,12 +332,8 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return toLessThanOrEqualToMask(new ConstantDoubleVertex(rhs));
     }
 
-    public DoubleVertex setWithMask(DoubleVertex mask, DoubleVertex value) {
-        return new DoubleSetWithMaskVertex(this, mask, value);
-    }
-
     public DoubleVertex setWithMask(DoubleVertex mask, double value) {
-        return setWithMask(mask, new ConstantDoubleVertex(value));
+        return new DoubleSetWithMaskVertex(this, mask, value);
     }
 
     public TakeVertex take(long... index) {

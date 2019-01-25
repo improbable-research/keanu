@@ -18,22 +18,22 @@ public class DoubleSetWithMaskVertex extends DoubleVertex implements NonProbabil
 
     private final DoubleVertex operand;
     private final DoubleVertex mask;
-    private final DoubleVertex setValue;
+    private final double setValue;
 
     @ExportVertexToPythonBindings
     public DoubleSetWithMaskVertex(@LoadVertexParam(OPERAND_NAME) DoubleVertex operand,
                                    @LoadVertexParam(MASK_NAME) DoubleVertex mask,
-                                   @LoadVertexParam(SET_VALUE_NAME) DoubleVertex setValue) {
+                                   @LoadVertexParam(SET_VALUE_NAME) double setValue) {
         super(checkHasOneNonLengthOneShapeOrAllLengthOne(operand.getShape(), mask.getShape()));
         this.operand = operand;
         this.mask = mask;
         this.setValue = setValue;
-        setParents(operand, mask, setValue);
+        setParents(operand, mask);
     }
 
     @Override
     public DoubleTensor calculate() {
-        return operand.getValue().setWithMask(mask.getValue(), setValue.getValue().scalar());
+        return operand.getValue().setWithMask(mask.getValue(), setValue);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class DoubleSetWithMaskVertex extends DoubleVertex implements NonProbabil
     }
 
     @SaveVertexParam(SET_VALUE_NAME)
-    public DoubleVertex getSetValue() {
+    public double getSetValue() {
         return setValue;
     }
 }
