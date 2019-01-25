@@ -17,11 +17,16 @@ import java.util.function.BiConsumer;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AdamOptimizer implements Optimizer {
 
+    public interface ConvergenceChecker {
+        boolean hasConverged(DoubleTensor[] gradient, DoubleTensor[] theta, DoubleTensor[] thetaNext);
+    }
+
     public static AdamOptimizerBuilder builder() {
         return new AdamOptimizerBuilder();
     }
 
     private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+    private final ConvergenceChecker convergenceChecker;
     private final double alpha;
     private final double beta1;
     private final double beta2;
@@ -59,7 +64,7 @@ public class AdamOptimizer implements Optimizer {
                 thetaNext[i] = theta[i].plus(m[i].times(alpha).div(v[i].sqrt().times(b).plus(epsilon)));
             }
 
-            converged = hasConverged(gradients, theta, thetaNext);
+            converged = convergenceChecker.hasConverged(gradients, theta, thetaNext);
 
             final DoubleTensor[] temp = theta;
             theta = thetaNext;
@@ -132,18 +137,7 @@ public class AdamOptimizer implements Optimizer {
         return asMap;
     }
 
-    private double magnitude(DoubleTensor[] values) {
-
-        double magPow2 = 0;
-        for (int i = 0; i < values.length; i++) {
-            magPow2 += values[i].pow(2).sum();
-        }
-
-        return Math.sqrt(magPow2);
-    }
-
-    private double magnitudeDelta(DoubleTensor[] a, DoubleTensor[] b) {
-
+    private static double magnitudeDelta(DoubleTensor[] a, DoubleTensor[] b) {
         double magPow2 = 0;
         for (int i = 0; i < a.length; i++) {
             magPow2 += a[i].minus(b[i]).pow(2).sum();
@@ -152,17 +146,8 @@ public class AdamOptimizer implements Optimizer {
         return Math.sqrt(magPow2);
     }
 
-    private boolean hasConverged(DoubleTensor[] gradient, DoubleTensor[] theta, DoubleTensor[] thetaNext) {
-
-//        if (magnitude(gradient) < 1e-6) {
-//            return true;
-//        }
-
-        if (magnitudeDelta(theta, thetaNext) < 1e-6) {
-            return true;
-        }
-
-        return false;
+    private static ConvergenceChecker thetaDeltaMagnitude(final double minThetaDelta) {
+        return (gradient, theta, thetaNext) -> magnitudeDelta(theta, thetaNext) < minThetaDelta;
     }
 
     @Override
@@ -200,6 +185,7 @@ public class AdamOptimizer implements Optimizer {
 
     public static class AdamOptimizerBuilder {
         private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+        private ConvergenceChecker convergenceChecker = AdamOptimizer.thetaDeltaMagnitude(1e-6);
 
         private double alpha = 0.001;
         private double beta1 = 0.9;
@@ -211,6 +197,16 @@ public class AdamOptimizer implements Optimizer {
 
         public AdamOptimizerBuilder bayesianNetwork(ProbabilisticWithGradientGraph probabilisticWithGradientGraph) {
             this.probabilisticWithGradientGraph = probabilisticWithGradientGraph;
+            return this;
+        }
+
+        public AdamOptimizerBuilder convergenceChecker(ConvergenceChecker convergenceChecker) {
+            this.convergenceChecker = convergenceChecker;
+            return this;
+        }
+
+        public AdamOptimizerBuilder useMaxThetaDeltaConvergenceChecker(double maxThetaDelta) {
+            this.convergenceChecker = AdamOptimizer.thetaDeltaMagnitude(maxThetaDelta);
             return this;
         }
 
@@ -235,7 +231,7 @@ public class AdamOptimizer implements Optimizer {
         }
 
         public AdamOptimizer build() {
-            return new AdamOptimizer(probabilisticWithGradientGraph, alpha, beta1, beta2, epsilon);
+            return new AdamOptimizer(probabilisticWithGradientGraph, convergenceChecker, alpha, beta1, beta2, epsilon);
         }
 
         public String toString() {
