@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 import shutil
+import os
 
 
 def readme() -> str:
@@ -7,17 +8,20 @@ def readme() -> str:
         return f.read()
 
 
-version_string = '0.0.15.dev1'
+here = os.path.abspath(os.path.dirname(__file__))
+about = {}
+with open(os.path.join(here, 'keanu', '__version__.py'), 'r', encoding='utf-8') as f:
+    exec(f.read(), about)
 
 # If you don't remove the old directories, it tends to put the excluded module "examples" into the bdist
-for dir_name in ("keanu-%s.dist-info" % version_string, "keanu.egg-info", "build", "dist"):
+for dir_name in ("keanu-%s.dist-info" % about['__version__'], "keanu.egg-info", "build", "dist"):
     shutil.rmtree(dir_name, ignore_errors=True)
 
 setup(
     name='keanu',
     description='A probabilistic approach from an Improbabilistic company',
     long_description=readme(),
-    version=version_string,
+    version=about['__version__'],
     author='Improbable Worlds',
     author_email='keanu-engineering@improbable.io',
     url='https://improbable-research.github.io/keanu/python',
