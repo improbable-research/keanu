@@ -5,9 +5,11 @@ import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.NetworkState;
 
+import java.util.function.Function;
+
 public class SamplingModelFitter implements ModelFitter {
 
-    private final PosteriorSamplingAlgorithm samplingAlgorithm;
+    private final Function<KeanuProbabilisticModel, PosteriorSamplingAlgorithm> samplingAlgorithmGenerator;
     private final int sampleCount;
     private NetworkSamples posteriorSamples;
 
@@ -16,11 +18,11 @@ public class SamplingModelFitter implements ModelFitter {
      *
      * The model's latent vertices will have their values set to the average over the samples.
      *
-     * @param samplingAlgorithm The algorithm to use, e.g. {@link io.improbable.keanu.algorithms.mcmc.MetropolisHastings}
+     * @param samplingAlgorithmGenerator The algorithm to use, e.g. {@link io.improbable.keanu.algorithms.mcmc.MetropolisHastings}
      * @param sampleCount The number of sample points to take.
      */
-    public SamplingModelFitter(PosteriorSamplingAlgorithm samplingAlgorithm, int sampleCount) {
-        this.samplingAlgorithm = samplingAlgorithm;
+    public SamplingModelFitter(Function<KeanuProbabilisticModel, PosteriorSamplingAlgorithm> samplingAlgorithmGenerator, int sampleCount) {
+        this.samplingAlgorithmGenerator = samplingAlgorithmGenerator;
         this.sampleCount = sampleCount;
     }
 
@@ -32,8 +34,9 @@ public class SamplingModelFitter implements ModelFitter {
      */
     @Override
     public void fit(ModelGraph modelGraph) {
-        posteriorSamples = samplingAlgorithm
-            .getPosteriorSamples(new KeanuProbabilisticModel(modelGraph.getBayesianNetwork()), sampleCount);
+        KeanuProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(modelGraph.getBayesianNetwork());
+        posteriorSamples = samplingAlgorithmGenerator.apply(probabilisticModel)
+            .getPosteriorSamples(probabilisticModel, sampleCount);
         NetworkState mostProbableState = posteriorSamples.getMostProbableState();
         modelGraph.getBayesianNetwork().setState(mostProbableState);
     }

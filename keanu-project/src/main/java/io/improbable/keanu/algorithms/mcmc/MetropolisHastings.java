@@ -12,6 +12,7 @@ import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.List;
 
@@ -25,7 +26,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
-    public static final ProposalRejectionStrategy DEFAULT_REJECTION_STRATEGY = new RollbackAndCascadeOnRejection();
 
     @Getter
     @Builder.Default
@@ -40,8 +40,8 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
 
     @Getter
-    @Builder.Default
-    private ProposalRejectionStrategy rejectionStrategy = DEFAULT_REJECTION_STRATEGY;
+    @NonNull
+    private ProposalRejectionStrategy rejectionStrategy;
 
     /**
      * @param model      a probabilistic model containing latent variables

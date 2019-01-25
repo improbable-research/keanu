@@ -195,6 +195,7 @@ public class MetropolisHastingsTest {
         ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
         MetropolisHastings metropolisHastings = MetropolisHastings.builder()
             .proposalDistribution(proposalDistribution)
+            .rejectionStrategy(new RollbackAndCascadeOnRejection(bayesNet.getLatentVertices()))
             .build();
 
         NetworkSamples posteriorSamples =  metropolisHastings.getPosteriorSamples(
