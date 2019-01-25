@@ -9,7 +9,7 @@ import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary
 public class DoubleGreaterThanMaskVertexTest {
 
     @Test
-    public void lessThanScalarVertexValues() {
+    public void greaterThanScalarVertexValues() {
         operatesOnTwoScalarVertexValues(
             2.0,
             3.0,
@@ -19,7 +19,7 @@ public class DoubleGreaterThanMaskVertexTest {
     }
 
     @Test
-    public void lessThanMatrixVertexValues() {
+    public void greaterThanMatrixVertexValues() {
         operatesOnTwo2x2MatrixVertexValues(
             new double[]{1.0, 4.0, 3.0, -3.0},
             new double[]{2.0, 2.0, 3.0, 3.0},

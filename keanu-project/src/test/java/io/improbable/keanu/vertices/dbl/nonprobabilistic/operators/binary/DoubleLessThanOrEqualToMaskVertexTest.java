@@ -19,7 +19,7 @@ public class DoubleLessThanOrEqualToMaskVertexTest {
     }
 
     @Test
-    public void lessThanMatrixVertexValues() {
+    public void lessThanOrEqualToMatrixVertexValues() {
         operatesOnTwo2x2MatrixVertexValues(
             new double[]{1.0, 4.0, 3.0, -3.0},
             new double[]{2.0, 2.0, 3.0, 3.0},

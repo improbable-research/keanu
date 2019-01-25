@@ -47,9 +47,9 @@ public class Dirichlet implements ContinuousDistribution {
     }
 
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex concentration) {
-        final BooleanVertex xIsLessThanOrEqualToEpsilon = x
+        final BooleanVertex xMinusOneIsLessThanOrEqualToEpsilon = x
             .sum().minus(1.).abs().lessThanOrEqualTo(ConstantVertex.of(EPSILON));
-        xIsLessThanOrEqualToEpsilon.assertTrue("Sum of values to calculate Dirichlet likelihood for must equal 1");
+        xMinusOneIsLessThanOrEqualToEpsilon.assertTrue("Sum of values to calculate Dirichlet likelihood for must equal 1");
 
         final DoubleVertex sumConcentrationLogged = concentration.minus(1.).times(x.log()).sum();
         final DoubleVertex sumLogGammaConcentration = concentration.logGamma().sum();

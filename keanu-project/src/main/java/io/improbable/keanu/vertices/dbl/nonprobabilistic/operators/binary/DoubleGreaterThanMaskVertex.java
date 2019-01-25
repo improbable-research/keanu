@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class DoubleGreaterThanMaskVertex extends DoubleBinaryOpVertex {
+
     @ExportVertexToPythonBindings
     public DoubleGreaterThanMaskVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
                                        @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {

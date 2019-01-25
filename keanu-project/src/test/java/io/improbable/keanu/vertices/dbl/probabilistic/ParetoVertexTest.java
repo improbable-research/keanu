@@ -91,7 +91,39 @@ public class ParetoVertexTest {
     }
 
     @Test
-    public void logProbGraphIsNegInfIfLocationOrScaleIsNotPositive() {
+    public void logProbGraphIsNegInfIfLocationIsNotPositive() {
+        DoubleVertex location = ConstantVertex.of(-1., 1.);
+        DoubleVertex scale = ConstantVertex.of(3., 3.);
+        ParetoVertex paretoVertex = new ParetoVertex(location, scale);
+        LogProbGraph logProbGraph = paretoVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("Location and scale must be strictly positive");
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+    }
+
+    @Test
+    public void logProbGraphIsNegInfIfScaleIsNotPositive() {
+        DoubleVertex location = ConstantVertex.of(1., 1.);
+        DoubleVertex scale = ConstantVertex.of(-3., 3.);
+        ParetoVertex paretoVertex = new ParetoVertex(location, scale);
+        LogProbGraph logProbGraph = paretoVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("Location and scale must be strictly positive");
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+    }
+
+    @Test
+    public void logProbGraphIsNegInfIfLocationAndScaleIsNotPositive() {
         DoubleVertex location = ConstantVertex.of(-1., 1.);
         DoubleVertex scale = ConstantVertex.of(0., 3.);
         ParetoVertex paretoVertex = new ParetoVertex(location, scale);
