@@ -130,11 +130,11 @@ class MetropolisHastingsStep {
 
     private static double sumLogProbabilityOfAffected(Set<Vertex> vertices,
                                                       Map<Vertex, LambdaSection> affectedVertices) {
-        double sumLogProb = 0.0;
+        Set<Vertex> lambdaSectionUnion = new HashSet<>();
         for (Vertex v : vertices) {
-            sumLogProb += ProbabilityCalculator.calculateLogProbFor(affectedVertices.get(v).getLatentAndObservedVertices());
+            lambdaSectionUnion.addAll(affectedVertices.get(v).getLatentAndObservedVertices());
         }
-        return sumLogProb;
+        return ProbabilityCalculator.calculateLogProbFor(lambdaSectionUnion);
     }
 
     /**

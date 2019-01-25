@@ -3,7 +3,10 @@ package io.improbable.keanu.algorithms.mcmc;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.testcases.MCMCTestCase;
+import io.improbable.keanu.algorithms.mcmc.testcases.SumGaussianTestCase;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
@@ -20,10 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class MetropolisHastingsTest {
 
@@ -31,32 +31,43 @@ public class MetropolisHastingsTest {
     public DeterministicRule rule = new DeterministicRule();
 
     @Test
-    public void samplesContinuousPrior() {
+    public void samplesContinuousPriorSingleVariableSelected() {
 
-        DoubleVertex A = new GaussianVertex(20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(20.0, 1.0);
+        MCMCTestCase testCase = new SumGaussianTestCase();
 
-        A.setValue(20.0);
-        B.setValue(20.0);
+        BayesianNetwork model = testCase.getModel();
 
-        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
+        NetworkSamples posteriorSamples = MetropolisHastings.builder()
+            .proposalDistribution(ProposalDistribution.usePrior())
+            .variableSelector(MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR)
+            .build()
+            .getPosteriorSamples(
+                model,
+                model.getLatentVertices(),
+                5000
+            );
 
-        Cobserved.observe(46.0);
+        testCase.assertExpected(posteriorSamples);
+    }
 
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-        bayesNet.probeForNonZeroProbability(100);
+    @Test
+    public void samplesContinuousPriorAllVariablesSelected() {
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            Arrays.asList(A, B),
-            5000
-        );
+        MCMCTestCase testCase = new SumGaussianTestCase();
 
-        double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages().scalar();
-        double averagePosteriorB = posteriorSamples.getDoubleTensorSamples(B).getAverages().scalar();
+        BayesianNetwork model = testCase.getModel();
 
-        double actual = averagePosteriorA + averagePosteriorB;
-        assertEquals(44.0, actual, 0.1);
+        NetworkSamples posteriorSamples = MetropolisHastings.builder()
+            .proposalDistribution(ProposalDistribution.usePrior())
+            .variableSelector(MHStepVariableSelector.FULL_VARIABLE_SELECTOR)
+            .build()
+            .getPosteriorSamples(
+                model,
+                model.getLatentVertices(),
+                5000
+            );
+
+        testCase.assertExpected(posteriorSamples);
     }
 
     @Category(Slow.class)
@@ -193,7 +204,7 @@ public class MetropolisHastingsTest {
             .proposalDistribution(proposalDistribution)
             .build();
 
-        NetworkSamples posteriorSamples =  metropolisHastings.getPosteriorSamples(
+        NetworkSamples posteriorSamples = metropolisHastings.getPosteriorSamples(
             bayesNet,
             Arrays.asList(A, B),
             1000
