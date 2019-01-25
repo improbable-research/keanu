@@ -14,17 +14,17 @@ public class VertexLabel {
     private final List<String> namespace;
     private final String name;
 
-    public VertexLabel(String... qualifiedName) {
-        this(getNamespace(qualifiedName), getName(qualifiedName));
-    }
-
-    private static List<String> getNamespace(String... qualifiedName) {
-        return ImmutableList.copyOf(Arrays.copyOf(qualifiedName,qualifiedName.length - 1));
-    }
-
-    private static String getName(String... qualifiedName) {
-        Preconditions.checkArgument(qualifiedName.length > 0);
-        return qualifiedName[qualifiedName.length - 1];
+    public VertexLabel(String outer, String... inner) {
+        if (inner.length <= 0) {
+            this.namespace = ImmutableList.of();
+            this.name = outer;
+        } else {
+            this.namespace = ImmutableList.<String>builder()
+                .add(outer)
+                .add(Arrays.copyOf(inner, inner.length - 1))
+                .build();
+            this.name = inner[inner.length - 1];
+        }
     }
 
     public VertexLabel(List<String> namespace, String name) {
