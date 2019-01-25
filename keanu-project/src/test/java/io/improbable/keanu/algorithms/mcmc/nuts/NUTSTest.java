@@ -16,7 +16,6 @@ import org.junit.experimental.categories.Category;
 
 import java.util.List;
 
-import static io.improbable.keanu.algorithms.mcmc.nuts.NUTS.Metrics.STEPSIZE;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -57,7 +56,7 @@ public class NUTSTest {
 
         Statistics statistics = nuts.getStatistics();
 
-        List<Double> stepSize = statistics.get(STEPSIZE);
+        List<Double> stepSize = statistics.get(NUTS.Metrics.STEPSIZE);
         List<Double> logProb = statistics.get(NUTS.Metrics.LOG_PROB);
         List<Double> meanTreeAccept = statistics.get(NUTS.Metrics.MEAN_TREE_ACCEPT);
         List<Double> treeSize = statistics.get(NUTS.Metrics.TREE_SIZE);
