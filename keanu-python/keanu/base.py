@@ -14,22 +14,19 @@ class JavaObjectWrapper:
         return "[{0} => {1}]".format(self._class, type(self))
 
     def __getattr__(self, k: str) -> Callable:
-        python_name = _to_snake_case_name(k)
+        self.__check_if_snake_case(k)
+        self.__check_if_wrapped_java_object_has_camel_cased_attr(k)
 
-        if k != python_name:
-            if python_name in self.__class__.__dict__:
-                raise AttributeError("{} has no attribute {}. Did you mean {}?".format(self.__class__, k, python_name))
+        return self.unwrap().__getattr__(_to_camel_case_name(k))
 
-            raise AttributeError("{} has no attribute {}".format(self.__class__, k))
+    def __check_if_snake_case(self, k: str) -> None:
+        snake_case_name = _to_snake_case_name(k)
+        if k != snake_case_name:
+            raise AttributeError("{} has no attribute {}. Did you mean {}?".format(self.__class__, k, snake_case_name))
 
-        if python_name == "_get_object_id":
-            raise TypeError("Trying to call %s on a JavaObjectWrapper - did you forget to call %s.unwrap()?" %
-                            (python_name, self._class))
-
-        java_name = _to_camel_case_name(k)
-        logging.getLogger("keanu").warning(
-            "\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
-        return self.unwrap().__getattr__(java_name)
+    def __check_if_wrapped_java_object_has_camel_cased_attr(self, k: str) -> None:
+        if not _to_camel_case_name(k) in dir(self.unwrap()):
+            raise AttributeError("{} has no attribute {}.".format(self.__class__, k))
 
     def unwrap(self) -> JavaObject:
         return self._val

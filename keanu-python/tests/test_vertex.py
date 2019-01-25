@@ -41,7 +41,7 @@ def assert_vertex_value_equals_pandas(vertex: Vertex, expected_type: Type, panda
     assert get_value.dtype == expected_type
 
 
-def test_can_pass_scalar_to_vertex(jvm_view: JVMView) -> None:
+def test_can_pass_scalar_to_vertex() -> None:
     gaussian = Gaussian(0., 1.)
     sample = gaussian.sample()
 
@@ -50,30 +50,30 @@ def test_can_pass_scalar_to_vertex(jvm_view: JVMView) -> None:
     assert sample.dtype == float
 
 
-def test_can_pass_ndarray_to_vertex(jvm_view: JVMView) -> None:
+def test_can_pass_ndarray_to_vertex() -> None:
     gaussian = Gaussian(np.array([0.1, 0.4]), np.array([0.4, 0.5]))
     sample = gaussian.sample()
 
     assert sample.shape == (2,)
 
 
-def test_can_pass_pandas_dataframe_to_vertex(jvm_view: JVMView) -> None:
+def test_can_pass_pandas_dataframe_to_vertex() -> None:
     gaussian = Gaussian(pd.DataFrame(data=[0.1, 0.4]), pd.DataFrame(data=[0.1, 0.4]))
     sample = gaussian.sample()
 
     assert sample.shape == (2, 1)
 
 
-def test_can_pass_pandas_series_to_vertex(jvm_view):
+def test_can_pass_pandas_series_to_vertex():
     gaussian = Gaussian(pd.Series(data=[0.1, 0.4]), pd.Series(data=[0.1, 0.4]))
     sample = gaussian.sample()
 
     assert sample.shape == (2,)
 
 
-def test_can_pass_vertex_to_vertex(jvm_view: JVMView) -> None:
+def test_can_pass_vertex_to_vertex() -> None:
     mu = Gaussian(0., 1.)
-    gaussian = Vertex(jvm_view.GaussianVertex, mu, Const(1.))
+    gaussian = Gaussian(mu, Const(1.))
     sample = gaussian.sample()
 
     assert type(sample) == numpy_types
@@ -147,14 +147,14 @@ def test_vertex_sample_is_a_numpy_array() -> None:
     assert value.shape == (2, 2)
 
 
-def test_get_connected_graph(jvm_view: JVMView) -> None:
+def test_get_connected_graph() -> None:
     gaussian = Gaussian(0., 1.)
     connected_graph = set(gaussian.get_connected_graph())
 
     assert len(connected_graph) == 3
 
 
-def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view: JVMView) -> None:
+def test_id_str_of_downstream_vertex_is_higher_than_upstream() -> None:
     hyper_params = Gaussian(0., 1.)
     gaussian = Gaussian(0., hyper_params)
 
@@ -167,14 +167,14 @@ def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view: JVMView) 
     assert hyper_params_id < gaussian_id
 
 
-def test_construct_vertex_with_java_vertex(jvm_view: JVMView) -> None:
+def test_construct_vertex_with_java_vertex() -> None:
     java_vertex = Gaussian(0., 1.).unwrap()
     python_vertex = Vertex(java_vertex)
 
     assert tuple(java_vertex.getId().getValue()) == python_vertex.get_id()
 
 
-def test_java_collections_to_generator(jvm_view: JVMView) -> None:
+def test_java_collections_to_generator() -> None:
     gaussian = Gaussian(0., 1.)
 
     java_collections = gaussian.unwrap().getConnectedGraph()
@@ -186,7 +186,7 @@ def test_java_collections_to_generator(jvm_view: JVMView) -> None:
     assert all(type(element) == Vertex and element.get_id() in java_vertex_ids for element in python_list)
 
 
-def test_get_vertex_id(jvm_view: JVMView) -> None:
+def test_get_vertex_id() -> None:
     gaussian = Gaussian(0., 1.)
 
     java_id = gaussian.unwrap().getId().getValue()
