@@ -3,7 +3,8 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.AdamOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.SumGaussianTestCase;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SingleGaussianTestCase;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SumGaussianTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -37,6 +38,7 @@ public class OptimizerTest {
         ADAM(bayesianNetwork -> {
 
             return AdamOptimizer.builder()
+                .alpha(0.1)
                 .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
                 .build();
         }),
@@ -58,10 +60,10 @@ public class OptimizerTest {
 
     @AllArgsConstructor
     public enum TestCase {
-        SUM_GAUSSIAN(SumGaussianTestCase::new);
+        SUM_GAUSSIAN(SumGaussianTestCase::new),
+        SINGLE_GAUSSIAN(SingleGaussianTestCase::new);
 
-        private Supplier<GradientOptimizerTestCase> supplier;
-
+        private Supplier<OptimizerTestCase> supplier;
     }
 
     @DataPoints
@@ -81,7 +83,7 @@ public class OptimizerTest {
 
     @Theory
     public void canOptimize(OptimizerType type, FitnessFunction fitnessFunction, TestCase testCaseSupplier) {
-        GradientOptimizerTestCase testCase = testCaseSupplier.supplier.get();
+        OptimizerTestCase testCase = testCaseSupplier.supplier.get();
         BayesianNetwork model = testCase.getModel();
         Optimizer optimizer = type.getOptimizer.apply(model);
         OptimizedResult result = fitnessFunction.getFitness.apply(optimizer);

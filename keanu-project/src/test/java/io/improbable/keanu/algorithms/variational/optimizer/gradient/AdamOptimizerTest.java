@@ -1,6 +1,8 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SingleGaussianTestCase;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -29,6 +31,25 @@ public class AdamOptimizerTest {
         optimizer.maxAPosteriori();
 
         assertEquals(mu, A.getValue().scalar(), 1e-2);
+    }
+
+    @Test
+    public void canOptimizeSingleGaussianVectorNetwork() {
+
+        SingleGaussianTestCase testCase = new SingleGaussianTestCase();
+
+        BayesianNetwork bayesianNetwork = testCase.getModel();
+
+        KeanuProbabilisticWithGradientGraph model = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
+
+        AdamOptimizer optimizer = AdamOptimizer.builder()
+            .alpha(0.1)
+            .bayesianNetwork(model)
+            .build();
+
+        OptimizedResult result = optimizer.maxAPosteriori();
+
+        testCase.assertMAP(result);
     }
 
     @Test

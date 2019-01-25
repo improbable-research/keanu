@@ -59,7 +59,7 @@ public class AdamOptimizer implements Optimizer {
                 thetaNext[i] = theta[i].plus(m[i].times(alpha).div(v[i].sqrt().times(b).plus(epsilon)));
             }
 
-            converged = hasConverged(gradients);
+            converged = hasConverged(gradients, theta, thetaNext);
 
             final DoubleTensor[] temp = theta;
             theta = thetaNext;
@@ -142,8 +142,27 @@ public class AdamOptimizer implements Optimizer {
         return Math.sqrt(magPow2);
     }
 
-    private boolean hasConverged(DoubleTensor[] gradient) {
-        return magnitude(gradient) < 1e-6;
+    private double magnitudeDelta(DoubleTensor[] a, DoubleTensor[] b) {
+
+        double magPow2 = 0;
+        for (int i = 0; i < a.length; i++) {
+            magPow2 += a[i].minus(b[i]).pow(2).sum();
+        }
+
+        return Math.sqrt(magPow2);
+    }
+
+    private boolean hasConverged(DoubleTensor[] gradient, DoubleTensor[] theta, DoubleTensor[] thetaNext) {
+
+//        if (magnitude(gradient) < 1e-6) {
+//            return true;
+//        }
+
+        if (magnitudeDelta(theta, thetaNext) < 1e-6) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override

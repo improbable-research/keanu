@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 
 import io.improbable.keanu.network.BayesianNetwork;
 
-public interface GradientOptimizerTestCase {
+public interface OptimizerTestCase {
 
     BayesianNetwork getModel();
 

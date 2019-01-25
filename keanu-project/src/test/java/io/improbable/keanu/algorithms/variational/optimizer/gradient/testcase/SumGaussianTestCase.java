@@ -1,6 +1,6 @@
-package io.improbable.keanu.algorithms.variational.optimizer.gradient;
+package io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase;
 
-import io.improbable.keanu.algorithms.variational.optimizer.GradientOptimizerTestCase;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizerTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
-public class SumGaussianTestCase implements GradientOptimizerTestCase {
+public class SumGaussianTestCase implements OptimizerTestCase {
 
     private final DoubleVertex A;
     private final DoubleVertex B;
