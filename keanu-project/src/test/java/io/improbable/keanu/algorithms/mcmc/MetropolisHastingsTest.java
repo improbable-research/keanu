@@ -4,6 +4,7 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -242,6 +243,7 @@ public class MetropolisHastingsTest {
         BayesianNetwork network = new BayesianNetwork(start.getConnectedGraph());
 
         MetropolisHastings.builder()
+            .proposalDistribution(new PriorProposalDistribution(network.getLatentVertices()))
             .rejectionStrategy(new RollBackToCachedValuesOnRejection(network.getLatentVertices()))
             .build()
             .getPosteriorSamples(

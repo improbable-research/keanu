@@ -24,7 +24,6 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
 @Builder
 public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
-    private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
 
     @Getter
@@ -32,8 +31,8 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
     @Getter
-    @Builder.Default
-    private ProposalDistribution proposalDistribution = DEFAULT_PROPOSAL_DISTRIBUTION;
+    @NonNull
+    private ProposalDistribution proposalDistribution;
 
     @Getter
     @Builder.Default
