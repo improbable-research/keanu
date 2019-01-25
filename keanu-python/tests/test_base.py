@@ -46,3 +46,8 @@ def test_java_object_wrapper_can_call_java_api_with_no_python_impl_if_both_camel
 
 def test_java_object_wrapper_can_call_python_api(java_list_wrapper) -> None:
     assert java_list_wrapper.index_of(1) == 100
+
+
+def test_java_object_wrapper_throws_type_error_if_not_unwrapped_and_passed_to_java_object(java_list_wrapper) -> None:
+    with pytest.raises(TypeError, match="Trying to pass JavaObjectWrapper to a method that expects a JavaObject - did you forget to call unwrap()?"):
+        lst = KeanuContext()._gateway.jvm.java.util.ArrayList(java_list_wrapper)
