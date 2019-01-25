@@ -19,11 +19,11 @@ public class LambdaSectionSnapshot {
     }
 
     public double logProb(Set<? extends Variable> variables) {
-        double sumLogProb = 0.0;
+         Set<Vertex> lambdaSectionUnion = new HashSet<>();
         for (Variable v : variables) {
-            sumLogProb += ProbabilityCalculator.calculateLogProbFor(affectedVariablesCache.get(v).getLatentAndObservedVertices());
+            lambdaSectionUnion.addAll(affectedVariablesCache.get(v).getLatentAndObservedVertices());
         }
-        return sumLogProb;
+        return ProbabilityCalculator.calculateLogProbFor(lambdaSectionUnion);
     }
 
     public Set<Vertex> getAllVerticesAffectedBy(Set<? extends Variable> variables) {
