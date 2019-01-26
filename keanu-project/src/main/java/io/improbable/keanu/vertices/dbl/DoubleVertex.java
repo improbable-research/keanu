@@ -333,6 +333,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public DoubleVertex setWithMask(DoubleVertex mask, double value) {
+        return setWithMask(mask, new ConstantDoubleVertex(value));
+    }
+
+    public DoubleVertex setWithMask(DoubleVertex mask, DoubleVertex value) {
         return new DoubleSetWithMaskVertex(this, mask, value);
     }
 

@@ -366,8 +366,8 @@ def Concatenation(dimension: int, operands: Collection[Vertex]) -> Vertex:
     return Double(context.jvm_view().ConcatenationVertex, cast_to_integer(dimension), cast_to_vertex_array(operands))
 
 
-def DoubleSetWithMask(operand: vertex_constructor_param_types, mask: vertex_constructor_param_types, set_value: float) -> Vertex:
-    return Double(context.jvm_view().DoubleSetWithMaskVertex, cast_to_double_vertex(operand), cast_to_double_vertex(mask), cast_to_double(set_value))
+def DoubleSetWithMask(operand: vertex_constructor_param_types, mask: vertex_constructor_param_types, set_value: vertex_constructor_param_types) -> Vertex:
+    return Double(context.jvm_view().DoubleSetWithMaskVertex, cast_to_double_vertex(operand), cast_to_double_vertex(mask), cast_to_double_vertex(set_value))
 
 
 def Abs(input_vertex: vertex_constructor_param_types) -> Vertex:

@@ -8,7 +8,8 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMatch;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsAreScalar;
 
 public class DoubleSetWithMaskVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
@@ -18,22 +19,23 @@ public class DoubleSetWithMaskVertex extends DoubleVertex implements NonProbabil
 
     private final DoubleVertex operand;
     private final DoubleVertex mask;
-    private final double setValue;
+    private final DoubleVertex setValue;
 
     @ExportVertexToPythonBindings
     public DoubleSetWithMaskVertex(@LoadVertexParam(OPERAND_NAME) DoubleVertex operand,
                                    @LoadVertexParam(MASK_NAME) DoubleVertex mask,
-                                   @LoadVertexParam(SET_VALUE_NAME) double setValue) {
-        super(checkHasOneNonLengthOneShapeOrAllLengthOne(operand.getShape(), mask.getShape()));
+                                   @LoadVertexParam(SET_VALUE_NAME) DoubleVertex setValue) {
+        super(checkAllShapesMatch(operand.getShape(), mask.getShape()));
+        checkTensorsAreScalar("setValue must be scalar", setValue.getShape());
         this.operand = operand;
         this.mask = mask;
         this.setValue = setValue;
-        setParents(operand, mask);
+        setParents(operand, mask, setValue);
     }
 
     @Override
     public DoubleTensor calculate() {
-        return operand.getValue().setWithMask(mask.getValue(), setValue);
+        return operand.getValue().setWithMask(mask.getValue(), setValue.getValue().scalar());
     }
 
     @Override
@@ -52,7 +54,7 @@ public class DoubleSetWithMaskVertex extends DoubleVertex implements NonProbabil
     }
 
     @SaveVertexParam(SET_VALUE_NAME)
-    public double getSetValue() {
+    public DoubleVertex getSetValue() {
         return setValue;
     }
 }
