@@ -1,9 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.algorithms.variational.optimizer.*;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -118,38 +115,38 @@ public class GradientOptimizer implements Optimizer {
 
     @Override
     public OptimizedResult maxAPosteriori() {
-        assertHasLatents();
-
-        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
-            probabilisticWithGradientGraph,
-            false,
-            this::handleGradientCalculation,
-            this::handleFitnessCalculation
-        );
-
-        return optimize(fitnessFunction);
+        return optimize(probabilisticWithGradientGraph, false);
     }
 
     @Override
     public OptimizedResult maxLikelihood() {
+        return optimize(probabilisticWithGradientGraph, true);
+    }
+
+    private OptimizedResult optimize(ProbabilisticWithGradientGraph probabilisticWithGradientGraph, boolean useMLE){
         assertHasLatents();
 
-        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
+        FitnessFunction fitnessFunction = new FitnessFunction(
             probabilisticWithGradientGraph,
-            true,
-            this::handleGradientCalculation,
+            useMLE,
             this::handleFitnessCalculation
         );
 
-        return optimize(fitnessFunction);
+        FitnessFunctionGradient fitnessFunctionGradient = new FitnessFunctionGradient(
+            probabilisticWithGradientGraph,
+            useMLE,
+            this::handleGradientCalculation
+        );
+
+        return optimize(fitnessFunction, fitnessFunctionGradient);
     }
 
-    private OptimizedResult optimize(FitnessFunctionWithGradient fitnessFunction) {
+    private OptimizedResult optimize(FitnessFunction fitnessFunction, FitnessFunctionGradient fitnessFunctionGradient) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
-        ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
-        ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
+        ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction);
+        ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunctionGradient);
 
         double[] startingPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticWithGradientGraph.getLatentVariables()));
 

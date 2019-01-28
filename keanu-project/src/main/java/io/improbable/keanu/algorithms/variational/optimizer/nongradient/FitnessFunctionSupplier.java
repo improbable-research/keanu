@@ -12,27 +12,27 @@ import java.util.function.BiConsumer;
 
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.convertFromPoint;
 
-public class FitnessFunction {
+public class FitnessFunctionSupplier {
 
     private final ProbabilisticGraph probabilisticGraph;
     private final boolean useLikelihood;
     private final List<? extends Variable> latentVariables;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunction(ProbabilisticGraph probabilisticGraph,
-                           boolean useLikelihood,
-                           BiConsumer<double[], Double> onFitnessCalculation) {
+    public FitnessFunctionSupplier(ProbabilisticGraph probabilisticGraph,
+                                   boolean useLikelihood,
+                                   BiConsumer<double[], Double> onFitnessCalculation) {
         this.probabilisticGraph = probabilisticGraph;
         this.useLikelihood = useLikelihood;
         this.latentVariables = probabilisticGraph.getLatentVariables();
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public FitnessFunction(ProbabilisticGraph probabilisticGraph, boolean useLikelihood) {
+    public FitnessFunctionSupplier(ProbabilisticGraph probabilisticGraph, boolean useLikelihood) {
         this(probabilisticGraph, useLikelihood, null);
     }
 
-    public MultivariateFunction fitness() {
+    public MultivariateFunction getFitnessFunction() {
         return point -> {
 
             Map<VariableReference, DoubleTensor> values = convertFromPoint(point, latentVariables);

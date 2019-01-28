@@ -81,7 +81,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
     }
 
-    private OptimizedResult optimize(FitnessFunction fitnessFunction) {
+    private OptimizedResult optimize(FitnessFunctionSupplier fitnessFunctionSupplier) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
@@ -100,7 +100,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         double[] startPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticGraph.getLatentVariables()));
 
-        double initialFitness = fitnessFunction.fitness().value(startPoint);
+        double initialFitness = fitnessFunctionSupplier.getFitnessFunction().value(startPoint);
 
         if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
@@ -111,7 +111,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
-            new ObjectiveFunction(fitnessFunction.fitness()),
+            new ObjectiveFunction(fitnessFunctionSupplier.getFitnessFunction()),
             bounds,
             MAXIMIZE,
             new InitialGuess(startPoint)
@@ -131,7 +131,7 @@ public class NonGradientOptimizer implements Optimizer {
 
     @Override
     public OptimizedResult maxAPosteriori() {
-        return optimize(new FitnessFunction(
+        return optimize(new FitnessFunctionSupplier(
             probabilisticGraph,
             false,
             this::handleFitnessCalculation
@@ -140,7 +140,7 @@ public class NonGradientOptimizer implements Optimizer {
 
     @Override
     public OptimizedResult maxLikelihood() {
-        return optimize(new FitnessFunction(
+        return optimize(new FitnessFunctionSupplier(
             probabilisticGraph,
             true,
             this::handleFitnessCalculation
