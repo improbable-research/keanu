@@ -184,3 +184,16 @@ def reorder_subplots(ax: Any) -> None:
     for plot in ax:
         new_position_index = sorted_titles.index(plot[0].get_title())
         plot[0].set_position(positions[new_position_index])
+
+def test_foo():
+    a = Gamma(np.array([1., 1., 1.]).reshape(3, 1), np.array([1., 1., 1.]).reshape(3, 1))
+    a.set_label("one")
+    b = Gamma(a, 1)
+    b.set_label("two")
+    net = BayesNet(a.get_connected_graph())
+    algo = MetropolisHastingsSampler()
+
+    latents = list(net.get_latent_vertices())
+    algo = MetropolisHastingsSampler()
+    samples = sample(net=net, sample_from=latents, sampling_algorithm=algo)
+    assert False

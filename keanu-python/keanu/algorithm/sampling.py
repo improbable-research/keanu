@@ -9,6 +9,7 @@ from keanu.net import BayesNet
 from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 from keanu.plots import traceplot
+import numpy as np
 
 k = KeanuContext()
 
@@ -92,7 +93,8 @@ def sample(net: BayesNet,
            drop: int = 0,
            down_sample_interval: int = 1,
            plot: bool = False,
-           ax: Any = None) -> sample_types:
+           ax: Any = None,
+           primitive: bool = False) -> sample_types:
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler()
@@ -107,6 +109,22 @@ def sample(net: BayesNet,
             map(Tensor._to_ndarray,
                 network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped
     }
+
+    vertex_samples_multi = {}
+    for vertex_label in vertex_samples:
+        vertex_samples_multi[vertex_label] = {}
+        for samples in vertex_samples[vertex_label]:
+            shape = samples.shape
+            if (shape == ()):
+                vertex_samples_multi[vertex_label]['0'] = float(samples)
+            else:
+                for index, value in np.ndenumerate(samples):
+                    vertex_samples_multi[vertex_label][str(index)] = float(value)
+
+    reform = {(outerKey, innerKey): values for outerKey, innerDict in vertex_samples_multi.items() for innerKey, values in innerDict.items()}
+
+    print("hello")
+    print(reform)
 
     if plot:
         traceplot(vertex_samples, ax=ax)
