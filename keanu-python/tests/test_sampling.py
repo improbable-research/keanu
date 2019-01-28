@@ -31,8 +31,7 @@ def net() -> BayesNet:
 @pytest.mark.parametrize(
     "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.get_latent_vertices())),
              (lambda net: NUTSSampler())])
-def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(
-        algo: lambda net: PosteriorSamplingAlgorithm, net: BayesNet) -> None:
+def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]
@@ -91,7 +90,7 @@ def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
 
 @pytest.mark.parametrize(
     "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution='prior', latents=net.get_latent_vertices()))])
-def test_can_iter_through_samples(algo: lambda net: PosteriorSamplingAlgorithm, net: BayesNet) -> None:
+def test_can_iter_through_samples(algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
     draws = 10
     samples = generate_samples(
         net=net, sample_from=net.get_latent_vertices(), sampling_algorithm=algo(net), down_sample_interval=1)
@@ -184,16 +183,3 @@ def reorder_subplots(ax: Any) -> None:
     for plot in ax:
         new_position_index = sorted_titles.index(plot[0].get_title())
         plot[0].set_position(positions[new_position_index])
-
-
-def samples_in_dataframe() -> None:
-    cero = Gaussian(0., 1.)
-    one = Gaussian(cero, 1.)
-    two = Gaussian(cero, 1.)
-
-    net = BayesNet(cero.get_connected_graph())
-    algo = MetropolisHastingsSampler()
-    draws = 5
-    sample_from = list(net.get_latent_vertices())
-
-    samples = sample(net=net, sample_from=sample_from, sampling_algorithm=algo, draws=draws)
