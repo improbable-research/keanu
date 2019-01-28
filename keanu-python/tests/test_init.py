@@ -1,6 +1,7 @@
 import keanu
 import re
 
+
 def test_version_is_correctly_formatted() -> None:
     version = keanu.__version__
     assert isinstance(version, str)
