@@ -28,7 +28,7 @@ class JavaObjectWrapper:
                     self.__class__, k, snake_case_name))
 
     def __check_if_unwrapped(self, k: str) -> None:
-        if _to_snake_case_name(k) == "_get_object_id":
+        if k == "_get_object_id":
             raise TypeError(
                 "Trying to pass JavaObjectWrapper to a method that expects a JavaObject - did you forget to call unwrap()?"
             )
