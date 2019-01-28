@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class TextComponent implements StatusBarComponent {
 
-    private AtomicReference<String> content = new AtomicReference<>();
+    private AtomicReference<String> content = new AtomicReference<>("");
 
     /**
      * Sets the text to be displayed by the component.
