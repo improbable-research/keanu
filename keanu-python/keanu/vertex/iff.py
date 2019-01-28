@@ -4,21 +4,16 @@ from keanu.infer_type import get_type_of_value
 from .base import Boolean
 from .vertex_casting import do_inferred_vertex_cast
 from .base import Vertex, vertex_constructor_param_types
-from .generated import BooleanIf, DoubleIf, IntegerIf, ConstantBoolean, ConstantInteger, ConstantDouble
-
-
-def __cast_to_vertex(input: vertex_constructor_param_types) -> Vertex:
-    return do_inferred_vertex_cast({bool: ConstantBoolean, int: ConstantInteger, float: ConstantDouble}, input)
-
+from .generated import cast_to_vertex, BooleanIf, DoubleIf, IntegerIf, ConstantBoolean, ConstantInteger, ConstantDouble
 
 from keanu.vartypes import tensor_arg_types
 
 
 def If(predicate: Union[tensor_arg_types, Vertex], thn: Union[tensor_arg_types, Vertex],
        els: Union[tensor_arg_types, Vertex]) -> Vertex:
-    predicate = __cast_to_vertex(predicate)
-    thn = __cast_to_vertex(thn)
-    els = __cast_to_vertex(els)
+    predicate = cast_to_vertex(predicate)
+    thn = cast_to_vertex(thn)
+    els = cast_to_vertex(els)
 
     if type(predicate) != Boolean:
         raise TypeError("Predicate must be boolean: got {}".format(type(predicate)))
