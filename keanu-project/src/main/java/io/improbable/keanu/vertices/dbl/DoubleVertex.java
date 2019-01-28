@@ -21,12 +21,17 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Additi
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanMaskVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanOrEqualToMaskVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanMaskVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.DoubleSetWithMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
@@ -288,16 +293,56 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new GreaterThanVertex<>(this, rhs);
     }
 
+    public DoubleVertex toGreaterThanMask(DoubleVertex rhs) {
+        return new DoubleGreaterThanMaskVertex(this, rhs);
+    }
+
+    public DoubleVertex toGreaterThanMask(double rhs) {
+        return toGreaterThanMask(new ConstantDoubleVertex(rhs));
+    }
+
     public <T extends NumberTensor> BooleanVertex greaterThanOrEqualTo(Vertex<T> rhs) {
         return new GreaterThanOrEqualVertex<>(this, rhs);
+    }
+
+    public DoubleVertex toGreaterThanOrEqualToMask(DoubleVertex rhs) {
+        return new DoubleGreaterThanOrEqualToMaskVertex(this, rhs);
+    }
+
+    public DoubleVertex toGreaterThanOrEqualToMask(double rhs) {
+        return toGreaterThanOrEqualToMask(new ConstantDoubleVertex(rhs));
     }
 
     public <T extends NumberTensor> BooleanVertex lessThan(Vertex<T> rhs) {
         return new LessThanVertex<>(this, rhs);
     }
 
+    public DoubleVertex toLessThanMask(DoubleVertex rhs) {
+        return new DoubleLessThanMaskVertex(this, rhs);
+    }
+
+    public DoubleVertex toLessThanMask(double rhs) {
+        return toLessThanMask(new ConstantDoubleVertex(rhs));
+    }
+
     public <T extends NumberTensor> BooleanVertex lessThanOrEqualTo(Vertex<T> rhs) {
         return new LessThanOrEqualVertex<>(this, rhs);
+    }
+
+    public DoubleVertex toLessThanOrEqualToMask(DoubleVertex rhs) {
+        return new DoubleLessThanOrEqualToMaskVertex(this, rhs);
+    }
+
+    public DoubleVertex toLessThanOrEqualToMask(double rhs) {
+        return toLessThanOrEqualToMask(new ConstantDoubleVertex(rhs));
+    }
+
+    public DoubleVertex setWithMask(DoubleVertex mask, double value) {
+        return setWithMask(mask, new ConstantDoubleVertex(value));
+    }
+
+    public DoubleVertex setWithMask(DoubleVertex mask, DoubleVertex value) {
+        return new DoubleSetWithMaskVertex(this, mask, value);
     }
 
     public TakeVertex take(long... index) {
