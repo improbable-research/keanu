@@ -50,16 +50,6 @@ public class NonGradientOptimizer implements Optimizer {
         }
     }
 
-    private OptimizedResult optimize(boolean useMLE) {
-        FitnessFunction fitnessFunction = new FitnessFunction(
-            probabilisticGraph,
-            useMLE,
-            this::handleFitnessCalculation
-        );
-
-        return optimize(fitnessFunction);
-    }
-
     private OptimizedResult optimize(FitnessFunction fitnessFunction) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
@@ -85,12 +75,22 @@ public class NonGradientOptimizer implements Optimizer {
 
     @Override
     public OptimizedResult maxAPosteriori() {
-        return optimize(false);
+        return optimize(
+            new LogProbFitnessFunction(
+                probabilisticGraph,
+                this::handleFitnessCalculation
+            )
+        );
     }
 
     @Override
     public OptimizedResult maxLikelihood() {
-        return optimize(true);
+        return optimize(
+            new LogLikelihoodFitnessFunction(
+                probabilisticGraph,
+                this::handleFitnessCalculation
+            )
+        );
     }
 
     @ToString

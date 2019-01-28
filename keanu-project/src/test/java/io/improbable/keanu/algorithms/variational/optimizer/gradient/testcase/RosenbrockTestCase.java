@@ -15,11 +15,11 @@ public class RosenbrockTestCase implements GradientOptimizationAlgorithmTestCase
     public RosenbrockTestCase(double a, double b){
         this.a = a;
         this.b = b;
-
     }
 
     @Override
     public FitnessFunction getFitnessFunction() {
+
         return null;
     }
 

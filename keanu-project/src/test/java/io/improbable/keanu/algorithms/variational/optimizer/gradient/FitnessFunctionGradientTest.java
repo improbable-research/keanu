@@ -1,10 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import com.google.common.collect.ImmutableMap;
-import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
-import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.algorithms.variational.optimizer.*;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -44,8 +41,7 @@ public class FitnessFunctionGradientTest {
 
         KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
 
-        FitnessFunction fitness = new FitnessFunction(graph, false, (a, b) -> {
-        });
+        FitnessFunction fitness = new LogProbFitnessFunction(graph);
         FitnessFunctionGradient fitnessGradient = new FitnessFunctionGradient(graph, false, (a, b) -> {
         });
 
@@ -86,8 +82,7 @@ public class FitnessFunctionGradientTest {
 
         KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
 
-        FitnessFunction fitness = new FitnessFunction(graph, false, (a, b) -> {
-        });
+        FitnessFunction fitness = new LogProbFitnessFunction(graph);
         FitnessFunctionGradient fitnessGradient = new FitnessFunctionGradient(graph, false, (a, b) -> {
         });
 
@@ -130,8 +125,7 @@ public class FitnessFunctionGradientTest {
         fObservation.observe(Nd4jDoubleTensor.scalar(1.0));
 
         KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
-        FitnessFunction fitness = new FitnessFunction(graph, false, (a, b) -> {
-        });
+        FitnessFunction fitness = new LogProbFitnessFunction(graph);
         FitnessFunctionGradient fitnessGradient = new FitnessFunctionGradient(graph, false, (a, b) -> {
         });
 
