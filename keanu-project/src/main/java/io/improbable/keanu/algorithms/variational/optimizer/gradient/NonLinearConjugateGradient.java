@@ -121,8 +121,5 @@ public class NonLinearConjugateGradient implements GradientOptimizationAlgorithm
             return new NonLinearConjugateGradient(maxEvaluations, relativeThreshold, absoluteThreshold, updateFormula);
         }
 
-        public String toString() {
-            return "NonLinearConjugateGradient.ApacheNonLinearConjugateGradientOptimizerBuilder(maxEvaluations=" + this.maxEvaluations + ", relativeThreshold=" + this.relativeThreshold + ", absoluteThreshold=" + this.absoluteThreshold + ", updateFormula=" + this.updateFormula + ")";
-        }
     }
 }

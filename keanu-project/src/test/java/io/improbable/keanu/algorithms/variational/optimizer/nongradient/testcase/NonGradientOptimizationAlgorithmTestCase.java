@@ -14,4 +14,3 @@ public interface NonGradientOptimizationAlgorithmTestCase {
 
     void assertResult(OptimizedResult result);
 }
-

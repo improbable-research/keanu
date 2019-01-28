@@ -39,9 +39,9 @@ public class OptimizerBenchmark {
 
         switch (optimizerType) {
             case ADAM:
-                optimizer = Adam.builder()
+                optimizer = GradientOptimizer.builder()
                     .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
-                    .build();
+                    .algorithm(Adam.builder().build()).build();
                 break;
 
             case APACHE_GRADIENT:

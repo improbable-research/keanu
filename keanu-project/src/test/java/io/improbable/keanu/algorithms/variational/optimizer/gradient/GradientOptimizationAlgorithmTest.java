@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.GradientOptimizationAlgorithmTestCase;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.RosenbrockTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SingleGaussianTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SumGaussianTestCase;
 import lombok.AllArgsConstructor;
@@ -27,13 +28,15 @@ public class GradientOptimizationAlgorithmTest {
 
             return Adam.builder()
                 .alpha(0.1)
+                .useMaxThetaDeltaConvergenceChecker(0.00001)
                 .build();
         }),
 
         NONLINEAR_CONJUGATE_GRADIENT(() -> {
 
             return NonLinearConjugateGradient.builder().build();
-        });
+        })
+        ;
 
         Supplier<GradientOptimizationAlgorithm> getOptimizer;
     }
@@ -42,6 +45,7 @@ public class GradientOptimizationAlgorithmTest {
     public enum TestCase {
         SUM_GAUSSIAN_MAP(() -> new SumGaussianTestCase(true)),
         SUM_GAUSSIAN_MLE(() -> new SumGaussianTestCase(false)),
+        ROSENBROCK_1_100(() -> new RosenbrockTestCase(1, 100, 1, 1)),
         SINGLE_GAUSSIAN(SingleGaussianTestCase::new);
 
         private Supplier<GradientOptimizationAlgorithmTestCase> supplier;
