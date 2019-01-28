@@ -3,25 +3,31 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 import io.improbable.keanu.algorithms.variational.optimizer.*;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class GradientOptimizer implements Optimizer {
+
+    private static final double FLAT_GRADIENT = 1e-16;
 
     public static GradientOptimizerBuilder builder() {
         return new GradientOptimizerBuilder();
     }
 
-    private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+    private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
 
-    private GradientOptimizationAlgorithm gradientOptimizationAlgorithm;
+    private final GradientOptimizationAlgorithm gradientOptimizationAlgorithm;
 
+    private final boolean checkInitialFitnessConditions;
 
     private final List<BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>>> onGradientCalculations = new ArrayList<>();
     private final List<BiConsumer<Map<VariableReference, DoubleTensor>, Double>> onFitnessCalculations = new ArrayList<>();
@@ -107,18 +113,58 @@ public class GradientOptimizer implements Optimizer {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
-        OptimizedResult result = gradientOptimizationAlgorithm.optimize(probabilisticWithGradientGraph.getLatentVariables(),
-            fitnessFunction, fitnessFunctionGradient);
+        if (checkInitialFitnessConditions) {
+            Map<VariableReference, DoubleTensor> startingPoint = getPoint(probabilisticWithGradientGraph.getLatentVariables());
+
+            double initialFitness = fitnessFunction.value(startingPoint);
+
+            if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
+                throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
+            }
+
+            Map<? extends VariableReference, DoubleTensor> initialGradient = fitnessFunctionGradient.value(startingPoint);
+            warnIfGradientIsFlat(initialGradient);
+        }
+
+        OptimizedResult result = gradientOptimizationAlgorithm.optimize(
+            probabilisticWithGradientGraph.getLatentVariables(),
+            fitnessFunction,
+            fitnessFunctionGradient
+        );
 
         progressBar.finish();
 
         return result;
     }
 
+    private Map<VariableReference, DoubleTensor> getPoint(List<? extends Variable> variables) {
+        return variables.stream()
+            .collect(Collectors.toMap(Variable::getReference, v -> {
+                if (v.getValue() instanceof DoubleTensor) {
+                    return (DoubleTensor) v.getValue();
+                } else {
+                    throw new UnsupportedOperationException(
+                        "Optimization unsupported on networks containing discrete latents. " +
+                            "Discrete latent : " + v.getReference() + " found.");
+                }
+            }));
+    }
+
+    private static void warnIfGradientIsFlat(Map<? extends VariableReference, DoubleTensor> gradient) {
+        double maxGradient = gradient.values().stream()
+            .flatMap(v -> Arrays.stream(v.asFlatDoubleArray()).boxed())
+            .mapToDouble(v -> v).max().orElseThrow(IllegalArgumentException::new);
+
+        if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
+            throw new IllegalStateException("The initial gradient is very flat. The largest gradient is " + maxGradient);
+        }
+    }
+
     public static class GradientOptimizerBuilder {
 
         private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
-        private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = ApacheNonLinearConjugateGradientOptimizer.builder().build();
+        private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = NonLinearConjugateGradientOptimizer.builder().build();
+        private boolean checkInitialFitnessConditions = true;
 
         GradientOptimizerBuilder() {
         }
@@ -133,6 +179,11 @@ public class GradientOptimizer implements Optimizer {
             return this;
         }
 
+        public GradientOptimizerBuilder checkInitialFitnessConditions(boolean check) {
+            this.checkInitialFitnessConditions = check;
+            return this;
+        }
+
         public GradientOptimizer build() {
             if (probabilisticWithGradientGraph == null) {
                 throw new IllegalStateException("Cannot build optimizer without specifying network to optimize.");
@@ -142,7 +193,8 @@ public class GradientOptimizer implements Optimizer {
             }
             return new GradientOptimizer(
                 probabilisticWithGradientGraph,
-                gradientOptimizationAlgorithm
+                gradientOptimizationAlgorithm,
+                checkInitialFitnessConditions
             );
         }
 

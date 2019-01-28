@@ -5,17 +5,15 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 /**
- * https://arxiv.org/pdf/1412.6980.pdf
+ * Implemented as described in https://arxiv.org/pdf/1412.6980.pdf
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class AdamOptimizer implements Optimizer {
+public class AdamOptimizer implements GradientOptimizationAlgorithm {
 
     public interface ConvergenceChecker {
         boolean hasConverged(DoubleTensor[] gradient, DoubleTensor[] theta, DoubleTensor[] thetaNext);
@@ -25,18 +23,17 @@ public class AdamOptimizer implements Optimizer {
         return new AdamOptimizerBuilder();
     }
 
-    private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
     private final ConvergenceChecker convergenceChecker;
     private final double alpha;
     private final double beta1;
     private final double beta2;
     private final double epsilon;
 
-    private final List<BiConsumer<DoubleTensor[], DoubleTensor[]>> onGradientCalculations = new ArrayList<>();
+    @Override
+    public OptimizedResult optimize(List<? extends Variable> latentVariables,
+                                    FitnessFunction fitnessFunction,
+                                    FitnessFunctionGradient fitnessFunctionGradient) {
 
-    private OptimizedResult optimize(boolean isMLE) {
-
-        List<? extends Variable> latentVariables = probabilisticWithGradientGraph.getLatentVariables();
         DoubleTensor[] theta = getTheta(latentVariables);
         DoubleTensor[] thetaNext = getZeros(theta);
         DoubleTensor[] m = getZeros(theta);
@@ -50,7 +47,7 @@ public class AdamOptimizer implements Optimizer {
         while (!converged && t < maxIterations) {
             t++;
 
-            final DoubleTensor[] gradients = getGradients(theta, latentVariables, isMLE);
+            final DoubleTensor[] gradients = getGradients(theta, latentVariables, fitnessFunctionGradient);
 
             final double beta1T = (1 - Math.pow(beta1, t));
             final double beta2T = (1 - Math.pow(beta2, t));
@@ -71,30 +68,20 @@ public class AdamOptimizer implements Optimizer {
             thetaNext = temp;
         }
 
-        double logProb = probabilisticWithGradientGraph.logProb();
+        double logProb = fitnessFunction.value(toMap(theta, latentVariables));
 
         return new OptimizedResult(toMap(theta, latentVariables), logProb);
     }
 
-    private DoubleTensor[] getGradients(DoubleTensor[] theta, List<? extends Variable> latentVariables, boolean isMLE) {
+    private DoubleTensor[] getGradients(DoubleTensor[] theta,
+                                        List<? extends Variable> latentVariables,
+                                        FitnessFunctionGradient fitnessFunctionGradient) {
         Map<VariableReference, DoubleTensor> thetaMap = toMap(theta, latentVariables);
 
-        final DoubleTensor[] gradients;
-        if (isMLE) {
-            gradients = toArray(
-                probabilisticWithGradientGraph.logLikelihoodGradients(thetaMap),
-                latentVariables
-            );
-        } else {
-            gradients = toArray(
-                probabilisticWithGradientGraph.logProbGradients(thetaMap),
-                latentVariables
-            );
-        }
-
-        handleGradientCalculation(theta, gradients);
-
-        return gradients;
+        return toArray(
+            fitnessFunctionGradient.value(thetaMap),
+            latentVariables
+        );
     }
 
     private DoubleTensor[] getTheta(List<? extends Variable> latentVertices) {
@@ -150,41 +137,7 @@ public class AdamOptimizer implements Optimizer {
         return (gradient, theta, thetaNext) -> magnitudeDelta(theta, thetaNext) < minThetaDelta;
     }
 
-    @Override
-    public OptimizedResult maxAPosteriori() {
-        return optimize(false);
-    }
-
-    @Override
-    public OptimizedResult maxLikelihood() {
-        return optimize(true);
-    }
-
-    public void addGradientCalculationHandler(BiConsumer<DoubleTensor[], DoubleTensor[]> gradientCalculationHandler) {
-        this.onGradientCalculations.add(gradientCalculationHandler);
-    }
-
-    public void removeGradientCalculationHandler(BiConsumer<DoubleTensor[], DoubleTensor[]> gradientCalculationHandler) {
-        this.onGradientCalculations.remove(gradientCalculationHandler);
-    }
-
-    private void handleGradientCalculation(DoubleTensor[] point, DoubleTensor[] gradients) {
-
-        for (BiConsumer<DoubleTensor[], DoubleTensor[]> gradientCalculationHandler : onGradientCalculations) {
-            gradientCalculationHandler.accept(point, gradients);
-        }
-    }
-
-    @Override
-    public void addFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler) {
-    }
-
-    @Override
-    public void removeFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler) {
-    }
-
     public static class AdamOptimizerBuilder {
-        private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
         private ConvergenceChecker convergenceChecker = AdamOptimizer.thetaDeltaMagnitude(1e-6);
 
         private double alpha = 0.001;
@@ -193,11 +146,6 @@ public class AdamOptimizer implements Optimizer {
         private double epsilon = 1e-8;
 
         AdamOptimizerBuilder() {
-        }
-
-        public AdamOptimizerBuilder bayesianNetwork(ProbabilisticWithGradientGraph probabilisticWithGradientGraph) {
-            this.probabilisticWithGradientGraph = probabilisticWithGradientGraph;
-            return this;
         }
 
         public AdamOptimizerBuilder convergenceChecker(ConvergenceChecker convergenceChecker) {
@@ -231,11 +179,7 @@ public class AdamOptimizer implements Optimizer {
         }
 
         public AdamOptimizer build() {
-            return new AdamOptimizer(probabilisticWithGradientGraph, convergenceChecker, alpha, beta1, beta2, epsilon);
-        }
-
-        public String toString() {
-            return "AdamOptimizer.AdamOptimizerBuilder(bayesianNetwork=" + this.probabilisticWithGradientGraph + ", alpha=" + this.alpha + ", beta1=" + this.beta1 + ", beta2=" + this.beta2 + ", epsilon=" + this.epsilon + ")";
+            return new AdamOptimizer(convergenceChecker, alpha, beta1, beta2, epsilon);
         }
     }
 }

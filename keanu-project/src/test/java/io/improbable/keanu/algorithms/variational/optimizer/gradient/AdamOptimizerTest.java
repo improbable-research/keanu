@@ -20,8 +20,9 @@ public class AdamOptimizerTest {
         BayesianNetwork bayesianNetwork = testCase.getModel();
         KeanuProbabilisticWithGradientGraph model = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
 
-        AdamOptimizer optimizer = AdamOptimizer.builder()
+        GradientOptimizer optimizer = GradientOptimizer.builder()
             .bayesianNetwork(model)
+            .algorithm(AdamOptimizer.builder().build())
             .build();
 
         OptimizedResult result = optimizer.maxAPosteriori();
@@ -38,9 +39,11 @@ public class AdamOptimizerTest {
 
         KeanuProbabilisticWithGradientGraph model = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
 
-        AdamOptimizer optimizer = AdamOptimizer.builder()
-            .alpha(0.1)
+        GradientOptimizer optimizer = GradientOptimizer.builder()
             .bayesianNetwork(model)
+            .algorithm(AdamOptimizer.builder()
+                .alpha(0.1)
+                .build())
             .build();
 
         OptimizedResult result = optimizer.maxAPosteriori();
@@ -56,14 +59,16 @@ public class AdamOptimizerTest {
         KeanuProbabilisticWithGradientGraph model = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
 
         MutableInt i = new MutableInt(0);
-        AdamOptimizer optimizer = AdamOptimizer.builder()
-            .alpha(0.1)
+        GradientOptimizer optimizer = GradientOptimizer.builder()
             .bayesianNetwork(model)
-            .convergenceChecker((gradient, theta, thetaNext) -> i.incrementAndGet() == 10)
+            .algorithm(AdamOptimizer.builder()
+                .alpha(0.1)
+                .convergenceChecker((gradient, theta, thetaNext) -> i.incrementAndGet() == 10)
+                .build())
             .build();
 
         optimizer.maxAPosteriori();
-        
+
         assertTrue(i.getValue() == 10);
     }
 
@@ -77,8 +82,9 @@ public class AdamOptimizerTest {
 
         KeanuProbabilisticWithGradientGraph model = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
 
-        AdamOptimizer optimizer = AdamOptimizer.builder()
+        GradientOptimizer optimizer = GradientOptimizer.builder()
             .bayesianNetwork(model)
+            .algorithm(AdamOptimizer.builder().build())
             .build();
 
         MutableInt callCount = new MutableInt(0);

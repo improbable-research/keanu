@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.*;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -10,9 +9,7 @@ import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleValueChecker;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
-import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -20,21 +17,22 @@ import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.get
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 @AllArgsConstructor
-public class ApacheNonLinearConjugateGradientOptimizer implements GradientOptimizationAlgorithm {
-
-    private static final double FLAT_GRADIENT = 1e-16;
+/**
+ * Backed by Apache Math org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer
+ */
+public class NonLinearConjugateGradientOptimizer implements GradientOptimizationAlgorithm {
 
     public static ApacheNonLinearConjugateGradientOptimizerBuilder builder() {
         return new ApacheNonLinearConjugateGradientOptimizerBuilder();
     }
 
     public enum UpdateFormula {
-        POLAK_RIBIERE(NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE),
-        FLETCHER_REEVES(NonLinearConjugateGradientOptimizer.Formula.FLETCHER_REEVES);
+        POLAK_RIBIERE(org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE),
+        FLETCHER_REEVES(org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer.Formula.FLETCHER_REEVES);
 
-        NonLinearConjugateGradientOptimizer.Formula apacheMapping;
+        org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer.Formula apacheMapping;
 
-        UpdateFormula(NonLinearConjugateGradientOptimizer.Formula apacheMapping) {
+        UpdateFormula(org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer.Formula apacheMapping) {
             this.apacheMapping = apacheMapping;
         }
     }
@@ -65,18 +63,9 @@ public class ApacheNonLinearConjugateGradientOptimizer implements GradientOptimi
 
         double[] startingPoint = Optimizer.convertToPoint(getAsDoubleTensors(latentVariables));
 
-        double initialFitness = fitness.getObjectiveFunction().value(startingPoint);
-        double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
+        org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer optimizer;
 
-        if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
-            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
-        }
-
-        warnIfGradientIsFlat(initialGradient);
-
-        NonLinearConjugateGradientOptimizer optimizer;
-
-        optimizer = new NonLinearConjugateGradientOptimizer(
+        optimizer = new org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer(
             updateFormula.apacheMapping,
             new SimpleValueChecker(relativeThreshold, absoluteThreshold)
         );
@@ -93,13 +82,6 @@ public class ApacheNonLinearConjugateGradientOptimizer implements GradientOptimi
             .convertFromPoint(pointValuePair.getPoint(), latentVariables);
 
         return new OptimizedResult(optimizedValues, pointValuePair.getValue());
-    }
-
-    private static void warnIfGradientIsFlat(double[] gradient) {
-        double maxGradient = Arrays.stream(gradient).max().orElseThrow(IllegalArgumentException::new);
-        if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
-            throw new IllegalStateException("The initial gradient is very flat. The largest gradient is " + maxGradient);
-        }
     }
 
     public static class ApacheNonLinearConjugateGradientOptimizerBuilder {
@@ -132,12 +114,12 @@ public class ApacheNonLinearConjugateGradientOptimizer implements GradientOptimi
             return this;
         }
 
-        public ApacheNonLinearConjugateGradientOptimizer build() {
-            return new ApacheNonLinearConjugateGradientOptimizer(maxEvaluations, relativeThreshold, absoluteThreshold, updateFormula);
+        public NonLinearConjugateGradientOptimizer build() {
+            return new NonLinearConjugateGradientOptimizer(maxEvaluations, relativeThreshold, absoluteThreshold, updateFormula);
         }
 
         public String toString() {
-            return "ApacheNonLinearConjugateGradientOptimizer.ApacheNonLinearConjugateGradientOptimizerBuilder(maxEvaluations=" + this.maxEvaluations + ", relativeThreshold=" + this.relativeThreshold + ", absoluteThreshold=" + this.absoluteThreshold + ", updateFormula=" + this.updateFormula + ")";
+            return "NonLinearConjugateGradientOptimizer.ApacheNonLinearConjugateGradientOptimizerBuilder(maxEvaluations=" + this.maxEvaluations + ", relativeThreshold=" + this.relativeThreshold + ", absoluteThreshold=" + this.absoluteThreshold + ", updateFormula=" + this.updateFormula + ")";
         }
     }
 }

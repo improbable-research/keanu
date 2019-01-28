@@ -39,10 +39,12 @@ public class OptimizerTest {
 
         ADAM(bayesianNetwork -> {
 
-            return AdamOptimizer.builder()
-                .alpha(0.1)
+            return GradientOptimizer.builder()
                 .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
-                .build();
+                .algorithm(AdamOptimizer.builder()
+                    .alpha(0.1)
+                    .build()
+                ).build();
         }),
 
         APACHE_GRADIENT(KeanuOptimizer.Gradient::of),
