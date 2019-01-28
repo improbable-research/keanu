@@ -1,4 +1,5 @@
 ### Version 0.0.19 ###
 
+Reversed the ordering of namespace for `VertexLabel` (e.g. from `new VertexLabel("keanu", "improbable", "io")` to `new VertexLabel("io", "improbable", "keanu"))
 Added a permute vertex
 Added the release notes text file to the repo
