@@ -40,6 +40,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGamm
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.PermuteVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
@@ -224,6 +225,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public ReshapeVertex reshape(long... proposedShape) {
         return new ReshapeVertex(this, proposedShape);
+    }
+
+    public PermuteVertex permute(int... rearrange) {
+        return new PermuteVertex(this, rearrange);
     }
 
     public DoubleUnaryOpLambda<DoubleTensor> lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
