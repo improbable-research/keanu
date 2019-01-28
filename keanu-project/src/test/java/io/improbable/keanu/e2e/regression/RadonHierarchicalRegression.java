@@ -2,6 +2,7 @@ package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheNonLinearConjugateGradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
@@ -22,9 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.*;
 
 public class RadonHierarchicalRegression {
 
@@ -144,9 +143,11 @@ public class RadonHierarchicalRegression {
     private void optimise(BayesianNetwork bayesianNetwork, List<RegressionModel> models) {
         bayesianNetwork.probeForNonZeroProbability(100);
         GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(bayesianNetwork)
-            .absoluteThreshold(0.25)
-            .maxEvaluations(10000)
-            .build();
+            .algorithm(ApacheNonLinearConjugateGradientOptimizer.builder()
+                .absoluteThreshold(0.25)
+                .maxEvaluations(10000)
+                .build()
+            ).build();
         optimizer.maxAPosteriori();
 
         assertValuesAreCorrect(bayesianNetwork, models);

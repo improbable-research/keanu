@@ -14,7 +14,7 @@ import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.con
 public class ApacheFitnessFunctionGradientAdaptor implements MultivariateVectorFunction {
 
     private final FitnessFunctionGradient fitnessFunctionGradient;
-    private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+    private final List<? extends Variable> latentVariables;
 
     @Override
     public double[] value(double[] point) {
@@ -23,11 +23,11 @@ public class ApacheFitnessFunctionGradientAdaptor implements MultivariateVectorF
 
         Map<? extends VariableReference, DoubleTensor> diffs = fitnessFunctionGradient.value(values);
 
-        return alignGradientsToAppropriateIndex(diffs, probabilisticWithGradientGraph.getLatentVariables());
+        return alignGradientsToAppropriateIndex(diffs, latentVariables);
     }
 
     private Map<VariableReference, DoubleTensor> getValues(double[] point) {
-        return convertFromPoint(point, probabilisticWithGradientGraph.getLatentVariables());
+        return convertFromPoint(point, latentVariables);
     }
 
     private static double[] alignGradientsToAppropriateIndex(Map<? extends VariableReference, DoubleTensor> diffs,

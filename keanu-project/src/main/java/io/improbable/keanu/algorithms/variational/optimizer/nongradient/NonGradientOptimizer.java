@@ -95,7 +95,9 @@ public class NonGradientOptimizer implements Optimizer {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
-        List<long[]> shapes = probabilisticGraph.getLatentVariables().stream()
+        List<? extends Variable> latentVariables = probabilisticGraph.getLatentVariables();
+
+        List<long[]> shapes = latentVariables.stream()
             .map(Variable::getShape)
             .collect(toList());
 
@@ -106,10 +108,10 @@ public class NonGradientOptimizer implements Optimizer {
         );
 
         ObjectiveFunction fitness = new ObjectiveFunction(
-            new ApacheFitnessFunctionAdaptor(fitnessFunction, probabilisticGraph)
+            new ApacheFitnessFunctionAdaptor(fitnessFunction, latentVariables)
         );
 
-        double[] startPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticGraph.getLatentVariables()));
+        double[] startPoint = Optimizer.convertToPoint(getAsDoubleTensors(latentVariables));
 
         double initialFitness = fitness.getObjectiveFunction().value(startPoint);
 
@@ -118,7 +120,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
 
         ApacheMathSimpleBoundsCalculator boundsCalculator = new ApacheMathSimpleBoundsCalculator(boundsRange, optimizerBounds);
-        SimpleBounds bounds = boundsCalculator.getBounds(probabilisticGraph.getLatentVariables(), startPoint);
+        SimpleBounds bounds = boundsCalculator.getBounds(latentVariables, startPoint);
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
@@ -131,7 +133,7 @@ public class NonGradientOptimizer implements Optimizer {
         progressBar.finish();
 
         Map<VariableReference, DoubleTensor> optimizedValues = Optimizer
-            .convertFromPoint(pointValuePair.getPoint(), probabilisticGraph.getLatentVariables());
+            .convertFromPoint(pointValuePair.getPoint(), latentVariables);
 
         return new OptimizedResult(optimizedValues, pointValuePair.getValue());
     }

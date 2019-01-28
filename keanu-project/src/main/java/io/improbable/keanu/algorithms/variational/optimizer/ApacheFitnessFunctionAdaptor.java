@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
+import java.util.List;
 import java.util.Map;
 
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.convertFromPoint;
@@ -12,7 +13,7 @@ import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.con
 public class ApacheFitnessFunctionAdaptor implements MultivariateFunction {
 
     private final FitnessFunction fitnessFunction;
-    private final ProbabilisticGraph probabilisticGraph;
+    private final List<? extends Variable> latentVariables;
 
     @Override
     public double value(double[] point) {
@@ -23,6 +24,6 @@ public class ApacheFitnessFunctionAdaptor implements MultivariateFunction {
     }
 
     private Map<VariableReference, DoubleTensor> getValues(double[] point) {
-        return convertFromPoint(point, probabilisticGraph.getLatentVariables());
+        return convertFromPoint(point, latentVariables);
     }
 }
