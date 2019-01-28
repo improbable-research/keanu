@@ -9,7 +9,6 @@ import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -24,26 +23,35 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to
  * tend towards the Maximum A Posteriori (MAP)
  */
-@Builder
 public class SimulatedAnnealing {
 
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
 
     @Getter
-    @Builder.Default
-    private KeanuRandom random = KeanuRandom.getDefaultRandom();
+    private KeanuRandom random;
 
     @Getter
     @NonNull
     private ProposalDistribution proposalDistribution;
 
     @Getter
-    @Builder.Default
-    private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
+    private MHStepVariableSelector variableSelector;
 
     @Getter
     @NonNull
     private ProposalRejectionStrategy rejectionStrategy;
+
+    @java.beans.ConstructorProperties({"random", "proposalDistribution", "variableSelector", "rejectionStrategy"})
+    SimulatedAnnealing(KeanuRandom random, ProposalDistribution proposalDistribution, MHStepVariableSelector variableSelector, ProposalRejectionStrategy rejectionStrategy) {
+        this.random = random;
+        this.proposalDistribution = proposalDistribution;
+        this.variableSelector = variableSelector;
+        this.rejectionStrategy = rejectionStrategy;
+    }
+
+    public static SimulatedAnnealingBuilder builder() {
+        return new SimulatedAnnealingBuilder();
+    }
 
     public NetworkState getMaxAPosteriori(ProbabilisticModel model,
                                           int sampleCount) {
@@ -131,4 +139,41 @@ public class SimulatedAnnealing {
         return n -> startT * Math.exp(minusK * n);
     }
 
+    public static class SimulatedAnnealingBuilder {
+        private KeanuRandom random = KeanuRandom.getDefaultRandom();
+        private ProposalDistribution proposalDistribution;
+        private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
+        private ProposalRejectionStrategy rejectionStrategy;
+
+        SimulatedAnnealingBuilder() {
+        }
+
+        public SimulatedAnnealingBuilder random(KeanuRandom random) {
+            this.random = random;
+            return this;
+        }
+
+        public SimulatedAnnealingBuilder proposalDistribution(ProposalDistribution proposalDistribution) {
+            this.proposalDistribution = proposalDistribution;
+            return this;
+        }
+
+        public SimulatedAnnealingBuilder variableSelector(MHStepVariableSelector variableSelector) {
+            this.variableSelector = variableSelector;
+            return this;
+        }
+
+        public SimulatedAnnealingBuilder rejectionStrategy(ProposalRejectionStrategy rejectionStrategy) {
+            this.rejectionStrategy = rejectionStrategy;
+            return this;
+        }
+
+        public SimulatedAnnealing build() {
+            return new SimulatedAnnealing(random, proposalDistribution, variableSelector, rejectionStrategy);
+        }
+
+        public String toString() {
+            return "SimulatedAnnealing.SimulatedAnnealingBuilder(random=" + this.random + ", proposalDistribution=" + this.proposalDistribution + ", variableSelector=" + this.variableSelector + ", rejectionStrategy=" + this.rejectionStrategy + ")";
+        }
+    }
 }
