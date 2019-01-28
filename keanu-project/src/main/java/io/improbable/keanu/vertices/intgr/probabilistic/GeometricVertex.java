@@ -49,7 +49,7 @@ public class GeometricVertex extends IntegerVertex implements ProbabilisticInteg
 
     @Override
     public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
-        return null;
+        return Geometric.withParameters(p.getValue()).sample(shape, random);
     }
 
     @Override
