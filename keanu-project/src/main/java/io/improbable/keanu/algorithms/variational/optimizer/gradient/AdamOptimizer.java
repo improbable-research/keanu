@@ -176,11 +176,11 @@ public class AdamOptimizer implements Optimizer {
     }
 
     @Override
-    public void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
+    public void addFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler) {
     }
 
     @Override
-    public void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
+    public void removeFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler) {
     }
 
     public static class AdamOptimizerBuilder {

@@ -59,24 +59,24 @@ public class NonGradientOptimizer implements Optimizer {
      */
     private final double stoppingTrustRegionRadius;
 
-    private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
+    private final List<BiConsumer<Map<VariableReference, DoubleTensor>, Double>> onFitnessCalculations = new ArrayList<>();
 
     public static NonGradientOptimizerBuilder builder() {
         return new NonGradientOptimizerBuilder();
     }
 
     @Override
-    public void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
+    public void addFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler) {
         this.onFitnessCalculations.add(fitnessCalculationHandler);
     }
 
     @Override
-    public void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
+    public void removeFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler) {
         this.onFitnessCalculations.remove(fitnessCalculationHandler);
     }
 
-    private void handleFitnessCalculation(double[] point, Double fitness) {
-        for (BiConsumer<double[], Double> fitnessCalculationHandler : onFitnessCalculations) {
+    private void handleFitnessCalculation(Map<VariableReference, DoubleTensor> point, Double fitness) {
+        for (BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler : onFitnessCalculations) {
             fitnessCalculationHandler.accept(point, fitness);
         }
     }
@@ -105,9 +105,13 @@ public class NonGradientOptimizer implements Optimizer {
             stoppingTrustRegionRadius
         );
 
+        ObjectiveFunction fitness = new ObjectiveFunction(
+            new ApacheFitnessFunctionAdaptor(fitnessFunction, probabilisticGraph)
+        );
+
         double[] startPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticGraph.getLatentVariables()));
 
-        double initialFitness = fitnessFunction.value(startPoint);
+        double initialFitness = fitness.getObjectiveFunction().value(startPoint);
 
         if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
@@ -118,7 +122,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
-            new ObjectiveFunction(fitnessFunction),
+            fitness,
             bounds,
             MAXIMIZE,
             new InitialGuess(startPoint)

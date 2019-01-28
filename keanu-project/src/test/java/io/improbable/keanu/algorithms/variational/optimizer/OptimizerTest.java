@@ -7,6 +7,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.Si
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SumGaussianTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -115,7 +117,7 @@ public class OptimizerTest {
 
         AtomicBoolean didCallFitness = new AtomicBoolean(false);
 
-        BiConsumer<double[], Double> fitnessHandler = mock(BiConsumer.class);
+        BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessHandler = mock(BiConsumer.class);
 
         optimizer.addFitnessCalculationHandler(fitnessHandler);
         optimizer.removeFitnessCalculationHandler(fitnessHandler);

@@ -1,9 +1,12 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -11,7 +14,8 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -46,8 +50,15 @@ public class FitnessFunctionGradientTest {
         });
 
         assert2DGradientEqualsApproxGradient(
-            new double[]{5, 5},
-            new double[]{0, 0},
+            A.getReference(), B.getReference(),
+            ImmutableMap.of(
+                A.getReference(), DoubleTensor.scalar(5),
+                B.getReference(), DoubleTensor.scalar(5)
+            ),
+            ImmutableMap.of(
+                A.getReference(), DoubleTensor.scalar(0),
+                B.getReference(), DoubleTensor.scalar(0)
+            ),
             0.2,
             fitness,
             fitnessGradient
@@ -81,8 +92,15 @@ public class FitnessFunctionGradientTest {
         });
 
         assert2DGradientEqualsApproxGradient(
-            new double[]{10, 10},
-            new double[]{2, 2},
+            A.getReference(), B.getReference(),
+            ImmutableMap.of(
+                A.getReference(), DoubleTensor.scalar(10),
+                B.getReference(), DoubleTensor.scalar(10)
+            ),
+            ImmutableMap.of(
+                A.getReference(), DoubleTensor.scalar(2),
+                B.getReference(), DoubleTensor.scalar(2)
+            ),
             0.2,
             fitness,
             fitnessGradient
@@ -118,8 +136,15 @@ public class FitnessFunctionGradientTest {
         });
 
         assert2DGradientEqualsApproxGradient(
-            new double[]{5, 5},
-            new double[]{0.1, 0.1},
+            A.getReference(), B.getReference(),
+            ImmutableMap.of(
+                A.getReference(), DoubleTensor.scalar(5),
+                B.getReference(), DoubleTensor.scalar(5)
+            ),
+            ImmutableMap.of(
+                A.getReference(), DoubleTensor.scalar(0.1),
+                B.getReference(), DoubleTensor.scalar(0.1)
+            ),
             0.2,
             fitness,
             fitnessGradient
@@ -132,49 +157,64 @@ public class FitnessFunctionGradientTest {
      * @param bottomLeft min input 1 and min input 2
      * @param stepSize   step size for moving from max to min in both dimensions
      */
-    private void assert2DGradientEqualsApproxGradient(double[] topRight,
-                                                      double[] bottomLeft,
+    private void assert2DGradientEqualsApproxGradient(VariableReference xRef,
+                                                      VariableReference yRef,
+                                                      Map<VariableReference, DoubleTensor> topRight,
+                                                      Map<VariableReference, DoubleTensor> bottomLeft,
                                                       double stepSize,
                                                       FitnessFunction fitness,
                                                       FitnessFunctionGradient fitnessFunctionGradient) {
 
-        double[] point = Arrays.copyOf(bottomLeft, bottomLeft.length);
+        Map<VariableReference, DoubleTensor> point = copyPoint(bottomLeft);
 
-        int xStepCount = (int) ((topRight[0] - bottomLeft[0]) / stepSize);
-        int yStepCount = (int) ((topRight[1] - bottomLeft[1]) / stepSize);
+        int xStepCount = (int) ((topRight.get(xRef).minus(bottomLeft.get(xRef)).scalar()) / stepSize);
+        int yStepCount = (int) ((topRight.get(yRef).minus(bottomLeft.get(yRef)).scalar()) / stepSize);
 
         for (int x = 0; x < xStepCount; x++) {
 
             for (int y = 0; y < yStepCount; y++) {
 
-                double[] gradient0 = fitnessFunctionGradient.value(point);
+                Map<? extends VariableReference, DoubleTensor> gradient0 = fitnessFunctionGradient.value(point);
+
                 double fitness0 = fitness.value(point);
 
                 double da = dx;
-                double[] pointA = {point[0] + da, point[1]};
+                Map<VariableReference, DoubleTensor> pointA = ImmutableMap.of(
+                    xRef, point.get(xRef).plus(da),
+                    yRef, point.get(yRef)
+                );
 
                 double fitness1a = fitness.value(pointA);
 
                 double approxGradientA = (fitness1a - fitness0) / da;
-                double epsA = Math.max(Math.abs(gradient0[0] * 0.01), 0.0001);
-                assertEquals(approxGradientA, gradient0[0], epsA);
+                double epsA = Math.max(Math.abs(gradient0.get(xRef).scalar() * 0.01), 0.0001);
+                assertEquals(approxGradientA, gradient0.get(xRef).scalar(), epsA);
 
                 double db = dx;
-                double[] pointB = {point[0], point[1] + db};
+
+                Map<VariableReference, DoubleTensor> pointB = ImmutableMap.of(
+                    xRef, point.get(xRef),
+                    yRef, point.get(yRef).plus(db)
+                );
 
                 double fitness1b = fitness.value(pointB);
 
                 double approxGradientB = (fitness1b - fitness0) / db;
-                double epsB = Math.max(Math.abs(gradient0[1] * 0.01), 0.0001);
-                assertEquals(approxGradientB, gradient0[1], epsB);
+                double epsB = Math.max(Math.abs(gradient0.get(yRef).scalar() * 0.01), 0.0001);
+                assertEquals(approxGradientB, gradient0.get(yRef).scalar(), epsB);
 
-                point[1] += stepSize;
+                point.put(yRef, point.get(yRef).plus(stepSize));
             }
 
-            point[0] += stepSize;
-            point[1] = bottomLeft[1];
+            point.put(xRef, point.get(xRef).plus(stepSize));
+            point.put(yRef, bottomLeft.get(yRef));
         }
 
+    }
+
+    private Map<VariableReference, DoubleTensor> copyPoint(Map<VariableReference, DoubleTensor> point) {
+        return point.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().duplicate()));
     }
 
 }

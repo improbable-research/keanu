@@ -61,8 +61,8 @@ public class GradientOptimizer implements Optimizer {
      */
     private UpdateFormula updateFormula;
 
-    private final List<BiConsumer<double[], double[]>> onGradientCalculations = new ArrayList<>();
-    private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
+    private final List<BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>>> onGradientCalculations = new ArrayList<>();
+    private final List<BiConsumer<Map<VariableReference, DoubleTensor>, Double>> onFitnessCalculations = new ArrayList<>();
 
     /**
      * Adds a callback to be called whenever the optimizer evaluates the gradient at a point.
@@ -71,7 +71,7 @@ public class GradientOptimizer implements Optimizer {
      *                                   The double[] argument to the handler represents the point being evaluated.
      *                                   The double[] argument to the handler represents the gradient of that point.
      */
-    public void addGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
+    public void addGradientCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> gradientCalculationHandler) {
         this.onGradientCalculations.add(gradientCalculationHandler);
     }
 
@@ -81,28 +81,28 @@ public class GradientOptimizer implements Optimizer {
      *
      * @param gradientCalculationHandler the function to be removed from the list of gradient evaluation callbacks
      */
-    public void removeGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
+    public void removeGradientCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> gradientCalculationHandler) {
         this.onGradientCalculations.remove(gradientCalculationHandler);
     }
 
-    private void handleGradientCalculation(double[] point, double[] gradients) {
-        for (BiConsumer<double[], double[]> gradientCalculationHandler : onGradientCalculations) {
+    private void handleGradientCalculation(Map<VariableReference, DoubleTensor> point, Map<? extends VariableReference, DoubleTensor> gradients) {
+        for (BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> gradientCalculationHandler : onGradientCalculations) {
             gradientCalculationHandler.accept(point, gradients);
         }
     }
 
     @Override
-    public void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
+    public void addFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler) {
         this.onFitnessCalculations.add(fitnessCalculationHandler);
     }
 
     @Override
-    public void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
+    public void removeFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler) {
         this.onFitnessCalculations.remove(fitnessCalculationHandler);
     }
 
-    private void handleFitnessCalculation(double[] point, Double fitness) {
-        for (BiConsumer<double[], Double> fitnessCalculationHandler : onFitnessCalculations) {
+    private void handleFitnessCalculation(Map<VariableReference, DoubleTensor> point, Double fitness) {
+        for (BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler : onFitnessCalculations) {
             fitnessCalculationHandler.accept(point, fitness);
         }
     }
@@ -145,8 +145,13 @@ public class GradientOptimizer implements Optimizer {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
-        ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction);
-        ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunctionGradient);
+        ObjectiveFunction fitness = new ObjectiveFunction(
+            new ApacheFitnessFunctionAdaptor(fitnessFunction, probabilisticWithGradientGraph)
+        );
+
+        ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(
+            new ApacheFitnessFunctionGradientAdaptor(fitnessFunctionGradient, probabilisticWithGradientGraph)
+        );
 
         double[] startingPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticWithGradientGraph.getLatentVariables()));
 

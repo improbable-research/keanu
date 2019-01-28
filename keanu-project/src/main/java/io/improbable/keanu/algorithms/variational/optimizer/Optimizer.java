@@ -22,7 +22,7 @@ public interface Optimizer {
      *                                  The double[] argument to the handler represents the point being evaluated.
      *                                  The Double argument to the handler represents the fitness of that point.
      */
-    void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
+    void addFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler);
 
     /**
      * Removes a callback function that previously would have been called whenever the optimizer
@@ -30,7 +30,7 @@ public interface Optimizer {
      *
      * @param fitnessCalculationHandler the function to be removed from the list of fitness evaluation callbacks
      */
-    void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
+    void removeFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler);
 
     /**
      * This will use MAP estimation to optimize the values of latent vertices such that the
@@ -118,7 +118,7 @@ public interface Optimizer {
     static ProgressBar createFitnessProgressBar(final Optimizer optimizerThatNeedsProgressBar) {
         AtomicInteger evalCount = new AtomicInteger(0);
         ProgressBar progressBar = new ProgressBar();
-        BiConsumer<double[], Double> progressBarFitnessCalculationHandler = (position, logProb) -> {
+        BiConsumer<Map<VariableReference, DoubleTensor>, Double> progressBarFitnessCalculationHandler = (position, logProb) -> {
             progressBar.progress(
                 String.format("Fitness Evaluation #%d LogProb: %.2f", evalCount.incrementAndGet(), logProb)
             );
