@@ -1,4 +1,5 @@
 ### Version 0.0.19 ###
 
+Added optional param "label" in Vertex kwarg in Python (e.g. Gaussian(0., 1., label="gaussian"))
 Added a permute vertex
 Added the release notes text file to the repo
