@@ -76,4 +76,4 @@ def test_predicate_must_be_boolean() -> None:
     with pytest.raises(TypeError) as excinfo:
         If(1, 1, 1)
 
-    assert str(excinfo.value) == "Predicate must be boolean: got keanu.vertex.base.Integer"
+    assert str(excinfo.value) == "Predicate must be boolean: got <class 'int'>"

@@ -1,25 +1,21 @@
 from typing import Union
 
 from keanu.infer_type import get_type_of_value
-from .base import Boolean
-from .vertex_casting import do_inferred_vertex_cast
-from .base import Vertex, vertex_constructor_param_types
-from .generated import cast_to_vertex, BooleanIf, DoubleIf, IntegerIf, ConstantBoolean, ConstantInteger, ConstantDouble
-
 from keanu.vartypes import tensor_arg_types
+from .base import Vertex
+from .generated import BooleanIf, DoubleIf, IntegerIf
 
 
 def If(predicate: Union[tensor_arg_types, Vertex], thn: Union[tensor_arg_types, Vertex],
        els: Union[tensor_arg_types, Vertex]) -> Vertex:
-    predicate = cast_to_vertex(predicate)
-    thn = cast_to_vertex(thn)
-    els = cast_to_vertex(els)
 
-    if type(predicate) != Boolean:
+    predicate_type = get_type_of_value(predicate)
+    then_type = get_type_of_value(thn)
+    else_type = get_type_of_value(els)
+
+    if predicate_type != bool:
         raise TypeError("Predicate must be boolean: got {}".format(type(predicate)))
 
-    then_type = get_type_of_value(thn.get_value())
-    else_type = get_type_of_value(els.get_value())
     if (then_type != else_type):
         raise TypeError('The "then" and "else" clauses must be of the same datatype: {} vs {}'.format(
             then_type, else_type))
