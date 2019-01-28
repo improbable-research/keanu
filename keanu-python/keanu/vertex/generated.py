@@ -87,6 +87,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.PermuteVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex")
@@ -443,6 +444,10 @@ def MatrixDeterminant(vertex: vertex_constructor_param_types, **kwargs) -> Verte
 
 def MatrixInverse(input_vertex: vertex_constructor_param_types, **kwargs) -> Vertex:
     return Double(context.jvm_view().MatrixInverseVertex, cast_to_double_vertex(input_vertex), **kwargs)
+
+
+def Permute(input_vertex: vertex_constructor_param_types, rearrange: Collection[int], **kwargs) -> Vertex:
+    return Double(context.jvm_view().PermuteVertex, cast_to_double_vertex(input_vertex), cast_to_int_array(rearrange), **kwargs)
 
 
 def Reshape(input_vertex: vertex_constructor_param_types, proposed_shape: Collection[int], **kwargs) -> Vertex:
