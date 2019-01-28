@@ -1,10 +1,8 @@
 package io.improbable.keanu.e2e.regression;
 
-import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection;
 import io.improbable.keanu.algorithms.mcmc.RollbackAndCascadeOnRejection;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
@@ -14,12 +12,9 @@ import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.Vertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-
-import java.util.Collection;
 
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertSampledWeightsAndInterceptMatchTestData;
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertWeightsAndInterceptMatchTestData;

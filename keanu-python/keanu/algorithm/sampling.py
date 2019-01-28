@@ -9,11 +9,13 @@ from keanu.net import BayesNet, ProbabilisticModel, ProbabilisticModelWithGradie
 from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 from keanu.plots import traceplot
+from itertools import tee
 
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.MetropolisHastings")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.nuts.NUTS")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection")
 
 
 class PosteriorSamplingAlgorithm:
@@ -28,27 +30,28 @@ class PosteriorSamplingAlgorithm:
 class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
 
     def __init__(self,
-                 proposal_distribution: str = None,
-                 proposal_distribution_sigma: numpy_types = None,
-                 proposal_distribution_latents: Iterable[Vertex] = None,
+                 proposal_distribution: str,
+                 latents: Iterable[Vertex],
                  proposal_listeners=[],
-                 use_cache_on_rejection: bool = None):
+                 proposal_distribution_sigma: numpy_types = None):
 
         if (proposal_distribution is None and len(proposal_listeners) > 0):
             raise TypeError("If you pass in proposal_listeners you must also specify proposal_distribution")
 
         builder: JavaObject = k.jvm_view().MetropolisHastings.builder()
 
-        if proposal_distribution is not None:
-            proposal_distribution_object = ProposalDistribution(
-                type_=proposal_distribution,
-                sigma=proposal_distribution_sigma,
-                latents=proposal_distribution_latents,
-                listeners=proposal_listeners)
-            builder = builder.proposalDistribution(proposal_distribution_object.unwrap())
+        latents, latents_copy = tee(latents)
 
-        if use_cache_on_rejection is not None:
-            builder.useCacheOnRejection(use_cache_on_rejection)
+        proposal_distribution_object = ProposalDistribution(
+            type_=proposal_distribution,
+            sigma=proposal_distribution_sigma,
+            latents=latents_copy,
+            listeners=proposal_listeners)
+
+        rejection_strategy = k.jvm_view().RollBackToCachedValuesOnRejection(k.to_java_object_list(latents))
+
+        builder = builder.proposalDistribution(proposal_distribution_object.unwrap())
+        builder = builder.rejectionStrategy(rejection_strategy)
 
         super().__init__(builder.build())
 
@@ -91,9 +94,10 @@ def sample(net: BayesNet,
            plot: bool = False,
            ax: Any = None) -> sample_types:
 
+    sample_from, sample_from_copy = tee(sample_from)
+
     if sampling_algorithm is None:
-        sampling_algorithm = MetropolisHastingsSampler(
-            proposal_distribution="prior", proposal_distribution_latents=net.get_latent_or_observed_vertices())
+        sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from_copy)
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
@@ -124,9 +128,10 @@ def generate_samples(net: BayesNet,
                      refresh_every: int = 100,
                      ax: Any = None) -> sample_generator_types:
 
+    sample_from, sample_from_copy = tee(sample_from)
+
     if sampling_algorithm is None:
-        sampling_algorithm = MetropolisHastingsSampler(
-            proposal_distribution="prior", proposal_distribution_latents=net.get_latent_or_observed_vertices())
+        sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from_copy)
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
@@ -137,6 +142,7 @@ def generate_samples(net: BayesNet,
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
 
+    print(vertices_unwrapped)
     return _samples_generator(
         sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax)
 

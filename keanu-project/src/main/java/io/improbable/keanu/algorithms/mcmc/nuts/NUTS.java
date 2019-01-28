@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import com.google.common.base.Preconditions;
-
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.Statistics;
@@ -11,14 +10,9 @@ import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -27,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
 
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".

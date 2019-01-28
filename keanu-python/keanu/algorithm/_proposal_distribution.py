@@ -40,8 +40,6 @@ class ProposalDistribution(JavaObjectWrapper):
             if latents is None:
                 raise TypeError("Prior Proposal Distribution requires latent variables")
             args.append(k.to_java_object_list(latents))
-        elif latents is not None:
-            raise TypeError('Parameter latents is not valid unless type is "prior"')
 
         if len(listeners) > 0:
             args.append(k.to_java_object_list(listeners))

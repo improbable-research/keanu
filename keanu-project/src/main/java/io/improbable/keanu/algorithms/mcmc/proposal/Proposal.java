@@ -1,14 +1,11 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-import com.google.common.collect.Lists;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
