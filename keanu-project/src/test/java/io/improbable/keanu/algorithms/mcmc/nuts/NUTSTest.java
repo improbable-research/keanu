@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.MCMCTestDistributions;
+import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -11,6 +12,8 @@ import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -102,10 +105,10 @@ public class NUTSTest {
     @Test
     public void samplesContinuousPrior() {
 
-        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 18.0);
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 15.0);
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(bayesNet);
 
-        int sampleCount = 2000;
+        int sampleCount = 6000;
         NUTS nuts = NUTS.builder()
             .adaptCount(sampleCount)
             .maxTreeHeight(4)
@@ -170,5 +173,40 @@ public class NUTSTest {
         );
 
         assertFalse(posteriorSamples.get(A).asList().isEmpty());
+    }
+
+    @Category(Slow.class)
+    @Test
+    /**
+     * This test assumes the functional logic of NUTS has not been changed.
+     * It simply checks that the samples produced are identical to a previous build.
+     */
+    public void checksSamplesAgainstMagicNumbers() {
+        double mu = 0.0;
+        double sigma = 1.0;
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, random);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
+
+        NUTS nuts = NUTS.builder()
+            .adaptCount(5)
+            .random(random)
+            .targetAcceptanceProb(0.65)
+            .build();
+
+        NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
+            model,
+            model.getLatentVariables(),
+            5
+        );
+
+        Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
+
+        List<DoubleTensor> samples = posteriorSamples.get(vertex).asList();
+
+        Assert.assertEquals(3.0, samples.get(0).scalar(), 1e-9);
+        Assert.assertEquals(3.0, samples.get(1).scalar(), 1e-9);
+        Assert.assertEquals(0.9374092571432446, samples.get(2).scalar(), 1e-9);
+        Assert.assertEquals(0.05720950629236243, samples.get(3).scalar(), 1e-9);
+        Assert.assertEquals(0.33119352888492626, samples.get(4).scalar(), 1e-9);
     }
 }

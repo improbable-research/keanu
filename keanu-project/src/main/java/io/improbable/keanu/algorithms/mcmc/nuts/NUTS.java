@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import com.google.common.base.Preconditions;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.Statistics;
@@ -10,9 +11,14 @@ import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -107,7 +113,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
         Map<? extends VariableReference, DoubleTensor> gradient = model.logProbGradients();
 
-        double initialLogOfMasterP = model.logProb();
+        double initialLogOfMasterP = model.logProb(position);
 
         double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(
             position,
@@ -124,7 +130,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample((List<? extends Variable<Object, ?>>)sampleFromVariables));
+        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, startingSample);
 
         return new NUTSSampler(
             sampleFromVariables,
