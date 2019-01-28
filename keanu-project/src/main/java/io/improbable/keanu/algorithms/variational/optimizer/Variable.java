@@ -8,8 +8,6 @@ public interface Variable<VALUE, STATE extends VariableState> {
 
     VALUE getValue();
 
-    void setValue(VALUE value);
-
     long[] getShape();
 
     STATE getState();

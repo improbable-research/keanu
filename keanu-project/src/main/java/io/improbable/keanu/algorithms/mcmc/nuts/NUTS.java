@@ -124,8 +124,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        resetVariableValue(sampleFromVariables, position);
-
         Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, takeSample((List<? extends Variable<Object, ?>>)sampleFromVariables));
 
         return new NUTSSampler(
@@ -145,13 +143,5 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     public Statistics getStatistics() {
         return statistics;
     }
-
-    private static void resetVariableValue(List<? extends Variable> sampleFromVariables, Map<? extends VariableReference, DoubleTensor> previousPosition) {
-        for (Variable variable : sampleFromVariables) {
-            variable.setValue(previousPosition.get(variable.getReference()));
-        }
-    }
-
-
 
 }

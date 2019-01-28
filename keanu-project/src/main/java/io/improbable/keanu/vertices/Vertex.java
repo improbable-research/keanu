@@ -109,7 +109,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
      *
      * @param value the observed value
      */
-    @Override
     public void setValue(T value) {
         if (!state.isObserved()) {
             state = new VertexState<>(value, false);
