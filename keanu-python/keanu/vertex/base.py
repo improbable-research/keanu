@@ -233,13 +233,13 @@ class Integer(Vertex):
 
     def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
         if is_floating_type(other):
-            return kn.vertex.CastToDouble(self).__add__(other)
+            return kn.vertex.generated.CastToDouble(self).__add__(other)
         else:
             return kn.vertex.generated.IntegerAddition(self, other)
 
     def __radd__(self, other: vertex_operation_param_types) -> 'Vertex':
         if is_floating_type(other):
-            return kn.vertex.CastToDouble(self).__radd__(other)
+            return kn.vertex.generated.CastToDouble(self).__radd__(other)
         else:
             return kn.vertex.generated.IntegerAddition(other, self)
 
@@ -251,7 +251,7 @@ class Integer(Vertex):
 
     def __rsub__(self, other: vertex_operation_param_types) -> 'Vertex':
         if is_floating_type(other):
-            return kn.vertex.CastToDouble(self).__rsub__(other)
+            return kn.vertex.generated.CastToDouble(self).__rsub__(other)
         else:
             return kn.vertex.generated.IntegerDifference(other, self)
 
@@ -263,7 +263,7 @@ class Integer(Vertex):
 
     def __rmul__(self, other: vertex_operation_param_types) -> 'Vertex':
         if is_floating_type(other):
-            return kn.vertex.CastToDouble(self).__rmul__(other)
+            return kn.vertex.generated.CastToDouble(self).__rmul__(other)
         else:
             return kn.vertex.generated.IntegerMultiplication(other, self)
 
@@ -275,7 +275,7 @@ class Integer(Vertex):
 
     def __rpow__(self, other: vertex_operation_param_types) -> 'Vertex':
         if is_floating_type(other):
-            return kn.vertex.CastToDouble(self).__rpow__(other)
+            return kn.vertex.generated.CastToDouble(self).__rpow__(other)
         else:
             return kn.vertex.generated.IntegerPower(other, self)
 
