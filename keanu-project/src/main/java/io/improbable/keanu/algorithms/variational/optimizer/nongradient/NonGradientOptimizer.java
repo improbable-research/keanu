@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsDoubleTensors;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 /**
@@ -81,17 +81,24 @@ public class NonGradientOptimizer implements Optimizer {
         }
     }
 
-    private OptimizedResult optimize(FitnessFunctionSupplier fitnessFunctionSupplier) {
+    private OptimizedResult optimize(boolean useMLE) {
+        FitnessFunction fitnessFunction = new FitnessFunction(
+            probabilisticGraph,
+            useMLE,
+            this::handleFitnessCalculation
+        );
+
+        return optimize(fitnessFunction);
+    }
+
+    private OptimizedResult optimize(FitnessFunction fitnessFunction) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
-        double logProb = probabilisticGraph.logProb();
+        List<long[]> shapes = probabilisticGraph.getLatentVariables().stream()
+            .map(Variable::getShape)
+            .collect(toList());
 
-        if (ProbabilityCalculator.isImpossibleLogProb(logProb)) {
-            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
-        }
-
-        List<long[]> shapes = probabilisticGraph.getLatentVariables().stream().map(Variable::getShape).collect(Collectors.toList());
         BOBYQAOptimizer optimizer = new BOBYQAOptimizer(
             getNumInterpolationPoints(shapes),
             initialTrustRegionRadius,
@@ -100,7 +107,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         double[] startPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticGraph.getLatentVariables()));
 
-        double initialFitness = fitnessFunctionSupplier.getFitnessFunction().value(startPoint);
+        double initialFitness = fitnessFunction.value(startPoint);
 
         if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
@@ -111,7 +118,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
-            new ObjectiveFunction(fitnessFunctionSupplier.getFitnessFunction()),
+            new ObjectiveFunction(fitnessFunction),
             bounds,
             MAXIMIZE,
             new InitialGuess(startPoint)
@@ -131,20 +138,12 @@ public class NonGradientOptimizer implements Optimizer {
 
     @Override
     public OptimizedResult maxAPosteriori() {
-        return optimize(new FitnessFunctionSupplier(
-            probabilisticGraph,
-            false,
-            this::handleFitnessCalculation
-        ));
+        return optimize(false);
     }
 
     @Override
     public OptimizedResult maxLikelihood() {
-        return optimize(new FitnessFunctionSupplier(
-            probabilisticGraph,
-            true,
-            this::handleFitnessCalculation
-        ));
+        return optimize(true);
     }
 
     public static class NonGradientOptimizerBuilder {

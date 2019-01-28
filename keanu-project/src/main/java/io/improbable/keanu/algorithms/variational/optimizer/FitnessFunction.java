@@ -12,7 +12,7 @@ import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.con
 @AllArgsConstructor
 public class FitnessFunction implements MultivariateFunction {
 
-    private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+    private final ProbabilisticGraph probabilisticGraph;
     private final boolean useLikelihood;
 
     private final BiConsumer<double[], Double> onFitnessCalculation;
@@ -23,8 +23,8 @@ public class FitnessFunction implements MultivariateFunction {
         Map<VariableReference, DoubleTensor> values = getValues(point);
 
         double logOfTotalProbability = useLikelihood ?
-            probabilisticWithGradientGraph.logLikelihood(values) :
-            probabilisticWithGradientGraph.logProb(values);
+            probabilisticGraph.logLikelihood(values) :
+            probabilisticGraph.logProb(values);
 
         if (onFitnessCalculation != null) {
             onFitnessCalculation.accept(point, logOfTotalProbability);
@@ -34,6 +34,6 @@ public class FitnessFunction implements MultivariateFunction {
     }
 
     private Map<VariableReference, DoubleTensor> getValues(double[] point) {
-        return convertFromPoint(point, probabilisticWithGradientGraph.getLatentVariables());
+        return convertFromPoint(point, probabilisticGraph.getLatentVariables());
     }
 }
