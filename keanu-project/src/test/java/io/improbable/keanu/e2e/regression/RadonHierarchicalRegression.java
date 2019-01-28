@@ -2,8 +2,8 @@ package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.NonLinearConjugateGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.NonLinearConjugateGradient;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.network.BayesianNetwork;
