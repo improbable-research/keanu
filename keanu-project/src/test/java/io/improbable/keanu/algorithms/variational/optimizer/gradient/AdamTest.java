@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class AdamOptimizerTest {
+public class AdamTest {
 
     @Test
     public void canOptimizeSingleGaussianNetwork() {
@@ -22,7 +22,7 @@ public class AdamOptimizerTest {
 
         GradientOptimizer optimizer = GradientOptimizer.builder()
             .bayesianNetwork(model)
-            .algorithm(AdamOptimizer.builder().build())
+            .algorithm(Adam.builder().build())
             .build();
 
         OptimizedResult result = optimizer.maxAPosteriori();
@@ -41,7 +41,7 @@ public class AdamOptimizerTest {
 
         GradientOptimizer optimizer = GradientOptimizer.builder()
             .bayesianNetwork(model)
-            .algorithm(AdamOptimizer.builder()
+            .algorithm(Adam.builder()
                 .alpha(0.1)
                 .build())
             .build();
@@ -61,7 +61,7 @@ public class AdamOptimizerTest {
         MutableInt i = new MutableInt(0);
         GradientOptimizer optimizer = GradientOptimizer.builder()
             .bayesianNetwork(model)
-            .algorithm(AdamOptimizer.builder()
+            .algorithm(Adam.builder()
                 .alpha(0.1)
                 .convergenceChecker((gradient, theta, thetaNext) -> i.incrementAndGet() == 10)
                 .build())
@@ -84,7 +84,7 @@ public class AdamOptimizerTest {
 
         GradientOptimizer optimizer = GradientOptimizer.builder()
             .bayesianNetwork(model)
-            .algorithm(AdamOptimizer.builder().build())
+            .algorithm(Adam.builder().build())
             .build();
 
         MutableInt callCount = new MutableInt(0);

@@ -3,12 +3,14 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 import io.improbable.keanu.algorithms.variational.optimizer.*;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleValueChecker;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
+import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 
 import java.util.List;
 import java.util.Map;
@@ -20,19 +22,19 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 /**
  * Backed by Apache Math org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer
  */
-public class NonLinearConjugateGradientOptimizer implements GradientOptimizationAlgorithm {
+public class NonLinearConjugateGradient implements GradientOptimizationAlgorithm {
 
     public static ApacheNonLinearConjugateGradientOptimizerBuilder builder() {
         return new ApacheNonLinearConjugateGradientOptimizerBuilder();
     }
 
     public enum UpdateFormula {
-        POLAK_RIBIERE(org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE),
-        FLETCHER_REEVES(org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer.Formula.FLETCHER_REEVES);
+        POLAK_RIBIERE(NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE),
+        FLETCHER_REEVES(NonLinearConjugateGradientOptimizer.Formula.FLETCHER_REEVES);
 
-        org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer.Formula apacheMapping;
+        NonLinearConjugateGradientOptimizer.Formula apacheMapping;
 
-        UpdateFormula(org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer.Formula apacheMapping) {
+        UpdateFormula(NonLinearConjugateGradientOptimizer.Formula apacheMapping) {
             this.apacheMapping = apacheMapping;
         }
     }
@@ -61,11 +63,11 @@ public class NonLinearConjugateGradientOptimizer implements GradientOptimization
             new ApacheFitnessFunctionGradientAdaptor(fitnessFunctionGradient, latentVariables)
         );
 
-        double[] startingPoint = Optimizer.convertToPoint(getAsDoubleTensors(latentVariables));
+        double[] startingPoint = Optimizer.convertToArrayPoint(getAsDoubleTensors(latentVariables));
 
-        org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer optimizer;
+        NonLinearConjugateGradientOptimizer optimizer;
 
-        optimizer = new org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer(
+        optimizer = new NonLinearConjugateGradientOptimizer(
             updateFormula.apacheMapping,
             new SimpleValueChecker(relativeThreshold, absoluteThreshold)
         );
@@ -84,6 +86,7 @@ public class NonLinearConjugateGradientOptimizer implements GradientOptimization
         return new OptimizedResult(optimizedValues, pointValuePair.getValue());
     }
 
+    @ToString
     public static class ApacheNonLinearConjugateGradientOptimizerBuilder {
 
         private int maxEvaluations = Integer.MAX_VALUE;
@@ -114,12 +117,12 @@ public class NonLinearConjugateGradientOptimizer implements GradientOptimization
             return this;
         }
 
-        public NonLinearConjugateGradientOptimizer build() {
-            return new NonLinearConjugateGradientOptimizer(maxEvaluations, relativeThreshold, absoluteThreshold, updateFormula);
+        public NonLinearConjugateGradient build() {
+            return new NonLinearConjugateGradient(maxEvaluations, relativeThreshold, absoluteThreshold, updateFormula);
         }
 
         public String toString() {
-            return "NonLinearConjugateGradientOptimizer.ApacheNonLinearConjugateGradientOptimizerBuilder(maxEvaluations=" + this.maxEvaluations + ", relativeThreshold=" + this.relativeThreshold + ", absoluteThreshold=" + this.absoluteThreshold + ", updateFormula=" + this.updateFormula + ")";
+            return "NonLinearConjugateGradient.ApacheNonLinearConjugateGradientOptimizerBuilder(maxEvaluations=" + this.maxEvaluations + ", relativeThreshold=" + this.relativeThreshold + ", absoluteThreshold=" + this.absoluteThreshold + ", updateFormula=" + this.updateFormula + ")";
         }
     }
 }

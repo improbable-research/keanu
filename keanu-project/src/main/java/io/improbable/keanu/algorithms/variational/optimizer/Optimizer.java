@@ -50,7 +50,7 @@ public interface Optimizer {
      */
     OptimizedResult maxLikelihood();
 
-    static double[] convertToPoint(List<? extends Variable<? extends NumberTensor>> latentVariables) {
+    static double[] convertToArrayPoint(List<? extends Variable<? extends NumberTensor>> latentVariables) {
 
         List<long[]> shapes = latentVariables.stream().map(Variable::getShape).collect(Collectors.toList());
 
@@ -70,6 +70,19 @@ public interface Optimizer {
         }
 
         return point;
+    }
+
+    static Map<VariableReference, DoubleTensor> convertToMapPoint(List<? extends Variable> variables) {
+        return variables.stream()
+            .collect(Collectors.toMap(Variable::getReference, v -> {
+                if (v.getValue() instanceof DoubleTensor) {
+                    return (DoubleTensor) v.getValue();
+                } else {
+                    throw new UnsupportedOperationException(
+                        "Optimization unsupported on networks containing discrete latents. " +
+                            "Discrete latent : " + v.getReference() + " found.");
+                }
+            }));
     }
 
     static Map<VariableReference, DoubleTensor> convertFromPoint(double[] point, List<? extends Variable> latentVariables) {

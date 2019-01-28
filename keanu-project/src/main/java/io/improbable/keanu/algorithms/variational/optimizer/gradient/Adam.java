@@ -4,6 +4,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.*;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,14 +14,14 @@ import java.util.Map;
  * Implemented as described in https://arxiv.org/pdf/1412.6980.pdf
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class AdamOptimizer implements GradientOptimizationAlgorithm {
+public class Adam implements GradientOptimizationAlgorithm {
 
     public interface ConvergenceChecker {
         boolean hasConverged(DoubleTensor[] gradient, DoubleTensor[] theta, DoubleTensor[] thetaNext);
     }
 
-    public static AdamOptimizerBuilder builder() {
-        return new AdamOptimizerBuilder();
+    public static AdamBuilder builder() {
+        return new AdamBuilder();
     }
 
     private final ConvergenceChecker convergenceChecker;
@@ -137,49 +138,50 @@ public class AdamOptimizer implements GradientOptimizationAlgorithm {
         return (gradient, theta, thetaNext) -> magnitudeDelta(theta, thetaNext) < minThetaDelta;
     }
 
-    public static class AdamOptimizerBuilder {
-        private ConvergenceChecker convergenceChecker = AdamOptimizer.thetaDeltaMagnitude(1e-6);
+    @ToString
+    public static class AdamBuilder {
+        private ConvergenceChecker convergenceChecker = Adam.thetaDeltaMagnitude(1e-6);
 
         private double alpha = 0.001;
         private double beta1 = 0.9;
         private double beta2 = 0.999;
         private double epsilon = 1e-8;
 
-        AdamOptimizerBuilder() {
+        AdamBuilder() {
         }
 
-        public AdamOptimizerBuilder convergenceChecker(ConvergenceChecker convergenceChecker) {
+        public AdamBuilder convergenceChecker(ConvergenceChecker convergenceChecker) {
             this.convergenceChecker = convergenceChecker;
             return this;
         }
 
-        public AdamOptimizerBuilder useMaxThetaDeltaConvergenceChecker(double maxThetaDelta) {
-            this.convergenceChecker = AdamOptimizer.thetaDeltaMagnitude(maxThetaDelta);
+        public AdamBuilder useMaxThetaDeltaConvergenceChecker(double maxThetaDelta) {
+            this.convergenceChecker = Adam.thetaDeltaMagnitude(maxThetaDelta);
             return this;
         }
 
-        public AdamOptimizerBuilder alpha(double alpha) {
+        public AdamBuilder alpha(double alpha) {
             this.alpha = alpha;
             return this;
         }
 
-        public AdamOptimizerBuilder beta1(double beta1) {
+        public AdamBuilder beta1(double beta1) {
             this.beta1 = beta1;
             return this;
         }
 
-        public AdamOptimizerBuilder beta2(double beta2) {
+        public AdamBuilder beta2(double beta2) {
             this.beta2 = beta2;
             return this;
         }
 
-        public AdamOptimizerBuilder epsilon(double epsilon) {
+        public AdamBuilder epsilon(double epsilon) {
             this.epsilon = epsilon;
             return this;
         }
 
-        public AdamOptimizer build() {
-            return new AdamOptimizer(convergenceChecker, alpha, beta1, beta2, epsilon);
+        public Adam build() {
+            return new Adam(convergenceChecker, alpha, beta1, beta2, epsilon);
         }
     }
 }

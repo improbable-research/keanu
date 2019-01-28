@@ -1,8 +1,9 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.AdamOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.Adam;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.NonLinearConjugateGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SingleGaussianTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SumGaussianTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
@@ -41,14 +42,26 @@ public class OptimizerTest {
 
             return GradientOptimizer.builder()
                 .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
-                .algorithm(AdamOptimizer.builder()
+                .algorithm(Adam.builder()
                     .alpha(0.1)
                     .build()
                 ).build();
         }),
 
-        APACHE_GRADIENT(KeanuOptimizer.Gradient::of),
-        APACHE_BOBYQA(KeanuOptimizer.NonGradient::of);
+        NONLINEAR_CONJUGATE_GRADIENT(bayesianNetwork -> {
+            return GradientOptimizer.builder()
+                .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
+                .algorithm(NonLinearConjugateGradient.builder().build()
+                ).build();
+        }),
+
+        BOBYQA(bayesianNetwork -> {
+            return NonGradientOptimizer.builder()
+                .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
+                .algorithm(io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA.builder()
+                    .build()
+                ).build();
+        });
 
         Function<BayesianNetwork, Optimizer> getOptimizer;
     }

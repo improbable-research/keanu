@@ -6,21 +6,12 @@ import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import org.apache.commons.math3.optim.InitialGuess;
-import org.apache.commons.math3.optim.MaxEval;
-import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.SimpleBounds;
-import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-
-import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsDoubleTensors;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 /**
  * This class can be used to construct a BOBYQA non-gradient optimizer.
@@ -33,31 +24,9 @@ public class NonGradientOptimizer implements Optimizer {
 
     private final ProbabilisticGraph probabilisticGraph;
 
-    /**
-     * maxEvaluations the maximum number of objective function evaluations before throwing an exception
-     * indicating convergence failure.
-     */
-    private int maxEvaluations;
+    private final NonGradientOptimizationAlgorithm nonGradientOptimizationAlgorithm;
 
-    /**
-     * bounding box around starting point
-     */
-    private final double boundsRange;
-
-    /**
-     * bounds for each specific continuous latent vertex
-     */
-    private final OptimizerBounds optimizerBounds;
-
-    /**
-     * radius around region to start testing points
-     */
-    private final double initialTrustRegionRadius;
-
-    /**
-     * stopping trust region radius
-     */
-    private final double stoppingTrustRegionRadius;
+    private final boolean checkInitialFitnessConditions;
 
     private final List<BiConsumer<Map<VariableReference, DoubleTensor>, Double>> onFitnessCalculations = new ArrayList<>();
 
@@ -97,49 +66,21 @@ public class NonGradientOptimizer implements Optimizer {
 
         List<? extends Variable> latentVariables = probabilisticGraph.getLatentVariables();
 
-        List<long[]> shapes = latentVariables.stream()
-            .map(Variable::getShape)
-            .collect(toList());
+        if (checkInitialFitnessConditions) {
+            Map<VariableReference, DoubleTensor> startingPoint = Optimizer.convertToMapPoint(latentVariables);
 
-        BOBYQAOptimizer optimizer = new BOBYQAOptimizer(
-            getNumInterpolationPoints(shapes),
-            initialTrustRegionRadius,
-            stoppingTrustRegionRadius
-        );
+            double initialFitness = fitnessFunction.value(startingPoint);
 
-        ObjectiveFunction fitness = new ObjectiveFunction(
-            new ApacheFitnessFunctionAdaptor(fitnessFunction, latentVariables)
-        );
-
-        double[] startPoint = Optimizer.convertToPoint(getAsDoubleTensors(latentVariables));
-
-        double initialFitness = fitness.getObjectiveFunction().value(startPoint);
-
-        if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
-            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
+            if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
+                throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
+            }
         }
 
-        ApacheMathSimpleBoundsCalculator boundsCalculator = new ApacheMathSimpleBoundsCalculator(boundsRange, optimizerBounds);
-        SimpleBounds bounds = boundsCalculator.getBounds(latentVariables, startPoint);
-
-        PointValuePair pointValuePair = optimizer.optimize(
-            new MaxEval(maxEvaluations),
-            fitness,
-            bounds,
-            MAXIMIZE,
-            new InitialGuess(startPoint)
-        );
+        OptimizedResult result = nonGradientOptimizationAlgorithm.optimize(latentVariables, fitnessFunction);
 
         progressBar.finish();
 
-        Map<VariableReference, DoubleTensor> optimizedValues = Optimizer
-            .convertFromPoint(pointValuePair.getPoint(), latentVariables);
-
-        return new OptimizedResult(optimizedValues, pointValuePair.getValue());
-    }
-
-    private int getNumInterpolationPoints(List<long[]> latentVariableShapes) {
-        return (int) (2 * Optimizer.totalNumberOfLatentDimensions(latentVariableShapes) + 1);
+        return result;
     }
 
     @Override
@@ -152,47 +93,30 @@ public class NonGradientOptimizer implements Optimizer {
         return optimize(true);
     }
 
+    @ToString
     public static class NonGradientOptimizerBuilder {
 
         private ProbabilisticGraph probabilisticGraph;
 
-        private int maxEvaluations = Integer.MAX_VALUE;
-        private double boundsRange = Double.POSITIVE_INFINITY;
-        private OptimizerBounds optimizerBounds = new OptimizerBounds();
-        private double initialTrustRegionRadius = BOBYQAOptimizer.DEFAULT_INITIAL_RADIUS;
-        private double stoppingTrustRegionRadius = BOBYQAOptimizer.DEFAULT_STOPPING_RADIUS;
+        private NonGradientOptimizationAlgorithm nonGradientOptimizationAlgorithm = BOBYQA.builder().build();
+
+        private boolean checkInitialFitnessConditions;
 
         NonGradientOptimizerBuilder() {
         }
-
 
         public NonGradientOptimizerBuilder bayesianNetwork(ProbabilisticGraph probabilisticGraph) {
             this.probabilisticGraph = probabilisticGraph;
             return this;
         }
 
-        public NonGradientOptimizerBuilder maxEvaluations(int maxEvaluations) {
-            this.maxEvaluations = maxEvaluations;
+        public NonGradientOptimizerBuilder algorithm(NonGradientOptimizationAlgorithm nonGradientOptimizationAlgorithm) {
+            this.nonGradientOptimizationAlgorithm = nonGradientOptimizationAlgorithm;
             return this;
         }
 
-        public NonGradientOptimizerBuilder boundsRange(double boundsRange) {
-            this.boundsRange = boundsRange;
-            return this;
-        }
-
-        public NonGradientOptimizerBuilder optimizerBounds(OptimizerBounds optimizerBounds) {
-            this.optimizerBounds = optimizerBounds;
-            return this;
-        }
-
-        public NonGradientOptimizerBuilder initialTrustRegionRadius(double initialTrustRegionRadius) {
-            this.initialTrustRegionRadius = initialTrustRegionRadius;
-            return this;
-        }
-
-        public NonGradientOptimizerBuilder stoppingTrustRegionRadius(double stoppingTrustRegionRadius) {
-            this.stoppingTrustRegionRadius = stoppingTrustRegionRadius;
+        public NonGradientOptimizerBuilder checkInitialFitnessConditions(boolean check) {
+            this.checkInitialFitnessConditions = check;
             return this;
         }
 
@@ -202,16 +126,9 @@ public class NonGradientOptimizer implements Optimizer {
             }
             return new NonGradientOptimizer(
                 probabilisticGraph,
-                maxEvaluations,
-                boundsRange,
-                optimizerBounds,
-                initialTrustRegionRadius,
-                stoppingTrustRegionRadius
+                nonGradientOptimizationAlgorithm,
+                checkInitialFitnessConditions
             );
-        }
-
-        public String toString() {
-            return "NonGradientOptimizer.NonGradientOptimizerBuilder(probabilisticGraph=" + this.probabilisticGraph + ", maxEvaluations=" + this.maxEvaluations + ", boundsRange=" + this.boundsRange + ", optimizerBounds=" + this.optimizerBounds + ", initialTrustRegionRadius=" + this.initialTrustRegionRadius + ", stoppingTrustRegionRadius=" + this.stoppingTrustRegionRadius + ")";
         }
     }
 }

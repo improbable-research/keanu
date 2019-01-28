@@ -152,7 +152,6 @@ public class KeanuOptimizer {
         }
     }
 
-
     void initializeNetworkForOptimization(BayesianNetwork bayesianNetwork) {
         List<Vertex> discreteLatentVertices = bayesianNetwork.getDiscreteLatentVertices();
         boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();

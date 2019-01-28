@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class GradientOptimizer implements Optimizer {
@@ -114,7 +113,7 @@ public class GradientOptimizer implements Optimizer {
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
         if (checkInitialFitnessConditions) {
-            Map<VariableReference, DoubleTensor> startingPoint = getPoint(probabilisticWithGradientGraph.getLatentVariables());
+            Map<VariableReference, DoubleTensor> startingPoint = Optimizer.convertToMapPoint(probabilisticWithGradientGraph.getLatentVariables());
 
             double initialFitness = fitnessFunction.value(startingPoint);
 
@@ -137,19 +136,6 @@ public class GradientOptimizer implements Optimizer {
         return result;
     }
 
-    private Map<VariableReference, DoubleTensor> getPoint(List<? extends Variable> variables) {
-        return variables.stream()
-            .collect(Collectors.toMap(Variable::getReference, v -> {
-                if (v.getValue() instanceof DoubleTensor) {
-                    return (DoubleTensor) v.getValue();
-                } else {
-                    throw new UnsupportedOperationException(
-                        "Optimization unsupported on networks containing discrete latents. " +
-                            "Discrete latent : " + v.getReference() + " found.");
-                }
-            }));
-    }
-
     private static void warnIfGradientIsFlat(Map<? extends VariableReference, DoubleTensor> gradient) {
         double maxGradient = gradient.values().stream()
             .flatMap(v -> Arrays.stream(v.asFlatDoubleArray()).boxed())
@@ -163,7 +149,7 @@ public class GradientOptimizer implements Optimizer {
     public static class GradientOptimizerBuilder {
 
         private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
-        private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = NonLinearConjugateGradientOptimizer.builder().build();
+        private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = NonLinearConjugateGradient.builder().build();
         private boolean checkInitialFitnessConditions = true;
 
         GradientOptimizerBuilder() {
