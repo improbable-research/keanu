@@ -23,7 +23,9 @@ class JavaObjectWrapper:
     def __check_if_snake_case(self, k: str) -> None:
         snake_case_name = _to_snake_case_name(k)
         if k != snake_case_name:
-            raise AttributeError("{} has no attribute {}. Did you mean {}?".format(self.__class__, k, snake_case_name))
+            raise AttributeError(
+                "{} has no attribute {}. Make sure the attribute is in snake case. Did you mean {}?".format(
+                    self.__class__, k, snake_case_name))
 
     def __check_if_unwrapped(self, k: str) -> None:
         if _to_snake_case_name(k) == "_get_object_id":
