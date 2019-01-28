@@ -42,8 +42,7 @@ public class FitnessFunctionGradientTest {
         KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
 
         FitnessFunction fitness = new LogProbFitnessFunction(graph);
-        FitnessFunctionGradient fitnessGradient = new FitnessFunctionGradient(graph, false, (a, b) -> {
-        });
+        FitnessFunctionGradient fitnessGradient = new LogProbFitnessFunctionGradient(graph);
 
         assert2DGradientEqualsApproxGradient(
             A.getReference(), B.getReference(),
@@ -83,8 +82,7 @@ public class FitnessFunctionGradientTest {
         KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
 
         FitnessFunction fitness = new LogProbFitnessFunction(graph);
-        FitnessFunctionGradient fitnessGradient = new FitnessFunctionGradient(graph, false, (a, b) -> {
-        });
+        FitnessFunctionGradient fitnessGradient = new LogProbFitnessFunctionGradient(graph);
 
         assert2DGradientEqualsApproxGradient(
             A.getReference(), B.getReference(),
@@ -126,8 +124,7 @@ public class FitnessFunctionGradientTest {
 
         KeanuProbabilisticWithGradientGraph graph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(A.getConnectedGraph()));
         FitnessFunction fitness = new LogProbFitnessFunction(graph);
-        FitnessFunctionGradient fitnessGradient = new FitnessFunctionGradient(graph, false, (a, b) -> {
-        });
+        FitnessFunctionGradient fitnessGradient = new LogProbFitnessFunctionGradient(graph);
 
         assert2DGradientEqualsApproxGradient(
             A.getReference(), B.getReference(),

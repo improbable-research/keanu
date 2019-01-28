@@ -94,23 +94,30 @@ public class GradientOptimizer implements Optimizer {
         assertHasLatents();
 
         FitnessFunction fitnessFunction;
+        FitnessFunctionGradient fitnessFunctionGradient;
+
         if (useMLE) {
             fitnessFunction = new LogLikelihoodFitnessFunction(
                 probabilisticWithGradientGraph,
                 this::handleFitnessCalculation
             );
+
+            fitnessFunctionGradient = new LogLikelihoodFitnessFunctionGradient(
+                probabilisticWithGradientGraph,
+                this::handleGradientCalculation
+            );
+
         } else {
             fitnessFunction = new LogProbFitnessFunction(
                 probabilisticWithGradientGraph,
                 this::handleFitnessCalculation
             );
-        }
 
-        FitnessFunctionGradient fitnessFunctionGradient = new FitnessFunctionGradient(
-            probabilisticWithGradientGraph,
-            useMLE,
-            this::handleGradientCalculation
-        );
+            fitnessFunctionGradient = new LogProbFitnessFunctionGradient(
+                probabilisticWithGradientGraph,
+                this::handleGradientCalculation
+            );
+        }
 
         return optimize(fitnessFunction, fitnessFunctionGradient);
     }

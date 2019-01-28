@@ -64,8 +64,11 @@ public class SumGaussianTestCase implements GradientOptimizationAlgorithmTestCas
 
     @Override
     public FitnessFunctionGradient getFitnessFunctionGradient() {
-        return new FitnessFunctionGradient(model, useMLE, (a, b) -> {
-        });
+        if (useMLE) {
+            return new LogLikelihoodFitnessFunctionGradient(model);
+        } else {
+            return new LogProbFitnessFunctionGradient(model);
+        }
     }
 
     @Override
