@@ -1,4 +1,0 @@
-### Version 0.0.19 ###
-
-* Added the release notes text file to the repo
-* Added __version__ attribute to Python
