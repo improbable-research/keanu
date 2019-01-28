@@ -56,11 +56,7 @@ public class VertexLabel {
     }
 
     public Optional<String> getOuterNamespace() {
-        try {
-            return Optional.of(namespace.get(0));
-        } catch (IndexOutOfBoundsException e) {
-            return Optional.empty();
-        }
+        return namespace.stream().findFirst();
     }
 
     public String getUnqualifiedName() {
