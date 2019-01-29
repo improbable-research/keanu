@@ -4,10 +4,13 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class MultivariateGaussian implements ContinuousDistribution {
 
+    private static final double LOG_2_PI = Math.log(2 * Math.PI);
     private final DoubleTensor mu;
     private final DoubleTensor covariance;
 
@@ -33,7 +36,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         final double dimensions = numberOfDimensions();
-        final double kLog2Pi = dimensions * Math.log(2 * Math.PI);
+        final double kLog2Pi = dimensions * LOG_2_PI;
         final double logCovDet = Math.log(covariance.determinant());
         DoubleTensor xMinusMu = x.minus(mu);
         DoubleTensor xMinusMuT = xMinusMu.transpose();
@@ -46,8 +49,28 @@ public class MultivariateGaussian implements ContinuousDistribution {
         return DoubleTensor.scalar(-0.5 * (scalar + kLog2Pi + logCovDet));
     }
 
+    public static DoubleVertex logProbGraph(DoublePlaceholderVertex x, DoublePlaceholderVertex mu, DoublePlaceholderVertex covariance) {
+        final double dimensions = numberOfDimensions(mu);
+        final double kLog2Pi = dimensions * LOG_2_PI;
+        final DoubleVertex logCovDet = covariance.matrixDeterminant().log();
+        DoubleVertex xMinusMu = x.minus(mu);
+        DoubleVertex xMinusMuT = xMinusMu.permute(1, 0);
+        DoubleVertex covInv = covariance.matrixInverse();
+
+        boolean isUnivariate = dimensions == 1;
+        DoubleVertex scalar = isUnivariate ?
+            covInv.times(xMinusMu).times(xMinusMuT):
+            xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu));
+
+        return scalar.plus(kLog2Pi).plus(logCovDet).times(-0.5).slice(0, 0);
+    }
+
     private boolean isUnivariate() {
         return numberOfDimensions() == 1;
+    }
+
+    private static long numberOfDimensions(DoublePlaceholderVertex mu) {
+        return mu.getShape()[0];
     }
 
     private long numberOfDimensions() {
