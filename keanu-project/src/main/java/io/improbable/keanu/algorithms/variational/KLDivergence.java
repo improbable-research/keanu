@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.variational;
 
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;

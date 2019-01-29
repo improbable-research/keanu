@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasShape;

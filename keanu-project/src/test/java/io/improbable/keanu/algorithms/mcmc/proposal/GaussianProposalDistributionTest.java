@@ -2,10 +2,10 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;

@@ -8,8 +8,8 @@ from typing import Any, Iterator, Iterable
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.network.BayesianNetwork")
-java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel")
-java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModelWithGradient")
+java_import(k.jvm_view(), "io.improbable.keanu.network.KeanuProbabilisticModel")
+java_import(k.jvm_view(), "io.improbable.keanu.network.KeanuProbabilisticModelWithGradient")
 
 
 class BayesNet(JavaObjectWrapper):

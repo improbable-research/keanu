@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.GenericVertex;
 
 public abstract class BinaryOpVertex<A, B, C> extends GenericVertex<C> implements NonProbabilistic<C> {

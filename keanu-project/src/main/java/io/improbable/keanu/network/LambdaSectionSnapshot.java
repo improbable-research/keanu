@@ -1,6 +1,6 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.network;
 
-import io.improbable.keanu.network.LambdaSection;
+import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 

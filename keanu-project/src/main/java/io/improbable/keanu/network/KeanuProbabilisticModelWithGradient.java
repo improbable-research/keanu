@@ -1,6 +1,7 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.network;
 
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;

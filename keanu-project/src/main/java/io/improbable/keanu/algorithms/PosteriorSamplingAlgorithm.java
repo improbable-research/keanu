@@ -1,8 +1,6 @@
 package io.improbable.keanu.algorithms;
 
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 
 import java.util.Collections;
 import java.util.List;

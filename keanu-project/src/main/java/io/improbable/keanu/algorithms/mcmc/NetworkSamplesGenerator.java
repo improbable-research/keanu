@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.mcmc;
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.util.status.PercentageComponent;
 import io.improbable.keanu.util.status.RemainingTimeComponent;
 import io.improbable.keanu.util.status.StatusBar;

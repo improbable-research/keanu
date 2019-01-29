@@ -1,7 +1,7 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 
 import java.util.Map;
 import java.util.Set;

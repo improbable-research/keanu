@@ -1,12 +1,12 @@
 package io.improbable.keanu.algorithms.mcmc.initialconditions;
 
 import io.improbable.keanu.Keanu;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.List;

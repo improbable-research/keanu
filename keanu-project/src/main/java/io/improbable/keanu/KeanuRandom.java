@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl;
+package io.improbable.keanu;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.continuous.Laplace;

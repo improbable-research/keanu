@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.algorithms;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 

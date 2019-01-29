@@ -1,13 +1,13 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.ProbabilisticModel;
+import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.util.status.StatusBar;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Getter;
 import lombok.NonNull;
 

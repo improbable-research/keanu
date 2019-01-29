@@ -1,10 +1,10 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.grouping.NetworkStateGrouper;
 import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Test;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
-import io.improbable.keanu.algorithms.variational.optimizer.LambdaSectionSnapshot;
+import io.improbable.keanu.network.LambdaSectionSnapshot;
 import io.improbable.keanu.network.NetworkSnapshot;
 import io.improbable.keanu.vertices.Vertex;
 
