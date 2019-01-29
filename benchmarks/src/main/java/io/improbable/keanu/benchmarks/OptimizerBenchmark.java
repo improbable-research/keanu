@@ -4,7 +4,9 @@ import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWi
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.Adam;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.ConjugateGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.util.status.StatusBar;
@@ -15,10 +17,10 @@ import org.openjdk.jmh.annotations.*;
 public class OptimizerBenchmark {
 
     public enum OptimizerType {
-        ADAM, APACHE_GRADIENT, APACHE_NON_GRADIENT
+        ADAM_OPTIMIZER, CONJUGATE_GRADIENT, BOBYQA_OPTIMIZER
     }
 
-    @Param({"ADAM", "APACHE_GRADIENT", "APACHE_NON_GRADIENT"})
+    @Param({"ADAM_OPTIMIZER", "CONJUGATE_GRADIENT", "BOBYQA_OPTIMIZER"})
     public OptimizerType optimizerType;
 
     private Optimizer optimizer;
@@ -36,22 +38,27 @@ public class OptimizerBenchmark {
         C.observe(30.0);
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(A.getConnectedGraph());
+        KeanuProbabilisticWithGradientGraph gradientGraph = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
 
         switch (optimizerType) {
-            case ADAM:
+            case ADAM_OPTIMIZER:
                 optimizer = GradientOptimizer.builder()
-                    .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
-                    .algorithm(Adam.builder().build()).build();
-                break;
-
-            case APACHE_GRADIENT:
-                optimizer = GradientOptimizer.builder()
-                    .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
+                    .bayesianNetwork(gradientGraph)
+                    .algorithm(Adam.builder()
+                        .build())
                     .build();
                 break;
-            case APACHE_NON_GRADIENT:
+
+            case CONJUGATE_GRADIENT:
+                optimizer = GradientOptimizer.builder()
+                    .bayesianNetwork(gradientGraph)
+                    .algorithm(ConjugateGradient.builder().build())
+                    .build();
+                break;
+            case BOBYQA_OPTIMIZER:
                 optimizer = NonGradientOptimizer.builder()
-                    .bayesianNetwork(new KeanuProbabilisticWithGradientGraph(bayesianNetwork))
+                    .bayesianNetwork(gradientGraph)
+                    .algorithm(BOBYQA.builder().build())
                     .build();
                 break;
         }
@@ -59,7 +66,18 @@ public class OptimizerBenchmark {
 
     @Benchmark
     public OptimizedResult baseline() {
-        return optimizer.maxAPosteriori();
+        OptimizedResult result = optimizer.maxAPosteriori();
+
+        assertEquals(result.getOptimizedFitness(), -0.1496, 1e-2);
+
+        return result;
+    }
+
+    private void assertEquals(double optimizedFitness, double expected, double eps) {
+
+        if (Math.abs(optimizedFitness - expected) >= eps) {
+            throw new IllegalStateException(optimizedFitness + " not " + expected);
+        }
     }
 
 }

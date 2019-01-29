@@ -25,7 +25,7 @@ public class GradientOptimizationAlgorithmTest {
 
             return Adam.builder()
                 .alpha(0.1)
-                .useMaxThetaDeltaConvergenceChecker(0.00001)
+                .convergenceChecker(Adam.thetaDeltaMagnitude(0.00001))
                 .build();
         }),
 

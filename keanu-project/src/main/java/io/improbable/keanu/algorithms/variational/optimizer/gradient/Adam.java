@@ -45,21 +45,24 @@ public class Adam implements GradientOptimizationAlgorithm {
 
         int maxIterations = Integer.MAX_VALUE;
 
+        final Map<VariableReference, DoubleTensor> thetaMap = new HashMap<>();
+        final DoubleTensor[] gradients = new DoubleTensor[theta.length];
+
         while (!converged && t < maxIterations) {
             t++;
 
-            final DoubleTensor[] gradients = getGradients(theta, latentVariables, fitnessFunctionGradient);
+            updateGradients(theta, thetaMap, gradients, latentVariables, fitnessFunctionGradient);
 
             final double beta1T = (1 - Math.pow(beta1, t));
             final double beta2T = (1 - Math.pow(beta2, t));
             final double b = beta1T / Math.sqrt(beta2T);
 
-            for (int i = 0; i < gradients.length; i++) {
+            for (int i = 0; i < theta.length; i++) {
 
-                m[i] = m[i].times(beta1).plus(gradients[i].times(1 - beta1));
-                v[i] = v[i].times(beta2).plus(gradients[i].pow(2).times(1 - beta2));
+                m[i] = m[i].times(beta1).plusInPlace(gradients[i].times(1 - beta1));
+                v[i] = v[i].times(beta2).plusInPlace(gradients[i].pow(2).timesInPlace(1 - beta2));
 
-                thetaNext[i] = theta[i].plus(m[i].times(alpha).div(v[i].sqrt().times(b).plus(epsilon)));
+                thetaNext[i] = theta[i].plus(m[i].times(alpha).divInPlace(v[i].sqrt().timesInPlace(b).plusInPlace(epsilon)));
             }
 
             converged = convergenceChecker.hasConverged(gradients, theta, thetaNext);
@@ -69,19 +72,22 @@ public class Adam implements GradientOptimizationAlgorithm {
             thetaNext = temp;
         }
 
-        double logProb = fitnessFunction.value(toMap(theta, latentVariables));
+        double logProb = fitnessFunction.value(updateMap(theta, latentVariables, thetaMap));
 
-        return new OptimizedResult(toMap(theta, latentVariables), logProb);
+        return new OptimizedResult(updateMap(theta, latentVariables, thetaMap), logProb);
     }
 
-    private DoubleTensor[] getGradients(DoubleTensor[] theta,
-                                        List<? extends Variable> latentVariables,
-                                        FitnessFunctionGradient fitnessFunctionGradient) {
-        Map<VariableReference, DoubleTensor> thetaMap = toMap(theta, latentVariables);
+    private DoubleTensor[] updateGradients(DoubleTensor[] theta,
+                                           Map<VariableReference, DoubleTensor> thetaMap,
+                                           DoubleTensor[] gradients,
+                                           List<? extends Variable> latentVariables,
+                                           FitnessFunctionGradient fitnessFunctionGradient) {
+        updateMap(theta, latentVariables, thetaMap);
 
-        return toArray(
+        return updateArray(
             fitnessFunctionGradient.value(thetaMap),
-            latentVariables
+            latentVariables,
+            gradients
         );
     }
 
@@ -105,9 +111,10 @@ public class Adam implements GradientOptimizationAlgorithm {
         return zeros;
     }
 
-    private DoubleTensor[] toArray(Map<? extends VariableReference, DoubleTensor> lookup, List<? extends Variable> orderded) {
+    private DoubleTensor[] updateArray(Map<? extends VariableReference, DoubleTensor> lookup,
+                                       List<? extends Variable> orderded,
+                                       DoubleTensor[] array) {
 
-        DoubleTensor[] array = new DoubleTensor[orderded.size()];
         for (int i = 0; i < orderded.size(); i++) {
             array[i] = lookup.get(orderded.get(i).getReference());
         }
@@ -115,9 +122,10 @@ public class Adam implements GradientOptimizationAlgorithm {
         return array;
     }
 
-    private Map<VariableReference, DoubleTensor> toMap(DoubleTensor[] values, List<? extends Variable> orderded) {
+    private Map<VariableReference, DoubleTensor> updateMap(DoubleTensor[] values,
+                                                           List<? extends Variable> orderded,
+                                                           Map<VariableReference, DoubleTensor> asMap) {
 
-        Map<VariableReference, DoubleTensor> asMap = new HashMap<>();
         for (int i = 0; i < values.length; i++) {
             asMap.put(orderded.get(i).getReference(), values[i]);
         }
@@ -134,7 +142,7 @@ public class Adam implements GradientOptimizationAlgorithm {
         return Math.sqrt(magPow2);
     }
 
-    private static ConvergenceChecker thetaDeltaMagnitude(final double minThetaDelta) {
+    public static ConvergenceChecker thetaDeltaMagnitude(final double minThetaDelta) {
         return (gradient, theta, thetaNext) -> magnitudeDelta(theta, thetaNext) < minThetaDelta;
     }
 
@@ -152,11 +160,6 @@ public class Adam implements GradientOptimizationAlgorithm {
 
         public AdamBuilder convergenceChecker(ConvergenceChecker convergenceChecker) {
             this.convergenceChecker = convergenceChecker;
-            return this;
-        }
-
-        public AdamBuilder useMaxThetaDeltaConvergenceChecker(double maxThetaDelta) {
-            this.convergenceChecker = Adam.thetaDeltaMagnitude(maxThetaDelta);
             return this;
         }
 
