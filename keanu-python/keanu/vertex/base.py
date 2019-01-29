@@ -164,8 +164,6 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def __round__(self, ndigits: Optional[int] = 0) -> 'Vertex':
         if ndigits != 0:
             raise NotImplementedError("Keanu only supports rounding to 0 digits")
-        else:
-            return kn.vertex.generated.Round(self)
 
     def __floor__(self) -> 'Vertex':
         return kn.vertex.generated.Floor(self)
