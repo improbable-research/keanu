@@ -43,6 +43,22 @@ public class GeometricVertexTest {
     }
 
     @Test
+    public void meanAndStandardDeviationMatchExpected() {
+        double p = 0.4;
+
+        GeometricVertex myVertex = new GeometricVertex(new long[] {1, 200000}, p);
+        IntegerTensor samples = myVertex.sample();
+
+        double expectedMean = 1 / p;
+        double expectedStdDeviation = Math.sqrt((1 - p) / Math.pow(p, 2.0));
+        double actualMean = samples.toDouble().average();
+        double actualStdDeviation = samples.toDouble().standardDeviation();
+
+        assertEquals(expectedMean, actualMean, 1e-2);
+        assertEquals(expectedStdDeviation, actualStdDeviation, 1e-2);
+    }
+
+    @Test
     public void samplesMatchPMF() {
         double p = 0.2;
 

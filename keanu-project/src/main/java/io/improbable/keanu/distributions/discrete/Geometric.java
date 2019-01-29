@@ -19,8 +19,7 @@ public class Geometric implements DiscreteDistribution {
 
     @Override
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
-        DoubleTensor numerator = random.nextDouble(shape);
-        numerator = numerator.logInPlace();
+        DoubleTensor numerator = random.nextDouble(shape).logInPlace();
         DoubleTensor denominator = p.unaryMinus().plusInPlace(1.0).logInPlace();
 
         return numerator.divInPlace(denominator).floorInPlace().toInteger().plusInPlace(1);
