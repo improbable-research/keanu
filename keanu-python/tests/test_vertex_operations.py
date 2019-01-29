@@ -138,9 +138,13 @@ def test_can_do_less_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, nump
 
 ### Arithmetic
 
+# Included the identity lambda to test the interoperability between vertexes and np/primitive types
+types_to_test = [generated.ConstantDouble, generated.ConstantInteger, lambda x: x]
 
-def infer_result_type(lhs: Union[Vertex, numpy_types, float],
-                      rhs: Union[Vertex, numpy_types, float]) -> Type[vertex_types]:
+arithmetic_op_value_types = Union['np._ArrayLike[int]', int]
+
+
+def infer_result_type(lhs: Union[Vertex, numpy_types, int], rhs: Union[Vertex, numpy_types, int]) -> Type[vertex_types]:
     if is_floating_type(lhs) or is_floating_type(rhs):
         return Double
     else:
@@ -154,35 +158,31 @@ def result_should_be_vertex(lhs: Union[Vertex, numpy_types], rhs: Union[Vertex, 
         return False
 
 
-def assert_is_correct_vertex_type_and_expected_value(lhs: Union[Vertex, numpy_types, float],
-                                                     rhs: Union[Vertex, numpy_types], result: Any,
-                                                     expected_result: Any) -> None:
+def assert_is_correct_vertex_type_and_expected_value(lhs: Union[Vertex, numpy_types, int],
+                                                     rhs: Union[Vertex, numpy_types, int], result: Any,
+                                                     expected_result: arithmetic_op_value_types) -> None:
     assert isinstance(result, Vertex)
     assert type(result) == infer_result_type(lhs, rhs)
     assert (result.get_value() == expected_result).all()
-
-
-# Included the identity lambda to test the interoperability between vertexes and np/primitive types
-types_to_test = [generated.ConstantDouble, generated.ConstantInteger, lambda x: x]
 
 
 # yapf: disable
 @pytest.mark.parametrize("lhs_constructor", types_to_test)
 @pytest.mark.parametrize("rhs_constructor", types_to_test)
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (       np.array([10., 20.]),np.array([1., 2.]) , np.array([11, 22])),
-    (         np.array([10, 20]),                 2., np.array([12, 22])),
-    (                         2., np.array([10, 20]), np.array([12, 22])),
-    (                         2.,                 2.,                  4),
+    (         np.array([10, 20]), np.array([1, 2]) , np.array([11, 22])),
+    (         np.array([10, 20]),                 2, np.array([12, 22])),
+    (                          2,np.array([10, 20]), np.array([12, 22])),
+    (                          2,                 2,                  4),
 ])
 # yapf: enable
-def test_can_do_addition(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Union[Vertex, numpy_types],
-                         rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+def test_can_do_addition(lhs_constructor: Callable, rhs_constructor: Callable, lhs: arithmetic_op_value_types,
+                         rhs: arithmetic_op_value_types, expected_result: arithmetic_op_value_types) -> None:
     lhs_casted = lhs_constructor(lhs)
     rhs_casted = rhs_constructor(rhs)
 
     if result_should_be_vertex(lhs_casted, rhs_casted):
-        result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted + rhs_casted
+        result: arithmetic_op_value_types = lhs_casted + rhs_casted
         assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, expected_result)
 
         result = rhs_casted + lhs_casted
@@ -193,19 +193,19 @@ def test_can_do_addition(lhs_constructor: Callable, rhs_constructor: Callable, l
 @pytest.mark.parametrize("lhs_constructor", types_to_test)
 @pytest.mark.parametrize("rhs_constructor", types_to_test)
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (       np.array([10., 20.]),       np.array([1., 2.]),   np.array([9, 18])),
-    (       np.array([10., 20.]),                       2.,   np.array([8, 18])),
-    (                         2.,     np.array([10., 20.]), np.array([-8, -18])),
-    (                          3,                        2 ,                  1),
+    (       np.array([10, 20]),       np.array([1, 2]),   np.array([9, 18])),
+    (       np.array([10, 20]),                      2,   np.array([8, 18])),
+    (                        2,     np.array([10, 20]), np.array([-8, -18])),
+    (                        3,                      2,                   1),
 ])
 # yapf: enable
-def test_can_do_subtraction(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Vertex,
-                            rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+def test_can_do_subtraction(lhs_constructor: Callable, rhs_constructor: Callable, lhs: arithmetic_op_value_types,
+                            rhs: arithmetic_op_value_types, expected_result: arithmetic_op_value_types) -> None:
     lhs_casted = lhs_constructor(lhs)
     rhs_casted = rhs_constructor(rhs)
 
     if result_should_be_vertex(lhs_casted, rhs_casted):
-        result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted - rhs_casted
+        result: arithmetic_op_value_types = lhs_casted - rhs_casted
         assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, expected_result)
 
         result = rhs_casted - lhs_casted
@@ -216,19 +216,19 @@ def test_can_do_subtraction(lhs_constructor: Callable, rhs_constructor: Callable
 @pytest.mark.parametrize("lhs_constructor", types_to_test)
 @pytest.mark.parametrize("rhs_constructor", types_to_test)
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (      np.array([3., 2.]),       np.array([5., 7.]), np.array([15, 14])),
-    (        np.array([3, 2]),                       5 , np.array([15, 10])),
-    (                      5 ,         np.array([3, 2]), np.array([15, 10])),
-    (                       3,                        2,                  6),
+    (      np.array([3, 2]),       np.array([5, 7]), np.array([15, 14])),
+    (      np.array([3, 2]),                      5, np.array([15, 10])),
+    (                     5,       np.array([3, 2]), np.array([15, 10])),
+    (                     3,                       2,                  6),
 ])
 # yapf: enable
-def test_can_do_multiplication(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Vertex,
-                               rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+def test_can_do_multiplication(lhs_constructor: Callable, rhs_constructor: Callable, lhs: arithmetic_op_value_types,
+                               rhs: arithmetic_op_value_types, expected_result: arithmetic_op_value_types) -> None:
     lhs_casted = lhs_constructor(lhs)
     rhs_casted = rhs_constructor(rhs)
 
     if result_should_be_vertex(lhs_casted, rhs_casted):
-        result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted * rhs_casted
+        result: arithmetic_op_value_types = lhs_casted * rhs_casted
         assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, expected_result)
 
         result = rhs_casted * lhs_casted
@@ -245,8 +245,8 @@ def test_can_do_multiplication(lhs_constructor: Callable, rhs_constructor: Calla
     (                        15.,                       2.,                   7.5),
 ])
 # yapf: enable
-def test_can_do_division(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Vertex,
-                         rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+def test_can_do_division(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Union[numpy_types, float],
+                         rhs: Union[numpy_types, float], expected_result: Union[numpy_types, float]) -> None:
     lhs_casted = lhs_constructor(lhs)
     rhs_casted = rhs_constructor(rhs)
 
@@ -272,8 +272,8 @@ def test_can_do_division(lhs_constructor: Callable, rhs_constructor: Callable, l
     (                       15,                      2,                7),
 ])
 # yapf: enable
-def test_can_do_integer_division(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Vertex,
-                                 rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+def test_can_do_integer_division(lhs_constructor: Callable, rhs_constructor: Callable, lhs: arithmetic_op_value_types,
+                                 rhs: arithmetic_op_value_types, expected_result: arithmetic_op_value_types) -> None:
     lhs_casted = lhs_constructor(lhs)
     rhs_casted = rhs_constructor(rhs)
 
@@ -292,8 +292,8 @@ def test_can_do_integer_division(lhs_constructor: Callable, rhs_constructor: Cal
     (                    2,                     3,                 8),
 ])
 # yapf: enable
-def test_can_do_pow(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Vertex,
-                    rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+def test_can_do_pow(lhs_constructor: Callable, rhs_constructor: Callable, lhs: arithmetic_op_value_types,
+                    rhs: arithmetic_op_value_types, expected_result: arithmetic_op_value_types) -> None:
     lhs_casted = lhs_constructor(lhs)
     rhs_casted = rhs_constructor(rhs)
 
