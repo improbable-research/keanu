@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.ProbabilisticModel;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
@@ -57,7 +58,13 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     @Override
     public double logProbAfter(Map<VariableReference, Object> newValues, double logProbBefore) {
-        Set<Vertex> affectedVertices = newValues.keySet().stream().map(ref -> vertexLookup.get(ref)).collect(Collectors.toSet());
+        ImmutableSet.Builder<Vertex> affectedVerticesBuilder = ImmutableSet.builder();
+        for (VariableReference reference : newValues.keySet()) {
+            Vertex vertex = vertexLookup.get(reference);
+            affectedVerticesBuilder.add(vertex);
+        }
+        Set<Vertex> affectedVertices = affectedVerticesBuilder.build();
+
         double lambdaSectionLogProbBefore = lambdaSectionSnapshot.logProb(affectedVertices);
         cascadeValues(newValues);
         double lambdaSectionLogProbAfter = lambdaSectionSnapshot.logProb(affectedVertices);
