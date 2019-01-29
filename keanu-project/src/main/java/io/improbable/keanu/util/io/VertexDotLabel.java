@@ -1,18 +1,22 @@
 package io.improbable.keanu.util.io;
 
 import io.improbable.keanu.annotation.DisplayInformationForOutput;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class VertexDotLabel {
+    private static final String DOT_LABEL_OPENING = "[label=\"";
+    private static final String DOT_LABEL_CLOSING = "\"]";
+    private static final String DOT_FIELD_OPENING = " [";
+    private static final String DOT_FIELD_SEPARATOR = "=";
+    private static final String DOT_FIELD_CLOSING = "]";
     private final Vertex vertex;
     private String value = "";
     private String annotation = "";
     private String vertexLabel = "";
-    private static final String DOT_LABEL_OPENING = "[label=\"";
-    private static final String DOT_LABEL_CLOSING = "\"]";
 
     public VertexDotLabel(Vertex vertex) {
         this.vertex = vertex;
@@ -29,26 +33,20 @@ public class VertexDotLabel {
         this.value = value;
     }
 
-    public String inDotFormat() {
-        // Output value if value is set, but also add some descriptive info for non-constant vertices.
-        if (!value.isEmpty()) {
-            String dotLabel = vertex.getId().hashCode() + DOT_LABEL_OPENING + value;
-            if (!(vertex instanceof ConstantVertex)) {
-                dotLabel += " (" + getDescriptiveInfo() + ")";
-            }
-            return dotLabel + DOT_LABEL_CLOSING;
+    public String inDotFormat(DotDecorator decorator) {
+        String dotLabel = vertex.getId().hashCode() + DOT_LABEL_OPENING;
+        if (this.value.length() > 0) dotLabel += this.value;
+        else dotLabel += StringUtils.join(decorator.labelVertex(vertex), ", ");
+        dotLabel += DOT_LABEL_CLOSING;
+        Map<String, String> fields = decorator.getExtraVertexFields(vertex);
+        for (Map.Entry<String, String> e : fields.entrySet()) {
+            dotLabel += DOT_FIELD_OPENING;
+            dotLabel += e.getKey();
+            dotLabel += DOT_FIELD_SEPARATOR;
+            dotLabel += e.getValue();
+            dotLabel += DOT_FIELD_CLOSING;
         }
-        return vertex.getId().hashCode() + DOT_LABEL_OPENING + getDescriptiveInfo() + DOT_LABEL_CLOSING;
-    }
-
-    private String getDescriptiveInfo() {
-        if (!vertexLabel.isEmpty()) {
-            return vertexLabel;
-        }
-        if (!annotation.isEmpty()) {
-            return annotation;
-        }
-        return vertex.getClass().getSimpleName();
+        return dotLabel;
     }
 
     @Override

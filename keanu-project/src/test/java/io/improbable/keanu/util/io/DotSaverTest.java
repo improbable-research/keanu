@@ -44,6 +44,7 @@ public class DotSaverTest {
     private static final String VERTEX_DEGREE2__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree2Output.dot";
     private static final String OUTPUT_WITH_VALUES_FILENAME = resourcesFolder + "/OutputValuesSetToTrueOutput.dot";
     private static final String OUTPUT_WITH_METADATA_FILENAME = resourcesFolder + "/OutputWithMetadata.dot";
+    private static final String OUTPUT_WITH_COLOR_DECORATION_FILENAME = resourcesFolder + "/OutputWithColor.dot";
 
 
     @BeforeClass
@@ -147,6 +148,19 @@ public class DotSaverTest {
         Map<String, String> metadata = ImmutableMap.of("Author", "Jane Doe", "Version", "V1");
         complexNetDotSaver.save(outputWriter, false, metadata);
         String expectedOutputWithMetadata = readFileToString(OUTPUT_WITH_METADATA_FILENAME);
+        checkDotFilesMatch(outputWriter.toString(), expectedOutputWithMetadata);
+    }
+
+    @Test
+    public void alternateRenderingIsSupported() throws IOException {
+        DoubleVertex unobservedGaussianVertex = new GaussianVertex(0, 1);
+        DoubleVertex observedGammaVertex = new GammaVertex(2, 3);
+        observedGammaVertex.observe(2.5);
+        DoubleVertex gammaMultipliedVertex = observedGammaVertex.times(new ConstantDoubleVertex(4));
+        Vertex resultVertex = gammaMultipliedVertex.plus(unobservedGaussianVertex);
+        DotSaver dotSaver = new DotSaver(new BayesianNetwork(resultVertex.getConnectedGraph()), new ColorByTypeDecorator() );
+        String expectedOutputWithMetadata = readFileToString(OUTPUT_WITH_COLOR_DECORATION_FILENAME);
+        dotSaver.save(outputWriter, false);
         checkDotFilesMatch(outputWriter.toString(), expectedOutputWithMetadata);
     }
 

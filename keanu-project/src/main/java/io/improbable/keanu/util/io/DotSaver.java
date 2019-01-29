@@ -38,6 +38,7 @@ public class DotSaver implements NetworkSaver {
     private static final String DOT_ENDING = "}";
     private static final String DOT_COMMENT_APPENDIX = "// ";
     private static final int INFINITE_NETWORK_DEGREE = Integer.MAX_VALUE;
+    private final DotDecorator decorator;
 
     private Set<VertexDotLabel> dotLabels = new HashSet<>();
     private Set<GraphEdge> graphEdges = new HashSet<>();
@@ -45,6 +46,11 @@ public class DotSaver implements NetworkSaver {
 
     public DotSaver(BayesianNetwork network) {
         bayesianNetwork = network;
+        this.decorator = new DefaultDecorator();
+    }
+    public DotSaver(BayesianNetwork network, DotDecorator decorator) {
+        bayesianNetwork = network;
+        this.decorator = decorator;
     }
 
     /**
@@ -122,16 +128,18 @@ public class DotSaver implements NetworkSaver {
         }
     }
 
-    private static void outputLabels(Collection<VertexDotLabel> dotLabels, Writer outputWriter) throws IOException {
+    private void outputLabels(Collection<VertexDotLabel> dotLabels, Writer outputWriter) throws IOException {
         for (VertexDotLabel dotLabel : dotLabels) {
-            outputWriter.write(dotLabel.inDotFormat() + "\n");
+            outputWriter.write(dotLabel.inDotFormat(this.decorator) + "\n");
         }
     }
 
-    private static void outputEdges(Collection<GraphEdge> edges, Writer outputWriter, Set<Vertex> verticesToOutput) throws IOException {
+    private void outputEdges(Collection<GraphEdge> edges, Writer outputWriter, Set<Vertex> verticesToOutput) throws IOException {
         for (GraphEdge edge : edges) {
             if (verticesToOutput.contains(edge.getParentVertex()) && verticesToOutput.contains(edge.getChildVertex())) {
-                outputWriter.write(EdgeDotLabel.inDotFormat(edge) + "\n");
+                if ( this.decorator.includeEdge(edge) ) {
+                    outputWriter.write(EdgeDotLabel.inDotFormat(edge,this.decorator) + "\n");
+                }
             }
         }
     }
