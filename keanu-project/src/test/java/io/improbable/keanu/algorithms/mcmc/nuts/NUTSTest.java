@@ -21,12 +21,7 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
@@ -195,7 +190,7 @@ public class NUTSTest {
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             model,
             model.getLatentVariables(),
-            5
+            20
         );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
@@ -207,5 +202,7 @@ public class NUTSTest {
         Assert.assertEquals(0.9374092571432446, samples.get(2).scalar(), 1e-9);
         Assert.assertEquals(0.05720950629236243, samples.get(3).scalar(), 1e-9);
         Assert.assertEquals(0.33119352888492626, samples.get(4).scalar(), 1e-9);
+        Assert.assertEquals(0.9124861769925321, samples.get(19).scalar(), 1e-9);
+
     }
 }
