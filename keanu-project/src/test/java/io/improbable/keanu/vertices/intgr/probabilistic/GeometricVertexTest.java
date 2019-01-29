@@ -44,7 +44,7 @@ public class GeometricVertexTest {
 
     @Test
     public void meanAndStandardDeviationMatchExpected() {
-        double p = 0.4;
+        double p = 0.1;
 
         GeometricVertex myVertex = new GeometricVertex(new long[] {1, 200000}, p);
         IntegerTensor samples = myVertex.sample();
@@ -54,7 +54,7 @@ public class GeometricVertexTest {
         double actualMean = samples.toDouble().average();
         double actualStdDeviation = samples.toDouble().standardDeviation();
 
-        assertEquals(expectedMean, actualMean, 1e-2);
+        assertEquals(expectedMean, actualMean, 1e-3);
         assertEquals(expectedStdDeviation, actualStdDeviation, 1e-2);
     }
 

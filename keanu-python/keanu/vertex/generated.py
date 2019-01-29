@@ -140,6 +140,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabili
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex")
+java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.GeometricVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.MultinomialVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
@@ -829,6 +830,10 @@ def IntegerTake(input_vertex: vertex_constructor_param_types, index: Collection[
 
 def Binomial(p: vertex_constructor_param_types, n: vertex_constructor_param_types) -> Vertex:
     return Integer(context.jvm_view().BinomialVertex, cast_to_double_vertex(p), cast_to_integer_vertex(n))
+
+
+def Geometric(p: vertex_constructor_param_types) -> Vertex:
+    return Integer(context.jvm_view().GeometricVertex, cast_to_double_vertex(p))
 
 
 def Multinomial(n: vertex_constructor_param_types, p: vertex_constructor_param_types) -> Vertex:
