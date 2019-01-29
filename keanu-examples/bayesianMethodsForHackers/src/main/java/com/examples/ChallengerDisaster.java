@@ -47,9 +47,9 @@ public class ChallengerDisaster {
 
         final int sampleCount = 3000;
         NetworkSamples networkSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
-            .generatePosteriorSamples(model, net.getLatentVertices())
+            .generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(sampleCount / 2)
-            .downSampleInterval(net.getLatentVertices().size())
+            .downSampleInterval(model.getLatentVariables().size())
             .generate(sampleCount);
 
         ChallengerPosteriors cp = new ChallengerPosteriors();

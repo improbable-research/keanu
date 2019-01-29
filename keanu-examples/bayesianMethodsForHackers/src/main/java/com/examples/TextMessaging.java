@@ -54,9 +54,9 @@ public class TextMessaging {
 
         final int numSamples = 1000;
         NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
-            .generatePosteriorSamples(model, net.getLatentVertices())
+            .generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(numSamples / 2)
-            .downSampleInterval(net.getLatentVertices().size())
+            .downSampleInterval(model.getLatentVariables().size())
             .generate(numSamples);
 
         return new TextMessagingResults(
