@@ -1,23 +1,26 @@
 from py4j.java_gateway import java_import, JavaObject, JavaClass
+from typing import Union, Optional, Tuple
+
+from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.net import BayesNet
-from keanu.vertex.base import Vertex
 from keanu.tensor import Tensor
-from keanu.base import JavaObjectWrapper
 from keanu.vartypes import numpy_types
-from typing import Union, Optional, Tuple
+from keanu.vertex.base import Vertex
 
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.gradient.ConjugateGradient")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer")
 
 
 class OptimizedResult(JavaObjectWrapper):
 
-    def __init__(self, saver_object: JavaObject):
-        super().__init__(saver_object)
+    def __init__(self, result_object: JavaObject):
+        super().__init__(result_object)
 
     def optimized_fitness(self) -> float:
         return self.unwrap().getOptimizedFitness()
@@ -57,6 +60,20 @@ class GradientOptimizer(Optimizer):
                  relative_threshold: Optional[float] = None,
                  absolute_threshold: Optional[float] = None) -> None:
         builder, net = Optimizer._build_bayes_net(k.jvm_view().KeanuOptimizer.Gradient, net)
+        builder.algorithm(ConjugateGradient(max_evaluations, relative_threshold, absolute_threshold).unwrap())
+
+        super(GradientOptimizer, self).__init__(builder.build(), net)
+
+
+class ConjugateGradient(JavaObjectWrapper):
+
+    def __init__(self,
+                 max_evaluations: Optional[int] = None,
+                 relative_threshold: Optional[float] = None,
+                 absolute_threshold: Optional[float] = None) -> None:
+
+        builder = k.jvm_view().ConjugateGradient.builder()
+
         if max_evaluations is not None:
             builder.maxEvaluations(max_evaluations)
         if relative_threshold is not None:
@@ -64,7 +81,7 @@ class GradientOptimizer(Optimizer):
         if absolute_threshold is not None:
             builder.absoluteThreshold(absolute_threshold)
 
-        super(GradientOptimizer, self).__init__(builder.build(), net)
+        super().__init__(builder.build())
 
 
 class NonGradientOptimizer(Optimizer):
@@ -76,6 +93,23 @@ class NonGradientOptimizer(Optimizer):
                  initial_trust_region_radius: Optional[float] = None,
                  stopping_trust_region_radius: Optional[float] = None) -> None:
         builder, net = Optimizer._build_bayes_net(k.jvm_view().KeanuOptimizer.NonGradient, net)
+
+        builder.algorithm(
+            BOBYQA(max_evaluations, bounds_range, initial_trust_region_radius, stopping_trust_region_radius).unwrap())
+
+        super(NonGradientOptimizer, self).__init__(builder.build(), net)
+
+
+class BOBYQA(JavaObjectWrapper):
+
+    def __init__(self,
+                 max_evaluations: Optional[int] = None,
+                 bounds_range: Optional[float] = None,
+                 initial_trust_region_radius: Optional[float] = None,
+                 stopping_trust_region_radius: Optional[float] = None) -> None:
+
+        builder = k.jvm_view().BOBYQA.builder()
+
         if max_evaluations is not None:
             builder.maxEvaluations(max_evaluations)
         if bounds_range is not None:
@@ -85,4 +119,4 @@ class NonGradientOptimizer(Optimizer):
         if stopping_trust_region_radius is not None:
             builder.stoppingTrustRegionRadius(stopping_trust_region_radius)
 
-        super(NonGradientOptimizer, self).__init__(builder.build(), net)
+        super().__init__(builder.build())

@@ -34,7 +34,7 @@ public class GradientOptimizationAlgorithmTest {
 
         NONLINEAR_CONJUGATE_GRADIENT(() -> {
 
-            return NonLinearConjugateGradient.builder().build();
+            return ConjugateGradient.builder().build();
         })
         ;
 

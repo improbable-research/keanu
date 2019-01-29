@@ -163,7 +163,7 @@ public class GradientOptimizer implements Optimizer {
     public static class GradientOptimizerBuilder {
 
         private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
-        private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = NonLinearConjugateGradient.builder().build();
+        private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = ConjugateGradient.builder().build();
         private boolean checkInitialFitnessConditions = true;
 
         GradientOptimizerBuilder() {

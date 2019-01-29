@@ -22,10 +22,10 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 /**
  * Backed by Apache Math org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer
  */
-public class NonLinearConjugateGradient implements GradientOptimizationAlgorithm {
+public class ConjugateGradient implements GradientOptimizationAlgorithm {
 
-    public static ApacheNonLinearConjugateGradientOptimizerBuilder builder() {
-        return new ApacheNonLinearConjugateGradientOptimizerBuilder();
+    public static ConjugateGradientBuilder builder() {
+        return new ConjugateGradientBuilder();
     }
 
     public enum UpdateFormula {
@@ -87,38 +87,38 @@ public class NonLinearConjugateGradient implements GradientOptimizationAlgorithm
     }
 
     @ToString
-    public static class ApacheNonLinearConjugateGradientOptimizerBuilder {
+    public static class ConjugateGradientBuilder {
 
         private int maxEvaluations = Integer.MAX_VALUE;
         private double relativeThreshold = 1e-8;
         private double absoluteThreshold = 1e-8;
         private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
 
-        ApacheNonLinearConjugateGradientOptimizerBuilder() {
+        ConjugateGradientBuilder() {
         }
 
-        public ApacheNonLinearConjugateGradientOptimizerBuilder maxEvaluations(int maxEvaluations) {
+        public ConjugateGradientBuilder maxEvaluations(int maxEvaluations) {
             this.maxEvaluations = maxEvaluations;
             return this;
         }
 
-        public ApacheNonLinearConjugateGradientOptimizerBuilder relativeThreshold(double relativeThreshold) {
+        public ConjugateGradientBuilder relativeThreshold(double relativeThreshold) {
             this.relativeThreshold = relativeThreshold;
             return this;
         }
 
-        public ApacheNonLinearConjugateGradientOptimizerBuilder absoluteThreshold(double absoluteThreshold) {
+        public ConjugateGradientBuilder absoluteThreshold(double absoluteThreshold) {
             this.absoluteThreshold = absoluteThreshold;
             return this;
         }
 
-        public ApacheNonLinearConjugateGradientOptimizerBuilder updateFormula(UpdateFormula updateFormula) {
+        public ConjugateGradientBuilder updateFormula(UpdateFormula updateFormula) {
             this.updateFormula = updateFormula;
             return this;
         }
 
-        public NonLinearConjugateGradient build() {
-            return new NonLinearConjugateGradient(maxEvaluations, relativeThreshold, absoluteThreshold, updateFormula);
+        public ConjugateGradient build() {
+            return new ConjugateGradient(maxEvaluations, relativeThreshold, absoluteThreshold, updateFormula);
         }
 
     }

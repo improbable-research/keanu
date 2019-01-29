@@ -2,8 +2,8 @@ package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.ConjugateGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.NonLinearConjugateGradient;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -143,7 +143,7 @@ public class RadonHierarchicalRegression {
     private void optimise(BayesianNetwork bayesianNetwork, List<RegressionModel> models) {
         bayesianNetwork.probeForNonZeroProbability(100);
         GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(bayesianNetwork)
-            .algorithm(NonLinearConjugateGradient.builder()
+            .algorithm(ConjugateGradient.builder()
                 .absoluteThreshold(0.25)
                 .maxEvaluations(10000)
                 .build()
