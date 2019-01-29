@@ -1,5 +1,5 @@
 import collections
-from typing import List, Tuple, Iterator, Union, SupportsRound, Optional
+from typing import List, Tuple, Iterator, Union, SupportsRound, Optional, Callable
 from typing import cast as typing_cast
 
 import numpy as np
@@ -231,53 +231,61 @@ class Integer(Vertex):
         else:
             raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
 
-    def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
+    def __op_based_on_other_type(self, other: vertex_operation_param_types, op: Callable,
+                                 integer_op_ctr: Callable) -> 'Vertex':
         if is_floating_type(other):
-            return kn.vertex.generated.CastToDouble(self).__add__(other)
+            # Equivalent to kn.vertex.generated.CastToDouble(self).__add__(other) for add
+            return op(kn.vertex.generated.CastToDouble(self))
         else:
-            return kn.vertex.generated.IntegerAddition(self, other)
+            return integer_op_ctr(other)
+
+    def __add__(self, other: vertex_operation_param_types) -> 'Vertex':
+        return self.__op_based_on_other_type(
+            other,
+            lambda casted_to_double: casted_to_double.__add__(other),
+            lambda other_holder: kn.vertex.generated.IntegerAddition(self, other_holder))
 
     def __radd__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if is_floating_type(other):
-            return kn.vertex.generated.CastToDouble(self).__radd__(other)
-        else:
-            return kn.vertex.generated.IntegerAddition(other, self)
+        return self.__op_based_on_other_type(
+            other,
+            lambda casted_to_double: casted_to_double.__radd__(other),
+            lambda other_holder: kn.vertex.generated.IntegerAddition(other_holder, self))
 
     def __sub__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if is_floating_type(other):
-            return kn.vertex.generated.CastToDouble(self).__sub__(other)
-        else:
-            return kn.vertex.generated.IntegerDifference(self, other)
+        return self.__op_based_on_other_type(
+            other,
+            lambda casted_to_double: casted_to_double.__sub__(other),
+            lambda other_holder: kn.vertex.generated.IntegerDifference(self, other_holder))
 
     def __rsub__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if is_floating_type(other):
-            return kn.vertex.generated.CastToDouble(self).__rsub__(other)
-        else:
-            return kn.vertex.generated.IntegerDifference(other, self)
+        return self.__op_based_on_other_type(
+            other,
+            lambda casted_to_double: casted_to_double.__rsub__(other),
+            lambda other_holder: kn.vertex.generated.IntegerDifference(other_holder, self))
 
     def __mul__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if is_floating_type(other):
-            return kn.vertex.generated.CastToDouble(self).__mul__(other)
-        else:
-            return kn.vertex.generated.IntegerMultiplication(self, other)
+        return self.__op_based_on_other_type(
+            other,
+            lambda casted_to_double: casted_to_double.__mul__(other),
+            lambda other_holder: kn.vertex.generated.IntegerMultiplication(self, other_holder))
 
     def __rmul__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if is_floating_type(other):
-            return kn.vertex.generated.CastToDouble(self).__rmul__(other)
-        else:
-            return kn.vertex.generated.IntegerMultiplication(other, self)
+        return self.__op_based_on_other_type(
+            other,
+            lambda casted_to_double: casted_to_double.__rmul__(other),
+            lambda other_holder: kn.vertex.generated.IntegerMultiplication(other_holder, self))
 
     def __pow__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if is_floating_type(other):
-            return kn.vertex.generated.CastToDouble(self).__pow__(other)
-        else:
-            return kn.vertex.generated.IntegerPower(self, other)
+        return self.__op_based_on_other_type(
+            other,
+            lambda casted_to_double: casted_to_double.__pow__(other),
+            lambda other_holder: kn.vertex.generated.IntegerPower(self, other_holder))
 
     def __rpow__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if is_floating_type(other):
-            return kn.vertex.generated.CastToDouble(self).__rpow__(other)
-        else:
-            return kn.vertex.generated.IntegerPower(other, self)
+        return self.__op_based_on_other_type(
+            other,
+            lambda casted_to_double: casted_to_double.__rpow__(other),
+            lambda other_holder: kn.vertex.generated.IntegerPower(other_holder, self))
 
     def __truediv__(self, other: vertex_operation_param_types) -> 'Vertex':
         return kn.vertex.generated.CastToDouble(self).__truediv__(other)
@@ -286,16 +294,16 @@ class Integer(Vertex):
         return kn.vertex.generated.CastToDouble(self).__rtruediv__(other)
 
     def __floordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if is_floating_type(other):
-            return kn.vertex.generated.CastToDouble(self).__truediv__(other).__floor__()
-        else:
-            return kn.vertex.generated.IntegerDivision(self, other)
+        return self.__op_based_on_other_type(
+            other,
+            lambda casted_to_double: casted_to_double.__truediv__(other).__floor__(),
+            lambda other_holder: kn.vertex.generated.IntegerDivision(self, other_holder))
 
     def __rfloordiv__(self, other: vertex_operation_param_types) -> 'Vertex':
-        if is_floating_type(other):
-            return kn.vertex.generated.CastToDouble(self).__rtruediv__(other).__floor__()
-        else:
-            return kn.vertex.generated.IntegerDivision(other, self)
+        return self.__op_based_on_other_type(
+            other,
+            lambda casted_to_double: casted_to_double.__rtruediv__(other).__floor__(),
+            lambda other_holder: kn.vertex.generated.IntegerDivision(other_holder, self))
 
 
 class Boolean(Vertex):
