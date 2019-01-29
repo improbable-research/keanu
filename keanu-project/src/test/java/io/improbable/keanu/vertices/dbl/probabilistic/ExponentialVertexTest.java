@@ -5,6 +5,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -34,7 +37,7 @@ public class ExponentialVertexTest {
     }
 
     @Test
-    public void maskAppliedToValuesWhereXLessThanA() {
+    public void logProbIsNegInfWhereXLessThanOne() {
         DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{1, -2}, new long[]{2, 1});
 
         DoubleTensor maskResult = Exponential.withParameters(DoubleTensor.ONE_SCALAR).logProb(matrixX);
@@ -42,7 +45,19 @@ public class ExponentialVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfScalar() {
+    public void logProbGraphIsNegInfWhereXLessThanOne() {
+        DoubleVertex rate = ConstantVertex.of(DoubleTensor.ONE_SCALAR);
+        ExponentialVertex tensorExponentialVertex = new ExponentialVertex(rate);
+        LogProbGraph logProbGraph = tensorExponentialVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, rate, rate.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, tensorExponentialVertex, DoubleTensor.create(1., -2.));
+
+        DoubleTensor expected = DoubleTensor.create(-1., Double.NEGATIVE_INFINITY);
+        LogProbGraphContract.equalTensor(logProbGraph, expected);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfScalar() {
         ExponentialDistribution distribution = new ExponentialDistribution(1.5);
         ExponentialVertex tensorExponentialVertex = new ExponentialVertex(1.5);
         double expectedDensity = distribution.logDensity(2.0);
@@ -51,12 +66,40 @@ public class ExponentialVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfVector() {
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        DoubleVertex rate = ConstantVertex.of(1.5);
+        ExponentialVertex tensorExponentialVertex = new ExponentialVertex(rate);
+        LogProbGraph logProbGraph = tensorExponentialVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, rate, rate.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, tensorExponentialVertex, DoubleTensor.scalar(2.0));
+
+        ExponentialDistribution distribution = new ExponentialDistribution(1.5);
+        double expectedDensity = distribution.logDensity(2.0);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfVector() {
 
         ExponentialDistribution distribution = new ExponentialDistribution(1.0);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(.75);
         ExponentialVertex ndExponentialVertex = new ExponentialVertex(1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndExponentialVertex, new double[]{0.25, .75}, expectedLogDensity);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        DoubleVertex rate = ConstantVertex.of(1.0, 1.0);
+        ExponentialVertex tensorExponentialVertex = new ExponentialVertex(rate);
+        LogProbGraph logProbGraph = tensorExponentialVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, rate, rate.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, tensorExponentialVertex, DoubleTensor.create(0.25, 0.75));
+
+        ExponentialDistribution distribution = new ExponentialDistribution(1.0);
+        double expectedDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Test

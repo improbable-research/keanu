@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -83,7 +83,7 @@ public class NonGradientOptimizer implements Optimizer {
 
     private double optimize(FitnessFunction fitnessFunction) {
 
-        ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
+        StatusBar statusBar = Optimizer.createFitnessStatusBar(this);
 
         double logProb = probabilisticModel.logProb();
 
@@ -117,7 +117,7 @@ public class NonGradientOptimizer implements Optimizer {
             new InitialGuess(startPoint)
         );
 
-        progressBar.finish();
+        statusBar.finish();
         return pointValuePair.getValue();
     }
 

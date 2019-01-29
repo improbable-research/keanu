@@ -11,7 +11,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWi
 import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Getter;
 
@@ -97,7 +97,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
                                                             final List<? extends Variable> fromVariables) {
         Preconditions.checkArgument(model instanceof ProbabilisticModelWithGradient, "NUTS requires a model on which gradients can be calculated.");
-        return new NetworkSamplesGenerator(setupSampler((ProbabilisticModelWithGradient) model, fromVariables), ProgressBar::new);
+        return new NetworkSamplesGenerator(setupSampler((ProbabilisticModelWithGradient) model, fromVariables), StatusBar::new);
     }
 
     private NUTSSampler setupSampler(final ProbabilisticModelWithGradient model,
