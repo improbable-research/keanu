@@ -143,6 +143,13 @@ public class VertexLabelTest {
         foo.withoutOuterNamespace();
     }
 
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void itThrowsIfYouRemoveExistingOuterNamespaceUntilThereIsNone() {
+        VertexLabel foo = new VertexLabel("namespace", "foo");
+        foo = foo.withoutOuterNamespace();
+        foo.withoutOuterNamespace();
+    }
+
     @Test
     public void isInNamespaceOfEqualValue() {
         VertexLabel label = new VertexLabel("outer", "inner", "foo");
