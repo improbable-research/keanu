@@ -101,6 +101,7 @@ def sample(net: BayesNet,
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler()
 
+    sample_from, sample_from_copy = tee(sample_from)
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
@@ -117,7 +118,7 @@ def sample(net: BayesNet,
     if plot:
         traceplot(vertex_samples, ax=ax)
 
-    if _all_samples_are_scalar(vertex_samples):
+    if _all_vertices_are_scalar(sample_from_copy):
         return vertex_samples
     else:
         return _create_multi_indexed_samples(vertex_samples, False)
@@ -142,19 +143,12 @@ def generate_samples(net: BayesNet,
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
 
-    all_are_scalar = _all_vertices_are_scalar_generator(sample_from_copy)
+    all_are_scalar = _all_vertices_are_scalar(sample_from_copy)
     return _samples_generator(
         sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax, all_scalar=all_are_scalar)
 
 
-def _all_samples_are_scalar(samples: dict) -> bool:
-    for vertex_label in samples:
-        if type(samples[vertex_label][0]) is ndarray:
-            return False
-    return True
-
-
-def _all_vertices_are_scalar_generator(sample_from: Iterable[Vertex]) -> bool:
+def _all_vertices_are_scalar(sample_from: Iterable[Vertex]) -> bool:
     for vertex in sample_from:
         if vertex.get_value().shape != ():
             return False
@@ -171,7 +165,7 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
             Vertex._get_python_label(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped), primitive=True)
             for vertex_unwrapped in vertices_unwrapped
         }           
-         
+
         if live_plot:
             traces.append(sample)
             if len(traces) % refresh_every == 0:
