@@ -6,7 +6,7 @@ import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -87,7 +87,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesNet,
                                                             final List<? extends Vertex> fromVertices) {
 
-        return new NetworkSamplesGenerator(setupSampler(bayesNet, fromVertices), ProgressBar::new);
+        return new NetworkSamplesGenerator(setupSampler(bayesNet, fromVertices), StatusBar::new);
     }
 
     private NUTSSampler setupSampler(final BayesianNetwork bayesNet,
