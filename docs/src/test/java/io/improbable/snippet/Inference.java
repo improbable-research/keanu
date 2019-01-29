@@ -37,7 +37,7 @@ public class Inference {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVertices(),
-            100000
+            30000
         );
         //%%SNIPPET_END%% InfMetropolisHastings
 

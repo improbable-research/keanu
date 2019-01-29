@@ -1,7 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
@@ -9,6 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
+import umontreal.ssj.probdist.TriangularDist;
 
 public class TriangularVertexTest {
 
@@ -23,11 +28,29 @@ public class TriangularVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfScalar() {
+    public void logProbMatchesKnownLogDensityOfScalar() {
 
         TriangularVertex tensorTriangularVertex = new TriangularVertex(0.0, 10., 5.);
         double expectedLogDensity = Math.log(0.1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorTriangularVertex, 2.5, expectedLogDensity);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        DoubleVertex xMin = ConstantVertex.of(0.);
+        DoubleVertex xMax = ConstantVertex.of(20.);
+        DoubleVertex c = ConstantVertex.of(10.);
+        TriangularVertex triangularVertex = new TriangularVertex(xMin, xMax, c);
+        LogProbGraph logProbGraph = triangularVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, xMin, xMin.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, xMax, xMax.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, c, c.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, triangularVertex, DoubleTensor.scalar(2.5));
+
+        TriangularDist triangularDist = new TriangularDist(0., 20., 10.);
+        double expectedDensity = Math.log(triangularDist.density(2.5));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Test
@@ -37,6 +60,24 @@ public class TriangularVertexTest {
         double expectedLogDensity = triangularVertex.logPdf(2.5) + triangularVertex.logPdf(7.5);
         TriangularVertex tensorTriangularVertex = new TriangularVertex(0.0, 10, 5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorTriangularVertex, new double[]{2.5, 7.5}, expectedLogDensity);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        DoubleVertex xMin = ConstantVertex.of(0., 0.);
+        DoubleVertex xMax = ConstantVertex.of(20., 20.);
+        DoubleVertex c = ConstantVertex.of(10., 10.);
+        TriangularVertex triangularVertex = new TriangularVertex(xMin, xMax, c);
+        LogProbGraph logProbGraph = triangularVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, xMin, xMin.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, xMax, xMax.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, c, c.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, triangularVertex, DoubleTensor.create(2.5, 7.5));
+
+        TriangularDist triangularDist = new TriangularDist(0., 20., 10.);
+        double expectedDensity = Math.log(triangularDist.density(2.5) * triangularDist.density(7.5));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Test

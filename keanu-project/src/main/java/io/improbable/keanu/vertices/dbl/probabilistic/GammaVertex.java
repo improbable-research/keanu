@@ -6,6 +6,9 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -24,7 +27,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class GammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class GammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex theta;
     private final DoubleVertex k;
@@ -92,6 +95,20 @@ public class GammaVertex extends DoubleVertex implements Differentiable, Probabi
 
         DoubleTensor logPdfs = Gamma.withParameters(thetaValues, kValues).logProb(value);
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex thetaPlaceholder = new DoublePlaceholderVertex(theta.getShape());
+        final DoublePlaceholderVertex kPlaceholder = new DoublePlaceholderVertex(k.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(theta, thetaPlaceholder)
+            .input(k, kPlaceholder)
+            .logProbOutput(Gamma.logProbOutput(xPlaceholder, thetaPlaceholder, kPlaceholder))
+            .build();
     }
 
     @Override

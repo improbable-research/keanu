@@ -6,6 +6,10 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -20,10 +24,11 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class ChiSquaredVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class ChiSquaredVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private IntegerVertex k;
     private static final String K_NAME = "k";
+    private static final double LOG_TWO = Math.log(2);
 
     /**
      * One k that must match a proposed tensor shape of ChiSquared
@@ -73,6 +78,18 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
     @Override
     public double logProb(DoubleTensor value) {
         return ChiSquared.withParameters(k.getValue()).logProb(value).sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final DoublePlaceholderVertex xPlaceHolder = new DoublePlaceholderVertex(this.getShape());
+        final IntegerPlaceHolderVertex kPlaceHolder = new IntegerPlaceHolderVertex(k.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceHolder)
+            .input(k, kPlaceHolder)
+            .logProbOutput(ChiSquared.logProbOutput(xPlaceHolder, kPlaceHolder))
+            .build();
     }
 
     @Override
