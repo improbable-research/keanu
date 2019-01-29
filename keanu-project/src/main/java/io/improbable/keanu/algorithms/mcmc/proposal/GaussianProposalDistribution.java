@@ -32,8 +32,8 @@ public class GaussianProposalDistribution implements ProposalDistribution {
             if (!(variable.getValue() instanceof DoubleTensor)) {
                 throw new IllegalStateException("Gaussian proposal function cannot be used for discrete variable " + variable);
             }
-            ContinuousDistribution proposalDistribution = Gaussian.withParameters((DoubleTensor) variable.getValue(), sigma);
-            proposal.setProposal(variable, proposalDistribution.sample(variable.getShape(), random));
+            DoubleTensor sample = random.nextGaussian(variable.getShape(), (DoubleTensor) variable.getValue(), sigma);
+            proposal.setProposal(variable, sample);
         }
         proposalNotifier.notifyProposalCreated(proposal);
         return proposal;

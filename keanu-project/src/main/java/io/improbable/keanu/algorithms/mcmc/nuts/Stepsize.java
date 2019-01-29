@@ -1,11 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
-import io.improbable.keanu.algorithms.SaveStatistics;
-import io.improbable.keanu.algorithms.Statistics;
-import io.improbable.keanu.algorithms.Variable;
-import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.algorithms.*;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.List;
@@ -50,18 +46,18 @@ class Stepsize implements SaveStatistics {
     /**
      * Taken from algorithm 4 in https://arxiv.org/pdf/1111.4246.pdf.
      *
-     * @param position                  the starting position
-     * @param gradient                  the gradient at the starting position
-     * @param variables                  the variables
-     * @param logProbGradientCalculator the log prob gradient calculator
-     * @param initialLogOfMasterP       the initial master log prob
-     * @param random                    the source of randomness
+     * @param position                       the starting position
+     * @param gradient                       the gradient at the starting position
+     * @param variables                      the variables
+     * @param probabilisticModelWithGradient the probabilistic model with gradient
+     * @param initialLogOfMasterP            the initial master log prob
+     * @param random                         the source of randomness
      * @return a starting step size
      */
     public static double findStartingStepSize(Map<VariableReference, DoubleTensor> position,
                                               Map<? extends VariableReference, DoubleTensor> gradient,
                                               List<? extends Variable<DoubleTensor, ?>> variables,
-                                              ProbabilisticModelWithGradient logProbGradientCalculator,
+                                              ProbabilisticModelWithGradient probabilisticModelWithGradient,
                                               double initialLogOfMasterP,
                                               KeanuRandom random) {
         double stepsize = STARTING_STEPSIZE;
@@ -74,9 +70,9 @@ class Stepsize implements SaveStatistics {
         Leapfrog leapfrog = new Leapfrog(position, momentums, gradient);
         double pThetaR = initialLogOfMasterP - leapfrog.halfDotProductMomentum();
 
-        Leapfrog delta = leapfrog.step(variables, logProbGradientCalculator, STARTING_STEPSIZE);
+        Leapfrog delta = leapfrog.step(variables, probabilisticModelWithGradient, STARTING_STEPSIZE);
 
-        double probAfterLeapfrog = logProbGradientCalculator.logProb();
+        double probAfterLeapfrog = probabilisticModelWithGradient.logProb();
         double pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
 
         double logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
@@ -85,8 +81,8 @@ class Stepsize implements SaveStatistics {
         while (scalingFactor * logLikelihoodRatio > -scalingFactor * Math.log(2)) {
             stepsize = stepsize * Math.pow(2, scalingFactor);
 
-            delta = leapfrog.step(variables, logProbGradientCalculator, stepsize);
-            probAfterLeapfrog = logProbGradientCalculator.logProb();
+            delta = leapfrog.step(variables, probabilisticModelWithGradient, stepsize);
+            probAfterLeapfrog = probabilisticModelWithGradient.logProb();
             pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
 
             logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;

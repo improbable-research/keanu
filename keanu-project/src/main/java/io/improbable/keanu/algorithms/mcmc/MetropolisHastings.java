@@ -8,6 +8,7 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.util.status.StatusBar;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -18,6 +19,7 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
 /**
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
  */
+@AllArgsConstructor
 public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
@@ -35,14 +37,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     @Getter
     @NonNull
     private ProposalRejectionStrategy rejectionStrategy;
-
-    @java.beans.ConstructorProperties({"random", "proposalDistribution", "variableSelector", "rejectionStrategy"})
-    MetropolisHastings(KeanuRandom random, ProposalDistribution proposalDistribution, MHStepVariableSelector variableSelector, ProposalRejectionStrategy rejectionStrategy) {
-        this.random = random;
-        this.proposalDistribution = proposalDistribution;
-        this.variableSelector = variableSelector;
-        this.rejectionStrategy = rejectionStrategy;
-    }
 
     public static MetropolisHastingsBuilder builder() {
         return new MetropolisHastingsBuilder();

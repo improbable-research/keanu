@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static java.util.stream.Collectors.toMap;
-
 public class Proposal {
 
     private final Map<Variable, Object> perVariableProposalTo;
@@ -29,7 +27,13 @@ public class Proposal {
     }
 
     public Map<VariableReference, Object> getProposalTo() {
-        return perVariableProposalTo.entrySet().stream().collect(toMap(e -> e.getKey().getReference(), Map.Entry::getValue));
+        Map<VariableReference, Object> asMap = new HashMap<>();
+
+        for (Map.Entry<Variable, Object> entry : perVariableProposalTo.entrySet()) {
+            asMap.put(entry.getKey().getReference(), entry.getValue());
+        }
+
+        return asMap;
     }
 
     public <T> T getProposalFrom(Variable<T, ?> variable) {

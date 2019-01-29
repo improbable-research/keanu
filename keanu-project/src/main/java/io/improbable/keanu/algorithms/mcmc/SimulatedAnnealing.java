@@ -9,6 +9,7 @@ import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -23,6 +24,7 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to
  * tend towards the Maximum A Posteriori (MAP)
  */
+@AllArgsConstructor
 public class SimulatedAnnealing {
 
     private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
@@ -40,14 +42,6 @@ public class SimulatedAnnealing {
     @Getter
     @NonNull
     private ProposalRejectionStrategy rejectionStrategy;
-
-    @java.beans.ConstructorProperties({"random", "proposalDistribution", "variableSelector", "rejectionStrategy"})
-    SimulatedAnnealing(KeanuRandom random, ProposalDistribution proposalDistribution, MHStepVariableSelector variableSelector, ProposalRejectionStrategy rejectionStrategy) {
-        this.random = random;
-        this.proposalDistribution = proposalDistribution;
-        this.variableSelector = variableSelector;
-        this.rejectionStrategy = rejectionStrategy;
-    }
 
     public static SimulatedAnnealingBuilder builder() {
         return new SimulatedAnnealingBuilder();

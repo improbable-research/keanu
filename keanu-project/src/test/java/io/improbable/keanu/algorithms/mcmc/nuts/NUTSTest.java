@@ -106,7 +106,6 @@ public class NUTSTest {
         NUTS nuts = NUTS.builder()
             .adaptCount(sampleCount)
             .maxTreeHeight(4)
-            .targetAcceptanceProb(0.6)
             .random(random)
             .build();
 

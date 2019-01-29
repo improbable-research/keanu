@@ -13,6 +13,7 @@ import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.status.StatusBar;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -26,23 +27,13 @@ import java.util.stream.Collectors;
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
+@AllArgsConstructor
 public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static final int DEFAULT_ADAPT_COUNT = 1000;
     private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.65;
 
     private final Statistics statistics = new Statistics(Metrics.values());
-
-    @java.beans.ConstructorProperties({"random", "adaptCount", "targetAcceptanceProb", "adaptEnabled", "initialStepSize", "maxTreeHeight", "saveStatistics"})
-    NUTS(KeanuRandom random, int adaptCount, double targetAcceptanceProb, boolean adaptEnabled, Double initialStepSize, int maxTreeHeight, boolean saveStatistics) {
-        this.random = random;
-        this.adaptCount = adaptCount;
-        this.targetAcceptanceProb = targetAcceptanceProb;
-        this.adaptEnabled = adaptEnabled;
-        this.initialStepSize = initialStepSize;
-        this.maxTreeHeight = maxTreeHeight;
-        this.saveStatistics = saveStatistics;
-    }
 
     public static NUTSBuilder builder() {
         return new NUTSBuilder();

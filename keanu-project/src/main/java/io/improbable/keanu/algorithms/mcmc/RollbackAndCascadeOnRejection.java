@@ -7,6 +7,7 @@ import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -26,8 +27,11 @@ public class RollbackAndCascadeOnRejection implements ProposalRejectionStrategy 
 
     @Override
     public void onProposalCreated(Proposal proposal) {
-        fromValues = proposal.getVariablesWithProposal().stream()
-            .collect(Collectors.toMap(v -> vertexLookup.get(v.getReference()), Variable::getValue));
+
+        fromValues = new HashMap<>();
+        for (Variable variable : proposal.getVariablesWithProposal()) {
+            fromValues.put(vertexLookup.get(variable.getReference()), variable.getValue());
+        }
     }
 
     @Override

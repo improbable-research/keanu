@@ -67,7 +67,6 @@ public class MetropolisHastingsSampler implements SamplingAlgorithm {
         List<T> samplesForVariable = (List<T>) samples.computeIfAbsent(variable.getReference(), v -> new ArrayList<T>());
         T value = variable.getValue();
         samplesForVariable.add(value);
-        log.trace(String.format("Sampled %s", value));
     }
 
 }
