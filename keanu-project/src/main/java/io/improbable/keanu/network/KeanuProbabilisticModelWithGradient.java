@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * An implementation of {@link ProbabilisticModelWithGradient} that is backed by a {@link BayesianNetwork}
+ */
 public class KeanuProbabilisticModelWithGradient extends KeanuProbabilisticModel implements ProbabilisticModelWithGradient {
 
     private final LogProbGradientCalculator logProbGradientCalculator;

@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A model composed of {@link Variable}s that can return a value of log-probability for a given set of input values.
+ */
 public interface ProbabilisticModel {
 
     default double logProb() {

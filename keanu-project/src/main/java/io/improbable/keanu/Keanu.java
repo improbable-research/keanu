@@ -11,6 +11,9 @@ import lombok.experimental.UtilityClass;
 
 import java.util.List;
 
+/**
+ * The entry point for creating {@link PosteriorSamplingAlgorithm}s such as {@link Sampling.MetropolisHastings} and {@link Sampling.NUTS}
+ */
 @UtilityClass
 public class Keanu {
 
@@ -18,6 +21,14 @@ public class Keanu {
     public static class Sampling {
 
         @UtilityClass
+        /**
+         * Class for choosing the appropriate sampling algorithm given a network.
+         * If the given network is differentiable, NUTS is proposed, otherwise Metropolis Hastings is chosen.
+         *
+         * Usage:
+         * PosteriorSamplingAlgorithm samplingAlgorithm = Keanu.Sampling.MCMC.withDefaultConfigFor(yourModel);
+         * samplingAlgorithm.getPosteriorSamples(...);
+         */
         public static class MCMC {
 
             /**

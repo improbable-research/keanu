@@ -8,6 +8,11 @@ import io.improbable.keanu.vertices.Vertex;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * When a proposal is created, take a snapshot of the vertices' {@link io.improbable.keanu.network.LambdaSection}s
+ * When a proposal is rejected, apply the snapshot to reset the Bayes Net to the old values.
+ * This is more performant than {@link RollbackAndCascadeOnRejection}
+ */
 public class RollBackToCachedValuesOnRejection implements ProposalRejectionStrategy {
     private final LambdaSectionSnapshot lambdaSectionSnapshot;
     private NetworkSnapshot networkSnapshot;

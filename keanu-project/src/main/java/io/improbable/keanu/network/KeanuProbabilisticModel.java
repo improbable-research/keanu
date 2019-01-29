@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * An implementation of {@link ProbabilisticModel} that is backed by a {@link BayesianNetwork}
+ */
 public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     private final Map<VariableReference, Vertex> vertexLookup;

@@ -10,6 +10,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * When a proposal is created, take a snapshot of the vertices' values.
+ * When a proposal is rejected, reset the Bayes Net to those values and cascade update.
+ * This is less performant than {@link RollBackToCachedValuesOnRejection}
+ */
 public class RollbackAndCascadeOnRejection implements ProposalRejectionStrategy {
 
     private Map<Vertex, Object> fromValues;
