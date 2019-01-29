@@ -35,8 +35,8 @@ def tensor_net() -> BayesNet:
 
 
 @pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler()), (HamiltonianSampler())])
-def test_sampling_returns_dict_of_list_of_scalars_for_scalar_vertices_in_sample_from(algo: PosteriorSamplingAlgorithm,
-                                                                               net: BayesNet) -> None:
+def test_sampling_returns_dict_of_list_of_scalars_for_scalar_vertices_in_sample_from(
+        algo: PosteriorSamplingAlgorithm, net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]
@@ -54,7 +54,8 @@ def test_sampling_returns_dict_of_list_of_scalars_for_scalar_vertices_in_sample_
 
 
 @pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler()), (HamiltonianSampler())])
-def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sample_from(algo: PosteriorSamplingAlgorithm, tensor_net: BayesNet) -> None:
+def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sample_from(
+        algo: PosteriorSamplingAlgorithm, tensor_net: BayesNet) -> None:
     draws = 5
     sample_from = list(tensor_net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]
@@ -72,9 +73,9 @@ def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sa
 @pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler()), (HamiltonianSampler())])
 def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_mixed_net(algo: PosteriorSamplingAlgorithm) -> None:
     exp = Exponential(1.)
-    add = exp + np.array([1. ,2., 3., 4.]).reshape(2, 2)
+    add = exp + np.array([1., 2., 3., 4.]).reshape(2, 2)
     gaussian = Gaussian(add, 2.)
-    
+
     exp.set_label("exp")
     gaussian.set_label("gaussian")
 
@@ -137,8 +138,6 @@ def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
     for child_column in df.columns.levels[1]:
         gamma.get_value()[child_column]
         assert type(gamma.get_value()[child_column]) == np.float64
-
-    assert False
 
 
 def test_dropping_samples(net: BayesNet) -> None:

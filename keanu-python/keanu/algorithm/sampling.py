@@ -108,9 +108,9 @@ def sample(net: BayesNet,
     vertex_samples = {
         Vertex._get_python_label(vertex_unwrapped): list(
             map(Tensor._to_ndarray,
-                network_samples.get(vertex_unwrapped).asList(), 
+                network_samples.get(vertex_unwrapped).asList(),
                 itertools.repeat(True, len(network_samples.get(vertex_unwrapped).asList()))))
-                for vertex_unwrapped in vertices_unwrapped
+        for vertex_unwrapped in vertices_unwrapped
     }
 
     if plot:
@@ -118,7 +118,7 @@ def sample(net: BayesNet,
 
     if _all_samples_are_scalar(vertex_samples):
         return vertex_samples
-    else: 
+    else:
         return _create_multi_indexed_samples(vertex_samples)
 
 
@@ -155,16 +155,19 @@ def _all_samples_are_scalar(samples):
 
 def _create_multi_indexed_samples(samples):
     vertex_samples_multi = {}
+    column_header_for_scalar = (0)
     for vertex_label in samples:
         vertex_samples_multi[vertex_label] = defaultdict(list)
         for sample_values in samples[vertex_label]:
             if type(sample_values) is not np.ndarray:
-                vertex_samples_multi[vertex_label][(0)].append(sample_values)
+                vertex_samples_multi[vertex_label][column_header_for_scalar].append(sample_values)
             else:
                 for index, value in np.ndenumerate(sample_values):
                     vertex_samples_multi[vertex_label][index].append(value.item())
 
-    tuple_heirarchy = {(vertex_label, tensor_index): values for vertex_label, tensor_index in vertex_samples_multi.items() for tensor_index, values in tensor_index.items()}
+    tuple_heirarchy = {(vertex_label, tensor_index): values
+                       for vertex_label, tensor_index in vertex_samples_multi.items()
+                       for tensor_index, values in tensor_index.items()}
 
     return tuple_heirarchy
 
