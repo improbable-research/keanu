@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,7 +16,7 @@ public class VertexLabel {
 
     public VertexLabel(String outer, String... inner) {
         if (inner.length <= 0) {
-            this.namespace = ImmutableList.of();
+            this.namespace = Collections.emptyList();
             this.name = outer;
         } else {
             this.namespace = ImmutableList.<String>builder()
