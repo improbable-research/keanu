@@ -88,8 +88,9 @@ def test_if_thn_or_els_is_not_int_it_gets_coerced(thn, els) -> None:
     assert result.sample() == 1
 
 
-def test_predicate_must_be_boolean() -> None:
-    with pytest.raises(TypeError) as excinfo:
-        If(1, 1, 1)
-
-    assert str(excinfo.value) == "Predicate must be boolean: got <class 'int'>"
+@pytest.mark.parametrize("pred", [1, 1., 1.1])
+def test_if_predicate_is_not_bool_it_gets_coerced(pred) -> None:
+    result = If(pred, 1, 0)
+    assert type(result) == Integer
+    assert result.unwrap().getClass().getSimpleName() == "IntegerIfVertex"
+    assert result.sample() == 1
