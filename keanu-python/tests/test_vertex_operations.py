@@ -1,4 +1,4 @@
-from typing import SupportsFloat, SupportsRound, Union, Any, Type
+from typing import SupportsFloat, SupportsRound, Union, Any, Type, Callable
 
 import numpy as np
 import pytest
@@ -7,6 +7,7 @@ import math
 from keanu.vartypes import numpy_types
 from keanu.vertex import Const
 from keanu.vertex.base import Vertex, Double, Integer, Boolean, is_floating_type
+from keanu.vertex import generated
 
 vertex_types = Union[Double, Boolean, Integer]
 
@@ -137,181 +138,175 @@ def test_can_do_less_than_or_equal_to_with_vertex_on_rhs(lhs: Union[Vertex, nump
 
 ### Arithmetic
 
-def infer_result_type(lhs: Union[Vertex, numpy_types, float], rhs: Union[Vertex, numpy_types, float]) -> Type[vertex_types]:
+
+def infer_result_type(lhs: Union[Vertex, numpy_types, float],
+                      rhs: Union[Vertex, numpy_types, float]) -> Type[vertex_types]:
     if is_floating_type(lhs) or is_floating_type(rhs):
         return Double
     else:
         return Integer
 
+
+def result_should_be_vertex(lhs: Union[Vertex, numpy_types], rhs: Union[Vertex, numpy_types, float]) -> bool:
+    if isinstance(lhs, Vertex) or isinstance(rhs, Vertex):
+        return True
+    else:
+        return False
+
+
+# Included the identity lambda to test the interoperability between vertexes and np/primitive types
+types_to_test = [generated.ConstantDouble, generated.ConstantInteger, lambda x: x]
+
+
 # yapf: disable
+@pytest.mark.parametrize("lhs_constructor", types_to_test)
+@pytest.mark.parametrize("rhs_constructor", types_to_test)
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([10., 20.])), Const(np.array([1., 2.])), np.array([11, 22])),
-    (Const(np.array([10., 20.])),       np.array([1., 2.]) , np.array([11, 22])),
-    (Const(np.array([10., 20.])),                        2., np.array([12, 22])),
-    (  Const(np.array([10, 20])),                         2, np.array([12, 22])),
-    (  Const(np.array([10, 20])),                 Const(2.), np.array([12, 22])),
-    (  Const(np.array([10, 20])),                        2., np.array([12, 22])),
-    (         np.array([10, 20]),                  Const(2), np.array([12, 22])),
-    (       np.array([10., 20.]),                  Const(2), np.array([12, 22])),
-    (                        20.,                  Const(2),                 22),
+    (       np.array([10., 20.]),np.array([1., 2.]) , np.array([11, 22])),
+    (         np.array([10, 20]),                 2., np.array([12, 22])),
+    (                         2., np.array([10, 20]), np.array([12, 22])),
+    (                         2.,                 2.,                  4),
 ])
 # yapf: enable
-def test_can_do_addition(lhs: Union[Vertex, numpy_types], rhs: Union[Vertex, numpy_types, float],
-                         expected_result: numpy_types) -> None:
-    result: Union[Vertex, np._ArrayLike[Any]] = lhs + rhs
-    assert isinstance(result, Vertex)
-    assert type(result) == infer_result_type(lhs, rhs)
-    assert (result.get_value() == expected_result).all()
-    result = rhs + lhs
-    assert isinstance(result, Vertex)
-    assert type(result) == infer_result_type(lhs, rhs)
-    assert (result.get_value() == expected_result).all()
+def test_can_do_addition(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Union[Vertex, numpy_types],
+                         rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+    lhs_casted = lhs_constructor(lhs)
+    rhs_casted = rhs_constructor(rhs)
+
+    result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted + rhs_casted
+    if result_should_be_vertex(lhs_casted, rhs_casted):
+        assert isinstance(result, Vertex)
+        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
+        assert (result.get_value() == expected_result).all()
+
+    result = rhs_casted + lhs_casted
+    if result_should_be_vertex(lhs_casted, rhs_casted):
+        assert isinstance(result, Vertex)
+        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
+        assert (result.get_value() == expected_result).all()
 
 
 # yapf: disable
+@pytest.mark.parametrize("lhs_constructor", types_to_test)
+@pytest.mark.parametrize("rhs_constructor", types_to_test)
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([10., 20.])), Const(np.array([1., 2.])), np.array([9, 18])),
-    (Const(np.array([10., 20.])),       np.array([1., 2.]) , np.array([9, 18])),
-    (Const(np.array([10., 20.])),                        2., np.array([8, 18])),
-    (  Const(np.array([10, 20])),                        2 , np.array([8, 18])),
-    (  Const(np.array([10, 20])),                Const(2.) , np.array([8, 18])),
-    (  Const(np.array([10, 20])),                       2. , np.array([8, 18])),
-    (         np.array([10, 20]),                 Const(2) , np.array([8, 18])),
-    (       np.array([10., 20.]),                 Const(2) , np.array([8, 18])),
-    (                         3.,                 Const(2) ,                 1),
+    (       np.array([10., 20.]),       np.array([1., 2.]),   np.array([9, 18])),
+    (       np.array([10., 20.]),                       2.,   np.array([8, 18])),
+    (                         2.,     np.array([10., 20.]), np.array([-8, -18])),
+    (                          3,                        2 ,                  1),
 ])
 # yapf: enable
-def test_can_do_subtraction(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
-    result: Union[Vertex, np._ArrayLike[Any]] = lhs - rhs
-    assert isinstance(result, Vertex)
-    assert type(result) == infer_result_type(lhs, rhs)
-    assert (result.get_value() == expected_result).all()
-    result = rhs - lhs
-    assert isinstance(result, Vertex)
-    assert type(result) == infer_result_type(lhs, rhs)
-    assert (result.get_value() == -expected_result).all()
+def test_can_do_subtraction(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Vertex,
+                            rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+    lhs_casted = lhs_constructor(lhs)
+    rhs_casted = rhs_constructor(rhs)
+
+    result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted - rhs_casted
+    if result_should_be_vertex(lhs_casted, rhs_casted):
+        assert isinstance(result, Vertex)
+        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
+        assert (result.get_value() == expected_result).all()
+
+        result = rhs_casted - lhs_casted
+        assert isinstance(result, Vertex)
+        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
+        assert (result.get_value() == -expected_result).all()
 
 
 # yapf: disable
+@pytest.mark.parametrize("lhs_constructor", types_to_test)
+@pytest.mark.parametrize("rhs_constructor", types_to_test)
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([3., 2.])), Const(np.array([5., 7.])), np.array([15, 14])),
-    (Const(np.array([3., 2.])),       np.array([5., 7.]) , np.array([15, 14])),
-    (Const(np.array([3., 2.])),                        5., np.array([15, 10])),
-    (  Const(np.array([3, 2])),                        5 , np.array([15, 10])),
-    (  Const(np.array([3, 2])),                 Const(5.), np.array([15, 10])),
-    (  Const(np.array([3, 2])),                       5. , np.array([15, 10])),
-    (        np.array([3, 2]) ,                 Const(5) , np.array([15, 10])),
-    (      np.array([3., 2.]) ,                 Const(5) , np.array([15, 10])),
-    (                       3.,                 Const(2) ,                  6),
+    (      np.array([3., 2.]),       np.array([5., 7.]), np.array([15, 14])),
+    (        np.array([3, 2]),                       5 , np.array([15, 10])),
+    (                      5 ,         np.array([3, 2]), np.array([15, 10])),
+    (                       3,                        2,                  6),
 ])
 # yapf: enable
-def test_can_do_multiplication(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
-                               expected_result: numpy_types) -> None:
-    result: Union[Vertex, np._ArrayLike[Any]] = lhs * rhs
-    assert isinstance(result, Vertex)
-    assert type(result) == infer_result_type(lhs, rhs)
-    assert (result.get_value() == expected_result).all()
-    result = rhs * lhs
-    assert isinstance(result, Vertex)
-    assert type(result) == infer_result_type(lhs, rhs)
-    assert (result.get_value() == expected_result).all()
+def test_can_do_multiplication(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Vertex,
+                               rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+    lhs_casted = lhs_constructor(lhs)
+    rhs_casted = rhs_constructor(rhs)
+
+    if result_should_be_vertex(lhs_casted, rhs_casted):
+        result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted * rhs_casted
+        assert isinstance(result, Vertex)
+        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
+        assert (result.get_value() == expected_result).all()
+        result = rhs_casted * lhs_casted
+        assert isinstance(result, Vertex)
+        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
+        assert (result.get_value() == expected_result).all()
 
 
 # yapf: disable
+@pytest.mark.parametrize("lhs_constructor", types_to_test)
+@pytest.mark.parametrize("rhs_constructor", types_to_test)
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([15., 10.])), Const(np.array([2., 4.])), np.array([7.5, 2.5 ])),
-    (Const(np.array([15., 10.])),       np.array([2., 4.]) , np.array([7.5, 2.5 ])),
-    (Const(np.array([15., 10.])),                 2.       , np.array([7.5, 5.  ])),
-    (  Const(np.array([15, 10])),                   2        , np.array([7.5, 5.  ])),
-    (  Const(np.array([15, 10])),                   2.       , np.array([7.5, 5.  ])),
-    (  Const(np.array([15, 10])),          np.array([2., 4.]), np.array([7.5, 2.5 ])),
-    (Const(np.array([15., 10.])),     Const(np.array([2, 4])), np.array([7.5, 2.5 ])),
-    (       np.array([15., 10.]),     Const(np.array([2, 4])), np.array([7.5, 2.5 ])),
-    (         np.array([15, 10]),   Const(np.array([2., 4.])), np.array([7.5, 2.5 ])),
-    (  Const(np.array([15, 10])),     Const(np.array([2, 4])), np.array([7.5, 2.5 ])),
-    (                        10.,                    Const(5),                     2),
+    (       np.array([15., 10.]),       np.array([2., 4.]), np.array([7.5, 2.5 ])),
+    (       np.array([15., 10.]),                       2., np.array([7.5, 5.  ])),
+    (                        15.,       np.array([2., 3.]), np.array([7.5, 5.  ])),
+    (                        15.,                       2.,                   7.5),
 ])
 # yapf: enable
-def test_can_do_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
-    result: Union[Vertex, np._ArrayLike[Any]] = lhs / rhs
-    assert isinstance(result, Vertex)
-    assert type(result) == Double
-    assert (result.get_value() == expected_result).all()
-    result = rhs / lhs
-    assert isinstance(result, Vertex)
-    assert (result.get_value() == 1. / expected_result).all()
+def test_can_do_division(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Vertex,
+                         rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+    lhs_casted = lhs_constructor(lhs)
+    rhs_casted = rhs_constructor(rhs)
+
+    if result_should_be_vertex(lhs_casted, rhs_casted):
+        result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted / rhs_casted
+        assert isinstance(result, Vertex)
+        assert type(result) == Double
+        assert (result.get_value() == expected_result).all()
+        result = rhs_casted / lhs_casted
+        assert type(result) == Double
+        assert isinstance(result, Vertex)
+        assert (result.get_value() == 1. / expected_result).all()
 
 
 # yapf: disable
+@pytest.mark.parametrize("lhs_constructor", types_to_test)
+@pytest.mark.parametrize("rhs_constructor", types_to_test)
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([15, 10])), Const(np.array([2, 4])), np.array([7, 2])),
-    (Const(np.array([15, 10])),       np.array([2, 4]) , np.array([7, 2])),
-    (Const(np.array([15, 10])),                      2 , np.array([7, 5])),
-    (Const(np.array([15, 10])),                     2. , np.array([7, 5])),
-    (Const(np.array([15, 10])),              Const(2.) , np.array([7, 5])),
-    (Const(np.array([15, 10])),     np.array([2., 4.]) , np.array([7, 2])),
-    (Const(np.array([15., 10.])),    np.array([2., 4.]), np.array([7, 2])),
-    (Const(np.array([15., 10.])),      np.array([2, 4]), np.array([7, 2])),
-    (Const(np.array([15., 10.])),Const(np.array([2, 4])), np.array([7, 2])),
+    (       np.array([15, 10]),       np.array([2, 4]), np.array([7, 2])),
+    (       np.array([15, 10]),                      2, np.array([7, 5])),
+    (                       15,       np.array([2, 4]), np.array([7, 3])),
+    (                       15,                      2,                7),
 ])
 # yapf: enable
-def test_can_do_integer_division(lhs: Vertex, rhs: Union[Vertex, numpy_types, float],
-                                 expected_result: numpy_types) -> None:
-    result = lhs // rhs
-    assert isinstance(result, Vertex)
-    assert type(result) == infer_result_type(lhs, rhs)
-    assert (result.get_value() == expected_result).all()
+def test_can_do_integer_division(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Vertex,
+                                 rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+    lhs_casted = lhs_constructor(lhs)
+    rhs_casted = rhs_constructor(rhs)
+
+    if result_should_be_vertex(lhs_casted, rhs_casted):
+        result = lhs_casted // rhs_casted
+        assert isinstance(result, Vertex)
+        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
+        assert (result.get_value() == expected_result).all()
 
 
 # yapf: disable
-@pytest.mark.parametrize("lhs, rhs, expected_result",
-                         [  (np.array([15, 10]), Const(np.array([2, 4])), np.array([7, 2])),
-                          (                  15, Const(np.array([2, 4])), np.array([7, 3])),
-                          (                 15.,                Const(2),                7),
-                          (np.array([15., 10.]),              Const(2), np.array([7, 5]))])
-# yapf: enable
-def test_can_do_integer_division_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
-                                                    expected_result: numpy_types) -> None:
-    result = lhs // rhs
-    assert isinstance(result, Vertex)
-    assert type(result) == infer_result_type(lhs, rhs)
-    assert (result.get_value() == expected_result).all()
-
-
-# yapf: disable
-
-
-# yapf: disable
+@pytest.mark.parametrize("lhs_constructor", types_to_test)
+@pytest.mark.parametrize("rhs_constructor", types_to_test)
 @pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (Const(np.array([3., 2.])), Const(np.array([2., 0.5])), np.array([9, 1.4142135623730951])),
-    (Const(np.array([3., 2.])),       np.array([2., 0.5]) , np.array([9, 1.4142135623730951])),
-    (Const(np.array([3., 2.])),                         2., np.array([9, 4                 ])),
-    (  Const(np.array([3, 2])),                          2, np.array([9, 4                 ])),
-    (  Const(np.array([3, 2])),                         2.,  np.array([9, 4                ])),
-    (Const(np.array([3., 2.])),                   Const(2),  np.array([9, 4                ])),
+    (     np.array([3, 2]),      np.array([2, 4]), np.array([9, 16])),
+    (     np.array([3, 2]),                     2,  np.array([9, 4])),
+    (                    2,      np.array([3, 2]),  np.array([8, 4])),
+    (                    2,                     3,                 8),
 ])
 # yapf: enable
-def test_can_do_pow(lhs: Vertex, rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
-    result = lhs ** rhs
-    assert isinstance(result, Vertex)
-    assert type(result) == infer_result_type(lhs, rhs)
-    assert (result.get_value() == expected_result).all()
+def test_can_do_pow(lhs_constructor: Callable, rhs_constructor: Callable, lhs: Vertex,
+                    rhs: Union[Vertex, numpy_types, float], expected_result: numpy_types) -> None:
+    lhs_casted = lhs_constructor(lhs)
+    rhs_casted = rhs_constructor(rhs)
 
-
-# yapf: disable
-@pytest.mark.parametrize("lhs, rhs, expected_result", [
-    (np.array([3., 2.]), Const(np.array([2., 0.5])), np.array([9, 1.4142135623730951])),
-    (3.                , Const(np.array([2., 0.5])), np.array([9, 1.7320508075688772])),
-    (3.                , Const(2)                  , 9.                               ),
-    (3                 , Const(2)                  , 9.                               ),
-])
-# yapf: enable
-def test_can_do_pow_with_vertex_on_rhs(lhs: Union[Vertex, numpy_types, float], rhs: Vertex,
-                                       expected_result: numpy_types) -> None:
-    result = lhs ** rhs
-    assert isinstance(result, Vertex)
-    assert type(result) == infer_result_type(lhs, rhs)
-    assert (result.get_value() == expected_result).all()
+    result = lhs_casted ** rhs_casted
+    if result_should_be_vertex(lhs_casted, rhs_casted):
+        assert isinstance(result, Vertex)
+        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
+        assert (result.get_value() == expected_result).all()
 
 
 def test_can_do_compound_operations() -> None:
