@@ -5,6 +5,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -32,7 +35,7 @@ public class LogisticVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfScalar() {
+    public void logProbMatchesKnownLogDensityOfScalar() {
         LogisticVertex tensorLogisticVertex = new LogisticVertex(0.5, 1.5);
         LogisticDistribution distribution = new LogisticDistribution(0.5, 1.5);
         double expectedDensity = distribution.logDensity(2.0);
@@ -41,11 +44,45 @@ public class LogisticVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfVector() {
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        DoubleVertex mu = ConstantVertex.of(0.5);
+        DoubleVertex s = ConstantVertex.of(1.5);
+        LogisticVertex logisticVertex = new LogisticVertex(mu, s);
+        LogProbGraph logProbGraph = logisticVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, mu.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, s, s.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, logisticVertex, DoubleTensor.scalar(2.));
+
+        LogisticDistribution distribution = new LogisticDistribution(0.5, 1.5);
+        double expectedDensity = distribution.logDensity(2.);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfVector() {
         LogisticDistribution distribution = new LogisticDistribution(0.0, 1.0);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75);
         LogisticVertex ndLogisticVertex = new LogisticVertex(0.0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndLogisticVertex, new double[]{0.25, .75}, expectedLogDensity);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        DoubleVertex mu = ConstantVertex.of(0., 0.);
+        DoubleVertex s = ConstantVertex.of(1., 1.);
+        LogisticVertex logisticVertex = new LogisticVertex(mu, s);
+        LogProbGraph logProbGraph = logisticVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, mu.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, s, s.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, logisticVertex, DoubleTensor.create(.25, .75));
+
+        LogisticDistribution distribution = new LogisticDistribution(0., 1.);
+        double expectedDensity = distribution.logDensity(.25) + distribution.logDensity(.75);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Test

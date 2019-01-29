@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
+package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -8,7 +8,9 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsWithRespectTo;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;

@@ -6,6 +6,9 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -24,7 +27,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class InverseGammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class InverseGammaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
@@ -104,6 +107,20 @@ public class InverseGammaVertex extends DoubleVertex implements Differentiable, 
 
         DoubleTensor logPdfs = InverseGamma.withParameters(alphaValues, betaValues).logProb(value);
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex alphaPlaceholder = new DoublePlaceholderVertex(alpha.getShape());
+        final DoublePlaceholderVertex betaPlaceholder = new DoublePlaceholderVertex(beta.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(alpha, alphaPlaceholder)
+            .input(beta, betaPlaceholder)
+            .logProbOutput(InverseGamma.logProbOutput(xPlaceholder, alphaPlaceholder, betaPlaceholder))
+            .build();
     }
 
     @Override

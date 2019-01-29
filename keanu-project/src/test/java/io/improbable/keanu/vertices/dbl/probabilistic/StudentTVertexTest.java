@@ -1,6 +1,12 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -46,6 +52,36 @@ public class StudentTVertexTest {
         for (int testValueForV : TEST_VALUES_OF_V) {
             testLogPdfAtGivenDegreesOfFreedom(testValueForV);
         }
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        IntegerVertex v = ConstantVertex.of(1);
+        StudentTVertex studentT = new StudentTVertex(v);
+        LogProbGraph logProbGraph = studentT.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, v, v.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, studentT, DoubleTensor.scalar(-4.5));
+
+        TDistribution distribution = new TDistribution(1);
+        double expectedDensity = distribution.logDensity(-4.5);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        IntegerVertex v = ConstantVertex.of(1, 1);
+        StudentTVertex studentT = new StudentTVertex(v);
+        LogProbGraph logProbGraph = studentT.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, v, v.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, studentT, DoubleTensor.create(-4.5, 4.5));
+
+        TDistribution distribution = new TDistribution(1);
+        double expectedDensity = distribution.logDensity(-4.5) + distribution.logDensity(4.5);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     /**
