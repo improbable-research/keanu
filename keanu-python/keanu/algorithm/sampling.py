@@ -145,12 +145,10 @@ def generate_samples(net: BayesNet,
 
 
 def _all_samples_are_scalar(samples):
-    samples_are_scalar = True
     for vertex_label in samples:
         if type(samples[vertex_label][0]) is np.ndarray:
-            samples_are_scalar = False
-            break
-    return samples_are_scalar
+            return False
+    return True
 
 
 def _create_multi_indexed_samples(samples):
