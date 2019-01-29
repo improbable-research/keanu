@@ -29,7 +29,7 @@ def test_autocorrelation_example_nd():
     algo = MetropolisHastingsSampler()
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
                                sampling_algorithm=algo, draws=100)
-    vertex_samples = posterior_samples.get('a')
-    ac = stats.autocorrelation(vertex_samples, (0,1))
+    vertex_samples = posterior_samples.get(('a', '(0, 1)')
+    ac = stats.autocorrelation(vertex_samples)
     # %%SNIPPET_END%% PythonNdAutocorrelation
 
