@@ -1,7 +1,6 @@
 package io.improbable.keanu.util.io;
 
 import io.improbable.keanu.annotation.DisplayInformationForOutput;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.*;
