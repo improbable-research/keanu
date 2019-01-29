@@ -2,10 +2,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.GradientOptimizationAlgorithmTestCase;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.RosenbrockTestCase;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SingleGaussianTestCase;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SumGaussianTestCase;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.*;
 import lombok.AllArgsConstructor;
 import org.junit.Rule;
 import org.junit.experimental.theories.DataPoints;
@@ -35,18 +32,19 @@ public class GradientOptimizationAlgorithmTest {
         NONLINEAR_CONJUGATE_GRADIENT(() -> {
 
             return ConjugateGradient.builder().build();
-        })
-        ;
+        });
 
         Supplier<GradientOptimizationAlgorithm> getOptimizer;
     }
 
     @AllArgsConstructor
     public enum TestCase {
+        SINGLE_GAUSSIAN(SingleGaussianTestCase::new),
         SUM_GAUSSIAN_MAP(() -> new SumGaussianTestCase(true)),
         SUM_GAUSSIAN_MLE(() -> new SumGaussianTestCase(false)),
         ROSENBROCK_1_100(() -> new RosenbrockTestCase(1, 100, 1, 1)),
-        SINGLE_GAUSSIAN(SingleGaussianTestCase::new);
+        HIMMELBLAU_A(() -> new HimmelblauTestCase(0, 3)),
+        HIMMELBLAU_B(() -> new HimmelblauTestCase(-2, -3));
 
         private Supplier<GradientOptimizationAlgorithmTestCase> supplier;
     }
