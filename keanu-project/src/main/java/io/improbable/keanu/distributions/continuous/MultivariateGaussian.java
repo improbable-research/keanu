@@ -50,15 +50,14 @@ public class MultivariateGaussian implements ContinuousDistribution {
     }
 
     public static DoubleVertex logProbGraph(DoublePlaceholderVertex x, DoublePlaceholderVertex mu, DoublePlaceholderVertex covariance) {
-        final double dimensions = numberOfDimensions(mu);
+        final long dimensions = numberOfDimensions(mu.getShape());
         final double kLog2Pi = dimensions * LOG_2_PI;
         final DoubleVertex logCovDet = covariance.matrixDeterminant().log();
         DoubleVertex xMinusMu = x.minus(mu);
         DoubleVertex xMinusMuT = xMinusMu.permute(1, 0);
         DoubleVertex covInv = covariance.matrixInverse();
 
-        boolean isUnivariate = dimensions == 1;
-        DoubleVertex scalar = isUnivariate ?
+        DoubleVertex scalar = isUnivariate(dimensions) ?
             covInv.times(xMinusMu).times(xMinusMuT):
             xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu));
 
@@ -66,15 +65,19 @@ public class MultivariateGaussian implements ContinuousDistribution {
     }
 
     private boolean isUnivariate() {
-        return numberOfDimensions() == 1;
+        return isUnivariate(numberOfDimensions());
     }
 
-    private static long numberOfDimensions(DoublePlaceholderVertex mu) {
-        return mu.getShape()[0];
+    private static boolean isUnivariate(long numberOfDimensions) {
+        return numberOfDimensions == 1;
     }
 
     private long numberOfDimensions() {
-        return mu.getShape()[0];
+        return numberOfDimensions(mu.getShape());
+    }
+
+    private static long numberOfDimensions(long[] muShape) {
+        return muShape[0];
     }
 
     @Override

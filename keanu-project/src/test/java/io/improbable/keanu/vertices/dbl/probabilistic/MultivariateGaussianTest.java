@@ -2,9 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -18,11 +16,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
 import static org.junit.Assert.assertEquals;
-import org.junit.rules.ExpectedException;
 
 
 public class MultivariateGaussianTest {
@@ -131,8 +129,7 @@ public class MultivariateGaussianTest {
 
     @Test
     public void bivariateGaussianLogProbMatchesLogDensityOfVector() {
-        DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new double[]{2, 3}, new long[]{2, 1}));
+        DoubleVertex mu = ConstantVertex.of(new double[]{2, 3}, 2, 1);
 
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, 1);
 
@@ -140,15 +137,14 @@ public class MultivariateGaussianTest {
         double expectedDensity2 = new NormalDistribution(3, 1).logDensity(10);
         double expectedDensity = expectedDensity1 + expectedDensity2;
 
-        double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{8, 10}, new long[]{2, 1}));
+        double density = mvg.logPdf(DoubleTensor.create(new double[]{8, 10}, 2, 1));
 
         assertEquals(expectedDensity, density, 0.0001);
     }
 
     @Test
     public void bivariateGaussianLogProbGraphMatchesLogDensityOfVector() {
-        DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new double[]{2, 3}, new long[]{2, 1}));
+        DoubleVertex mu = ConstantVertex.of(new double[]{2, 3}, 2, 1);
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, 1.);
         DoubleVertex covariance = mvg.getCovariance();
         LogProbGraph logProbGraph = mvg.logProbGraph();
@@ -166,13 +162,11 @@ public class MultivariateGaussianTest {
 
     @Test
     public void bivariateGaussianLogProbMatchesLogDensityOfScipy() {
-        DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new double[]{1, 2}, new long[]{2, 1}));
-        DoubleVertex covarianceMatrix = ConstantVertex.of(
-            new Nd4jDoubleTensor(new double[]{1, 0.3, 0.3, 0.6}, new long[]{2, 2}));
+        DoubleVertex mu = ConstantVertex.of(new double[]{1, 2}, 2, 1);
+        DoubleVertex covarianceMatrix = ConstantVertex.of(new double[]{1, 0.3, 0.3, 0.6}, 2, 2);
 
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covarianceMatrix);
-        double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{0.5, 0.4}, new long[]{2, 1}));
+        double density = mvg.logPdf(DoubleTensor.create(new double[]{0.5, 0.4}, 2, 1));
         double expected = -3.6874792995813834;
 
         assertEquals(expected, density, 0.001);
@@ -180,10 +174,8 @@ public class MultivariateGaussianTest {
 
     @Test
     public void bivariateGaussianLogProbGraphMatchesLogDensityOfScipy() {
-        DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new double[]{1, 2}, new long[]{2, 1}));
-        DoubleVertex covarianceMatrix = ConstantVertex.of(
-            new Nd4jDoubleTensor(new double[]{1, 0.3, 0.3, 0.6}, new long[]{2, 2}));
+        DoubleVertex mu = ConstantVertex.of(new double[]{1, 2}, 2, 1);
+        DoubleVertex covarianceMatrix = ConstantVertex.of(new double[]{1, 0.3, 0.3, 0.6}, 2, 2);
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covarianceMatrix);
         LogProbGraph logProbGraph = mvg.logProbGraph();
 
@@ -197,22 +189,18 @@ public class MultivariateGaussianTest {
 
     @Test
     public void multivariateGaussianLogProbMatchesLogDensityOfScipy() {
-        DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new double[]{1, 2, 3}, new long[]{3, 1}));
+        DoubleVertex mu = ConstantVertex.of(new double[]{1, 2, 3}, 3, 1);
 
         DoubleVertex covarianceMatrix = ConstantVertex.of(
-            new Nd4jDoubleTensor(
-                new double[]{
-                    1.0, 0.3, 0.3,
-                    0.3, 0.8, 0.3,
-                    0.3, 0.3, 0.6
-                },
-                new long[]{3, 3}
-            )
-        );
+            new double[]{
+                1.0, 0.3, 0.3,
+                0.3, 0.8, 0.3,
+                0.3, 0.3, 0.6
+            },
+            3, 3);
 
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covarianceMatrix);
-        double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{0.2, 0.3, 0.4}, new long[]{3, 1}));
+        double density = mvg.logPdf(DoubleTensor.create(new double[]{0.2, 0.3, 0.4}, 3, 1));
         double expected = -8.155504532016181;
 
         assertEquals(expected, density, 0.001);
@@ -220,19 +208,15 @@ public class MultivariateGaussianTest {
 
     @Test
     public void multivariateGaussianLogProbGraphMatchesLogDensityOfScipy() {
-        DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new double[]{1, 2, 3}, new long[]{3, 1}));
+        DoubleVertex mu = ConstantVertex.of(new double[]{1, 2, 3}, 3, 1);
 
         DoubleVertex covarianceMatrix = ConstantVertex.of(
-            new Nd4jDoubleTensor(
-                new double[]{
-                    1.0, 0.3, 0.3,
-                    0.3, 0.8, 0.3,
-                    0.3, 0.3, 0.6
-                },
-                new long[]{3, 3}
-            )
-        );
+            new double[]{
+                1.0, 0.3, 0.3,
+                0.3, 0.8, 0.3,
+                0.3, 0.3, 0.6
+            },
+            3, 3);
 
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covarianceMatrix);
         LogProbGraph logProbGraph = mvg.logProbGraph();
@@ -249,8 +233,7 @@ public class MultivariateGaussianTest {
     @Category(Slow.class)
     @Test
     public void gaussianSampleMethodMatchesLogProbMethod() {
-        DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new double[]{0, 0}, new long[]{2, 1}));
+        DoubleVertex mu = ConstantVertex.of(new double[]{0, 0}, 2, 1);
 
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, 1);
 
@@ -263,8 +246,8 @@ public class MultivariateGaussianTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void whenYouSampleYouMustMatchMusShape() {
-        DoubleTensor mu = new Nd4jDoubleTensor(new double[]{0, 0}, new long[]{2, 1});
-        DoubleTensor sigma = new Nd4jDoubleTensor(new double[]{1}, new long[]{1});
+        DoubleTensor mu = DoubleTensor.create(new double[]{0, 0}, 2, 1);
+        DoubleTensor sigma = DoubleTensor.create(new double[]{1}, 1);
 
         ContinuousDistribution mvg = MultivariateGaussian.withParameters(mu, sigma);
         mvg.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
