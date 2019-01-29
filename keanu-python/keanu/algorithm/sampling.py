@@ -153,7 +153,7 @@ def _all_samples_are_scalar(samples):
 
 def _create_multi_indexed_samples(samples):
     vertex_samples_multi = {}
-    column_header_for_scalar = (0)
+    column_header_for_scalar = '(0)'
     for vertex_label in samples:
         vertex_samples_multi[vertex_label] = defaultdict(list)
         for sample_values in samples[vertex_label]:
@@ -161,7 +161,7 @@ def _create_multi_indexed_samples(samples):
                 vertex_samples_multi[vertex_label][column_header_for_scalar].append(sample_values)
             else:
                 for index, value in np.ndenumerate(sample_values):
-                    vertex_samples_multi[vertex_label][index].append(value.item())
+                    vertex_samples_multi[vertex_label][str(index)].append(value.item())
 
     tuple_heirarchy = {(vertex_label, tensor_index): values
                        for vertex_label, tensor_index in vertex_samples_multi.items()

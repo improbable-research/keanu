@@ -94,11 +94,11 @@ def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_mixed_net(al
         assert type(vertex_samples) == list
         assert all(type(sample) == float for sample in vertex_samples)
 
-    assert ('exp', (0)) in samples
-    assert ('gaussian', (0, 0)) in samples
-    assert ('gaussian', (0, 1)) in samples
-    assert ('gaussian', (1, 0)) in samples
-    assert ('gaussian', (1, 1)) in samples
+    assert ('exp', '(0)') in samples
+    assert ('gaussian', '(0, 0)') in samples
+    assert ('gaussian', '(0, 1)') in samples
+    assert ('gaussian', '(1, 0)') in samples
+    assert ('gaussian', '(1, 1)') in samples
 
 
 def test_sample_dict_can_be_loaded_in_to_dataframe(net: BayesNet) -> None:
@@ -136,8 +136,7 @@ def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
         assert parent_column in vertex_labels
 
     for child_column in df.columns.levels[1]:
-        gamma.get_value()[child_column]
-        assert type(gamma.get_value()[child_column]) == np.float64
+        assert type(child_column) == str
 
 
 def test_dropping_samples(net: BayesNet) -> None:
