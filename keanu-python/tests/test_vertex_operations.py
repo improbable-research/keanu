@@ -154,6 +154,14 @@ def result_should_be_vertex(lhs: Union[Vertex, numpy_types], rhs: Union[Vertex, 
         return False
 
 
+def assert_is_correct_vertex_type_and_expected_value(lhs: Union[Vertex, numpy_types, float],
+                                                     rhs: Union[Vertex, numpy_types], result: Any,
+                                                     expected_result: Any) -> None:
+    assert isinstance(result, Vertex)
+    assert type(result) == infer_result_type(lhs, rhs)
+    assert (result.get_value() == expected_result).all()
+
+
 # Included the identity lambda to test the interoperability between vertexes and np/primitive types
 types_to_test = [generated.ConstantDouble, generated.ConstantInteger, lambda x: x]
 
@@ -173,17 +181,12 @@ def test_can_do_addition(lhs_constructor: Callable, rhs_constructor: Callable, l
     lhs_casted = lhs_constructor(lhs)
     rhs_casted = rhs_constructor(rhs)
 
-    result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted + rhs_casted
     if result_should_be_vertex(lhs_casted, rhs_casted):
-        assert isinstance(result, Vertex)
-        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
-        assert (result.get_value() == expected_result).all()
+        result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted + rhs_casted
+        assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, expected_result)
 
-    result = rhs_casted + lhs_casted
-    if result_should_be_vertex(lhs_casted, rhs_casted):
-        assert isinstance(result, Vertex)
-        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
-        assert (result.get_value() == expected_result).all()
+        result = rhs_casted + lhs_casted
+        assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, expected_result)
 
 
 # yapf: disable
@@ -201,16 +204,12 @@ def test_can_do_subtraction(lhs_constructor: Callable, rhs_constructor: Callable
     lhs_casted = lhs_constructor(lhs)
     rhs_casted = rhs_constructor(rhs)
 
-    result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted - rhs_casted
     if result_should_be_vertex(lhs_casted, rhs_casted):
-        assert isinstance(result, Vertex)
-        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
-        assert (result.get_value() == expected_result).all()
+        result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted - rhs_casted
+        assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, expected_result)
 
         result = rhs_casted - lhs_casted
-        assert isinstance(result, Vertex)
-        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
-        assert (result.get_value() == -expected_result).all()
+        assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, -expected_result)
 
 
 # yapf: disable
@@ -230,13 +229,10 @@ def test_can_do_multiplication(lhs_constructor: Callable, rhs_constructor: Calla
 
     if result_should_be_vertex(lhs_casted, rhs_casted):
         result: Union[Vertex, np._ArrayLike[Any]] = lhs_casted * rhs_casted
-        assert isinstance(result, Vertex)
-        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
-        assert (result.get_value() == expected_result).all()
+        assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, expected_result)
+
         result = rhs_casted * lhs_casted
-        assert isinstance(result, Vertex)
-        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
-        assert (result.get_value() == expected_result).all()
+        assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, expected_result)
 
 
 # yapf: disable
@@ -259,6 +255,7 @@ def test_can_do_division(lhs_constructor: Callable, rhs_constructor: Callable, l
         assert isinstance(result, Vertex)
         assert type(result) == Double
         assert (result.get_value() == expected_result).all()
+
         result = rhs_casted / lhs_casted
         assert type(result) == Double
         assert isinstance(result, Vertex)
@@ -282,9 +279,7 @@ def test_can_do_integer_division(lhs_constructor: Callable, rhs_constructor: Cal
 
     if result_should_be_vertex(lhs_casted, rhs_casted):
         result = lhs_casted // rhs_casted
-        assert isinstance(result, Vertex)
-        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
-        assert (result.get_value() == expected_result).all()
+        assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, expected_result)
 
 
 # yapf: disable
@@ -304,9 +299,7 @@ def test_can_do_pow(lhs_constructor: Callable, rhs_constructor: Callable, lhs: V
 
     result = lhs_casted ** rhs_casted
     if result_should_be_vertex(lhs_casted, rhs_casted):
-        assert isinstance(result, Vertex)
-        assert type(result) == infer_result_type(lhs_casted, rhs_casted)
-        assert (result.get_value() == expected_result).all()
+        assert_is_correct_vertex_type_and_expected_value(lhs_casted, rhs_casted, result, expected_result)
 
 
 def test_can_do_compound_operations() -> None:
