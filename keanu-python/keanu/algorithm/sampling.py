@@ -149,6 +149,7 @@ def _all_samples_are_scalar(samples):
     for vertex_label in samples:
         if type(samples[vertex_label][0]) is np.ndarray:
             samples_are_scalar = False
+            break
     return samples_are_scalar
 
 
@@ -158,14 +159,14 @@ def _create_multi_indexed_samples(samples):
         vertex_samples_multi[vertex_label] = defaultdict(list)
         for sample_values in samples[vertex_label]:
             if type(sample_values) is not np.ndarray:
-                vertex_samples_multi[vertex_label]['0'].append(sample_values)
+                vertex_samples_multi[vertex_label][(0)].append(sample_values)
             else:
                 for index, value in np.ndenumerate(sample_values):
                     vertex_samples_multi[vertex_label][index].append(value.item())
 
-    reform = {(outerKey, innerKey): values for outerKey, innerDict in vertex_samples_multi.items() for innerKey, values in innerDict.items()}
+    tuple_heirarchy = {(vertex_label, tensor_index): values for vertex_label, tensor_index in vertex_samples_multi.items() for tensor_index, values in tensor_index.items()}
 
-    return reform
+    return tuple_heirarchy
 
 
 def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList, live_plot: bool, refresh_every: int,

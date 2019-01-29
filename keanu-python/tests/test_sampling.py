@@ -10,7 +10,7 @@ from examples import thermometers
 from keanu import BayesNet, KeanuRandom, Model
 from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler,
                              HamiltonianSampler, NUTSSampler, PosteriorSamplingAlgorithm)
-from keanu.vertex import Gamma, Exponential, Cauchy, KeanuContext, Bernoulli
+from keanu.vertex import Gamma, Exponential, Cauchy, KeanuContext, Bernoulli, Gaussian
 from typing import Any, Callable
 
 
@@ -28,7 +28,7 @@ def net() -> BayesNet:
 def tensor_net() -> BayesNet:
     with Model() as m:
         m.gamma = Gamma(np.array([1., 1., 1., 1.]).reshape(2, 2), np.array([2., 2., 2., 2.]).reshape(2, 2))
-        m.exp = Exponential(np.array([1., 1., 1., 1.].reshape(2, 2)))
+        m.exp = Exponential(np.array([1., 1., 1., 1.]).reshape(2, 2))
         m.cauchy = Cauchy(m.gamma, m.exp)
 
     return m.to_bayes_net()
@@ -69,7 +69,38 @@ def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sa
         assert all(type(sample) == float for sample in vertex_samples)
 
 
-def test_sample_dict_dict_can_be_loaded_in_dataframe(net: BayesNet) -> None:
+@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler()), (HamiltonianSampler())])
+def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_mixed_net(algo: PosteriorSamplingAlgorithm) -> None:
+    exp = Exponential(1.)
+    add = exp + np.array([1. ,2., 3., 4.]).reshape(2, 2)
+    gaussian = Gaussian(add, 2.)
+    
+    exp.set_label("exp")
+    gaussian.set_label("gaussian")
+
+    mixed_net = BayesNet(exp.get_connected_graph())
+
+    draws = 5
+    sample_from = list(mixed_net.get_latent_vertices())
+    vertex_labels = [vertex.get_label() for vertex in sample_from]
+
+    samples = sample(net=mixed_net, sample_from=sample_from, sampling_algorithm=algo, draws=draws)
+    assert type(samples) == dict
+
+    for label, vertex_samples in samples.items():
+        assert label[0] in vertex_labels
+        assert len(vertex_samples) == draws
+        assert type(vertex_samples) == list
+        assert all(type(sample) == float for sample in vertex_samples)
+
+    assert ('exp', (0)) in samples
+    assert ('gaussian', (0, 0)) in samples
+    assert ('gaussian', (0, 1)) in samples
+    assert ('gaussian', (1, 0)) in samples
+    assert ('gaussian', (1, 1)) in samples
+
+
+def test_sample_dict_can_be_loaded_in_to_dataframe(net: BayesNet) -> None:
     sample_from = list(net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]
 
@@ -79,11 +110,10 @@ def test_sample_dict_dict_can_be_loaded_in_dataframe(net: BayesNet) -> None:
     for column in df:
         header = df[column].name
         vertex_label = header
-
         assert vertex_label in vertex_labels
 
 
-def test_multi_indexed_sample_dict_can_be_loaded_in_dataframe() -> None:
+def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
     gamma = Gamma(np.array([1., 1., 1., 1.]).reshape(2, 2), np.array([2., 2., 2., 2.]).reshape(2, 2))
     exp = Exponential(np.array([1., 1., 1., 1.]).reshape(2, 2))
     cauchy = Cauchy(gamma, exp)
