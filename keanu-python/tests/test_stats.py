@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from itertools import islice
+from typing import cast
 from keanu import Model, stats, KeanuRandom, BayesNet
 from keanu.algorithm import sample, generate_samples
 from keanu.vertex import Uniform, Gaussian
@@ -21,7 +22,6 @@ def test_autocorrelation_example_nd():
     bayes_net = BayesNet(a.get_connected_graph())
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(), draws=10)
     vertex_samples = posterior_samples.get(('a', '(0, 1)'))
-    print(vertex_samples)
     ac = stats.autocorrelation(vertex_samples)
 
 
@@ -32,7 +32,6 @@ def test_autocorr_returns_ndarray_of_correct_dtype() -> None:
     samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=10)
     valid_key = list(samples.keys())[0]
     sample_ = samples.get(valid_key)
-    print(sample_)
     assert sample_ is not None
     autocorr = stats.autocorrelation(sample_)
     assert type(autocorr) == np.ndarray

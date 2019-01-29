@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Any
 from numpy import ndarray, fromiter, issubdtype, floating, stack
 from py4j.java_gateway import java_import
 
@@ -13,13 +13,13 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.statistics.Autocorrelation")
 
 
-def autocorrelation(arg: List[numpy_types]) -> ndarray:
+def autocorrelation(arg: List[Any]) -> ndarray:
     check_all_floats(arg)
     autocorr = k.jvm_view().Autocorrelation.calculate(k.to_java_array(arg))
     return fromiter(autocorr, float)
 
 
-def check_all_floats(arg: List[numpy_types]) -> None:
+def check_all_floats(arg: List[Any]) -> None:
     print(type(arg[0]))
     all_floats = all((type(elem) == float or type(elem) == np.float64) for elem in arg)
     if not all_floats:

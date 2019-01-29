@@ -32,8 +32,8 @@ def __calc_max_lag(data_len: int) -> int:
     return lim
 
 
-def plot_acf(data: List[numpy_types], index: Tuple[int, ...] = (), nlags: int = None) -> Any:
-    autocorr = stats.autocorrelation(data, index)
+def plot_acf(data: List[numpy_types], nlags: int = None) -> Any:
+    autocorr = stats.autocorrelation(data)
     fig, ax = __create_new_mpl()
     if nlags is None:
         nlags = __calc_max_lag(len(autocorr))
