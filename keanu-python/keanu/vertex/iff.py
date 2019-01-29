@@ -3,7 +3,7 @@ from typing import Union
 from keanu.infer_type import get_type_of_value
 from keanu.vartypes import tensor_arg_types
 from .base import Vertex
-from .generated import BooleanIf, DoubleIf, IntegerIf
+from .generated import BooleanIf, DoubleIf, IntegerIf, cast_to_double_vertex
 
 
 def If(predicate: Union[tensor_arg_types, Vertex], thn: Union[tensor_arg_types, Vertex],
@@ -16,15 +16,11 @@ def If(predicate: Union[tensor_arg_types, Vertex], thn: Union[tensor_arg_types, 
     if predicate_type != bool:
         raise TypeError("Predicate must be boolean: got {}".format(type(predicate)))
 
-    if (then_type != else_type):
-        raise TypeError('The "then" and "else" clauses must be of the same datatype: {} vs {}'.format(
-            then_type, else_type))
-
-    if then_type == bool:
-        return BooleanIf(predicate, thn, els)
-    elif then_type == int:
-        return IntegerIf(predicate, thn, els)
-    elif then_type == float:
+    if then_type == float or else_type == float:
         return DoubleIf(predicate, thn, els)
+    elif then_type == int or else_type == int:
+        return IntegerIf(predicate, thn, els)
+    elif then_type == bool and else_type == bool:
+        return BooleanIf(predicate, thn, els)
     else:
-        raise NotImplementedError("Unexpected type {} for vertex {}".format(then_type, thn))
+        raise NotImplementedError("Unexpected types for If statement: {}, {}".format(then_type, else_type))

@@ -64,12 +64,28 @@ def test_you_can_create_a_boolean_valued_if(predicate: Union[tensor_arg_types, V
     assert result.unwrap().getClass().getSimpleName() == "BooleanIfVertex"
 
 
-def test_then_and_else_must_be_of_the_same_type() -> None:
-    with pytest.raises(TypeError) as excinfo:
-        If(True, 1, 1.)
+@pytest.mark.parametrize(["thn", "els"], [
+    (1, 1.),
+    (1., 1),
+    (1., True),
+    (True, 1.),
+])
+def test_if_thn_or_els_is_not_float_it_gets_coerced(thn, els) -> None:
+    result = If(True, thn, els)
+    assert type(result) == Double
+    assert result.unwrap().getClass().getSimpleName() == "DoubleIfVertex"
+    assert result.sample() == 1.
 
-    assert str(excinfo.value) == \
-           "The \"then\" and \"else\" clauses must be of the same datatype: <class 'int'> vs <class 'float'>"
+
+@pytest.mark.parametrize(["thn", "els"], [
+    (1, True),
+    (True, 1),
+])
+def test_if_thn_or_els_is_not_int_it_gets_coerced(thn, els) -> None:
+    result = If(True, thn, els)
+    assert type(result) == Integer
+    assert result.unwrap().getClass().getSimpleName() == "IntegerIfVertex"
+    assert result.sample() == 1
 
 
 def test_predicate_must_be_boolean() -> None:
