@@ -19,7 +19,11 @@ public class Geometric implements DiscreteDistribution {
 
     @Override
     public IntegerTensor sample(long[] shape, KeanuRandom random) {
-        return null;
+        DoubleTensor numerator = random.nextDouble(shape);
+        numerator = numerator.logInPlace();
+        DoubleTensor denominator = p.unaryMinus().plusInPlace(1.0).logInPlace();
+
+        return numerator.divInPlace(denominator).floorInPlace().toInteger().plusInPlace(1);
     }
 
     @Override
@@ -40,7 +44,7 @@ public class Geometric implements DiscreteDistribution {
     }
 
     private DoubleTensor setProbToZeroForInvalidX(DoubleTensor x, DoubleTensor results) {
-        DoubleTensor invalidX = results.getLessThanMask(DoubleTensor.create(1.0, x.getShape()));
+        DoubleTensor invalidX = results.getGreaterThanOrEqualToMask(DoubleTensor.create(1.0, x.getShape()));
 
         return results.setWithMaskInPlace(invalidX, Double.NEGATIVE_INFINITY);
     }
