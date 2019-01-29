@@ -25,7 +25,7 @@ public class GeometricVertexTest {
     @Test
     public void logProbIsCorrectVector() {
         double p = 0.8;
-        int[] values = new int[] {3, 5, 6};
+        int[] values = new int[] {3, 5, 15};
         GeometricVertex myVertex = new GeometricVertex(new long[] {values.length}, p);
 
         double calculatedP = myVertex.logPmf(values);
