@@ -1,7 +1,8 @@
 package com.examples;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
@@ -49,12 +50,13 @@ public class TextMessaging {
 
         BayesianNetwork net = new BayesianNetwork(textsForDay.getConnectedGraph());
         net.probeForNonZeroProbability(1000);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
         final int numSamples = 1000;
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig()
-            .generatePosteriorSamples(net, net.getLatentVertices())
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+            .generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(numSamples / 2)
-            .downSampleInterval(net.getLatentVertices().size())
+            .downSampleInterval(model.getLatentVariables().size())
             .generate(numSamples);
 
         return new TextMessagingResults(

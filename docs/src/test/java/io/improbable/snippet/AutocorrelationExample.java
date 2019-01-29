@@ -1,8 +1,9 @@
 package io.improbable.snippet;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -20,12 +21,12 @@ public class AutocorrelationExample {
         C.observe(43.0);
         A.setValue(20.0);
         B.setValue(20.0);
-        BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
 
         //%%SNIPPET_START%% ScalarAutocorrelation
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+            model,
+            model.getLatentVariables(),
             100
         );
         DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation();
@@ -39,11 +40,12 @@ public class AutocorrelationExample {
         BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
         C.observe(new double[]{1, 4, 5, 7, 8});
         bayesNet.probeForNonZeroProbability(100);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
         //%%SNIPPET_START%% TensorAutocorrelation
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+            model,
+            model.getLatentVariables(),
             100
         );
         DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAutocorrelation(0, 1);

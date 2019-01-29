@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSample;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Rule;
@@ -15,6 +14,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 import static org.junit.Assert.assertEquals;
 
 public class IntegerIfVertexTest {
@@ -56,10 +56,10 @@ public class IntegerIfVertexTest {
     }
 
     private static double calculateMeanOfVertex(IntegerVertex vertex) {
-        BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
 
-        return MetropolisHastings.withDefaultConfig(KeanuRandom.getDefaultRandom())
-            .generatePosteriorSamples(net, Collections.singletonList(vertex)).stream()
+        return MetropolisHastings.withDefaultConfigFor(model, KeanuRandom.getDefaultRandom())
+            .generatePosteriorSamples(model, Collections.singletonList(vertex)).stream()
             .limit(2000)
             .collect(Collectors.averagingInt((NetworkSample state) -> state.get(vertex).scalar()));
     }

@@ -3,10 +3,9 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
@@ -27,6 +26,8 @@ import org.junit.experimental.categories.Category;
 import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 
 public class ProcessModelVertexTest {
 
@@ -177,10 +178,10 @@ public class ProcessModelVertexTest {
         chanceOfRainObservation.observe(3.0);
         humidityObservation.observe(60.0);
 
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(chanceOfRainObservation.getConnectedGraph());
+        KeanuProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(chanceOfRainObservation.getConnectedGraph());
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesianNetwork,
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfigFor(probabilisticModel).getPosteriorSamples(
+            probabilisticModel,
             inputToModel,
             220
         );
