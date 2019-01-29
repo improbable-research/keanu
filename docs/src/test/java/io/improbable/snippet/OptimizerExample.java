@@ -1,7 +1,9 @@
 package io.improbable.snippet;
 
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.ConjugateGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.OptimizerBounds;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -29,9 +31,11 @@ public class OptimizerExample {
     private static double runGradientOptimizer(DoubleVertex temperature) {
         //%%SNIPPET_START%% GradientOptimizerMostProbable
         GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(temperature.getConnectedGraph())
-            .maxEvaluations(5000)
-            .relativeThreshold(1e-8)
-            .absoluteThreshold(1e-8)
+            .algorithm(ConjugateGradient.builder()
+                .maxEvaluations(5000)
+                .relativeThreshold(1e-8)
+                .absoluteThreshold(1e-8)
+                .build())
             .build();
         optimizer.maxAPosteriori();
 
@@ -45,11 +49,13 @@ public class OptimizerExample {
         //%%SNIPPET_START%% NonGradientOptimizerMostProbable
         OptimizerBounds temperatureBounds = new OptimizerBounds().addBound(temperature.getId(), -250., 250.0);
         NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.builderFor(temperature.getConnectedGraph())
-            .maxEvaluations(5000)
-            .boundsRange(100000)
-            .optimizerBounds(temperatureBounds)
-            .initialTrustRegionRadius(5.)
-            .stoppingTrustRegionRadius(2e-8)
+            .algorithm(BOBYQA.builder()
+                .maxEvaluations(5000)
+                .boundsRange(100000)
+                .optimizerBounds(temperatureBounds)
+                .initialTrustRegionRadius(5.)
+                .stoppingTrustRegionRadius(2e-8)
+                .build())
             .build();
         optimizer.maxAPosteriori();
 

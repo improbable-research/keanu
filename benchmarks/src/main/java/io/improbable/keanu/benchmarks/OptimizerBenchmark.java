@@ -7,7 +7,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.Adam;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.openjdk.jmh.annotations.*;
 
@@ -26,7 +26,7 @@ public class OptimizerBenchmark {
     @Setup
     public void setup() {
 
-        ProgressBar.disable();
+        StatusBar.disable();
 
         GaussianVertex A = new GaussianVertex(10, 0.1);
         A.setValue(0.0);

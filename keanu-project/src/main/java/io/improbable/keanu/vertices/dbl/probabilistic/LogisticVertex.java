@@ -6,6 +6,9 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -24,7 +27,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class LogisticVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class LogisticVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex mu;
     private final DoubleVertex s;
@@ -86,6 +89,20 @@ public class LogisticVertex extends DoubleVertex implements Differentiable, Prob
         DoubleTensor logPdfs = Logistic.withParameters(muValues, sValues).logProb(value);
 
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex muPlaceholder = new DoublePlaceholderVertex(mu.getShape());
+        final DoublePlaceholderVertex sPlaceholder = new DoublePlaceholderVertex(s.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(mu, muPlaceholder)
+            .input(s, sPlaceholder)
+            .logProbOutput(Logistic.logProbOutput(xPlaceholder, muPlaceholder, sPlaceholder))
+            .build();
     }
 
     @Override

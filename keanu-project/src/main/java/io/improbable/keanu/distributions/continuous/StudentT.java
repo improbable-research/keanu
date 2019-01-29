@@ -4,6 +4,9 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
@@ -46,11 +49,11 @@ public class StudentT implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor t) {
 
         DoubleTensor vAsDouble = v.toDouble();
-        DoubleTensor halfVPlusOne = vAsDouble.plus(1).divInPlace(2);
+        DoubleTensor halfVPlusOne = vAsDouble.plus(1.).divInPlace(2.);
 
         DoubleTensor logGammaHalfVPlusOne = halfVPlusOne.logGamma();
-        DoubleTensor logGammaHalfV = vAsDouble.div(2).logGammaInPlace();
-        DoubleTensor halfLogV = vAsDouble.log().divInPlace(2);
+        DoubleTensor logGammaHalfV = vAsDouble.div(2.).logGammaInPlace();
+        DoubleTensor halfLogV = vAsDouble.log().divInPlace(2.);
 
         return logGammaHalfVPlusOne
             .minusInPlace(halfLogV)
@@ -58,7 +61,27 @@ public class StudentT implements ContinuousDistribution {
             .minusInPlace(logGammaHalfV)
             .minusInPlace(
                 halfVPlusOne.timesInPlace(
-                    t.pow(2).divInPlace(vAsDouble).plusInPlace(1).logInPlace()
+                    t.pow(2.).divInPlace(vAsDouble).plusInPlace(1.).logInPlace()
+                )
+            );
+    }
+
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex t, IntegerPlaceHolderVertex v) {
+
+        DoubleVertex vAsDouble = v.toDouble();
+        DoubleVertex halfVPlusOne = vAsDouble.plus(1.).div(2.);
+
+        DoubleVertex logGammaHalfVPlusOne = halfVPlusOne.logGamma();
+        DoubleVertex logGammaHalfV = vAsDouble.div(2.).logGamma();
+        DoubleVertex halfLogV = vAsDouble.log().div(2.);
+
+        return logGammaHalfVPlusOne
+            .minus(halfLogV)
+            .minus(HALF_LOG_PI)
+            .minus(logGammaHalfV)
+            .minus(
+                halfVPlusOne.times(
+                    t.pow(2.).div(vAsDouble).plus(1.).log()
                 )
             );
     }

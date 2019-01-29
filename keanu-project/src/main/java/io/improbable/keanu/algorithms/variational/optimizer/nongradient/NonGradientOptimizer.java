@@ -1,8 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.*;
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -52,7 +55,7 @@ public class NonGradientOptimizer implements Optimizer {
 
     private OptimizedResult optimize(FitnessFunction fitnessFunction) {
 
-        ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
+        StatusBar statusBar = Optimizer.createFitnessStatusBar(this);
 
         List<? extends Variable> latentVariables = probabilisticGraph.getLatentVariables();
 
@@ -68,7 +71,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         OptimizedResult result = nonGradientOptimizationAlgorithm.optimize(latentVariables, fitnessFunction);
 
-        progressBar.finish();
+        statusBar.finish();
 
         return result;
     }

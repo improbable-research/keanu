@@ -80,9 +80,11 @@ how to use the builder to change all of the available parameters.
 
 ```java
 GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(temperature.getConnectedGraph())
-    .maxEvaluations(5000)
-    .relativeThreshold(1e-8)
-    .absoluteThreshold(1e-8)
+    .algorithm(ConjugateGradient.builder()
+        .maxEvaluations(5000)
+        .relativeThreshold(1e-8)
+        .absoluteThreshold(1e-8)
+        .build())
     .build();
 optimizer.maxAPosteriori();
 
@@ -118,11 +120,13 @@ how to use the builder to change all of the available parameters.
 ```java
 OptimizerBounds temperatureBounds = new OptimizerBounds().addBound(temperature.getId(), -250., 250.0);
 NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.builderFor(temperature.getConnectedGraph())
-    .maxEvaluations(5000)
-    .boundsRange(100000)
-    .optimizerBounds(temperatureBounds)
-    .initialTrustRegionRadius(5.)
-    .stoppingTrustRegionRadius(2e-8)
+    .algorithm(BOBYQA.builder()
+        .maxEvaluations(5000)
+        .boundsRange(100000)
+        .optimizerBounds(temperatureBounds)
+        .initialTrustRegionRadius(5.)
+        .stoppingTrustRegionRadius(2e-8)
+        .build())
     .build();
 optimizer.maxAPosteriori();
 

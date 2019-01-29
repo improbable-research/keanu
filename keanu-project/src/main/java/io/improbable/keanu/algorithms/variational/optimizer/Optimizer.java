@@ -4,7 +4,8 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.AverageTimeComponent;
+import io.improbable.keanu.util.status.StatusBar;
 
 import java.util.HashMap;
 import java.util.List;
@@ -128,18 +129,22 @@ public interface Optimizer {
             ).collect(Collectors.toList());
     }
 
-    static ProgressBar createFitnessProgressBar(final Optimizer optimizerThatNeedsProgressBar) {
+    static StatusBar createFitnessStatusBar(final Optimizer optimizerThatNeedsStatusBar) {
         AtomicInteger evalCount = new AtomicInteger(0);
-        ProgressBar progressBar = new ProgressBar();
-        BiConsumer<Map<VariableReference, DoubleTensor>, Double> progressBarFitnessCalculationHandler = (position, logProb) -> {
-            progressBar.progress(
+        StatusBar statusBar = new StatusBar();
+        AverageTimeComponent averageTimeComponent = new AverageTimeComponent();
+        statusBar.addComponent(averageTimeComponent);
+
+        BiConsumer<Map<VariableReference, DoubleTensor>, Double> statusBarFitnessCalculationHandler = (position, logProb) -> {
+            statusBar.setMessage(
                 String.format("Fitness Evaluation #%d LogProb: %.2f", evalCount.incrementAndGet(), logProb)
             );
+            averageTimeComponent.step();
         };
 
-        optimizerThatNeedsProgressBar.addFitnessCalculationHandler(progressBarFitnessCalculationHandler);
-        progressBar.addFinishHandler(() -> optimizerThatNeedsProgressBar.removeFitnessCalculationHandler(progressBarFitnessCalculationHandler));
+        optimizerThatNeedsStatusBar.addFitnessCalculationHandler(statusBarFitnessCalculationHandler);
+        statusBar.addFinishHandler(() -> optimizerThatNeedsStatusBar.removeFitnessCalculationHandler(statusBarFitnessCalculationHandler));
 
-        return progressBar;
+        return statusBar;
     }
 }
