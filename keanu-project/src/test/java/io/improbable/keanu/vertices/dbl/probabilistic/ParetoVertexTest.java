@@ -5,14 +5,20 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.apache.commons.math3.distribution.ParetoDistribution;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +34,16 @@ public class ParetoVertexTest {
 
     private KeanuRandom random;
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Before
     public void setup() {
         random = new KeanuRandom(1);
     }
 
     @Test
-    public void matchesKnownLogDensityOfScalar() {
+    public void logProbMatchesKnownLogDensityOfScalar() {
         ParetoDistribution baseline = new ParetoDistribution(1.0, 1.5);
         ParetoVertex vertex = new ParetoVertex(1.0, 1.5);
         double expected = baseline.logDensity(1.25);
@@ -42,11 +51,109 @@ public class ParetoVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfVector() {
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        DoubleVertex location = ConstantVertex.of(1.);
+        DoubleVertex scale = ConstantVertex.of(1.5);
+        ParetoVertex paretoVertex = new ParetoVertex(location, scale);
+        LogProbGraph logProbGraph = paretoVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.scalar(1.25));
+
+        ParetoDistribution baseline = new ParetoDistribution(1., 1.5);
+        double expected = baseline.logDensity(1.25);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expected);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfVector() {
         ParetoDistribution baseline = new ParetoDistribution(1.0, 1.5);
         ParetoVertex vertex = new ParetoVertex(1.0, 1.5);
         double expected = baseline.logDensity(1.25) + baseline.logDensity(6.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(vertex, new double[]{1.25, 6.5}, expected);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        DoubleVertex location = ConstantVertex.of(1., 1.);
+        DoubleVertex scale = ConstantVertex.of(1.5, 1.5);
+        ParetoVertex paretoVertex = new ParetoVertex(location, scale);
+        LogProbGraph logProbGraph = paretoVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(1.25, 6.5));
+
+        ParetoDistribution baseline = new ParetoDistribution(1., 1.5);
+        double expected = baseline.logDensity(1.25) + baseline.logDensity(6.5);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expected);
+    }
+
+    @Test
+    public void logProbGraphIsNegInfIfLocationIsNotPositive() {
+        DoubleVertex location = ConstantVertex.of(-1., 1.);
+        DoubleVertex scale = ConstantVertex.of(3., 3.);
+        ParetoVertex paretoVertex = new ParetoVertex(location, scale);
+        LogProbGraph logProbGraph = paretoVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("Location and scale must be strictly positive");
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+    }
+
+    @Test
+    public void logProbGraphIsNegInfIfScaleIsNotPositive() {
+        DoubleVertex location = ConstantVertex.of(1., 1.);
+        DoubleVertex scale = ConstantVertex.of(-3., 3.);
+        ParetoVertex paretoVertex = new ParetoVertex(location, scale);
+        LogProbGraph logProbGraph = paretoVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("Location and scale must be strictly positive");
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+    }
+
+    @Test
+    public void logProbGraphIsNegInfIfLocationAndScaleIsNotPositive() {
+        DoubleVertex location = ConstantVertex.of(-1., 1.);
+        DoubleVertex scale = ConstantVertex.of(0., 3.);
+        ParetoVertex paretoVertex = new ParetoVertex(location, scale);
+        LogProbGraph logProbGraph = paretoVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("Location and scale must be strictly positive");
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+    }
+
+    @Test
+    public void logProbGraphIsNegInfIfXIsLessThanOrEqualToLocation() {
+        DoubleVertex location = ConstantVertex.of(1., 1.);
+        DoubleVertex scale = ConstantVertex.of(10., 10.);
+        ParetoVertex paretoVertex = new ParetoVertex(location, scale);
+        LogProbGraph logProbGraph = paretoVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., .5));
+
+        ParetoDistribution distribution = new ParetoDistribution(1., 10.);
+        double expectedDensity = distribution.logDensity(2.);
+        DoubleTensor expected = DoubleTensor.create(expectedDensity, Double.NEGATIVE_INFINITY);
+
+        LogProbGraphContract.equalTensor(logProbGraph, expected);
     }
 
     @Test

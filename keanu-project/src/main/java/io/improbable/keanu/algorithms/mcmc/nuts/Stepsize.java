@@ -31,6 +31,7 @@ class Stepsize implements SaveStatistics {
     private double stepsize;
     private double averageAcceptanceProb;
     private double logStepSizeFrozen;
+    private double logStepSize;
 
     /**
      * @param stepsize             the step size
@@ -40,7 +41,9 @@ class Stepsize implements SaveStatistics {
     Stepsize(double stepsize, double targetAcceptanceProb, int adaptCount) {
         this.targetAcceptanceProb = targetAcceptanceProb;
         this.stepsize = stepsize;
-        this.logStepSizeFrozen = Math.log(stepsize);
+        this.averageAcceptanceProb = 0;
+        this.logStepSize = Math.log(stepsize);
+        this.logStepSizeFrozen = Math.log(1);
         this.adaptCount = adaptCount;
         this.shrinkageTarget = Math.log(10 * stepsize);
     }
@@ -104,10 +107,10 @@ class Stepsize implements SaveStatistics {
      */
     public double adaptStepSize(Tree tree, int sampleNum) {
 
-        double logStepSize = logStepSizeFrozen;
-
         if (sampleNum < adaptCount) {
             logStepSize = updateLogStepSize(tree, sampleNum);
+        } else {
+            logStepSize = logStepSizeFrozen;
         }
 
         stepsize = Math.exp(logStepSize);
@@ -148,10 +151,11 @@ class Stepsize implements SaveStatistics {
         //(1-m^-k) * log(epsilon_bar_m-1)
         double increasedStepSizeFrozen = (1 - tendToZero) * logStepSizeFrozen;
 
+        //log(epsilon_bar_m) = m^-k * log(epsilon_m) + (1 - m^-k) * log(epsilon_bar_m-1)
+        logStepSizeFrozen = reducedStepSize + increasedStepSizeFrozen;
         averageAcceptanceProb = updatedAverageAcceptanceProb;
 
-        //log(epsilon_bar_m) = m^-k * log(epsilon_m) + (1 - m^-k) * log(epsilon_bar_m-1)
-        return reducedStepSize + increasedStepSizeFrozen;
+        return updatedLogStepSize;
     }
 
     public double getStepsize() {

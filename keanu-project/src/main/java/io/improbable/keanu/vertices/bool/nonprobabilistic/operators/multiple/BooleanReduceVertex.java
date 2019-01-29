@@ -19,7 +19,7 @@ public class BooleanReduceVertex extends BooleanVertex implements NonProbabilist
     private final List<? extends Vertex<BooleanTensor>> inputs;
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
-    public BooleanReduceVertex(long[] shape, Collection<Vertex<BooleanTensor>> input,
+    public BooleanReduceVertex(long[] shape, Collection<? extends Vertex<BooleanTensor>> input,
                                BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
         super(shape);
         if (input.size() < 2) {

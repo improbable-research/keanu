@@ -1,4 +1,4 @@
-current_version: 0.0.18
+current_version: 0.0.19
 
 # Theme settings
 doks:
@@ -9,7 +9,7 @@ doks:
             image: true
         nav:
             - item_name: Python Docs
-              item_url: '/python'
+              item_url: 'python/latest/'
             - item_name: JavaDoc
               external_url: true
               contains_version: true
