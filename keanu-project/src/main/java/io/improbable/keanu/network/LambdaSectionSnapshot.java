@@ -1,6 +1,6 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.network;
 
-import io.improbable.keanu.network.LambdaSection;
+import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * A snapshot of {@link LambdaSection}s for a chosen set of {@link Variable}s. It is used to roll back the state of a {@link BayesianNetwork} in a performant way.
+ */
 public class LambdaSectionSnapshot {
 
     private final Map<Variable, LambdaSection> affectedVariablesCache;

@@ -1,11 +1,11 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.ProbabilisticModel;
+import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 

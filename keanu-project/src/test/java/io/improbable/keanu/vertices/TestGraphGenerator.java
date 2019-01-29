@@ -68,7 +68,7 @@ public class TestGraphGenerator {
         return new PassThroughVertex(from, opCount, autoDiffCount, onOp);
     }
 
-    public static class SumVertex extends DoubleBinaryOpVertex {
+    public static class SumVertex extends DoubleBinaryOpVertex implements Differentiable {
 
         private final AtomicInteger opCount;
         private final AtomicInteger autoDiffCount;
@@ -98,9 +98,11 @@ public class TestGraphGenerator {
         }
 
         @Override
-        protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative l, PartialDerivative r) {
+        public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+            PartialDerivative dLeftWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
+            PartialDerivative dRightWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
             autoDiffCount.incrementAndGet();
-            return l.add(r);
+            return dLeftWrtInput.add(dRightWrtInput);
         }
 
         @Override

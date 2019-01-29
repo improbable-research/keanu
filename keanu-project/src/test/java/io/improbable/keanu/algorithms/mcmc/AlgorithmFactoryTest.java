@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import org.junit.Test;
 
 import static org.mockito.Mockito.mock;

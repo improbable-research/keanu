@@ -1,19 +1,18 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.ProbabilisticModel;
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.Statistics;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModel;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.ProgressBar;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import lombok.Builder;
+import io.improbable.keanu.util.status.StatusBar;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
-@Builder
 public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static final int DEFAULT_ADAPT_COUNT = 1000;
@@ -35,43 +33,51 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     private final Statistics statistics = new Statistics(Metrics.values());
 
+    @java.beans.ConstructorProperties({"random", "adaptCount", "targetAcceptanceProb", "adaptEnabled", "initialStepSize", "maxTreeHeight", "saveStatistics"})
+    NUTS(KeanuRandom random, int adaptCount, double targetAcceptanceProb, boolean adaptEnabled, Double initialStepSize, int maxTreeHeight, boolean saveStatistics) {
+        this.random = random;
+        this.adaptCount = adaptCount;
+        this.targetAcceptanceProb = targetAcceptanceProb;
+        this.adaptEnabled = adaptEnabled;
+        this.initialStepSize = initialStepSize;
+        this.maxTreeHeight = maxTreeHeight;
+        this.saveStatistics = saveStatistics;
+    }
+
+    public static NUTSBuilder builder() {
+        return new NUTSBuilder();
+    }
+
     public enum Metrics {
         STEPSIZE, LOG_PROB, MEAN_TREE_ACCEPT, TREE_SIZE
     }
 
     @Getter
-    @Builder.Default
-    private KeanuRandom random = KeanuRandom.getDefaultRandom();
+    private KeanuRandom random;
 
     //The number of samples for which the step size will be tuned. For the remaining samples
     //in which it is not tuned, the step size will be frozen to its last calculated value
     @Getter
-    @Builder.Default
-    private int adaptCount = DEFAULT_ADAPT_COUNT;
+    private int adaptCount;
 
     //The target acceptance probability, a suggested value of this is 0.65,
     //Beskos et al., 2010; Neal, 2011
-    @Builder.Default
     @Getter
-    private double targetAcceptanceProb = DEFAULT_TARGET_ACCEPTANCE_PROB;
+    private double targetAcceptanceProb;
 
     //Determines whether the step size wil
     // l adapt during the first adaptCount samples
-    @Builder.Default
-    private boolean adaptEnabled = true;
+    private boolean adaptEnabled;
 
     //Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.
-    @Builder.Default
-    private Double initialStepSize = null;
+    private Double initialStepSize;
 
     //The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This
     //will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample.
-    @Builder.Default
-    private int maxTreeHeight = 10;
+    private int maxTreeHeight;
 
     //Sets whether or not to save debug STATISTICS. The STATISTICS available are: Step size, Log Prob, Mean Tree Acceptance Prob, Tree Size.
-    @Builder.Default
-    private boolean saveStatistics = false;
+    private boolean saveStatistics;
 
     /**
      * Sample from the posterior of a probabilistic model using the No-U-Turn-Sampling algorithm
@@ -91,7 +97,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
                                                             final List<? extends Variable> fromVariables) {
         Preconditions.checkArgument(model instanceof ProbabilisticModelWithGradient, "NUTS requires a model on which gradients can be calculated.");
-        return new NetworkSamplesGenerator(setupSampler((ProbabilisticModelWithGradient) model, fromVariables), ProgressBar::new);
+        return new NetworkSamplesGenerator(setupSampler((ProbabilisticModelWithGradient) model, fromVariables), StatusBar::new);
     }
 
     private NUTSSampler setupSampler(final ProbabilisticModelWithGradient model,
@@ -143,4 +149,59 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         return statistics;
     }
 
+    public static class NUTSBuilder {
+        private KeanuRandom random = KeanuRandom.getDefaultRandom();
+        private int adaptCount = DEFAULT_ADAPT_COUNT;
+        private double targetAcceptanceProb = DEFAULT_TARGET_ACCEPTANCE_PROB;
+        private boolean adaptEnabled = true;
+        private Double initialStepSize = null;
+        private int maxTreeHeight = 10;
+        private boolean saveStatistics = false;
+
+        NUTSBuilder() {
+        }
+
+        public NUTSBuilder random(KeanuRandom random) {
+            this.random = random;
+            return this;
+        }
+
+        public NUTSBuilder adaptCount(int adaptCount) {
+            this.adaptCount = adaptCount;
+            return this;
+        }
+
+        public NUTSBuilder targetAcceptanceProb(double targetAcceptanceProb) {
+            this.targetAcceptanceProb = targetAcceptanceProb;
+            return this;
+        }
+
+        public NUTSBuilder adaptEnabled(boolean adaptEnabled) {
+            this.adaptEnabled = adaptEnabled;
+            return this;
+        }
+
+        public NUTSBuilder initialStepSize(Double initialStepSize) {
+            this.initialStepSize = initialStepSize;
+            return this;
+        }
+
+        public NUTSBuilder maxTreeHeight(int maxTreeHeight) {
+            this.maxTreeHeight = maxTreeHeight;
+            return this;
+        }
+
+        public NUTSBuilder saveStatistics(boolean saveStatistics) {
+            this.saveStatistics = saveStatistics;
+            return this;
+        }
+
+        public NUTS build() {
+            return new NUTS(random, adaptCount, targetAcceptanceProb, adaptEnabled, initialStepSize, maxTreeHeight, saveStatistics);
+        }
+
+        public String toString() {
+            return "NUTS.NUTSBuilder(random=" + this.random + ", adaptCount=" + this.adaptCount + ", targetAcceptanceProb=" + this.targetAcceptanceProb + ", adaptEnabled=" + this.adaptEnabled + ", initialStepSize=" + this.initialStepSize + ", maxTreeHeight=" + this.maxTreeHeight + ", saveStatistics=" + this.saveStatistics + ")";
+        }
+    }
 }

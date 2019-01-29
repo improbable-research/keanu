@@ -1,6 +1,7 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.network;
 
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
@@ -9,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * An implementation of {@link ProbabilisticModelWithGradient} that is backed by a {@link BayesianNetwork}
+ */
 public class KeanuProbabilisticModelWithGradient extends KeanuProbabilisticModel implements ProbabilisticModelWithGradient {
 
     private final LogProbGradientCalculator logProbGradientCalculator;

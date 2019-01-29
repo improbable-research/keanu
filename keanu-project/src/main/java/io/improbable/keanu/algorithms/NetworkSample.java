@@ -1,7 +1,5 @@
 package io.improbable.keanu.algorithms;
 
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

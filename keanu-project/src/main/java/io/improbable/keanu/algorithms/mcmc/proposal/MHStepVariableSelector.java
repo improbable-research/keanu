@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.Variable;
 
 import java.util.List;
 import java.util.Set;

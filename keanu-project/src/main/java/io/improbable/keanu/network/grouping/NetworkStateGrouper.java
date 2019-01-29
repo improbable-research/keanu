@@ -1,6 +1,6 @@
 package io.improbable.keanu.network.grouping;
 
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.network.grouping.continuouspointgroupers.ContinuousPointGrouper;

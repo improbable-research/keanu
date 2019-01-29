@@ -2,6 +2,9 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import java.util.List;
 
+/**
+ * Manages multiple {@link ProposalListener}s and notifies them when a proposal is created or rejected.
+ */
 public class ProposalNotifier {
     private final List<ProposalListener> listeners;
     private Proposal proposal;

@@ -1,9 +1,9 @@
 package io.improbable.keanu.distributions.discrete;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class UniformInt implements DiscreteDistribution {
 

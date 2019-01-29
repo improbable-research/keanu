@@ -31,7 +31,8 @@ def net() -> BayesNet:
 @pytest.mark.parametrize(
     "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.get_latent_vertices())),
              (lambda net: NUTSSampler())])
-def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
+def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(
+        algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]

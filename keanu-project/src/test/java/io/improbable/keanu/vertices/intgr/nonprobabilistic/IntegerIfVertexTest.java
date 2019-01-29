@@ -1,11 +1,11 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSample;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Rule;

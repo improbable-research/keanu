@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticModelWithGradient;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -142,7 +142,7 @@ public class GradientOptimizer implements Optimizer {
 
     private double optimize(FitnessFunctionWithGradient fitnessFunction) {
 
-        ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
+        StatusBar statusBar = Optimizer.createFitnessStatusBar(this);
 
         ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
@@ -173,7 +173,7 @@ public class GradientOptimizer implements Optimizer {
             new InitialGuess(startingPoint)
         );
 
-        progressBar.finish();
+        statusBar.finish();
         return pointValuePair.getValue();
     }
 

@@ -1,15 +1,20 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * When a proposal is created, take a snapshot of the vertices' values.
+ * When a proposal is rejected, reset the Bayes Net to those values and cascade update.
+ * This is less performant than {@link RollBackToCachedValuesOnRejection}
+ */
 public class RollbackAndCascadeOnRejection implements ProposalRejectionStrategy {
 
     private Map<Vertex, Object> fromValues;

@@ -1,9 +1,11 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
@@ -39,8 +41,16 @@ public class Logistic implements ContinuousDistribution {
         final DoubleTensor ln1OverB = s.reciprocal().logInPlace();
 
         return xMinusAOverB.plus(ln1OverB).minusInPlace(
-            xMinusAOverB.expInPlace().plusInPlace(1).logInPlace().timesInPlace(2)
+            xMinusAOverB.expInPlace().plusInPlace(1.).logInPlace().timesInPlace(2.)
         );
+    }
+
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex mu, DoublePlaceholderVertex s) {
+        final DoubleVertex xMinusAOverB = x.minus(mu).div(s);
+        final DoubleVertex ln1OverB = s.reverseDiv(1.).log();
+
+        return xMinusAOverB.plus(ln1OverB).minus(
+            xMinusAOverB.exp().plus(1.).log().times(2.));
     }
 
     @Override

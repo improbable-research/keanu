@@ -1,13 +1,13 @@
 package io.improbable.keanu.e2e.rocket;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSample;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
