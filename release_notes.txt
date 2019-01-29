@@ -1,5 +1,7 @@
 ### Version 0.0.19 ###
 
+* Added better Python operator overloading support.
+  - Includes automatically casting to the correct datatype where possible.
 * Added __version__ attribute to Python
 * Added a permute vertex
 * Added the release notes text file to the repo
