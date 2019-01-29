@@ -20,7 +20,6 @@ def autocorrelation(arg: List[Any]) -> ndarray:
 
 
 def check_all_floats(arg: List[Any]) -> None:
-    print(type(arg[0]))
     all_floats = all((type(elem) == float or type(elem) == np.float64) for elem in arg)
     if not all_floats:
         raise ValueError("Autocorrelation must be run on a list of floating types.")

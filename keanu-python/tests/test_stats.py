@@ -61,9 +61,6 @@ def test_autocorrelation_same_for_streaming_as_batch() -> None:
     set_starting_state(model)
     iter_samples = generate_samples(net=net, sample_from=net.get_latent_vertices())
 
-    print("Hello")
-    print(samples)
-
     samples_dataframe = pd.DataFrame()
     for next_sample in islice(iter_samples, draws):
         samples_dataframe = samples_dataframe.append(next_sample, ignore_index=True)
