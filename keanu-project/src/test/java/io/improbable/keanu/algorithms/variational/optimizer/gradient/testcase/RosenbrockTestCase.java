@@ -15,6 +15,15 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
+/**
+ * This is a common test case for gradient optimization algorithms.
+ * <p>
+ * https://en.wikipedia.org/wiki/Rosenbrock_function
+ * <p>
+ * The function has been inverted here because our optimizers find maxima and this
+ * function provides a global minima. The global maxima is at (a, a^2) so for a=1,b=100
+ * the maxima will be (1,1)
+ */
 public class RosenbrockTestCase implements GradientOptimizationAlgorithmTestCase {
 
     private final DoubleVertex a;
