@@ -59,7 +59,7 @@ DoubleTensor autocorrelation = posteriorSamples.getDoubleTensorSamples(A).getAut
 It's also possible to calculate the autocorrelation of samples in Python.
 
 ```python
-algo = MetropolisHastingsSampler()
+algo = MetropolisHastingsSampler(proposal_distribution='prior', latents=bayes_net.get_latent_vertices())
 posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
                            sampling_algorithm=algo, draws=100)
 vertex_samples = posterior_samples.get('a')
@@ -70,7 +70,7 @@ When the samples are `ndarrays` the index on which to calculate the autocorrelat
 as a tuple.
 
 ```python
-algo = MetropolisHastingsSampler()
+algo = MetropolisHastingsSampler(proposal_distribution='prior', latents=bayes_net.get_latent_vertices())
 posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
                            sampling_algorithm=algo, draws=100)
 vertex_samples = posterior_samples.get('a')

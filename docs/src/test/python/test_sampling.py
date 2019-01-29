@@ -13,7 +13,7 @@ def test_inference_example_metropolis():
     m.a.set_value(20.)
     m.b.set_value(20.)
     bayes_net = m.to_bayes_net()
-    algo = MetropolisHastingsSampler()
+    algo = MetropolisHastingsSampler(proposal_distribution='prior', latents=bayes_net.get_latent_vertices())
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
                                sampling_algorithm=algo, draws=30000)
 
