@@ -1,7 +1,5 @@
 ### Version 0.0.19 ###
 
-* Added the release notes text file to the repo
-* Added a permute vertex
 * Reorganised the factory methods for building `PosteriorSamplingAlgorithm` objects. The following are available and give you access to either a default implementation or, when you need more control over the configuration, a Builder object:
   * `Keanu.Sampling.MetropolisHastings`
   * `Keanu.Sampling.NUTS`
@@ -22,3 +20,6 @@
 * `KeanuRandom` has been moved to package `io.improbable.keanu`
 * The `ProposalListener` interface has been changed: `onProposalApplied` is now called `onProposalCreated`.
   * This is because the `Proposal` interface no longer has `apply` and `reject` methods.
+* Added `__version__` attribute to Python
+* Added a permute vertex
+* Added the release notes text file to the repo
