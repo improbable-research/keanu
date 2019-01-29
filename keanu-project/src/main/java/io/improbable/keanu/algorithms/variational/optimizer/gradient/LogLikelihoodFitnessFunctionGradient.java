@@ -1,5 +1,8 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 
@@ -7,7 +10,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 @AllArgsConstructor
-public class LogLikelihoodFitnessFunctionGradient implements FitnessFunctionGradient{
+public class LogLikelihoodFitnessFunctionGradient implements FitnessFunctionGradient {
 
     private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
 

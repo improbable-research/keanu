@@ -1,5 +1,8 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
+import io.improbable.keanu.algorithms.variational.optimizer.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;

@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.algorithms.variational.optimizer.*;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogProbFitnessFunction;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;

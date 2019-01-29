@@ -1,6 +1,10 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase;
 
 import io.improbable.keanu.algorithms.variational.optimizer.*;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.LogLikelihoodFitnessFunctionGradient;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.LogProbFitnessFunctionGradient;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogLikelihoodFitnessFunction;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogProbFitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.testcase.NonGradientOptimizationAlgorithmTestCase;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
