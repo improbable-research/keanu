@@ -114,6 +114,8 @@ class Stepsize implements SaveStatistics {
         return stepsize;
     }
 
+    // TODO adapt diagonal matrix?
+
     private double updateLogStepSize(Tree tree, int sampleNum) {
 
         //1/(m+t0)

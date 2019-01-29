@@ -161,7 +161,7 @@ public class ProgressBar {
                 sb.append(String.format(" %3.1f%%", Math.min(100.0, Math.max(0, update.getProgressPercentage() * 100))));
             }
             appendSpacesToClearPreviousContent(sb);
-            printStream.print(sb.toString());
+            printStream.print(sb.toString() + '\n');
         }
     }
 
