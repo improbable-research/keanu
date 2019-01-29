@@ -36,9 +36,10 @@ def test_autocorr_returns_ndarray_of_correct_dtype() -> None:
     with Model() as m:
         m.uniform = Uniform(0, 1000)
     net = m.to_bayes_net()
-    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=1000)
+    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=10)
     valid_key = list(samples.keys())[0]
     sample_ = samples.get(valid_key)
+    print(sample_)
     assert sample_ is not None
     autocorr = stats.autocorrelation(sample_)
     assert type(autocorr) == np.ndarray

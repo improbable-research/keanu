@@ -18,9 +18,7 @@ def test_coalmining() -> None:
     samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=2000, drop=100, down_sample_interval=5)
 
     vertex_samples: List[numpy_types] = samples["switchpoint"]
-    vertex_samples_primitive: List[List[primitive_types]] = list(map(
-        lambda a: a.tolist(), vertex_samples))  # because you can't concatenate 0-d arrays
-    vertex_samples_concatentated: np.ndarray = np.array(vertex_samples_primitive)
+    vertex_samples_concatentated: np.ndarray = np.array(vertex_samples)
 
     switch_year = np.argmax(np.bincount(vertex_samples_concatentated))
 

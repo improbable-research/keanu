@@ -10,7 +10,7 @@ from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 from keanu.plots import traceplot
 from collections import defaultdict
-import numpy as np
+from numpy import ndenumerate, ndarray
 import itertools
 
 k = KeanuContext()
@@ -95,7 +95,8 @@ def sample(net: BayesNet,
            drop: int = 0,
            down_sample_interval: int = 1,
            plot: bool = False,
-           ax: Any = None) -> sample_types:
+           ax: Any = None,
+           primitive: bool = False) -> sample_types:
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler()
@@ -109,14 +110,14 @@ def sample(net: BayesNet,
         Vertex._get_python_label(vertex_unwrapped): list(
             map(Tensor._to_ndarray,
                 network_samples.get(vertex_unwrapped).asList(),
-                itertools.repeat(True, len(network_samples.get(vertex_unwrapped).asList()))))
+                itertools.repeat(primitive, len(network_samples.get(vertex_unwrapped).asList()))))
         for vertex_unwrapped in vertices_unwrapped
     }
 
     if plot:
         traceplot(vertex_samples, ax=ax)
 
-    if _all_samples_are_scalar(vertex_samples):
+    if _all_samples_are_scalar(vertex_samples, primitive):
         return vertex_samples
     else:
         return _create_multi_indexed_samples(vertex_samples)
@@ -144,23 +145,27 @@ def generate_samples(net: BayesNet,
         sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax)
 
 
-def _all_samples_are_scalar(samples):
+def _all_samples_are_scalar(samples: dict, primitive: bool) -> bool:
     for vertex_label in samples:
-        if type(samples[vertex_label][0]) is np.ndarray:
+        if primitive == True and type(samples[vertex_label][0]) is ndarray:
+            return False
+        if primitive == False and samples[vertex_label][0].shape != ():
             return False
     return True
 
 
-def _create_multi_indexed_samples(samples):
-    vertex_samples_multi = {}
+def _create_multi_indexed_samples(samples: dict) -> dict:
+    vertex_samples_multi: dict = {}
     column_header_for_scalar = '(0)'
     for vertex_label in samples:
         vertex_samples_multi[vertex_label] = defaultdict(list)
         for sample_values in samples[vertex_label]:
-            if type(sample_values) is not np.ndarray:
+            if type(sample_values) is not ndarray:
                 vertex_samples_multi[vertex_label][column_header_for_scalar].append(sample_values)
+            elif sample_values.shape == ():
+                vertex_samples_multi[vertex_label][column_header_for_scalar].append(sample_values.item())
             else:
-                for index, value in np.ndenumerate(sample_values):
+                for index, value in ndenumerate(sample_values):
                     vertex_samples_multi[vertex_label][str(index)].append(value.item())
 
     tuple_heirarchy = {(vertex_label, tensor_index): values

@@ -27,8 +27,8 @@ def net() -> BayesNet:
 @pytest.fixture
 def tensor_net() -> BayesNet:
     with Model() as m:
-        m.gamma = Gamma(np.array([1., 1., 1., 1.]).reshape(2, 2), np.array([2., 2., 2., 2.]).reshape(2, 2))
-        m.exp = Exponential(np.array([1., 1., 1., 1.]).reshape(2, 2))
+        m.gamma = Gamma(np.array([1., 1., 1., 1.]).reshape((2, 2)), np.array([2., 2., 2., 2.]).reshape((2, 2)))
+        m.exp = Exponential(np.array([1., 1., 1., 1.]).reshape((2, 2)))
         m.cauchy = Cauchy(m.gamma, m.exp)
 
     return m.to_bayes_net()
@@ -41,7 +41,7 @@ def test_sampling_returns_dict_of_list_of_scalars_for_scalar_vertices_in_sample_
     sample_from = list(net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]
 
-    samples = sample(net=net, sample_from=sample_from, sampling_algorithm=algo, draws=draws)
+    samples = sample(net=net, sample_from=sample_from, sampling_algorithm=algo, draws=draws, primitive=True)
     assert len(samples) == len(sample_from)
     assert type(samples) == dict
 
@@ -73,7 +73,7 @@ def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sa
 @pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler()), (HamiltonianSampler())])
 def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_mixed_net(algo: PosteriorSamplingAlgorithm) -> None:
     exp = Exponential(1.)
-    add = exp + np.array([1., 2., 3., 4.]).reshape(2, 2)
+    add = exp + np.array([1., 2., 3., 4.]).reshape((2, 2))
     gaussian = Gaussian(add, 2.)
 
     exp.set_label("exp")
@@ -115,8 +115,8 @@ def test_sample_dict_can_be_loaded_in_to_dataframe(net: BayesNet) -> None:
 
 
 def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
-    gamma = Gamma(np.array([1., 1., 1., 1.]).reshape(2, 2), np.array([2., 2., 2., 2.]).reshape(2, 2))
-    exp = Exponential(np.array([1., 1., 1., 1.]).reshape(2, 2))
+    gamma = Gamma(np.array([1., 1., 1., 1.]).reshape((2, 2)), np.array([2., 2., 2., 2.]).reshape((2, 2)))
+    exp = Exponential(np.array([1., 1., 1., 1.]).reshape((2, 2)))
     cauchy = Cauchy(gamma, exp)
 
     gamma.set_label("gamma")
@@ -129,7 +129,7 @@ def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
     sample_from = list(tensor_net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]
 
-    samples = sample(net=tensor_net, sample_from=sample_from, draws=5)
+    samples = sample(net=tensor_net, sample_from=sample_from, draws=5, primitive=True)
     df = pd.DataFrame(samples)
 
     for parent_column in df.columns.levels[0]:
