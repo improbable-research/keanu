@@ -9,7 +9,9 @@ from keanu.net import BayesNet
 from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 from keanu.plots import traceplot
+from collections import defaultdict
 import numpy as np
+import itertools
 
 k = KeanuContext()
 
@@ -93,8 +95,7 @@ def sample(net: BayesNet,
            drop: int = 0,
            down_sample_interval: int = 1,
            plot: bool = False,
-           ax: Any = None,
-           primitive: bool = False) -> sample_types:
+           ax: Any = None) -> sample_types:
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler()
@@ -107,29 +108,18 @@ def sample(net: BayesNet,
     vertex_samples = {
         Vertex._get_python_label(vertex_unwrapped): list(
             map(Tensor._to_ndarray,
-                network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped
+                network_samples.get(vertex_unwrapped).asList(), 
+                itertools.repeat(True, len(network_samples.get(vertex_unwrapped).asList()))))
+                for vertex_unwrapped in vertices_unwrapped
     }
-
-    vertex_samples_multi = {}
-    for vertex_label in vertex_samples:
-        vertex_samples_multi[vertex_label] = {}
-        for samples in vertex_samples[vertex_label]:
-            shape = samples.shape
-            if (shape == ()):
-                vertex_samples_multi[vertex_label]['0'] = float(samples)
-            else:
-                for index, value in np.ndenumerate(samples):
-                    vertex_samples_multi[vertex_label][str(index)] = float(value)
-
-    reform = {(outerKey, innerKey): values for outerKey, innerDict in vertex_samples_multi.items() for innerKey, values in innerDict.items()}
-
-    print("hello")
-    print(reform)
 
     if plot:
         traceplot(vertex_samples, ax=ax)
 
-    return vertex_samples
+    if _all_samples_are_scalar(vertex_samples):
+        return vertex_samples
+    else: 
+        return _create_multi_indexed_samples(vertex_samples)
 
 
 def generate_samples(net: BayesNet,
@@ -152,6 +142,30 @@ def generate_samples(net: BayesNet,
 
     return _samples_generator(
         sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax)
+
+
+def _all_samples_are_scalar(samples):
+    samples_are_scalar = True
+    for vertex_label in samples:
+        if type(samples[vertex_label][0]) is np.ndarray:
+            samples_are_scalar = False
+    return samples_are_scalar
+
+
+def _create_multi_indexed_samples(samples):
+    vertex_samples_multi = {}
+    for vertex_label in samples:
+        vertex_samples_multi[vertex_label] = defaultdict(list)
+        for sample_values in samples[vertex_label]:
+            if type(sample_values) is not np.ndarray:
+                vertex_samples_multi[vertex_label]['0'].append(sample_values)
+            else:
+                for index, value in np.ndenumerate(sample_values):
+                    vertex_samples_multi[vertex_label][index].append(value.item())
+
+    reform = {(outerKey, innerKey): values for outerKey, innerDict in vertex_samples_multi.items() for innerKey, values in innerDict.items()}
+
+    return reform
 
 
 def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList, live_plot: bool, refresh_every: int,

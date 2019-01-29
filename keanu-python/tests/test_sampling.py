@@ -24,8 +24,18 @@ def net() -> BayesNet:
     return m.to_bayes_net()
 
 
+@pytest.fixture
+def tensor_net() -> BayesNet:
+    with Model() as m:
+        m.gamma = Gamma(np.array([1., 1., 1., 1.]).reshape(2, 2), np.array([2., 2., 2., 2.]).reshape(2, 2))
+        m.exp = Exponential(np.array([1., 1., 1., 1.].reshape(2, 2)))
+        m.cauchy = Cauchy(m.gamma, m.exp)
+
+    return m.to_bayes_net()
+
+
 @pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler()), (HamiltonianSampler())])
-def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(algo: PosteriorSamplingAlgorithm,
+def test_sampling_returns_dict_of_list_of_scalars_for_scalar_vertices_in_sample_from(algo: PosteriorSamplingAlgorithm,
                                                                                net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
@@ -40,9 +50,65 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(a
 
         assert len(vertex_samples) == draws
         assert type(vertex_samples) == list
-        assert all(type(sample) == np.ndarray for sample in vertex_samples)
-        assert all(sample.dtype == float for sample in vertex_samples)
-        assert all(sample.shape == () for sample in vertex_samples)
+        assert all(type(sample) == float for sample in vertex_samples)
+
+
+@pytest.mark.parametrize("algo", [(MetropolisHastingsSampler()), (NUTSSampler()), (HamiltonianSampler())])
+def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sample_from(algo: PosteriorSamplingAlgorithm, tensor_net: BayesNet) -> None:
+    draws = 5
+    sample_from = list(tensor_net.get_latent_vertices())
+    vertex_labels = [vertex.get_label() for vertex in sample_from]
+
+    samples = sample(net=tensor_net, sample_from=sample_from, sampling_algorithm=algo, draws=draws)
+    assert type(samples) == dict
+
+    for label, vertex_samples in samples.items():
+        assert label[0] in vertex_labels
+        assert len(vertex_samples) == draws
+        assert type(vertex_samples) == list
+        assert all(type(sample) == float for sample in vertex_samples)
+
+
+def test_sample_dict_dict_can_be_loaded_in_dataframe(net: BayesNet) -> None:
+    sample_from = list(net.get_latent_vertices())
+    vertex_labels = [vertex.get_label() for vertex in sample_from]
+
+    samples = sample(net=net, sample_from=sample_from, draws=5)
+    df = pd.DataFrame(samples)
+
+    for column in df:
+        header = df[column].name
+        vertex_label = header
+
+        assert vertex_label in vertex_labels
+
+
+def test_multi_indexed_sample_dict_can_be_loaded_in_dataframe() -> None:
+    gamma = Gamma(np.array([1., 1., 1., 1.]).reshape(2, 2), np.array([2., 2., 2., 2.]).reshape(2, 2))
+    exp = Exponential(np.array([1., 1., 1., 1.]).reshape(2, 2))
+    cauchy = Cauchy(gamma, exp)
+
+    gamma.set_label("gamma")
+    exp.set_label("exp")
+    cauchy.set_label("cauchy")
+
+    tensor_net = BayesNet(gamma.get_connected_graph())
+
+    draws = 5
+    sample_from = list(tensor_net.get_latent_vertices())
+    vertex_labels = [vertex.get_label() for vertex in sample_from]
+
+    samples = sample(net=tensor_net, sample_from=sample_from, draws=5)
+    df = pd.DataFrame(samples)
+
+    for parent_column in df.columns.levels[0]:
+        assert parent_column in vertex_labels
+
+    for child_column in df.columns.levels[1]:
+        gamma.get_value()[child_column]
+        assert type(gamma.get_value()[child_column]) == np.float64
+
+    assert False
 
 
 def test_dropping_samples(net: BayesNet) -> None:
@@ -184,16 +250,3 @@ def reorder_subplots(ax: Any) -> None:
     for plot in ax:
         new_position_index = sorted_titles.index(plot[0].get_title())
         plot[0].set_position(positions[new_position_index])
-
-def test_foo():
-    a = Gamma(np.array([1., 1., 1.]).reshape(3, 1), np.array([1., 1., 1.]).reshape(3, 1))
-    a.set_label("one")
-    b = Gamma(a, 1)
-    b.set_label("two")
-    net = BayesNet(a.get_connected_graph())
-    algo = MetropolisHastingsSampler()
-
-    latents = list(net.get_latent_vertices())
-    algo = MetropolisHastingsSampler()
-    samples = sample(net=net, sample_from=latents, sampling_algorithm=algo)
-    assert False
