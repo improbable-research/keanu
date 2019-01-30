@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import lombok.Getter;
 import lombok.Value;
 
-import java.io.FileOutputStream;
 import java.util.function.Function;
 
 public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, OUTPUT> {
