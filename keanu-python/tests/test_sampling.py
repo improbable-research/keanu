@@ -40,17 +40,11 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(
         algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
-    vertex_labels = [vertex.get_label() for vertex in sample_from]
     samples = sample(net=net, sample_from=sample_from, sampling_algorithm=algo(net), draws=draws)
     assert len(samples) == len(sample_from)
     assert type(samples) == dict
 
-    for label, vertex_samples in samples.items():
-        assert label in vertex_labels
-
-        assert len(vertex_samples) == draws
-        assert type(vertex_samples) == list
-        assert all(type(sample) == float for sample in vertex_samples)
+    __assert_valid_samples(draws, samples)
 
 
 @pytest.mark.parametrize(
@@ -60,16 +54,10 @@ def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sa
         algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], tensor_net: BayesNet) -> None:
     draws = 5
     sample_from = list(tensor_net.get_latent_vertices())
-    vertex_labels = [vertex.get_label() for vertex in sample_from]
-
     samples = sample(net=tensor_net, sample_from=sample_from, sampling_algorithm=algo(tensor_net), draws=draws)
     assert type(samples) == dict
 
-    for label, vertex_samples in samples.items():
-        assert label[0] in vertex_labels
-        assert len(vertex_samples) == draws
-        assert type(vertex_samples) == list
-        assert all(type(sample) == float for sample in vertex_samples)
+    __assert_valid_samples(draws, samples)
 
 
 @pytest.mark.parametrize(
@@ -88,22 +76,15 @@ def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_mixed_net(
 
     draws = 5
     sample_from = list(mixed_net.get_latent_vertices())
-    vertex_labels = [vertex.get_label() for vertex in sample_from]
-
     samples = sample(net=mixed_net, sample_from=sample_from, sampling_algorithm=algo(mixed_net), draws=draws)
     assert type(samples) == dict
 
-    for label, vertex_samples in samples.items():
-        assert label[0] in vertex_labels
-        assert len(vertex_samples) == draws
-        assert type(vertex_samples) == list
-        assert all(type(sample) == float for sample in vertex_samples)
+    __assert_valid_samples(draws, samples)
 
     assert ('exp', '(0)') in samples
-    assert ('gaussian', '(0, 0)') in samples
-    assert ('gaussian', '(0, 1)') in samples
-    assert ('gaussian', '(1, 0)') in samples
-    assert ('gaussian', '(1, 1)') in samples
+    for i in (0, 1):
+        for j in (0, 1):
+            assert (('gaussian', '({}, {})'.format(i, j)) in samples)
 
 
 def test_sample_dict_can_be_loaded_in_to_dataframe(net: BayesNet) -> None:
@@ -305,3 +286,11 @@ def reorder_subplots(ax: Any) -> None:
     for plot in ax:
         new_position_index = sorted_titles.index(plot[0].get_title())
         plot[0].set_position(positions[new_position_index])
+
+
+def __assert_valid_samples(draws, samples):
+    for label, vertex_samples in samples.items():
+        assert label in samples
+        assert len(vertex_samples) == draws
+        assert type(vertex_samples) == list
+        assert all(type(sample) == float for sample in vertex_samples)
