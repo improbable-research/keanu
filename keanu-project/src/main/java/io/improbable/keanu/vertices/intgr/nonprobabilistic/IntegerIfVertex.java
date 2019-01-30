@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -8,7 +9,6 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerIfVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {

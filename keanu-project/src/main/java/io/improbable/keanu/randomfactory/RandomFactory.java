@@ -1,6 +1,6 @@
 package io.improbable.keanu.randomfactory;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.KeanuRandom;
 
 public interface RandomFactory<T> {
 

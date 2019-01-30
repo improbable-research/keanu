@@ -1,13 +1,13 @@
 package io.improbable.keanu.vertices.dbl;
 
-import io.improbable.keanu.algorithms.VertexSamples;
+import io.improbable.keanu.algorithms.Samples;
 import io.improbable.keanu.algorithms.statistics.Autocorrelation;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.List;
 
-public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
+public class DoubleVertexSamples extends Samples<DoubleTensor> {
     private final long sampleShape[];
 
     public DoubleVertexSamples(List<DoubleTensor> samples) {

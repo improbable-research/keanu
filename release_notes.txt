@@ -1,4 +1,0 @@
-### Version 0.0.19 ###
-
-Added a permute vertex
-Added the release notes text file to the repo
