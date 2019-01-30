@@ -166,7 +166,8 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
         if all_scalar:
             sample: Dict[Union[str, Tuple[str, str]], primitive_types] = {
                 Vertex._get_python_label(vertex_unwrapped): Tensor._to_ndarray(
-                    network_sample.get(vertex_unwrapped), return_as_primitive=True) for vertex_unwrapped in vertices_unwrapped
+                    network_sample.get(vertex_unwrapped), return_as_primitive=True)
+                for vertex_unwrapped in vertices_unwrapped
             }
         else:
             sample = __create_multi_indexed_samples(vertices_unwrapped, network_sample, True)
@@ -198,9 +199,7 @@ def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrap
         vertex_label = Vertex._get_python_label(vertex_unwrapped)
         samples_for_vertex = network_samples.get(vertex_unwrapped).asList()
         is_primitive = [True] * len(samples_for_vertex)
-        samples_as_ndarray = map(Tensor._to_ndarray,
-                                 samples_for_vertex,
-                                 is_primitive)
+        samples_as_ndarray = map(Tensor._to_ndarray, samples_for_vertex, is_primitive)
         vertex_samples[vertex_label] = list(samples_as_ndarray)
     return vertex_samples
 
@@ -218,9 +217,7 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
         else:
             samples_for_vertex = network_samples.get(vertex).asList()
             is_primitive = [True] * len(samples_for_vertex)
-            samples_as_ndarray = map(Tensor._to_ndarray,
-                                     samples_for_vertex,
-                                     is_primitive)
+            samples_as_ndarray = map(Tensor._to_ndarray, samples_for_vertex, is_primitive)
             samples = list(samples_as_ndarray)
             for sample in samples:
                 __add_sample_to_dict(sample, vertex_samples_multi, vertex_label, column_header_for_scalar)

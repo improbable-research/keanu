@@ -100,7 +100,6 @@ def test_sample_dict_can_be_loaded_in_to_dataframe(net: BayesNet) -> None:
         assert type(df[column][0]) == np.float64
 
 
-
 def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
     gamma = Gamma(np.array([1., 1., 1., 1.]).reshape((2, 2)), np.array([2., 2., 2., 2.]).reshape((2, 2)))
     exp = Exponential(np.array([1., 1., 1., 1.]).reshape((2, 2)))
@@ -125,7 +124,6 @@ def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
             assert type(child_column) == str
             assert len(df[parent_column][child_column]) == 5
             assert type(df[parent_column][child_column][0]) == np.float64
-
 
 
 def test_dropping_samples(net: BayesNet) -> None:
