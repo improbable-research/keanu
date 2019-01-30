@@ -8,6 +8,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.Vertex;
@@ -156,11 +157,12 @@ public class RadonHierarchicalRegression {
         Vertex sigmaBeta = bayesianNetwork.getVertexByLabel(new VertexLabel("SigmaGradient"));
 
         // note that way too few samples are taken due to time constraints
+        KeanuProbabilisticModelWithGradient probabilisticModel = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
         return NUTS.builder()
             .maxTreeHeight(5)
             .adaptEnabled(true)
             .build()
-            .getPosteriorSamples(bayesianNetwork, Arrays.asList(muAlpha, muBeta, sigmaAlpha, sigmaBeta), 100)
+            .getPosteriorSamples(probabilisticModel, Arrays.asList(muAlpha, muBeta, sigmaAlpha, sigmaBeta), 100)
             .downSample(2);
     }
 
