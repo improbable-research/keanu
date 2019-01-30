@@ -2,15 +2,17 @@ import numpy as np
 import pytest
 
 from itertools import islice
-from typing import cast
+from typing import cast, List, Any, Union
+from numpy import integer, floating, bool_
 from keanu import Model, stats, KeanuRandom, BayesNet
 from keanu.algorithm import sample, generate_samples
+from keanu.vartypes import numpy_types, primitive_types
 from keanu.vertex import Uniform, Gaussian
 import pandas as pd
 
 
 def test_can_get_correct_autocorrelation() -> None:
-    x = [1., 2., 3., 4., 5., 6., 7., 8.]
+    x: List[primitive_types] = [1., 2., 3., 4., 5., 6., 7., 8.]
     autocorr = stats.autocorrelation(x)
     expected = [1., 0.625, 0.27380952, -0.0297619, -0.26190476, -0.39880952, -0.41666667, -0.29166667]
     np.testing.assert_almost_equal(autocorr, expected)
@@ -21,7 +23,7 @@ def test_autocorrelation_example_nd() -> None:
     a.set_label("a")
     bayes_net = BayesNet(a.get_connected_graph())
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(), draws=10)
-    vertex_samples = posterior_samples.get(('a', '(0, 1)'))
+    vertex_samples = posterior_samples[('a', '(0, 1)')]
     ac = stats.autocorrelation(vertex_samples)
 
 
@@ -38,17 +40,15 @@ def test_autocorr_returns_ndarray_of_correct_dtype() -> None:
 
 
 def test_cant_get_autocorrelation_of_np_bools() -> None:
-    x = [True, False, False]
-    x_list = [np.array(a) for a in x]
+    x: List[primitive_types] = [True, False, False]
     with pytest.raises(ValueError, match="Autocorrelation must be run on a list of floating types"):
-        stats.autocorrelation(x_list)
+        stats.autocorrelation(x)
 
 
 def test_cant_get_autocorrelation_of_np_ints() -> None:
-    x = [1, 2, 3]
-    x_list = [np.array(a, int) for a in x]
+    x: List[primitive_types] = [1, 2, 3]
     with pytest.raises(ValueError, match="Autocorrelation must be run on a list of floating types"):
-        stats.autocorrelation(x_list)
+        stats.autocorrelation(x)
 
 
 def test_autocorrelation_same_for_streaming_as_batch() -> None:

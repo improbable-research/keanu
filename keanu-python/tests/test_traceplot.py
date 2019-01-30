@@ -11,10 +11,7 @@ from collections import OrderedDict
 
 @pytest.fixture
 def trace() -> sample_types:
-    return OrderedDict([("gamma", [array([[1., 2.], [3., 4.]]),
-                                   array([[2., 3.], [4., 5.]])]),
-                        ("gaussian", [array([[0.1, 0.2], [0.3, 0.4]]),
-                                      array([[0.2, 0.3], [0.4, 0.5]])])])
+    return OrderedDict([("gamma", [1., 2., 3., 4.]), ("gaussian", [0.1, 0.2, 0.3, 0.4])])
 
 
 def test_traceplot_returns_axesplot_with_correct_data(trace: sample_types) -> None:
@@ -32,5 +29,5 @@ def test_traceplot_returns_axesplot_with_correct_data(trace: sample_types) -> No
     gamma_ax_data = [l.get_ydata() for l in gamma_lines]
     gaussian_ax_data = [l.get_ydata() for l in gaussian_lines]
 
-    assert_array_equal(gamma_ax_data, [array([1., 2.]), array([2., 3.]), array([3., 4.]), array([4., 5.])])
-    assert_array_equal(gaussian_ax_data, [array([0.1, 0.2]), array([0.2, 0.3]), array([0.3, 0.4]), array([0.4, 0.5])])
+    assert_array_equal(gamma_ax_data, [[1., 2., 3., 4.]])
+    assert_array_equal(gaussian_ax_data, [[0.1, 0.2, 0.3, 0.4]])

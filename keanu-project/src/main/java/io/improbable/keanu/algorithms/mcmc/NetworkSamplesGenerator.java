@@ -3,10 +3,10 @@ package io.improbable.keanu.algorithms.mcmc;
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.util.status.PercentageComponent;
 import io.improbable.keanu.util.status.RemainingTimeComponent;
 import io.improbable.keanu.util.status.StatusBar;
-import io.improbable.keanu.vertices.VertexId;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,7 +86,7 @@ public class NetworkSamplesGenerator {
 
         StatusBar statusBar = statusBarSupplier.get();
 
-        Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
+        Map<VariableReference, List<?>> samplesByVariable = new HashMap<>();
         List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
         dropSamples(dropCount, statusBar);
@@ -99,7 +99,7 @@ public class NetworkSamplesGenerator {
         int samplesLeft = totalSampleCount - dropCount;
         for (int i = 0; i < samplesLeft; i++) {
             if (i % downSampleInterval == 0) {
-                algorithm.sample(samplesByVertex, logOfMasterPForEachSample);
+                algorithm.sample(samplesByVariable, logOfMasterPForEachSample);
                 sampleCount++;
             } else {
                 algorithm.step();
@@ -109,7 +109,7 @@ public class NetworkSamplesGenerator {
         }
 
         statusBar.finish();
-        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, sampleCount);
+        return new NetworkSamples(samplesByVariable, logOfMasterPForEachSample, sampleCount);
     }
 
     private PercentageComponent newPercentageComponentAndAddToStatusBar(StatusBar statusBar) {

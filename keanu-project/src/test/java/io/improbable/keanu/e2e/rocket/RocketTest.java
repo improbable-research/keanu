@@ -1,13 +1,13 @@
 package io.improbable.keanu.e2e.rocket;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSample;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -16,6 +16,7 @@ import org.junit.experimental.categories.Category;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 import static org.junit.Assert.assertEquals;
 
 @Slf4j
@@ -51,9 +52,10 @@ public class RocketTest {
 
         BayesianNetwork net = new BayesianNetwork(oRingFailure.getConnectedGraph());
         net.probeForNonZeroProbability(1000);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
-        Stream<NetworkSample> networkSamples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
-            net,
+        Stream<NetworkSample> networkSamples = MetropolisHastings.withDefaultConfigFor(model).generatePosteriorSamples(
+            model,
             Arrays.asList(oRingFailure, residualFuel, alarm1FalsePositive)
         ).stream();
 

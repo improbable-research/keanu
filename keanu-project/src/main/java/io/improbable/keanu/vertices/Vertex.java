@@ -1,15 +1,17 @@
 package io.improbable.keanu.vertices;
 
 import com.google.common.collect.ImmutableSet;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,15 +19,14 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable<T> {
+public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable<T, VertexState<T>> {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;
-    private final Observable<T> observation;
 
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
-    private T value;
+    private VertexState<T> state;
     private VertexLabel label = null;
 
     public Vertex() {
@@ -34,7 +35,7 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     public Vertex(long[] initialShape) {
         this.initialShape = initialShape;
-        this.observation = Observable.observableTypeFor(this.getClass());
+        this.state = VertexState.nullState();
     }
 
     /**
@@ -88,18 +89,6 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
         return this.getValue();
     }
 
-
-    public <V extends Vertex<T>> V print() {
-        new PrintVertex<>(this);
-        return (V) this;
-    }
-
-
-    public <V extends Vertex<T>> V print(final String message, final boolean printData) {
-        new PrintVertex<>(this, message, printData);
-        return (V) this;
-    }
-
     /**
      * @return True if the vertex is probabilistic, false otherwise.
      * A probabilistic vertex is defined as a vertex whose value is
@@ -121,17 +110,27 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
      * @param value the observed value
      */
     public void setValue(T value) {
-        if (!observation.isObserved()) {
-            this.value = value;
+        if (!state.isObserved()) {
+            state = new VertexState<>(value, false);
         }
     }
 
     @Override
     public T getValue() {
-        return hasValue() ? value : lazyEval();
+        return hasValue() ? state.getValue() : lazyEval();
+    }
+
+    @Override
+    public VertexState<T> getState() {
+        return state;
+    }
+
+    public void setState(VertexState<T> newState) {
+        state = newState;
     }
 
     public boolean hasValue() {
+        T value = state.getValue();
         if (value instanceof Tensor) {
             return !((Tensor) value).isShapePlaceholder();
         } else {
@@ -141,8 +140,8 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     @Override
     public long[] getShape() {
-        if (value instanceof Tensor) {
-            return ((Tensor) value).getShape();
+        if (state.getValue() instanceof Tensor) {
+            return ((Tensor) state.getValue()).getShape();
         } else {
             return initialShape;
         }
@@ -150,6 +149,17 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
 
     public int getRank() {
         return getShape().length;
+    }
+
+    public <V extends Vertex<T>> V print() {
+        new PrintVertex<>(this);
+        return (V) this;
+    }
+
+
+    public <V extends Vertex<T>> V print(final String message, final boolean printData) {
+        new PrintVertex<>(this, message, printData);
+        return (V) this;
     }
 
     /**
@@ -175,30 +185,39 @@ public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable
      */
     @Override
     public void observe(T value) {
-        this.value = value;
-        observation.observe(value);
+        if (!isObservable(this.getClass())) {
+            throw new UnsupportedOperationException("This type of vertex does not support being observed");
+        }
+        state = new VertexState<>(value, true);
+    }
+
+    private static boolean isObservable(Class<? extends Vertex> v) {
+        boolean isProbabilistic = Probabilistic.class.isAssignableFrom(v);
+        boolean isNotDoubleOrIntegerVertex = !IntegerVertex.class.isAssignableFrom(v) && !DoubleVertex.class.isAssignableFrom(v);
+
+        return isProbabilistic || isNotDoubleOrIntegerVertex;
     }
 
     /**
      * Cause this vertex to observe its own value, for example when generating test data
      */
     public void observeOwnValue() {
-        observation.observe(getValue());
+        observe(getValue());
     }
 
     @Override
     public void unobserve() {
-        observation.unobserve();
+        state = new VertexState<>(state.getValue(), false);
     }
 
     @Override
     public boolean isObserved() {
-        return observation.isObserved();
+        return state.isObserved();
     }
 
     @Override
     public Optional<T> getObservedValue() {
-        return observation.getObservedValue();
+        return state.getObservedValue();
     }
 
     @Override

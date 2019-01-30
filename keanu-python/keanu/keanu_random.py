@@ -5,7 +5,7 @@ from typing import Optional
 
 k = KeanuContext()
 
-java_import(k.jvm_view(), "io.improbable.keanu.vertices.dbl.KeanuRandom")
+java_import(k.jvm_view(), "io.improbable.keanu.KeanuRandom")
 
 
 class KeanuRandom(JavaObjectWrapper):

@@ -3,7 +3,7 @@ from matplotlib.ticker import MaxNLocator
 import numpy as np
 from keanu import stats
 from typing import Tuple, Any, List
-from keanu.vartypes import numpy_types
+from keanu.vartypes import primitive_types
 from math import log, floor
 from numpy import ndarray
 
@@ -32,7 +32,7 @@ def __calc_max_lag(data_len: int) -> int:
     return lim
 
 
-def plot_acf(data: List[numpy_types], nlags: int = None) -> Any:
+def plot_acf(data: List[primitive_types], nlags: int = None) -> Any:
     autocorr = stats.autocorrelation(data)
     fig, ax = __create_new_mpl()
     if nlags is None:

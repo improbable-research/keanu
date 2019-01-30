@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.GenericVertex;
 
 import java.io.PrintStream;

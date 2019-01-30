@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 import java.util.Arrays;

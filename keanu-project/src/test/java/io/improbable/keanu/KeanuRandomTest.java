@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl;
+package io.improbable.keanu;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.random.MersenneTwister;
