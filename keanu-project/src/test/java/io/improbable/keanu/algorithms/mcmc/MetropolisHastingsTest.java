@@ -149,7 +149,7 @@ public class MetropolisHastingsTest {
 
     @Category(Slow.class)
     @Test
-    public void samplesComplexDiscreteWithMultipleVariableSelect() {
+    public void samplesComplexDiscreteWithFullVariableSelect() {
 
         MCMCTestCase testCase = new MultiVariateDiscreteTestCase();
 
