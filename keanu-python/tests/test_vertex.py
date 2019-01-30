@@ -320,10 +320,15 @@ def test_you_can_observe_scalar(ctor, args, expected_type, value) -> None:
     test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals_scalar)
 
 
-def test_set_label_in_kwargs() -> None:
+def test_set_label_as_an_optional_param() -> None:
     label = "gaussian_vertex"
     vertex = Gaussian(0., 1., label=label)
     assert vertex.get_label() == label
+
+
+def test_can_pass_none_to_label() -> None:
+    vertex = Gaussian(0., 1., label=None)
+    assert vertex.get_label() == None
 
 
 def test_set_label() -> None:
@@ -331,3 +336,8 @@ def test_set_label() -> None:
     vertex = Gaussian(0., 1.)
     vertex.set_label(label)
     assert vertex.get_label() == label
+
+
+def test_set_label_is_required_for_proxy_vertices() -> None:
+    with pytest.raises(TypeError):
+        vertex = IntegerProxy([1, 1])
