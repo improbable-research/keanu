@@ -1,8 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +27,36 @@ public class ChiSquaredVertexTest {
     @Before
     public void setup() {
         random = new KeanuRandom(1);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        IntegerVertex k = ConstantVertex.of(1);
+        ChiSquaredVertex vertex = new ChiSquaredVertex(k);
+        LogProbGraph logProbGraph = vertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, k, k.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.scalar(0.5));
+
+        ChiSquaredDistribution chiSquaredDistribution = new ChiSquaredDistribution(1);
+        double expectedLogDensity = chiSquaredDistribution.logDensity(0.5);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedLogDensity);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        IntegerVertex k = ConstantVertex.of(1, 1);
+        ChiSquaredVertex vertex = new ChiSquaredVertex(k);
+        LogProbGraph logProbGraph = vertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, k, k.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.create(0.25, 0.75));
+
+        ChiSquaredDistribution chiSquaredDistribution = new ChiSquaredDistribution(1);
+        double expectedLogDensity = chiSquaredDistribution.logDensity(0.25) + chiSquaredDistribution.logDensity(0.75);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedLogDensity);
     }
 
     @Test

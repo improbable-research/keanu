@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.AutoDiffBroadcast;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
@@ -11,7 +12,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ArcTan2Vertex extends DoubleBinaryOpVertex {
+public class ArcTan2Vertex extends DoubleBinaryOpVertex implements Differentiable {
 
     private static final String X_NAME = LEFT_NAME;
     private static final String Y_NAME = RIGHT_NAME;
@@ -34,7 +35,9 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivative forwardModeAutoDifferentiation(PartialDerivative dxWrtInput, PartialDerivative dyWrtInput) {
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+        PartialDerivative dxWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY);
+        PartialDerivative dyWrtInput = derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY);
 
         DoubleTensor yValue = right.getValue();
         DoubleTensor xValue = left.getValue();

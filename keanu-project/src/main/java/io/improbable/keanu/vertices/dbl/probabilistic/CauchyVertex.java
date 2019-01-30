@@ -1,17 +1,20 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Cauchy;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.HashMap;
@@ -24,7 +27,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class CauchyVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class CauchyVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex location;
     private final DoubleVertex scale;
@@ -99,6 +102,20 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
         DoubleTensor logPdfs = Cauchy.withParameters(locationValues, scaleValues).logProb(value);
 
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        DoublePlaceholderVertex xPlaceHolder = new DoublePlaceholderVertex(this.getShape());
+        DoublePlaceholderVertex locationPlaceHolder = new DoublePlaceholderVertex(location.getShape());
+        DoublePlaceholderVertex scalePlaceHolder = new DoublePlaceholderVertex(scale.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceHolder)
+            .input(location, locationPlaceHolder)
+            .input(scale, scalePlaceHolder)
+            .logProbOutput(Cauchy.logProbOutput(xPlaceHolder, locationPlaceHolder, scalePlaceHolder))
+            .build();
     }
 
     @Override

@@ -1,17 +1,20 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.HashMap;
@@ -21,9 +24,10 @@ import java.util.Set;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.C;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
-public class DirichletVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class DirichletVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex concentration;
+
     private static final String CONCENTRATION_NAME = "concentration";
 
     /**
@@ -81,6 +85,18 @@ public class DirichletVertex extends DoubleVertex implements Differentiable, Pro
         DoubleTensor concentrationValues = concentration.getValue();
         DoubleTensor logPdfs = Dirichlet.withParameters(concentrationValues).logProb(value);
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        DoublePlaceholderVertex concentrationPlaceholder = new DoublePlaceholderVertex(concentration.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(concentration, concentrationPlaceholder)
+            .logProbOutput(Dirichlet.logProbOutput(xPlaceholder, concentrationPlaceholder))
+            .build();
     }
 
     @Override

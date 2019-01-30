@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
@@ -7,12 +8,14 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.HashMap;
@@ -25,7 +28,7 @@ import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BetaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class BetaVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
@@ -106,6 +109,20 @@ public class BetaVertex extends DoubleVertex implements Differentiable, Probabil
     public double logProb(DoubleTensor value) {
         DoubleTensor logPdfs = distribution().logProb(value);
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final DoublePlaceholderVertex xPlaceHolder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex alphaPlaceHolder = new DoublePlaceholderVertex(alpha.getShape());
+        final DoublePlaceholderVertex betaPlaceHolder = new DoublePlaceholderVertex(beta.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceHolder)
+            .input(alpha, alphaPlaceHolder)
+            .input(beta, betaPlaceHolder)
+            .logProbOutput(Beta.logProbOutput(xPlaceHolder, alphaPlaceHolder, betaPlaceHolder))
+            .build();
     }
 
     @Override

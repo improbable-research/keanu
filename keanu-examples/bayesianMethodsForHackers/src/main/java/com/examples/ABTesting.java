@@ -1,13 +1,13 @@
 package com.examples;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 import java.util.Arrays;
@@ -40,11 +40,11 @@ public class ABTesting {
         observationB.observe(observationsB);
 
         //infer the most probable probabilities
-        BayesianNetwork net = new BayesianNetwork(probabilityA.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(probabilityA.getConnectedGraph());
         int sampleCount = 100;
-        NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig()
-            .getPosteriorSamples(net, Arrays.asList(probabilityA, probabilityB, delta), sampleCount)
-            .drop(sampleCount/2).downSample(net.getLatentVertices().size());
+        NetworkSamples networkSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+            .getPosteriorSamples(model, Arrays.asList(probabilityA, probabilityB, delta), sampleCount)
+            .drop(sampleCount/2).downSample(model.getLatentVariables().size());
 
         DoubleVertexSamples pASamples = networkSamples.getDoubleTensorSamples(probabilityA);
         DoubleVertexSamples pBSamples = networkSamples.getDoubleTensorSamples(probabilityB);

@@ -1,11 +1,11 @@
 package io.improbable.keanu.distributions.discrete;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
  * Computer Generation of Statistical Distributions

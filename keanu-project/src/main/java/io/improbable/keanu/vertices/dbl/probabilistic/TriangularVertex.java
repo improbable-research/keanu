@@ -1,16 +1,19 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.Map;
@@ -19,7 +22,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class TriangularVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
+public class TriangularVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
@@ -134,6 +137,22 @@ public class TriangularVertex extends DoubleVertex implements Differentiable, Pr
 
         DoubleTensor logPdfs = Triangular.withParameters(xMinValues, xMaxValues, cValues).logProb(value);
         return logPdfs.sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex xMinPlaceholder = new DoublePlaceholderVertex(xMin.getShape());
+        final DoublePlaceholderVertex xMaxPlaceholder = new DoublePlaceholderVertex(xMax.getShape());
+        final DoublePlaceholderVertex cPlaceholder = new DoublePlaceholderVertex(c.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(xMin, xMinPlaceholder)
+            .input(xMax, xMaxPlaceholder)
+            .input(c, cPlaceholder)
+            .logProbOutput(Triangular.logProbOutput(xPlaceholder, xMinPlaceholder, xMaxPlaceholder, cPlaceholder))
+            .build();
     }
 
     @Override
