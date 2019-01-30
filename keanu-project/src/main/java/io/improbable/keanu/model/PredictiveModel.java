@@ -1,6 +1,6 @@
 package io.improbable.keanu.model;
 
-public interface Model<INPUT, OUTPUT> {
+public interface PredictiveModel<INPUT, OUTPUT> {
 
     OUTPUT predict(INPUT input);
 
