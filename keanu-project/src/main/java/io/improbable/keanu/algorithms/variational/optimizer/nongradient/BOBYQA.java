@@ -1,6 +1,10 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.*;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionAdaptor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.*;
+import io.improbable.keanu.algorithms.ProbabilisticModel;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -25,7 +27,7 @@ import java.util.function.BiConsumer;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class NonGradientOptimizer implements Optimizer {
 
-    private final ProbabilisticGraph probabilisticGraph;
+    private final ProbabilisticModel probabilisticModel;
 
     private final NonGradientOptimizationAlgorithm nonGradientOptimizationAlgorithm;
 
@@ -57,7 +59,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         StatusBar statusBar = Optimizer.createFitnessStatusBar(this);
 
-        List<? extends Variable> latentVariables = probabilisticGraph.getLatentVariables();
+        List<? extends Variable> latentVariables = probabilisticModel.getLatentVariables();
 
         if (checkInitialFitnessConditions) {
             Map<VariableReference, DoubleTensor> startingPoint = Optimizer.convertToMapPoint(latentVariables);
@@ -80,7 +82,7 @@ public class NonGradientOptimizer implements Optimizer {
     public OptimizedResult maxAPosteriori() {
         return optimize(
             new LogProbFitnessFunction(
-                probabilisticGraph,
+                probabilisticModel,
                 this::handleFitnessCalculation
             )
         );
@@ -90,7 +92,7 @@ public class NonGradientOptimizer implements Optimizer {
     public OptimizedResult maxLikelihood() {
         return optimize(
             new LogLikelihoodFitnessFunction(
-                probabilisticGraph,
+                probabilisticModel,
                 this::handleFitnessCalculation
             )
         );
@@ -99,7 +101,7 @@ public class NonGradientOptimizer implements Optimizer {
     @ToString
     public static class NonGradientOptimizerBuilder {
 
-        private ProbabilisticGraph probabilisticGraph;
+        private ProbabilisticModel probabilisticModel;
 
         private NonGradientOptimizationAlgorithm nonGradientOptimizationAlgorithm = BOBYQA.builder().build();
 
@@ -108,8 +110,8 @@ public class NonGradientOptimizer implements Optimizer {
         NonGradientOptimizerBuilder() {
         }
 
-        public NonGradientOptimizerBuilder bayesianNetwork(ProbabilisticGraph probabilisticGraph) {
-            this.probabilisticGraph = probabilisticGraph;
+        public NonGradientOptimizerBuilder probabilisticModel(ProbabilisticModel probabilisticModel) {
+            this.probabilisticModel = probabilisticModel;
             return this;
         }
 
@@ -124,11 +126,11 @@ public class NonGradientOptimizer implements Optimizer {
         }
 
         public NonGradientOptimizer build() {
-            if (probabilisticGraph == null) {
+            if (probabilisticModel == null) {
                 throw new IllegalStateException("Cannot build optimizer without specifying network to optimize.");
             }
             return new NonGradientOptimizer(
-                probabilisticGraph,
+                probabilisticModel,
                 nonGradientOptimizationAlgorithm,
                 checkInitialFitnessConditions
             );

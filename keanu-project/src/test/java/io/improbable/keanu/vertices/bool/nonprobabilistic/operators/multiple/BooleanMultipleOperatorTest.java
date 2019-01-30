@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 

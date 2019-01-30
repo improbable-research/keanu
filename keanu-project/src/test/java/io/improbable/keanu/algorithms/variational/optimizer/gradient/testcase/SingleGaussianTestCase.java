@@ -1,12 +1,16 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase;
 
-import io.improbable.keanu.algorithms.variational.optimizer.*;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.LogLikelihoodFitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.LogProbFitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogLikelihoodFitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogProbFitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.testcase.NonGradientOptimizationAlgorithmTestCase;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
@@ -20,7 +24,7 @@ public class SingleGaussianTestCase implements GradientOptimizationAlgorithmTest
     private long[] shape;
 
     private boolean useMLE;
-    private KeanuProbabilisticWithGradientGraph model;
+    private KeanuProbabilisticModelWithGradient model;
 
     public SingleGaussianTestCase() {
         this(false, new long[]{2});
@@ -37,7 +41,7 @@ public class SingleGaussianTestCase implements GradientOptimizationAlgorithmTest
         B.observe(DoubleTensor.create(5, shape));
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(A.getConnectedGraph());
-        model = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
+        model = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
     }
 
     private void assertMLE(OptimizedResult result) {

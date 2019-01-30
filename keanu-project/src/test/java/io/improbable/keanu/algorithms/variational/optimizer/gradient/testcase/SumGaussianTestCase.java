@@ -1,12 +1,16 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase;
 
-import io.improbable.keanu.algorithms.variational.optimizer.*;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.LogLikelihoodFitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.LogProbFitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogLikelihoodFitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogProbFitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.testcase.NonGradientOptimizationAlgorithmTestCase;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
@@ -21,7 +25,7 @@ public class SumGaussianTestCase implements GradientOptimizationAlgorithmTestCas
     private final DoubleVertex B;
 
     private boolean useMLE;
-    private KeanuProbabilisticWithGradientGraph model;
+    private KeanuProbabilisticModelWithGradient model;
 
     public SumGaussianTestCase(boolean useMLE) {
         this.useMLE = useMLE;
@@ -38,7 +42,7 @@ public class SumGaussianTestCase implements GradientOptimizationAlgorithmTestCas
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
 
-        model = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
+        model = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
     }
 
     private void assertMLE(OptimizedResult result) {

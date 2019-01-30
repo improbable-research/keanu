@@ -2,11 +2,13 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.ProbabilisticModel;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
+import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +19,7 @@ import java.util.Arrays;
 import static junit.framework.TestCase.assertEquals;
 
 @RunWith(Parameterized.class)
-public class KeanuProbabilisticGraphTest {
+public class KeanuProbabilisticModelTest {
 
     private GaussianVertex A;
     private GaussianVertex B;
@@ -36,7 +38,7 @@ public class KeanuProbabilisticGraphTest {
         });
     }
 
-    public KeanuProbabilisticGraphTest(DoubleTensor initialA, DoubleTensor initialB, DoubleTensor observationD) {
+    public KeanuProbabilisticModelTest(DoubleTensor initialA, DoubleTensor initialB, DoubleTensor observationD) {
 
         this.initialA = initialA;
         this.initialB = initialB;
@@ -53,34 +55,34 @@ public class KeanuProbabilisticGraphTest {
     }
 
     @Test
-    public void canCalculateLogProbOnKeanuProbabilisticGraph() {
-        ProbabilisticGraph probabilisticGraph = new KeanuProbabilisticGraph(new BayesianNetwork(D.getConnectedGraph()));
-        canCalculateLogProb(probabilisticGraph);
+    public void canCalculateLogProbOnKeanuProbabilisticModel() {
+        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(D.getConnectedGraph());
+        canCalculateLogProb(probabilisticModel);
     }
 
     @Test
-    public void canCalculateLogProbOnKeanuProbabilisticWithGradientGraph() {
-        ProbabilisticGraph probabilisticGraph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(D.getConnectedGraph()));
-        canCalculateLogProb(probabilisticGraph);
+    public void canCalculateLogProbOnKeanuProbabilisticModelWithGradient() {
+        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModelWithGradient(D.getConnectedGraph());
+        canCalculateLogProb(probabilisticModel);
     }
 
     @Test
-    public void canCalculateLogLikelihoodOnKeanuProbabilisticGraph() {
-        ProbabilisticGraph probabilisticGraph = new KeanuProbabilisticGraph(new BayesianNetwork(D.getConnectedGraph()));
-        canCalculateLogLikelihood(probabilisticGraph);
+    public void canCalculateLogLikelihoodOnKeanuProbabilisticModel() {
+        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(D.getConnectedGraph());
+        canCalculateLogLikelihood(probabilisticModel);
     }
 
     @Test
-    public void canCalculateLogLikelihoodOnKeanuProbabilisticWithGradientGraph() {
-        ProbabilisticGraph probabilisticGraph = new KeanuProbabilisticWithGradientGraph(new BayesianNetwork(D.getConnectedGraph()));
-        canCalculateLogLikelihood(probabilisticGraph);
+    public void canCalculateLogLikelihoodOnKeanuProbabilisticModelWithGradient() {
+        ProbabilisticModel probabilisticModel = new KeanuProbabilisticModelWithGradient(D.getConnectedGraph());
+        canCalculateLogLikelihood(probabilisticModel);
     }
 
-    public void canCalculateLogProb(ProbabilisticGraph probabilisticGraph) {
+    public void canCalculateLogProb(ProbabilisticModel probabilisticModel) {
 
-        double defaultLogProb = probabilisticGraph.logProb();
+        double defaultLogProb = probabilisticModel.logProb();
 
-        double logProb = probabilisticGraph.logProb(ImmutableMap.of(
+        double logProb = probabilisticModel.logProb(ImmutableMap.of(
             A.getId(), initialA,
             B.getId(), initialB
         ));
@@ -91,7 +93,7 @@ public class KeanuProbabilisticGraphTest {
         assertEquals(expectedInitialLogProb, logProb, 1e-5);
 
         DoubleTensor newA = KeanuRandom.getDefaultRandom().nextDouble(initialA.getShape());
-        double postUpdateLogProb = probabilisticGraph.logProb(ImmutableMap.of(
+        double postUpdateLogProb = probabilisticModel.logProb(ImmutableMap.of(
             A.getId(), newA
         ));
 
@@ -100,11 +102,11 @@ public class KeanuProbabilisticGraphTest {
         assertEquals(expectedPostUpdateLogProb, postUpdateLogProb, 1e-5);
     }
 
-    public void canCalculateLogLikelihood(ProbabilisticGraph probabilisticGraph) {
+    public void canCalculateLogLikelihood(ProbabilisticModel probabilisticModel) {
 
-        double defaultLogProb = probabilisticGraph.logLikelihood();
+        double defaultLogProb = probabilisticModel.logLikelihood();
 
-        double logProb = probabilisticGraph.logLikelihood(ImmutableMap.of(
+        double logProb = probabilisticModel.logLikelihood(ImmutableMap.of(
             A.getId(), initialA,
             B.getId(), initialB
         ));
@@ -115,7 +117,7 @@ public class KeanuProbabilisticGraphTest {
         assertEquals(expectedInitialLogProb, logProb, 1e-5);
 
         DoubleTensor newA = KeanuRandom.getDefaultRandom().nextDouble(initialA.getShape());
-        double postUpdateLogProb = probabilisticGraph.logLikelihood(ImmutableMap.of(
+        double postUpdateLogProb = probabilisticModel.logLikelihood(ImmutableMap.of(
             A.getId(), newA
         ));
 

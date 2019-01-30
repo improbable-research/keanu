@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

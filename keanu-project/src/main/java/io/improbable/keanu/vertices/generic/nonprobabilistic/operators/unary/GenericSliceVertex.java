@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static io.improbable.keanu.tensor.TensorShape.removeDimension;
 

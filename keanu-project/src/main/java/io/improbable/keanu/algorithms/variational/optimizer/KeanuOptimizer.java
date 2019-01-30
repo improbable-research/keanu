@@ -4,6 +4,8 @@ import io.improbable.keanu.algorithms.graphtraversal.DifferentiableChecker;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
+import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.experimental.UtilityClass;
 
@@ -98,7 +100,7 @@ public class KeanuOptimizer {
 
         public NonGradientOptimizer.NonGradientOptimizerBuilder builderFor(BayesianNetwork network) {
             initializeNetworkForOptimization(network);
-            return NonGradientOptimizer.builder().bayesianNetwork(new KeanuProbabilisticGraph(network));
+            return NonGradientOptimizer.builder().probabilisticModel(new KeanuProbabilisticModel(network));
         }
 
     }
@@ -148,7 +150,7 @@ public class KeanuOptimizer {
 
         public GradientOptimizer.GradientOptimizerBuilder builderFor(BayesianNetwork network) {
             initializeNetworkForOptimization(network);
-            return GradientOptimizer.builder().bayesianNetwork(new KeanuProbabilisticWithGradientGraph(network));
+            return GradientOptimizer.builder().probabilisticModel(new KeanuProbabilisticModelWithGradient(network));
         }
     }
 

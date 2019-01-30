@@ -1,6 +1,5 @@
 package io.improbable.keanu.benchmarks;
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuProbabilisticWithGradientGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.Adam;
@@ -9,6 +8,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.openjdk.jmh.annotations.*;
@@ -38,12 +38,12 @@ public class OptimizerBenchmark {
         C.observe(30.0);
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(A.getConnectedGraph());
-        KeanuProbabilisticWithGradientGraph gradientGraph = new KeanuProbabilisticWithGradientGraph(bayesianNetwork);
+        KeanuProbabilisticModelWithGradient gradientGraph = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
 
         switch (optimizerType) {
             case ADAM_OPTIMIZER:
                 optimizer = GradientOptimizer.builder()
-                    .bayesianNetwork(gradientGraph)
+                    .probabilisticModel(gradientGraph)
                     .algorithm(Adam.builder()
                         .build())
                     .build();
@@ -51,13 +51,13 @@ public class OptimizerBenchmark {
 
             case CONJUGATE_GRADIENT:
                 optimizer = GradientOptimizer.builder()
-                    .bayesianNetwork(gradientGraph)
+                    .probabilisticModel(gradientGraph)
                     .algorithm(ConjugateGradient.builder().build())
                     .build();
                 break;
             case BOBYQA_OPTIMIZER:
                 optimizer = NonGradientOptimizer.builder()
-                    .bayesianNetwork(gradientGraph)
+                    .probabilisticModel(gradientGraph)
                     .algorithm(BOBYQA.builder().build())
                     .build();
                 break;

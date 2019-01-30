@@ -1,8 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.*;
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogLikelihoodFitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogProbFitnessFunction;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -26,7 +29,7 @@ public class GradientOptimizer implements Optimizer {
         return new GradientOptimizerBuilder();
     }
 
-    private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+    private final ProbabilisticModelWithGradient probabilisticModelWithGradient;
 
     private final GradientOptimizationAlgorithm gradientOptimizationAlgorithm;
 
@@ -79,22 +82,22 @@ public class GradientOptimizer implements Optimizer {
     }
 
     private void assertHasLatents() {
-        if (probabilisticWithGradientGraph.getLatentVariables().isEmpty()) {
+        if (probabilisticModelWithGradient.getLatentVariables().isEmpty()) {
             throw new IllegalArgumentException("Cannot find MAP of network without any latent variables");
         }
     }
 
     @Override
     public OptimizedResult maxAPosteriori() {
-        return optimize(probabilisticWithGradientGraph, false);
+        return optimize(probabilisticModelWithGradient, false);
     }
 
     @Override
     public OptimizedResult maxLikelihood() {
-        return optimize(probabilisticWithGradientGraph, true);
+        return optimize(probabilisticModelWithGradient, true);
     }
 
-    private OptimizedResult optimize(ProbabilisticWithGradientGraph probabilisticWithGradientGraph, boolean useMLE) {
+    private OptimizedResult optimize(ProbabilisticModelWithGradient probabilisticModelWithGradient, boolean useMLE) {
         assertHasLatents();
 
         FitnessFunction fitnessFunction;
@@ -102,23 +105,23 @@ public class GradientOptimizer implements Optimizer {
 
         if (useMLE) {
             fitnessFunction = new LogLikelihoodFitnessFunction(
-                probabilisticWithGradientGraph,
+                probabilisticModelWithGradient,
                 this::handleFitnessCalculation
             );
 
             fitnessFunctionGradient = new LogLikelihoodFitnessFunctionGradient(
-                probabilisticWithGradientGraph,
+                probabilisticModelWithGradient,
                 this::handleGradientCalculation
             );
 
         } else {
             fitnessFunction = new LogProbFitnessFunction(
-                probabilisticWithGradientGraph,
+                probabilisticModelWithGradient,
                 this::handleFitnessCalculation
             );
 
             fitnessFunctionGradient = new LogProbFitnessFunctionGradient(
-                probabilisticWithGradientGraph,
+                probabilisticModelWithGradient,
                 this::handleGradientCalculation
             );
         }
@@ -131,7 +134,7 @@ public class GradientOptimizer implements Optimizer {
         StatusBar statusBar = Optimizer.createFitnessStatusBar(this);
 
         if (checkInitialFitnessConditions) {
-            Map<VariableReference, DoubleTensor> startingPoint = Optimizer.convertToMapPoint(probabilisticWithGradientGraph.getLatentVariables());
+            Map<VariableReference, DoubleTensor> startingPoint = Optimizer.convertToMapPoint(probabilisticModelWithGradient.getLatentVariables());
 
             double initialFitness = fitnessFunction.value(startingPoint);
 
@@ -144,7 +147,7 @@ public class GradientOptimizer implements Optimizer {
         }
 
         OptimizedResult result = gradientOptimizationAlgorithm.optimize(
-            probabilisticWithGradientGraph.getLatentVariables(),
+            probabilisticModelWithGradient.getLatentVariables(),
             fitnessFunction,
             fitnessFunctionGradient
         );
@@ -166,15 +169,15 @@ public class GradientOptimizer implements Optimizer {
 
     public static class GradientOptimizerBuilder {
 
-        private ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+        private ProbabilisticModelWithGradient probabilisticModelWithGradient;
         private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = ConjugateGradient.builder().build();
         private boolean checkInitialFitnessConditions = true;
 
         GradientOptimizerBuilder() {
         }
 
-        public GradientOptimizerBuilder bayesianNetwork(ProbabilisticWithGradientGraph probabilisticWithGradientGraph) {
-            this.probabilisticWithGradientGraph = probabilisticWithGradientGraph;
+        public GradientOptimizerBuilder probabilisticModel(ProbabilisticModelWithGradient probabilisticModelWithGradient) {
+            this.probabilisticModelWithGradient = probabilisticModelWithGradient;
             return this;
         }
 
@@ -189,14 +192,14 @@ public class GradientOptimizer implements Optimizer {
         }
 
         public GradientOptimizer build() {
-            if (probabilisticWithGradientGraph == null) {
+            if (probabilisticModelWithGradient == null) {
                 throw new IllegalStateException("Cannot build optimizer without specifying network to optimize.");
             }
             if (gradientOptimizationAlgorithm == null) {
                 throw new IllegalStateException("Cannot build optimizer without specifying algorithm for optimizing.");
             }
             return new GradientOptimizer(
-                probabilisticWithGradientGraph,
+                probabilisticModelWithGradient,
                 gradientOptimizationAlgorithm,
                 checkInitialFitnessConditions
             );

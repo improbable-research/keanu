@@ -1,6 +1,8 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -51,7 +53,7 @@ public interface Optimizer {
      */
     OptimizedResult maxLikelihood();
 
-    static double[] convertToArrayPoint(List<? extends Variable<? extends NumberTensor>> latentVariables) {
+    static double[] convertToArrayPoint(List<? extends Variable<? extends NumberTensor, ?>> latentVariables) {
 
         List<long[]> shapes = latentVariables.stream().map(Variable::getShape).collect(Collectors.toList());
 
@@ -64,7 +66,7 @@ public interface Optimizer {
         int position = 0;
         double[] point = new double[(int) totalLatentDimensions];
 
-        for (Variable<? extends NumberTensor> variable : latentVariables) {
+        for (Variable<? extends NumberTensor, ?> variable : latentVariables) {
             double[] values = variable.getValue().asFlatDoubleArray();
             System.arraycopy(values, 0, point, position, values.length);
             position += values.length;
@@ -114,12 +116,12 @@ public interface Optimizer {
         return TensorShape.getLength(shape);
     }
 
-    static List<Variable<? extends DoubleTensor>> getAsDoubleTensors(List<? extends Variable> variables) {
+    static List<Variable<? extends DoubleTensor, ?>> getAsDoubleTensors(List<? extends Variable> variables) {
         return variables.stream()
             .map(
                 v -> {
                     if (v.getValue() instanceof DoubleTensor) {
-                        return (Variable<DoubleTensor>) v;
+                        return (Variable<DoubleTensor, ?>) v;
                     } else {
                         throw new UnsupportedOperationException(
                             "Optimization unsupported on networks containing discrete latents. " +
