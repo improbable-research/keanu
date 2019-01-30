@@ -39,17 +39,17 @@ public class Geometric implements DiscreteDistribution {
     }
 
     private DoubleTensor calculateLogProb(IntegerTensor k) {
-        DoubleTensor xAsDouble = k.toDouble();
+        DoubleTensor kAsDouble = k.toDouble();
         DoubleTensor oneMinusP = p.unaryMinus().plusInPlace(1.0);
-        DoubleTensor results = xAsDouble.minusInPlace(1.0).timesInPlace(oneMinusP.logInPlace()).plusInPlace(p.log());
+        DoubleTensor results = kAsDouble.minusInPlace(1.0).timesInPlace(oneMinusP.logInPlace()).plusInPlace(p.log());
 
         return setProbToZeroForInvalidK(k, results);
     }
 
     private DoubleTensor setProbToZeroForInvalidK(IntegerTensor k, DoubleTensor results) {
-        IntegerTensor invalidX = k.getLessThanMask(IntegerTensor.create(1, k.getShape()));
+        IntegerTensor invalidK = k.getLessThanMask(IntegerTensor.create(1, k.getShape()));
 
-        return results.setWithMaskInPlace(invalidX.toDouble(), Double.NEGATIVE_INFINITY);
+        return results.setWithMaskInPlace(invalidK.toDouble(), Double.NEGATIVE_INFINITY);
     }
 
     private boolean checkParameterIsValid() {
