@@ -97,12 +97,12 @@ def sample(net: BayesNet,
            plot: bool = False,
            ax: Any = None) -> sample_types:
 
-    sample_from, sample_from_copy = tee(sample_from)
+    sample_from = list(sample_from)
 
     if sampling_algorithm is None:
-        sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from_copy)
+        sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from)
 
-    sample_from, sample_from_copy = tee(sample_from)
+    sample_from = list(sample_from)
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
     probabilistic_model = ProbabilisticModel(net) if isinstance(
@@ -121,7 +121,7 @@ def sample(net: BayesNet,
     if plot:
         traceplot(vertex_samples, ax=ax)
 
-    if _all_vertices_are_scalar(sample_from_copy):
+    if _all_vertices_are_scalar(sample_from):
         return vertex_samples
     else:
         return _create_multi_indexed_samples(vertex_samples, False)
@@ -136,12 +136,11 @@ def generate_samples(net: BayesNet,
                      refresh_every: int = 100,
                      ax: Any = None) -> sample_generator_types:
 
-    sample_from, sample_from_copy = tee(sample_from)
+    sample_from = list(sample_from)
 
     if sampling_algorithm is None:
-        sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from_copy)
+        sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from)
 
-    sample_from, sample_from_copy = tee(sample_from)
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
     probabilistic_model = ProbabilisticModel(net) if isinstance(
@@ -151,7 +150,7 @@ def generate_samples(net: BayesNet,
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
 
-    all_are_scalar = _all_vertices_are_scalar(sample_from_copy)
+    all_are_scalar = _all_vertices_are_scalar(sample_from)
 
     return _samples_generator(
         sample_iterator,
