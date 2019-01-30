@@ -46,15 +46,15 @@ public abstract class GraphToDot {
     }
 
     protected static void write(GraphNode n, Writer outputWriter) throws IOException {
-        outputWriter.write(Integer.toString(n.getIndex()));
+        outputWriter.write(Long.toString(n.getIndex()));
         write(n.getDetails(), outputWriter);
         outputWriter.write(DOT_NEW_LINE);
     }
 
     protected static void write(GraphEdge e, Writer outputWriter) throws IOException {
-        outputWriter.write(Integer.toString(e.getSource().getIndex()));
+        outputWriter.write(Long.toString(e.getSource().getIndex()));
         outputWriter.write(DOT_EDGE);
-        outputWriter.write(Integer.toString(e.getDestination().getIndex()));
+        outputWriter.write(Long.toString(e.getDestination().getIndex()));
         write(e.getDetails(), outputWriter);
         outputWriter.write(DOT_NEW_LINE);
     }

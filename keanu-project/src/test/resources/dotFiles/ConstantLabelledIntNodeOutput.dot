@@ -1,7 +1,7 @@
 digraph BayesianNetwork {
-91 -> 92 [label=right]
-90 -> 92 [label=left]
-90[label="SomeLabel"]
-91[label="2"]
-92[label="*"]
+    6 [label="SomeLabel"]
+    7 [label="2"]
+    8 [label="*"]
+    6 -> 8
+    7 -> 8
 }

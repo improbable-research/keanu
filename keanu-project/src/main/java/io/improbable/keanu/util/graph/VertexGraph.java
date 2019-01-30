@@ -1,5 +1,6 @@
 package io.improbable.keanu.util.graph;
 
+import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Probabilistic;
@@ -8,6 +9,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.awt.*;
 import java.lang.reflect.Method;
@@ -27,13 +29,12 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     private static final String LABEL_FIELD = "label";
     private static final String COLOR_FIELD = "color";
     private static final Color DOUBLE_COLOR = Color.red;
+    private static final Color INTEGER_COLOR = Color.green;
     private static final Color BOOLEAN_COLOR = Color.blue;
     private static final Color OTHER_COLOR = Color.darkGray;
 
     private Map<Vertex, BasicGraphNode> vertexNodes = new HashMap<>();
     private Map<BasicGraphNode, Vertex> invertedVertexNodes = new HashMap<>();
-
-    private int index;
 
     public VertexGraph(BayesianNetwork inputNetwork) {
         this(inputNetwork.getAllVertices());
@@ -48,7 +49,6 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     public VertexGraph(Collection<Vertex> inputList) {
-        index = 0;
         // we loop twice first to create the nodes, then second time we know the other end should exist if it's in scope
         for (Vertex v : inputList) {
             addVertex(v);
@@ -71,9 +71,21 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     private BasicGraphNode createGraphNodeFor(Vertex v) {
-        BasicGraphNode n = new BasicGraphNode(++index);
-        n.details.put(LABEL_FIELD, v.getClass().getSimpleName());
+        BasicGraphNode n = new BasicGraphNode();
+        n.details.put(LABEL_FIELD, getBasicNameForVertex(v));
         return n;
+    }
+
+    private String getBasicNameForVertex(Vertex v) {
+        if ( v.getLabel() != null ){
+            return v.getLabel().getUnqualifiedName();
+        }
+        DisplayInformationForOutput vertexAnnotation = v.getClass().getAnnotation(DisplayInformationForOutput.class);
+        if (vertexAnnotation != null && !vertexAnnotation.displayName().isEmpty()) {
+            return vertexAnnotation.displayName();
+        } else {
+            return v.getClass().getSimpleName();
+        }
     }
 
     private void addVertexEdges(Vertex v) {
@@ -151,6 +163,8 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         Color c;
         if (v instanceof DoubleVertex) {
             c = DOUBLE_COLOR;
+        } else if (v instanceof IntegerVertex) {
+            c = INTEGER_COLOR;
         } else if (v instanceof BooleanVertex) {
             c = BOOLEAN_COLOR;
         } else {
@@ -172,6 +186,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     private String convertValueToString(Vertex vertex) {
         Object obj = vertex.getValue();
         if (obj instanceof Tensor) {
+            if (!((Tensor) obj).isScalar()) return null;
             return ((Tensor) obj).scalar().toString();
         } else {
             return obj.toString();
@@ -204,13 +219,15 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     public void setVertexMetadata(String field, Function<Vertex, String> f) {
         for (Map.Entry<Vertex, BasicGraphNode> e : vertexNodes.entrySet()) {
-            e.getValue().details.put(field, f.apply(e.getKey()));
+            String v = f.apply(e.getKey());
+            if (v != null) e.getValue().details.put(field, v);
         }
     }
 
     public void setEdgeMetadata(String field, Function<BasicGraphEdge, String> f) {
         for (BasicGraphEdge e : edges) {
-            e.details.put(field, f.apply(e));
+            String v = f.apply(e);
+            if (v != null) e.details.put(field, v);
         }
     }
 

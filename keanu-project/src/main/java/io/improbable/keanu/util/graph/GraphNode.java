@@ -5,5 +5,5 @@ import java.util.Map;
 public interface GraphNode {
     Map<String,String> getDetails();
 
-    int getIndex();
+    long getIndex();
 }
