@@ -5,5 +5,6 @@ __all__ = ["BooleanIf", "BooleanProxy", "CastToBoolean", "ConstantBoolean", "Num
 
 from .generated import *
 from .const import Const
+from .iff import If
 from .lambda_model import LambdaModel
 from . import generated, const
