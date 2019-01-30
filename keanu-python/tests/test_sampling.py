@@ -1,7 +1,7 @@
-import matplotlib.pyplot as plt
-
 from itertools import islice
+from typing import Any, Callable
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
@@ -10,8 +10,7 @@ from examples import thermometers
 from keanu import BayesNet, KeanuRandom, Model
 from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler, NUTSSampler,
                              PosteriorSamplingAlgorithm)
-from keanu.vertex import Gamma, Exponential, Cauchy, KeanuContext, Bernoulli, Gaussian
-from typing import Any, Callable
+from keanu.vertex import Gamma, Exponential, Cauchy, Gaussian
 
 
 @pytest.fixture
@@ -118,6 +117,9 @@ def test_sample_dict_can_be_loaded_in_to_dataframe(net: BayesNet) -> None:
         header = df[column].name
         vertex_label = header
         assert vertex_label in vertex_labels
+        assert len(df[column]) == 5
+        assert type(df[column][0]) == np.float64
+
 
 
 def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
@@ -131,7 +133,6 @@ def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
 
     tensor_net = BayesNet(gamma.get_connected_graph())
 
-    draws = 5
     sample_from = list(tensor_net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]
 
@@ -141,8 +142,11 @@ def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
     for parent_column in df.columns.levels[0]:
         assert parent_column in vertex_labels
 
-    for child_column in df.columns.levels[1]:
-        assert type(child_column) == str
+        for child_column in df.columns.levels[1]:
+            assert type(child_column) == str
+            assert len(df[parent_column][child_column]) == 5
+            assert type(df[parent_column][child_column][0]) == np.float64
+
 
 
 def test_dropping_samples(net: BayesNet) -> None:
@@ -211,14 +215,10 @@ def test_can_iter_through_tensor_samples(algo: Callable[[BayesNet], PosteriorSam
     count = 0
     for sample in islice(samples, draws):
         count += 1
-        assert ('exp', '(0, 0)') in sample
-        assert ('exp', '(0, 1)') in sample
-        assert ('exp', '(1, 0)') in sample
-        assert ('exp', '(1, 1)') in sample
-        assert ('cauchy', '(0, 0)') in sample
-        assert ('cauchy', '(0, 1)') in sample
-        assert ('cauchy', '(1, 0)') in sample
-        assert ('cauchy', '(1, 1)') in sample
+        for distribution in ('exp', 'cauchy'):
+            for i in (0, 1):
+                for j in (0, 1):
+                    assert ((distribution, '({}, {})'.format(i, j)) in sample)
     assert count == draws
 
 
