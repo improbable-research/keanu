@@ -1,15 +1,13 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfAScalarAndVector;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfAVectorAndScalar;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfTwoMatricesElementWiseOperator;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfTwoScalars;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwo2x2MatrixVertexValues;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwoScalarVertexValues;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
 
 public class PowerVertexTest {
 
@@ -64,6 +62,40 @@ public class PowerVertexTest {
             DoubleTensor.create(Math.log(3.0) * 3, Math.log(3.0) * 9, Math.log(3.0) * 27, Math.log(3.0) * 81).diag().reshape(4, 4),
             DoubleVertex::pow
         );
+    }
+
+    @Test
+    public void canCalculateWrtBaseWhenBaseIsZero() {
+        UniformVertex A = new UniformVertex(-10.0, 10.0);
+        A.setValue(0.0);
+        UniformVertex B = new UniformVertex(-10.0, 10.0);
+        B.setValue(2.0);
+
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A,B), A.pow(B), 1e-10, 1e-10);
+    }
+
+    @Test
+    public void matchesFiniteDifferenceWhenWrtExponentExists() {
+        testWithFiniteDifference(DoubleTensor.scalar(5.0), DoubleTensor.scalar(0.0));
+        testWithFiniteDifference(DoubleTensor.create(4.0, 1.0, 2.0, 3.0), DoubleTensor.scalar(0.0));
+        testWithFiniteDifference(DoubleTensor.create(4.0, 1.0, 2.0, 3.0), DoubleTensor.scalar(2.0));
+        testWithFiniteDifference(DoubleTensor.create(new double[]{4, 1, 2, 3}, 2, 2), DoubleTensor.scalar(2.0));
+    }
+
+    @Test
+    public void matchesFiniteDifferenceWithPowerMatchesBaseShape() {
+        testWithFiniteDifference(DoubleTensor.create(4, 1, 2, 3), DoubleTensor.create(2, 1, 2, 3));
+    }
+
+    private void testWithFiniteDifference(DoubleTensor baseValue,
+                                          DoubleTensor exponentValue) {
+
+        UniformVertex A = new UniformVertex(baseValue.getShape(), -10.0, 10.0);
+        A.setValue(baseValue);
+        UniformVertex B = new UniformVertex(exponentValue.getShape(), -10.0, 10.0);
+        B.setValue(exponentValue);
+
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), A.pow(B), 1e-10, 1e-10);
     }
 
 }
