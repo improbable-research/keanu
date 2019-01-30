@@ -2,15 +2,15 @@ package io.improbable.keanu.network;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,10 +79,10 @@ public class BayesianNetwork {
     }
 
     public void setState(NetworkState state) {
-        for (VertexId vertexId : state.getVertexIds()) {
+        for (VariableReference reference : state.getVariableReferences()) {
             this.vertices.stream()
-                .filter(v -> v.getId() == vertexId)
-                .forEach(v -> v.setValue(state.get(vertexId)));
+                .filter(v -> v.getId() == reference)
+                .forEach(v -> v.setValue(state.get(reference)));
         }
     }
 

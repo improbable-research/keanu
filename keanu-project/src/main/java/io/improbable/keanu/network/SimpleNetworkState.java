@@ -1,31 +1,31 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 
 import java.util.Map;
 import java.util.Set;
 
 public class SimpleNetworkState implements NetworkState {
 
-    private final Map<VertexId, ?> vertexValues;
+    private final Map<VariableReference, ?> variableValues;
 
-    public SimpleNetworkState(Map<VertexId, ?> vertexValues) {
-        this.vertexValues = vertexValues;
+    public SimpleNetworkState(Map<VariableReference, ?> variableValues) {
+        this.variableValues = variableValues;
     }
 
     @Override
-    public <T> T get(Vertex<T> vertex) {
-        return (T) vertexValues.get(vertex.getId());
+    public <T> T get(Variable<T, ?> variable) {
+        return (T) variableValues.get(variable.getReference());
     }
 
     @Override
-    public <T> T get(VertexId vertexId) {
-        return (T) vertexValues.get(vertexId);
+    public <T> T get(VariableReference variableReference) {
+        return (T) variableValues.get(variableReference);
     }
 
     @Override
-    public Set<VertexId> getVertexIds() {
-        return vertexValues.keySet();
+    public Set<VariableReference> getVariableReferences() {
+        return variableValues.keySet();
     }
 }

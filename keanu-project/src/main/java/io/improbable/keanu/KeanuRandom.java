@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl;
+package io.improbable.keanu;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.continuous.Laplace;
@@ -76,7 +76,7 @@ public class KeanuRandom {
     public double nextDoubleNonZero() {
         double randomValue;
 
-        while ((randomValue = nextDouble()) == 0.0);
+        while ((randomValue = nextDouble()) == 0.0) ;
 
         return randomValue;
     }
@@ -87,6 +87,10 @@ public class KeanuRandom {
         } else {
             return new Nd4jDoubleTensor(doubleNextGaussian(shape));
         }
+    }
+
+    public DoubleTensor nextGaussian(long[] shape, DoubleTensor mu, DoubleTensor sigma) {
+        return nextGaussian(shape).timesInPlace(sigma).plusInPlace(mu);
     }
 
     public DoubleTensor nextGamma(long[] shape, DoubleTensor theta, DoubleTensor k) {
