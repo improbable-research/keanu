@@ -1,10 +1,13 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -21,9 +24,6 @@ import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class MetropolisHastingsTest {
 
@@ -45,9 +45,10 @@ public class MetropolisHastingsTest {
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
         bayesNet.probeForNonZeroProbability(100);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+            model,
             Arrays.asList(A, B),
             5000
         );
@@ -75,9 +76,10 @@ public class MetropolisHastingsTest {
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
         bayesNet.probeForNonZeroProbability(100);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+            model,
             Arrays.asList(A, B),
             5000
         );
@@ -107,9 +109,10 @@ public class MetropolisHastingsTest {
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C));
         bayesNet.probeForNonZeroProbability(100);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+            model,
             Collections.singletonList(A),
             10000
         );
@@ -138,9 +141,10 @@ public class MetropolisHastingsTest {
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C, D, E));
         bayesNet.probeForNonZeroProbability(100);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+            model,
             Collections.singletonList(A),
             1000
         );
@@ -160,9 +164,10 @@ public class MetropolisHastingsTest {
 
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
         net.probeForNonZeroProbability(100);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            net,
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+            model,
             Collections.singletonList(A),
             10000
         );
@@ -191,10 +196,11 @@ public class MetropolisHastingsTest {
         ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
         MetropolisHastings metropolisHastings = MetropolisHastings.builder()
             .proposalDistribution(proposalDistribution)
+            .rejectionStrategy(new RollbackAndCascadeOnRejection(bayesNet.getLatentVertices()))
             .build();
 
         NetworkSamples posteriorSamples =  metropolisHastings.getPosteriorSamples(
-            bayesNet,
+            new KeanuProbabilisticModel(bayesNet),
             Arrays.asList(A, B),
             1000
         );
@@ -236,8 +242,12 @@ public class MetropolisHastingsTest {
         int sampleCount = 100;
         BayesianNetwork network = new BayesianNetwork(start.getConnectedGraph());
 
-        MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            network,
+        MetropolisHastings.builder()
+            .proposalDistribution(new PriorProposalDistribution(network.getLatentVertices()))
+            .rejectionStrategy(new RollBackToCachedValuesOnRejection(network.getLatentVertices()))
+            .build()
+            .getPosteriorSamples(
+            new KeanuProbabilisticModel(network),
             network.getLatentVertices(),
             sampleCount
         );
@@ -246,43 +256,14 @@ public class MetropolisHastingsTest {
     }
 
     @Test
-    public void canDefaultToSettingsInBuilderAndIsConfigurableAfterBuilding() {
-
-        GaussianVertex A = new GaussianVertex(0.0, 1.0);
-        BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
-        net.probeForNonZeroProbability(100);
-
-        MetropolisHastings algo = MetropolisHastings.builder()
-            .useCacheOnRejection(false)
-            .build();
-
-        assertNotNull(algo.getProposalDistribution());
-        assertNotNull(algo.getRandom());
-        assertNotNull(algo.getVariableSelector());
-
-        NetworkSamples posteriorSamples = algo.getPosteriorSamples(
-            net,
-            net.getLatentVertices(),
-            2
-        );
-
-        algo.setVariableSelector(null);
-        assertNull(algo.getVariableSelector());
-
-        assertFalse(posteriorSamples.get(A).asList().isEmpty());
-    }
-
-    @Test
     public void doesNotStoreSamplesThatWillBeDropped() {
-
-        MetropolisHastings algo = MetropolisHastings.withDefaultConfig();
 
         int sampleCount = 1000;
         int dropCount = 100;
         int downSampleInterval = 2;
         GaussianVertex A = new GaussianVertex(0, 1);
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        NetworkSamples samples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(network, network.getLatentVertices())
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+        NetworkSamples samples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
             .generate(sampleCount);
@@ -294,15 +275,14 @@ public class MetropolisHastingsTest {
     @Test
     public void canStreamSamples() {
 
-        MetropolisHastings algo = MetropolisHastings.withDefaultConfig();
-
         int sampleCount = 1000;
         int dropCount = 100;
         int downSampleInterval = 1;
         GaussianVertex A = new GaussianVertex(0, 1);
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+        MetropolisHastings algo = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model);
 
-        double averageA = algo.generatePosteriorSamples(network, network.getLatentVertices())
+        double averageA = algo.generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
             .stream()

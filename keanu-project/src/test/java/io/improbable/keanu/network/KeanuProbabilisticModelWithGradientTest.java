@@ -1,6 +1,6 @@
-package io.improbable.keanu.algorithms.variational.optimizer;
+package io.improbable.keanu.network;
 
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -15,13 +15,13 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class KeanuProbabilisticWithGradientGraphTest {
+public class KeanuProbabilisticModelWithGradientTest {
 
     GaussianVertex A;
     GaussianVertex B;
     BernoulliVertex C;
 
-    KeanuProbabilisticWithGradientGraph graph;
+    KeanuProbabilisticModelWithGradient model;
 
     @Before
     public void setup() {
@@ -33,15 +33,13 @@ public class KeanuProbabilisticWithGradientGraphTest {
         C = new BernoulliVertex(A.times(B));
         C.observe(true);
 
-        graph = new KeanuProbabilisticWithGradientGraph(
-            new BayesianNetwork(C.getConnectedGraph())
-        );
+        model = new KeanuProbabilisticModelWithGradient(C.getConnectedGraph());
     }
 
     @Test
     public void canCalculateLogProbGradient() {
 
-        Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients = graph.logLikelihoodGradients();
+        Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients = model.logLikelihoodGradients();
 
         LogProbGradientCalculator logLikelihoodGradientCalculator = new LogProbGradientCalculator(
             Collections.singletonList(C), Arrays.asList(A, B)
@@ -53,7 +51,7 @@ public class KeanuProbabilisticWithGradientGraphTest {
     @Test
     public void canCalculateLogLikelihoodGradient() {
 
-        Map<? extends VariableReference, DoubleTensor> logProbGradients = graph.logProbGradients();
+        Map<? extends VariableReference, DoubleTensor> logProbGradients = model.logProbGradients();
         LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(
             Arrays.asList(C, A, B), Arrays.asList(A, B)
         );
