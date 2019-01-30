@@ -10,14 +10,11 @@ import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
-import io.improbable.keanu.util.io.DotSaver;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
-import java.io.FileOutputStream;
-import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.both;
@@ -56,6 +54,11 @@ public class RadonHierarchicalRegression {
     public void canPerformSimpleLinearRegression() {
         RegressionModel model = linearRegression(radonData);
         assertLinearRegressionIsCorrect(model);
+    }
+
+    @Test
+    public void canPerformRegressionWithOneHierarchy() {
+        buildAndRunHierarchicalNetwork(radonData, 1);
     }
 
     @Test

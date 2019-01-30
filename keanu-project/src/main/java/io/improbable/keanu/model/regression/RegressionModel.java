@@ -23,7 +23,7 @@ import java.util.function.Function;
  * </pre>
  */
 public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
-    private static final double DEFAULT_OBSERVATION_SIGMA = 5.0;
+    private static final double DEFAULT_OBSERVATION_SIGMA = 1.0;
     private final ModelFitter fitter;
     private final LinearRegressionGraph<OUTPUT> modelGraph;
 

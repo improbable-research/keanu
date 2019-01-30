@@ -6,14 +6,13 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.io.DotSaver;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import java.io.FileOutputStream;
 import lombok.Getter;
 import lombok.Value;
 
+import java.io.FileOutputStream;
 import java.util.function.Function;
 
 public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, OUTPUT> {
@@ -61,7 +60,6 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
     }
 
     public DoubleVertex getWeightVertex() {
-        saveDot(bayesianNetwork, "linearregression.dot");
         return weightsVertex;
     }
 
@@ -69,13 +67,6 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
         return yObservationVertex;
     }
 
-    private void saveDot(BayesianNetwork net, final String name) {
-        try {
-            new DotSaver(net).save(new FileOutputStream(name), true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     @Value
     public static class OutputVertices<OUTPUT> {
         Vertex<OUTPUT> outputVertex;
