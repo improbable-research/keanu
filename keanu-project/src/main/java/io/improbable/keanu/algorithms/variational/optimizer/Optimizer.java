@@ -1,10 +1,13 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.AverageTimeComponent;
+import io.improbable.keanu.util.status.StatusBar;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +53,7 @@ public interface Optimizer {
      */
     double maxLikelihood();
 
-    static double[] convertToPoint(List<? extends Variable<? extends NumberTensor>> latentVariables) {
+    static double[] convertToPoint(List<? extends Variable<? extends NumberTensor, ?>> latentVariables) {
 
         List<long[]> shapes = latentVariables.stream().map(Variable::getShape).collect(Collectors.toList());
 
@@ -63,7 +66,7 @@ public interface Optimizer {
         int position = 0;
         double[] point = new double[(int) totalLatentDimensions];
 
-        for (Variable<? extends NumberTensor> variable : latentVariables) {
+        for (Variable<? extends NumberTensor, ?> variable : latentVariables) {
             double[] values = variable.getValue().asFlatDoubleArray();
             System.arraycopy(values, 0, point, position, values.length);
             position += values.length;
@@ -100,12 +103,12 @@ public interface Optimizer {
         return TensorShape.getLength(shape);
     }
 
-    static List<Variable<? extends DoubleTensor>> getAsDoubleTensors(List<? extends Variable> variables) {
+    static List<Variable<? extends DoubleTensor, ?>> getAsDoubleTensors(List<? extends Variable> variables) {
         return variables.stream()
             .map(
                 v -> {
                     if (v.getValue() instanceof DoubleTensor) {
-                        return (Variable<DoubleTensor>) v;
+                        return (Variable<DoubleTensor, ?>) v;
                     } else {
                         throw new UnsupportedOperationException(
                             "Optimization unsupported on networks containing discrete latents. " +
@@ -115,18 +118,22 @@ public interface Optimizer {
             ).collect(Collectors.toList());
     }
 
-    static ProgressBar createFitnessProgressBar(final Optimizer optimizerThatNeedsProgressBar) {
+    static StatusBar createFitnessStatusBar(final Optimizer optimizerThatNeedsStatusBar) {
         AtomicInteger evalCount = new AtomicInteger(0);
-        ProgressBar progressBar = new ProgressBar();
-        BiConsumer<double[], Double> progressBarFitnessCalculationHandler = (position, logProb) -> {
-            progressBar.progress(
+        StatusBar statusBar = new StatusBar();
+        AverageTimeComponent averageTimeComponent = new AverageTimeComponent();
+        statusBar.addComponent(averageTimeComponent);
+
+        BiConsumer<double[], Double> statusBarFitnessCalculationHandler = (position, logProb) -> {
+            statusBar.setMessage(
                 String.format("Fitness Evaluation #%d LogProb: %.2f", evalCount.incrementAndGet(), logProb)
             );
+            averageTimeComponent.step();
         };
 
-        optimizerThatNeedsProgressBar.addFitnessCalculationHandler(progressBarFitnessCalculationHandler);
-        progressBar.addFinishHandler(() -> optimizerThatNeedsProgressBar.removeFitnessCalculationHandler(progressBarFitnessCalculationHandler));
+        optimizerThatNeedsStatusBar.addFitnessCalculationHandler(statusBarFitnessCalculationHandler);
+        statusBar.addFinishHandler(() -> optimizerThatNeedsStatusBar.removeFitnessCalculationHandler(statusBarFitnessCalculationHandler));
 
-        return progressBar;
+        return statusBar;
     }
 }

@@ -1,9 +1,9 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
+import io.improbable.keanu.algorithms.ProbabilisticModel;
+import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,7 +31,7 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class NonGradientOptimizer implements Optimizer {
 
-    private final ProbabilisticGraph probabilisticGraph;
+    private final ProbabilisticModel probabilisticModel;
 
     /**
      * maxEvaluations the maximum number of objective function evaluations before throwing an exception
@@ -83,22 +83,22 @@ public class NonGradientOptimizer implements Optimizer {
 
     private double optimize(FitnessFunction fitnessFunction) {
 
-        ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
+        StatusBar statusBar = Optimizer.createFitnessStatusBar(this);
 
-        double logProb = probabilisticGraph.logProb();
+        double logProb = probabilisticModel.logProb();
 
         if (ProbabilityCalculator.isImpossibleLogProb(logProb)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        List<long[]> shapes = probabilisticGraph.getLatentVariables().stream().map(Variable::getShape).collect(Collectors.toList());
+        List<long[]> shapes = probabilisticModel.getLatentVariables().stream().map(Variable::getShape).collect(Collectors.toList());
         BOBYQAOptimizer optimizer = new BOBYQAOptimizer(
             getNumInterpolationPoints(shapes),
             initialTrustRegionRadius,
             stoppingTrustRegionRadius
         );
 
-        double[] startPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticGraph.getLatentVariables()));
+        double[] startPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticModel.getLatentVariables()));
 
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
@@ -107,7 +107,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
 
         ApacheMathSimpleBoundsCalculator boundsCalculator = new ApacheMathSimpleBoundsCalculator(boundsRange, optimizerBounds);
-        SimpleBounds bounds = boundsCalculator.getBounds(probabilisticGraph.getLatentVariables(), startPoint);
+        SimpleBounds bounds = boundsCalculator.getBounds(probabilisticModel.getLatentVariables(), startPoint);
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
@@ -117,7 +117,7 @@ public class NonGradientOptimizer implements Optimizer {
             new InitialGuess(startPoint)
         );
 
-        progressBar.finish();
+        statusBar.finish();
         return pointValuePair.getValue();
     }
 
@@ -128,7 +128,7 @@ public class NonGradientOptimizer implements Optimizer {
     @Override
     public double maxAPosteriori() {
         return optimize(new FitnessFunction(
-            probabilisticGraph,
+            probabilisticModel,
             false,
             this::handleFitnessCalculation
         ));
@@ -137,7 +137,7 @@ public class NonGradientOptimizer implements Optimizer {
     @Override
     public double maxLikelihood() {
         return optimize(new FitnessFunction(
-            probabilisticGraph,
+            probabilisticModel,
             true,
             this::handleFitnessCalculation
         ));
@@ -145,7 +145,7 @@ public class NonGradientOptimizer implements Optimizer {
 
     public static class NonGradientOptimizerBuilder {
 
-        private ProbabilisticGraph probabilisticGraph;
+        private ProbabilisticModel probabilisticModel;
 
         private int maxEvaluations = Integer.MAX_VALUE;
         private double boundsRange = Double.POSITIVE_INFINITY;
@@ -157,8 +157,8 @@ public class NonGradientOptimizer implements Optimizer {
         }
 
 
-        public NonGradientOptimizerBuilder bayesianNetwork(ProbabilisticGraph probabilisticGraph) {
-            this.probabilisticGraph = probabilisticGraph;
+        public NonGradientOptimizerBuilder probabilisticModel(ProbabilisticModel probabilisticModel) {
+            this.probabilisticModel = probabilisticModel;
             return this;
         }
 
@@ -188,11 +188,11 @@ public class NonGradientOptimizer implements Optimizer {
         }
 
         public NonGradientOptimizer build() {
-            if (probabilisticGraph == null) {
+            if (probabilisticModel == null) {
                 throw new IllegalStateException("Cannot build optimizer without specifying network to optimize.");
             }
             return new NonGradientOptimizer(
-                probabilisticGraph,
+                probabilisticModel,
                 maxEvaluations,
                 boundsRange,
                 optimizerBounds,
@@ -202,7 +202,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
 
         public String toString() {
-            return "NonGradientOptimizer.NonGradientOptimizerBuilder(probabilisticGraph=" + this.probabilisticGraph + ", maxEvaluations=" + this.maxEvaluations + ", boundsRange=" + this.boundsRange + ", optimizerBounds=" + this.optimizerBounds + ", initialTrustRegionRadius=" + this.initialTrustRegionRadius + ", stoppingTrustRegionRadius=" + this.stoppingTrustRegionRadius + ")";
+            return "NonGradientOptimizer.NonGradientOptimizerBuilder(probabilisticModel=" + this.probabilisticModel + ", maxEvaluations=" + this.maxEvaluations + ", boundsRange=" + this.boundsRange + ", optimizerBounds=" + this.optimizerBounds + ", initialTrustRegionRadius=" + this.initialTrustRegionRadius + ", stoppingTrustRegionRadius=" + this.stoppingTrustRegionRadius + ")";
         }
     }
 }
