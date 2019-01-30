@@ -1,9 +1,9 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 
-import io.improbable.keanu.algorithms.variational.optimizer.ProbabilisticWithGradientGraph;
-import io.improbable.keanu.algorithms.variational.optimizer.Variable;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
@@ -18,24 +18,24 @@ import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.con
 
 public class FitnessFunctionWithGradient {
 
-    private final ProbabilisticWithGradientGraph probabilisticWithGradientGraph;
+    private final ProbabilisticModelWithGradient probabilisticModel;
     private final boolean useLikelihood;
 
     private final BiConsumer<double[], double[]> onGradientCalculation;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunctionWithGradient(ProbabilisticWithGradientGraph probabilisticWithGradientGraph,
+    public FitnessFunctionWithGradient(ProbabilisticModelWithGradient probabilisticModel,
                                        boolean useLikelihood,
                                        BiConsumer<double[], double[]> onGradientCalculation,
                                        BiConsumer<double[], Double> onFitnessCalculation) {
-        this.probabilisticWithGradientGraph = probabilisticWithGradientGraph;
+        this.probabilisticModel = probabilisticModel;
         this.useLikelihood = useLikelihood;
         this.onGradientCalculation = onGradientCalculation;
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public FitnessFunctionWithGradient(ProbabilisticWithGradientGraph probabilisticWithGradientGraph, boolean useLikelihood) {
-        this(probabilisticWithGradientGraph, useLikelihood, null, null);
+    public FitnessFunctionWithGradient(ProbabilisticModelWithGradient probabilisticModel, boolean useLikelihood) {
+        this(probabilisticModel, useLikelihood, null, null);
     }
 
     public MultivariateVectorFunction gradient() {
@@ -44,10 +44,10 @@ public class FitnessFunctionWithGradient {
             Map<VariableReference, DoubleTensor> values = getValues(point);
 
             Map<? extends VariableReference, DoubleTensor> diffs = useLikelihood ?
-                probabilisticWithGradientGraph.logLikelihoodGradients(values) :
-                probabilisticWithGradientGraph.logProbGradients(values);
+                probabilisticModel.logLikelihoodGradients(values) :
+                probabilisticModel.logProbGradients(values);
 
-            double[] gradients = alignGradientsToAppropriateIndex(diffs, probabilisticWithGradientGraph.getLatentVariables());
+            double[] gradients = alignGradientsToAppropriateIndex(diffs, probabilisticModel.getLatentVariables());
 
             if (onGradientCalculation != null) {
                 onGradientCalculation.accept(point, gradients);
@@ -63,8 +63,8 @@ public class FitnessFunctionWithGradient {
             Map<VariableReference, DoubleTensor> values = getValues(point);
 
             double logOfTotalProbability = useLikelihood ?
-                probabilisticWithGradientGraph.logLikelihood(values) :
-                probabilisticWithGradientGraph.logProb(values);
+                probabilisticModel.logLikelihood(values) :
+                probabilisticModel.logProb(values);
 
             if (onFitnessCalculation != null) {
                 onFitnessCalculation.accept(point, logOfTotalProbability);
@@ -75,7 +75,7 @@ public class FitnessFunctionWithGradient {
     }
 
     private Map<VariableReference, DoubleTensor> getValues(double[] point) {
-        return convertFromPoint(point, probabilisticWithGradientGraph.getLatentVariables());
+        return convertFromPoint(point, probabilisticModel.getLatentVariables());
     }
 
     private static double[] alignGradientsToAppropriateIndex(Map<? extends VariableReference, DoubleTensor> diffs,

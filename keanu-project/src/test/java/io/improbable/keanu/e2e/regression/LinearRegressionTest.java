@@ -3,6 +3,7 @@ package io.improbable.keanu.e2e.regression;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.RollbackAndCascadeOnRejection;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
@@ -150,9 +151,10 @@ public class LinearRegressionTest {
 
         ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(0.25));
 
-        SamplingModelFitting sampling = new SamplingModelFitting(MetropolisHastings.builder()
+        SamplingModelFitting sampling = new SamplingModelFitting(model -> MetropolisHastings.builder()
             .proposalDistribution(proposalDistribution)
             .variableSelector(MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR)
+            .rejectionStrategy(new RollbackAndCascadeOnRejection(model.getLatentVertices()))
             .build(),
             samplingCount);
 

@@ -1,9 +1,9 @@
 package io.improbable.keanu.randomfactory
 
+import io.improbable.keanu.KeanuRandom
 import io.improbable.keanu.kotlin.ArithmeticDouble
 import io.improbable.keanu.kotlin.DoubleOperators
 import io.improbable.keanu.vertices.dbl.DoubleVertex
-import io.improbable.keanu.vertices.dbl.KeanuRandom
 import junit.framework.TestCase
 import org.junit.Test
 

@@ -1,10 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,18 +28,18 @@ public class LeapfrogTest {
     private DoubleVertex vertexA = new GaussianVertex(0, 1);;
     private DoubleVertex vertexB = new GaussianVertex(0, 1);;
 
-    private VertexId aID = vertexA.getId();;
-    private VertexId bID = vertexB.getId();
+    private VariableReference aID = vertexA.getId();;
+    private VariableReference bID = vertexB.getId();
 
     private List<Vertex<DoubleTensor>> vertices = Arrays.asList(vertexA, vertexB);
-    private List<VertexId> ids = Arrays.asList(aID, bID);
+    private List<VariableReference> ids = Arrays.asList(aID, bID);
 
-    private Map<VertexId, DoubleTensor> position = new HashMap<>();
-    private Map<VertexId, DoubleTensor> momentum = new HashMap<>();
-    private Map<VertexId, DoubleTensor> gradient = new HashMap<>();
+    private Map<VariableReference, DoubleTensor> position = new HashMap<>();
+    private Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
+    private Map<VariableReference, DoubleTensor> gradient = new HashMap<>();
 
-    private LogProbGradientCalculator mockedGradientCalculator;
-    private LogProbGradientCalculator mockedReverseGradientCalculator;
+    private ProbabilisticModelWithGradient mockedGradientCalculator;
+    private ProbabilisticModelWithGradient mockedReverseGradientCalculator;
 
     @Before
     public void setupGraphForLeapfrog() {
@@ -53,13 +54,13 @@ public class LeapfrogTest {
         mockedReverseGradientCalculator = setUpMock(-1., 1.);
     }
 
-    private LogProbGradientCalculator setUpMock(double aValue, double bValue) {
-        Map<VertexId, DoubleTensor> gradient = new HashMap<>();
+    private ProbabilisticModelWithGradient setUpMock(double aValue, double bValue) {
+        Map<VariableReference, DoubleTensor> gradient = new HashMap<>();
         gradient.put(aID, DoubleTensor.scalar(aValue));
         gradient.put(bID, DoubleTensor.scalar(bValue));
 
-        LogProbGradientCalculator mock = mock(LogProbGradientCalculator.class);
-        when(mock.getJointLogProbGradientWrtLatents()).thenAnswer(
+        ProbabilisticModelWithGradient mock = mock(ProbabilisticModelWithGradient.class);
+        when(mock.logProbGradients(anyMap())).thenAnswer(
             invocation -> gradient
         );
         return mock;
@@ -85,10 +86,10 @@ public class LeapfrogTest {
         Leapfrog start = new Leapfrog(position, momentum, gradient);
         Leapfrog leapForward = start.step(vertices, mockedGradientCalculator, EPSILON);
 
-        Map<VertexId, DoubleTensor> momentum = new HashMap<>(leapForward.getMomentum());
+        Map<VariableReference, DoubleTensor> momentum = new HashMap<>(leapForward.getMomentum());
 
         fillMap(leapForward.getMomentum(), DoubleTensor.scalar(-1.0));
-        fillMap(leapForward.getGradient(), DoubleTensor.scalar(-2.0));
+        fillMap((Map<VariableReference, DoubleTensor>) leapForward.getGradient(), DoubleTensor.scalar(-2.0));
 
         Leapfrog leapBackToStart = leapForward.step(vertices, mockedReverseGradientCalculator, EPSILON);
 
@@ -96,13 +97,13 @@ public class LeapfrogTest {
         assertThat(momentum, Matchers.equalTo(revertDirectionOfMap(leapBackToStart.getMomentum())));
     }
 
-    private void fillMap(Map<VertexId, DoubleTensor> map, DoubleTensor value) {
-        for (VertexId id : ids) {
+    private void fillMap(Map<VariableReference, DoubleTensor> map, DoubleTensor value) {
+        for (VariableReference id : ids) {
             map.put(id, value);
         }
     }
 
-    private Map<VertexId, DoubleTensor> revertDirectionOfMap(Map<VertexId, DoubleTensor> map) {
+    private Map<VariableReference, DoubleTensor> revertDirectionOfMap(Map<VariableReference, DoubleTensor> map) {
         for (DoubleTensor tensor : map.values()) {
             tensor.timesInPlace(-1.);
         }

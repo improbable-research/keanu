@@ -11,11 +11,11 @@ import java.util.function.Function;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 
-public class VertexSamples<T> {
+public class Samples<T> {
 
     protected final List<T> samples;
 
-    public VertexSamples(List<T> samples) {
+    public Samples(List<T> samples) {
         Preconditions.checkArgument(!samples.isEmpty(), "No samples provided.");
         this.samples = samples;
     }

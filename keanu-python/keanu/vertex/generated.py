@@ -148,7 +148,7 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.utility.AssertVert
 
 
 def BooleanIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
-    return Boolean(context.jvm_view().BooleanIfVertex, cast_to_vertex(predicate), cast_to_vertex(thn), cast_to_vertex(els))
+    return Boolean(context.jvm_view().BooleanIfVertex, cast_to_boolean_vertex(predicate), cast_to_boolean_vertex(thn), cast_to_boolean_vertex(els))
 
 
 def BooleanProxy(shape: Collection[int], label: str) -> Vertex:
@@ -251,7 +251,7 @@ def ConstantDouble(constant: tensor_arg_types) -> Vertex:
 
 
 def DoubleIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
-    return Double(context.jvm_view().DoubleIfVertex, cast_to_vertex(predicate), cast_to_double_vertex(thn), cast_to_double_vertex(els))
+    return Double(context.jvm_view().DoubleIfVertex, cast_to_boolean_vertex(predicate), cast_to_double_vertex(thn), cast_to_double_vertex(els))
 
 
 def DoubleProxy(shape: Collection[int], label: str) -> Vertex:
@@ -704,7 +704,7 @@ def ConstantInteger(constant: tensor_arg_types) -> Vertex:
 
 
 def IntegerIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_param_types, els: vertex_constructor_param_types) -> Vertex:
-    return Integer(context.jvm_view().IntegerIfVertex, cast_to_vertex(predicate), cast_to_integer_vertex(thn), cast_to_integer_vertex(els))
+    return Integer(context.jvm_view().IntegerIfVertex, cast_to_boolean_vertex(predicate), cast_to_integer_vertex(thn), cast_to_integer_vertex(els))
 
 
 def IntegerProxy(tensor_shape: Collection[int], label: str) -> Vertex:
