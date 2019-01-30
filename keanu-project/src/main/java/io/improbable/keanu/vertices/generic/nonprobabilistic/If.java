@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -16,14 +15,14 @@ public class If {
     private If() {
     }
 
-    public static IfThenBuilder isTrue(Vertex<BooleanTensor> predicate) {
+    public static IfThenBuilder isTrue(BooleanVertex predicate) {
         return new IfThenBuilder(predicate);
     }
 
     public static class IfThenBuilder {
-        private final Vertex<? extends BooleanTensor> predicate;
+        private final BooleanVertex predicate;
 
-        public IfThenBuilder(Vertex<? extends BooleanTensor> predicate) {
+        public IfThenBuilder(BooleanVertex predicate) {
             this.predicate = predicate;
         }
 
@@ -58,10 +57,10 @@ public class If {
 
     public static class IfThenElseBuilder<T> {
 
-        private final Vertex<? extends BooleanTensor> predicate;
+        private final BooleanVertex predicate;
         private final Vertex<? extends Tensor<T>> thn;
 
-        public IfThenElseBuilder(Vertex<? extends BooleanTensor> predicate,
+        public IfThenElseBuilder(BooleanVertex predicate,
                                  Vertex<? extends Tensor<T>> thn) {
             this.predicate = predicate;
             this.thn = thn;
@@ -74,16 +73,16 @@ public class If {
 
     public static class BooleanIfThenElseBuilder {
 
-        private final Vertex<? extends BooleanTensor> predicate;
-        private final Vertex<? extends BooleanTensor> thn;
+        private final BooleanVertex predicate;
+        private final BooleanVertex thn;
 
-        public BooleanIfThenElseBuilder(Vertex<? extends BooleanTensor> predicate,
-                                        Vertex<? extends BooleanTensor> thn) {
+        public BooleanIfThenElseBuilder(BooleanVertex predicate,
+                                        BooleanVertex thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
 
-        public BooleanIfVertex orElse(Vertex<? extends BooleanTensor> els) {
+        public BooleanIfVertex orElse(BooleanVertex els) {
             return new BooleanIfVertex(predicate, thn, els);
         }
 
@@ -94,10 +93,10 @@ public class If {
 
     public static class DoubleIfThenElseBuilder {
 
-        private final Vertex<? extends BooleanTensor> predicate;
+        private final BooleanVertex predicate;
         private final DoubleVertex thn;
 
-        public DoubleIfThenElseBuilder(Vertex<? extends BooleanTensor> predicate,
+        public DoubleIfThenElseBuilder(BooleanVertex predicate,
                                        DoubleVertex thn) {
             this.predicate = predicate;
             this.thn = thn;
@@ -114,10 +113,10 @@ public class If {
 
     public static class IntegerIfThenElseBuilder {
 
-        private final Vertex<? extends BooleanTensor> predicate;
+        private final BooleanVertex predicate;
         private final IntegerVertex thn;
 
-        public IntegerIfThenElseBuilder(Vertex<? extends BooleanTensor> predicate,
+        public IntegerIfThenElseBuilder(BooleanVertex predicate,
                                         IntegerVertex thn) {
             this.predicate = predicate;
             this.thn = thn;
