@@ -23,6 +23,7 @@ public class ColorSequence<T> {
     }
 
     public Color getOrChoseColor(T src) {
+        if ( src == null ) return null;
         if ( assignments.containsKey(src) ){
             return assignments.get( src);
         }else{

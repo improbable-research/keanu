@@ -57,20 +57,21 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         }
     }
 
+    private static final String formatColorForDot(Color c) {
+        if (c == null) return null;
+        return String.format("#%06X", (0xFFFFFF & c.getRGB()));
+    }
+
     public VertexGraph putMetadata(String key, String value) {
         metadata.put(key, value);
         return this;
     }
 
     public VertexGraph autoPutMetadata() {
-        metadata.put("vertices",Integer.toString(vertexNodes.size()));
-        metadata.put("edges",Integer.toString(edgeCount()));
-        metadata.put("timestamp",new Date().toString());
+        metadata.put("vertices", Integer.toString(vertexNodes.size()));
+        metadata.put("edges", Integer.toString(edgeCount()));
+        metadata.put("timestamp", new Date().toString());
         return this;
-    }
-
-    private static final String formatColorForDot(Color c) {
-        return String.format("#%06X", (0xFFFFFF & c.getRGB()));
     }
 
     public void prepareForExport() {
@@ -143,6 +144,18 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         return label.isInNamespace(namespace);
     }
 
+    public void removeVertices(Predicate<Vertex> f) {
+        Set<Vertex> toRemove = new HashSet<>();
+        for (Vertex v : vertexNodes.keySet()) {
+            if (f.test(v)) {
+                toRemove.add(v);
+            }
+        }
+        for (Vertex v : toRemove) {
+            removeVertex(v);
+        }
+    }
+
     public void removeVerticesPreservingEdges(Predicate<Vertex> f) {
         Set<Vertex> toRemove = new HashSet<>();
         for (Vertex v : vertexNodes.keySet()) {
@@ -182,11 +195,17 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         return this;
     }
 
-
-    public VertexGraph colorVerticiesByNamespace() {
+    public VertexGraph colorVerticesByNamespace() {
         formattingApplied = true;
         ColorSequence<String> seq = new ColorSequence<>();
         setVertexMetadata(COLOR_FIELD, (v) -> formatColorForDot(seq.getOrChoseColor(getVertexNamespace(v))));
+        return this;
+    }
+
+    public VertexGraph colorVerticesByField(String field) {
+        formattingApplied = true;
+        ColorSequence<String> seq = new ColorSequence<>();
+        setVertexNodeMetadata(COLOR_FIELD, (v) -> formatColorForDot(seq.getOrChoseColor(v.details.get(field))));
         return this;
     }
 
@@ -290,6 +309,14 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         }
     }
 
+    public void setVertexNodeMetadata(String field, Function<BasicGraphNode, String> f) {
+        formattingApplied = true;
+        for (BasicGraphNode node : vertexNodes.values()) {
+            String v = f.apply(node);
+            if (v != null) node.details.put(field, v);
+        }
+    }
+
     public void setEdgeMetadata(String field, Function<BasicGraphEdge, String> f) {
         formattingApplied = true;
         for (BasicGraphEdge e : edges) {
@@ -306,19 +333,51 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
             Set<BasicGraphEdge> outgoingEdges = findEdgesFrom(n);
             edges.removeAll(incommingEdges);
             edges.removeAll(outgoingEdges);
+            Set<BasicGraphEdge> newEdges = new HashSet<>();
             // generate the cartesian product
             for (BasicGraphEdge i : incommingEdges) {
                 for (BasicGraphEdge o : outgoingEdges) {
-                    mergeEdge(i, o);
+                    newEdges.add(mergeEdge(i, o));
                 }
+            }
+            removeDuplicatedEdges(newEdges);
+        }
+    }
+
+    private void removeDuplicatedEdges(Set<BasicGraphEdge> edgesToCheck) {
+        Set<BasicGraphEdge> known = new HashSet<>();
+        for (BasicGraphEdge e : edgesToCheck) {
+            boolean found = false;
+            for (BasicGraphEdge k : known) {
+                if (e.getSource() == k.getSource() && e.getDestination() == k.getDestination()) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                edges.remove(e);
+            } else {
+                known.add(e);
             }
         }
     }
 
-    private void mergeEdge(BasicGraphEdge i, BasicGraphEdge o) {
-        BasicGraphEdge e = new BasicGraphEdge(i.getSource(), o.getDestination());
-        mergeMetadata(e.details, i.details, o.details);
+    public void putEdgeMetadataBetween(Vertex a, Vertex b, String key, String value) {
+        BasicGraphNode nodeA = vertexNodes.get(a);
+        BasicGraphNode nodeB = vertexNodes.get(b);
+        if (nodeA == null || nodeB == null) return;
+        for (BasicGraphEdge edge : edges) {
+            if ((edge.getSource() == nodeA && edge.getDestination() == nodeB) ||
+                (edge.getSource() == nodeB && edge.getDestination() == nodeA)) {
+                edge.details.put(key, value);
+            }
+        }
+    }
+
+    private BasicGraphEdge mergeEdge(BasicGraphEdge i, BasicGraphEdge o) {
+        BasicGraphEdge e = new BasicGraphEdge(i.getSource(), o.getDestination() , o.getDetails() );
         edges.add(e);
+        return e;
     }
 
     @Override
@@ -330,5 +389,4 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     public Collection<BasicGraphEdge> getEdges() {
         return edges;
     }
-
 }

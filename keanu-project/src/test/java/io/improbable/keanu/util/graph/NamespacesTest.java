@@ -66,14 +66,14 @@ public class NamespacesTest {
 
     @Test
     public void colorByNamespace() {
-        VertexGraph graph = new VertexGraph(outA).colorVerticiesByNamespace();
+        VertexGraph graph = new VertexGraph(outA).colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
         assertThat("There are three distinct colours", colors.size() == 3);
     }
 
     @Test
     public void removeIntermediates() {
-        VertexGraph graph = new VertexGraph(outA).removeNamespace("intermediate").colorVerticiesByNamespace();
+        VertexGraph graph = new VertexGraph(outA).removeNamespace("intermediate").colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
         assertThat("There are two distinct colours", colors.size() == 2);
     }
