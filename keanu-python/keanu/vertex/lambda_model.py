@@ -1,4 +1,4 @@
-from typing import Dict, Callable
+from typing import Dict, Callable, Optional
 
 from py4j.java_collections import JavaMap
 from py4j.java_gateway import java_import
@@ -14,7 +14,11 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.model.LambdaModelV
 
 class LambdaModel(Vertex):
 
-    def __init__(self, inputs: Dict[str, Vertex], executor: Callable, update_values: Callable = None) -> None:
+    def __init__(self,
+                 inputs: Dict[str, Vertex],
+                 executor: Callable,
+                 update_values: Callable = None,
+                 label: Optional[str] = None) -> None:
         self.vertices_wrapped = inputs
         vertex_map = LambdaModel.__to_java_map(inputs)
         self.executor = executor
@@ -22,7 +26,7 @@ class LambdaModel(Vertex):
 
         vertex = context.jvm_view().LambdaModelVertex(vertex_map, Consumer(self.__execute),
                                                       Supplier(lambda: self.__update_value()))
-        super(LambdaModel, self).__init__(vertex)
+        super(LambdaModel, self).__init__(vertex, label)
 
     def __execute(self, vertices_unwrapped: JavaMap) -> None:
         self.vertices_wrapped = LambdaModel.__wrap(vertices_unwrapped)
@@ -40,7 +44,7 @@ class LambdaModel(Vertex):
 
     @staticmethod
     def __wrap(vertices: JavaMap) -> Dict[str, Vertex]:
-        return {k.getUnqualifiedName(): Vertex(v) for k, v in vertices.items()}
+        return {k.getUnqualifiedName(): Vertex._from_java_vertex(v) for k, v in vertices.items()}
 
     @staticmethod
     def __update_unwrapped_vertices(vertices_wrapped: Dict[str, Vertex], vertices_unwrapped: JavaMap) -> None:
@@ -50,4 +54,4 @@ class LambdaModel(Vertex):
     def get_double_model_output_vertex(self, label: str) -> Vertex:
         label_unwrapped = _VertexLabel(label).unwrap()
         result = self.unwrap().getDoubleModelOutputVertex(label_unwrapped)
-        return Vertex(result)
+        return Vertex._from_java_vertex(result)

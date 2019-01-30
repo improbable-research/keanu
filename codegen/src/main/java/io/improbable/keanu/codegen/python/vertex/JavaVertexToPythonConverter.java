@@ -33,33 +33,34 @@ import java.util.List;
  */
 class JavaVertexToPythonConverter {
 
-    private static final List<PythonParam> OPTIONAL_PARAMS = ImmutableList.of(
+    private static final List<PythonParam> EXTRA_PARAMS = ImmutableList.of(
         new PythonParam("label", String.class, "None")
     );
-    private static final String OPTIONAL_PARAM_PREFIX = "optional_";
     private Constructor javaConstructor;
     private List<PythonParam> allParams;
+    private List<PythonParam> commonParams;
 
     JavaVertexToPythonConverter(Constructor javaConstructor, Reflections reflections) {
        this.javaConstructor = javaConstructor;
-       this.allParams = createListOfPythonVertexParam(javaConstructor, reflections);
+       createListOfPythonVertexParam(javaConstructor, reflections);
     }
 
-    private List<PythonParam> createListOfPythonVertexParam(Constructor javaConstructor, Reflections reflections) {
-        List<PythonParam> listOfPythonVertexParam = new ArrayList<>();
+    private void createListOfPythonVertexParam(Constructor javaConstructor, Reflections reflections) {
         List<String> paramNames = reflections.getConstructorParamNames(javaConstructor);
         List<Class> paramTypes = Arrays.asList(javaConstructor.getParameterTypes());
 
+        this.allParams = new ArrayList<>();
+        this.commonParams = new ArrayList<>();
+
         for (int i = 0; i < javaConstructor.getParameterCount(); i++) {
-            listOfPythonVertexParam.add(new PythonParam(paramNames.get(i), paramTypes.get(i)));
+            this.allParams.add(new PythonParam(paramNames.get(i), paramTypes.get(i)));
         }
 
-        for (PythonParam optionalParam : OPTIONAL_PARAMS) {
-            if (!paramNames.contains(optionalParam.getName())) {
-                listOfPythonVertexParam.add(optionalParam);
+        for (PythonParam extraParam : EXTRA_PARAMS) {
+            if (!paramNames.contains(extraParam.getName())) {
+                this.commonParams.add(extraParam);
             }
         }
-        return listOfPythonVertexParam;
     }
 
     String getClassName() {
@@ -80,21 +81,22 @@ class JavaVertexToPythonConverter {
     }
 
     String getTypedParams() {
-        String[] pythonParams = new String[allParams.size()];
+        String[] pythonParams = new String[allParams.size() + commonParams.size()];
 
         for (int i = 0; i < allParams.size(); i++) {
             PythonParam param = allParams.get(i);
-            boolean hasDefaultValue = param.hasDefaultValue();
-            pythonParams[i] = param.getName() + ": " + toTypedParam(param.getKlass(), hasDefaultValue);
-            if (hasDefaultValue) {
-                pythonParams[i] += "=" + param.getDefaultValue();
-            }
+            pythonParams[i] = param.getName() + ": " + toTypedParam(param.getKlass());
+        }
+
+        for (int i = 0; i < commonParams.size(); i++) {
+            PythonParam param = commonParams.get(i);
+            pythonParams[allParams.size() + i] = param.getName() + ": Optional[" + toTypedParam(param.getKlass()) + "]=" + param.getDefaultValue();
         }
 
         return String.join(", ", pythonParams);
     }
 
-    private String toTypedParam(Class<?> parameterClass, boolean optional) {
+    private String toTypedParam(Class<?> parameterClass) {
         Class parameterType = Primitives.wrap(parameterClass);
 
         if (Vertex.class.isAssignableFrom(parameterType)) {
@@ -110,7 +112,7 @@ class JavaVertexToPythonConverter {
         } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
             return "int";
         } else if (String.class.isAssignableFrom(parameterType)) {
-            return optional ? "Optional[str]" : "str";
+            return "str";
         } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
             long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
             return "Collection[int]";
@@ -122,15 +124,16 @@ class JavaVertexToPythonConverter {
     }
 
     String getCastedParams() {
-        String[] pythonParams = new String[allParams.size()];
+        String[] pythonParams = new String[EXTRA_PARAMS.size() + allParams.size()];
+
+        for (int i = 0; i < EXTRA_PARAMS.size(); i++) {
+            PythonParam param = EXTRA_PARAMS.get(i);
+            pythonParams[i] = toCastedParam(param.getName(), param.getKlass());
+        }
 
         for (int i = 0; i < allParams.size(); i++) {
             PythonParam param = allParams.get(i);
-            if (param.hasDefaultValue()) {
-                pythonParams[i] = OPTIONAL_PARAM_PREFIX + param.getName() + "=" + toCastedParam(param.getName(), param.getKlass());
-            } else {
-                pythonParams[i] = toCastedParam(param.getName(), param.getKlass());
-            }
+            pythonParams[EXTRA_PARAMS.size() + i] = toCastedParam(param.getName(), param.getKlass());
         }
 
         return String.join(", ", pythonParams);

@@ -21,10 +21,8 @@ vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_
 
 class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
-    def __init__(self,
-                 val_or_ctor: Union[JavaMember, JavaObject],
-                 *args: Union[vertex_constructor_param_types, shape_types],
-                 optional_label: Optional[str] = None) -> None:
+    def __init__(self, val_or_ctor: Union[JavaMember, JavaObject], label: Optional[str],
+                 *args: Union[vertex_constructor_param_types, shape_types]) -> None:
         val: JavaObject
         if args:
             ctor = val_or_ctor
@@ -33,8 +31,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             val = typing_cast(JavaObject, val_or_ctor)
 
         super(Vertex, self).__init__(val)
-        if optional_label:
-            self.set_label(optional_label)
+        if label:
+            self.set_label(label)
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return v
@@ -188,8 +186,12 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
+    def _from_java_vertex(java_vertex: JavaObject) -> 'Vertex':
+        return Vertex(java_vertex, None)
+
+    @staticmethod
     def _to_generator(java_vertices: Union[JavaList, JavaArray]) -> Iterator['Vertex']:
-        return (Vertex(java_vertex) for java_vertex in java_vertices)
+        return (Vertex._from_java_vertex(java_vertex) for java_vertex in java_vertices)
 
     @staticmethod
     def _get_python_id(java_vertex: JavaObject) -> Tuple[JavaObject, ...]:

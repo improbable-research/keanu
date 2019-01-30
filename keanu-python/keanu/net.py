@@ -38,4 +38,4 @@ class BayesNet(JavaObjectWrapper):
 
     def get_vertex_by_label(self, label: str) -> Optional[Vertex]:
         java_vertex = self.unwrap().getVertexByLabel(_VertexLabel(label).unwrap())
-        return Vertex(java_vertex) if java_vertex else None
+        return Vertex._from_java_vertex(java_vertex) if java_vertex else None

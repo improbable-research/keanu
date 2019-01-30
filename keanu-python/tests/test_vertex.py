@@ -73,7 +73,7 @@ def test_can_pass_pandas_series_to_vertex(jvm_view):
 
 def test_can_pass_vertex_to_vertex(jvm_view: JVMView) -> None:
     mu = Gaussian(0., 1.)
-    gaussian = Vertex(jvm_view.GaussianVertex, mu, Const(1.))
+    gaussian = Vertex(jvm_view.GaussianVertex, "gaussian", mu, Const(1.))
     sample = gaussian.sample()
 
     assert type(sample) == numpy_types
@@ -82,7 +82,7 @@ def test_can_pass_vertex_to_vertex(jvm_view: JVMView) -> None:
 
 
 def test_can_pass_array_to_vertex(jvm_view: JVMView) -> None:
-    gaussian = Vertex(jvm_view.GaussianVertex, [3, 3], Const(0.), Const(1.))
+    gaussian = Vertex(jvm_view.GaussianVertex, "gaussian", [3, 3], Const(0.), Const(1.))
     sample = gaussian.sample()
 
     assert sample.shape == (3, 3)
@@ -95,7 +95,7 @@ def test_cannot_pass_generic_to_vertex(jvm_view: JVMView) -> None:
 
     with pytest.raises(ValueError) as excinfo:
         Vertex(  # type: ignore # this is expected to fail mypy
-            jvm_view.GaussianVertex, GenericExampleClass(), GenericExampleClass())
+            jvm_view.GaussianVertex, "gaussian", GenericExampleClass(), GenericExampleClass())
 
     assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(GenericExampleClass)
 
@@ -169,7 +169,7 @@ def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view: JVMView) 
 
 def test_construct_vertex_with_java_vertex(jvm_view: JVMView) -> None:
     java_vertex = Gaussian(0., 1.).unwrap()
-    python_vertex = Vertex(java_vertex)
+    python_vertex = Vertex._from_java_vertex(java_vertex)
 
     assert tuple(java_vertex.getId().getValue()) == python_vertex.get_id()
 
