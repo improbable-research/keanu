@@ -65,6 +65,13 @@ public class WriteToDotFileTest {
         complexResultVertex.observeOwnValue();
     }
 
+    private static String readFileToString(String fileOnClassPath) throws IOException {
+        URL url = Resources.getResource(fileOnClassPath);
+        String fileAsString = Resources.toString(url, Charsets.UTF_8);
+        System.out.println(fileOnClassPath);
+        return fileAsString;
+    }
+
     @Before
     public void resetVertexIdsAndOutputStream() {
         VertexId.ID_GENERATOR.set(0);
@@ -107,8 +114,43 @@ public class WriteToDotFileTest {
     }
 
     @Test
+    public void outputContainsHyperparameters() throws IOException {
+        GaussianVertex gaussianV = new GaussianVertex(0, 1);
+        BayesianNetwork gaussianNet = new BayesianNetwork(gaussianV.getConnectedGraph());
+
+        GraphToDot.write(new VertexGraph(gaussianNet), outputWriter);
+
+        String expectedGaussianNodeOutput = readFileToString(GAUSSIAN_OUTPUT_FILENAME);
+        checkDotFilesMatch(outputWriter.toString(), expectedGaussianNodeOutput);
+    }
+
+    @Test
+    public void outputtingComplexNet() throws IOException {
+        BayesianNetwork complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
+        GraphToDot.write(new VertexGraph(complexNet), outputWriter);
+        String expectedComplexOutput = readFileToString(COMPLEX_OUTPUT_FILENAME);
+        checkDotFilesMatch(outputWriter.toString(), expectedComplexOutput);
+    }
+
+    @Test
+    public void outputtingVertexDegree1Surroundings() throws IOException {
+        BayesianNetwork complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
+        GraphToDot.write(new VertexGraph(complexNet, complexResultVertex, 1), outputWriter);
+        String expectedVertexDegree1Output = readFileToString(VERTEX_DEGREE1__OUTPUT_FILENAME);
+        checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree1Output);
+    }
+
+    @Test
+    public void outputtingVertexDegree2Surroundings() throws IOException {
+        BayesianNetwork complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
+        GraphToDot.write(new VertexGraph(complexNet, complexResultVertex, 2), outputWriter);
+        String expectedVertexDegree2Output = readFileToString(VERTEX_DEGREE2__OUTPUT_FILENAME);
+        checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree2Output);
+    }
+
+    @Test
     public void dotVertexLabelsAreSetCorrectly() throws IOException {
-        int[] intValues = new int[] {1,2,3};
+        int[] intValues = new int[]{1, 2, 3};
         ConstantIntegerVertex constantIntVertex = new ConstantIntegerVertex(intValues);
         ConstantIntegerVertex constantIntVertex2 = new ConstantIntegerVertex(2);
         IntegerMultiplicationVertex multiplicationVertex = new IntegerMultiplicationVertex(constantIntVertex, constantIntVertex2);
@@ -150,12 +192,5 @@ public class WriteToDotFileTest {
             .toArray(String[]::new);
 
         assertThat(output1Lines, containsInAnyOrder(output2Lines));
-    }
-
-    private static String readFileToString(String fileOnClassPath) throws IOException {
-        URL url = Resources.getResource(fileOnClassPath);
-        String fileAsString = Resources.toString(url, Charsets.UTF_8);
-        System.out.println(fileOnClassPath);
-        return fileAsString;
     }
 }

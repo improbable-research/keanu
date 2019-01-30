@@ -1,27 +1,67 @@
 digraph BayesianNetwork {
-96 -> 97 [label=sigma]
-98 -> 99 [label=right]
-100 -> 101 [label=right]
-101 -> 102 [label=right]
-91 -> 92 [label=k]
-93 -> 94 [label=right]
-95 -> 97 [label=mu]
-97 -> 99 [label=left]
-99 -> 101 [label=left]
-90 -> 92 [label=theta]
-92 -> 94 [label=left]
-94 -> 102 [label=left]
-97[label="GaussianVertex"]
-98[label="5.0"]
-99[label="+"]
-100[label="10.0"]
-101[label="EqualsVertex"]
-102[label="OR"]
-90[label="0.0"]
-91[label="1.0"]
-92[label="GammaVertex"]
-93[label="-1"]
-94[label="LessThanVertex"]
-95[label="0.0"]
-96[label="1.0"]
+    0 [label="ConstantDoubleVertex"]
+    1 [label="BernoulliVertex"]
+    2 [label="NotVertex"]
+    3 [label="ConstantDoubleVertex"]
+    4 [label="ConstantDoubleVertex"]
+    5 [label="DoubleIfVertex"]
+    6 [label="ConstantDoubleVertex"]
+    7 [label="BernoulliVertex"]
+    8 [label="NotVertex"]
+    9 [label="ConstantIntegerVertex"]
+    10 [label="ConstantIntegerVertex"]
+    11 [label="IntegerIfVertex"]
+    12 [label="CastToDoubleVertex"]
+    13 [label="ConstantDoubleVertex"]
+    14 [label="ConstantDoubleVertex"]
+    15 [label="GammaVertex"]
+    16 [label="ConstantDoubleVertex"]
+    17 [label="GaussianVertex"]
+    18 [label="+"]
+    19 [label="ConstantDoubleVertex"]
+    20 [label="GaussianVertex"]
+    21 [label="+"]
+    22 [label="ConstantDoubleVertex"]
+    23 [label="GaussianVertex"]
+    24 [label="+"]
+    25 [label="ConstantDoubleVertex"]
+    26 [label="+"]
+    27 [label="ConstantDoubleVertex"]
+    28 [label="ConstantDoubleVertex"]
+    29 [label="*"]
+    30 [label="+"]
+    31 [label="GaussianVertex"]
+    12 -> 29
+    20 -> 21
+    18 -> 21
+    25 -> 26
+    23 -> 24
+    28 -> 29
+    10 -> 11
+    22 -> 23
+    4 -> 5
+    15 -> 18
+    7 -> 8
+    3 -> 5
+    14 -> 15
+    9 -> 11
+    24 -> 26
+    6 -> 7
+    30 -> 31
+    5 -> 23
+    2 -> 5
+    21 -> 24
+    16 -> 17
+    11 -> 12
+    13 -> 15
+    29 -> 30
+    1 -> 2
+    5 -> 17
+    8 -> 11
+    27 -> 30
+    17 -> 18
+    19 -> 20
+    0 -> 1
+    26 -> 31
+    5 -> 20
 }
