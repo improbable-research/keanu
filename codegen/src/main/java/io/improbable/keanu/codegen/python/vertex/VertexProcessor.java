@@ -51,6 +51,8 @@ public class VertexProcessor {
             .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner(), new MethodParameterNamesScanner()));
 
         List<Constructor> constructors = getSortedListOfAnnotatedVertexConstructors(reflections);
+        Map<String, DocString> nameToDocStringMap = KeanuProjectDoclet.getDocStringsFromFile();
+        StringJoiner exportedMethodsJoiner = new StringJoiner("\", \"", "\"", "\"");
 
         Map<String, Object> root = new HashMap<>();
         List<Import> imports = new ArrayList<>();
@@ -58,23 +60,18 @@ public class VertexProcessor {
 
         root.put("imports", imports);
         root.put("constructors", pythonConstructors);
-        Map<String, DocString> nameToDocStringMap = KeanuProjectDoclet.getDocStringsFromFile();
-        StringJoiner exportedMethodsJoiner = new StringJoiner("\", \"", "\"", "\"");
 
         for (Constructor constructor : constructors) {
-            String qualifiedName = constructor.getName();
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
 
-            String javaClass = constructor.getDeclaringClass().getSimpleName();
-            JavaVertexToPythonConverter javaVertexToPythonConverter = new JavaVertexToPythonConverter(constructor, reflections);
-            DocString docString = nameToDocStringMap.get(qualifiedName);
+            JavaVertexToPythonConverter javaVertexToPythonConverter = new JavaVertexToPythonConverter(constructor, reflections, nameToDocStringMap);
             VertexConstructor pythonConstructor = new VertexConstructor(
-                javaClass,
+                javaVertexToPythonConverter.getJavaClassName(),
                 javaVertexToPythonConverter.getClassName(),
                 javaVertexToPythonConverter.getChildClassName(),
                 javaVertexToPythonConverter.getTypedParams(),
                 javaVertexToPythonConverter.getCastedParams(),
-                docString.getAsString()
+                javaVertexToPythonConverter.getDocString()
             );
 
             pythonConstructors.add(pythonConstructor);

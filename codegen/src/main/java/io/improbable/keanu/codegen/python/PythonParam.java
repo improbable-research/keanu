@@ -2,6 +2,8 @@ package io.improbable.keanu.codegen.python;
 
 import lombok.Getter;
 
+import java.util.Objects;
+
 /**
  * Encapsulates data required for defining a python parameter
  */
@@ -23,7 +25,11 @@ public class PythonParam {
         this(name, klass, null);
     }
 
-    public boolean hasDefaultValue() {
-        return defaultValue != null;
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
+        PythonParam that = (PythonParam) other;
+        return Objects.equals(name, that.name);
     }
 }

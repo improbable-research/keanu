@@ -2,6 +2,7 @@ package io.improbable.keanu.codegen.python.vertex;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.internal.Primitives;
+import io.improbable.keanu.codegen.python.DocString;
 import io.improbable.keanu.codegen.python.PythonParam;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -17,6 +18,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Apache FreeMarker Format:
@@ -29,38 +31,43 @@ import java.util.List;
  *
  * Python:
  * def Gaussian(mu: vertex_constructor_param_types, sigma: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
- *     return Double(context.jvm_view().GaussianVertex, cast_to_double_vertex(mu), cast_to_double_vertex(sigma), optional_label=label)
+ *     return Double(context.jvm_view().GaussianVertex, label, cast_to_double_vertex(mu), cast_to_double_vertex(sigma))
  */
 class JavaVertexToPythonConverter {
 
+    /**
+     * Extra parameters are added:
+     * - as optional parameters to TypedParams, at the end
+     * - as required parameters to CastedParams, before *args
+     */
     private static final List<PythonParam> EXTRA_PARAMS = ImmutableList.of(
         new PythonParam("label", String.class, "None")
     );
     private Constructor javaConstructor;
+    private Map<String, DocString> docStringMap;
     private List<PythonParam> allParams;
-    private List<PythonParam> commonParams;
 
-    JavaVertexToPythonConverter(Constructor javaConstructor, Reflections reflections) {
+    JavaVertexToPythonConverter(Constructor javaConstructor, Reflections reflections, Map<String, DocString> docStringMap) {
        this.javaConstructor = javaConstructor;
-       createListOfPythonVertexParam(javaConstructor, reflections);
+       this.docStringMap = docStringMap;
+       this.allParams = createListOfPythonVertexParam(javaConstructor, reflections);
     }
 
-    private void createListOfPythonVertexParam(Constructor javaConstructor, Reflections reflections) {
+    private List<PythonParam> createListOfPythonVertexParam(Constructor javaConstructor, Reflections reflections) {
         List<String> paramNames = reflections.getConstructorParamNames(javaConstructor);
         List<Class> paramTypes = Arrays.asList(javaConstructor.getParameterTypes());
 
-        this.allParams = new ArrayList<>();
-        this.commonParams = new ArrayList<>();
+        List<PythonParam> listOfPythonVertexParams = new ArrayList<>();
 
         for (int i = 0; i < javaConstructor.getParameterCount(); i++) {
-            this.allParams.add(new PythonParam(paramNames.get(i), paramTypes.get(i)));
+            listOfPythonVertexParams.add(new PythonParam(paramNames.get(i), paramTypes.get(i)));
         }
 
-        for (PythonParam extraParam : EXTRA_PARAMS) {
-            if (!paramNames.contains(extraParam.getName())) {
-                this.commonParams.add(extraParam);
-            }
-        }
+        return listOfPythonVertexParams;
+    }
+
+    String getJavaClassName() {
+        return javaConstructor.getDeclaringClass().getSimpleName();
     }
 
     String getClassName() {
@@ -81,16 +88,16 @@ class JavaVertexToPythonConverter {
     }
 
     String getTypedParams() {
-        String[] pythonParams = new String[allParams.size() + commonParams.size()];
+        List<String> pythonParams = new ArrayList<>();
 
-        for (int i = 0; i < allParams.size(); i++) {
-            PythonParam param = allParams.get(i);
-            pythonParams[i] = param.getName() + ": " + toTypedParam(param.getKlass());
+        for (PythonParam param : allParams) {
+            pythonParams.add(param.getName() + ": " + toTypedParam(param.getKlass()));
         }
 
-        for (int i = 0; i < commonParams.size(); i++) {
-            PythonParam param = commonParams.get(i);
-            pythonParams[allParams.size() + i] = param.getName() + ": Optional[" + toTypedParam(param.getKlass()) + "]=" + param.getDefaultValue();
+        for (PythonParam extraParam : EXTRA_PARAMS) {
+            if (!allParams.contains(extraParam)) {
+                pythonParams.add(extraParam.getName() + ": Optional[" + toTypedParam(extraParam.getKlass()) + "]=" + extraParam.getDefaultValue());
+            }
         }
 
         return String.join(", ", pythonParams);
@@ -124,16 +131,14 @@ class JavaVertexToPythonConverter {
     }
 
     String getCastedParams() {
-        String[] pythonParams = new String[EXTRA_PARAMS.size() + allParams.size()];
+        List<String> pythonParams = new ArrayList<>();
 
-        for (int i = 0; i < EXTRA_PARAMS.size(); i++) {
-            PythonParam param = EXTRA_PARAMS.get(i);
-            pythonParams[i] = toCastedParam(param.getName(), param.getKlass());
+        for (PythonParam extraParam : EXTRA_PARAMS) {
+            pythonParams.add(toCastedParam(extraParam.getName(), extraParam.getKlass()));
         }
 
-        for (int i = 0; i < allParams.size(); i++) {
-            PythonParam param = allParams.get(i);
-            pythonParams[EXTRA_PARAMS.size() + i] = toCastedParam(param.getName(), param.getKlass());
+        for (PythonParam param : allParams) {
+            pythonParams.add(toCastedParam(param.getName(), param.getKlass()));
         }
 
         return String.join(", ", pythonParams);
@@ -173,5 +178,9 @@ class JavaVertexToPythonConverter {
         } else {
             throw new IllegalArgumentException("Failed to Encode " + pythonParameter + " of type: " + parameterType);
         }
+    }
+
+    String getDocString() {
+        return docStringMap.get(javaConstructor.getName()).getAsString();
     }
 }
