@@ -107,11 +107,11 @@ public BayesianNetwork loadNetFromJSON(InputStream input) throws IOException {
 }
 ```
 
-### Python Save Examples
+### Python Saving Examples
 
-Saving a model in Python is also reasonabl easy requiring you construct your saver and pass it a fully qualified
-file name and the network to save (along with an optional metadata map).  An example for each of the savers is given
-below:
+Saving a model in Python is also straightforward requiring only that you construct your saver and pass it a fully
+qualified file name and the network to save (along with an optional metadata map).  An example for each of the savers
+is given below:
 
 ```python
 net = BayesNet(gamma.get_connected_graph())
@@ -127,7 +127,7 @@ dot_saver = DotSaver(net)
 dot_saver.save(DOT_FILE_NAME, True, metadata)
 ```
 
-### Python Load Example
+### Python Loading Examples
 
 Once again, networks can be loaded using Python API via the JSON or Protobuf Loader objects.  Example below:
 
