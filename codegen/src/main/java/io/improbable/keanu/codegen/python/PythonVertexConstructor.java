@@ -29,7 +29,7 @@ import java.util.List;
 class PythonVertexConstructor {
 
     private static final List<PythonParam> optionalParams = ImmutableList.of(
-        new PythonParam("set_label", String.class, "=None")
+        new PythonParam("label", String.class, "=None")
     );
     private Constructor javaConstructor;
     private List<PythonParam> allParams;
@@ -113,7 +113,7 @@ class PythonVertexConstructor {
         for (int i = 0; i < allParams.size(); i++) {
             PythonParam param = allParams.get(i);
             if (!param.getDefaultValue().isEmpty()) {
-                pythonParams[i] = param.getName() + "=" + toCastedParam(param.getName(), param.getKlass());
+                pythonParams[i] = "optional_" + param.getName() + "=" + toCastedParam(param.getName(), param.getKlass());
             } else {
                 pythonParams[i] = toCastedParam(param.getName(), param.getKlass());
             }

@@ -16,7 +16,7 @@ from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, n
 k = KeanuContext()
 
 vertex_operation_param_types = Union['Vertex', tensor_arg_types]
-vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_types, str]
+vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_types, Optional[str]]
 
 
 class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
@@ -24,7 +24,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def __init__(self,
                  val_or_ctor: Union[JavaMember, JavaObject],
                  *args: Union[vertex_constructor_param_types, shape_types],
-                 set_label: Optional[str] = None) -> None:
+                 optional_label: Optional[str] = None) -> None:
         val: JavaObject
         if args:
             ctor = val_or_ctor
@@ -33,8 +33,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             val = typing_cast(JavaObject, val_or_ctor)
 
         super(Vertex, self).__init__(val)
-        if not set_label is None:
-            self.set_label(set_label)
+        if not optional_label is None:
+            self.set_label(optional_label)
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return v

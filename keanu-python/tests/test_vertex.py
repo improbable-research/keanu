@@ -322,7 +322,7 @@ def test_you_can_observe_scalar(ctor, args, expected_type, value) -> None:
 
 def test_set_label_in_kwargs() -> None:
     label = "gaussian_vertex"
-    vertex = Gaussian(0., 1., set_label=label)
+    vertex = Gaussian(0., 1., label=label)
     assert vertex.get_label() == label
 
 
