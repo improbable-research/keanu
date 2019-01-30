@@ -30,24 +30,24 @@ public class Geometric implements DiscreteDistribution {
     }
 
     @Override
-    public DoubleTensor logProb(IntegerTensor x) {
+    public DoubleTensor logProb(IntegerTensor k) {
         if (!checkParameterIsValid()) {
-            return DoubleTensor.create(Double.NEGATIVE_INFINITY, x.getShape());
+            return DoubleTensor.create(Double.NEGATIVE_INFINITY, k.getShape());
         } else {
-            return calculateLogProb(x);
+            return calculateLogProb(k);
         }
     }
 
-    private DoubleTensor calculateLogProb(IntegerTensor x) {
-        DoubleTensor xAsDouble = x.toDouble();
+    private DoubleTensor calculateLogProb(IntegerTensor k) {
+        DoubleTensor xAsDouble = k.toDouble();
         DoubleTensor oneMinusP = p.unaryMinus().plusInPlace(1.0);
         DoubleTensor results = xAsDouble.minusInPlace(1.0).timesInPlace(oneMinusP.logInPlace()).plusInPlace(p.log());
 
-        return setProbToZeroForInvalidX(x, results);
+        return setProbToZeroForInvalidK(k, results);
     }
 
-    private DoubleTensor setProbToZeroForInvalidX(IntegerTensor x, DoubleTensor results) {
-        IntegerTensor invalidX = x.getLessThanMask(IntegerTensor.create(1, x.getShape()));
+    private DoubleTensor setProbToZeroForInvalidK(IntegerTensor k, DoubleTensor results) {
+        IntegerTensor invalidX = k.getLessThanMask(IntegerTensor.create(1, k.getShape()));
 
         return results.setWithMaskInPlace(invalidX.toDouble(), Double.NEGATIVE_INFINITY);
     }
