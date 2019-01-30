@@ -63,6 +63,9 @@ class KeanuContext(metaclass=Singleton):
     def jvm_view(self) -> JVMView:
         return self.__jvm_view
 
+    def to_java_string(self, python_str: str) -> JavaObject:
+        return self._gateway.jvm.java.lang.String(python_str)
+
     def to_java_map(self, python_map: Dict[Any, Any]) -> JavaMap:
         m = self._gateway.jvm.java.util.HashMap()
 

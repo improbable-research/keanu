@@ -16,7 +16,7 @@ from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, n
 k = KeanuContext()
 
 vertex_operation_param_types = Union['Vertex', tensor_arg_types]
-vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_types, Optional[str]]
+vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_types, str]
 
 
 class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
@@ -33,7 +33,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             val = typing_cast(JavaObject, val_or_ctor)
 
         super(Vertex, self).__init__(val)
-        if not optional_label is None:
+        if optional_label:
             self.set_label(optional_label)
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
@@ -180,8 +180,10 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             return arg.unwrap()
         elif isinstance(arg, collections.Collection) and all(isinstance(x, runtime_primitive_types) for x in arg):
             return k.to_java_long_array(arg)
-        elif isinstance(arg, runtime_primitive_types) or isinstance(arg, JavaObject):
+        elif isinstance(arg, (runtime_primitive_types, JavaObject)):
             return arg
+        elif isinstance(arg, str):
+            return k.to_java_string(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 

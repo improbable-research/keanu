@@ -16,7 +16,6 @@ from .vertex_casting import (
     cast_to_boolean_tensor,
     cast_to_double,
     cast_to_integer,
-    cast_to_string,
     cast_to_boolean,
     cast_to_long_array,
     cast_to_int_array,

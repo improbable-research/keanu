@@ -45,10 +45,6 @@ def cast_to_integer(input: tensor_arg_types) -> int:
     return int(input)
 
 
-def cast_to_string(input: Any) -> Optional[str]:
-    return None if input is None else str(input)
-
-
 def cast_to_boolean(input: Any) -> bool:
     return bool(input)
 

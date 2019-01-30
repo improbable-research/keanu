@@ -74,13 +74,13 @@ class PythonVertexConstructor {
 
         for (int i = 0; i < allParams.size(); i++) {
             PythonParam param = allParams.get(i);
-            pythonParams[i] = param.getName() + ": " + toTypedParam(param.getKlass()) + param.getDefaultValue();
+            pythonParams[i] = param.getName() + ": " + toTypedParam(param.getKlass(), param.getDefaultValue().isEmpty()) + param.getDefaultValue();
         }
 
         return String.join(", ", pythonParams);
     }
 
-    private String toTypedParam(Class<?> parameterClass) {
+    private String toTypedParam(Class<?> parameterClass, boolean required) {
         Class parameterType = Primitives.wrap(parameterClass);
 
         if (Vertex.class.isAssignableFrom(parameterType)) {
@@ -96,7 +96,7 @@ class PythonVertexConstructor {
         } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
             return "int";
         } else if (String.class.isAssignableFrom(parameterType)) {
-            return "Optional[str]";
+            return required ? "str" : "Optional[str]";
         } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
             long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
             return "Collection[int]";
@@ -144,7 +144,7 @@ class PythonVertexConstructor {
         } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
             return "cast_to_integer(" + pythonParameter + ")";
         } else if (String.class.isAssignableFrom(parameterType)) {
-            return "cast_to_string(" + pythonParameter + ")";
+            return pythonParameter;
         } else if (Boolean.class.isAssignableFrom(parameterType)) {
             return "cast_to_boolean(" + pythonParameter + ")";
         } else if (Long[].class.isAssignableFrom(parameterType) || long[].class.isAssignableFrom(parameterType)) {
