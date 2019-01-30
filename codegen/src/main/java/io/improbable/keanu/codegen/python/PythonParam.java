@@ -1,8 +1,10 @@
 package io.improbable.keanu.codegen.python;
 
-import com.google.common.base.CaseFormat;
 import lombok.Getter;
 
+/**
+ * Encapsulates data required for defining a python parameter
+ */
 public class PythonParam {
     @Getter
     private String name;
@@ -11,13 +13,17 @@ public class PythonParam {
     @Getter
     private String defaultValue;
 
-    PythonParam(String name, Class klass, String defaultValue) {
-        this.name = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name);
+    public PythonParam(String name, Class klass, String defaultValue) {
+        this.name = ParamStringProcessor.toLowerUnderscore(name);
         this.klass = klass;
         this.defaultValue = defaultValue;
     }
 
-    PythonParam(String name, Class klass) {
-        this(name, klass, "");
+    public PythonParam(String name, Class klass) {
+        this(name, klass, null);
+    }
+
+    public boolean hasDefaultValue() {
+        return defaultValue != null;
     }
 }

@@ -1,7 +1,8 @@
-package io.improbable.keanu.codegen.python;
+package io.improbable.keanu.codegen.python.vertex;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.internal.Primitives;
+import io.improbable.keanu.codegen.python.PythonParam;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -23,33 +24,42 @@ import java.util.List;
  *      return {ChildClassName}({CastedParams})
  *
  * e.g.
- * def Gaussian(mu: vertex_constructor_param_types, sigma: vertex_constructor_param_types, label: str=None) -> Vertex:
- *     return Double(context.jvm_view().GaussianVertex, cast_to_double_vertex(mu), cast_to_double_vertex(sigma), str(label))
+ * Java method signature:
+ * public GaussianVertex(DoubleVertex mu, DoubleVertex sigma)
+ *
+ * Python:
+ * def Gaussian(mu: vertex_constructor_param_types, sigma: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
+ *     return Double(context.jvm_view().GaussianVertex, cast_to_double_vertex(mu), cast_to_double_vertex(sigma), optional_label=label)
  */
-class PythonVertexConstructor {
+class JavaVertexToPythonConverter {
 
-    private static final List<PythonParam> optionalParams = ImmutableList.of(
-        new PythonParam("label", String.class, "=None")
+    private static final List<PythonParam> OPTIONAL_PARAMS = ImmutableList.of(
+        new PythonParam("label", String.class, "None")
     );
+    private static final String OPTIONAL_PARAM_PREFIX = "optional_";
     private Constructor javaConstructor;
     private List<PythonParam> allParams;
 
-    PythonVertexConstructor(Constructor javaConstructor, Reflections reflections) {
+    JavaVertexToPythonConverter(Constructor javaConstructor, Reflections reflections) {
        this.javaConstructor = javaConstructor;
-       this.allParams = new ArrayList<>();
+       this.allParams = createListOfPythonVertexParam(javaConstructor, reflections);
+    }
 
+    private List<PythonParam> createListOfPythonVertexParam(Constructor javaConstructor, Reflections reflections) {
+        List<PythonParam> listOfPythonVertexParam = new ArrayList<>();
         List<String> paramNames = reflections.getConstructorParamNames(javaConstructor);
         List<Class> paramTypes = Arrays.asList(javaConstructor.getParameterTypes());
 
         for (int i = 0; i < javaConstructor.getParameterCount(); i++) {
-            this.allParams.add(new PythonParam(paramNames.get(i), paramTypes.get(i)));
+            listOfPythonVertexParam.add(new PythonParam(paramNames.get(i), paramTypes.get(i)));
         }
 
-        for (PythonParam optionalParam : this.optionalParams) {
+        for (PythonParam optionalParam : OPTIONAL_PARAMS) {
             if (!paramNames.contains(optionalParam.getName())) {
-                this.allParams.add(optionalParam);
+                listOfPythonVertexParam.add(optionalParam);
             }
         }
+        return listOfPythonVertexParam;
     }
 
     String getClassName() {
@@ -74,13 +84,17 @@ class PythonVertexConstructor {
 
         for (int i = 0; i < allParams.size(); i++) {
             PythonParam param = allParams.get(i);
-            pythonParams[i] = param.getName() + ": " + toTypedParam(param.getKlass(), param.getDefaultValue().isEmpty()) + param.getDefaultValue();
+            boolean hasDefaultValue = param.hasDefaultValue();
+            pythonParams[i] = param.getName() + ": " + toTypedParam(param.getKlass(), hasDefaultValue);
+            if (hasDefaultValue) {
+                pythonParams[i] += "=" + param.getDefaultValue();
+            }
         }
 
         return String.join(", ", pythonParams);
     }
 
-    private String toTypedParam(Class<?> parameterClass, boolean required) {
+    private String toTypedParam(Class<?> parameterClass, boolean optional) {
         Class parameterType = Primitives.wrap(parameterClass);
 
         if (Vertex.class.isAssignableFrom(parameterType)) {
@@ -96,7 +110,7 @@ class PythonVertexConstructor {
         } else if (Integer.class.isAssignableFrom(parameterType) || Long.class.isAssignableFrom(parameterType)) {
             return "int";
         } else if (String.class.isAssignableFrom(parameterType)) {
-            return required ? "str" : "Optional[str]";
+            return optional ? "Optional[str]" : "str";
         } else if (Long[].class.isAssignableFrom(parameterType) || Integer[].class.isAssignableFrom(parameterType) ||
             long[].class.isAssignableFrom(parameterType) || int[].class.isAssignableFrom(parameterType)) {
             return "Collection[int]";
@@ -112,8 +126,8 @@ class PythonVertexConstructor {
 
         for (int i = 0; i < allParams.size(); i++) {
             PythonParam param = allParams.get(i);
-            if (!param.getDefaultValue().isEmpty()) {
-                pythonParams[i] = "optional_" + param.getName() + "=" + toCastedParam(param.getName(), param.getKlass());
+            if (param.hasDefaultValue()) {
+                pythonParams[i] = OPTIONAL_PARAM_PREFIX + param.getName() + "=" + toCastedParam(param.getName(), param.getKlass());
             } else {
                 pythonParams[i] = toCastedParam(param.getName(), param.getKlass());
             }

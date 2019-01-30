@@ -76,7 +76,7 @@ public class KeanuProjectDoclet extends Standard {
         }
     }
 
-    Map<String, DocString> getDocStringsFromFile() throws IOException {
+    public Map<String, DocString> getDocStringsFromFile() throws IOException {
         try {
             Type listType = new TypeToken<Map<String, DocString>>(){}.getType();
             Reader reader = new FileReader(DESTINATION + DESTINATION_FILE_NAME);

@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Any, Collection, Optional
+from typing import Callable, Dict, Any, Collection
 from .base import (Vertex, cast_tensor_arg_to_double, cast_tensor_arg_to_integer, cast_tensor_arg_to_boolean,
                    vertex_constructor_param_types)
 from keanu.tensor import Tensor

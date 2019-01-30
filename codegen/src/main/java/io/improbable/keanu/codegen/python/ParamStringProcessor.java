@@ -7,20 +7,24 @@ import lombok.experimental.UtilityClass;
 
 import java.util.Map;
 
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_UNDERSCORE;
-import static com.google.common.base.CaseFormat.UPPER_CAMEL;
 
 @UtilityClass
-class ParamStringProcessor {
+public class ParamStringProcessor {
     Map<String, String> getNameToCommentMapping(ConstructorDoc constructorDoc) {
         ImmutableMap.Builder<String, String> nameToCommentMapping = ImmutableMap.builder();
         Tag[] params = constructorDoc.tags("@param");
         for (Tag param: params) {
             String[] text = param.text().split(" ", 2);
-            String snakeCaseParamName = UPPER_CAMEL.to(LOWER_UNDERSCORE, text[0]);
+            String snakeCaseParamName = toLowerUnderscore(text[0]);
             String paramComment = text[1].trim();
             nameToCommentMapping.put(snakeCaseParamName, paramComment);
         }
         return nameToCommentMapping.build();
+    }
+
+    public String toLowerUnderscore(String lowerCamel) {
+        return LOWER_CAMEL.to(LOWER_UNDERSCORE, lowerCamel);
     }
 }

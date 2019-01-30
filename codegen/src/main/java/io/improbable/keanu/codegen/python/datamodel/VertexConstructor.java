@@ -1,4 +1,4 @@
-package io.improbable.keanu.codegen.python.templateobject;
+package io.improbable.keanu.codegen.python.datamodel;
 
 import lombok.Getter;
 

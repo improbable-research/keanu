@@ -15,9 +15,9 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 @UtilityClass
-class TemplateProcessor {
+public class TemplateProcessor {
 
-    void processDataModel(Map<String, Object> dataModel, Template fileTemplate, Writer fileWriter) {
+    public void processDataModel(Map<String, Object> dataModel, Template fileTemplate, Writer fileWriter) {
         try {
             fileTemplate.process(dataModel, fileWriter);
             fileWriter.close();
@@ -28,7 +28,7 @@ class TemplateProcessor {
         }
     }
 
-    Template getFileTemplate(String templateFile) {
+    public Template getFileTemplate(String templateFile) {
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
         cfg.setClassForTemplateLoading(Runner.class, "/");
         try {
@@ -38,7 +38,7 @@ class TemplateProcessor {
         }
     }
 
-    Writer createFileWriter(String fileToWrite) {
+    public Writer createFileWriter(String fileToWrite) {
         try {
             Files.deleteIfExists(Paths.get(fileToWrite));
             return new FileWriter(new File(fileToWrite), true);

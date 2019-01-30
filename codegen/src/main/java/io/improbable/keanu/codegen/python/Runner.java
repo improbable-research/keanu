@@ -1,5 +1,7 @@
 package io.improbable.keanu.codegen.python;
 
+import io.improbable.keanu.codegen.python.vertex.VertexProcessor;
+
 import java.io.IOException;
 
 public class Runner {

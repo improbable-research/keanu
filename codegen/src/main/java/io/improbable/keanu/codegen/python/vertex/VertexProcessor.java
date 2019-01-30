@@ -1,9 +1,12 @@
-package io.improbable.keanu.codegen.python;
+package io.improbable.keanu.codegen.python.vertex;
 
 import freemarker.template.Template;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import io.improbable.keanu.codegen.python.templateobject.Import;
-import io.improbable.keanu.codegen.python.templateobject.VertexConstructor;
+import io.improbable.keanu.codegen.python.DocString;
+import io.improbable.keanu.codegen.python.KeanuProjectDoclet;
+import io.improbable.keanu.codegen.python.TemplateProcessor;
+import io.improbable.keanu.codegen.python.datamodel.Import;
+import io.improbable.keanu.codegen.python.datamodel.VertexConstructor;
 import lombok.experimental.UtilityClass;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -24,14 +27,14 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 @UtilityClass
-class VertexProcessor {
+public class VertexProcessor {
 
     final private static String TEMPLATE_FILE = "generated.py.ftl";
     final private static String GENERATED_FILE = "generated.py";
     final private static String TEMPLATE_INIT_FILE = "__init__.py.ftl";
     final private static String GENERATED_INIT_FILE = "__init__.py";
 
-    void process(String generatedDir) throws IOException {
+    public void process(String generatedDir) throws IOException {
         Map<String, Object> dataModel = buildDataModel();
         Template generatedVerticesFileTemplate = TemplateProcessor.getFileTemplate(TEMPLATE_FILE);
         Writer fileWriter = TemplateProcessor.createFileWriter(generatedDir + GENERATED_FILE);
@@ -59,19 +62,18 @@ class VertexProcessor {
         StringJoiner exportedMethodsJoiner = new StringJoiner("\", \"", "\"", "\"");
 
         for (Constructor constructor : constructors) {
-            String javaClass = constructor.getDeclaringClass().getSimpleName();
             String qualifiedName = constructor.getName();
-            DocString docString = nameToDocStringMap.get(qualifiedName);
-            PythonVertexConstructor pythonCtor = new PythonVertexConstructor(constructor, reflections);
-
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
 
+            String javaClass = constructor.getDeclaringClass().getSimpleName();
+            JavaVertexToPythonConverter javaVertexToPythonConverter = new JavaVertexToPythonConverter(constructor, reflections);
+            DocString docString = nameToDocStringMap.get(qualifiedName);
             VertexConstructor pythonConstructor = new VertexConstructor(
                 javaClass,
-                pythonCtor.getClassName(),
-                pythonCtor.getChildClassName(),
-                pythonCtor.getTypedParams(),
-                pythonCtor.getCastedParams(),
+                javaVertexToPythonConverter.getClassName(),
+                javaVertexToPythonConverter.getChildClassName(),
+                javaVertexToPythonConverter.getTypedParams(),
+                javaVertexToPythonConverter.getCastedParams(),
                 docString.getAsString()
             );
 
