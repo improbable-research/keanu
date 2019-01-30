@@ -16,7 +16,7 @@ def test_can_get_correct_autocorrelation() -> None:
     np.testing.assert_almost_equal(autocorr, expected)
 
 
-def test_autocorrelation_example_nd():
+def test_autocorrelation_example_nd() -> None:
     a = Gaussian(np.array([[20., 30.], [40., 60.]]), np.array([[1., 1.], [1., 1.]]))
     a.set_label("a")
     bayes_net = BayesNet(a.get_connected_graph())

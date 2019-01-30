@@ -145,7 +145,12 @@ def generate_samples(net: BayesNet,
 
     all_are_scalar = _all_vertices_are_scalar(sample_from_copy)
     return _samples_generator(
-        sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax, all_scalar=all_are_scalar)
+        sample_iterator,
+        vertices_unwrapped,
+        live_plot=live_plot,
+        refresh_every=refresh_every,
+        ax=ax,
+        all_scalar=all_are_scalar)
 
 
 def _all_vertices_are_scalar(sample_from: Iterable[Vertex]) -> bool:
@@ -162,9 +167,9 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
     while (True):
         network_sample = sample_iterator.next()
         sample = {
-            Vertex._get_python_label(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped), primitive=True)
-            for vertex_unwrapped in vertices_unwrapped
-        }           
+            Vertex._get_python_label(vertex_unwrapped): Tensor._to_ndarray(
+                network_sample.get(vertex_unwrapped), primitive=True) for vertex_unwrapped in vertices_unwrapped
+        }
 
         if live_plot:
             traces.append(sample)
@@ -195,12 +200,14 @@ def _create_multi_indexed_samples(samples: dict, generated: bool) -> dict:
             _add_sample_to_dict(samples[vertex_label], vertex_samples_multi, vertex_label, column_header_for_scalar)
 
         tuple_heirarchy = {(vertex_label, tensor_index): values
-                       for vertex_label, tensor_index in vertex_samples_multi.items()
-                       for tensor_index, values in tensor_index.items()}
+                           for vertex_label, tensor_index in vertex_samples_multi.items()
+                           for tensor_index, values in tensor_index.items()}
 
     return tuple_heirarchy
 
-def _add_sample_to_dict(sample_value: Any, vertex_samples_multi: dict, vertex_label: str, column_header_for_scalar: str):
+
+def _add_sample_to_dict(sample_value: Any, vertex_samples_multi: dict, vertex_label: str,
+                        column_header_for_scalar: str):
     if type(sample_value) is not ndarray:
         vertex_samples_multi[vertex_label][column_header_for_scalar].append(sample_value)
     elif sample_value.shape == ():
