@@ -74,9 +74,7 @@ class Tensor(JavaObjectWrapper):
     @staticmethod
     def _to_ndarray(java_tensor: JavaObject, primitive: bool = False) -> Any:
         if java_tensor.getRank() == 0:
-            if primitive:
-                return np.array(java_tensor.scalar()).item()
-            else:
-                return np.array(java_tensor.scalar())
+            scalar_array = np.array(java_tensor.scalar())
+            return scalar_array.item() if primitive else scalar_array
         else:
             return np.array(list(java_tensor.asFlatArray())).reshape(java_tensor.getShape())

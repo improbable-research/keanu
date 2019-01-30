@@ -1,12 +1,11 @@
-from typing import List, Tuple, Any
-from numpy import ndarray, fromiter, issubdtype, floating, stack
-from py4j.java_gateway import java_import
-
-from keanu.shape_validation import check_index_is_valid, check_all_shapes_match
-from keanu.vartypes import numpy_types, primitive_types
-from .context import KeanuContext
+from typing import List
 
 import numpy as np
+from numpy import ndarray, fromiter
+from py4j.java_gateway import java_import
+
+from keanu.vartypes import primitive_types
+from .context import KeanuContext
 
 k = KeanuContext()
 
