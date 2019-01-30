@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
-    private final Vertex<? extends BooleanTensor> predicate;
+    private final BooleanVertex predicate;
     private final DoubleVertex thn;
     private final DoubleVertex els;
     protected static final String PREDICATE_NAME = "predicate";
@@ -27,7 +28,7 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     protected static final String ELSE_NAME = "else";
 
     @ExportVertexToPythonBindings
-    public DoubleIfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
+    public DoubleIfVertex(@LoadVertexParam(PREDICATE_NAME) BooleanVertex predicate,
                           @LoadVertexParam(THEN_NAME) DoubleVertex thn,
                           @LoadVertexParam(ELSE_NAME) DoubleVertex els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
@@ -38,7 +39,7 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     }
 
     @SaveVertexParam(PREDICATE_NAME)
-    public Vertex<? extends BooleanTensor> getPredicate() {
+    public BooleanVertex getPredicate() {
         return predicate;
     }
 
