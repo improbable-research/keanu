@@ -1,6 +1,6 @@
 ## This is a generated file. DO NOT EDIT.
 
-from typing import Collection
+from typing import Collection, Optional
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex, Double, Integer, Boolean, vertex_constructor_param_types
@@ -45,9 +45,9 @@ def cast_to_vertex(input: vertex_constructor_param_types) -> Vertex:
 <#list imports as import>
 java_import(context.jvm_view(), "${import.packageName}")
 </#list>
-<#list constructors as constructor>
+<#list constructors as javaConstructor>
 
 
-def ${constructor.pythonClass}(${constructor.pythonTypedParameters}, **kwargs) -> Vertex:
-    ${constructor.docString}return ${constructor.pythonVertexClass}(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters}, **kwargs)
+def ${javaConstructor.pythonClass}(${javaConstructor.pythonTypedParameters}) -> Vertex:
+    ${javaConstructor.docString}return ${javaConstructor.pythonVertexClass}(context.jvm_view().${javaConstructor.javaClass}, ${javaConstructor.pythonParameters})
 </#list>

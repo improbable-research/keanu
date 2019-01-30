@@ -1,4 +1,4 @@
-from typing import Iterable, Union, Type, Any, TYPE_CHECKING, Dict, Tuple, List, Generator
+from typing import Iterable, Union, Type, Any, TYPE_CHECKING, Dict, Tuple, List, Generator, Optional
 from numpy import integer, floating, bool_, ndarray
 from pandas import Series, DataFrame
 from .base import JavaObjectWrapper
@@ -25,8 +25,8 @@ shape_types = Iterable[primitive_types]
 '''
 Sample types
 '''
-sample_types = Dict[str, List[numpy_types]]
-sample_generator_types = Generator[Dict[str, numpy_types], None, None]
+sample_types = Dict[Optional[str], List[numpy_types]]
+sample_generator_types = Generator[Dict[Optional[str], numpy_types], None, None]
 '''
 Runtime types
 '''

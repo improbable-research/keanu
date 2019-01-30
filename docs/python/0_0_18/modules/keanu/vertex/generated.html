@@ -262,7 +262,7 @@
 
 <div class="viewcode-block" id="Bernoulli"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Bernoulli">[docs]</a><span class="k">def</span> <span class="nf">Bernoulli</span><span class="p">(</span><span class="n">prob_true</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    One to one constructor for mapping some shape of probTrue to</span>
+<span class="sd">    One to one javaConstructor for mapping some shape of probTrue to</span>
 <span class="sd">    a matching shaped Bernoulli.</span>
 <span class="sd">    </span>
 <span class="sd">    :param prob_true: probTrue with same shape as desired Bernoulli tensor or scalar</span>
@@ -554,7 +554,7 @@
 
 <div class="viewcode-block" id="Beta"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Beta">[docs]</a><span class="k">def</span> <span class="nf">Beta</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    One to one constructor for mapping some tensorShape of alpha and beta to</span>
+<span class="sd">    One to one javaConstructor for mapping some tensorShape of alpha and beta to</span>
 <span class="sd">    a matching tensorShaped Beta.</span>
 <span class="sd">    </span>
 <span class="sd">    :param alpha: the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar</span>
@@ -569,7 +569,7 @@
 
 <div class="viewcode-block" id="ChiSquared"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.ChiSquared">[docs]</a><span class="k">def</span> <span class="nf">ChiSquared</span><span class="p">(</span><span class="n">k</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    One to one constructor for mapping some shape of k to</span>
+<span class="sd">    One to one javaConstructor for mapping some shape of k to</span>
 <span class="sd">    a matching shaped ChiSquared.</span>
 <span class="sd">    </span>
 <span class="sd">    :param k: the number of degrees of freedom</span>
@@ -588,7 +588,7 @@
 
 <div class="viewcode-block" id="Exponential"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Exponential">[docs]</a><span class="k">def</span> <span class="nf">Exponential</span><span class="p">(</span><span class="n">rate</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    One to one constructor for mapping some shape of rate to matching shaped exponential.</span>
+<span class="sd">    One to one javaConstructor for mapping some shape of rate to matching shaped exponential.</span>
 <span class="sd">    </span>
 <span class="sd">    :param rate: the rate of the Exponential with either the same shape as specified for this vertex or scalar</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -597,7 +597,7 @@
 
 <div class="viewcode-block" id="Gamma"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Gamma">[docs]</a><span class="k">def</span> <span class="nf">Gamma</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    One to one constructor for mapping some shape of theta and k to matching shaped gamma.</span>
+<span class="sd">    One to one javaConstructor for mapping some shape of theta and k to matching shaped gamma.</span>
 <span class="sd">    </span>
 <span class="sd">    :param theta: the theta (scale) of the Gamma with either the same shape as specified for this vertex</span>
 <span class="sd">    :param k: the k (shape) of the Gamma with either the same shape as specified for this vertex</span>
@@ -619,7 +619,7 @@
 
 <div class="viewcode-block" id="InverseGamma"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.InverseGamma">[docs]</a><span class="k">def</span> <span class="nf">InverseGamma</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    One to one constructor for mapping some shape of alpha and beta to</span>
+<span class="sd">    One to one javaConstructor for mapping some shape of alpha and beta to</span>
 <span class="sd">    alpha matching shaped Inverse Gamma.</span>
 <span class="sd">    </span>
 <span class="sd">    :param alpha: the alpha of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar</span>
@@ -634,7 +634,7 @@
 
 <div class="viewcode-block" id="Laplace"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Laplace">[docs]</a><span class="k">def</span> <span class="nf">Laplace</span><span class="p">(</span><span class="n">mu</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    One to one constructor for mapping some shape of mu and sigma to</span>
+<span class="sd">    One to one javaConstructor for mapping some shape of mu and sigma to</span>
 <span class="sd">    a matching shaped Laplace.</span>
 <span class="sd">    </span>
 <span class="sd">    :param mu: the mu of the Laplace with either the same shape as specified for this vertex or a scalar</span>
@@ -675,7 +675,7 @@
 
 <div class="viewcode-block" id="Triangular"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Triangular">[docs]</a><span class="k">def</span> <span class="nf">Triangular</span><span class="p">(</span><span class="n">x_min</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">,</span> <span class="n">x_max</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    One to one constructor for mapping some shape of xMin, xMax and c to a matching shaped triangular.</span>
+<span class="sd">    One to one javaConstructor for mapping some shape of xMin, xMax and c to a matching shaped triangular.</span>
 <span class="sd">    </span>
 <span class="sd">    :param x_min: the xMin of the Triangular with either the same shape as specified for this vertex or a scalar</span>
 <span class="sd">    :param x_max: the xMax of the Triangular with either the same shape as specified for this vertex or a scalar</span>
@@ -686,7 +686,7 @@
 
 <div class="viewcode-block" id="Uniform"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Uniform">[docs]</a><span class="k">def</span> <span class="nf">Uniform</span><span class="p">(</span><span class="n">x_min</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">,</span> <span class="n">x_max</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    One to one constructor for mapping some shape of mu and sigma to</span>
+<span class="sd">    One to one javaConstructor for mapping some shape of mu and sigma to</span>
 <span class="sd">    a matching shaped Uniform Vertex</span>
 <span class="sd">    </span>
 <span class="sd">    :param x_min: the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar</span>
@@ -842,7 +842,7 @@
 
 <div class="viewcode-block" id="Poisson"><a class="viewcode-back" href="../../../keanu.vertex.html#keanu.vertex.Poisson">[docs]</a><span class="k">def</span> <span class="nf">Poisson</span><span class="p">(</span><span class="n">mu</span><span class="p">:</span> <span class="n">vertex_constructor_param_types</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    One to one constructor for mapping some shape of mu to</span>
+<span class="sd">    One to one javaConstructor for mapping some shape of mu to</span>
 <span class="sd">    a matching shaped Poisson.</span>
 <span class="sd">    </span>
 <span class="sd">    :param mu: mu with same shape as desired Poisson tensor or scalar</span>

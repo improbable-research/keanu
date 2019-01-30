@@ -21,8 +21,10 @@ vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_
 
 class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
-    def __init__(self, val_or_ctor: Union[JavaMember, JavaObject],
-                 *args: Union[vertex_constructor_param_types, shape_types], **kwargs: Dict[str, Any]) -> None:
+    def __init__(self,
+                 val_or_ctor: Union[JavaMember, JavaObject],
+                 *args: Union[vertex_constructor_param_types, shape_types],
+                 set_label: Optional[str] = None) -> None:
         val: JavaObject
         if args:
             ctor = val_or_ctor
@@ -31,7 +33,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             val = typing_cast(JavaObject, val_or_ctor)
 
         super(Vertex, self).__init__(val)
-        self.__handle_optional_params(**kwargs)
+        if not set_label is None:
+            self.set_label(set_label)
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return v
@@ -51,11 +54,6 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def set_label(self, label: str) -> None:
         self.unwrap().setLabel(label)
 
-    def __handle_optional_params(self, **kwargs: Dict[str, Any]) -> None:
-        if "label" in kwargs:
-            casted_kwarg = typing_cast(str, kwargs["label"])
-            self.set_label(casted_kwarg)
-
     def sample(self) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().sample())
 
@@ -68,7 +66,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def get_id(self) -> Tuple[JavaObject, ...]:
         return Vertex._get_python_id(self.unwrap())
 
-    def get_label(self) -> str:
+    def get_label(self) -> Optional[str]:
         return Vertex._get_python_label(self.unwrap())
 
     """
@@ -196,8 +194,9 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return tuple(java_vertex.getId().getValue())
 
     @staticmethod
-    def _get_python_label(java_vertex: JavaObject) -> str:
-        return java_vertex.getLabel().getQualifiedName()
+    def _get_python_label(java_vertex: JavaObject) -> Optional[str]:
+        java_label = java_vertex.getLabel()
+        return java_label.getQualifiedName() if java_label else None
 
 
 class Double(Vertex):

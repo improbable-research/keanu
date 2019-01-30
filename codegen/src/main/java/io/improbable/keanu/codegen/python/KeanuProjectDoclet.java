@@ -7,6 +7,7 @@ import com.sun.javadoc.ConstructorDoc;
 import com.sun.javadoc.RootDoc;
 import com.sun.tools.doclets.standard.Standard;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import lombok.experimental.UtilityClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,15 +22,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+@UtilityClass
 public class KeanuProjectDoclet extends Standard {
 
-    private static final Logger logger = LoggerFactory.getLogger(KeanuProjectDoclet.class);
+    private final Logger logger = LoggerFactory.getLogger(KeanuProjectDoclet.class);
 
-    private static final String EXPORT_VERTEX_ANNOTATION_NAME = "@" + ExportVertexToPythonBindings.class.getName();
-    private static final String DESTINATION_FILE_NAME = "javadocstrings.json";
-    private static final String DESTINATION = "./build/resources/";
+    private final String EXPORT_VERTEX_ANNOTATION_NAME = "@" + ExportVertexToPythonBindings.class.getName();
+    private final String DESTINATION_FILE_NAME = "javadocstrings.json";
+    private final String DESTINATION = "./build/resources/";
 
-    public static boolean start(RootDoc root) {
+    public boolean start(RootDoc root) {
 
         Map<String, DocString> docStrings = new HashMap<>();
         ClassDoc[] classes = root.classes();
@@ -48,12 +50,12 @@ public class KeanuProjectDoclet extends Standard {
         return true;
     }
 
-    private static boolean isConstructorAnnotated(ConstructorDoc constructorDoc) {
+    private boolean isConstructorAnnotated(ConstructorDoc constructorDoc) {
         return Arrays.stream(constructorDoc.annotations())
             .anyMatch(an -> an.toString().equals(EXPORT_VERTEX_ANNOTATION_NAME));
     }
 
-    private static void writeDocStringsToFile(Map<String, DocString> docString) {
+    private void writeDocStringsToFile(Map<String, DocString> docString) {
         String json = (new Gson()).toJson(docString);
         createFilesIfNecessary();
         try (OutputStream outputStream =
@@ -64,7 +66,7 @@ public class KeanuProjectDoclet extends Standard {
         }
     }
 
-    private static void createFilesIfNecessary() {
+    private void createFilesIfNecessary() {
         File outputFile = new File(DESTINATION + DESTINATION_FILE_NAME);
         outputFile.getParentFile().mkdirs();
         try {
@@ -74,7 +76,7 @@ public class KeanuProjectDoclet extends Standard {
         }
     }
 
-    static Map<String, DocString> getDocStringsFromFile() throws IOException {
+    Map<String, DocString> getDocStringsFromFile() throws IOException {
         try {
             Type listType = new TypeToken<Map<String, DocString>>(){}.getType();
             Reader reader = new FileReader(DESTINATION + DESTINATION_FILE_NAME);

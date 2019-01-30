@@ -322,7 +322,7 @@ def test_you_can_observe_scalar(ctor, args, expected_type, value) -> None:
 
 def test_set_label_in_kwargs() -> None:
     label = "gaussian_vertex"
-    vertex = Gaussian(0., 1., label=label)
+    vertex = Gaussian(0., 1., set_label=label)
     assert vertex.get_label() == label
 
 
@@ -331,10 +331,3 @@ def test_set_label() -> None:
     vertex = Gaussian(0., 1.)
     vertex.set_label(label)
     assert vertex.get_label() == label
-
-
-def test_cannot_set_label_in_kwargs_for_proxy_vertices() -> None:
-    intended_label = "intended_label"
-    redundant_label = "redundant label"
-    with pytest.raises(TypeError):
-        IntegerProxy([1], intended_label, label=redundant_label)  # type: ignore # this is expected to fail mypy

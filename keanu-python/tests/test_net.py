@@ -105,13 +105,13 @@ def test_can_save_and_load(tmpdir) -> None:
 
 
 def test_get_vertex_by_label() -> None:
-    vertex = Gamma(1., 1., label="gamma")
+    vertex = Gamma(1., 1., set_label="gamma")
     net = BayesNet([vertex])
     retrieved_vertex = cast(Vertex, net.get_vertex_by_label("gamma"))
     assert retrieved_vertex.get_id() == vertex.get_id()
 
 
 def test_get_vertex_by_label_returns_none_if_not_found() -> None:
-    vertex = Gamma(1., 1., label="gamma")
+    vertex = Gamma(1., 1., set_label="gamma")
     net = BayesNet([vertex])
     assert net.get_vertex_by_label("gaussian") is None
