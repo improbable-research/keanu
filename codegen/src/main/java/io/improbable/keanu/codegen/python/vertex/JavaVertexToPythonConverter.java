@@ -29,8 +29,8 @@ class JavaVertexToPythonConverter {
 
     /**
      * Extra parameters are added:
-     * - as optional parameters to TypedParams, at the end
-     * - as required parameters to CastedParams, before *args
+     * - as optional parameters to pythonTypedParameters, at the end
+     * - as required parameters to pythonParameters, before other parameters
      */
     private static final List<PythonParam> EXTRA_PARAMS = ImmutableList.of(
         new PythonParam("label", String.class, "None")
