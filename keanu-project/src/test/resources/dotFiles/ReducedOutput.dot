@@ -1,0 +1,17 @@
+digraph BayesianNetwork {
+    1 [color="#FFAFAF"] [label="BernoulliVertex"]
+    7 [color="#FFAFAF"] [label="BernoulliVertex"]
+    15 [color="#FFAFAF"] [label="GammaVertex"]
+    17 [color="#FFAFAF"] [label="GaussianVertex"]
+    20 [color="#FFAFAF"] [label="GaussianVertex"]
+    23 [color="#FFAFAF"] [label="GaussianVertex"]
+    31 [color="#0000FF"] [label="GaussianVertex"]
+    1 -> 17 [label="inputVertex, predicate, sigma"]
+    23 -> 31 [label="right, left, mu"]
+    15 -> 31 [label="left, left, left, left, mu"]
+    7 -> 31 [label="inputVertex, predicate, inputVertex, right, right, sigma"]
+    1 -> 20 [label="inputVertex, predicate, sigma"]
+    17 -> 31 [label="right, left, left, left, mu"]
+    20 -> 31 [label="right, left, left, mu"]
+    1 -> 23 [label="inputVertex, predicate, sigma"]
+}

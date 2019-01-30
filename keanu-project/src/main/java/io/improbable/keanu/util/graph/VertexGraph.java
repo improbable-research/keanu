@@ -57,6 +57,18 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         }
     }
 
+    public VertexGraph putMetadata(String key, String value) {
+        metadata.put(key, value);
+        return this;
+    }
+
+    public VertexGraph autoPutMetadata() {
+        metadata.put("vertices",Integer.toString(vertexNodes.size()));
+        metadata.put("edges",Integer.toString(edgeCount()));
+        metadata.put("timestamp",new Date().toString());
+        return this;
+    }
+
     private static final String formatColorForDot(Color c) {
         return String.format("#%06X", (0xFFFFFF & c.getRGB()));
     }
@@ -121,14 +133,14 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     public VertexGraph removeNamespace(String namespace) {
-        removeVerticesPreservingEdges((v) -> vertexInNamespace(v,namespace));
+        removeVerticesPreservingEdges((v) -> vertexInNamespace(v, namespace));
         return this;
     }
 
-    private boolean vertexInNamespace(Vertex v,String namespace) {
+    private boolean vertexInNamespace(Vertex v, String namespace) {
         VertexLabel label = v.getLabel();
-        if ( label == null ) return true;
-        return label.isInNamespace( namespace );
+        if (label == null) return true;
+        return label.isInNamespace(namespace);
     }
 
     public void removeVerticesPreservingEdges(Predicate<Vertex> f) {
@@ -242,7 +254,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
 
     private String convertConstantValueToString(Vertex vertex) {
-        if ( ! (vertex instanceof ConstantVertex) ) return null;
+        if (!(vertex instanceof ConstantVertex)) return null;
         return convertValueToString(vertex);
     }
 
@@ -318,4 +330,5 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     public Collection<BasicGraphEdge> getEdges() {
         return edges;
     }
+
 }

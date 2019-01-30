@@ -40,6 +40,10 @@ public class WriteToDotFileTest {
     private static final String COMPLEX_OUTPUT_FILENAME = resourcesFolder + "/ComplexNetDotOutput.dot";
     private static final String VERTEX_DEGREE1__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree1Output.dot";
     private static final String VERTEX_DEGREE2__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree2Output.dot";
+    private static final String REDUCED_OUTPUT_FILENAME = resourcesFolder + "/ReducedOutput.dot";
+    private static final String REDUCED_INTERMEDIATE_OUTPUT_FILENAME = resourcesFolder + "/ReducedIntermediate.dot";
+    private static final String SIMPLE_OUTPUT_FILENAME = resourcesFolder + "/SimpleOutput.dot";
+    private static final String OUTPUT_WITH_METADATA = resourcesFolder + "/OutputWithMetadata.dot";
 
     private static Vertex complexResultVertex;
     private static ByteArrayOutputStream outputWriter;
@@ -65,7 +69,6 @@ public class WriteToDotFileTest {
     private static String readFileToString(String fileOnClassPath) throws IOException {
         URL url = Resources.getResource(fileOnClassPath);
         String fileAsString = Resources.toString(url, Charsets.UTF_8);
-        System.out.println(fileOnClassPath);
         return fileAsString;
     }
 
@@ -79,15 +82,17 @@ public class WriteToDotFileTest {
     public void simpleOutput() throws IOException {
         VertexGraph graph = new VertexGraph(complexResultVertex);
         GraphToDot.write(graph, outputWriter);
-        System.out.println(outputWriter.toString());
+        String expectedGaussianNodeOutput = readFileToString(SIMPLE_OUTPUT_FILENAME);
+        checkDotFilesMatch(outputWriter.toString(), expectedGaussianNodeOutput);
     }
 
     @Test
     public void valueOutput() throws IOException {
         VertexGraph graph = new VertexGraph(complexResultVertex);
-        graph.labelEdgesWithParameters().colorVerticesByType();
+        graph.labelEdgesWithParameters().colorVerticesByType().labelVerticesWithValue();
         GraphToDot.write(graph, outputWriter);
-        System.out.println(outputWriter.toString());
+
+        assertThat("Output contains expected string", outputWriter.toString().contains("0 [color=\"#FF0000\"] [label=\"0.5\"]"));
     }
 
     @Test
@@ -95,9 +100,10 @@ public class WriteToDotFileTest {
         VertexGraph graph = new VertexGraph(complexResultVertex);
         graph.labelEdgesWithParameters().colorVerticesByState();
         graph.removeDeterministicVertices();
-        graph.labelVerticesWithValue();
         GraphToDot.write(graph, outputWriter);
-        System.out.println(outputWriter.toString());
+
+        String expectedGaussianNodeOutput = readFileToString(REDUCED_OUTPUT_FILENAME);
+        checkDotFilesMatch(outputWriter.toString(), expectedGaussianNodeOutput);
     }
 
     @Test
@@ -106,7 +112,9 @@ public class WriteToDotFileTest {
         graph.labelEdgesWithParameters().colorVerticesByState();
         graph.removeIntermediateVertices();
         GraphToDot.write(graph, outputWriter);
-        System.out.println(outputWriter.toString());
+
+        String expectedGaussianNodeOutput = readFileToString(REDUCED_INTERMEDIATE_OUTPUT_FILENAME);
+        checkDotFilesMatch(outputWriter.toString(), expectedGaussianNodeOutput);
     }
 
     @Test
@@ -145,6 +153,16 @@ public class WriteToDotFileTest {
     }
 
     @Test
+    public void outputtingWithMetadata() throws IOException {
+        BayesianNetwork complexNet = new BayesianNetwork(complexResultVertex.getConnectedGraph());
+        VertexGraph g = new VertexGraph(complexNet).putMetadata("author", "Jane Doe").putMetadata("version", "V1").autoPutMetadata();
+        g.metadata.remove("timestamp"); // this is non deterministic, so we remove it.
+        GraphToDot.write(g, outputWriter);
+        String expectedVertexDegree2Output = readFileToString(OUTPUT_WITH_METADATA);
+        checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree2Output);
+    }
+
+    @Test
     public void dotVertexLabelsAreSetCorrectly() throws IOException {
         int[] intValues = new int[]{1, 2, 3};
         ConstantIntegerVertex constantIntVertex = new ConstantIntegerVertex(intValues);
@@ -176,9 +194,6 @@ public class WriteToDotFileTest {
 
     // Need to compare the outputs line by line, as the labels and edges are not written out in a fixed order.
     private void checkDotFilesMatch(String output1, String output2) {
-
-        System.out.println(output1);
-
         List<String> output1Lines = Arrays.stream(output1.split("\n"))
             .map(s -> s.replace("\r", "").trim())
             .collect(Collectors.toList());

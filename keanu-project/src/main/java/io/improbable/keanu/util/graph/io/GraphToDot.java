@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class GraphToDot {
 
@@ -21,6 +22,7 @@ public abstract class GraphToDot {
     private static final String DOT_FIELD_SEPARATOR = "=\"";
     private static final String DOT_FIELD_CLOSING = "\"]";
     private static final String DOT_NEW_LINE = "\n";
+    private static final String DOT_METADATA_SPACER = ": ";
 
     public static void write(AbstractGraph<? extends GraphNode, ? extends GraphEdge> graph, OutputStream output) throws IOException {
         Writer outputWriter = new OutputStreamWriter(output);
@@ -33,6 +35,7 @@ public abstract class GraphToDot {
         for (Map.Entry<String, String> e : graph.getMetaData().entrySet()) {
             outputWriter.write(DOT_COMMENT_APPENDIX);
             outputWriter.write(e.getKey());
+            outputWriter.write(DOT_METADATA_SPACER);
             outputWriter.write(e.getValue());
             outputWriter.write(DOT_NEW_LINE);
         }

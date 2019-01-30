@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 
 public class NamespacesTest {
@@ -59,7 +60,8 @@ public class NamespacesTest {
     public void simpleOutput() throws IOException {
         VertexGraph graph = new VertexGraph(outA).labelConstantVerticesWithValue();
         GraphToDot.write(graph, outputWriter);
-        System.out.println(outputWriter.toString());
+        int lines = outputWriter.toString().split("\n").length;
+        assertEquals( 20 , lines );
     }
 
     @Test

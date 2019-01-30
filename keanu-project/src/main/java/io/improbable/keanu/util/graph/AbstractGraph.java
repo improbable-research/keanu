@@ -64,4 +64,5 @@ public abstract class AbstractGraph<N extends GraphNode, E extends GraphEdge<N>>
     public int nodeCount() {
         return getNodes().size();
     }
+
 }
