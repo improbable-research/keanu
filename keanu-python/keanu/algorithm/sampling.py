@@ -6,7 +6,7 @@ from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
 from keanu.net import BayesNet, ProbabilisticModel, ProbabilisticModelWithGradient
-from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional, Union
+from typing import Any, Iterable, Dict, Tuple, Union
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types, primitive_types
 from keanu.plots import traceplot
 from collections import defaultdict
@@ -209,8 +209,11 @@ def _create_multi_indexed_samples(samples: dict, generated: bool) -> dict:
         else:
             _add_sample_to_dict(samples[vertex_label], vertex_samples_multi, vertex_label, column_header_for_scalar)
 
-        return {(vertex_label, tensor_index): values for vertex_label, tensor_index in vertex_samples_multi.items()
-                for tensor_index, values in tensor_index.items()}
+        tuple_heirarchy = {(vertex_label, tensor_index): values
+                           for vertex_label, tensor_index in vertex_samples_multi.items()
+                           for tensor_index, values in tensor_index.items()}
+
+    return tuple_heirarchy
 
 
 def _add_sample_to_dict(sample_value: Any, vertex_samples_multi: dict, vertex_label: str,
