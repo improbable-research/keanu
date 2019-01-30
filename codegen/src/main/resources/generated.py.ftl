@@ -44,9 +44,9 @@ def cast_to_vertex(input: vertex_constructor_param_types) -> Vertex:
 <#list imports as import>
 java_import(context.jvm_view(), "${import.packageName}")
 </#list>
-<#list constructors as javaConstructor>
+<#list constructors as constructor>
 
 
-def ${javaConstructor.pythonClass}(${javaConstructor.pythonTypedParameters}) -> Vertex:
-    ${javaConstructor.docString}return ${javaConstructor.pythonVertexClass}(context.jvm_view().${javaConstructor.javaClass}, ${javaConstructor.pythonParameters})
+def ${constructor.pythonClass}(${constructor.pythonTypedParameters}) -> Vertex:
+    ${constructor.docString}return ${constructor.pythonVertexClass}(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters})
 </#list>
