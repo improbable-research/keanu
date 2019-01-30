@@ -25,8 +25,8 @@ page_nav:
 
 ## Saving and Loading models
 
-Keanu supports the ability to save models to JSON, Dot and Protobuf formats for long term storage or transmission across
-a network.  It also supports instantiating a network from a saved Protobuf & JSON format model.
+Keanu supports the ability to save models to JSON, Dot and Protobuf formats for long term storage, transmission across
+a network or for visualisation purposes.  It also supports instantiating a network from a saved Protobuf & JSON format model.
 
 Models can also be saved with their associated data and observations, allowing a user to save a pre-trained/optimised
 model ready for future analysis.
@@ -39,7 +39,7 @@ JSON should be used where a user wants to be able to manually view/search/edit t
 Dot is useful when a user wishes to use existing graph visualization tooling to inspect the underlying graph of the
 model.
 
-### Saving Examples
+### Java Saving Examples
 
 To save a model, a user simply has to create a NetworkSaver object and call the .save() method, passing in an OutputStream
 and indicating whether they wish to save the current state of the model or to strip out all value information.  For
@@ -65,7 +65,7 @@ This operation is similarly simple:
 {% snippet SavePartialToDot %}
 ```
 
-### Loading Examples
+### Java Loading Examples
 
 Loading a network is once again simple with a user creating an instance of a NetworkLoader object and calling the .load()
 method.  This method will create a new BayesianNetwork object containing all the specified vertices and will replay the values if present
@@ -77,4 +77,14 @@ in the stored model.  This can be achieved in a few lines of code as below:
 
 ```java
 {% snippet LoadFromJSON %}
+```
+
+### Python Save Examples
+
+Saving a model in Python is also reasonabl easy requiring you construct your saver and pass it a fully qualified
+file name and the network to save (along with an optional metadata map).  An example for each of the savers is given
+below:
+
+```python
+{% snippet PythonSaveSnippet %}
 ```
