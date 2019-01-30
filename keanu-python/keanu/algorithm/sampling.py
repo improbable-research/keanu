@@ -113,9 +113,8 @@ def sample(net: BayesNet,
 
     vertex_samples: sample_types = {
         Vertex._get_python_label(vertex_unwrapped): list(
-            map(Tensor._to_ndarray,
-                network_samples.get(vertex_unwrapped).asList(),
-                itertools.repeat(True, len(network_samples.get(vertex_unwrapped).asList()))))
+            map(lambda samples : Tensor._to_ndarray(samples, True),
+                network_samples.get(vertex_unwrapped).asList()))
         for vertex_unwrapped in vertices_unwrapped
     }
 
