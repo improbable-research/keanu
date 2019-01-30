@@ -5,6 +5,10 @@ import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
+/**
+ * Implements a Geometric Random Distribution.  More details can be found at:
+ * https://en.wikipedia.org/wiki/Geometric_distribution
+ */
 public class Geometric implements DiscreteDistribution {
 
     private final DoubleTensor p;
