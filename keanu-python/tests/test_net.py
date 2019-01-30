@@ -107,7 +107,8 @@ def test_can_save_and_load(tmpdir) -> None:
 def test_get_vertex_by_label() -> None:
     vertex = Gamma(1., 1., label="gamma")
     net = BayesNet([vertex])
-    retrieved_vertex = cast(Vertex, net.get_vertex_by_label("gamma"))
+    retrieved_vertex = net.get_vertex_by_label("gamma")
+    assert retrieved_vertex is not None
     assert retrieved_vertex.get_id() == vertex.get_id()
 
 
