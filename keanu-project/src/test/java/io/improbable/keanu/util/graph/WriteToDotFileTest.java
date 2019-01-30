@@ -40,9 +40,6 @@ public class WriteToDotFileTest {
     private static final String COMPLEX_OUTPUT_FILENAME = resourcesFolder + "/ComplexNetDotOutput.dot";
     private static final String VERTEX_DEGREE1__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree1Output.dot";
     private static final String VERTEX_DEGREE2__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree2Output.dot";
-    private static final String OUTPUT_WITH_VALUES_FILENAME = resourcesFolder + "/OutputValuesSetToTrueOutput.dot";
-    private static final String OUTPUT_WITH_METADATA_FILENAME = resourcesFolder + "/OutputWithMetadata.dot";
-    private static final String OUTPUT_WITH_COLOR_DECORATION_FILENAME = resourcesFolder + "/OutputWithColor.dot";
 
     private static Vertex complexResultVertex;
     private static ByteArrayOutputStream outputWriter;
@@ -81,7 +78,6 @@ public class WriteToDotFileTest {
     @Test
     public void simpleOutput() throws IOException {
         VertexGraph graph = new VertexGraph(complexResultVertex);
-        graph.labelEdgesWithParameters().colorVerticesByType();
         GraphToDot.write(graph, outputWriter);
         System.out.println(outputWriter.toString());
     }
@@ -89,7 +85,7 @@ public class WriteToDotFileTest {
     @Test
     public void valueOutput() throws IOException {
         VertexGraph graph = new VertexGraph(complexResultVertex);
-        graph.labelEdgesWithParameters().colorVerticesByType().labelEdgesWithParameters();
+        graph.labelEdgesWithParameters().colorVerticesByType();
         GraphToDot.write(graph, outputWriter);
         System.out.println(outputWriter.toString());
     }

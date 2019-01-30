@@ -28,6 +28,7 @@ public abstract class GraphToDot {
     }
 
     public static void write(AbstractGraph<? extends GraphNode, ? extends GraphEdge> graph, Writer outputWriter) throws IOException {
+        graph.prepareForExport();
         outputWriter.write(DOT_HEADER);
         for (Map.Entry<String, String> e : graph.getMetaData().entrySet()) {
             outputWriter.write(DOT_COMMENT_APPENDIX);

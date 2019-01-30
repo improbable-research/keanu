@@ -1,7 +1,7 @@
 digraph BayesianNetwork {
-    3 [label="ConstantIntegerVertex"]
-    4 [label="ConstantIntegerVertex"]
-    5 [label="*"]
-    4 -> 5
-    3 -> 5
+    3 [color="#00FF00"] [label="ConstantIntegerVertex"]
+    4 [color="#00FF00"] [label="2"]
+    5 [color="#00FF00"] [label="*"]
+    4 -> 5 [color="#00FF00"] [label="right"]
+    3 -> 5 [color="#00FF00"] [label="left"]
 }

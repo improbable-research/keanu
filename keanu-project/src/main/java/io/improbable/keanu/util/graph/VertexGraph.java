@@ -3,12 +3,9 @@ package io.improbable.keanu.util.graph;
 import io.improbable.keanu.annotation.DisplayInformationForOutput;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.*;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.awt.*;
@@ -22,6 +19,7 @@ This class implements AbstractGraph that can be generated from a BayesianNetwork
  */
 public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
+    private static final Color CONSTANT_COLOR = Color.BLACK;
     private static final Color PROBABILISTIC_COLOR = Color.PINK;
     private static final Color OBSERVED_COLOR = Color.BLUE;
     private static final Color DETERMINISTIC_COLOR = Color.CYAN;
@@ -32,6 +30,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     private static final Color INTEGER_COLOR = Color.green;
     private static final Color BOOLEAN_COLOR = Color.blue;
     private static final Color OTHER_COLOR = Color.darkGray;
+    private boolean formattingApplied = false;
 
     private Map<Vertex, BasicGraphNode> vertexNodes = new HashMap<>();
     private Map<BasicGraphNode, Vertex> invertedVertexNodes = new HashMap<>();
@@ -62,6 +61,12 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         return String.format("#%06X", (0xFFFFFF & c.getRGB()));
     }
 
+    public void prepareForExport() {
+        if (!formattingApplied) {
+            labelEdgesWithParameters().colorVerticesByType().colorEdgesByParent().labelConstantVerticesWithValue();
+        }
+    }
+
     private void addVertex(Vertex v) {
         if (!vertexNodes.containsKey(v)) {
             BasicGraphNode n = createGraphNodeFor(v);
@@ -77,7 +82,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     private String getBasicNameForVertex(Vertex v) {
-        if ( v.getLabel() != null ){
+        if (v.getLabel() != null) {
             return v.getLabel().getUnqualifiedName();
         }
         DisplayInformationForOutput vertexAnnotation = v.getClass().getAnnotation(DisplayInformationForOutput.class);
@@ -111,8 +116,19 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     public VertexGraph removeIntermediateVertices() {
         removeVerticesPreservingEdges((v) ->
-            !v.isProbabilistic() && !(v instanceof ConstantDoubleVertex) && !v.getChildren().isEmpty());
+            !v.isProbabilistic() && !(v instanceof ConstantVertex) && !v.getChildren().isEmpty());
         return this;
+    }
+
+    public VertexGraph removeNamespace(String namespace) {
+        removeVerticesPreservingEdges((v) -> vertexInNamespace(v,namespace));
+        return this;
+    }
+
+    private boolean vertexInNamespace(Vertex v,String namespace) {
+        VertexLabel label = v.getLabel();
+        if ( label == null ) return true;
+        return label.isInNamespace( namespace );
     }
 
     public void removeVerticesPreservingEdges(Predicate<Vertex> f) {
@@ -137,14 +153,35 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     public VertexGraph colorVerticesByState() {
+        formattingApplied = true;
         setVertexMetadata(COLOR_FIELD, this::convertStateToColor);
         return this;
     }
 
-
     public VertexGraph colorVerticesByType() {
+        formattingApplied = true;
         setVertexMetadata(COLOR_FIELD, this::convertTypeToColor);
         return this;
+    }
+
+    public VertexGraph colorEdgesByParent() {
+        formattingApplied = true;
+        setEdgeMetadata(COLOR_FIELD, (e) -> e.getSource().details.getOrDefault(COLOR_FIELD, null));
+        return this;
+    }
+
+
+    public VertexGraph colorVerticiesByNamespace() {
+        formattingApplied = true;
+        ColorSequence<String> seq = new ColorSequence<>();
+        setVertexMetadata(COLOR_FIELD, (v) -> formatColorForDot(seq.getOrChoseColor(getVertexNamespace(v))));
+        return this;
+    }
+
+    private String getVertexNamespace(Vertex v) {
+        VertexLabel label = v.getLabel();
+        if (label == null) return null;
+        return label.getOuterNamespace().orElse("none");
     }
 
     private String convertStateToColor(Vertex v) {
@@ -153,6 +190,8 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
             c = OBSERVED_COLOR;
         } else if (v instanceof Probabilistic) {
             c = PROBABILISTIC_COLOR;
+        } else if (v instanceof ConstantVertex) {
+            c = CONSTANT_COLOR;
         } else {
             c = DETERMINISTIC_COLOR;
         }
@@ -174,11 +213,19 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     public VertexGraph labelVerticesWithValue() {
+        formattingApplied = true;
         setVertexMetadata(LABEL_FIELD, this::convertValueToString);
         return this;
     }
 
+    public VertexGraph labelConstantVerticesWithValue() {
+        formattingApplied = true;
+        setVertexMetadata(LABEL_FIELD, this::convertConstantValueToString);
+        return this;
+    }
+
     public VertexGraph labelEdgesWithParameters() {
+        formattingApplied = true;
         setEdgeMetadata(LABEL_FIELD, this::readEdgeName);
         return this;
     }
@@ -191,6 +238,12 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         } else {
             return obj.toString();
         }
+    }
+
+
+    private String convertConstantValueToString(Vertex vertex) {
+        if ( ! (vertex instanceof ConstantVertex) ) return null;
+        return convertValueToString(vertex);
     }
 
     private String readEdgeName(BasicGraphEdge edge) {
@@ -218,6 +271,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     public void setVertexMetadata(String field, Function<Vertex, String> f) {
+        formattingApplied = true;
         for (Map.Entry<Vertex, BasicGraphNode> e : vertexNodes.entrySet()) {
             String v = f.apply(e.getKey());
             if (v != null) e.getValue().details.put(field, v);
@@ -225,6 +279,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     public void setEdgeMetadata(String field, Function<BasicGraphEdge, String> f) {
+        formattingApplied = true;
         for (BasicGraphEdge e : edges) {
             String v = f.apply(e);
             if (v != null) e.details.put(field, v);

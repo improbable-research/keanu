@@ -14,6 +14,10 @@ public abstract class AbstractGraph<N extends GraphNode, E extends GraphEdge<N>>
 
     public abstract Collection<N> getNodes();
 
+    public void prepareForExport(){
+
+    }
+
     public Collection<E> getEdges() {
         return edges;
     }

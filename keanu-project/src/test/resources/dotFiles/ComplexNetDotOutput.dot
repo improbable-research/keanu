@@ -1,67 +1,67 @@
 digraph BayesianNetwork {
-    0 [label="ConstantDoubleVertex"]
-    1 [label="BernoulliVertex"]
-    2 [label="NotVertex"]
-    3 [label="ConstantDoubleVertex"]
-    4 [label="ConstantDoubleVertex"]
-    5 [label="DoubleIfVertex"]
-    6 [label="ConstantDoubleVertex"]
-    7 [label="BernoulliVertex"]
-    8 [label="NotVertex"]
-    9 [label="ConstantIntegerVertex"]
-    10 [label="ConstantIntegerVertex"]
-    11 [label="IntegerIfVertex"]
-    12 [label="CastToDoubleVertex"]
-    13 [label="ConstantDoubleVertex"]
-    14 [label="ConstantDoubleVertex"]
-    15 [label="GammaVertex"]
-    16 [label="ConstantDoubleVertex"]
-    17 [label="GaussianVertex"]
-    18 [label="+"]
-    19 [label="ConstantDoubleVertex"]
-    20 [label="GaussianVertex"]
-    21 [label="+"]
-    22 [label="ConstantDoubleVertex"]
-    23 [label="GaussianVertex"]
-    24 [label="+"]
-    25 [label="ConstantDoubleVertex"]
-    26 [label="+"]
-    27 [label="ConstantDoubleVertex"]
-    28 [label="ConstantDoubleVertex"]
-    29 [label="*"]
-    30 [label="+"]
-    31 [label="GaussianVertex"]
-    12 -> 29
-    20 -> 21
-    18 -> 21
-    25 -> 26
-    23 -> 24
-    28 -> 29
-    10 -> 11
-    22 -> 23
-    4 -> 5
-    15 -> 18
-    7 -> 8
-    3 -> 5
-    14 -> 15
-    9 -> 11
-    24 -> 26
-    6 -> 7
-    30 -> 31
-    5 -> 23
-    2 -> 5
-    21 -> 24
-    16 -> 17
-    11 -> 12
-    13 -> 15
-    29 -> 30
-    1 -> 2
-    5 -> 17
-    8 -> 11
-    27 -> 30
-    17 -> 18
-    19 -> 20
-    0 -> 1
-    26 -> 31
-    5 -> 20
+    0 [color="#FF0000"] [label="0.5"]
+    1 [color="#0000FF"] [label="BernoulliVertex"]
+    2 [color="#0000FF"] [label="NotVertex"]
+    3 [color="#FF0000"] [label="5.0"]
+    4 [color="#FF0000"] [label="1.0"]
+    5 [color="#FF0000"] [label="DoubleIfVertex"]
+    6 [color="#FF0000"] [label="0.4"]
+    7 [color="#0000FF"] [label="BernoulliVertex"]
+    8 [color="#0000FF"] [label="NotVertex"]
+    9 [color="#00FF00"] [label="5"]
+    10 [color="#00FF00"] [label="2"]
+    11 [color="#00FF00"] [label="IntegerIfVertex"]
+    12 [color="#FF0000"] [label="CastToDoubleVertex"]
+    13 [color="#FF0000"] [label="0.1"]
+    14 [color="#FF0000"] [label="0.5"]
+    15 [color="#FF0000"] [label="GammaVertex"]
+    16 [color="#FF0000"] [label="0.0"]
+    17 [color="#FF0000"] [label="GaussianVertex"]
+    18 [color="#FF0000"] [label="+"]
+    19 [color="#FF0000"] [label="1.0"]
+    20 [color="#FF0000"] [label="GaussianVertex"]
+    21 [color="#FF0000"] [label="+"]
+    22 [color="#FF0000"] [label="3.0"]
+    23 [color="#FF0000"] [label="GaussianVertex"]
+    24 [color="#FF0000"] [label="+"]
+    25 [color="#FF0000"] [label="5.0"]
+    26 [color="#FF0000"] [label="+"]
+    27 [color="#FF0000"] [label="0.2"]
+    28 [color="#FF0000"] [label="1.2"]
+    29 [color="#FF0000"] [label="*"]
+    30 [color="#FF0000"] [label="+"]
+    31 [color="#FF0000"] [label="GaussianVertex"]
+    2 -> 5 [color="#0000FF"] [label="predicate"]
+    23 -> 24 [color="#FF0000"] [label="right"]
+    0 -> 1 [color="#FF0000"] [label="probTrue"]
+    28 -> 29 [color="#FF0000"] [label="left"]
+    19 -> 20 [color="#FF0000"] [label="mu"]
+    1 -> 2 [color="#0000FF"] [label="inputVertex"]
+    21 -> 24 [color="#FF0000"] [label="left"]
+    5 -> 20 [color="#FF0000"] [label="sigma"]
+    30 -> 31 [color="#FF0000"] [label="sigma"]
+    12 -> 29 [color="#FF0000"] [label="right"]
+    26 -> 31 [color="#FF0000"] [label="mu"]
+    20 -> 21 [color="#FF0000"] [label="right"]
+    15 -> 18 [color="#FF0000"] [label="left"]
+    7 -> 8 [color="#0000FF"] [label="inputVertex"]
+    5 -> 23 [color="#FF0000"] [label="sigma"]
+    27 -> 30 [color="#FF0000"] [label="left"]
+    14 -> 15 [color="#FF0000"] [label="k"]
+    17 -> 18 [color="#FF0000"] [label="right"]
+    4 -> 5 [color="#FF0000"] [label="else"]
+    18 -> 21 [color="#FF0000"] [label="left"]
+    11 -> 12 [color="#00FF00"] [label="inputVertex"]
+    9 -> 11 [color="#00FF00"] [label="then"]
+    5 -> 17 [color="#FF0000"] [label="sigma"]
+    25 -> 26 [color="#FF0000"] [label="right"]
+    10 -> 11 [color="#00FF00"] [label="else"]
+    3 -> 5 [color="#FF0000"] [label="then"]
+    22 -> 23 [color="#FF0000"] [label="mu"]
+    24 -> 26 [color="#FF0000"] [label="left"]
+    13 -> 15 [color="#FF0000"] [label="theta"]
+    29 -> 30 [color="#FF0000"] [label="right"]
+    6 -> 7 [color="#FF0000"] [label="probTrue"]
+    8 -> 11 [color="#0000FF"] [label="predicate"]
+    16 -> 17 [color="#FF0000"] [label="mu"]
 }
