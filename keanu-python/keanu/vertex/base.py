@@ -68,7 +68,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     See https://docs.scipy.org/doc/numpy-1.13.0/neps/ufunc-overrides.html
     """
 
-    def __array_ufunc__(self, ufunc: np.ufunc, method: str, input0: numpy_types, input1: 'Vertex') -> 'Vertex':
+    def __array_ufunc__(self, ufunc: np.ufunc, method: str, input0: numpy_types, _: 'Vertex') -> 'Vertex':
         methods = {
             "equal": Vertex.__eq__,
             "not_equal": Vertex.__ne__,
@@ -86,7 +86,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         if method == "__call__":
             try:
                 dispatch_method = methods[ufunc.__name__]
-                result = dispatch_method(input1, input0)
+                result = dispatch_method(self, input0)
                 return result
             except KeyError:
                 raise NotImplementedError("NumPy ufunc of type %s not implemented" % ufunc.__name__)
@@ -211,7 +211,7 @@ class Integer(Vertex):
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return cast_tensor_arg_to_integer(v)
 
-    def __array_ufunc__(self, ufunc: np.ufunc, method: str, input0: numpy_types, input1: 'Vertex') -> 'Vertex':
+    def __array_ufunc__(self, ufunc: np.ufunc, method: str, input0: numpy_types, _: 'Vertex') -> 'Vertex':
         methods = {
             "add": Integer.__radd__,
             "subtract": Integer.__rsub__,
@@ -223,10 +223,10 @@ class Integer(Vertex):
         if method == "__call__":
             try:
                 dispatch_method = methods[ufunc.__name__]
-                result = dispatch_method(input1, input0)  # type: ignore # Does not accept Vertex as an Integer
+                result = dispatch_method(self, input0)
                 return result
             except KeyError:
-                return super().__array_ufunc__(ufunc, method, input0, input1)
+                return super().__array_ufunc__(ufunc, method, input0, _)
         else:
             raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
 
