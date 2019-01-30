@@ -43,6 +43,13 @@ public class GeometricVertexTest {
     }
 
     @Test
+    public void lobProbIsNegativeInfinityOutsideSupport() {
+        GeometricVertex myVertex = new GeometricVertex(0.5);
+        double logProb = myVertex.logPmf(0);
+        assertEquals(Double.NEGATIVE_INFINITY, logProb, 1e-10);
+    }
+
+    @Test
     public void meanAndStandardDeviationMatchExpected() {
         double p = 0.1;
 

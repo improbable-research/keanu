@@ -43,13 +43,13 @@ public class Geometric implements DiscreteDistribution {
         DoubleTensor oneMinusP = p.unaryMinus().plusInPlace(1.0);
         DoubleTensor results = xAsDouble.minusInPlace(1.0).timesInPlace(oneMinusP.logInPlace()).plusInPlace(p.log());
 
-        return setProbToZeroForInvalidX(xAsDouble, results);
+        return setProbToZeroForInvalidX(x, results);
     }
 
-    private DoubleTensor setProbToZeroForInvalidX(DoubleTensor x, DoubleTensor results) {
-        DoubleTensor invalidX = results.getGreaterThanOrEqualToMask(DoubleTensor.create(1.0, x.getShape()));
+    private DoubleTensor setProbToZeroForInvalidX(IntegerTensor x, DoubleTensor results) {
+        IntegerTensor invalidX = x.getLessThanMask(IntegerTensor.create(1, x.getShape()));
 
-        return results.setWithMaskInPlace(invalidX, Double.NEGATIVE_INFINITY);
+        return results.setWithMaskInPlace(invalidX.toDouble(), Double.NEGATIVE_INFINITY);
     }
 
     private boolean checkParameterIsValid() {
