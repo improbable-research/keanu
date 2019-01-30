@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 
 @Slf4j
 public class DotSaverTest {
-
+/*
     private static Vertex complexResultVertex;
     private static DotSaver complexNetDotSaver;
     private static ByteArrayOutputStream outputWriter;
@@ -183,4 +183,5 @@ public class DotSaverTest {
         String fileAsString = Resources.toString(url, Charsets.UTF_8);
         return fileAsString;
     }
+    */
 }
