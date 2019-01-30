@@ -66,11 +66,11 @@ public class VertexProcessor {
 
             JavaVertexToPythonConverter javaVertexToPythonConverter = new JavaVertexToPythonConverter(constructor, reflections, nameToDocStringMap);
             VertexConstructor pythonConstructor = new VertexConstructor(
-                javaVertexToPythonConverter.getJavaClassName(),
-                javaVertexToPythonConverter.getClassName(),
-                javaVertexToPythonConverter.getChildClassName(),
-                javaVertexToPythonConverter.getTypedParams(),
-                javaVertexToPythonConverter.getCastedParams(),
+                javaVertexToPythonConverter.getJavaClass(),
+                javaVertexToPythonConverter.getPythonClass(),
+                javaVertexToPythonConverter.getPythonVertexClass(),
+                javaVertexToPythonConverter.getPythonTypedParameters(),
+                javaVertexToPythonConverter.getPythonParameters(),
                 javaVertexToPythonConverter.getDocString()
             );
 

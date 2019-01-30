@@ -22,16 +22,8 @@ import java.util.Map;
 
 /**
  * Apache FreeMarker Format:
- * def {ClassName}({TypedParams}) -> Vertex:
- *      return {ChildClassName}({CastedParams})
- *
- * e.g.
- * Java method signature:
- * public GaussianVertex(DoubleVertex mu, DoubleVertex sigma)
- *
- * Python:
- * def Gaussian(mu: vertex_constructor_param_types, sigma: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
- *     return Double(context.jvm_view().GaussianVertex, label, cast_to_double_vertex(mu), cast_to_double_vertex(sigma))
+ * def ${constructor.pythonClass}(${constructor.pythonTypedParameters}) -> Vertex:
+ *      ${constructor.docString}return ${constructor.pythonVertexClass}(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters})
  */
 class JavaVertexToPythonConverter {
 
@@ -66,15 +58,15 @@ class JavaVertexToPythonConverter {
         return listOfPythonVertexParams;
     }
 
-    String getJavaClassName() {
+    String getJavaClass() {
         return javaConstructor.getDeclaringClass().getSimpleName();
     }
 
-    String getClassName() {
+    String getPythonClass() {
         return javaConstructor.getDeclaringClass().getSimpleName().replaceAll("Vertex$", "");
     }
 
-    String getChildClassName() {
+    String getPythonVertexClass() {
         Class<?> javaClass = javaConstructor.getDeclaringClass();
         if (DoubleVertex.class.isAssignableFrom(javaClass)) {
             return "Double";
@@ -87,7 +79,7 @@ class JavaVertexToPythonConverter {
         }
     }
 
-    String getTypedParams() {
+    String getPythonTypedParameters() {
         List<String> pythonParams = new ArrayList<>();
 
         for (PythonParam param : allParams) {
@@ -130,7 +122,7 @@ class JavaVertexToPythonConverter {
         }
     }
 
-    String getCastedParams() {
+    String getPythonParameters() {
         List<String> pythonParams = new ArrayList<>();
 
         for (PythonParam extraParam : EXTRA_PARAMS) {
