@@ -1,11 +1,11 @@
 package io.improbable.keanu.distributions.discrete;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

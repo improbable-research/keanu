@@ -1,13 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.CauchyDistribution;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,7 +41,7 @@ public class CauchyVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfScalar() {
+    public void logProbMatchesKnownLogDensityOfScalar() {
 
         CauchyDistribution distribution = new CauchyDistribution(0.0, 1.0);
         CauchyVertex tensorCauchyVertex = new CauchyVertex(0, 1);
@@ -47,12 +50,44 @@ public class CauchyVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfVector() {
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        DoubleVertex location = ConstantVertex.of(0.);
+        DoubleVertex scale = ConstantVertex.of(1.);
+        CauchyVertex vertex = new CauchyVertex(location, scale);
+        LogProbGraph logProbGraph = vertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.scalar(0.5));
+
+        CauchyDistribution distribution = new CauchyDistribution(0., 1.);
+        double expectedDensity = distribution.logDensity(0.5);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfVector() {
 
         CauchyDistribution distribution = new CauchyDistribution(0.0, 1.0);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(-0.75);
         CauchyVertex tensorCauchyVertex = new CauchyVertex(0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorCauchyVertex, new double[]{0.25, -0.75}, expectedLogDensity);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownDensityOfVector() {
+        DoubleVertex location = ConstantVertex.of(0., 0.);
+        DoubleVertex scale = ConstantVertex.of(1., 1.);
+        CauchyVertex vertex = new CauchyVertex(location, scale);
+        LogProbGraph logProbGraph = vertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, vertex, DoubleTensor.create(0.25, -0.75));
+
+        CauchyDistribution distribution = new CauchyDistribution(0., 1.);
+        double expectedDensity = distribution.logDensity(0.25) + distribution.logDensity(-0.75);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Test
