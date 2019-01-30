@@ -126,3 +126,14 @@ json_saver.save(JSON_FILE_NAME, True, metadata)
 dot_saver = DotSaver(net)
 dot_saver.save(DOT_FILE_NAME, True, metadata)
 ```
+
+### Python Load Example
+
+Once again, networks can be loaded using Python API via the JSON or Protobuf Loader objects.  Example below:
+
+```python
+protobuf_loader = ProtobufLoader()
+new_net_from_proto = protobuf_loader.load(PROTO_FILE_NAME)
+json_loader = JsonLoader()
+new_net_from_json = json_loader.load(JSON_FILE_NAME)
+```

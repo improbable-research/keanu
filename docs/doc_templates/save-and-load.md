@@ -88,3 +88,11 @@ below:
 ```python
 {% snippet PythonSaveSnippet %}
 ```
+
+### Python Load Example
+
+Once again, networks can be loaded using Python API via the JSON or Protobuf Loader objects.  Example below:
+
+```python
+{% snippet PythonLoadSnippet %}
+```
