@@ -111,20 +111,24 @@ def sample(net: BayesNet,
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
-    vertex_samples: sample_types = {
-        Vertex._get_python_label(vertex_unwrapped): list(
-            map(lambda samples : Tensor._to_ndarray(samples, True),
-                network_samples.get(vertex_unwrapped).asList()))
-        for vertex_unwrapped in vertices_unwrapped
-    }
+    vertex_samples = {}
+
+    for vertex_unwrapped in vertices_unwrapped:
+        vertex_label = Vertex._get_python_label(vertex_unwrapped)
+        samples_for_vertex = network_samples.get(vertex_unwrapped).asList()
+        is_primitive = [True] * len(samples_for_vertex)
+        samples_as_ndarray = map(Tensor._to_ndarray,
+                                 samples_for_vertex,
+                                 is_primitive)
+        vertex_samples[vertex_label] = list(samples_as_ndarray)
 
     if plot:
         traceplot(vertex_samples, ax=ax)
 
-    if _all_vertices_are_scalar(sample_from):
+    if __all_vertices_are_scalar(sample_from):
         return vertex_samples
     else:
-        return _create_multi_indexed_samples(vertex_samples, False)
+        return __create_multi_indexed_samples(vertex_samples, False)
 
 
 def generate_samples(net: BayesNet,
@@ -150,7 +154,7 @@ def generate_samples(net: BayesNet,
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
 
-    all_are_scalar = _all_vertices_are_scalar(sample_from)
+    all_are_scalar = __all_vertices_are_scalar(sample_from)
 
     return _samples_generator(
         sample_iterator,
@@ -159,13 +163,6 @@ def generate_samples(net: BayesNet,
         refresh_every=refresh_every,
         ax=ax,
         all_scalar=all_are_scalar)
-
-
-def _all_vertices_are_scalar(sample_from: Iterable[Vertex]) -> bool:
-    for vertex in sample_from:
-        if vertex.get_value().shape != ():
-            return False
-    return True
 
 
 def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList, live_plot: bool, refresh_every: int,
@@ -193,29 +190,41 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
         if all_scalar:
             yield sample
         else:
-            yield _create_multi_indexed_samples(sample, True)
+            yield __create_multi_indexed_samples(sample, True)
 
 
-def _create_multi_indexed_samples(samples: dict, generated: bool) -> dict:
+def __all_vertices_are_scalar(sample_from: Iterable[Vertex]) -> bool:
+    for vertex in sample_from:
+        if vertex.get_value().shape != ():
+            return False
+    return True
+
+
+def __create_multi_indexed_samples(samples: Dict, generated: bool) -> dict:
+    """
+    >>> __create_multi_indexed_samples({"a": [1], "b": [2]}, False)
+    {('a', '(0)'): [1], ('b', '(0)'): [2]}
+    """
     vertex_samples_multi: dict = {}
+    tuple_hierarchy = {}
     column_header_for_scalar = '(0)'
     for vertex_label in samples:
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        if not generated:
-            for sample_value in samples[vertex_label]:
-                _add_sample_to_dict(sample_value, vertex_samples_multi, vertex_label, column_header_for_scalar)
+        if generated:
+            __add_sample_to_dict(samples[vertex_label], vertex_samples_multi, vertex_label, column_header_for_scalar)
         else:
-            _add_sample_to_dict(samples[vertex_label], vertex_samples_multi, vertex_label, column_header_for_scalar)
+            for sample_value in samples[vertex_label]:
+                __add_sample_to_dict(sample_value, vertex_samples_multi, vertex_label, column_header_for_scalar)
 
-        tuple_heirarchy = {(vertex_label, tensor_index): values
+        tuple_hierarchy = {(vertex_label, tensor_index): values
                            for vertex_label, tensor_index in vertex_samples_multi.items()
                            for tensor_index, values in tensor_index.items()}
 
-    return tuple_heirarchy
+    return tuple_hierarchy
 
 
-def _add_sample_to_dict(sample_value: Any, vertex_samples_multi: dict, vertex_label: str,
-                        column_header_for_scalar: str):
+def __add_sample_to_dict(sample_value: Any, vertex_samples_multi: Dict, vertex_label: str,
+                         column_header_for_scalar: str):
     if type(sample_value) is not ndarray:
         vertex_samples_multi[vertex_label][column_header_for_scalar].append(sample_value)
     elif sample_value.shape == ():
