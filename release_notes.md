@@ -1,5 +1,7 @@
 ### Version 0.0.19 ###
 
+* Added Adam optimizer
+* GradientOptimizer and NonGradientOptimizer now takes an algorithm argument that by default will use Conjugate Gradient and BOBYQA respectively.
 * Reorganised the factory methods for building `PosteriorSamplingAlgorithm` objects. The following are available and give you access to either a default implementation or, when you need more control over the configuration, a Builder object:
   * `Keanu.Sampling.MetropolisHastings`
   * `Keanu.Sampling.NUTS`
