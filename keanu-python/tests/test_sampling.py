@@ -1,5 +1,5 @@
 from itertools import islice
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -40,10 +40,9 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(
         algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
-    samples = sample(net=net, sample_from=sample_from, sampling_algorithm=algo(net), draws=draws)
+    samples = sample(net=net, sample_from=sample_from, sampling_algorithm=algo(net), draws=draws, plot=True)
     assert len(samples) == len(sample_from)
     assert type(samples) == dict
-
     __assert_valid_samples(draws, samples)
 
 
@@ -56,7 +55,6 @@ def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sa
     sample_from = list(tensor_net.get_latent_vertices())
     samples = sample(net=tensor_net, sample_from=sample_from, sampling_algorithm=algo(tensor_net), draws=draws)
     assert type(samples) == dict
-
     __assert_valid_samples(draws, samples)
 
 
@@ -200,6 +198,7 @@ def test_can_iter_through_tensor_samples(algo: Callable[[BayesNet], PosteriorSam
             for i in (0, 1):
                 for j in (0, 1):
                     assert ((distribution, '({}, {})'.format(i, j)) in sample)
+    plt.show()
     assert count == draws
 
 
@@ -288,7 +287,7 @@ def reorder_subplots(ax: Any) -> None:
         plot[0].set_position(positions[new_position_index])
 
 
-def __assert_valid_samples(draws, samples):
+def __assert_valid_samples(draws: int, samples: Dict) -> None:
     for label, vertex_samples in samples.items():
         assert label in samples
         assert len(vertex_samples) == draws

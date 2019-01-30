@@ -32,7 +32,7 @@ def traceplot(trace: sample_types, labels: List[Union[str, Tuple[str, str]]] = N
         ax[index][0].set_title(label)
         ax[index][0].plot(__integer_xaxis(ax[index][0], x0, len(data)), data)
 
-        __pause_for_crude_animation()
+    __pause_for_crude_animation()
 
     return ax
 

@@ -1,12 +1,10 @@
-import matplotlib.pyplot as plt
+from collections import OrderedDict
+
+import pytest
+from numpy.testing import assert_array_equal
 
 from keanu.plots import traceplot
 from keanu.vartypes import sample_types
-from numpy import array
-from numpy.testing import assert_array_equal
-import pytest
-from typing import Any
-from collections import OrderedDict
 
 
 @pytest.fixture
