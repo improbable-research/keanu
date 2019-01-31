@@ -174,6 +174,6 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
         yield sample
 
 
-def __check_if_vertices_are_labelled(vertices: List[Vertex]) -> bool:
+def __check_if_vertices_are_labelled(vertices: List[Vertex]) -> None:
     if any(vertex.get_label() == None for vertex in vertices):
         raise ValueError("Vertices in sample_from must be labelled.")
