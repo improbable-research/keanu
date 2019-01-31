@@ -168,7 +168,7 @@ def test_can_specify_nuts_params(net: BayesNet) -> None:
     samples = sample(net, list(net.get_latent_vertices()), algo, draws=500, drop=100)
 
 
-def test_sample_throws_if_vertices_in_bayes_net_are_missing_labels() -> None:
+def test_sample_throws_if_vertices_in_sample_from_are_missing_labels() -> None:
     sigma = Gamma(1., 1)
     vertex = Gaussian(0., sigma, label="gaussian")
 
@@ -179,7 +179,7 @@ def test_sample_throws_if_vertices_in_bayes_net_are_missing_labels() -> None:
         samples = sample(net=net, sample_from=net.get_latent_vertices())
 
 
-def test_generate_samples_throws_if_vertices_in_bayes_net_are_missing_labels() -> None:
+def test_generate_samples_throws_if_vertices_in_sample_from_are_missing_labels() -> None:
     sigma = Gamma(1., 1)
     vertex = Gaussian(0., sigma, label="gaussian")
 
