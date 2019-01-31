@@ -2,7 +2,6 @@ package io.improbable.keanu.util.io;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -14,6 +13,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.mir.KeanuSavedBayesNet;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -3,7 +3,6 @@ package io.improbable.keanu.util.io;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -24,6 +23,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.Conc
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.mir.KeanuSavedBayesNet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

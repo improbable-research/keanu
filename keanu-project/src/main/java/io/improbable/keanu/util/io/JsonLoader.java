@@ -1,13 +1,13 @@
 package io.improbable.keanu.util.io;
 
 import com.google.protobuf.util.JsonFormat;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.mir.KeanuSavedBayesNet;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;

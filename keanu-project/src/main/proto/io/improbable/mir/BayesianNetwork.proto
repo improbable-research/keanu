@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package keanu;
 
-option java_package = "io.improbable.keanu";
+option java_package = "io.improbable.mir";
 option java_outer_classname = "KeanuSavedBayesNet";
 
 message Model {

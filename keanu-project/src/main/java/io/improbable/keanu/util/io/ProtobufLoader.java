@@ -5,7 +5,6 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.gson.internal.Primitives;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.tensor.Tensor;
@@ -19,6 +18,7 @@ import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.mir.KeanuSavedBayesNet;
 
 import java.io.IOException;
 import java.io.InputStream;

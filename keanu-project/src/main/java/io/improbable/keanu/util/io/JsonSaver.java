@@ -1,7 +1,6 @@
 package io.improbable.keanu.util.io;
 
 import com.google.protobuf.util.JsonFormat;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -12,6 +11,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.mir.KeanuSavedBayesNet;
 
 import java.io.IOException;
 import java.io.OutputStream;
