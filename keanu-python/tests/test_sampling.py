@@ -168,6 +168,28 @@ def test_can_specify_nuts_params(net: BayesNet) -> None:
     samples = sample(net, list(net.get_latent_vertices()), algo, draws=500, drop=100)
 
 
+def test_sample_throws_if_vertices_in_bayes_net_are_missing_labels() -> None:
+    sigma = Gamma(1., 1)
+    vertex = Gaussian(0., sigma, label="gaussian")
+
+    assert sigma.get_label() is None
+
+    net = BayesNet([sigma, vertex])
+    with pytest.raises(ValueError, match="Vertices in sample_from must be labelled."):
+        samples = sample(net=net, sample_from=net.get_latent_vertices())
+
+
+def test_generate_samples_throws_if_vertices_in_bayes_net_are_missing_labels() -> None:
+    sigma = Gamma(1., 1)
+    vertex = Gaussian(0., sigma, label="gaussian")
+
+    assert sigma.get_label() is None
+
+    net = BayesNet([sigma, vertex])
+    with pytest.raises(ValueError, match="Vertices in sample_from must be labelled."):
+        samples = generate_samples(net=net, sample_from=net.get_latent_vertices())
+
+
 def set_starting_state(model: Model) -> None:
     KeanuRandom.set_default_random_seed(1)
     model.temperature.set_value(model.temperature.sample())

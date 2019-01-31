@@ -94,12 +94,14 @@ def sample(net: BayesNet,
            plot: bool = False,
            ax: Any = None) -> sample_types:
 
-    sample_from, sample_from_copy = tee(sample_from)
+    sample_from_copy = list(sample_from)
+
+    __check_if_vertices_are_labelled(sample_from_copy)
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from_copy)
 
-    vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
+    vertices_unwrapped: JavaList = k.to_java_object_list(sample_from_copy)
 
     probabilistic_model = ProbabilisticModel(net) if isinstance(
         sampling_algorithm, MetropolisHastingsSampler) else ProbabilisticModelWithGradient(net)
@@ -128,12 +130,14 @@ def generate_samples(net: BayesNet,
                      refresh_every: int = 100,
                      ax: Any = None) -> sample_generator_types:
 
-    sample_from, sample_from_copy = tee(sample_from)
+    sample_from_copy = list(sample_from)
+
+    __check_if_vertices_are_labelled(sample_from_copy)
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from_copy)
 
-    vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
+    vertices_unwrapped: JavaList = k.to_java_object_list(sample_from_copy)
 
     probabilistic_model = ProbabilisticModel(net) if isinstance(
         sampling_algorithm, MetropolisHastingsSampler) else ProbabilisticModelWithGradient(net)
@@ -141,8 +145,6 @@ def generate_samples(net: BayesNet,
                                                                                     vertices_unwrapped)
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
-
-    print(vertices_unwrapped)
     return _samples_generator(
         sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax)
 
@@ -170,3 +172,8 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
                 traces = []
 
         yield sample
+
+
+def __check_if_vertices_are_labelled(vertices: List[Vertex]) -> bool:
+    if any(vertex.get_label() == None for vertex in vertices):
+        raise ValueError("Vertices in sample_from must be labelled.")
