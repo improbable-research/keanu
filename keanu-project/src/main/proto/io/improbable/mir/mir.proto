@@ -5,6 +5,7 @@ package mir;
 option java_package = "io.improbable.mir";
 option java_outer_classname = "MIR";
 
+import "io/improbable/mir/BayesNet.proto";
 
 message Model {
     string name = 1;
@@ -20,11 +21,6 @@ message ModelProperties {
     CycleMetadata recursion_metadata = 4;
     repeated RecursiveTrace recursive_traces = 5;
     bool dynamic_collections = 7;
-}
-
-message Metadata {
-    string key = 1;
-    string value = 2;
 }
 
 message CycleMetadata {
@@ -59,14 +55,8 @@ message InstructionGroup {
         Graph graph = 2;
         Loop loop = 3;
         Call call = 4;
-        BlackBoxCall black_box_call = 5;
     }
     repeated Metadata metadata = 6;
-}
-
-message Graph {
-    repeated Vertex vertices = 1;
-    repeated StoredValue default_state = 2;
 }
 
 message Loop {
@@ -86,105 +76,12 @@ message Call {
     repeated Placeholder outputs = 4;
 }
 
-message BlackBoxCall {
-    string address = 1;
-    repeated VertexID inputs = 2;
-    repeated Placeholder outputs = 3;
-    repeated PartialDerivativeMatrix partial_derivatives = 4;
-}
-
 message PartialDerivativeMatrix {
     repeated PartialDerivatives output_partial_derivatives = 1;
 }
 
 message PartialDerivatives {
     repeated bool partial_derivatives = 1;
-}
-
-message VertexID {
-    string id = 1;
-}
-
-message Vertex {
-    VertexID id = 1;
-    string label = 2;
-    string vertexType = 3;
-    repeated NamedParam parameters = 5;
-    DataType data_type = 6;
-    repeated Metadata metadata = 7;
-}
-
-message DoubleTensor {
-    repeated int64 shape = 1;
-    repeated double values = 2;
-}
-
-message IntegerTensor {
-    repeated int64 shape = 1;
-    repeated int32 values = 2;
-}
-
-message BooleanTensor {
-    repeated int64 shape = 1;
-    repeated bool values = 2;
-}
-
-message GenericTensor {
-    repeated int64 shape = 1;
-    repeated string values = 2;
-}
-
-message LongArray {
-    repeated int64 values = 1;
-}
-
-message IntArray {
-    repeated int32 values = 1;
-}
-
-message VertexArray {
-    repeated VertexID values = 1;
-}
-
-message NamedParam {
-    string name = 1;
-    oneof param {
-        DoubleTensor double_tensor_param = 2;
-        IntegerTensor int_tensor_param = 3;
-        BooleanTensor bool_tensor_param = 4;
-        VertexID parent_vertex = 5;
-        double double_param = 6;
-        int32 int_param = 7;
-        int64 long_param = 8;
-        string string_param = 9;
-        LongArray long_array_param = 10;
-        VertexArray vertex_array_param = 11;
-        IntArray int_array_param = 12;
-    }
-}
-
-message StoredValue {
-    VertexValue value = 1;
-    string vertex_label = 2;
-    VertexID id = 3;
-}
-
-message VertexValue {
-    oneof valueType {
-        DoubleTensor double_val = 1;
-        IntegerTensor int_val = 2;
-        BooleanTensor bool_val = 3;
-        GenericTensor generic_val = 4;
-    }
-}
-
-enum DataType {
-    DOUBLE = 0;
-    INTEGER = 1;
-    BOOLEAN = 2;
-    DOUBLE_COLLECTION = 3;
-    INTEGER_COLLECTION = 4;
-    BOOLEAN_COLLECTION = 5;
 }
 
 enum IterationType {

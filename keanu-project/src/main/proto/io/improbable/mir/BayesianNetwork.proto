@@ -1,102 +1,17 @@
 syntax = "proto3";
 
-package keanu;
+package mir;
 
 option java_package = "io.improbable.mir";
 option java_outer_classname = "KeanuSavedBayesNet";
 
-message Model {
-    BayesianNetwork network = 1;
-    BayesianNetworkState networkState = 2;
-    Metadata metadata = 3;
+import "io/improbable/mir/BayesNet.proto";
+
+message ProtoModel {
+    Graph graph = 1;
+    ModelMetadata metadata = 2;
 }
 
-message BayesianNetworkState {
-    repeated StoredValue defaultState = 1;
-}
-
-message BayesianNetwork {
-    repeated Vertex vertices = 1;
-}
-
-message VertexID {
-    string id = 1;
-}
-
-message Vertex {
-    VertexID id = 1;
-    string label = 2;
-    string vertexType = 3;
-    repeated NamedParam parameters = 5;
-    repeated int64 shape = 6;
-}
-
-message DoubleTensor {
-    repeated int64 shape = 1;
-    repeated double values = 2;
-}
-
-message IntegerTensor {
-    repeated int64 shape = 1;
-    repeated int32 values = 2;
-}
-
-message BooleanTensor {
-    repeated int64 shape = 1;
-    repeated bool values = 2;
-}
-
-message GenericTensor {
-    repeated int64 shape = 1;
-    repeated string values = 2;
-}
-
-message LongArray {
-    repeated int64 values = 1;
-}
-
-message IntArray {
-    repeated int32 values = 1;
-}
-
-message VertexArray {
-    repeated VertexID values = 1;
-}
-
-message NamedParam {
-    string name = 1;
-    oneof param {
-        DoubleTensor doubleTensorParam = 2;
-        IntegerTensor intTensorParam = 3;
-        BooleanTensor boolTensorParam = 4;
-        VertexID parentVertex = 5;
-        double doubleParam = 6;
-        int32 intParam = 7;
-        int64 longParam = 8;
-        string stringParam = 9;
-        LongArray longArrayParam = 10;
-        VertexArray vertexArrayParam = 11;
-        IntArray intArrayParam = 12;
-        bool boolParam = 13;
-    }
-}
-
-message StoredValue {
-    VertexValue value = 1;
-    string vertexLabel = 2;
-    VertexID id = 3;
-    bool isObserved = 4;
-}
-
-message VertexValue {
-    oneof valueType {
-        DoubleTensor doubleVal = 1;
-        IntegerTensor intVal = 2;
-        BooleanTensor boolVal = 3;
-        GenericTensor genericVal = 4;
-    }
-}
-
-message Metadata {
+message ModelMetadata {
     map<string, string> metadataInfo = 1;
 }
