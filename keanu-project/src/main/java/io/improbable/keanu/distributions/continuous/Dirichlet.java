@@ -1,9 +1,13 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.C;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
@@ -40,6 +44,17 @@ public class Dirichlet implements ContinuousDistribution {
         final double sumLogGammaConcentration = concentration.logGamma().sum();
         final double logGammaSumConcentration = org.apache.commons.math3.special.Gamma.logGamma(concentration.sum());
         return DoubleTensor.scalar(sumConcentrationLogged - sumLogGammaConcentration + logGammaSumConcentration);
+    }
+
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex concentration) {
+        final BooleanVertex xMinusOneIsLessThanOrEqualToEpsilon = x
+            .sum().minus(1.).abs().lessThanOrEqualTo(ConstantVertex.of(EPSILON));
+        xMinusOneIsLessThanOrEqualToEpsilon.assertTrue("Sum of values to calculate Dirichlet likelihood for must equal 1");
+
+        final DoubleVertex sumConcentrationLogged = concentration.minus(1.).times(x.log()).sum();
+        final DoubleVertex sumLogGammaConcentration = concentration.logGamma().sum();
+        final DoubleVertex logGammaSumConcentration = concentration.sum().logGamma();
+        return sumConcentrationLogged.minus(sumLogGammaConcentration).plus(logGammaSumConcentration);
     }
 
     @Override

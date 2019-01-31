@@ -1,12 +1,12 @@
 package io.improbable.snippet;
 
+import io.improbable.keanu.Keanu;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.Hamiltonian;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
+import io.improbable.keanu.algorithms.ProbabilisticModel;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class Inference {
@@ -30,14 +30,14 @@ public class Inference {
         A.setValue(20.0);
         B.setValue(20.0);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
         //%%SNIPPET_END%% InfStartState
 
         //%%SNIPPET_START%% InfMetropolisHastings
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
-            30000
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+            model,
+            model.getLatentVariables(),
+            100000
         );
         //%%SNIPPET_END%% InfMetropolisHastings
 
@@ -49,27 +49,15 @@ public class Inference {
         //%%SNIPPET_END%% InfAverage
     }
 
-    private static void inferenceExample2() {
-        BayesianNetwork bayesNet = null;
-        KeanuRandom random = null;
-
-        //%%SNIPPET_START%% InfHamiltonian
-        NetworkSamples posteriorSamples = Hamiltonian.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
-            2000
-        );
-        //%%SNIPPET_END%% InfHamiltonian
-    }
-
     private static void nutsExample() {
         BayesianNetwork bayesNet = null;
+        ProbabilisticModel model = null;
         KeanuRandom random = null;
 
         //%%SNIPPET_START%% InfNuts
-        NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
+        NetworkSamples posteriorSamples = Keanu.Sampling.NUTS.withDefaultConfig().getPosteriorSamples(
+            model,
+            model.getLatentVariables(),
             2000
         );
         //%%SNIPPET_END%% InfNuts

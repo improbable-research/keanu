@@ -1,0 +1,10 @@
+### Version 0.0.19 ###
+
+* Reversed the ordering of namespace for `VertexLabel` (e.g. from `new VertexLabel("keanu", "improbable", "io")` to `new VertexLabel("io", "improbable", "keanu"))
+* Added better Python operator overloading support.
+  - Includes automatically casting to the correct datatype where possible.
+* Added Geometric Distribution vertex
+* Fixed issue with certain vertices not taking a list properly in Kotlin
+* Added __version__ attribute to Python
+* Added a permute vertex
+* Added the release notes text file to the repo
