@@ -111,7 +111,7 @@ def sample(net: BayesNet,
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
-    if all((vertex.get_value().shape == () for vertex in sample_from)):
+    if __all_scalar(sample_from):
         vertex_samples = __create_single_indexed_samples(network_samples, vertices_unwrapped)
     else:
         vertex_samples = __create_multi_indexed_samples(vertices_unwrapped, network_samples, False)
@@ -145,7 +145,7 @@ def generate_samples(net: BayesNet,
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
 
-    all_are_scalar = all((vertex.get_value().shape == () for vertex in sample_from))
+    all_are_scalar = __all_scalar(sample_from)
 
     return _samples_generator(
         sample_iterator,
@@ -154,6 +154,10 @@ def generate_samples(net: BayesNet,
         refresh_every=refresh_every,
         ax=ax,
         all_scalar=all_are_scalar)
+
+
+def __all_scalar(sample_from):
+    return all((vertex.get_value().shape == () for vertex in sample_from))
 
 
 def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList, live_plot: bool, refresh_every: int,
