@@ -30,9 +30,7 @@ def test_wrapped_can_call_python_api(java_list_wrapper) -> None:
 
 
 def test_throws_if_there_is_no_java_api(java_list_wrapper) -> None:
-    with pytest.raises(
-            AttributeError,
-            match="{} has no attribute missingMethod".format(type(java_list_wrapper))):
+    with pytest.raises(AttributeError, match="{} has no attribute missingMethod".format(type(java_list_wrapper))):
         java_list_wrapper.missingMethod()
 
 
