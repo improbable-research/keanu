@@ -152,7 +152,7 @@ public class HalfCauchyVertexTest {
         latentScale.setAndCascade(DoubleTensor.scalar(0.1));
         latentScaleList.add(latentScale);
 
-        int numSamples = 3000;
+        int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
             hyperParams -> new HalfCauchyVertex(new long[]{numSamples, 1}, hyperParams.get(0)),
             scale,

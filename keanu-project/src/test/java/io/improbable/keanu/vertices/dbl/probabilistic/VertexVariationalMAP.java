@@ -5,6 +5,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class VertexVariationalMAP {
         DoubleVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
 
         // GENERATE FAKE DATA
-        DoubleTensor samples = sourceVertex.eval();
+        DoubleTensor samples = sourceVertex.getValue();
 
         DoubleVertex observedDistribution = vertexUnderTestCreator.apply(latentsToInfer);
         observedDistribution.observe(samples);

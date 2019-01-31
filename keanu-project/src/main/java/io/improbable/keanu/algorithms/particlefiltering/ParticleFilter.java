@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Preconditions;
+
 /***
  * This class allows you to create particle filters to find likely states of a network (i.e. Particles)
  *
@@ -170,4 +172,5 @@ public class ParticleFilter {
 
         return p;
     }
+
 }

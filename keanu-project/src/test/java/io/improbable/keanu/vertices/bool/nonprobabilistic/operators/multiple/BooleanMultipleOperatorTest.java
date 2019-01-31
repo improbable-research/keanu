@@ -18,12 +18,6 @@ public class BooleanMultipleOperatorTest {
     private List<Vertex<BooleanTensor>> allTrue = buildVertexList(15, 15);
     private List<Vertex<BooleanTensor>> allMixed = buildVertexList(18, 10);
     private List<Vertex<BooleanTensor>> allFalse = buildVertexList(15, 0);
-    private KeanuRandom random;
-
-    @Before
-    public void setup() {
-        this.random = new KeanuRandom(1);
-    }
 
     @Test
     public void testMultipleAnd() {
