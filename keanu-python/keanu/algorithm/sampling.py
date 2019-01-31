@@ -1,6 +1,6 @@
 from collections import defaultdict
 from itertools import tee
-from typing import Any, Iterable, Dict, Tuple, Union
+from typing import Any, Iterable, Dict, Tuple, Union, List
 
 from numpy import ndenumerate, ndarray
 from py4j.java_collections import JavaList
@@ -156,7 +156,7 @@ def generate_samples(net: BayesNet,
         all_scalar=all_are_scalar)
 
 
-def __all_scalar(sample_from):
+def __all_scalar(sample_from: List[Vertex]):
     return all((vertex.get_value().shape == () for vertex in sample_from))
 
 
