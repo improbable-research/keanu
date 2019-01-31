@@ -1,5 +1,5 @@
 import logging
-from .case_conversion import _to_camel_case_name, _to_snake_case_name
+from .case_conversion import _to_camel_case_name
 from typing import Callable
 from py4j.java_gateway import JavaObject
 
@@ -15,7 +15,6 @@ class JavaObjectWrapper:
 
     def __getattr__(self, k: str) -> Callable:
         self.__check_if_unwrapped(k)
-        self.__check_if_snake_case(k)
         self.__check_if_wrapped_java_object_has_camel_cased_attr(k)
 
         return self.unwrap().__getattr__(_to_camel_case_name(k))
@@ -27,13 +26,6 @@ class JavaObjectWrapper:
             raise TypeError(
                 "Trying to pass {} to a method that expects a JavaObject - did you forget to call unwrap()?".format(
                     self.__class__))
-
-    def __check_if_snake_case(self, k: str) -> None:
-        snake_case_name = _to_snake_case_name(k)
-        if k != snake_case_name:
-            raise AttributeError(
-                "{} has no attribute {}. Make sure the attribute is in snake case. Did you mean {}?".format(
-                    self.__class__, k, snake_case_name))
 
     def __check_if_wrapped_java_object_has_camel_cased_attr(self, k: str) -> None:
         if not _to_camel_case_name(k) in dir(self.unwrap()):
