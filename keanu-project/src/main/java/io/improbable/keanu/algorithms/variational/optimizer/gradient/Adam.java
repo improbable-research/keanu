@@ -43,20 +43,22 @@ public class Adam implements GradientOptimizationAlgorithm {
         DoubleTensor[] m = getZeros(theta);
         DoubleTensor[] v = getZeros(theta);
 
-        int t = 0;
         boolean converged = false;
 
         final Map<VariableReference, DoubleTensor> thetaMap = new HashMap<>();
         final DoubleTensor[] gradients = new DoubleTensor[theta.length];
 
-        while (!converged && t < maxIterations) {
-            t++;
+        double beta1T = 1;
+        double beta2T = 1;
+
+        for (int t = 1; !converged && t < maxIterations; t++) {
 
             updateGradients(theta, thetaMap, gradients, latentVariables, fitnessFunctionGradient);
 
-            final double beta1T = (1 - Math.pow(beta1, t));
-            final double beta2T = (1 - Math.pow(beta2, t));
-            final double b = beta1T / Math.sqrt(beta2T);
+            beta1T = beta1T * beta1;
+            beta2T = beta2T * beta2;
+
+            final double b = (1 - beta1T) / Math.sqrt(1 - Math.pow(beta2, t));
 
             for (int i = 0; i < theta.length; i++) {
 
@@ -78,14 +80,14 @@ public class Adam implements GradientOptimizationAlgorithm {
         return new OptimizedResult(updateMap(theta, latentVariables, thetaMap), logProb);
     }
 
-    private DoubleTensor[] updateGradients(DoubleTensor[] theta,
-                                           Map<VariableReference, DoubleTensor> thetaMap,
-                                           DoubleTensor[] gradients,
-                                           List<? extends Variable> latentVariables,
-                                           FitnessFunctionGradient fitnessFunctionGradient) {
+    private void updateGradients(DoubleTensor[] theta,
+                                 Map<VariableReference, DoubleTensor> thetaMap,
+                                 DoubleTensor[] gradients,
+                                 List<? extends Variable> latentVariables,
+                                 FitnessFunctionGradient fitnessFunctionGradient) {
         updateMap(theta, latentVariables, thetaMap);
 
-        return updateArray(
+        updateArray(
             fitnessFunctionGradient.getGradientsAt(thetaMap),
             latentVariables,
             gradients

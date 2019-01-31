@@ -126,7 +126,7 @@ public class GradientOptimizer implements Optimizer {
             }
 
             Map<? extends VariableReference, DoubleTensor> initialGradient = fitnessFunctionGradient.getGradientsAt(startingPoint);
-            warnIfGradientIsFlat(initialGradient);
+            throwIfGradientIsFlat(initialGradient);
         }
 
         OptimizedResult result = gradientOptimizationAlgorithm.optimize(
@@ -140,7 +140,7 @@ public class GradientOptimizer implements Optimizer {
         return result;
     }
 
-    private static void warnIfGradientIsFlat(Map<? extends VariableReference, DoubleTensor> gradient) {
+    private static void throwIfGradientIsFlat(Map<? extends VariableReference, DoubleTensor> gradient) {
         double maxGradient = gradient.values().stream()
             .flatMap(v -> Arrays.stream(v.asFlatDoubleArray()).boxed())
             .mapToDouble(v -> v).max().orElseThrow(IllegalArgumentException::new);

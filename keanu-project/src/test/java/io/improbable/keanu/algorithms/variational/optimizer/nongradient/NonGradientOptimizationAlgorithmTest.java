@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SingleGaussianTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SumGaussianTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.testcase.NonGradientOptimizationAlgorithmTestCase;
@@ -34,8 +35,8 @@ public class NonGradientOptimizationAlgorithmTest {
 
     @AllArgsConstructor
     public enum TestCase {
-        SUM_GAUSSIAN_MAP(() -> new SumGaussianTestCase(true)),
-        SUM_GAUSSIAN_MLE(() -> new SumGaussianTestCase(false)),
+        SUM_GAUSSIAN_MAP(() -> new SumGaussianTestCase(ProbabilityFitness.MAP)),
+        SUM_GAUSSIAN_MLE(() -> new SumGaussianTestCase(ProbabilityFitness.MLE)),
         SINGLE_GAUSSIAN(SingleGaussianTestCase::new);
 
         private Supplier<NonGradientOptimizationAlgorithmTestCase> supplier;

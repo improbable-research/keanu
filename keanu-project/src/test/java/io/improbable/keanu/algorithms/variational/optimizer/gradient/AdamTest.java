@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.GradientOptimizationAlgorithmTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SingleGaussianTestCase;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -13,7 +14,7 @@ public class AdamTest {
     @Test
     public void canOptimizeSingleGaussianNetwork() {
 
-        GradientOptimizationAlgorithmTestCase testCase = new SingleGaussianTestCase(false, new long[0]);
+        GradientOptimizationAlgorithmTestCase testCase = new SingleGaussianTestCase(ProbabilityFitness.MAP, new long[0]);
 
         Adam adamOptimizer = Adam.builder()
             .build();
@@ -48,7 +49,7 @@ public class AdamTest {
     @Test
     public void canAddConvergenceChecker() {
 
-        GradientOptimizationAlgorithmTestCase testCase = new SingleGaussianTestCase(false, new long[0]);
+        GradientOptimizationAlgorithmTestCase testCase = new SingleGaussianTestCase(ProbabilityFitness.MAP, new long[0]);
 
         MutableInt i = new MutableInt(0);
         Adam adamOptimizer = Adam.builder()

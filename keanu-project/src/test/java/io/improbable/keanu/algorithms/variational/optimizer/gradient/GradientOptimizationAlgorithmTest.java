@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.ConvergenceChecker;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.GradientOptimizationAlgorithmTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.HimmelblauTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.RosenbrockTestCase;
@@ -45,8 +46,8 @@ public class GradientOptimizationAlgorithmTest {
     @AllArgsConstructor
     public enum TestCase {
         SINGLE_GAUSSIAN(SingleGaussianTestCase::new),
-        SUM_GAUSSIAN_MAP(() -> new SumGaussianTestCase(true)),
-        SUM_GAUSSIAN_MLE(() -> new SumGaussianTestCase(false)),
+        SUM_GAUSSIAN_MAP(() -> new SumGaussianTestCase(ProbabilityFitness.MAP)),
+        SUM_GAUSSIAN_MLE(() -> new SumGaussianTestCase(ProbabilityFitness.MLE)),
         ROSENBROCK_1_100(() -> new RosenbrockTestCase(1, 100)),
         HIMMELBLAU_A(() -> new HimmelblauTestCase(0, 3)),
         HIMMELBLAU_B(() -> new HimmelblauTestCase(-2, -3));
