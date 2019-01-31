@@ -3,7 +3,8 @@ package io.improbable.snippet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkLoader;
 import io.improbable.keanu.network.NetworkSaver;
-import io.improbable.keanu.util.io.DotSaver;
+import io.improbable.keanu.util.graph.VertexGraph;
+import io.improbable.keanu.util.graph.io.GraphToDot;
 import io.improbable.keanu.util.io.JsonLoader;
 import io.improbable.keanu.util.io.JsonSaver;
 import io.improbable.keanu.util.io.ProtobufLoader;
@@ -36,10 +37,9 @@ public class SaveLoadExamples {
 
     //%%SNIPPET_START%% SaveToDot
     public void saveNetToDotFile(BayesianNetwork net,
-                                 OutputStream outputStream,
-                                 boolean saveValuesAndObservations) throws IOException {
-        NetworkSaver saver = new DotSaver(net);
-        saver.save(outputStream, saveValuesAndObservations);
+                                 OutputStream outputStream) throws IOException {
+        VertexGraph graph = new VertexGraph(net);
+        GraphToDot.write(graph, outputStream);
     }
     //%%SNIPPET_END%% SaveToDot
 
