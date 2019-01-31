@@ -4,10 +4,7 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.LogLikelihoodFitnessFunctionGradient;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.LogProbFitnessFunctionGradient;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogLikelihoodFitnessFunction;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogProbFitnessFunction;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.testcase.NonGradientOptimizationAlgorithmTestCase;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
@@ -23,15 +20,15 @@ public class SingleGaussianTestCase implements GradientOptimizationAlgorithmTest
     private final GaussianVertex A;
     private final long[] shape;
 
-    private final boolean useMLE;
+    private final ProbabilityFitness probabilityFitness;
     private final KeanuProbabilisticModelWithGradient model;
 
     public SingleGaussianTestCase() {
-        this(false, new long[]{2});
+        this(ProbabilityFitness.MAP, new long[]{2});
     }
 
-    public SingleGaussianTestCase(boolean useMLE, long[] shape) {
-        this.useMLE = useMLE;
+    public SingleGaussianTestCase(ProbabilityFitness probabilityFitness, long[] shape) {
+        this.probabilityFitness = probabilityFitness;
         this.shape = shape;
 
         A = new GaussianVertex(shape, 10, 0.1);
@@ -63,20 +60,12 @@ public class SingleGaussianTestCase implements GradientOptimizationAlgorithmTest
 
     @Override
     public FitnessFunction getFitnessFunction() {
-        if (useMLE) {
-            return new LogLikelihoodFitnessFunction(model);
-        } else {
-            return new LogProbFitnessFunction(model);
-        }
+        return probabilityFitness.getFitnessFunction(model);
     }
 
     @Override
     public FitnessFunctionGradient getFitnessFunctionGradient() {
-        if (useMLE) {
-            return new LogLikelihoodFitnessFunctionGradient(model);
-        } else {
-            return new LogProbFitnessFunctionGradient(model);
-        }
+        return probabilityFitness.getFitnessFunctionGradient(model);
     }
 
     @Override
@@ -86,7 +75,7 @@ public class SingleGaussianTestCase implements GradientOptimizationAlgorithmTest
 
     @Override
     public void assertResult(OptimizedResult result) {
-        if (useMLE) {
+        if (probabilityFitness.equals(ProbabilityFitness.MLE)) {
             assertMLE(result);
         } else {
             assertMAP(result);

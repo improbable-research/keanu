@@ -1,5 +1,6 @@
 package io.improbable.keanu.benchmarks;
 
+import io.improbable.keanu.algorithms.variational.optimizer.ConvergenceChecker;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.Adam;
@@ -16,6 +17,7 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 
 @State(Scope.Benchmark)
 public class OptimizerBenchmark {
@@ -49,6 +51,7 @@ public class OptimizerBenchmark {
                 optimizer = GradientOptimizer.builder()
                     .probabilisticModel(gradientGraph)
                     .algorithm(Adam.builder()
+                        .convergenceChecker(ConvergenceChecker.relativeChecker(ConvergenceChecker.Norm.L2, 1e-5))
                         .build())
                     .build();
                 break;
@@ -68,13 +71,17 @@ public class OptimizerBenchmark {
         }
     }
 
+    private OptimizedResult result;
+
     @Benchmark
-    public OptimizedResult baseline() {
-        OptimizedResult result = optimizer.maxAPosteriori();
-
-        assertEquals(result.getFitness(), -0.1496, 1e-2);
-
+    public OptimizedResult findMap() {
+        result = optimizer.maxAPosteriori();
         return result;
+    }
+
+    @TearDown
+    public void checkResult() {
+        assertEquals(result.getFitness(), -0.1496, 1e-2);
     }
 
     private void assertEquals(double optimizedFitness, double expected, double eps) {

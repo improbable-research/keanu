@@ -4,10 +4,7 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.LogLikelihoodFitnessFunctionGradient;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.LogProbFitnessFunctionGradient;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogLikelihoodFitnessFunction;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogProbFitnessFunction;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.testcase.NonGradientOptimizationAlgorithmTestCase;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
@@ -24,11 +21,11 @@ public class SumGaussianTestCase implements GradientOptimizationAlgorithmTestCas
     private final DoubleVertex A;
     private final DoubleVertex B;
 
-    private final boolean useMLE;
+    private final ProbabilityFitness probabilityFitness;
     private final KeanuProbabilisticModelWithGradient model;
 
-    public SumGaussianTestCase(boolean useMLE) {
-        this.useMLE = useMLE;
+    public SumGaussianTestCase(ProbabilityFitness probabilityFitness) {
+        this.probabilityFitness = probabilityFitness;
 
         A = new GaussianVertex(20.0, 1.0);
         B = new GaussianVertex(20.0, 1.0);
@@ -63,20 +60,12 @@ public class SumGaussianTestCase implements GradientOptimizationAlgorithmTestCas
 
     @Override
     public FitnessFunction getFitnessFunction() {
-        if (useMLE) {
-            return new LogLikelihoodFitnessFunction(model);
-        } else {
-            return new LogProbFitnessFunction(model);
-        }
+        return probabilityFitness.getFitnessFunction(model);
     }
 
     @Override
     public FitnessFunctionGradient getFitnessFunctionGradient() {
-        if (useMLE) {
-            return new LogLikelihoodFitnessFunctionGradient(model);
-        } else {
-            return new LogProbFitnessFunctionGradient(model);
-        }
+        return probabilityFitness.getFitnessFunctionGradient(model);
     }
 
     @Override
@@ -86,9 +75,10 @@ public class SumGaussianTestCase implements GradientOptimizationAlgorithmTestCas
 
     @Override
     public void assertResult(OptimizedResult result) {
-        if (useMLE) {
+        if (probabilityFitness.equals(ProbabilityFitness.MLE)) {
             assertMLE(result);
         } else {
+            assertMAP(result);
             assertMAP(result);
         }
     }

@@ -6,8 +6,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogLikelihoodFitnessFunction;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.LogProbFitnessFunction;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -89,42 +88,26 @@ public class GradientOptimizer implements Optimizer {
 
     @Override
     public OptimizedResult maxAPosteriori() {
-        return optimize(probabilisticModelWithGradient, false);
+        return optimize(ProbabilityFitness.MAP);
     }
 
     @Override
     public OptimizedResult maxLikelihood() {
-        return optimize(probabilisticModelWithGradient, true);
+        return optimize(ProbabilityFitness.MLE);
     }
 
-    private OptimizedResult optimize(ProbabilisticModelWithGradient probabilisticModelWithGradient, boolean useMLE) {
+    private OptimizedResult optimize(ProbabilityFitness probabilityFitness) {
         assertHasLatents();
 
-        FitnessFunction fitnessFunction;
-        FitnessFunctionGradient fitnessFunctionGradient;
+        FitnessFunction fitnessFunction = probabilityFitness.getFitnessFunction(
+            probabilisticModelWithGradient,
+            this::handleFitnessCalculation
+        );
 
-        if (useMLE) {
-            fitnessFunction = new LogLikelihoodFitnessFunction(
-                probabilisticModelWithGradient,
-                this::handleFitnessCalculation
-            );
-
-            fitnessFunctionGradient = new LogLikelihoodFitnessFunctionGradient(
-                probabilisticModelWithGradient,
-                this::handleGradientCalculation
-            );
-
-        } else {
-            fitnessFunction = new LogProbFitnessFunction(
-                probabilisticModelWithGradient,
-                this::handleFitnessCalculation
-            );
-
-            fitnessFunctionGradient = new LogProbFitnessFunctionGradient(
-                probabilisticModelWithGradient,
-                this::handleGradientCalculation
-            );
-        }
+        FitnessFunctionGradient fitnessFunctionGradient = probabilityFitness.getFitnessFunctionGradient(
+            probabilisticModelWithGradient,
+            this::handleGradientCalculation
+        );
 
         return optimize(fitnessFunction, fitnessFunctionGradient);
     }

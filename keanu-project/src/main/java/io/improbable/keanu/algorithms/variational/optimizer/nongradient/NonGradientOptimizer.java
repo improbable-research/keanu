@@ -6,6 +6,7 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
@@ -55,6 +56,13 @@ public class NonGradientOptimizer implements Optimizer {
         }
     }
 
+    private OptimizedResult optimize(ProbabilityFitness probabilityFitness) {
+        return optimize(probabilityFitness.getFitnessFunction(
+            probabilisticModel,
+            this::handleFitnessCalculation)
+        );
+    }
+
     private OptimizedResult optimize(FitnessFunction fitnessFunction) {
 
         StatusBar statusBar = Optimizer.createFitnessStatusBar(this);
@@ -80,22 +88,12 @@ public class NonGradientOptimizer implements Optimizer {
 
     @Override
     public OptimizedResult maxAPosteriori() {
-        return optimize(
-            new LogProbFitnessFunction(
-                probabilisticModel,
-                this::handleFitnessCalculation
-            )
-        );
+        return optimize(ProbabilityFitness.MAP);
     }
 
     @Override
     public OptimizedResult maxLikelihood() {
-        return optimize(
-            new LogLikelihoodFitnessFunction(
-                probabilisticModel,
-                this::handleFitnessCalculation
-            )
-        );
+        return optimize(ProbabilityFitness.MLE);
     }
 
     @ToString
@@ -106,9 +104,6 @@ public class NonGradientOptimizer implements Optimizer {
         private NonGradientOptimizationAlgorithm nonGradientOptimizationAlgorithm = BOBYQA.builder().build();
 
         private boolean checkInitialFitnessConditions;
-
-        NonGradientOptimizerBuilder() {
-        }
 
         public NonGradientOptimizerBuilder probabilisticModel(ProbabilisticModel probabilisticModel) {
             this.probabilisticModel = probabilisticModel;
