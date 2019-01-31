@@ -63,7 +63,7 @@ public class NamespacesTest {
     }
 
     @Test
-    public void colorByNamespace() {
+    public void colorByNamespace() throws IOException {
         VertexGraph graph = new VertexGraph(outA).colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
         GraphToDot.write( graph , System.out );
