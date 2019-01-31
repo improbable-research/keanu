@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.utility;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;

@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import com.google.common.collect.Iterables;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;

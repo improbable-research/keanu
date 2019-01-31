@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;

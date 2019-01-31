@@ -1,7 +1,5 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;

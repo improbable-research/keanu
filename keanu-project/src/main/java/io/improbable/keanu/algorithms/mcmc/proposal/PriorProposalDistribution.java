@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.vertices.Probabilistic;
@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.google.common.base.Preconditions;
 
 public class PriorProposalDistribution implements ProposalDistribution {
     private final Map<VariableReference, Vertex> vertexLookup;

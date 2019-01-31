@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;

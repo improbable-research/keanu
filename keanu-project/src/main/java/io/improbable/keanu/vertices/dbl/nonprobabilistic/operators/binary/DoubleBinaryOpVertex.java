@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;

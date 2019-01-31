@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
