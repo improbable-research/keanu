@@ -66,7 +66,7 @@ public class NamespacesTest {
     public void colorByNamespace() throws IOException {
         VertexGraph graph = new VertexGraph(outA).colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
-        GraphToDot.write( graph , System.out );
+        GraphToDot.write( graph , System.err );
         String s = String.join(",", colors);
         assertEquals("There are three distinct colours " + s, 3, colors.size());
     }
@@ -75,7 +75,7 @@ public class NamespacesTest {
     public void removeIntermediates() throws IOException {
         VertexGraph graph = new VertexGraph(outA).removeNamespace("intermediate").colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
-        GraphToDot.write( graph , System.out );
+        GraphToDot.write( graph , System.err );
         String s = String.join(",", colors);
         assertEquals("There are two distinct colours " + s, 2, colors.size());
     }
