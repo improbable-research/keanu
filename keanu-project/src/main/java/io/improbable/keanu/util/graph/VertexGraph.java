@@ -24,8 +24,8 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     private static final Color OBSERVED_COLOR = Color.BLUE;
     private static final Color DETERMINISTIC_COLOR = Color.CYAN;
 
-    private static final String LABEL_FIELD = "label";
-    private static final String COLOR_FIELD = "color";
+    private static final String LABEL_KEY = "label";
+    private static final String COLOR_KEY = "color";
     private static final Color DOUBLE_COLOR = Color.red;
     private static final Color INTEGER_COLOR = Color.green;
     private static final Color BOOLEAN_COLOR = Color.blue;
@@ -111,7 +111,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     private BasicGraphNode createGraphNodeFor(Vertex v) {
         BasicGraphNode n = new BasicGraphNode(VertexId.ID_GENERATOR.getAndIncrement());
-        n.details.put(LABEL_FIELD, getBasicNameForVertex(v));
+        n.details.put(LABEL_KEY, getBasicNameForVertex(v));
         return n;
     }
 
@@ -256,7 +256,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
      */
     public VertexGraph colorVerticesByState() {
         formattingApplied = true;
-        setVertexMetadata(COLOR_FIELD, this::convertStateToColor);
+        setVertexMetadata(COLOR_KEY, this::convertStateToColor);
         return this;
     }
 
@@ -266,7 +266,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
      */
     public VertexGraph colorVerticesByType() {
         formattingApplied = true;
-        setVertexMetadata(COLOR_FIELD, this::convertTypeToColor);
+        setVertexMetadata(COLOR_KEY, this::convertTypeToColor);
         return this;
     }
 
@@ -276,7 +276,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
      */
     public VertexGraph colorEdgesByParent() {
         formattingApplied = true;
-        setEdgeMetadata(COLOR_FIELD, (e) -> e.getSource().details.getOrDefault(COLOR_FIELD, null));
+        setEdgeMetadata(COLOR_KEY, (e) -> e.getSource().details.getOrDefault(COLOR_KEY, null));
         return this;
     }
 
@@ -287,19 +287,19 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     public VertexGraph colorVerticesByNamespace() {
         formattingApplied = true;
         ColorSequence<String> seq = new ColorSequence<>();
-        setVertexMetadata(COLOR_FIELD, (v) -> formatColorForDot(seq.getOrChoseColor(getVertexNamespace(v))));
+        setVertexMetadata(COLOR_KEY, (v) -> formatColorForDot(seq.getOrChoseColor(getVertexNamespace(v))));
         return this;
     }
 
     /**
-     * This colours all vertex by a specified field
-     * @param field the field to use to chose the color
+     * This colours all vertex by a specified key
+     * @param key the key to use to chose the color
      * @return itself - so it's chainable
      */
-    public VertexGraph colorVerticesByField(String field) {
+    public VertexGraph colorVerticesByKey(String key) {
         formattingApplied = true;
         ColorSequence<String> seq = new ColorSequence<>();
-        setVertexNodeMetadata(COLOR_FIELD, (v) -> formatColorForDot(seq.getOrChoseColor(v.details.get(field))));
+        setVertexNodeMetadata(COLOR_KEY, (v) -> formatColorForDot(seq.getOrChoseColor(v.details.get(key))));
         return this;
     }
 
@@ -343,7 +343,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
      */
     public VertexGraph labelVerticesWithValue() {
         formattingApplied = true;
-        setVertexMetadata(LABEL_FIELD, this::convertValueToString);
+        setVertexMetadata(LABEL_KEY, this::convertValueToString);
         return this;
     }
 
@@ -353,7 +353,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
      */
     public VertexGraph labelConstantVerticesWithValue() {
         formattingApplied = true;
-        setVertexMetadata(LABEL_FIELD, this::convertConstantValueToString);
+        setVertexMetadata(LABEL_KEY, this::convertConstantValueToString);
         return this;
     }
 
@@ -363,7 +363,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
      */
     public VertexGraph labelEdgesWithParameters() {
         formattingApplied = true;
-        setEdgeMetadata(LABEL_FIELD, this::readEdgeName);
+        setEdgeMetadata(LABEL_KEY, this::readEdgeName);
         return this;
     }
 
@@ -408,45 +408,45 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * Sets a vertex metadata based on the Vertex
-     * @param field The field to set
+     * @param key The key to set
      * @param f The mapping to define the new value
      * @return itself - so it's chainable
      */
-    public VertexGraph setVertexMetadata(String field, Function<Vertex, String> f) {
+    public VertexGraph setVertexMetadata(String key, Function<Vertex, String> f) {
         formattingApplied = true;
         for (Map.Entry<Vertex, BasicGraphNode> e : vertexNodes.entrySet()) {
             String v = f.apply(e.getKey());
-            if (v != null) e.getValue().details.put(field, v);
+            if (v != null) e.getValue().details.put(key, v);
         }
         return this;
     }
 
     /**
      * Sets a vertex metadata based on the Node's existing metadata
-     * @param field The key to set
+     * @param key The key to set
      * @param f The mapping to define the new value
      * @return itself - so it's chainable
      */
-    public VertexGraph setVertexNodeMetadata(String field, Function<BasicGraphNode, String> f) {
+    public VertexGraph setVertexNodeMetadata(String key, Function<BasicGraphNode, String> f) {
         formattingApplied = true;
         for (BasicGraphNode node : vertexNodes.values()) {
             String v = f.apply(node);
-            if (v != null) node.details.put(field, v);
+            if (v != null) node.details.put(key, v);
         }
         return this;
     }
 
     /**
      * Sets an edges metadata based on the Edge
-     * @param field the key to set
+     * @param key the key to set
      * @param f the mapping to define the new value
      * @return itself - so it's chainable
      */
-    public VertexGraph setEdgeMetadata(String field, Function<BasicGraphEdge, String> f) {
+    public VertexGraph setEdgeMetadata(String key, Function<BasicGraphEdge, String> f) {
         formattingApplied = true;
         for (BasicGraphEdge e : edges) {
             String v = f.apply(e);
-            if (v != null) e.details.put(field, v);
+            if (v != null) e.details.put(key, v);
         }
         return this;
     }
@@ -492,6 +492,18 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         return this;
     }
 
+    /**
+     * Updates the metadata for a specific vertex
+     * @param v the vertex to update
+     * @param key the key to set
+     * @param value the value to set to the key
+     */
+    public void putNodeMetadata(Vertex v, String key, String value) {
+        if ( vertexNodes.containsKey(v) ){
+            vertexNodes.get(v).details.put(key,value);
+        }
+    }
+
     private BasicGraphEdge mergeEdge(BasicGraphEdge i, BasicGraphEdge o) {
         BasicGraphEdge e = new BasicGraphEdge(i.getSource(), o.getDestination(), o.getDetails());
         edges.add(e);
@@ -502,4 +514,5 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     public Collection<BasicGraphNode> getNodes() {
         return vertexNodes.values();
     }
+
 }
