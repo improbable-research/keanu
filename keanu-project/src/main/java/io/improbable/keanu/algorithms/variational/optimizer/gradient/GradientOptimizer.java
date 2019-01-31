@@ -136,13 +136,13 @@ public class GradientOptimizer implements Optimizer {
         if (checkInitialFitnessConditions) {
             Map<VariableReference, DoubleTensor> startingPoint = Optimizer.convertToMapPoint(probabilisticModelWithGradient.getLatentVariables());
 
-            double initialFitness = fitnessFunction.value(startingPoint);
+            double initialFitness = fitnessFunction.getFitnessAt(startingPoint);
 
             if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
                 throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
             }
 
-            Map<? extends VariableReference, DoubleTensor> initialGradient = fitnessFunctionGradient.value(startingPoint);
+            Map<? extends VariableReference, DoubleTensor> initialGradient = fitnessFunctionGradient.getGradientsAt(startingPoint);
             warnIfGradientIsFlat(initialGradient);
         }
 

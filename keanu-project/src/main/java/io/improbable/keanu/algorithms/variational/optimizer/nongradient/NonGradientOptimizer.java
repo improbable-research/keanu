@@ -64,7 +64,7 @@ public class NonGradientOptimizer implements Optimizer {
         if (checkInitialFitnessConditions) {
             Map<VariableReference, DoubleTensor> startingPoint = Optimizer.convertToMapPoint(latentVariables);
 
-            double initialFitness = fitnessFunction.value(startingPoint);
+            double initialFitness = fitnessFunction.getFitnessAt(startingPoint);
 
             if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
                 throw new IllegalArgumentException("Cannot start optimizer on zero probability network");

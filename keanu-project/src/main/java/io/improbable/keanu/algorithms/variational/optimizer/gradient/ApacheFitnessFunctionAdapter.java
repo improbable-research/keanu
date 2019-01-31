@@ -23,7 +23,7 @@ public class ApacheFitnessFunctionAdapter implements MultivariateFunction {
 
         Map<VariableReference, DoubleTensor> values = getValues(point);
 
-        return fitnessFunction.value(values);
+        return fitnessFunction.getFitnessAt(values);
     }
 
     private Map<VariableReference, DoubleTensor> getValues(double[] point) {

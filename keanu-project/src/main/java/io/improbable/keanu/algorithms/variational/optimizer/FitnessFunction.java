@@ -7,5 +7,9 @@ import java.util.Map;
 
 public interface FitnessFunction {
 
-    double value(Map<VariableReference, DoubleTensor> values);
+    /**
+     * @param values the values for each variable in the function
+     * @return the fitness at the values specified
+     */
+    double getFitnessAt(Map<VariableReference, DoubleTensor> values);
 }

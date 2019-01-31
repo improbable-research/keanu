@@ -7,5 +7,10 @@ import java.util.Map;
 
 public interface FitnessFunctionGradient {
 
-    Map<? extends VariableReference, DoubleTensor> value(Map<VariableReference, DoubleTensor> values);
+    /**
+     * @param values the values of the variables in the fitness function.
+     * @return The gradient of the fitness function with respect to each of the variables specified in values at the
+     * values specified.
+     */
+    Map<? extends VariableReference, DoubleTensor> getGradientsAt(Map<VariableReference, DoubleTensor> values);
 }

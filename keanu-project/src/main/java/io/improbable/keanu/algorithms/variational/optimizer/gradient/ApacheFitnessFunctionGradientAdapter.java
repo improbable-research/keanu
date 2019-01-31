@@ -24,7 +24,7 @@ public class ApacheFitnessFunctionGradientAdapter implements MultivariateVectorF
 
         Map<VariableReference, DoubleTensor> values = getValues(point);
 
-        Map<? extends VariableReference, DoubleTensor> diffs = fitnessFunctionGradient.value(values);
+        Map<? extends VariableReference, DoubleTensor> diffs = fitnessFunctionGradient.getGradientsAt(values);
 
         return alignGradientsToAppropriateIndex(diffs, latentVariables);
     }

@@ -74,7 +74,7 @@ public class Adam implements GradientOptimizationAlgorithm {
             thetaNext = temp;
         }
 
-        double logProb = fitnessFunction.value(updateMap(theta, latentVariables, thetaMap));
+        double logProb = fitnessFunction.getFitnessAt(updateMap(theta, latentVariables, thetaMap));
 
         return new OptimizedResult(updateMap(theta, latentVariables, thetaMap), logProb);
     }
@@ -87,7 +87,7 @@ public class Adam implements GradientOptimizationAlgorithm {
         updateMap(theta, latentVariables, thetaMap);
 
         return updateArray(
-            fitnessFunctionGradient.value(thetaMap),
+            fitnessFunctionGradient.getGradientsAt(thetaMap),
             latentVariables,
             gradients
         );

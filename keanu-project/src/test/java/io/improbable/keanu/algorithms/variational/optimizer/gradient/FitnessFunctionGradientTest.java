@@ -169,9 +169,9 @@ public class FitnessFunctionGradientTest {
 
             for (int y = 0; y < yStepCount; y++) {
 
-                Map<? extends VariableReference, DoubleTensor> gradient0 = fitnessFunctionGradient.value(point);
+                Map<? extends VariableReference, DoubleTensor> gradient0 = fitnessFunctionGradient.getGradientsAt(point);
 
-                double fitness0 = fitness.value(point);
+                double fitness0 = fitness.getFitnessAt(point);
 
                 double da = dx;
                 Map<VariableReference, DoubleTensor> pointA = ImmutableMap.of(
@@ -179,7 +179,7 @@ public class FitnessFunctionGradientTest {
                     yRef, point.get(yRef)
                 );
 
-                double fitness1a = fitness.value(pointA);
+                double fitness1a = fitness.getFitnessAt(pointA);
 
                 double approxGradientA = (fitness1a - fitness0) / da;
                 double epsA = Math.max(Math.abs(gradient0.get(xRef).scalar() * 0.01), 0.0001);
@@ -192,7 +192,7 @@ public class FitnessFunctionGradientTest {
                     yRef, point.get(yRef).plus(db)
                 );
 
-                double fitness1b = fitness.value(pointB);
+                double fitness1b = fitness.getFitnessAt(pointB);
 
                 double approxGradientB = (fitness1b - fitness0) / db;
                 double epsB = Math.max(Math.abs(gradient0.get(yRef).scalar() * 0.01), 0.0001);

@@ -21,7 +21,7 @@ public class LogProbFitnessFunction implements FitnessFunction {
     }
 
     @Override
-    public double value(Map<VariableReference, DoubleTensor> values) {
+    public double getFitnessAt(Map<VariableReference, DoubleTensor> values) {
 
         double logProb = probabilisticModel.logProb(values);
 

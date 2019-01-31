@@ -22,7 +22,7 @@ public class LogLikelihoodFitnessFunctionGradient implements FitnessFunctionGrad
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> value(Map<VariableReference, DoubleTensor> values) {
+    public Map<? extends VariableReference, DoubleTensor> getGradientsAt(Map<VariableReference, DoubleTensor> values) {
 
         Map<? extends VariableReference, DoubleTensor> diffs = probabilisticModelWithGradient.logLikelihoodGradients(values);
 
