@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.mcmc;
+package io.improbable.keanu.algorithms.mcmc.testcases;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.network.BayesianNetwork;
