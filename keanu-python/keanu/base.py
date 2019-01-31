@@ -21,6 +21,8 @@ class JavaObjectWrapper:
         return self.unwrap().__getattr__(_to_camel_case_name(k))
 
     def __check_if_unwrapped(self, k: str) -> None:
+        # better error message for when JavaObjectWrapper is passed to a method that expects JavaObject
+        # see: https://www.py4j.org/advanced_topics.html#converting-python-collections-to-java-collections
         if k == "_get_object_id":
             raise TypeError(
                 "Trying to pass {} to a method that expects a JavaObject - did you forget to call unwrap()?".format(
