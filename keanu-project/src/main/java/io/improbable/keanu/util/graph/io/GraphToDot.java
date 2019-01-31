@@ -30,7 +30,7 @@ public abstract class GraphToDot {
      * Writes the graph directly to a file
      * @param graph the graph to write
      * @param file the file to write to
-     * @throws IOException
+     * @throws IOException if the underlying io operations fail
      */
     public static void writeFile(@NotNull AbstractGraph<? extends GraphNode, ? extends GraphEdge>  graph, @NotNull File file) throws IOException {
         FileOutputStream outputStream = new FileOutputStream(file);
@@ -45,7 +45,7 @@ public abstract class GraphToDot {
      * Writes the graph to a OutputSteam
      * @param graph the graph to write
      * @param output the output steam to use
-     * @throws IOException
+     * @throws IOException if the underlying io operations fail
      */
     public static void write(@NotNull AbstractGraph<? extends GraphNode, ? extends GraphEdge> graph, @NotNull OutputStream output) throws IOException {
         Writer outputWriter = new OutputStreamWriter(output);
@@ -56,7 +56,7 @@ public abstract class GraphToDot {
      * Writes the graph to a Writer
      * @param graph the graph to write
      * @param outputWriter the writer to use
-     * @throws IOException
+     * @throws IOException if the underlying io operations fail
      */
     public static void write(@NotNull AbstractGraph<? extends GraphNode, ? extends GraphEdge> graph, @NotNull Writer outputWriter) throws IOException {
         graph.prepareForExport();

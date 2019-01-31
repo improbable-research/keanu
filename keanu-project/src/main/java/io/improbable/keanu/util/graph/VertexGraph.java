@@ -293,6 +293,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This colours all vertex by a specified field
+     * @param field the field to use to chose the color
      * @return itself - so it's chainable
      */
     public VertexGraph colorVerticesByField(String field) {
