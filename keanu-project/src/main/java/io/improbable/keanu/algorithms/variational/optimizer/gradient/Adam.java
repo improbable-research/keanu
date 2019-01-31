@@ -27,6 +27,7 @@ public class Adam implements GradientOptimizationAlgorithm {
     }
 
     private final ConvergenceChecker convergenceChecker;
+    private final int maxIterations;
     private final double alpha;
     private final double beta1;
     private final double beta2;
@@ -44,8 +45,6 @@ public class Adam implements GradientOptimizationAlgorithm {
 
         int t = 0;
         boolean converged = false;
-
-        int maxIterations = Integer.MAX_VALUE;
 
         final Map<VariableReference, DoubleTensor> thetaMap = new HashMap<>();
         final DoubleTensor[] gradients = new DoubleTensor[theta.length];
@@ -114,22 +113,22 @@ public class Adam implements GradientOptimizationAlgorithm {
     }
 
     private DoubleTensor[] updateArray(Map<? extends VariableReference, DoubleTensor> lookup,
-                                       List<? extends Variable> orderded,
+                                       List<? extends Variable> ordered,
                                        DoubleTensor[] array) {
 
-        for (int i = 0; i < orderded.size(); i++) {
-            array[i] = lookup.get(orderded.get(i).getReference());
+        for (int i = 0; i < ordered.size(); i++) {
+            array[i] = lookup.get(ordered.get(i).getReference());
         }
 
         return array;
     }
 
     private Map<VariableReference, DoubleTensor> updateMap(DoubleTensor[] values,
-                                                           List<? extends Variable> orderded,
+                                                           List<? extends Variable> ordered,
                                                            Map<VariableReference, DoubleTensor> asMap) {
 
         for (int i = 0; i < values.length; i++) {
-            asMap.put(orderded.get(i).getReference(), values[i]);
+            asMap.put(ordered.get(i).getReference(), values[i]);
         }
 
         return asMap;
@@ -140,6 +139,7 @@ public class Adam implements GradientOptimizationAlgorithm {
     public static class AdamBuilder {
         private ConvergenceChecker convergenceChecker = new RelativeConvergenceChecker(ConvergenceChecker.Norm.MAX_ABS, 1e-6);
 
+        private int maxIterations = Integer.MAX_VALUE;
         private double alpha = 0.001;
         private double beta1 = 0.9;
         private double beta2 = 0.999;
@@ -171,7 +171,7 @@ public class Adam implements GradientOptimizationAlgorithm {
         }
 
         public Adam build() {
-            return new Adam(convergenceChecker, alpha, beta1, beta2, epsilon);
+            return new Adam(convergenceChecker, maxIterations, alpha, beta1, beta2, epsilon);
         }
     }
 }

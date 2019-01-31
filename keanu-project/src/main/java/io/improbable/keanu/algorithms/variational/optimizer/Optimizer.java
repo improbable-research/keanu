@@ -22,7 +22,7 @@ public interface Optimizer {
      * Adds a callback to be called whenever the optimizer evaluates the fitness of a point. E.g. for logging.
      *
      * @param fitnessCalculationHandler a function to be called whenever the optimizer evaluates the fitness of a point.
-     *                                  The double[] argument to the handler represents the point being evaluated.
+     *                                  The Map<VariableReference, DoubleTensor> argument to the handler represents the point being evaluated.
      *                                  The Double argument to the handler represents the fitness of that point.
      */
     void addFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler);
