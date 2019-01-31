@@ -410,39 +410,45 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
      * Sets a vertex metadata based on the Vertex
      * @param field The field to set
      * @param f The mapping to define the new value
+     * @return itself - so it's chainable
      */
-    public void setVertexMetadata(String field, Function<Vertex, String> f) {
+    public VertexGraph setVertexMetadata(String field, Function<Vertex, String> f) {
         formattingApplied = true;
         for (Map.Entry<Vertex, BasicGraphNode> e : vertexNodes.entrySet()) {
             String v = f.apply(e.getKey());
             if (v != null) e.getValue().details.put(field, v);
         }
+        return this;
     }
 
     /**
      * Sets a vertex metadata based on the Node's existing metadata
      * @param field The key to set
      * @param f The mapping to define the new value
+     * @return itself - so it's chainable
      */
-    public void setVertexNodeMetadata(String field, Function<BasicGraphNode, String> f) {
+    public VertexGraph setVertexNodeMetadata(String field, Function<BasicGraphNode, String> f) {
         formattingApplied = true;
         for (BasicGraphNode node : vertexNodes.values()) {
             String v = f.apply(node);
             if (v != null) node.details.put(field, v);
         }
+        return this;
     }
 
     /**
      * Sets an edges metadata based on the Edge
      * @param field the key to set
      * @param f the mapping to define the new value
+     * @return itself - so it's chainable
      */
-    public void setEdgeMetadata(String field, Function<BasicGraphEdge, String> f) {
+    public VertexGraph setEdgeMetadata(String field, Function<BasicGraphEdge, String> f) {
         formattingApplied = true;
         for (BasicGraphEdge e : edges) {
             String v = f.apply(e);
             if (v != null) e.details.put(field, v);
         }
+        return this;
     }
 
     private void removeDuplicatedEdges(Set<BasicGraphEdge> edgesToCheck) {
@@ -469,19 +475,21 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
      * @param b second vertex
      * @param key key to update
      * @param value value to use
+     * @return itself - so it's chainable
      *
      * this will look for any edge between a and b (regardless of direction)
      */
-    public void putEdgeMetadataBetween(Vertex a, Vertex b, String key, String value) {
+    public VertexGraph putEdgeMetadataBetween(Vertex a, Vertex b, String key, String value) {
         BasicGraphNode nodeA = vertexNodes.get(a);
         BasicGraphNode nodeB = vertexNodes.get(b);
-        if (nodeA == null || nodeB == null) return;
+        if (nodeA == null || nodeB == null) return this;
         for (BasicGraphEdge edge : edges) {
             if ((edge.getSource() == nodeA && edge.getDestination() == nodeB) ||
                 (edge.getSource() == nodeB && edge.getDestination() == nodeA)) {
                 edge.details.put(key, value);
             }
         }
+        return this;
     }
 
     private BasicGraphEdge mergeEdge(BasicGraphEdge i, BasicGraphEdge o) {

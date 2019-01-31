@@ -2,6 +2,6 @@ digraph BayesianNetwork {
     6 [label="SomeLabel"]
     7 [label="2"]
     8 [label="*"]
-    6 -> 8
-    7 -> 8
+    7 -> 8 []
+    6 -> 8 []
 }

@@ -1,7 +1,7 @@
 digraph BayesianNetwork {
-    0 [color="#FF0000"] [label="+"]
-    1 [color="#FF0000"] [label="+"]
-    2 [color="#FF0000"] [label="GaussianVertex"]
-    0 -> 2 [color="#FF0000"] [label="mu"]
-    1 -> 2 [color="#FF0000"] [label="sigma"]
+    0 [color="#FF0000",label="+"]
+    1 [color="#FF0000",label="+"]
+    2 [color="#FF0000",label="GaussianVertex"]
+    0 -> 2 [color="#FF0000",label="mu"]
+    1 -> 2 [color="#FF0000",label="sigma"]
 }

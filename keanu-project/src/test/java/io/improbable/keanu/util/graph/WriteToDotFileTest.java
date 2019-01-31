@@ -92,7 +92,7 @@ public class WriteToDotFileTest {
         graph.labelEdgesWithParameters().colorVerticesByType().labelVerticesWithValue();
         GraphToDot.write(graph, outputWriter);
 
-        assertThat("Output contains expected string", outputWriter.toString().contains("0 [color=\"#FF0000\"] [label=\"0.5\"]"));
+        assertThat("Output contains expected string", outputWriter.toString().contains("0 [color=\"#FF0000\",label=\"0.5\"]"));
     }
 
     @Test
