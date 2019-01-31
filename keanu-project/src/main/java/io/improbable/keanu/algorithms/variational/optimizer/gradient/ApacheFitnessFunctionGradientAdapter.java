@@ -14,7 +14,7 @@ import java.util.Map;
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.convertFromPoint;
 
 @AllArgsConstructor
-public class ApacheFitnessFunctionGradientAdaptor implements MultivariateVectorFunction {
+public class ApacheFitnessFunctionGradientAdapter implements MultivariateVectorFunction {
 
     private final FitnessFunctionGradient fitnessFunctionGradient;
     private final List<? extends Variable> latentVariables;

@@ -5,7 +5,7 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionAdaptor;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionAdapter;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
@@ -70,7 +70,7 @@ public class BOBYQA implements NonGradientOptimizationAlgorithm {
         );
 
         ObjectiveFunction fitness = new ObjectiveFunction(
-            new ApacheFitnessFunctionAdaptor(fitnessFunction, latentVariables)
+            new ApacheFitnessFunctionAdapter(fitnessFunction, latentVariables)
         );
 
         double[] startPoint = Optimizer.convertToArrayPoint(getAsDoubleTensors(latentVariables));
