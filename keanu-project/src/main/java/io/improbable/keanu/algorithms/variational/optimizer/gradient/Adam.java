@@ -2,9 +2,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
-import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
-import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
+import io.improbable.keanu.algorithms.variational.optimizer.*;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,10 +17,6 @@ import java.util.Map;
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Adam implements GradientOptimizationAlgorithm {
-
-    public interface ConvergenceChecker {
-        boolean hasConverged(DoubleTensor[] gradient, DoubleTensor[] theta, DoubleTensor[] thetaNext);
-    }
 
     public static AdamBuilder builder() {
         return new AdamBuilder();
@@ -69,7 +63,7 @@ public class Adam implements GradientOptimizationAlgorithm {
                 thetaNext[i] = theta[i].plus(m[i].times(alpha).divInPlace(v[i].sqrt().timesInPlace(b).plusInPlace(epsilon)));
             }
 
-            converged = convergenceChecker.hasConverged(gradients, theta, thetaNext);
+            converged = convergenceChecker.hasConverged(theta, thetaNext);
 
             final DoubleTensor[] temp = theta;
             theta = thetaNext;
@@ -137,30 +131,15 @@ public class Adam implements GradientOptimizationAlgorithm {
         return asMap;
     }
 
-    private static double magnitudeDelta(DoubleTensor[] a, DoubleTensor[] b) {
-        double magPow2 = 0;
-        for (int i = 0; i < a.length; i++) {
-            magPow2 += a[i].minus(b[i]).pow(2).sum();
-        }
-
-        return Math.sqrt(magPow2);
-    }
-
-    public static ConvergenceChecker thetaDeltaMagnitude(final double minThetaDelta) {
-        return (gradient, theta, thetaNext) -> magnitudeDelta(theta, thetaNext) < minThetaDelta;
-    }
 
     @ToString
     public static class AdamBuilder {
-        private ConvergenceChecker convergenceChecker = Adam.thetaDeltaMagnitude(1e-6);
+        private ConvergenceChecker convergenceChecker = new RelativeConvergenceChecker(ConvergenceChecker.Norm.MAX_ABS, 1e-6);
 
         private double alpha = 0.001;
         private double beta1 = 0.9;
         private double beta2 = 0.999;
         private double epsilon = 1e-8;
-
-        AdamBuilder() {
-        }
 
         public AdamBuilder convergenceChecker(ConvergenceChecker convergenceChecker) {
             this.convergenceChecker = convergenceChecker;

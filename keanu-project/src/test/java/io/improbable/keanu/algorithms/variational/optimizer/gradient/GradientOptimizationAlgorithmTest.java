@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.variational.optimizer.ConvergenceChecker;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.*;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class GradientOptimizationAlgorithmTest {
 
             return Adam.builder()
                 .alpha(0.1)
-                .convergenceChecker(Adam.thetaDeltaMagnitude(0.00001))
+                .convergenceChecker(ConvergenceChecker.absoluteChecker(ConvergenceChecker.Norm.L2, 0.00001))
                 .build();
         }),
 

@@ -53,7 +53,7 @@ public class AdamTest {
         MutableInt i = new MutableInt(0);
         Adam adamOptimizer = Adam.builder()
             .alpha(0.1)
-            .convergenceChecker((gradient, theta, thetaNext) -> i.incrementAndGet() == 10)
+            .convergenceChecker((theta, thetaNext) -> i.incrementAndGet() == 10)
             .build();
 
         adamOptimizer.optimize(
