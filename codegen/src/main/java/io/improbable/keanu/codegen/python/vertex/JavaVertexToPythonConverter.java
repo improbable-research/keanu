@@ -40,9 +40,9 @@ class JavaVertexToPythonConverter {
     private List<PythonParam> allParams;
 
     JavaVertexToPythonConverter(Constructor javaConstructor, Reflections reflections, Map<String, DocString> docStringMap) {
-       this.javaConstructor = javaConstructor;
-       this.docStringMap = docStringMap;
-       this.allParams = createListOfPythonVertexParam(javaConstructor, reflections);
+        this.javaConstructor = javaConstructor;
+        this.docStringMap = docStringMap;
+        this.allParams = createListOfPythonVertexParam(javaConstructor, reflections);
     }
 
     private List<PythonParam> createListOfPythonVertexParam(Constructor javaConstructor, Reflections reflections) {
