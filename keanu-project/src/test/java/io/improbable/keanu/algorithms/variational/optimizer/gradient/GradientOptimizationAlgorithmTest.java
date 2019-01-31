@@ -47,7 +47,7 @@ public class GradientOptimizationAlgorithmTest {
         SINGLE_GAUSSIAN(SingleGaussianTestCase::new),
         SUM_GAUSSIAN_MAP(() -> new SumGaussianTestCase(true)),
         SUM_GAUSSIAN_MLE(() -> new SumGaussianTestCase(false)),
-        ROSENBROCK_1_100(() -> new RosenbrockTestCase(1, 100, 1, 1)),
+        ROSENBROCK_1_100(() -> new RosenbrockTestCase(1, 100)),
         HIMMELBLAU_A(() -> new HimmelblauTestCase(0, 3)),
         HIMMELBLAU_B(() -> new HimmelblauTestCase(-2, -3));
 

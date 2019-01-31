@@ -24,8 +24,8 @@ public class SumGaussianTestCase implements GradientOptimizationAlgorithmTestCas
     private final DoubleVertex A;
     private final DoubleVertex B;
 
-    private boolean useMLE;
-    private KeanuProbabilisticModelWithGradient model;
+    private final boolean useMLE;
+    private final KeanuProbabilisticModelWithGradient model;
 
     public SumGaussianTestCase(boolean useMLE) {
         this.useMLE = useMLE;

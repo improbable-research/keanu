@@ -22,11 +22,11 @@ public class RosenbrockTestCase extends BivariateFunctionTestCase {
 
     private final double expectedX, expectedY;
 
-    public RosenbrockTestCase(double aParameter, double bParameter, double expectedX, double expectedY) {
+    public RosenbrockTestCase(double aParameter, double bParameter) {
         super(createRosenbrockFunction(aParameter, bParameter));
 
-        this.expectedX = expectedX;
-        this.expectedY = expectedY;
+        this.expectedX = aParameter;
+        this.expectedY = aParameter * aParameter;
 
     }
 
@@ -48,7 +48,7 @@ public class RosenbrockTestCase extends BivariateFunctionTestCase {
     }
 
     @Override
-    public void assertResult(OptimizedResult result, Double actualX, Double actualY) {
+    public void assertResult(OptimizedResult result, double actualX, double actualY) {
         assertEquals(expectedX, actualX, 1e-2);
         assertEquals(expectedY, actualY, 1e-2);
     }

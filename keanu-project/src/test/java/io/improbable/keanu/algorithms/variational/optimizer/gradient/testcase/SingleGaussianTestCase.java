@@ -20,11 +20,11 @@ import static org.junit.Assert.assertArrayEquals;
 
 public class SingleGaussianTestCase implements GradientOptimizationAlgorithmTestCase, NonGradientOptimizationAlgorithmTestCase {
 
-    private GaussianVertex A;
-    private long[] shape;
+    private final GaussianVertex A;
+    private final long[] shape;
 
-    private boolean useMLE;
-    private KeanuProbabilisticModelWithGradient model;
+    private final boolean useMLE;
+    private final KeanuProbabilisticModelWithGradient model;
 
     public SingleGaussianTestCase() {
         this(false, new long[]{2});

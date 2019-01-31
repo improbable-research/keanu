@@ -41,7 +41,7 @@ public class HimmelblauTestCase extends BivariateFunctionTestCase {
     }
 
     @Override
-    public void assertResult(OptimizedResult result, Double actualX, Double actualY) {
+    public void assertResult(OptimizedResult result, double actualX, double actualY) {
 
         double epsilon = 1e-2;
 
