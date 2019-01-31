@@ -27,8 +27,6 @@ class JavaObjectWrapper:
                             (python_name, self._class))
 
         java_name = _to_camel_case_name(k)
-        logging.getLogger("keanu").warning(
-            "\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
         return self.unwrap().__getattr__(java_name)
 
     def unwrap(self) -> JavaObject:
