@@ -26,6 +26,7 @@ shape_types = Iterable[primitive_types]
 Sample types
 '''
 sample_types = Dict[Union[str, Tuple[str, str]], List[primitive_types]]
+sample_generator_dict_type = Dict[Union[str, Tuple[str, str]], primitive_types]
 sample_generator_types = Generator[Dict[Union[str, Tuple[str, str]], primitive_types], None, None]
 '''
 Runtime types

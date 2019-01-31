@@ -37,7 +37,7 @@ def test_dataframe_passed_to_Tensor_creates_tensor(data: List[List[primitive_typ
 
     assert_java_class(t, expected_java_class)
 
-    tensor_value = Tensor._to_ndarray(t.unwrap())
+    tensor_value = Tensor._to_scalar_or_ndarray(t.unwrap())
     dataframe_value = dataframe.values
 
     assert np.array_equal(tensor_value, dataframe_value)
@@ -53,7 +53,7 @@ def test_series_passed_to_Tensor_creates_tensor(data: List[primitive_types], exp
 
     assert_java_class(t, expected_java_class)
 
-    tensor_value = Tensor._to_ndarray(t.unwrap())
+    tensor_value = Tensor._to_scalar_or_ndarray(t.unwrap())
     series_value = series.values
 
     assert len(tensor_value) == len(series_value)
@@ -96,7 +96,7 @@ def test_can_pass_empty_ndarray_to_Tensor() -> None:
 @pytest.mark.parametrize("value", [(np.array([[1, 2], [3, 4]])), np.array([3])])
 def test_convert_java_tensor_to_ndarray(value: numpy_types) -> None:
     t = Tensor(value)
-    ndarray = Tensor._to_ndarray(t.unwrap())
+    ndarray = Tensor._to_scalar_or_ndarray(t.unwrap())
 
     assert type(ndarray) == np.ndarray
     assert (value == ndarray).all()
@@ -113,5 +113,5 @@ def assert_java_class(java_object_wrapper: JavaObjectWrapper, java_class_str: st
 def test_you_can_apply_a_function_to_a_tensor(value, expected_result):
     t = Tensor(value)
     result = t.apply(lambda x: x + 10)
-    ndarray = Tensor._to_ndarray(result)
+    ndarray = Tensor._to_scalar_or_ndarray(result)
     assert (ndarray == expected_result).all()
