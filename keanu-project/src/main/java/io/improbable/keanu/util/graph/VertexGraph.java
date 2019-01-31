@@ -57,11 +57,6 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         }
     }
 
-    private static final String formatColorForDot(Color c) {
-        if (c == null) return null;
-        return String.format("#%06X", (0xFFFFFF & c.getRGB()));
-    }
-
     public VertexGraph putMetadata(String key, String value) {
         metadata.put(key, value);
         return this;
@@ -89,7 +84,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     private BasicGraphNode createGraphNodeFor(Vertex v) {
-        BasicGraphNode n = new BasicGraphNode();
+        BasicGraphNode n = new BasicGraphNode(VertexId.ID_GENERATOR.getAndIncrement());
         n.details.put(LABEL_FIELD, getBasicNameForVertex(v));
         return n;
     }
@@ -375,7 +370,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     private BasicGraphEdge mergeEdge(BasicGraphEdge i, BasicGraphEdge o) {
-        BasicGraphEdge e = new BasicGraphEdge(i.getSource(), o.getDestination() , o.getDetails() );
+        BasicGraphEdge e = new BasicGraphEdge(i.getSource(), o.getDestination(), o.getDetails());
         edges.add(e);
         return e;
     }
@@ -383,10 +378,5 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     @Override
     public Collection<BasicGraphNode> getNodes() {
         return vertexNodes.values();
-    }
-
-    @Override
-    public Collection<BasicGraphEdge> getEdges() {
-        return edges;
     }
 }

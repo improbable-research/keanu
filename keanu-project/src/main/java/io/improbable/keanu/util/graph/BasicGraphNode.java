@@ -1,17 +1,15 @@
 package io.improbable.keanu.util.graph;
 
-import io.improbable.keanu.vertices.VertexId;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class BasicGraphNode implements GraphNode {
 
-    public Map<String,String> details = new HashMap<>();
     public final long index;
+    public Map<String, String> details = new HashMap<>();
 
-    public BasicGraphNode(){
-        this.index = VertexId.ID_GENERATOR.getAndIncrement();
+    public BasicGraphNode(long index) {
+        this.index = index;
     }
 
     @Override

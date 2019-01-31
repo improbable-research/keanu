@@ -1,5 +1,6 @@
 package io.improbable.keanu.util.graph;
 
+import java.awt.*;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -20,6 +21,11 @@ public abstract class AbstractGraph<N extends GraphNode, E extends GraphEdge<N>>
 
     public Collection<E> getEdges() {
         return edges;
+    }
+
+    public static final String formatColorForDot(Color c) {
+        if (c == null) return null;
+        return String.format("#%06X", (0xFFFFFF & c.getRGB()));
     }
 
     public static void mergeMetadata(Map<String, String> target, Map<String, String>... input) {
