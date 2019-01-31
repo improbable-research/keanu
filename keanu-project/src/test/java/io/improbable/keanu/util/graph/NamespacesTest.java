@@ -46,7 +46,6 @@ public class NamespacesTest {
 
         outA = new GaussianVertex(intermediateA, intermediateC);
         outA.setLabel(new VertexLabel("A", "out"));
-
     }
 
     @Before
@@ -67,13 +66,17 @@ public class NamespacesTest {
     public void colorByNamespace() {
         VertexGraph graph = new VertexGraph(outA).colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
-        assertEquals("There are three distinct colours"+colors.size(), 3, colors.size());
+        GraphToDot.write( graph , System.out );
+        String s = String.join(",", colors);
+        assertEquals("There are three distinct colours " + s, 3, colors.size());
     }
 
     @Test
-    public void removeIntermediates() {
+    public void removeIntermediates() throws IOException {
         VertexGraph graph = new VertexGraph(outA).removeNamespace("intermediate").colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
-        assertEquals("There are two distinct colours "+colors.size(), 2, colors.size());
+        GraphToDot.write( graph , System.out );
+        String s = String.join(",", colors);
+        assertEquals("There are two distinct colours " + s, 2, colors.size());
     }
 }
