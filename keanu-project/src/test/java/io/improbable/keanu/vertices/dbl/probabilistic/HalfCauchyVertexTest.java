@@ -8,6 +8,9 @@ import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
+
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.apache.commons.math3.distribution.CauchyDistribution;
 import org.junit.Assert;
 import org.junit.Before;
@@ -170,4 +173,5 @@ public class HalfCauchyVertexTest {
         Assert.assertEquals(0.0, derivative.getValue(0), 1e-6);
         Assert.assertTrue(derivative.getValue(1) != 0.);
     }
+
 }
