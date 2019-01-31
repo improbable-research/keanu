@@ -29,7 +29,7 @@ public class JsonLoader implements NetworkLoader {
     @Override
     public BayesianNetwork loadNetwork(InputStream input) throws IOException {
         String jsonInput = IOUtils.toString(input, StandardCharsets.UTF_8);
-        KeanuSavedBayesNet.Model.Builder modelBuilder = KeanuSavedBayesNet.Model.newBuilder();
+        KeanuSavedBayesNet.ProtoModel.Builder modelBuilder = KeanuSavedBayesNet.ProtoModel.newBuilder();
         JsonFormat.parser().merge(jsonInput, modelBuilder);
         return protobufLoader.loadNetwork(modelBuilder.build());
     }

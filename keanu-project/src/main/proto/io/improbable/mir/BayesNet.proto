@@ -3,6 +3,7 @@ syntax = "proto3";
 package mir;
 
 option java_package = "io.improbable.mir";
+option java_outer_classname = "SavedBayesNet";
 
 message Graph {
     repeated Vertex vertices = 1;
