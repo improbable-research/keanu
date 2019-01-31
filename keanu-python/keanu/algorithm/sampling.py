@@ -116,7 +116,7 @@ def sample(net: BayesNet,
     if __all_scalar(sample_from):
         vertex_samples = __create_single_indexed_samples(network_samples, vertices_unwrapped)
     else:
-        vertex_samples = __create_multi_indexed_samples(vertices_unwrapped, network_samples, False)
+        vertex_samples = __create_multi_indexed_samples(vertices_unwrapped, network_samples)
 
     if plot:
         traceplot(vertex_samples, ax=ax)
@@ -176,7 +176,7 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
                 for vertex_unwrapped in vertices_unwrapped
             }
         else:
-            sample = __create_multi_indexed_samples_generated(vertices_unwrapped, network_sample, True)
+            sample = __create_multi_indexed_samples_generated(vertices_unwrapped, network_sample)
 
         if live_plot:
             traces.append(sample)
@@ -205,8 +205,7 @@ def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrap
     return vertex_samples
 
 
-def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples: JavaObject,
-                                   generated: bool) -> sample_types:
+def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples: JavaObject) -> sample_types:
     vertex_samples_multi: Dict = {}
     for vertex in vertices_unwrapped:
         vertex_label = Vertex._get_python_label(vertex)
@@ -225,15 +224,13 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
     return tuple_hierarchy
 
 
-def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, network_samples: JavaObject,
-                                             generated: bool) -> sample_generator_dict_type:
+def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, network_samples: JavaObject) -> sample_generator_dict_type:
     vertex_samples_multi: Dict = {}
     for vertex in vertices_unwrapped:
         vertex_label = Vertex._get_python_label(vertex)
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        if generated:
-            sample = Tensor._to_scalar_or_ndarray(network_samples.get(vertex), return_as_primitive=True)
-            __add_sample_to_dict(sample, vertex_samples_multi, vertex_label)
+        sample = Tensor._to_scalar_or_ndarray(network_samples.get(vertex), return_as_primitive=True)
+        __add_sample_to_dict(sample, vertex_samples_multi, vertex_label)
 
     tuple_hierarchy: Dict = {(vertex_label, tensor_index): values
                              for vertex_label, tensor_index in vertex_samples_multi.items()
