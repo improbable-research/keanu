@@ -9,6 +9,6 @@ java_import(k.jvm_view(), "io.improbable.keanu.vertices.VertexLabel")
 
 class _VertexLabel(JavaObjectWrapper):
 
-    def __init__(self, name: str, namespace=[]):
-        java_object = k.jvm_view().VertexLabel(k.to_java_object_list(namespace), name)
+    def __init__(self, name: str):
+        java_object = k.jvm_view().VertexLabel(name)
         super(_VertexLabel, self).__init__(java_object)
