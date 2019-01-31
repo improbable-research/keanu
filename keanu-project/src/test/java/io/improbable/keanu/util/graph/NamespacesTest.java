@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 
@@ -61,20 +60,20 @@ public class NamespacesTest {
         VertexGraph graph = new VertexGraph(outA).labelConstantVerticesWithValue();
         GraphToDot.write(graph, outputWriter);
         int lines = outputWriter.toString().split("\n").length;
-        assertEquals( 20 , lines );
+        assertEquals(20, lines);
     }
 
     @Test
     public void colorByNamespace() {
         VertexGraph graph = new VertexGraph(outA).colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
-        assertThat("There are three distinct colours", colors.size() == 3);
+        assertEquals("There are three distinct colours", 3, colors.size());
     }
 
     @Test
     public void removeIntermediates() {
         VertexGraph graph = new VertexGraph(outA).removeNamespace("intermediate").colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
-        assertThat("There are two distinct colours", colors.size() == 2);
+        assertEquals("There are two distinct colours", 2, colors.size());
     }
 }
