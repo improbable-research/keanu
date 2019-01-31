@@ -21,6 +21,7 @@ public class LogProbFitnessFunctionGradient implements FitnessFunctionGradient {
         this.onGradientCalculation = null;
     }
 
+    @Override
     public Map<? extends VariableReference, DoubleTensor> value(Map<VariableReference, DoubleTensor> values) {
 
         Map<? extends VariableReference, DoubleTensor> diffs = probabilisticModelWithGradient.logProbGradients(values);

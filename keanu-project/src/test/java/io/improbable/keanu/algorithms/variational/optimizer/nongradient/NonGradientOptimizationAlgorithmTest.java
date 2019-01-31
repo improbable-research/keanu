@@ -29,7 +29,7 @@ public class NonGradientOptimizationAlgorithmTest {
                 .build();
         });
 
-        Supplier<NonGradientOptimizationAlgorithm> getOptimizer;
+        private Supplier<NonGradientOptimizationAlgorithm> getOptimizer;
     }
 
     @AllArgsConstructor

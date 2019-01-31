@@ -35,7 +35,7 @@ public class GradientOptimizationAlgorithmTest {
             return ConjugateGradient.builder().build();
         });
 
-        Supplier<GradientOptimizationAlgorithm> getOptimizer;
+        private Supplier<GradientOptimizationAlgorithm> getOptimizer;
     }
 
     @AllArgsConstructor

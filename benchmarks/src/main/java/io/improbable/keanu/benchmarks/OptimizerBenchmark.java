@@ -11,7 +11,11 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 
 @State(Scope.Benchmark)
 public class OptimizerBenchmark {
@@ -68,7 +72,7 @@ public class OptimizerBenchmark {
     public OptimizedResult baseline() {
         OptimizedResult result = optimizer.maxAPosteriori();
 
-        assertEquals(result.getOptimizedFitness(), -0.1496, 1e-2);
+        assertEquals(result.getFitness(), -0.1496, 1e-2);
 
         return result;
     }

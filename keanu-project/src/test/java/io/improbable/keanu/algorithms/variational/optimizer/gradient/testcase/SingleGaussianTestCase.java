@@ -45,7 +45,7 @@ public class SingleGaussianTestCase implements GradientOptimizationAlgorithmTest
     }
 
     private void assertMLE(OptimizedResult result) {
-        double[] maxA = result.get(A.getReference()).asFlatDoubleArray();
+        double[] maxA = result.getValueFor(A.getReference()).asFlatDoubleArray();
 
         DoubleTensor expected = DoubleTensor.create(5.0, shape);
 
@@ -54,7 +54,7 @@ public class SingleGaussianTestCase implements GradientOptimizationAlgorithmTest
 
 
     private void assertMAP(OptimizedResult result) {
-        double[] maxA = result.get(A.getReference()).asFlatDoubleArray();
+        double[] maxA = result.getValueFor(A.getReference()).asFlatDoubleArray();
 
         DoubleTensor expected = DoubleTensor.create(7.5, shape);
 

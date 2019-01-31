@@ -47,15 +47,15 @@ public class SumGaussianTestCase implements GradientOptimizationAlgorithmTestCas
 
     private void assertMLE(OptimizedResult result) {
 
-        double maxA = result.get(A.getReference()).scalar();
-        double maxB = result.get(B.getReference()).scalar();
+        double maxA = result.getValueFor(A.getReference()).scalar();
+        double maxB = result.getValueFor(B.getReference()).scalar();
 
         assertEquals(46, maxA + maxB, 0.1);
     }
 
     private void assertMAP(OptimizedResult result) {
-        double maxA = result.get(A.getReference()).scalar();
-        double maxB = result.get(B.getReference()).scalar();
+        double maxA = result.getValueFor(A.getReference()).scalar();
+        double maxB = result.getValueFor(B.getReference()).scalar();
 
         assertEquals(22, maxA, 0.1);
         assertEquals(22, maxB, 0.1);

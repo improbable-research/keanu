@@ -99,9 +99,6 @@ public class ConjugateGradient implements GradientOptimizationAlgorithm {
         private double absoluteThreshold = 1e-8;
         private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
 
-        ConjugateGradientBuilder() {
-        }
-
         public ConjugateGradientBuilder maxEvaluations(int maxEvaluations) {
             this.maxEvaluations = maxEvaluations;
             return this;

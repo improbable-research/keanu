@@ -88,8 +88,8 @@ public abstract class BivariateFunctionTestCase implements GradientOptimizationA
 
     @Override
     public void assertResult(OptimizedResult result) {
-        Double actualX = result.get(bivariateFunction.x.getReference()).scalar();
-        Double actualY = result.get(bivariateFunction.y.getReference()).scalar();
+        Double actualX = result.getValueFor(bivariateFunction.x.getReference()).scalar();
+        Double actualY = result.getValueFor(bivariateFunction.y.getReference()).scalar();
 
         assertResult(result, actualX, actualY);
     }

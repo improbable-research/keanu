@@ -105,9 +105,6 @@ public class BOBYQA implements NonGradientOptimizationAlgorithm {
         private double initialTrustRegionRadius = BOBYQAOptimizer.DEFAULT_INITIAL_RADIUS;
         private double stoppingTrustRegionRadius = BOBYQAOptimizer.DEFAULT_STOPPING_RADIUS;
 
-        BOBYQABuilder() {
-        }
-
         public BOBYQABuilder maxEvaluations(int maxEvaluations) {
             this.maxEvaluations = maxEvaluations;
             return this;
