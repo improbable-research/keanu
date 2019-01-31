@@ -42,8 +42,8 @@ public class GradientOptimizer implements Optimizer {
      * Adds a callback to be called whenever the optimizer evaluates the gradient at a point.
      *
      * @param gradientCalculationHandler a function to be called whenever the optimizer evaluates the gradient at a point.
-     *                                   The double[] argument to the handler represents the point being evaluated.
-     *                                   The double[] argument to the handler represents the gradient of that point.
+     *                                   The first argument to the handler represents the point being evaluated.
+     *                                   The second argument to the handler represents the gradient of that point.
      */
     public void addGradientCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> gradientCalculationHandler) {
         this.onGradientCalculations.add(gradientCalculationHandler);
@@ -172,9 +172,6 @@ public class GradientOptimizer implements Optimizer {
         private ProbabilisticModelWithGradient probabilisticModelWithGradient;
         private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = ConjugateGradient.builder().build();
         private boolean checkInitialFitnessConditions = true;
-
-        GradientOptimizerBuilder() {
-        }
 
         public GradientOptimizerBuilder probabilisticModel(ProbabilisticModelWithGradient probabilisticModelWithGradient) {
             this.probabilisticModelWithGradient = probabilisticModelWithGradient;

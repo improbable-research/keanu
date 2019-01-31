@@ -22,8 +22,8 @@ public interface Optimizer {
      * Adds a callback to be called whenever the optimizer evaluates the fitness of a point. E.g. for logging.
      *
      * @param fitnessCalculationHandler a function to be called whenever the optimizer evaluates the fitness of a point.
-     *                                  The Map<VariableReference, DoubleTensor> argument to the handler represents the point being evaluated.
-     *                                  The Double argument to the handler represents the fitness of that point.
+     *                                  The first argument to the handler represents the point being evaluated.
+     *                                  The second argument to the handler represents the fitness of that point.
      */
     void addFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler);
 
@@ -77,15 +77,7 @@ public interface Optimizer {
 
     static Map<VariableReference, DoubleTensor> convertToMapPoint(List<? extends Variable> variables) {
         return variables.stream()
-            .collect(Collectors.toMap(Variable::getReference, v -> {
-                if (v.getValue() instanceof DoubleTensor) {
-                    return (DoubleTensor) v.getValue();
-                } else {
-                    throw new UnsupportedOperationException(
-                        "Optimization unsupported on networks containing discrete latents. " +
-                            "Discrete latent : " + v.getReference() + " found.");
-                }
-            }));
+            .collect(Collectors.toMap(Variable::getReference, v -> toDoubleTensorVariable(v).getValue()));
     }
 
     static Map<VariableReference, DoubleTensor> convertFromPoint(double[] point, List<? extends Variable> latentVariables) {
@@ -118,17 +110,18 @@ public interface Optimizer {
 
     static List<Variable<? extends DoubleTensor, ?>> getAsDoubleTensors(List<? extends Variable> variables) {
         return variables.stream()
-            .map(
-                v -> {
-                    if (v.getValue() instanceof DoubleTensor) {
-                        return (Variable<DoubleTensor, ?>) v;
-                    } else {
-                        throw new UnsupportedOperationException(
-                            "Optimization unsupported on networks containing discrete latents. " +
-                                "Discrete latent : " + v.getReference() + " found.");
-                    }
-                }
-            ).collect(Collectors.toList());
+            .map(v -> toDoubleTensorVariable(v))
+            .collect(Collectors.toList());
+    }
+
+    static Variable<DoubleTensor, ?> toDoubleTensorVariable(Variable<?, ?> v) {
+        if (v.getValue() instanceof DoubleTensor) {
+            return (Variable<DoubleTensor, ?>) v;
+        } else {
+            throw new UnsupportedOperationException(
+                "Optimization unsupported on networks containing discrete latents. " +
+                    "Discrete latent : " + v.getReference() + " found.");
+        }
     }
 
     static StatusBar createFitnessStatusBar(final Optimizer optimizerThatNeedsStatusBar) {
