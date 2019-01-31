@@ -24,7 +24,7 @@ public class VertexVariationalMAP {
         DoubleVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
 
         // GENERATE FAKE DATA
-        DoubleTensor samples = sourceVertex.sample(random);
+        DoubleTensor samples = sourceVertex.eval();
 
         DoubleVertex observedDistribution = vertexUnderTestCreator.apply(latentsToInfer);
         observedDistribution.observe(samples);

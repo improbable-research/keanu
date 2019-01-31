@@ -47,11 +47,6 @@ public class IntegerIfVertex extends IntegerVertex implements NonProbabilistic<I
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op(predicate.sample(random), thn.sample(random), els.sample(random));
-    }
-
-    @Override
     public IntegerTensor calculate() {
         return op(predicate.getValue(), thn.getValue(), els.getValue());
     }

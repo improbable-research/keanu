@@ -62,11 +62,6 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
         return stringBuilder.toString();
     }
 
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return predicate.sample();
-    }
-
     @SaveVertexParam(PREDICATE_NAME)
     public Vertex<? extends BooleanTensor> getPredicate() {
         return predicate;

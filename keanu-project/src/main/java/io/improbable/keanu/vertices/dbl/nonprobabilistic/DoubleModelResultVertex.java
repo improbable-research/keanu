@@ -31,11 +31,6 @@ public class DoubleModelResultVertex extends DoubleVertex implements ModelResult
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return delegate.sample(random);
-    }
-
-    @Override
     public DoubleTensor calculate() {
         return delegate.calculate();
     }

@@ -26,11 +26,6 @@ public class IntegerUnaryOpLambda<IN> extends IntegerVertex implements NonProbab
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op.apply(inputVertex.sample(random));
-    }
-
-    @Override
     public IntegerTensor calculate() {
         return op.apply(inputVertex.getValue());
     }

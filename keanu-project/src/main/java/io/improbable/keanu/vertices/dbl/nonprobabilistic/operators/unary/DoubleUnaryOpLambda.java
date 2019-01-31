@@ -47,11 +47,6 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op.apply(inputVertex.sample(random));
-    }
-
-    @Override
     public DoubleTensor calculate() {
         return op.apply(inputVertex.getValue());
     }

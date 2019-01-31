@@ -34,11 +34,6 @@ public class BooleanIfVertex extends BooleanVertex implements NonProbabilistic<B
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(predicate.sample(random), thn.sample(random), els.sample(random));
-    }
-
-    @Override
     public BooleanTensor calculate() {
         return op(predicate.getValue(), thn.getValue(), els.getValue());
     }

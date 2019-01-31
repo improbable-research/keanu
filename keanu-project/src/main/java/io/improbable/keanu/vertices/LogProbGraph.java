@@ -47,10 +47,6 @@ public class LogProbGraph {
             return getPlaceholderVertexValue(this);
         }
 
-        @Override
-        public DoubleTensor sample(KeanuRandom random) {
-            return getPlaceholderVertexValue(this);
-        }
     }
 
     static public class IntegerPlaceHolderVertex extends IntegerVertex implements PlaceholderVertex<IntegerTensor>, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
@@ -64,10 +60,6 @@ public class LogProbGraph {
             return getPlaceholderVertexValue(this);
         }
 
-        @Override
-        public IntegerTensor sample(KeanuRandom random) {
-            return getPlaceholderVertexValue(this);
-        }
     }
 
     private interface PlaceholderVertex<T> {

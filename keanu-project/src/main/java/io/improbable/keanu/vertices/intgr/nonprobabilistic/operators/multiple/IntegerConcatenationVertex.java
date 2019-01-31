@@ -51,11 +51,6 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
         return op(extractFromInputs(IntegerTensor.class, Vertex::getValue, input));
     }
 
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(IntegerTensor.class, Vertex::sample, input));
-    }
-
     private IntegerTensor op(IntegerTensor... inputs) {
         return IntegerTensor.concat(dimension, inputs);
     }

@@ -31,11 +31,6 @@ public class IntegerModelResultVertex extends IntegerVertex implements ModelResu
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return delegate.sample(random);
-    }
-
-    @Override
     public IntegerTensor calculate() {
         return delegate.calculate();
     }

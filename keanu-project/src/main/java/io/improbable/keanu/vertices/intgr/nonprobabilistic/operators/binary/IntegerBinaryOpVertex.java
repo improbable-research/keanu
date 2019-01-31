@@ -41,11 +41,6 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op(left.sample(random), right.sample(random));
-    }
-
-    @Override
     public IntegerTensor calculate() {
         return op(left.getValue(), right.getValue());
     }

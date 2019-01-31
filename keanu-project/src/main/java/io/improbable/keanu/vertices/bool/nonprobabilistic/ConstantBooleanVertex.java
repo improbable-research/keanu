@@ -35,11 +35,6 @@ public class ConstantBooleanVertex extends BooleanVertex implements ConstantVert
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return getValue();
-    }
-
-    @Override
     public BooleanTensor calculate() {
         return getValue();
     }

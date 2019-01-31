@@ -35,12 +35,6 @@ public class MultiplexerVertex<T> extends GenericVertex<T> implements NonProbabi
     }
 
     @Override
-    public T sample(KeanuRandom random) {
-        Vertex<T> selector = getSelector();
-        return selector.sample(random);
-    }
-
-    @Override
     public T calculate() {
         Vertex<T> selector = getSelector();
         return selector.getValue();

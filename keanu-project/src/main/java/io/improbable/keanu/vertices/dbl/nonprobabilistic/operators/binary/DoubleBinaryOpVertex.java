@@ -43,11 +43,6 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op(left.sample(random), right.sample(random));
-    }
-
-    @Override
     public DoubleTensor calculate() {
         return op(left.getValue(), right.getValue());
     }

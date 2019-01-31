@@ -31,13 +31,6 @@ public class IntegerCPTVertex extends IntegerVertex implements NonProbabilistic<
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.sample(random).scalar());
-        IntegerVertex vertex = conditions.get(condition);
-        return vertex == null ? defaultResult.sample(random) : vertex.sample(random);
-    }
-
-    @Override
     public IntegerTensor calculate() {
         final CPTCondition condition = CPTCondition.from(inputs, v -> v.getValue().scalar());
         IntegerVertex vertex = conditions.get(condition);

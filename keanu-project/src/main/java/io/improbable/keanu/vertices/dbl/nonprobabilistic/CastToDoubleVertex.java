@@ -28,11 +28,6 @@ public class CastToDoubleVertex extends DoubleVertex implements NonProbabilistic
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return inputVertex.sample(random).toDouble();
-    }
-
-    @Override
     public DoubleTensor calculate() {
         return inputVertex.getValue().toDouble();
     }

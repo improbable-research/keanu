@@ -30,9 +30,9 @@ class LinearRegressionTestUtils {
     }
 
     static TestData generateSingleFeatureData(int numSamples) {
-        DoubleVertex xGenerator = new UniformVertex(new long[]{numSamples, 1}, 0, 10);
+        UniformVertex xGenerator = new UniformVertex(new long[]{numSamples, 1}, 0, 10);
         DoubleVertex mu = xGenerator.multiply(EXPECTED_W1).plus(EXPECTED_B);
-        DoubleVertex yGenerator = new GaussianVertex(mu, 1.0);
+        GaussianVertex yGenerator = new GaussianVertex(mu, 1.0);
         DoubleTensor xData = xGenerator.sample();
         xGenerator.setAndCascade(xData);
         DoubleTensor yData = yGenerator.sample();
@@ -45,9 +45,9 @@ class LinearRegressionTestUtils {
     }
 
     static TestData generateTwoFeatureData(int numSamples) {
-        DoubleVertex x1Generator = new UniformVertex(new long[]{numSamples, 1}, 0, 10);
-        DoubleVertex x2Generator = new UniformVertex(new long[]{numSamples, 1}, 50, 100);
-        DoubleVertex yGenerator = new GaussianVertex(
+        UniformVertex x1Generator = new UniformVertex(new long[]{numSamples, 1}, 0, 10);
+        UniformVertex x2Generator = new UniformVertex(new long[]{numSamples, 1}, 50, 100);
+        GaussianVertex yGenerator = new GaussianVertex(
             x1Generator.multiply(EXPECTED_W1).plus(x2Generator.multiply(EXPECTED_W2)).plus(EXPECTED_B),
             1.0
         );
@@ -62,10 +62,10 @@ class LinearRegressionTestUtils {
     }
 
     static TestData generateThreeFeatureDataWithOneUncorrelatedFeature() {
-        DoubleVertex x1Generator = new UniformVertex(new long[]{N, 1}, 0, 10);
-        DoubleVertex x2Generator = new UniformVertex(new long[]{N, 1}, 50, 100);
-        DoubleVertex x3Generator = new UniformVertex(new long[]{N, 1}, 50, 100);
-        DoubleVertex yGenerator = new GaussianVertex(
+        UniformVertex x1Generator = new UniformVertex(new long[]{N, 1}, 0, 10);
+        UniformVertex x2Generator = new UniformVertex(new long[]{N, 1}, 50, 100);
+        UniformVertex x3Generator = new UniformVertex(new long[]{N, 1}, 50, 100);
+        GaussianVertex yGenerator = new GaussianVertex(
             x1Generator.multiply(EXPECTED_W1).plus(x2Generator.multiply(EXPECTED_W2)).plus(EXPECTED_B),
             1.0
         );
@@ -95,11 +95,11 @@ class LinearRegressionTestUtils {
         long N = 1000;
         double expectedB = 20;
 
-        DoubleVertex xGenerator = new UniformVertex(new long[]{N, featureCount}, 0, 100);
-        DoubleVertex weightsGenerator = weightVertexFromShape.apply(new long[]{featureCount,1});
+        UniformVertex xGenerator = new UniformVertex(new long[]{N, featureCount}, 0, 100);
+        DoubleVertex weightsGenerator = weightVertexFromShape.apply(new long[]{featureCount, 1});
         DoubleVertex yGenerator = new GaussianVertex(new long[]{N, 1}, xGenerator.matrixMultiply(weightsGenerator).plus(expectedB), 1.0);
         DoubleTensor xData = xGenerator.sample();
-        DoubleTensor weights = weightsGenerator.sample();
+        DoubleTensor weights = weightsGenerator.eval();
         xGenerator.setValue(xData);
         weightsGenerator.setValue(weights);
         DoubleTensor yData = yGenerator.getValue();

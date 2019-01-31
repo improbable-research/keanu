@@ -22,11 +22,6 @@ public class CastToBooleanVertex extends BooleanVertex implements NonProbabilist
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return inputVertex.sample(random);
-    }
-
-    @Override
     public BooleanTensor calculate() {
         return inputVertex.getValue();
     }

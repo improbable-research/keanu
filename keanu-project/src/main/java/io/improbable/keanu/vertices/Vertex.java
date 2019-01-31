@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class Vertex<T> implements Observable<T>, Samplable<T>, Variable<T, VertexState<T>> {
+public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexState<T>> {
 
     private final VertexId id = new VertexId();
     private final long[] initialShape;

@@ -31,11 +31,6 @@ public class BooleanModelResultVertex extends BooleanVertex implements ModelResu
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return delegate.sample(random);
-    }
-
-    @Override
     public BooleanTensor calculate() {
         return delegate.calculate();
     }

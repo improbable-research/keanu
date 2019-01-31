@@ -20,11 +20,6 @@ public abstract class UnaryOpVertex<IN, OUT> extends GenericVertex<OUT> implemen
     }
 
     @Override
-    public OUT sample(KeanuRandom random) {
-        return op(inputVertex.sample(random));
-    }
-
-    @Override
     public OUT calculate() {
         return op(inputVertex.getValue());
     }

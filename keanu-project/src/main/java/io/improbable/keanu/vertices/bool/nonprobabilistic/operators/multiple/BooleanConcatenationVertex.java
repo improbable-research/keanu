@@ -50,11 +50,6 @@ public class BooleanConcatenationVertex extends BooleanVertex implements NonProb
         return op(extractFromInputs(BooleanTensor.class, Vertex::getValue, input));
     }
 
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(BooleanTensor.class, Vertex::sample, input));
-    }
-
     protected BooleanTensor op(BooleanTensor... inputs) {
         return BooleanTensor.concat(dimension, inputs);
     }

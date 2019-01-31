@@ -26,11 +26,6 @@ public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
         this.index = index;
     }
 
-    @Override
-    public Tensor<T> sample(KeanuRandom random) {
-        return op(inputVertex.sample(random));
-    }
-
     protected Tensor<T> op(Tensor<T> input) {
         return GenericTensor.scalar(input.getValue(index));
     }

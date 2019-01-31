@@ -106,16 +106,6 @@ public class BayesianNetworkTest {
     }
 
     private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {
-        @Override
-        public DoubleTensor sample(KeanuRandom random) {
-            return null;
-        }
-
-        @Override
-        public DoubleTensor sample() {
-            return null;
-        }
-
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});
         }

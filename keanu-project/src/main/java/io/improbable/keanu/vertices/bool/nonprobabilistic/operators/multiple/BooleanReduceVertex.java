@@ -37,11 +37,6 @@ public class BooleanReduceVertex extends BooleanVertex implements NonProbabilist
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return applyReduce((vertex) -> vertex.sample(random));
-    }
-
-    @Override
     public BooleanTensor calculate() {
         return applyReduce(Vertex::getValue);
     }

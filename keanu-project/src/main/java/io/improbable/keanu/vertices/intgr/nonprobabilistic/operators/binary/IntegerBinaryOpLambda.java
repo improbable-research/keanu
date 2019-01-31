@@ -34,11 +34,6 @@ public class IntegerBinaryOpLambda<A, B> extends IntegerVertex implements NonPro
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op.apply(left.sample(random), right.sample(random));
-    }
-
-    @Override
     public IntegerTensor calculate() {
         return op.apply(left.getValue(), right.getValue());
     }

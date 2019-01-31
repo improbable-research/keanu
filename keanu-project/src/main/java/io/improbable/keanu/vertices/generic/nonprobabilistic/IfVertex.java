@@ -36,11 +36,6 @@ public class IfVertex<T> extends GenericTensorVertex<Tensor<T>> implements NonPr
     }
 
     @Override
-    public Tensor<T> sample(KeanuRandom random) {
-        return op(predicate.sample(random), thn.sample(random), els.sample(random));
-    }
-
-    @Override
     public Tensor<T> calculate() {
         return op(predicate.getValue(), thn.getValue(), els.getValue());
     }

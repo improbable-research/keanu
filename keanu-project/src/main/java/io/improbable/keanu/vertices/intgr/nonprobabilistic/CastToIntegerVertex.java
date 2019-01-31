@@ -23,11 +23,6 @@ public class CastToIntegerVertex extends IntegerVertex implements NonProbabilist
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return inputVertex.sample(random).toInteger();
-    }
-
-    @Override
     public IntegerTensor calculate() {
         return inputVertex.getValue().toInteger();
     }

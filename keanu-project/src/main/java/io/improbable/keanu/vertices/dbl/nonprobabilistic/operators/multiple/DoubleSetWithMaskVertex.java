@@ -38,11 +38,6 @@ public class DoubleSetWithMaskVertex extends DoubleVertex implements NonProbabil
         return operand.getValue().setWithMask(mask.getValue(), setValue.getValue().scalar());
     }
 
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return this.getValue();
-    }
-
     @SaveVertexParam(OPERAND_NAME)
     public DoubleVertex getOperand() {
         return operand;

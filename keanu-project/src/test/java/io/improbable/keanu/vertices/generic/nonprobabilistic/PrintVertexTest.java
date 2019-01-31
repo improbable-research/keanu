@@ -106,15 +106,6 @@ public class PrintVertexTest {
     }
 
     @Test
-    public void whenSampleIsCalledThenKeanuRandomIsPassedToParentSample() {
-        final KeanuRandom random = mock(KeanuRandom.class);
-
-        final PrintVertex<DoubleTensor> sut = new PrintVertex<>(parent);
-        sut.sample(random);
-        verify(parent).sample(random);
-    }
-
-    @Test
     public void whenPrefixIsSuppliedThenItIsUsedInPresentation() {
         final PrintVertex<DoubleTensor> sut = new PrintVertex<>(parent, "my vertex\n", false);
 

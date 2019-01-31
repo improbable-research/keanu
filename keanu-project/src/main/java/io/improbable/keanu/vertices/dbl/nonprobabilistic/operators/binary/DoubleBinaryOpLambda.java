@@ -55,11 +55,6 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differen
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op.apply(left.sample(random), right.sample(random));
-    }
-
-    @Override
     public DoubleTensor calculate() {
         return op.apply(left.getValue(), right.getValue());
     }

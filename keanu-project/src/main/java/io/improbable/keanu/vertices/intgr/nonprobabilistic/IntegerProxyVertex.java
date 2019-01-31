@@ -45,11 +45,6 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return getParent().sample();
-    }
-
-    @Override
     public void setParent(IntegerVertex newParent) {
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(getShape(), newParent.getShape());
         setParents(newParent);

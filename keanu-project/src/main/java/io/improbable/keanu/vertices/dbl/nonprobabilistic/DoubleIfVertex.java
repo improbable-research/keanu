@@ -54,11 +54,6 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op(predicate.sample(random), thn.sample(random), els.sample(random));
-    }
-
-    @Override
     public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
 
         PartialDerivative thnPartial = derivativeOfParentsWithRespectToInput.getOrDefault(thn, PartialDerivative.EMPTY);

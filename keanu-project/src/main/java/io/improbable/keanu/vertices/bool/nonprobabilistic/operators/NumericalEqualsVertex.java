@@ -35,11 +35,6 @@ public class NumericalEqualsVertex extends BooleanVertex implements NonProbabili
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(a.sample(random), b.sample(random), epsilon.sample(random));
-    }
-
-    @Override
     public BooleanTensor calculate() {
         return op(a.getValue(), b.getValue(), epsilon.getValue());
     }

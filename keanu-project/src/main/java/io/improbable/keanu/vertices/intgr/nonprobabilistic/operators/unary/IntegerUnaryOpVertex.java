@@ -33,11 +33,6 @@ public abstract class IntegerUnaryOpVertex extends IntegerVertex implements NonP
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op(inputVertex.sample(random));
-    }
-
-    @Override
     public IntegerTensor calculate() {
         return op(inputVertex.getValue());
     }

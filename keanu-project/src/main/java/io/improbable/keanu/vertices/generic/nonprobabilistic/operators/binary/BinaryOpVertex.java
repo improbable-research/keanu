@@ -17,11 +17,6 @@ public abstract class BinaryOpVertex<A, B, C> extends GenericVertex<C> implement
     }
 
     @Override
-    public C sample(KeanuRandom random) {
-        return op(a.sample(random), b.sample(random));
-    }
-
-    @Override
     public C calculate() {
         return op(a.getValue(), b.getValue());
     }

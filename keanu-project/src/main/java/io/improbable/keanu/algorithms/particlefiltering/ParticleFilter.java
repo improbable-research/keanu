@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
@@ -132,7 +133,7 @@ public class ParticleFilter {
     }
 
     private <T> void sampleValueAndAddToParticle(Vertex<T> vertex, Particle particle) {
-        T sample = vertex.sample(random);
+        T sample = ((Probabilistic<T>) vertex).sample(random);
         particle.addLatentVertex(vertex, sample);
     }
 

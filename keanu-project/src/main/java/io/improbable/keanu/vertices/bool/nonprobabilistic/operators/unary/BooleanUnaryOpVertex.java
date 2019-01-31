@@ -24,11 +24,6 @@ public abstract class BooleanUnaryOpVertex<T extends Tensor> extends BooleanVert
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(a.sample(random));
-    }
-
-    @Override
     public BooleanTensor calculate() {
         return op(a.getValue());
     }

@@ -87,11 +87,6 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return applyReduce(vertex -> vertex.sample(random));
-    }
-
-    @Override
     public DoubleTensor calculate() {
         return applyReduce(Vertex::getValue);
     }

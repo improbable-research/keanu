@@ -34,11 +34,6 @@ public class ConstantIntegerVertex extends IntegerVertex implements ConstantVert
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return getValue();
-    }
-
-    @Override
     public void save(NetworkSaver netSaver) {
         netSaver.save(this);
     }

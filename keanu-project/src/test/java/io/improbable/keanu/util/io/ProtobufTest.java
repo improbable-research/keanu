@@ -466,15 +466,6 @@ public class ProtobufTest {
             super(new long[]{1, 1});
         }
 
-        @Override
-        public DoubleTensor sample(KeanuRandom random) {
-            return null;
-        }
-
-        @Override
-        public DoubleTensor sample() {
-            return null;
-        }
     }
 
     @Test(expected = IllegalArgumentException.class)

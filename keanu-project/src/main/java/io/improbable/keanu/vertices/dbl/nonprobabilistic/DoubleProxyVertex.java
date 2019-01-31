@@ -51,11 +51,6 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return getParent().sample();
-    }
-
-    @Override
     public void setParent(DoubleVertex newParent) {
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(getShape(), newParent.getShape());
         setParents(newParent);

@@ -28,25 +28,25 @@ public class BooleanMultipleOperatorTest {
     @Test
     public void testMultipleAnd() {
         BooleanVertex andTrue = new AndMultipleVertex(allTrue);
-        assertEquals(true, andTrue.sample(random).scalar());
+        assertEquals(true, andTrue.eval().scalar());
 
         BooleanVertex andMixed = new AndMultipleVertex(allMixed);
-        assertEquals(false, andMixed.sample(random).scalar());
+        assertEquals(false, andMixed.eval().scalar());
 
         BooleanVertex andFalse = new AndMultipleVertex(allFalse);
-        assertEquals(false, andFalse.sample(random).scalar());
+        assertEquals(false, andFalse.eval().scalar());
     }
 
     @Test
     public void testMultipleOr() {
         BooleanVertex orTrue = new OrMultipleVertex(allTrue);
-        assertEquals(true, orTrue.sample(random).scalar());
+        assertEquals(true, orTrue.eval().scalar());
 
         BooleanVertex orMixed = new OrMultipleVertex(allMixed);
-        assertEquals(true, orMixed.sample(random).scalar());
+        assertEquals(true, orMixed.eval().scalar());
 
         BooleanVertex orFalse = new OrMultipleVertex(allFalse);
-        assertEquals(false, orFalse.sample(random).scalar());
+        assertEquals(false, orFalse.eval().scalar());
     }
 
     private List<Vertex<BooleanTensor>> buildVertexList(int numberOfVertices, int numberThatAreTrue) {

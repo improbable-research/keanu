@@ -115,7 +115,7 @@ public class LambdaModelVertexTest {
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
 
         for (int i = 0; i < numSamples; i++) {
-            double inputValue = inputToModel.sample(random).scalar();
+            double inputValue = inputToModel.getValue().scalar();
             inputToModel.setAndCascade(inputValue);
             double expectedValue = (inputValue * 0.1) * (inputValue * 2);
             Assert.assertEquals(expectedValue, shouldIBringUmbrella.getValue().scalar(), 1e-6);

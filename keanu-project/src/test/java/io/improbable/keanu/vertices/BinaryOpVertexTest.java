@@ -43,7 +43,9 @@ public class BinaryOpVertexTest {
         int N = 1000000;
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
-            samples.add(custom.sample(random).scalar());
+            bernoulliVertex.setValue(bernoulliVertex.sample(random));
+            gaussianVertex.setValue(gaussianVertex.sample(random));
+            samples.add(custom.lazyEval().scalar());
         }
 
         SummaryStatistics stats = new SummaryStatistics();

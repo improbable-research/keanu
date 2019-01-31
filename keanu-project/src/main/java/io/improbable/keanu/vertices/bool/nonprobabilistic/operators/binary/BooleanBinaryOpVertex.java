@@ -29,11 +29,6 @@ public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> 
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(a.sample(random), b.sample(random));
-    }
-
-    @Override
     public boolean contradictsObservation() {
         return isObserved() && !op(a.getValue(), b.getValue()).elementwiseEquals(getValue()).allTrue();
     }

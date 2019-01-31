@@ -45,11 +45,6 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return getParent().sample();
-    }
-
-    @Override
     public void setParent(BooleanVertex newParent) {
         checkTensorsMatchNonLengthOneShapeOrAreLengthOne(getShape(), newParent.getShape());
         setParents(newParent);

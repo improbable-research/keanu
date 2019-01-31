@@ -28,13 +28,6 @@ public class CPTVertex<OUT extends Tensor> extends GenericTensorVertex<OUT> impl
     }
 
     @Override
-    public OUT sample(KeanuRandom random) {
-        final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.sample(random).scalar());
-        Vertex<OUT> vertex = conditions.get(condition);
-        return vertex == null ? defaultResult.sample(random) : vertex.sample(random);
-    }
-
-    @Override
     public OUT calculate() {
         final CPTCondition condition = CPTCondition.from(inputs, v -> v.getValue().scalar());
         Vertex<OUT> vertex = conditions.get(condition);

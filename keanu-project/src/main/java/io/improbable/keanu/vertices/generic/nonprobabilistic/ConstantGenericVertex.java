@@ -12,11 +12,6 @@ public class ConstantGenericVertex<T> extends GenericVertex<T> implements NonPro
     }
 
     @Override
-    public T sample(KeanuRandom random) {
-        return getValue();
-    }
-
-    @Override
     public T calculate() {
         return getValue();
     }

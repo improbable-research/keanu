@@ -48,11 +48,6 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
         return Collections.emptyMap();
     }
 
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return getValue();
-    }
-
     public DoubleTensor calculate() {
         return getValue();
     }

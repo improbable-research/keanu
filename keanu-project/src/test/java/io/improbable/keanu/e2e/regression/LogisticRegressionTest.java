@@ -55,11 +55,11 @@ public class LogisticRegressionTest {
     }
 
     private DoubleTensor generateX(int nSamples) {
-        DoubleVertex[] xVertices = new DoubleVertex[NUM_FEATURES];
+        DoubleTensor[] xValues = new DoubleTensor[NUM_FEATURES];
         for (int i = 0; i < NUM_FEATURES; i++) {
-            xVertices[i] = new GaussianVertex(new long[]{nSamples, 1}, 0.0, SIGMAS[i]);
+            xValues[i] = new GaussianVertex(new long[]{nSamples, 1}, 0.0, SIGMAS[i]).sample();
         }
-        return DoubleVertex.concat(1, xVertices).sample(random);
+        return DoubleTensor.concat(1, xValues);
     }
 
     private BooleanTensor generateY(DoubleTensor x) {

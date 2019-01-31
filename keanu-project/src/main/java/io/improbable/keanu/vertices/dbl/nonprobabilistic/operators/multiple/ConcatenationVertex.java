@@ -153,11 +153,6 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(DoubleTensor.class, Vertex::sample, operands));
-    }
-
-    @Override
     public DoubleTensor calculate() {
         return op(extractFromInputs(DoubleTensor.class, Vertex::getValue, operands));
     }
