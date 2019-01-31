@@ -3,7 +3,6 @@ package io.improbable.keanu.util.graph.io;
 import io.improbable.keanu.util.graph.AbstractGraph;
 import io.improbable.keanu.util.graph.GraphEdge;
 import io.improbable.keanu.util.graph.GraphNode;
-import io.improbable.keanu.util.graph.VertexGraph;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
