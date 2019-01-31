@@ -19,8 +19,9 @@ message Vertex {
     string label = 2;
     string vertexType = 3;
     repeated NamedParam parameters = 5;
-    DataType data_type = 6;
-    repeated Metadata metadata = 7;
+    repeated int64 shape = 6;
+    DataType data_type = 7;
+    repeated Metadata metadata = 8;
 }
 
 message DoubleTensor {
@@ -69,6 +70,7 @@ message NamedParam {
         LongArray long_array_param = 10;
         VertexArray vertex_array_param = 11;
         IntArray int_array_param = 12;
+        bool bool_param = 13;
     }
 }
 
@@ -76,6 +78,7 @@ message StoredValue {
     VertexValue value = 1;
     string vertex_label = 2;
     VertexID id = 3;
+    bool isObserved = 4;
 }
 
 message VertexValue {

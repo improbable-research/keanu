@@ -19,7 +19,6 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.mir.KeanuSavedBayesNet;
-import io.improbable.mir.MIRCommon;
 import io.improbable.mir.SavedBayesNet;
 
 import java.io.IOException;
@@ -27,6 +26,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ProtobufLoader implements NetworkLoader {
@@ -58,7 +58,7 @@ public class ProtobufLoader implements NetworkLoader {
 
         BayesianNetwork bayesNet = new BayesianNetwork(instantiatedVertices.values());
 
-        loadDefaultValues(parsedModel.getGraph()., instantiatedVertices, bayesNet);
+        loadDefaultValues(parsedModel.getGraph().getDefaultStateList(), instantiatedVertices, bayesNet);
 
         return bayesNet;
     }
@@ -72,17 +72,17 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private DoubleTensor extractDoubleValue(SavedBayesNet.VertexValue value) {
-        if (value.getValueTypeCase() != KeanuSavedBayesNet.VertexValue.ValueTypeCase.DOUBLEVAL) {
+        if (value.getValueTypeCase() != SavedBayesNet.VertexValue.ValueTypeCase.DOUBLE_VAL) {
             throw new IllegalArgumentException("Non Double Value specified for Double Vertex");
         } else {
             return extractDoubleTensor(value.getDoubleVal());
         }
     }
 
-    private void loadDefaultValues(SavedBayesNet.BayesianNetworkState parsedNetworkState,
+    private void loadDefaultValues(List<SavedBayesNet.StoredValue> defaultState,
                                    Map<SavedBayesNet.VertexID, Vertex> instantiatedVertices,
                                    BayesianNetwork bayesNet) {
-        for (SavedBayesNet.StoredValue value : parsedNetworkState.getDefaultStateList()) {
+        for (SavedBayesNet.StoredValue value : defaultState) {
             Vertex targetVertex = getTargetVertex(value, instantiatedVertices, bayesNet);
 
             savedValues.put(targetVertex, value);
@@ -149,7 +149,7 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private BooleanTensor extractBoolValue(SavedBayesNet.VertexValue value) {
-        if (value.getValueTypeCase() != SavedBayesNet.VertexValue.ValueTypeCase.BOOLVAL) {
+        if (value.getValueTypeCase() != SavedBayesNet.VertexValue.ValueTypeCase.BOOL_VAL) {
             throw new IllegalArgumentException("Non Boolean Value specified for Boolean Vertex");
         } else {
             return extractBoolTensor(value.getBoolVal());
@@ -165,7 +165,7 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     private IntegerTensor extractIntValue(SavedBayesNet.VertexValue value) {
-        if (value.getValueTypeCase() != SavedBayesNet.VertexValue.ValueTypeCase.INTVAL) {
+        if (value.getValueTypeCase() != SavedBayesNet.VertexValue.ValueTypeCase.INT_VAL) {
             throw new IllegalArgumentException("Non Int Value specified for Int Vertex");
         } else {
             return extractIntTensor(value.getIntVal());
@@ -279,40 +279,40 @@ public class ProtobufLoader implements NetworkLoader {
     private Object getDecodedParam(SavedBayesNet.NamedParam parameter,
                                    Map<SavedBayesNet.VertexID, Vertex> existingVertices) {
         switch (parameter.getParamCase()) {
-            case PARENTVERTEX:
+            case PARENT_VERTEX:
                 return existingVertices.get(parameter.getParentVertex());
 
-            case DOUBLETENSORPARAM:
+            case DOUBLE_TENSOR_PARAM:
                 return extractDoubleTensor(parameter.getDoubleTensorParam());
 
-            case INTTENSORPARAM:
+            case INT_TENSOR_PARAM:
                 return extractIntTensor(parameter.getIntTensorParam());
 
-            case BOOLTENSORPARAM:
+            case BOOL_TENSOR_PARAM:
                 return extractBoolTensor(parameter.getBoolTensorParam());
 
-            case DOUBLEPARAM:
+            case DOUBLE_PARAM:
                 return parameter.getDoubleParam();
 
-            case INTPARAM:
+            case INT_PARAM:
                 return parameter.getIntParam();
 
-            case LONGPARAM:
+            case LONG_PARAM:
                 return parameter.getLongParam();
 
-            case STRINGPARAM:
+            case STRING_PARAM:
                 return parameter.getStringParam();
 
-            case BOOLPARAM:
+            case BOOL_PARAM:
                 return parameter.getBoolParam();
 
-            case LONGARRAYPARAM:
+            case LONG_ARRAY_PARAM:
                 return Longs.toArray(parameter.getLongArrayParam().getValuesList());
 
-            case INTARRAYPARAM:
+            case INT_ARRAY_PARAM:
                 return Ints.toArray(parameter.getIntArrayParam().getValuesList());
 
-            case VERTEXARRAYPARAM:
+            case VERTEX_ARRAY_PARAM:
                 return extractVertexArray(parameter, existingVertices);
 
             default:
