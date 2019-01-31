@@ -8,6 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.*;
 import java.util.Map;
 
+/**
+ * Standard output to save an AbstractGraph to a .dot file
+ */
 public abstract class GraphToDot {
 
     private static final String DOT_HEADER = "digraph BayesianNetwork {\n";
@@ -23,6 +26,12 @@ public abstract class GraphToDot {
     private static final String DOT_NEW_LINE = "\n";
     private static final String DOT_METADATA_SPACER = ": ";
 
+    /**
+     * Writes the graph directly to a file
+     * @param graph the graph to write
+     * @param file the file to write to
+     * @throws IOException
+     */
     public static void writeFile(@NotNull AbstractGraph<? extends GraphNode, ? extends GraphEdge>  graph, @NotNull File file) throws IOException {
         FileOutputStream outputStream = new FileOutputStream(file);
         try {
@@ -32,11 +41,23 @@ public abstract class GraphToDot {
         }
     }
 
+    /**
+     * Writes the graph to a OutputSteam
+     * @param graph the graph to write
+     * @param output the output steam to use
+     * @throws IOException
+     */
     public static void write(@NotNull AbstractGraph<? extends GraphNode, ? extends GraphEdge> graph, @NotNull OutputStream output) throws IOException {
         Writer outputWriter = new OutputStreamWriter(output);
         write(graph, outputWriter);
     }
 
+    /**
+     * Writes the graph to a Writer
+     * @param graph the graph to write
+     * @param outputWriter the writer to use
+     * @throws IOException
+     */
     public static void write(@NotNull AbstractGraph<? extends GraphNode, ? extends GraphEdge> graph, @NotNull Writer outputWriter) throws IOException {
         graph.prepareForExport();
         outputWriter.write(DOT_HEADER);
@@ -90,7 +111,7 @@ public abstract class GraphToDot {
         outputWriter.write(sb.toString());
     }
 
-    private static String makeSafe(String input) {
+    protected static String makeSafe(String input) {
         if ( input == null ) return null;
         return input.replaceAll("[\n\"]" , "" );
     }

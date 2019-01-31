@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * This class provides a maping from elements of T into unique colors.
+ * It's main use is applying coloring to graphs.
+ * @param <T> Input type
+ */
 public class ColorSequence<T> {
 
     private List<Color> colors = new LinkedList<>();
@@ -39,6 +44,11 @@ public class ColorSequence<T> {
         return new Color( comps[0] , comps[1] , comps[2]  );
     }
 
+    /**
+     * Primary usage
+     * @param src Source value to lookup
+     * @return a Color that represents that value
+     */
     public Color getOrChoseColor(T src) {
         if (src == null) return null;
         if (assignments.containsKey(src)) {
