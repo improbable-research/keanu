@@ -22,11 +22,11 @@ class OptimizedResult(JavaObjectWrapper):
     def __init__(self, result_object: JavaObject):
         super().__init__(result_object)
 
-    def optimized_fitness(self) -> float:
-        return self.unwrap().getOptimizedFitness()
+    def fitness(self) -> float:
+        return self.unwrap().getFitness()
 
-    def optimized_value(self, v: Vertex) -> numpy_types:
-        return Tensor._to_ndarray(self.unwrap().get(v.unwrap().getReference()))
+    def value_for(self, v: Vertex) -> numpy_types:
+        return Tensor._to_ndarray(self.unwrap().getValueFor(v.unwrap().getReference()))
 
 
 class Optimizer:

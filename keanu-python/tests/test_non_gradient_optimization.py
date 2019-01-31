@@ -56,16 +56,16 @@ def test_non_gradient_can_set_bounds_range_builder_properties(model: Model) -> N
 def test_map_non_gradient(model: Model) -> None:
     non_gradient_optimizer = NonGradientOptimizer(model.a)
     result = non_gradient_optimizer.max_a_posteriori()
-    assert result.optimized_fitness() < 0.
+    assert result.fitness() < 0.
 
-    sum_ab = result.optimized_value(model.a) + result.optimized_value(model.b)
+    sum_ab = result.value_for(model.a) + result.value_for(model.b)
     assert 19.9 < sum_ab < 20.1
 
 
 def test_max_likelihood_non_gradient(model: Model) -> None:
     non_gradient_optimizer = NonGradientOptimizer(model.a)
     result = non_gradient_optimizer.max_likelihood()
-    assert result.optimized_fitness() < 0.
+    assert result.fitness() < 0.
 
-    sum_ab = result.optimized_value(model.a) + result.optimized_value(model.b)
+    sum_ab = result.value_for(model.a) + result.value_for(model.b)
     assert 19.9 < sum_ab < 20.1

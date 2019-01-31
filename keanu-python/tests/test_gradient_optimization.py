@@ -46,9 +46,9 @@ def test_thermometers_map_gradient(model: Model) -> None:
     net = BayesNet(model.temperature.get_connected_graph())
     gradient_optimizer = GradientOptimizer(net)
     result = gradient_optimizer.max_a_posteriori()
-    assert result.optimized_fitness() < 0.
+    assert result.fitness() < 0.
 
-    temperature = result.optimized_value(model.temperature)
+    temperature = result.value_for(model.temperature)
     assert 20.995 < temperature < 21.005
 
 
@@ -56,7 +56,7 @@ def test_thermometers_max_likelihood_gradient(model: Model) -> None:
     net = BayesNet(model.temperature.get_connected_graph())
     gradient_optimizer = GradientOptimizer(net)
     result = gradient_optimizer.max_likelihood()
-    assert result.optimized_fitness() < 0.
+    assert result.fitness() < 0.
 
-    temperature = result.optimized_value(model.temperature)
+    temperature = result.value_for(model.temperature)
     assert 20.995 < temperature < 21.005
