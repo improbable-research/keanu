@@ -91,6 +91,7 @@ public abstract class GraphToDot {
     }
 
     private static String makeSafe(String input) {
+        if ( input == null ) return null;
         return input.replaceAll("[\n\"]" , "" );
     }
 }
