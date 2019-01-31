@@ -47,10 +47,9 @@ public class SaveLoadExamples {
     public void savePartialNetToDot(Vertex startingVertex,
                                     int degree,
                                     BayesianNetwork net,
-                                    OutputStream outputStream,
-                                    boolean saveValuesAndObservations) throws IOException {
-        DotSaver saver = new DotSaver(net);
-        saver.save(outputStream, startingVertex, degree, saveValuesAndObservations);
+                                    OutputStream outputStream) throws IOException {
+        VertexGraph graph = new VertexGraph(net,startingVertex,degree);
+        GraphToDot.write(graph, outputStream);
     }
     //%%SNIPPET_END%% SavePartialToDot
 
