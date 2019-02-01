@@ -17,9 +17,9 @@ import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLog
 import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbPrior;
 
 @AllArgsConstructor
-public class TensorflowProbabilisticGraph implements ProbabilisticModel {
+public class TensorflowProbabilisticModel implements ProbabilisticModel {
 
-    public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
+    public static TensorflowProbabilisticModel convert(BayesianNetwork network) {
         TensorflowComputableGraphBuilder builder = new TensorflowComputableGraphBuilder();
 
         builder.convert(network.getVertices());
@@ -37,7 +37,7 @@ public class TensorflowProbabilisticGraph implements ProbabilisticModel {
             .map(v -> new TensorflowVariable<>(computableGraph, v))
             .collect(Collectors.toList());
 
-        return new TensorflowProbabilisticGraph(
+        return new TensorflowProbabilisticModel(
             computableGraph,
             latentVariables,
             logProbReference,
@@ -64,11 +64,6 @@ public class TensorflowProbabilisticGraph implements ProbabilisticModel {
     }
 
     @Override
-    public double logProbAfter(Map<VariableReference, Object> newValues, double logProbBefore) {
-        return 0;
-    }
-
-    @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
 
         if (logLikelihoodOp == null) {
@@ -77,11 +72,6 @@ public class TensorflowProbabilisticGraph implements ProbabilisticModel {
 
         DoubleTensor logLikelihood = computableGraph.compute(inputs, logLikelihoodOp);
         return logLikelihood.scalar();
-    }
-
-    @Override
-    public List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
-        return null;
     }
 
     @Override
