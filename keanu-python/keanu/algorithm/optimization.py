@@ -22,7 +22,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer")
 
 
-class OptimizedResult(JavaObjectWrapper):
+class _OptimizedResult(JavaObjectWrapper):
 
     def __init__(self, result_object: JavaObject) -> None:
         super().__init__(result_object)
@@ -76,11 +76,11 @@ class Optimizer:
         self.optimizer = optimizer
         self.net = net
 
-    def max_a_posteriori(self) -> OptimizedResult:
-        return OptimizedResult(self.optimizer.maxAPosteriori())
+    def max_a_posteriori(self) -> _OptimizedResult:
+        return _OptimizedResult(self.optimizer.maxAPosteriori())
 
-    def max_likelihood(self) -> OptimizedResult:
-        return OptimizedResult(self.optimizer.maxLikelihood())
+    def max_likelihood(self) -> _OptimizedResult:
+        return _OptimizedResult(self.optimizer.maxLikelihood())
 
     @staticmethod
     def _build_bayes_net(factory_class: JavaClass,
