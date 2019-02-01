@@ -61,17 +61,12 @@ public class MIRLoader extends ProtobufLoader {
         }
 
         if (properties.getRecursiveTracesCount() != 0) {
-            throw new IllegalArgumentException("Keanu Does not support Recursive models");
-        }
-
-        if (properties.getLoopMetadata().getDimensionGenerating()
-            || properties.getRecursionMetadata().getDimensionGenerating()) {
-            throw new IllegalArgumentException("Keanu does not support Dimension Generation");
+            throw new IllegalArgumentException("Keanu does not support models with recursive function calls");
         }
 
         if (properties.getLoopMetadata().getIteration() != MIR.IterationType.NONE
             || properties.getRecursionMetadata().getIteration() != MIR.IterationType.NONE) {
-            throw new IllegalArgumentException("Keanu does not support iteration");
+            throw new IllegalArgumentException("Keanu does not support models with loops");
         }
     }
 
