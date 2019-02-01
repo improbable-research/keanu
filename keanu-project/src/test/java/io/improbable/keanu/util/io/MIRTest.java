@@ -6,7 +6,10 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.mir.MIR;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,6 +23,9 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
 public class MIRTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void youCanSaveAndLoadANetworkWithValues() throws IOException {
@@ -49,5 +55,85 @@ public class MIRTest {
         assertThat(labelGaussianVerted.getMu().getValue(2), closeTo(5.0, 1e-10));
         assertThat(latentGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         latentGaussianVertex.sample();
+    }
+
+    @Test
+    public void loadFailsIfIncorrectVersionUsed() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Keanu only supports Version 1 of MIR");
+
+        MIR.Model.Builder builder = MIR.Model.newBuilder();
+        builder.getPropertiesBuilder().setMirVersionValue(10);
+        MIRLoader loader = new MIRLoader();
+        loader.loadNetwork(builder.build());
+    }
+
+    @Test
+    public void loadFailsIfModelHasWrongEntryPoint() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Keanu only supports loading Keanu generated Graphs");
+
+        MIR.Model.Builder builder = MIR.Model.newBuilder();
+        builder.setEntryPointName("Incorrect Entry Point");
+        MIRLoader loader = new MIRLoader();
+        loader.loadNetwork(builder.build());
+    }
+
+    @Test
+    public void loadFailsIfEntryPointIsMissing() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Expected Entry Point not found");
+
+        MIR.Model.Builder builder = MIR.Model.newBuilder();
+        builder.setEntryPointName(MIRSaver.ENTRY_POINT_NAME);
+        MIRLoader loader = new MIRLoader();
+        loader.loadNetwork(builder.build());
+    }
+
+    @Test
+    public void loadFailsIfEntryPointIsEmpty() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Entry Point has no Instruction Groups");
+
+        MIR.Model.Builder builder = MIR.Model.newBuilder();
+        builder.setEntryPointName(MIRSaver.ENTRY_POINT_NAME);
+        MIR.Function.Builder function = MIR.Function.newBuilder();
+        function.setName(MIRSaver.ENTRY_POINT_NAME);
+        builder.putFunctionsByName(MIRSaver.ENTRY_POINT_NAME, function.build());
+        MIRLoader loader = new MIRLoader();
+        loader.loadNetwork(builder.build());
+    }
+
+    @Test
+    public void loadFailsIfTooManyInstructionGroups() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("More than the expected number of instruction groups");
+
+        MIR.Model.Builder builder = MIR.Model.newBuilder();
+        builder.setEntryPointName(MIRSaver.ENTRY_POINT_NAME);
+        MIR.Function.Builder function = MIR.Function.newBuilder();
+        function.setName(MIRSaver.ENTRY_POINT_NAME);
+        function.addInstructionGroupsBuilder().setId(1);
+        function.addInstructionGroupsBuilder().setId(2);
+        builder.putFunctionsByName(MIRSaver.ENTRY_POINT_NAME, function.build());
+        MIRLoader loader = new MIRLoader();
+        loader.loadNetwork(builder.build());
+    }
+
+    @Test
+    public void loadFailsIfNonGraphInstructionGroupPresent() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Received Non Graph Instruction Group");
+
+        MIR.Model.Builder builder = MIR.Model.newBuilder();
+        builder.setEntryPointName(MIRSaver.ENTRY_POINT_NAME);
+        MIR.Function.Builder function = MIR.Function.newBuilder();
+        function.setName(MIRSaver.ENTRY_POINT_NAME);
+        function.addInstructionGroupsBuilder()
+            .setId(1)
+            .getLoopBuilder();
+        builder.putFunctionsByName(MIRSaver.ENTRY_POINT_NAME, function.build());
+        MIRLoader loader = new MIRLoader();
+        loader.loadNetwork(builder.build());
     }
 }

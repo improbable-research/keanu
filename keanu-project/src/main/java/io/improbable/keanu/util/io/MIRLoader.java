@@ -12,6 +12,11 @@ public class MIRLoader extends ProtobufLoader {
     @Override
     public BayesianNetwork loadNetwork(InputStream input) throws IOException {
         MIR.Model model = MIR.Model.parseFrom(input);
+
+        return loadNetwork(model);
+    }
+
+    BayesianNetwork loadNetwork(MIR.Model model) {
         checkModelIsCompatible(model);
 
         return extractGraphAndLoadNetwork(model);
@@ -24,8 +29,21 @@ public class MIRLoader extends ProtobufLoader {
     }
 
     private static void checkFunction(MIR.Model model) {
-        if (model.getFunctionsByNameMap().get(MIRSaver.ENTRY_POINT_NAME) == null) {
+        MIR.Function function = model.getFunctionsByNameMap().get(MIRSaver.ENTRY_POINT_NAME);
+        if (function == null) {
             throw new IllegalArgumentException("Expected Entry Point not found");
+        }
+
+        if (function.getInstructionGroupsCount() == 0) {
+            throw new IllegalArgumentException("Entry Point has no Instruction Groups");
+        }
+
+        if (function.getInstructionGroupsCount() > 1) {
+            throw new IllegalArgumentException("More than the expected number of instruction groups");
+        }
+
+        if (function.getInstructionGroups(0).getBodyCase() != MIR.InstructionGroup.BodyCase.GRAPH) {
+            throw new IllegalArgumentException("Received Non Graph Instruction Group");
         }
     }
 
