@@ -224,7 +224,8 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
     return tuple_hierarchy
 
 
-def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, network_samples: JavaObject) -> sample_generator_dict_type:
+def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList,
+                                             network_samples: JavaObject) -> sample_generator_dict_type:
     vertex_samples_multi: Dict = {}
     for vertex in vertices_unwrapped:
         vertex_label = Vertex._get_python_label(vertex)
