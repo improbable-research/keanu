@@ -29,13 +29,15 @@ import java.util.Map;
  */
 class JavaVertexToPythonConverter {
 
+    private static final PythonParam LABEL_PARAM = new PythonParam("label", String.class, "None");
+
     /**
      * Extra parameters are added:
      * - as optional parameters to pythonTypedParameters, at the end
      * - as required parameters to pythonParameters, at the beginning
      */
     private static final List<PythonParam> EXTRA_PARAMS = ImmutableList.of(
-        new PythonParam("label", String.class, "None")
+        LABEL_PARAM
     );
     private Constructor javaConstructor;
     private Map<String, DocString> docStringMap;

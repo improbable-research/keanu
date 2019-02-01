@@ -11,7 +11,8 @@ from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_wrapped_java_types,
-                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, runtime_float_types)
+                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, runtime_float_types,
+                            runtime_str_types)
 
 k = KeanuContext()
 
@@ -187,10 +188,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             return arg.unwrap()
         elif isinstance(arg, collections.Collection) and all(isinstance(x, runtime_primitive_types) for x in arg):
             return k.to_java_long_array(arg)
-        elif isinstance(arg, (runtime_primitive_types, JavaObject)):
+        elif isinstance(arg, (runtime_primitive_types, JavaObject, runtime_str_types)):
             return arg
-        elif isinstance(arg, str):
-            return k.to_java_string(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
