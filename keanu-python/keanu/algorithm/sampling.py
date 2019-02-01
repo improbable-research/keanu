@@ -1,6 +1,5 @@
 from collections import defaultdict
-from itertools import tee
-from typing import Any, Iterable, Dict, Tuple, Union, List
+from typing import Any, Iterable, Dict, List
 
 from numpy import ndenumerate, ndarray
 from py4j.java_collections import JavaList
@@ -11,7 +10,7 @@ from keanu.context import KeanuContext
 from keanu.net import BayesNet, ProbabilisticModel, ProbabilisticModelWithGradient
 from keanu.plots import traceplot
 from keanu.tensor import Tensor
-from keanu.vartypes import sample_types, sample_generator_types, numpy_types, primitive_types, sample_generator_dict_type
+from keanu.vartypes import sample_types, sample_generator_types, numpy_types, sample_generator_dict_type
 from keanu.vertex.base import Vertex
 
 COLUMN_HEADER_FOR_SCALAR = '(0)'
@@ -45,12 +44,12 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
 
         builder: JavaObject = k.jvm_view().MetropolisHastings.builder()
 
-        latents, latents_copy = tee(latents)
+        latents = list(latents)
 
         proposal_distribution_object = ProposalDistribution(
             type_=proposal_distribution,
             sigma=proposal_distribution_sigma,
-            latents=latents_copy,
+            latents=latents,
             listeners=proposal_listeners)
 
         rejection_strategy = k.jvm_view().RollBackToCachedValuesOnRejection(k.to_java_object_list(latents))
@@ -181,7 +180,7 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
         if live_plot:
             traces.append(sample)
             if len(traces) % refresh_every == 0:
-                joined_trace: Dict[Union[str, Tuple[str, str]], List[primitive_types]] = {
+                joined_trace: sample_types = {
                     k: [t[k] for t in traces] for k in sample.keys()
                 }
                 if ax is None:

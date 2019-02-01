@@ -40,7 +40,7 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(
         algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
-    samples = sample(net=net, sample_from=sample_from, sampling_algorithm=algo(net), draws=draws, plot=True)
+    samples = sample(net=net, sample_from=sample_from, sampling_algorithm=algo(net), draws=draws)
     assert len(samples) == len(sample_from)
     assert type(samples) == dict
     __assert_valid_samples(draws, samples)
