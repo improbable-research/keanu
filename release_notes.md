@@ -27,4 +27,5 @@
 * Fixed issue with certain vertices not taking a list properly in Kotlin
 * Added `__version__` attribute to Python
 * Added a permute vertex
+* Added the MIRSaver/MIRLoader + the proposed MIR proto format
 * Added the release notes text file to the repo

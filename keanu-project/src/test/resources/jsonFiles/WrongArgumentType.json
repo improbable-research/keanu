@@ -1,5 +1,5 @@
 {
-    "network": {
+    "graph": {
         "vertices": [{
             "id": {
                 "id": "1"
