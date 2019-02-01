@@ -8,7 +8,6 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.ConjugateGr
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -43,8 +42,7 @@ public class OptimizerBenchmark {
         GaussianVertex C = new GaussianVertex(A.times(B), 0.1);
         C.observe(30.0);
 
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(A.getConnectedGraph());
-        KeanuProbabilisticModelWithGradient gradientGraph = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
+        KeanuProbabilisticModelWithGradient gradientGraph = new KeanuProbabilisticModelWithGradient(A.getConnectedGraph());
 
         switch (optimizerType) {
             case ADAM_OPTIMIZER:
