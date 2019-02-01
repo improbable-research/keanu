@@ -343,7 +343,14 @@ def test_label_is_required_param_for_proxy_vertices() -> None:
         vertex = IntegerProxy([1, 1])  # type: ignore # this is expected to fail mypy
 
 
-def test_vertex_takes_string_as_required_param() -> None:
+def test_proxy_vertex_takes_string_as_required_param() -> None:
     label = "proxy_vertex"
     vertex = IntegerProxy([1, 1], label)
     assert vertex.get_label() == label
+
+
+def test_java_vertex_to_python_vertex_persists_label() -> None:
+    label = "gaussian"
+    java_vertex = Gaussian(0., 1., label=label).unwrap()
+    python_vertex = Vertex._from_java_vertex(java_vertex)
+    assert python_vertex.get_label() == label
