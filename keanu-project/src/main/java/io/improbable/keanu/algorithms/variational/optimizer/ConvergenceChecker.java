@@ -17,7 +17,7 @@ public interface ConvergenceChecker {
             }
         },
 
-        MAX_ABS {
+        MAX {
             @Override
             double calculate(DoubleTensor[] a) {
                 double max = -Double.MAX_VALUE;
@@ -35,7 +35,7 @@ public interface ConvergenceChecker {
     boolean hasConverged(DoubleTensor[] position, DoubleTensor[] nextPosition);
 
     static ConvergenceChecker absoluteChecker(double threshold) {
-        return absoluteChecker(Norm.MAX_ABS, threshold);
+        return absoluteChecker(Norm.MAX, threshold);
     }
 
     static ConvergenceChecker absoluteChecker(Norm norm, double threshold) {
@@ -43,7 +43,7 @@ public interface ConvergenceChecker {
     }
 
     static ConvergenceChecker relativeChecker(double threshold) {
-        return relativeChecker(Norm.MAX_ABS, threshold);
+        return relativeChecker(Norm.MAX, threshold);
     }
 
     static ConvergenceChecker relativeChecker(Norm norm, double threshold) {

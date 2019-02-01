@@ -21,7 +21,7 @@ public class AbsoluteConvergenceChecker implements ConvergenceChecker {
 
         DoubleTensor[] absolute = new DoubleTensor[a.length];
         for (int i = 0; i < a.length; i++) {
-            absolute[i] = a[i].minus(b[i]);
+            absolute[i] = a[i].minus(b[i]).abs();
         }
 
         return absolute;

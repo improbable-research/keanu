@@ -49,7 +49,7 @@ public class OptimizerBenchmark {
                 optimizer = GradientOptimizer.builder()
                     .probabilisticModel(gradientGraph)
                     .algorithm(Adam.builder()
-                        .convergenceChecker(ConvergenceChecker.relativeChecker(ConvergenceChecker.Norm.L2, 1e-5))
+                        .convergenceChecker(ConvergenceChecker.absoluteChecker(ConvergenceChecker.Norm.MAX, 1e-5))
                         .build())
                     .build();
                 break;
@@ -57,7 +57,9 @@ public class OptimizerBenchmark {
             case CONJUGATE_GRADIENT:
                 optimizer = GradientOptimizer.builder()
                     .probabilisticModel(gradientGraph)
-                    .algorithm(ConjugateGradient.builder().build())
+                    .algorithm(ConjugateGradient.builder()
+                        .absoluteThreshold(1e-5)
+                        .build())
                     .build();
                 break;
             case BOBYQA_OPTIMIZER:
