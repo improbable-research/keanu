@@ -1,16 +1,20 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import umontreal.ssj.probdist.InverseGammaDist;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +36,7 @@ public class InverseGammaVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfScalar() {
+    public void logProbMatchesKnownLogDensityOfScalar() {
 
         InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(2.0, 1.0);
         double expectedDensity = InverseGamma.logPdf(2.0, 1.0, 0.5);
@@ -40,11 +44,43 @@ public class InverseGammaVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfVector() {
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        DoubleVertex alpha = ConstantVertex.of(2.);
+        DoubleVertex beta = ConstantVertex.of(1.);
+        InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(alpha, beta);
+        LogProbGraph logProbGraph = tensorInverseGammaVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, alpha, alpha.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, beta, beta.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, tensorInverseGammaVertex, DoubleTensor.scalar(0.5));
+
+        InverseGammaDist inverseGammaDist = new InverseGammaDist(2., 1.);
+        double expectedDensity = Math.log(inverseGammaDist.density(0.5));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfVector() {
 
         double expectedLogDensity = InverseGamma.logPdf(2.0, 1.0, 0.25) + InverseGamma.logPdf(2.0, 1.0, 0.75);
         InverseGammaVertex ndInverseGammaVertex = new InverseGammaVertex(2.0, 1.0);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndInverseGammaVertex, new double[]{0.25, 0.75}, expectedLogDensity);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        DoubleVertex alpha = ConstantVertex.of(2., 2.);
+        DoubleVertex beta = ConstantVertex.of(1., 1.);
+        InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(alpha, beta);
+        LogProbGraph logProbGraph = tensorInverseGammaVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, alpha, alpha.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, beta, beta.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, tensorInverseGammaVertex, DoubleTensor.create(0.25, 0.75));
+
+        InverseGammaDist inverseGammaDist = new InverseGammaDist(2., 1.);
+        double expectedDensity = Math.log(inverseGammaDist.density(0.25) * inverseGammaDist.density(0.75));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Test

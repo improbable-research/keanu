@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.bool;
 
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -9,12 +9,12 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
 
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 import static io.improbable.keanu.vertices.bool.BooleanVertex.not;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -248,10 +248,10 @@ public class BooleanVertexTest {
     }
 
     public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean>> vertex, int sampleCount, KeanuRandom random) {
-        BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
 
-        long trueCount = MetropolisHastings.withDefaultConfig(random)
-            .generatePosteriorSamples(net, Collections.singletonList(vertex)).stream()
+        long trueCount = MetropolisHastings.withDefaultConfigFor(model, random)
+            .generatePosteriorSamples(model, Collections.singletonList(vertex)).stream()
             .limit(sampleCount)
             .filter(state -> state.get(vertex).scalar())
             .count();

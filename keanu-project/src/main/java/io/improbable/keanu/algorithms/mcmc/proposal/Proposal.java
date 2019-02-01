@@ -1,67 +1,46 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-import com.google.common.collect.Lists;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class Proposal {
 
-    private final Map<Vertex, Object> perVertexProposalTo;
-    private final Map<Vertex, Object> perVertexProposalFrom;
-    private final List<ProposalListener> listeners = Lists.newArrayList();
+    private final Map<Variable, Object> perVariableProposalTo;
+    private final Map<Variable, Object> perVariableProposalFrom;
 
     public Proposal() {
-        this.perVertexProposalTo = new HashMap<>();
-        this.perVertexProposalFrom = new HashMap<>();
+        this.perVariableProposalTo = new HashMap<>();
+        this.perVariableProposalFrom = new HashMap<>();
     }
 
-    public <T> void setProposal(Vertex<T> vertex, T to) {
-        perVertexProposalFrom.put(vertex, vertex.getValue());
-        perVertexProposalTo.put(vertex, to);
+    public <T> void setProposal(Variable<T, ?> variable, T to) {
+        perVariableProposalFrom.put(variable, variable.getValue());
+        perVariableProposalTo.put(variable, to);
     }
 
-    public void addListener(ProposalListener listener) {
-        this.listeners.add(listener);
+    public <T> T getProposalTo(Variable<T, ?> variable) {
+        return (T) perVariableProposalTo.get(variable);
     }
 
-    public void addListeners(List<ProposalListener> listeners) {
-        this.listeners.addAll(listeners);
-    }
+    public Map<VariableReference, Object> getProposalTo() {
+        Map<VariableReference, Object> asMap = new HashMap<>();
 
-    public <T> T getProposalTo(Vertex<T> vertex) {
-        return (T) perVertexProposalTo.get(vertex);
-    }
-
-    public <T> T getProposalFrom(Vertex<T> vertex) {
-        return (T) perVertexProposalFrom.get(vertex);
-    }
-
-    public Set<Vertex> getVerticesWithProposal() {
-        return perVertexProposalTo.keySet();
-    }
-
-    public void apply() {
-        Set<Vertex> vertices = perVertexProposalTo.keySet();
-        for (Vertex v : vertices) {
-            v.setValue(getProposalTo(v));
+        for (Map.Entry<Variable, Object> entry : perVariableProposalTo.entrySet()) {
+            asMap.put(entry.getKey().getReference(), entry.getValue());
         }
-        for (ProposalListener listener : listeners) {
-            listener.onProposalApplied(this);
-        }
+
+        return asMap;
     }
 
-    public void reject() {
-        Set<Vertex> vertices = perVertexProposalTo.keySet();
-        for (Vertex v : vertices) {
-            v.setValue(getProposalFrom(v));
-        }
-        for (ProposalListener listener : listeners) {
-            listener.onProposalRejected(this);
-        }
+    public <T> T getProposalFrom(Variable<T, ?> variable) {
+        return (T) perVariableProposalFrom.get(variable);
     }
 
+    public Set<Variable> getVariablesWithProposal() {
+        return perVariableProposalTo.keySet();
+    }
 }

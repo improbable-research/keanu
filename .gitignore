@@ -9,3 +9,4 @@ out/
 **/*.gpg
 /docs/python/.buildinfo
 codegen/out
+Pipfile.lock

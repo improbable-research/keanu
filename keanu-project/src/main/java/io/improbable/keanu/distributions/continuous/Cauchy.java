@@ -1,10 +1,12 @@
 package io.improbable.keanu.distributions.continuous;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
@@ -37,10 +39,18 @@ public class Cauchy implements ContinuousDistribution {
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor negLnScaleMinusLnPi = scale.log().unaryMinusInPlace().plusInPlace(NEG_LOG_PI);
-        final DoubleTensor xMinusLocationOverScalePow2Plus1 = x.minus(location).divInPlace(scale).powInPlace(2).plusInPlace(1);
+        final DoubleTensor xMinusLocationOverScalePow2Plus1 = x.minus(location).divInPlace(scale).powInPlace(2.).plusInPlace(1.);
         final DoubleTensor lnXMinusLocationOverScalePow2Plus1 = xMinusLocationOverScalePow2Plus1.logInPlace();
 
         return negLnScaleMinusLnPi.minusInPlace(lnXMinusLocationOverScalePow2Plus1);
+    }
+
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex location, DoublePlaceholderVertex scale) {
+        final DoubleVertex negLnScaleMinusLnPi = scale.log().unaryMinus().plus(NEG_LOG_PI);
+        final DoubleVertex xMinusLocationOverScalePow2Plus1 = x.minus(location).div(scale).pow(2.).plus(1.);
+        final DoubleVertex lnXMinusLocationOverScalePow2Plus1 = xMinusLocationOverScalePow2Plus1.log();
+
+        return negLnScaleMinusLnPi.minus(lnXMinusLocationOverScalePow2Plus1);
     }
 
     @Override

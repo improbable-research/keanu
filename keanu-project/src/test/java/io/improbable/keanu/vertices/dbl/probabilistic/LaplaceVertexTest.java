@@ -1,13 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.LaplaceDistribution;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +36,7 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfScalar() {
+    public void logProbMatchesKnownLogDensityOfScalar() {
 
         LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(0.5, 1);
         LaplaceDistribution distribution = new LaplaceDistribution(0.5, 1.0);
@@ -42,12 +45,44 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfVector() {
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        DoubleVertex mu = ConstantVertex.of(0.5);
+        DoubleVertex beta = ConstantVertex.of(1.);
+        LaplaceVertex laplaceVertex = new LaplaceVertex(mu, beta);
+        LogProbGraph logProbGraph = laplaceVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, mu.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, beta, beta.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, laplaceVertex, DoubleTensor.scalar(0.5));
+
+        LaplaceDistribution distribution = new LaplaceDistribution(0.5, 1.);
+        double expectedDensity = distribution.logDensity(0.5);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfVector() {
 
         LaplaceDistribution distribution = new LaplaceDistribution(0.0, 1.0);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75);
         LaplaceVertex ndLaplaceVertex = new LaplaceVertex(0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndLaplaceVertex, new double[]{0.25, 0.75}, expectedLogDensity);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        DoubleVertex mu = ConstantVertex.of(0., 0.);
+        DoubleVertex beta = ConstantVertex.of(1., 1.);
+        LaplaceVertex laplaceVertex = new LaplaceVertex(mu, beta);
+        LogProbGraph logProbGraph = laplaceVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, mu.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, beta, beta.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, laplaceVertex, DoubleTensor.create(0.25, 0.75));
+
+        LaplaceDistribution distribution = new LaplaceDistribution(0., 1.);
+        double expectedDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Test

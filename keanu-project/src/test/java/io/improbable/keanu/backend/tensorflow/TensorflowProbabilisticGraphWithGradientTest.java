@@ -1,8 +1,8 @@
 package io.improbable.keanu.backend.tensorflow;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.backend.ProbabilisticGraphWithGradient;
-import io.improbable.keanu.backend.VariableReference;
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
@@ -62,7 +62,7 @@ public class TensorflowProbabilisticGraphWithGradientTest {
 
         Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
-        try (ProbabilisticGraphWithGradient graph = TensorflowProbabilisticGraphWithGradient.convert(network)) {
+        try (ProbabilisticModelWithGradient graph = TensorflowProbabilisticGraphWithGradient.convert(network)) {
 
             double tensorflowLogProb = graph.logProb(inputs);
             Map<? extends VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
@@ -105,7 +105,7 @@ public class TensorflowProbabilisticGraphWithGradientTest {
 
         Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
-        try (ProbabilisticGraphWithGradient graph = TensorflowProbabilisticGraphWithGradient.convert(network)) {
+        try (ProbabilisticModelWithGradient graph = TensorflowProbabilisticGraphWithGradient.convert(network)) {
 
             Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
             inputs.put(A.getReference(), initialA);

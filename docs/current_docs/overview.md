@@ -130,8 +130,9 @@ wetGrass.observe(true);
 
 //What does that observation say about the probability that it rained or that
 //the sprinkler was on?
-NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-    new BayesianNetwork(wetGrass.getConnectedGraph()),
+KeanuProbabilisticModel model = new KeanuProbabilisticModel(wetGrass.getConnectedGraph());
+NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+    model,
     Arrays.asList(sprinkler, rain),
     100000
 ).drop(10000).downSample(2);
@@ -147,7 +148,7 @@ The wet grass example describes a problem as a Bayesian Network. It then takes s
 posterior distribution, using:
  
  ```java
- MetropolisHastings.withDefaultConfig().getPosteriorSamples(...)
+ MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(...)
  ```
  
 in order to determine the probability that it rained given the grass was observed

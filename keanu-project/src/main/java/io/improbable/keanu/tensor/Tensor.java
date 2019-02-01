@@ -71,6 +71,7 @@ public interface Tensor<T> {
 
     long[] SCALAR_SHAPE = new long[]{};
     long[] SCALAR_STRIDE = new long[]{};
+    long[] ONE_BY_ONE_SHAPE = new long[]{1, 1};
 
     int getRank();
 

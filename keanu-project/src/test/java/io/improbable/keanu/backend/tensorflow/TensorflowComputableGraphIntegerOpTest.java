@@ -1,8 +1,8 @@
 package io.improbable.keanu.backend.tensorflow;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;

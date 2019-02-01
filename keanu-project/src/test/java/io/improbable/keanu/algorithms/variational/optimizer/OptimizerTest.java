@@ -75,13 +75,13 @@ public class OptimizerTest {
 
     private Function<BayesianNetwork, Optimizer> getTensorflowGradientOptimizer() {
         return (bayesNet) -> GradientOptimizer.builder()
-            .bayesianNetwork(TensorflowProbabilisticGraphWithGradient.convert(bayesNet))
+            .probabilisticModel(TensorflowProbabilisticGraphWithGradient.convert(bayesNet))
             .build();
     }
 
     private Function<BayesianNetwork, Optimizer> getTensorflowNonGradientOptimizer() {
         return (bayesNet) -> NonGradientOptimizer.builder()
-            .bayesianNetwork(TensorflowProbabilisticGraph.convert(bayesNet))
+            .probabilisticModel(TensorflowProbabilisticGraph.convert(bayesNet))
             .build();
     }
 

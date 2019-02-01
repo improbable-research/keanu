@@ -1,5 +1,6 @@
 package io.improbable.keanu.backend;
 
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;

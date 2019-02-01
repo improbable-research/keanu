@@ -1,11 +1,11 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.CPTCondition;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 

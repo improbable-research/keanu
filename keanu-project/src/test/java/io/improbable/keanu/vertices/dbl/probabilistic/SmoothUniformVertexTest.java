@@ -1,12 +1,18 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import umontreal.ssj.probdist.UniformDist;
 
 import java.util.Map;
 
@@ -34,7 +40,24 @@ public class SmoothUniformVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfVector() {
+    public void logProbGraphMatchesLogDensityOfScalar() {
+        DoubleVertex xMin = ConstantVertex.of(0.);
+        DoubleVertex xMax = ConstantVertex.of(100.);
+        SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(xMin, xMax, 1e-6);
+        LogProbGraph logProbGraph = smoothUniformVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, xMin, xMin.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, xMax, xMax.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, smoothUniformVertex, DoubleTensor.scalar(50.));
+
+        UniformDist uniformDist = new UniformDist(0., 100.);
+        double expectedDensity = Math.log(uniformDist.density(50.));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfVector() {
 
         SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(0, 1);
         double expectedLogDensity = smoothUniformVertex.logPdf(0.25) + smoothUniformVertex.logPdf(0.75);
@@ -44,6 +67,23 @@ public class SmoothUniformVertexTest {
             new double[]{0.25, 0.75},
             expectedLogDensity
         );
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        DoubleVertex xMin = ConstantVertex.of(0., 0.);
+        DoubleVertex xMax = ConstantVertex.of(100., 100.);
+        SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(xMin, xMax, 1e-6);
+        LogProbGraph logProbGraph = smoothUniformVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, xMin, xMin.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, xMax, xMax.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, smoothUniformVertex, DoubleTensor.create(25., 75.));
+
+        UniformDist uniformDist = new UniformDist(0., 100.);
+        double expectedDensity = Math.log(uniformDist.density(25.) * uniformDist.density(75.));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Test

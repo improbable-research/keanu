@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexUnaryOp;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public abstract class IntegerUnaryOpVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor>, VertexUnaryOp<IntegerVertex> {

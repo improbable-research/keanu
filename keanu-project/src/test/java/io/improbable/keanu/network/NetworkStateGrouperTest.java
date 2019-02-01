@@ -1,9 +1,10 @@
 package io.improbable.keanu.network;
 
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.grouping.NetworkStateGrouper;
 import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -35,8 +36,8 @@ public class NetworkStateGrouperTest {
         networkStates.addAll(createGroup(true, false, 6.0, 5.0, 4.0));
         networkStates.addAll(createGroup(false, false, 100.0, 200.0, 50000.0));
 
-        List<VertexId> discreteIds = Arrays.asList(v1Id, v2Id);
-        List<VertexId> continuousIds = Arrays.asList(v3Id, v4Id, v5Id);
+        List<VariableReference> discreteIds = Arrays.asList(v1Id, v2Id);
+        List<VariableReference> continuousIds = Arrays.asList(v3Id, v4Id, v5Id);
 
         NetworkStateGrouper grouper = new NetworkStateGrouper(new DBSCANContinuousPointGrouper(1.0, 3));
         List<List<NetworkState>> filteredStates = grouper.groupNetworkStates(networkStates, discreteIds, continuousIds);
@@ -49,7 +50,7 @@ public class NetworkStateGrouperTest {
         List<NetworkState> group = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
-            Map<VertexId, ? super Object> values = new HashMap<>();
+            Map<VariableReference, ? super Object> values = new HashMap<>();
             values.put(v1Id, v1);
             values.put(v2Id, v2);
             values.put(v3Id, v3 + (random.nextDouble() - 0.5));

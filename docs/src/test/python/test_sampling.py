@@ -1,4 +1,4 @@
-from keanu.algorithm import sample, MetropolisHastingsSampler, HamiltonianSampler, NUTSSampler
+from keanu.algorithm import sample, MetropolisHastingsSampler, NUTSSampler
 from keanu import BayesNet, KeanuRandom, Model
 from keanu.vertex import Gamma, Exponential, Cauchy, Gaussian
 import numpy as np
@@ -13,7 +13,7 @@ def test_inference_example_metropolis():
     m.a.set_value(20.)
     m.b.set_value(20.)
     bayes_net = m.to_bayes_net()
-    algo = MetropolisHastingsSampler()
+    algo = MetropolisHastingsSampler(proposal_distribution='prior', latents=bayes_net.get_latent_vertices())
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
                                sampling_algorithm=algo, draws=30000)
 
@@ -32,11 +32,6 @@ def test_inference_example_hmc_nuts():
     m.a.set_value(20.)
     m.b.set_value(20.)
     bayes_net = m.to_bayes_net()
-    # %%SNIPPET_START%% PythonHamiltonianExample
-    algo = HamiltonianSampler()
-    posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
-                               sampling_algorithm=algo, draws=2000)
-    # %%SNIPPET_END%% PythonHamiltonianExample
     # %%SNIPPET_START%% PythonNUTSExample
     algo = NUTSSampler()
     posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),

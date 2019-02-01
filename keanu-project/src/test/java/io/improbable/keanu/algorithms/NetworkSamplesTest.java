@@ -33,7 +33,7 @@ public class NetworkSamplesTest {
     @Before
     public void setup() {
 
-        Map<VertexId, List<Integer>> sampleMap = new HashMap<>();
+        Map<VariableReference, List<Integer>> sampleMap = new HashMap<>();
         sampleMap.put(v1, Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         sampleMap.put(v2, Arrays.asList(9, 8, 7, 6, 5, 4, 3, 2, 1, 0));
 
@@ -110,11 +110,11 @@ public class NetworkSamplesTest {
         List<Double> v1Samples = Arrays.asList(33.2, 3.9);
         List<Double> v2Samples = Arrays.asList(109.4, 3.55);
         final List<Double> logOfMasterPBySample = Arrays.asList(9.4, 12.7);
-        Map<VertexId, Double> vertexValsFirstSample = ImmutableMap.of(
+        Map<VariableReference, Double> vertexValsFirstSample = ImmutableMap.of(
             v1, v1Samples.get(0),
             v2, v2Samples.get(0)
         );
-        Map<VertexId, Double> vertexValsSecondSample = ImmutableMap.of(
+        Map<VariableReference, Double> vertexValsSecondSample = ImmutableMap.of(
             v1, v1Samples.get(1),
             v2, v2Samples.get(1)
         );

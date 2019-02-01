@@ -1,9 +1,9 @@
 package io.improbable.keanu.algorithms.variational;
 
 import com.google.common.collect.ImmutableList;
-import io.improbable.keanu.algorithms.VertexSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.Keanu;
+import io.improbable.keanu.algorithms.Samples;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class GaussianKDE {
 
-    public static KDEVertex approximate(VertexSamples<DoubleTensor> vertexSamples) {
+    public static KDEVertex approximate(Samples<DoubleTensor> vertexSamples) {
 
         List<Double> samples = vertexSamples.asList().stream()
             .map(GaussianKDE::checkIfScalar)
@@ -26,9 +26,9 @@ public class GaussianKDE {
     }
 
     public static KDEVertex approximate(DoubleVertex vertex, Integer nSamples) {
-        BayesianNetwork network = new BayesianNetwork(vertex.getConnectedGraph());
-        DoubleVertexSamples vertexSamples = MetropolisHastings.withDefaultConfig()
-            .getPosteriorSamples(network, ImmutableList.of(vertex), nSamples).getDoubleTensorSamples(vertex);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
+        DoubleVertexSamples vertexSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+            .getPosteriorSamples(model, ImmutableList.of(vertex), nSamples).getDoubleTensorSamples(vertex);
         return approximate(vertexSamples);
     }
 

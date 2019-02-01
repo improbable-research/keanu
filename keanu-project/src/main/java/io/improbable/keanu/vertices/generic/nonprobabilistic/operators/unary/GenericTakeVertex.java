@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
 

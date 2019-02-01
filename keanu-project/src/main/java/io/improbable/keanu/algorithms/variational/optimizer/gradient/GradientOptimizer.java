@@ -1,11 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.backend.ProbabilisticGraphWithGradient;
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,7 +47,7 @@ public class GradientOptimizer implements Optimizer {
     }
 
 
-    private ProbabilisticGraphWithGradient probabilisticWithGradientGraph;
+    private ProbabilisticModelWithGradient probabilisticModel;
 
     /**
      * maxEvaluations the maximum number of objective function evaluations before throwing an exception
@@ -111,7 +111,7 @@ public class GradientOptimizer implements Optimizer {
     }
 
     private void assertHasLatents() {
-        if (probabilisticWithGradientGraph.getLatentVariables().isEmpty()) {
+        if (probabilisticModel.getLatentVariables().isEmpty()) {
             throw new IllegalArgumentException("Cannot find MAP of network without any latent variables");
         }
     }
@@ -121,7 +121,7 @@ public class GradientOptimizer implements Optimizer {
         assertHasLatents();
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
-            probabilisticWithGradientGraph,
+            probabilisticModel,
             false,
             this::handleGradientCalculation,
             this::handleFitnessCalculation
@@ -135,7 +135,7 @@ public class GradientOptimizer implements Optimizer {
         assertHasLatents();
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
-            probabilisticWithGradientGraph,
+            probabilisticModel,
             true,
             this::handleGradientCalculation,
             this::handleFitnessCalculation
@@ -146,12 +146,12 @@ public class GradientOptimizer implements Optimizer {
 
     private OptimizedResult optimize(FitnessFunctionWithGradient fitnessFunction) {
 
-        ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
+        StatusBar statusBar = Optimizer.createFitnessStatusBar(this);
 
         ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
 
-        double[] startingPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticWithGradientGraph.getLatentVariables()));
+        double[] startingPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticModel.getLatentVariables()));
 
         double initialFitness = fitness.getObjectiveFunction().value(startingPoint);
         double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
@@ -177,10 +177,10 @@ public class GradientOptimizer implements Optimizer {
             new InitialGuess(startingPoint)
         );
 
-        progressBar.finish();
+        statusBar.finish();
 
         Map<VariableReference, DoubleTensor> optimizedValues = Optimizer
-            .convertFromPoint(pointValuePair.getPoint(), probabilisticWithGradientGraph.getLatentVariables());
+            .convertFromPoint(pointValuePair.getPoint(), probabilisticModel.getLatentVariables());
 
         return new OptimizedResult(optimizedValues, pointValuePair.getValue());
     }
@@ -194,7 +194,7 @@ public class GradientOptimizer implements Optimizer {
 
     public static class GradientOptimizerBuilder {
 
-        private ProbabilisticGraphWithGradient probabilisticWithGradientGraph;
+        private ProbabilisticModelWithGradient probabilisticModel;
         private int maxEvaluations = Integer.MAX_VALUE;
         private double relativeThreshold = 1e-8;
         private double absoluteThreshold = 1e-8;
@@ -203,8 +203,8 @@ public class GradientOptimizer implements Optimizer {
         GradientOptimizerBuilder() {
         }
 
-        public GradientOptimizerBuilder bayesianNetwork(ProbabilisticGraphWithGradient probabilisticWithGradientGraph) {
-            this.probabilisticWithGradientGraph = probabilisticWithGradientGraph;
+        public GradientOptimizerBuilder probabilisticModel(ProbabilisticModelWithGradient probabilisticModel) {
+            this.probabilisticModel = probabilisticModel;
             return this;
         }
 
@@ -229,11 +229,11 @@ public class GradientOptimizer implements Optimizer {
         }
 
         public GradientOptimizer build() {
-            if (probabilisticWithGradientGraph == null) {
+            if (probabilisticModel == null) {
                 throw new IllegalStateException("Cannot build optimizer without specifying network to optimize.");
             }
             return new GradientOptimizer(
-                probabilisticWithGradientGraph,
+                probabilisticModel,
                 maxEvaluations,
                 relativeThreshold,
                 absoluteThreshold,
@@ -242,7 +242,7 @@ public class GradientOptimizer implements Optimizer {
         }
 
         public String toString() {
-            return "GradientOptimizer.GradientOptimizerBuilder(probabilisticWithGradientGraph=" + this.probabilisticWithGradientGraph + ", maxEvaluations=" + this.maxEvaluations + ", relativeThreshold=" + this.relativeThreshold + ", absoluteThreshold=" + this.absoluteThreshold + ", updateFormula=" + this.updateFormula + ")";
+            return "GradientOptimizer.GradientOptimizerBuilder(probabilisticModel=" + this.probabilisticModel + ", maxEvaluations=" + this.maxEvaluations + ", relativeThreshold=" + this.relativeThreshold + ", absoluteThreshold=" + this.absoluteThreshold + ", updateFormula=" + this.updateFormula + ")";
         }
     }
 }

@@ -1,21 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
-import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
-
-import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
-public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor>, VertexBinaryOp<DoubleVertex, DoubleVertex> {
+public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, VertexBinaryOp<DoubleVertex, DoubleVertex> {
 
     protected final DoubleVertex left;
     protected final DoubleVertex right;
@@ -70,19 +65,5 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements Diffe
         return right;
     }
 
-    @Override
-    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
-        try {
-            return forwardModeAutoDifferentiation(
-                derivativeOfParentsWithRespectToInput.getOrDefault(left, PartialDerivative.EMPTY),
-                derivativeOfParentsWithRespectToInput.getOrDefault(right, PartialDerivative.EMPTY)
-            );
-        } catch (UnsupportedOperationException e) {
-            return Differentiable.super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInput);
-        }
-    }
-
     protected abstract DoubleTensor op(DoubleTensor l, DoubleTensor r);
-
-    protected abstract PartialDerivative forwardModeAutoDifferentiation(PartialDerivative l, PartialDerivative r);
 }

@@ -1,6 +1,7 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -9,7 +10,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Assert;
 import org.junit.Before;
