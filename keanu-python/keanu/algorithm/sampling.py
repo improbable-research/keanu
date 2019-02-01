@@ -212,7 +212,7 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
         samples_as_ndarray = map(Tensor._to_scalar_or_ndarray, samples_for_vertex, is_primitive)
         samples = list(samples_as_ndarray)
         for sample in samples:
-            __add_sample_to_dict(sample, vertex_samples_multi, vertex_label)
+            __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
     tuple_hierarchy: Dict = {(vertex_label, shape_index): values
                              for vertex_label, tensor_index in vertex_samples_multi.items()
@@ -228,7 +228,7 @@ def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList,
         vertex_label = Vertex._get_python_label(vertex)
         vertex_samples_multi[vertex_label] = defaultdict(list)
         sample = Tensor._to_scalar_or_ndarray(network_samples.get(vertex), return_as_primitive=True)
-        __add_sample_to_dict(sample, vertex_samples_multi, vertex_label)
+        __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
     tuple_hierarchy: Dict = {(vertex_label, tensor_index): values
                              for vertex_label, tensor_index in vertex_samples_multi.items()
@@ -237,11 +237,11 @@ def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList,
     return tuple_hierarchy
 
 
-def __add_sample_to_dict(sample_value: Any, vertex_samples_multi: Dict, vertex_label: str):
+def __add_sample_to_dict(sample_value: Any, vertex_sample: Dict):
     if type(sample_value) is not ndarray:
-        vertex_samples_multi[vertex_label][COLUMN_HEADER_FOR_SCALAR].append(sample_value)
+        vertex_sample[COLUMN_HEADER_FOR_SCALAR].append(sample_value)
     elif sample_value.shape == ():
-        vertex_samples_multi[vertex_label][COLUMN_HEADER_FOR_SCALAR].append(sample_value.item())
+        vertex_sample[COLUMN_HEADER_FOR_SCALAR].append(sample_value.item())
     else:
         for index, value in ndenumerate(sample_value):
-            vertex_samples_multi[vertex_label][str(index)].append(value.item())
+            vertex_sample[str(index)].append(value.item())
