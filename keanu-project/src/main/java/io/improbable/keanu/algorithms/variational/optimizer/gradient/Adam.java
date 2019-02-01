@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.algorithms.ContinuousPoint;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.variational.optimizer.ConvergenceChecker;
@@ -14,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public class Adam implements GradientOptimizationAlgorithm {
 
         boolean converged = false;
 
-        final ContinuousPoint thetaAsPoint = new ContinuousPoint();
+        final Map<VariableReference, DoubleTensor> thetaAsPoint = new HashMap<>();
         final DoubleTensor[] gradients = new DoubleTensor[theta.length];
 
         double beta1T = 1;
@@ -85,7 +85,7 @@ public class Adam implements GradientOptimizationAlgorithm {
 
     private void updateGradients(List<? extends Variable> ordered,
                                  DoubleTensor[] theta,
-                                 ContinuousPoint thetaAsPoint,
+                                 Map<VariableReference, DoubleTensor> thetaAsPoint,
                                  DoubleTensor[] gradients,
                                  FitnessFunctionGradient fitnessFunctionGradient) {
         updatePoint(
@@ -131,15 +131,14 @@ public class Adam implements GradientOptimizationAlgorithm {
 
     }
 
-    private Map<VariableReference, DoubleTensor> updatePoint(List<? extends Variable> ordered,
-                                                             DoubleTensor[] values,
-                                                             ContinuousPoint valuesAsPoint) {
+    private void updatePoint(List<? extends Variable> ordered,
+                             DoubleTensor[] values,
+                             Map<VariableReference, DoubleTensor> valuesAsPoint) {
 
         for (int i = 0; i < values.length; i++) {
             valuesAsPoint.put(ordered.get(i).getReference(), values[i]);
         }
 
-        return valuesAsPoint;
     }
 
 
