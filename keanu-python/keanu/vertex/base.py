@@ -5,6 +5,7 @@ from typing import cast as typing_cast
 import numpy as np
 from py4j.java_collections import JavaList, JavaArray
 from py4j.java_gateway import JavaObject, JavaMember
+from py4j.protocol import Py4JError
 
 import keanu as kn
 from keanu.base import JavaObjectWrapper
@@ -208,7 +209,10 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     @staticmethod
     def _get_python_label(java_vertex: JavaObject) -> Optional[str]:
         java_label = java_vertex.getLabel()
-        return java_label.getQualifiedName() if java_label else None
+        try:
+            return java_label.getQualifiedName()
+        except (Py4JError):
+            return None
 
 
 class Double(Vertex):
