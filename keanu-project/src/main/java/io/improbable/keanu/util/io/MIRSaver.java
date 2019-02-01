@@ -11,8 +11,8 @@ import java.util.Map;
 
 public class MIRSaver extends ProtobufSaver {
 
-    private final static String MODEL_NAME = "Saved Keanu Graph";
-    private final static String ENTRY_POINT_NAME = "Keanu Graph";
+    public final static String MODEL_NAME = "Saved Keanu Graph";
+    public final static String ENTRY_POINT_NAME = "Keanu Graph";
 
     public MIRSaver(BayesianNetwork net) {
         super(net);

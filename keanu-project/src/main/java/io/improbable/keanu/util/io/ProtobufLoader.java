@@ -49,16 +49,20 @@ public class ProtobufLoader implements NetworkLoader {
     }
 
     public BayesianNetwork loadNetwork(KeanuSavedBayesNet.ProtoModel parsedModel) {
+        return loadNetwork(parsedModel.getGraph());
+    }
+
+    protected BayesianNetwork loadNetwork(SavedBayesNet.Graph graph) {
         Map<SavedBayesNet.VertexID, Vertex> instantiatedVertices = new HashMap<>();
 
-        for (SavedBayesNet.Vertex vertex : parsedModel.getGraph().getVerticesList()) {
+        for (SavedBayesNet.Vertex vertex : graph.getVerticesList()) {
             Vertex newVertex = createVertexFromProtoBuf(vertex, instantiatedVertices);
             instantiatedVertices.put(vertex.getId(), newVertex);
         }
 
         BayesianNetwork bayesNet = new BayesianNetwork(instantiatedVertices.values());
 
-        loadDefaultValues(parsedModel.getGraph().getDefaultStateList(), instantiatedVertices, bayesNet);
+        loadDefaultValues(graph.getDefaultStateList(), instantiatedVertices, bayesNet);
 
         return bayesNet;
     }
