@@ -27,7 +27,7 @@ public class GaussianKDE {
 
     public static KDEVertex approximate(DoubleVertex vertex, Integer nSamples) {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
-        DoubleVertexSamples vertexSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+        DoubleVertexSamples vertexSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig()
             .getPosteriorSamples(model, ImmutableList.of(vertex), nSamples).getDoubleTensorSamples(vertex);
         return approximate(vertexSamples);
     }

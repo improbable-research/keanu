@@ -84,7 +84,7 @@ public class ProcessModelVertexTest {
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
-        
+
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -169,7 +169,7 @@ public class ProcessModelVertexTest {
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
-        
+
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -180,7 +180,7 @@ public class ProcessModelVertexTest {
 
         KeanuProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(chanceOfRainObservation.getConnectedGraph());
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfigFor(probabilisticModel).getPosteriorSamples(
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             probabilisticModel,
             inputToModel,
             220

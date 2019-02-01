@@ -24,7 +24,7 @@ public class AutocorrelationExample {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
 
         //%%SNIPPET_START%% ScalarAutocorrelation
-        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100
@@ -43,7 +43,7 @@ public class AutocorrelationExample {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
         //%%SNIPPET_START%% TensorAutocorrelation
-        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100
