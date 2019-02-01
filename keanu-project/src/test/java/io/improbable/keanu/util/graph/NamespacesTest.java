@@ -31,21 +31,21 @@ public class NamespacesTest {
         DoubleVertex initial5 = new ConstantDoubleVertex(5.0);
         DoubleVertex initial10 = new ConstantDoubleVertex(10.0);
 
-        initial1.setLabel(new VertexLabel("1", "initial"));
-        initial5.setLabel(new VertexLabel("5", "initial"));
-        initial10.setLabel(new VertexLabel("10", "initial"));
+        initial1.setLabel(new VertexLabel( "initial" ,"1"));
+        initial5.setLabel(new VertexLabel("initial" , "5"));
+        initial10.setLabel(new VertexLabel("initial" , "10"));
 
         DoubleVertex intermediateA = initial1.plus(initial5);
-        intermediateA.setLabel(new VertexLabel("A", "intermediate"));
+        intermediateA.setLabel(new VertexLabel( "intermediate","A"));
         DoubleVertex intermediateB = initial1.div(initial5);
-        intermediateB.setLabel(new VertexLabel("B", "intermediate"));
+        intermediateB.setLabel(new VertexLabel( "intermediate","B"));
         DoubleVertex intermediateC = initial10.plus(initial5);
-        intermediateC.setLabel(new VertexLabel("C", "intermediate"));
+        intermediateC.setLabel(new VertexLabel( "intermediate","C"));
         DoubleVertex intermediateD = initial5.times(initial10);
-        intermediateD.setLabel(new VertexLabel("D", "intermediate"));
+        intermediateD.setLabel(new VertexLabel( "intermediate","D"));
 
         outA = new GaussianVertex(intermediateA, intermediateC);
-        outA.setLabel(new VertexLabel("A", "out"));
+        outA.setLabel(new VertexLabel("out" , "A"));
     }
 
     @Before
@@ -67,8 +67,7 @@ public class NamespacesTest {
         VertexGraph graph = new VertexGraph(outA).colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
         GraphToDot.write( graph , System.err );
-        String s = String.join(",", colors);
-        assertEquals("There are three distinct colours " + s, 3, colors.size());
+        assertEquals("There are three distinct colours", 3, colors.size());
     }
 
     @Test
@@ -76,7 +75,6 @@ public class NamespacesTest {
         VertexGraph graph = new VertexGraph(outA).removeNamespace("intermediate").colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
         GraphToDot.write( graph , System.err );
-        String s = String.join(",", colors);
-        assertEquals("There are two distinct colours " + s, 2, colors.size());
+        assertEquals("There are two distinct colours", 2, colors.size());
     }
 }

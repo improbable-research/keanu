@@ -318,8 +318,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     private String getVertexNamespace(Vertex v) {
         VertexLabel label = v.getLabel();
-        System.out.println("Processing label " + label);
-        if (label == null) return null;
+        if (label == null) return "none";
         return label.getOuterNamespace().orElse("none");
     }
 
