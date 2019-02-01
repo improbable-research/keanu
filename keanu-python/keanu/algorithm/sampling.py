@@ -180,9 +180,7 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
         if live_plot:
             traces.append(sample)
             if len(traces) % refresh_every == 0:
-                joined_trace: sample_types = {
-                    k: [t[k] for t in traces] for k in sample.keys()
-                }
+                joined_trace: sample_types = {k: [t[k] for t in traces] for k in sample.keys()}
                 if ax is None:
                     ax = traceplot(joined_trace, x0=x0)
                 else:
