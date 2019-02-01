@@ -1,25 +1,70 @@
 package io.improbable.keanu.util.io;
 
-import io.improbable.keanu.network.NetworkSaver;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.mir.MIR;
+import io.improbable.mir.SavedBayesNet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
-public class MIRSaver implements NetworkSaver {
-    @Override
-    public void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException {
+public class MIRSaver extends ProtobufSaver {
 
+    private final static String MODEL_NAME = "Saved Keanu Graph";
+    private final static String ENTRY_POINT_NAME = "Keanu Graph";
+
+    public MIRSaver(BayesianNetwork net) {
+        super(net);
     }
 
     @Override
-    public void save(Vertex vertex) {
-
+    public void save(OutputStream output, boolean saveValues) throws IOException {
+        SavedBayesNet.Graph graph = getGraph(saveValues);
+        MIR.Model myModel = wrapGraphInMIR(graph);
+        myModel.writeTo(output);
+        clearGraph();
     }
 
-    @Override
-    public void saveValue(Vertex vertex) {
+    private MIR.Model wrapGraphInMIR(SavedBayesNet.Graph graph) {
+        MIR.Model.Builder builder = MIR.Model.newBuilder();
+        builder.setName(MODEL_NAME);
+        builder.setEntryPointName(ENTRY_POINT_NAME);
+        builder.setProperties(getBasicModelProperties());
+        builder.putAllFunctionsByName(getFunctionMap(graph));
 
+        return builder.build();
+    }
+
+    private MIR.ModelProperties getBasicModelProperties() {
+        MIR.CycleMetadata cycles = MIR.CycleMetadata.newBuilder()
+            .setDimensionGenerating(false)
+            .setIteration(MIR.IterationType.NONE)
+            .build();
+
+        return MIR.ModelProperties.newBuilder()
+            .setMirVersion(MIR.VersionNumber.VERSION_1)
+            .setLoopMetadata(cycles)
+            .setRecursionMetadata(cycles)
+            .setDynamicCollections(false)
+            .build();
+    }
+
+    private Map<String, MIR.Function> getFunctionMap(SavedBayesNet.Graph graph) {
+        Map<String, MIR.Function> functionMap = new HashMap<>();
+        functionMap.put(ENTRY_POINT_NAME, getFunctionForGraph(graph));
+
+        return functionMap;
+    }
+
+    private MIR.Function getFunctionForGraph(SavedBayesNet.Graph graph) {
+        MIR.Function.Builder builder = MIR.Function.newBuilder();
+
+        builder.setName(ENTRY_POINT_NAME);
+        builder.getInstructionGroupsBuilder(0)
+            .setId(0)
+            .setGraph(graph);
+
+        return builder.build();
     }
 }

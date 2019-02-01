@@ -32,12 +32,12 @@ public class ProtobufSaver implements NetworkSaver {
     public ProtobufSaver(BayesianNetwork net) {
         this.net = net;
     }
-    
+
     @Override
     public void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException {
         KeanuSavedBayesNet.ProtoModel protobufModel = getModel(saveValues, metadata);
         protobufModel.writeTo(output);
-        graphBuilder = null;
+        clearGraph();
     }
 
     protected KeanuSavedBayesNet.ProtoModel getModel(boolean withSavedValues, Map<String, String> metadata) {
@@ -54,6 +54,10 @@ public class ProtobufSaver implements NetworkSaver {
     protected SavedBayesNet.Graph getGraph(boolean withSavedValues) {
         createGraph(withSavedValues);
         return graphBuilder.build();
+    }
+
+    protected void clearGraph() {
+        graphBuilder = null;
     }
 
     private void createGraph(boolean saveValues) {

@@ -7,6 +7,10 @@ option java_outer_classname = "MIR";
 
 import "io/improbable/mir/BayesNet.proto";
 
+enum VersionNumber {
+    VERSION_1 = 0;
+}
+
 message Model {
     string name = 1;
     string entry_point_name = 2;
@@ -15,12 +19,12 @@ message Model {
 }
 
 message ModelProperties {
-    string mir_version = 1;
+    VersionNumber mir_version = 1;
     repeated Metadata metadata = 2;
     CycleMetadata loop_metadata = 3;
     CycleMetadata recursion_metadata = 4;
     repeated RecursiveTrace recursive_traces = 5;
-    bool dynamic_collections = 7;
+    bool dynamic_collections = 6;
 }
 
 message CycleMetadata {
