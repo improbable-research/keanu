@@ -1,5 +1,5 @@
 {
-    "network": {
+    "graph": {
         "vertices": [{
             "id": {
                 "id": "[0]"
@@ -41,10 +41,8 @@
                 }
             }],
             "shape": ["2"]
-        }]
-    },
-    "networkState": {
-        "defaultState": [{
+        }],
+        "default_state": [{
             "value": {
                 "doubleVal": {
                     "values": [0.5]
