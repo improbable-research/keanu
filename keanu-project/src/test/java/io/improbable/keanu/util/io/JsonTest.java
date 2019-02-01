@@ -77,13 +77,13 @@ public class JsonTest {
 
     @Test
     public void jsonSaverSavesMetadata() throws IOException {
-        KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
+        KeanuSavedBayesNet.ModelMetadata.Builder metadataBuilder = KeanuSavedBayesNet.ModelMetadata.newBuilder();
         for (Map.Entry<String, String> entry : someMetadata.entrySet()) {
             metadataBuilder.putMetadataInfo(entry.getKey(), entry.getValue());
         }
-        KeanuSavedBayesNet.Model.Builder modelBuilder = KeanuSavedBayesNet.Model.newBuilder();
+        KeanuSavedBayesNet.ProtoModel.Builder modelBuilder = KeanuSavedBayesNet.ProtoModel.newBuilder();
         JsonFormat.parser().merge(outputStream.toString(), modelBuilder);
-        KeanuSavedBayesNet.Model parsedModel = modelBuilder.build();
+        KeanuSavedBayesNet.ProtoModel parsedModel = modelBuilder.build();
 
         assertTrue(parsedModel.hasMetadata());
         assertEquals(parsedModel.getMetadata().getMetadataInfoMap().size(), (metadataBuilder.getMetadataInfoMap().size()));

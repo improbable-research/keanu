@@ -45,7 +45,7 @@ public class JsonSaver implements NetworkSaver{
 
     @Override
     public void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException {
-        KeanuSavedBayesNet.Model model = protobufSaver.getModel(saveValues, metadata);
+        KeanuSavedBayesNet.ProtoModel model = protobufSaver.getModel(saveValues, metadata);
 
         Writer outputWriter = new OutputStreamWriter(output);
         String jsonOutput = JsonFormat.printer().print(model);
