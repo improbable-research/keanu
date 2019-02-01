@@ -338,10 +338,10 @@ def test_set_label() -> None:
     assert vertex.get_label() == label
 
 
-def test_can_set_none_label() -> None:
+def test_cannot_set_none_label() -> None:
     vertex = Gaussian(0., 1., label="gaussian")
-    vertex.set_label(None)
-    assert vertex.get_label() == None
+    with pytest.raises(ValueError, match="label cannot be None"):
+        vertex.set_label(None)
 
 
 def test_label_is_required_param_for_proxy_vertices() -> None:

@@ -52,6 +52,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         self.unwrap().setAndCascade(Tensor(self.cast(v)).unwrap())
 
     def set_label(self, label: Optional[str]) -> None:
+        if label is None:
+            raise ValueError("label cannot be None.")
         self.unwrap().setLabel(label)
 
     def sample(self) -> numpy_types:

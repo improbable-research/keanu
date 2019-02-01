@@ -9,11 +9,11 @@ import java.util.Objects;
  */
 public class PythonParam {
     @Getter
-    private String name;
+    final private String name;
     @Getter
-    private Class klass;
+    final private Class klass;
     @Getter
-    private String defaultValue;
+    final private String defaultValue;
 
     public PythonParam(String name, Class klass, String defaultValue) {
         this.name = ParamStringProcessor.toLowerUnderscore(name);
@@ -30,7 +30,7 @@ public class PythonParam {
         if (this == other) return true;
         if (other == null || getClass() != other.getClass()) return false;
         PythonParam that = (PythonParam) other;
-        return Objects.equals(name, that.name);
+        return name.equals(that.name);
     }
 
     @Override
