@@ -5,29 +5,34 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 public interface ConvergenceChecker {
 
     enum Norm {
-        L2, MAX_ABS
+        L2 {
+            @Override
+            double calculate(DoubleTensor[] a) {
+                double magPow2 = 0;
+                for (int i = 0; i < a.length; i++) {
+                    magPow2 += a[i].pow(2).sum();
+                }
+
+                return Math.sqrt(magPow2);
+            }
+        },
+
+        MAX_ABS {
+            @Override
+            double calculate(DoubleTensor[] a) {
+                double max = -Double.MAX_VALUE;
+                for (int i = 0; i < a.length; i++) {
+                    max = Math.max(max, a[i].max());
+                }
+
+                return max;
+            }
+        };
+
+        abstract double calculate(DoubleTensor[] a);
     }
 
     boolean hasConverged(DoubleTensor[] position, DoubleTensor[] nextPosition);
-
-    static double l2Norm(DoubleTensor[] a) {
-        double magPow2 = 0;
-        for (int i = 0; i < a.length; i++) {
-            magPow2 += a[i].pow(2).sum();
-        }
-
-        return Math.sqrt(magPow2);
-    }
-
-    static double maxAbs(DoubleTensor[] a) {
-
-        double max = -Double.MAX_VALUE;
-        for (int i = 0; i < a.length; i++) {
-            max = Math.max(max, a[i].max());
-        }
-
-        return max;
-    }
 
     static ConvergenceChecker absoluteChecker(double threshold) {
         return absoluteChecker(Norm.MAX_ABS, threshold);

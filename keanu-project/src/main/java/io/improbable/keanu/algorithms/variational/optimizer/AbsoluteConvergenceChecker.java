@@ -9,18 +9,12 @@ public class AbsoluteConvergenceChecker implements ConvergenceChecker {
     private final Norm normStrategy;
     private final double threshold;
 
+    @Override
     public final boolean hasConverged(DoubleTensor[] position, DoubleTensor[] nextPosition) {
 
         DoubleTensor[] delta = absoluteDelta(position, nextPosition);
 
-        double norm;
-        if (normStrategy.equals(ConvergenceChecker.Norm.L2)) {
-            norm = ConvergenceChecker.l2Norm(delta);
-        } else {
-            norm = ConvergenceChecker.maxAbs(delta);
-        }
-
-        return norm < threshold;
+        return normStrategy.calculate(delta) < threshold;
     }
 
     private DoubleTensor[] absoluteDelta(DoubleTensor[] a, DoubleTensor[] b) {

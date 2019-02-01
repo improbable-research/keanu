@@ -14,18 +14,12 @@ public class RelativeConvergenceChecker implements ConvergenceChecker {
         this(normStrategy, threshold, 1e-6);
     }
 
+    @Override
     public final boolean hasConverged(DoubleTensor[] position, DoubleTensor[] nextPosition) {
 
         DoubleTensor[] delta = relativeDelta(position, nextPosition, epsilon);
 
-        double norm;
-        if (normStrategy.equals(Norm.L2)) {
-            norm = ConvergenceChecker.l2Norm(delta);
-        } else {
-            norm = ConvergenceChecker.maxAbs(delta);
-        }
-
-        return norm < threshold;
+        return normStrategy.calculate(delta) < threshold;
     }
 
     private DoubleTensor[] relativeDelta(DoubleTensor[] a, DoubleTensor[] b, double epsilon) {
