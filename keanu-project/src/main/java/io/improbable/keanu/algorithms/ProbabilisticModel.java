@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A model composed of {@link Variable}s that can return a value of log-probability for a given set of input values.
@@ -17,8 +18,6 @@ public interface ProbabilisticModel extends AutoCloseable {
 
     double logProb(Map<VariableReference, ?> inputs);
 
-    double logProbAfter(Map<VariableReference, Object> newValues, double logProbBefore);
-
     default double logLikelihood() {
         return logLikelihood(Collections.emptyMap());
     }
@@ -27,7 +26,16 @@ public interface ProbabilisticModel extends AutoCloseable {
 
     List<? extends Variable> getLatentVariables();
 
-    List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables();
+    default List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
+        return getLatentVariables().stream()
+            .filter(v -> v.getValue() instanceof DoubleTensor)
+            .map(v -> (Variable<DoubleTensor, ?>) v)
+            .collect(Collectors.toList());
+    }
+
+    default double logProbAfter(Map<VariableReference, Object> newValues, double logProbBefore) {
+        return logProb(newValues);
+    }
 
     @Override
     default void close() {

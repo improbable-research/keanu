@@ -91,14 +91,6 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
         return latentOrObservedVertices;
     }
 
-    @Override
-    public List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
-        return getLatentVariables().stream()
-            .filter(v -> v.getValue() instanceof DoubleTensor)
-            .map(v -> (Variable<DoubleTensor, ?>) v)
-            .collect(Collectors.toList());
-    }
-
     private void checkBayesNetInHealthyState() {
         if (latentOrObservedVertices.isEmpty()) {
             throw new IllegalArgumentException("Cannot run inference or sampling from a completely deterministic BayesNet");

@@ -18,7 +18,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class TensorflowProbabilisticGraphWithGradientTest {
+public class TensorflowProbabilisticModelWithGradientTest {
 
     @Rule
     public DeterministicRule deterministicRule = new DeterministicRule();
@@ -62,7 +62,7 @@ public class TensorflowProbabilisticGraphWithGradientTest {
 
         Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
-        try (ProbabilisticModelWithGradient graph = TensorflowProbabilisticGraphWithGradient.convert(network)) {
+        try (ProbabilisticModelWithGradient graph = TensorflowProbabilisticModelWithGradient.convert(network)) {
 
             double tensorflowLogProb = graph.logProb(inputs);
             Map<? extends VariableReference, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
@@ -105,7 +105,7 @@ public class TensorflowProbabilisticGraphWithGradientTest {
 
         Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
-        try (ProbabilisticModelWithGradient graph = TensorflowProbabilisticGraphWithGradient.convert(network)) {
+        try (ProbabilisticModelWithGradient graph = TensorflowProbabilisticModelWithGradient.convert(network)) {
 
             Map<VariableReference, DoubleTensor> inputs = new HashMap<>();
             inputs.put(A.getReference(), initialA);

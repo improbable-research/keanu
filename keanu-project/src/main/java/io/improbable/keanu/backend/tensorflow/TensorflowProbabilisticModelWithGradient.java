@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbObservation;
 import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbPrior;
 
-public class TensorflowProbabilisticGraphWithGradient extends TensorflowProbabilisticGraph implements ProbabilisticModelWithGradient {
+public class TensorflowProbabilisticModelWithGradient extends TensorflowProbabilisticModel implements ProbabilisticModelWithGradient {
 
-    public static TensorflowProbabilisticGraphWithGradient convert(BayesianNetwork network) {
+    public static TensorflowProbabilisticModelWithGradient convert(BayesianNetwork network) {
 
         TensorflowComputableGraphBuilder builder = new TensorflowComputableGraphBuilder();
 
@@ -52,7 +52,7 @@ public class TensorflowProbabilisticGraphWithGradient extends TensorflowProbabil
             .map(v -> new TensorflowVariable<>(computableGraph, v))
             .collect(Collectors.toList());
 
-        return new TensorflowProbabilisticGraphWithGradient(
+        return new TensorflowProbabilisticModelWithGradient(
             computableGraph,
             latentVariables,
             logProbReference,
@@ -67,7 +67,7 @@ public class TensorflowProbabilisticGraphWithGradient extends TensorflowProbabil
     private final Map<VariableReference, VariableReference> logProbGradients;
     private final Map<VariableReference, VariableReference> logLikelihoodGradients;
 
-    public TensorflowProbabilisticGraphWithGradient(TensorflowComputableGraph computableGraph,
+    public TensorflowProbabilisticModelWithGradient(TensorflowComputableGraph computableGraph,
                                                     List<? extends Variable> latentVariables,
                                                     VariableReference logProbOp,
                                                     VariableReference logLikelihoodOp,
