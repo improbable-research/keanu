@@ -31,21 +31,21 @@ public class NamespacesTest {
         DoubleVertex initial5 = new ConstantDoubleVertex(5.0);
         DoubleVertex initial10 = new ConstantDoubleVertex(10.0);
 
-        initial1.setLabel(new VertexLabel( "initial" ,"1"));
-        initial5.setLabel(new VertexLabel("initial" , "5"));
-        initial10.setLabel(new VertexLabel("initial" , "10"));
+        initial1.setLabel(new VertexLabel("initial", "1"));
+        initial5.setLabel(new VertexLabel("initial", "5"));
+        initial10.setLabel(new VertexLabel("initial", "10"));
 
         DoubleVertex intermediateA = initial1.plus(initial5);
-        intermediateA.setLabel(new VertexLabel( "intermediate","A"));
+        intermediateA.setLabel(new VertexLabel("intermediate", "A"));
         DoubleVertex intermediateB = initial1.div(initial5);
-        intermediateB.setLabel(new VertexLabel( "intermediate","B"));
+        intermediateB.setLabel(new VertexLabel("intermediate", "B"));
         DoubleVertex intermediateC = initial10.plus(initial5);
-        intermediateC.setLabel(new VertexLabel( "intermediate","C"));
+        intermediateC.setLabel(new VertexLabel("intermediate", "C"));
         DoubleVertex intermediateD = initial5.times(initial10);
-        intermediateD.setLabel(new VertexLabel( "intermediate","D"));
+        intermediateD.setLabel(new VertexLabel("intermediate", "D"));
 
         outA = new GaussianVertex(intermediateA, intermediateC);
-        outA.setLabel(new VertexLabel("out" , "A"));
+        outA.setLabel(new VertexLabel("out", "A"));
     }
 
     @Before
@@ -63,18 +63,16 @@ public class NamespacesTest {
     }
 
     @Test
-    public void colorByNamespace() throws IOException {
+    public void colorByNamespace() {
         VertexGraph graph = new VertexGraph(outA).colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
-        GraphToDot.write( graph , System.err );
         assertEquals("There are three distinct colours", 3, colors.size());
     }
 
     @Test
-    public void removeIntermediates() throws IOException {
+    public void removeIntermediates() {
         VertexGraph graph = new VertexGraph(outA).removeNamespace("intermediate").colorVerticesByNamespace();
         Set<String> colors = graph.getNodes().stream().map((n) -> n.details.get("color")).collect(Collectors.toSet());
-        GraphToDot.write( graph , System.err );
         assertEquals("There are two distinct colours", 2, colors.size());
     }
 }
