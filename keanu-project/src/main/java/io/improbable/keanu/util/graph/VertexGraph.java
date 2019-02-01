@@ -299,7 +299,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     public VertexGraph colorVerticesByNamespace() {
         formattingApplied = true;
         ColorSequence<String> seq = new ColorSequence<>();
-        setVertexMetadata(COLOR_KEY, (v) -> formatColorForDot(seq.getOrChoseColor(getVertexNamespace(v))));
+        setVertexMetadata(COLOR_KEY, (v) -> formatColor(seq.getOrChoseColor(getVertexNamespace(v))));
         return this;
     }
 
@@ -312,7 +312,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     public VertexGraph colorVerticesByKey(String key) {
         formattingApplied = true;
         ColorSequence<String> seq = new ColorSequence<>();
-        setVertexNodeMetadata(COLOR_KEY, (v) -> formatColorForDot(seq.getOrChoseColor(v.details.get(key))));
+        setVertexNodeMetadata(COLOR_KEY, (v) -> formatColor(seq.getOrChoseColor(v.details.get(key))));
         return this;
     }
 
@@ -333,7 +333,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         } else {
             c = DETERMINISTIC_COLOR;
         }
-        return formatColorForDot(c);
+        return formatColor(c);
     }
 
     private String convertTypeToColor(Vertex v) {
@@ -347,7 +347,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
         } else {
             c = OTHER_COLOR;
         }
-        return formatColorForDot(c);
+        return formatColor(c);
     }
 
     /**

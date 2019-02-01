@@ -41,11 +41,11 @@ public abstract class AbstractGraph<N extends GraphNode, E extends GraphEdge<N>>
     }
 
     /**
-     * This converts a java color to a .dot format
+     * This converts a java color to a standard format
      * @param c The color to convert
-     * @return the colot as a 6 digit hex string (e.g. #FF00FF)
+     * @return the color as a 6 digit hex string (e.g. #FF00FF), valid for .dot and HTML
      */
-    public static final String formatColorForDot(Color c) {
+    public static final String formatColor(Color c) {
         if (c == null) return null;
         return String.format("#%06X", (0xFFFFFF & c.getRGB()));
     }
