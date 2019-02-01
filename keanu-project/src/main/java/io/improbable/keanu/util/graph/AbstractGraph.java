@@ -50,23 +50,6 @@ public abstract class AbstractGraph<N extends GraphNode, E extends GraphEdge<N>>
         return String.format("#%06X", (0xFFFFFF & c.getRGB()));
     }
 
-    /**
-     * This function is a utility to support merging metadata from different nodes.
-     * @param target The metadata to write to
-     * @param input The metadatas to merge togehter
-     */
-    public static void mergeMetadata(Map<String, String> target, Map<String, String>... input) {
-        for (Map<String, String> i : input) {
-            for (Map.Entry<String, String> e : i.entrySet()) {
-                if (target.containsKey(e.getKey())) {
-                    target.put(e.getKey(), target.get(e.getKey()) + ", " + e.getValue());
-                } else {
-                    target.put(e.getKey(), e.getValue());
-                }
-            }
-        }
-    }
-
     public Set<E> findEdges(Predicate<E> f) {
         Set<E> edges = new HashSet<>();
         for (E e : getEdges()) {
