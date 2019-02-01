@@ -17,8 +17,8 @@ public abstract class ProbabilityFitnessFunctionGradient implements FitnessFunct
     private final BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> onGradientCalculation;
 
     public ProbabilityFitnessFunctionGradient(ProbabilisticModelWithGradient probabilisticModelWithGradient) {
-        this.probabilisticModelWithGradient = probabilisticModelWithGradient;
-        this.onGradientCalculation = null;
+        this(probabilisticModelWithGradient, (point, gradient) -> {
+        });
     }
 
     @Override
@@ -26,9 +26,7 @@ public abstract class ProbabilityFitnessFunctionGradient implements FitnessFunct
 
         final Map<? extends VariableReference, DoubleTensor> gradients = calculateGradients(probabilisticModelWithGradient, values);
 
-        if (onGradientCalculation != null) {
-            onGradientCalculation.accept(values, gradients);
-        }
+        onGradientCalculation.accept(values, gradients);
 
         return gradients;
     }

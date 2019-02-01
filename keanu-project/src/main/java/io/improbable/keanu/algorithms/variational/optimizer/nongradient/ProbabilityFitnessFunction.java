@@ -16,7 +16,8 @@ public abstract class ProbabilityFitnessFunction implements FitnessFunction {
     private final BiConsumer<Map<VariableReference, DoubleTensor>, Double> onFitnessCalculation;
 
     public ProbabilityFitnessFunction(ProbabilisticModel probabilisticModel) {
-        this(probabilisticModel, null);
+        this(probabilisticModel, (point, fitness) -> {
+        });
     }
 
     @Override
@@ -24,9 +25,7 @@ public abstract class ProbabilityFitnessFunction implements FitnessFunction {
 
         final double logProb = calculateFitness(probabilisticModel, values);
 
-        if (onFitnessCalculation != null) {
-            onFitnessCalculation.accept(values, logProb);
-        }
+        onFitnessCalculation.accept(values, logProb);
 
         return logProb;
     }
