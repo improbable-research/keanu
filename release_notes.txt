@@ -8,3 +8,4 @@
 * Added __version__ attribute to Python
 * Added a permute vertex
 * Added the release notes text file to the repo
+* Added MIR loader
