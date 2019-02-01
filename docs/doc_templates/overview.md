@@ -107,7 +107,7 @@ The wet grass example describes a problem as a Bayesian Network. It then takes s
 posterior distribution, using:
  
  ```java
- MetropolisHastings.withDefaultConfig().getPosteriorSamples(...)
+ MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(...)
  ```
  
 in order to determine the probability that it rained given the grass was observed

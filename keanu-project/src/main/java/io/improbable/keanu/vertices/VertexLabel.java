@@ -2,24 +2,34 @@ package io.improbable.keanu.vertices;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 public class VertexLabel {
     private static final char NAMESPACE_SEPARATOR = '.';
-    private final String name;
     private final List<String> namespace;
+    private final String name;
 
-    public VertexLabel(String name, String... namespace) {
-        this(name, ImmutableList.copyOf(namespace));
+    public VertexLabel(String name) {
+        this.namespace = Collections.emptyList();
+        this.name = name;
     }
 
-    public VertexLabel(String name, List<String> namespace) {
-        this.name = name;
+    public VertexLabel(String outer, String... inner) {
+        this.namespace = ImmutableList.<String>builder()
+            .add(outer)
+            .add(Arrays.copyOf(inner, inner.length - 1))
+            .build();
+        this.name = inner[inner.length - 1];
+    }
+
+    public VertexLabel(List<String> namespace, String name) {
         this.namespace = ImmutableList.copyOf(namespace);
+        this.name = name;
     }
 
     public boolean isInNamespace(String... namespace) {
@@ -37,21 +47,17 @@ public class VertexLabel {
     }
 
     public VertexLabel withExtraNamespace(String topLevelNamespace) {
-        List<String> newNamespace = ImmutableList.<String>builder().addAll(namespace).add(topLevelNamespace).build();
-        return new VertexLabel(this.name, newNamespace);
+        List<String> newNamespace = ImmutableList.<String>builder().add(topLevelNamespace).addAll(namespace).build();
+        return new VertexLabel(newNamespace, this.name);
     }
 
     public VertexLabel withoutOuterNamespace() {
-        List<String> reducedNamespace = namespace.subList(0, namespace.size() - 1);
-        return new VertexLabel(this.name, reducedNamespace);
+        List<String> reducedNamespace = namespace.subList(1, namespace.size());
+        return new VertexLabel(reducedNamespace, this.name);
     }
 
     public Optional<String> getOuterNamespace() {
-        try {
-            return Optional.of(namespace.get(namespace.size() - 1));
-        } catch (IndexOutOfBoundsException e) {
-            return Optional.empty();
-        }
+        return namespace.stream().findFirst();
     }
 
     public String getUnqualifiedName() {
@@ -59,8 +65,8 @@ public class VertexLabel {
     }
 
     public String getQualifiedName() {
-        ImmutableList<String> names = ImmutableList.<String>builder().add(name).addAll(namespace).build();
-        return Joiner.on(NAMESPACE_SEPARATOR).join(Lists.reverse(names));
+        ImmutableList<String> names = ImmutableList.<String>builder().addAll(namespace).add(name).build();
+        return Joiner.on(NAMESPACE_SEPARATOR).join(names);
     }
 
     @Override
@@ -80,6 +86,6 @@ public class VertexLabel {
     @Override
     public int hashCode() {
 
-        return Objects.hash(name, namespace);
+        return Objects.hash(namespace, name);
     }
 }
