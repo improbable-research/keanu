@@ -21,9 +21,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Apache FreeMarker Format:
+ * The following Apache FreeMarker Format is used to generate Python code for Keanu vertices:
  * def ${constructor.pythonClass}(${constructor.pythonTypedParameters}) -> Vertex:
  *      ${constructor.docString}return ${constructor.pythonVertexClass}(context.jvm_view().${constructor.javaClass}, ${constructor.pythonParameters})
+ *
+ * This converter returns values for each vertex that are injected during code generation.
  */
 class JavaVertexToPythonConverter {
 
