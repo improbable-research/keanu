@@ -339,7 +339,7 @@ def test_set_label() -> None:
 
 
 def test_can_set_none_label() -> None:
-    vertex = Gaussian(0., 1.)
+    vertex = Gaussian(0., 1., label="gaussian")
     vertex.set_label(None)
     assert vertex.get_label() == None
 

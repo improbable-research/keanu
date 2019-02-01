@@ -208,10 +208,9 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
     @staticmethod
     def _get_python_label(java_vertex: JavaObject) -> Optional[str]:
-        java_label = java_vertex.getLabel()
         try:
-            return java_label.getQualifiedName()
-        except (Py4JError):
+            return java_vertex.getLabel().getQualifiedName()
+        except (AttributeError, Py4JError):
             return None
 
 
