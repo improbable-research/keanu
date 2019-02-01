@@ -61,7 +61,7 @@ public class MIRSaver extends ProtobufSaver {
         MIR.Function.Builder builder = MIR.Function.newBuilder();
 
         builder.setName(ENTRY_POINT_NAME);
-        builder.getInstructionGroupsBuilder(0)
+        builder.addInstructionGroupsBuilder(0)
             .setId(0)
             .setGraph(graph);
 

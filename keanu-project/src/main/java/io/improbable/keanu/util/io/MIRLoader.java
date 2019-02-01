@@ -30,7 +30,7 @@ public class MIRLoader extends ProtobufLoader {
     }
 
     private static void checkEntryPoint(MIR.Model model) {
-        if (model.getEntryPointName() != MIRSaver.ENTRY_POINT_NAME) {
+        if (!model.getEntryPointName().equals(MIRSaver.ENTRY_POINT_NAME)) {
             throw new IllegalArgumentException("Keanu only supports loading Keanu generated Graphs");
         }
     }
