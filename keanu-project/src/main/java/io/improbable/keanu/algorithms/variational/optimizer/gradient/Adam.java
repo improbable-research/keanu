@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.ContinuousPoint;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.variational.optimizer.ConvergenceChecker;
@@ -13,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public class Adam implements GradientOptimizationAlgorithm {
 
         boolean converged = false;
 
-        final Map<VariableReference, DoubleTensor> thetaMap = new HashMap<>();
+        final ContinuousPoint thetaAsPoint = new ContinuousPoint();
         final DoubleTensor[] gradients = new DoubleTensor[theta.length];
 
         double beta1T = 1;
@@ -54,7 +54,7 @@ public class Adam implements GradientOptimizationAlgorithm {
 
         for (int t = 1; !converged && t <= maxEvaluations; t++) {
 
-            updateGradients(theta, thetaMap, gradients, latentVariables, fitnessFunctionGradient);
+            updateGradients(latentVariables, theta, thetaAsPoint, gradients, fitnessFunctionGradient);
 
             beta1T = beta1T * beta1;
             beta2T = beta2T * beta2;
@@ -76,21 +76,27 @@ public class Adam implements GradientOptimizationAlgorithm {
             thetaNext = temp;
         }
 
-        double logProb = fitnessFunction.getFitnessAt(updateMap(theta, latentVariables, thetaMap));
+        updatePoint(latentVariables, theta, thetaAsPoint);
 
-        return new OptimizedResult(updateMap(theta, latentVariables, thetaMap), logProb);
+        double logProb = fitnessFunction.getFitnessAt(thetaAsPoint);
+
+        return new OptimizedResult(thetaAsPoint, logProb);
     }
 
-    private void updateGradients(DoubleTensor[] theta,
-                                 Map<VariableReference, DoubleTensor> thetaMap,
+    private void updateGradients(List<? extends Variable> ordered,
+                                 DoubleTensor[] theta,
+                                 ContinuousPoint thetaAsPoint,
                                  DoubleTensor[] gradients,
-                                 List<? extends Variable> latentVariables,
                                  FitnessFunctionGradient fitnessFunctionGradient) {
-        updateMap(theta, latentVariables, thetaMap);
+        updatePoint(
+            ordered,
+            theta,
+            thetaAsPoint
+        );
 
-        updateArray(
-            fitnessFunctionGradient.getGradientsAt(thetaMap),
-            latentVariables,
+        updateGradients(
+            ordered,
+            fitnessFunctionGradient.getGradientsAt(thetaAsPoint),
             gradients
         );
     }
@@ -115,26 +121,25 @@ public class Adam implements GradientOptimizationAlgorithm {
         return zeros;
     }
 
-    private DoubleTensor[] updateArray(Map<? extends VariableReference, DoubleTensor> lookup,
-                                       List<? extends Variable> ordered,
-                                       DoubleTensor[] array) {
+    private void updateGradients(List<? extends Variable> ordered,
+                                 Map<? extends VariableReference, DoubleTensor> newGradients,
+                                 DoubleTensor[] gradients) {
 
         for (int i = 0; i < ordered.size(); i++) {
-            array[i] = lookup.get(ordered.get(i).getReference());
+            gradients[i] = newGradients.get(ordered.get(i).getReference());
         }
 
-        return array;
     }
 
-    private Map<VariableReference, DoubleTensor> updateMap(DoubleTensor[] values,
-                                                           List<? extends Variable> ordered,
-                                                           Map<VariableReference, DoubleTensor> asMap) {
+    private Map<VariableReference, DoubleTensor> updatePoint(List<? extends Variable> ordered,
+                                                             DoubleTensor[] values,
+                                                             ContinuousPoint valuesAsPoint) {
 
         for (int i = 0; i < values.length; i++) {
-            asMap.put(ordered.get(i).getReference(), values[i]);
+            valuesAsPoint.put(ordered.get(i).getReference(), values[i]);
         }
 
-        return asMap;
+        return valuesAsPoint;
     }
 
 
