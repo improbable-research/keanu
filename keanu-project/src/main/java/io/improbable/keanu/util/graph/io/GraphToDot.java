@@ -13,7 +13,8 @@ import java.util.Map;
  */
 public abstract class GraphToDot {
 
-    private static final String DOT_HEADER = "digraph BayesianNetwork {\n";
+    private static final String DOT_HEADER = "digraph ";
+    private static final String DOT_HEADER_END = " {\n";
     private static final String DOT_ENDING = "}";
     private static final String DOT_COMMENT_APPENDIX = "// ";
     private static final String DOT_EDGE = " -> ";
@@ -61,6 +62,8 @@ public abstract class GraphToDot {
     public static void write(@NotNull AbstractGraph<? extends GraphNode, ? extends GraphEdge> graph, @NotNull Writer outputWriter) throws IOException {
         graph.prepareForExport();
         outputWriter.write(DOT_HEADER);
+        outputWriter.write( graph.getMetaData().getOrDefault("name","BayesianNetwork"));
+        outputWriter.write(DOT_HEADER_END);
         for (Map.Entry<String, String> e : graph.getMetaData().entrySet()) {
             outputWriter.write(DOT_COMMENT_APPENDIX);
             outputWriter.write(e.getKey());
