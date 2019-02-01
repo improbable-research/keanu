@@ -38,14 +38,10 @@ _norm = dict(max_abs='MAX_ABS', l2="L2")
 
 
 def relative(norm: str, tolerance: float):
-    print(_norm[norm])
-    print(tolerance)
     return k.jvm_view().RelativeConvergenceChecker(k.jvm_view().ConvergenceChecker.Norm.valueOf(_norm[norm]), tolerance)
 
 
 def absolute(norm: str, tolerance: float):
-    print(_norm[norm])
-    print(tolerance)
     return k.jvm_view().AbsoluteConvergenceChecker(k.jvm_view().ConvergenceChecker.Norm.valueOf(_norm[norm]), tolerance)
 
 
@@ -61,7 +57,7 @@ class ConvergenceChecker(JavaObjectWrapper):
     norm : srt
         one of {'max_abs', 'l2'}
         max_abs is max(abs(postion - next_position))
-        l2 is sqrt(sum((position-nex_position)**2))
+        l2 is sqrt(sum((position-next_position)**2))
     tolerance : float
         when the norm strategy is less than this, the optimizer is consider converged and will stop
     """

@@ -79,7 +79,6 @@ public class SumGaussianTestCase implements GradientOptimizationAlgorithmTestCas
             assertMLE(result);
         } else {
             assertMAP(result);
-            assertMAP(result);
         }
     }
 }

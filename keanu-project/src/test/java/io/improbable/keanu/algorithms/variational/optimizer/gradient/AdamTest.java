@@ -5,6 +5,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.GradientOptimizationAlgorithmTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.SingleGaussianTestCase;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -111,12 +112,12 @@ public class AdamTest {
         validateParameters(10, 0.1, 0.1, 1, 0.1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NotStrictlyPositiveException.class)
     public void throwsOnNegativeAlpha() {
         validateParameters(10, -0.1, 0.1, 0.1, 0.1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NotStrictlyPositiveException.class)
     public void throwsOnNegativeEpsilon() {
         validateParameters(10, 0.1, 0.1, 0.1, -0.1);
     }

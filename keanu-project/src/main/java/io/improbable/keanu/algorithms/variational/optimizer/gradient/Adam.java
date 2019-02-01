@@ -59,7 +59,7 @@ public class Adam implements GradientOptimizationAlgorithm {
             beta1T = beta1T * beta1;
             beta2T = beta2T * beta2;
 
-            final double b = (1 - beta1T) / Math.sqrt(1 - Math.pow(beta2, t));
+            final double b = (1 - beta1T) / Math.sqrt(1 - beta2T);
 
             for (int i = 0; i < theta.length; i++) {
 

@@ -19,10 +19,10 @@ public class ConjugateGradientTest {
         validateParameters(10, 0.1, -0.1);
     }
 
-    public void validateParameters(int maxIterations, double relativeThreshold, double absoluteThreshold) {
+    public void validateParameters(int maxEvaluations, double relativeThreshold, double absoluteThreshold) {
 
         ConjugateGradient.builder()
-            .maxEvaluations(maxIterations)
+            .maxEvaluations(maxEvaluations)
             .relativeThreshold(relativeThreshold)
             .absoluteThreshold(absoluteThreshold)
             .build();
