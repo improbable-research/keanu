@@ -1,14 +1,18 @@
 package io.improbable.keanu.benchmarks;
 
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.backend.keanu.KeanuComputableGraph;
 import io.improbable.keanu.backend.keanu.compiled.KeanuCompiledGraphBuilder;
 import io.improbable.keanu.backend.tensorflow.TensorflowComputableGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 
 import java.util.HashMap;
 import java.util.Map;

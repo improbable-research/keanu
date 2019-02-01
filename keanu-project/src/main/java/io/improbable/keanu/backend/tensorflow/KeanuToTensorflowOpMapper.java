@@ -1,6 +1,6 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import io.improbable.keanu.backend.VariableReference;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.tensorflow.TensorflowOpFactory.OpType;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;

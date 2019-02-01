@@ -1,6 +1,7 @@
 package io.improbable.keanu.distributions.discrete;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -9,7 +10,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.DebugTensorValidator;
 import io.improbable.keanu.tensor.validate.TensorValidator;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;

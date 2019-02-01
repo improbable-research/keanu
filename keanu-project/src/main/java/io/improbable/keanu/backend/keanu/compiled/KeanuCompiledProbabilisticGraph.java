@@ -1,10 +1,11 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
+import io.improbable.keanu.algorithms.ProbabilisticModel;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
-import io.improbable.keanu.backend.ProbabilisticGraph;
-import io.improbable.keanu.backend.Variable;
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.backend.tensorflow.TensorflowVariable;
+import io.improbable.keanu.backend.tensorflow.TensorflowVariableState;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLog
 import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbPrior;
 
 @AllArgsConstructor
-public class KeanuCompiledProbabilisticGraph implements ProbabilisticGraph {
+public class KeanuCompiledProbabilisticGraph implements ProbabilisticModel {
 
     public static KeanuCompiledProbabilisticGraph convert(BayesianNetwork network) {
         KeanuCompiledGraphBuilder builder = new KeanuCompiledGraphBuilder();
@@ -38,7 +39,7 @@ public class KeanuCompiledProbabilisticGraph implements ProbabilisticGraph {
 
         ComputableGraph computableGraph = builder.build();
 
-        List<Variable<?>> latentVariables = builder.getLatentVariables().stream()
+        List<Variable<?, TensorflowVariableState>> latentVariables = builder.getLatentVariables().stream()
             .map(v -> new TensorflowVariable<>(computableGraph, v))
             .collect(Collectors.toList());
 
@@ -69,6 +70,11 @@ public class KeanuCompiledProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
+    public double logProbAfter(Map<VariableReference, Object> newValues, double logProbBefore) {
+        return 0;
+    }
+
+    @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
 
         if (logLikelihoodOp == null) {
@@ -77,5 +83,10 @@ public class KeanuCompiledProbabilisticGraph implements ProbabilisticGraph {
 
         DoubleTensor logLikelihood = computableGraph.compute(inputs, logLikelihoodOp);
         return logLikelihood.scalar();
+    }
+
+    @Override
+    public List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
+        return null;
     }
 }

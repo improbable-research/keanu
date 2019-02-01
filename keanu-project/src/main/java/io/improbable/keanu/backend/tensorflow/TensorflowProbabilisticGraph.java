@@ -1,8 +1,8 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import io.improbable.keanu.backend.ProbabilisticGraph;
-import io.improbable.keanu.backend.Variable;
-import io.improbable.keanu.backend.VariableReference;
+import io.improbable.keanu.algorithms.ProbabilisticModel;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLog
 import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbPrior;
 
 @AllArgsConstructor
-public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
+public class TensorflowProbabilisticGraph implements ProbabilisticModel {
 
     public static TensorflowProbabilisticGraph convert(BayesianNetwork network) {
         TensorflowComputableGraphBuilder builder = new TensorflowComputableGraphBuilder();
@@ -33,7 +33,7 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
 
         TensorflowComputableGraph computableGraph = builder.build();
 
-        List<Variable<?>> latentVariables = builder.getLatentVariables().stream()
+        List<Variable<?, TensorflowVariableState>> latentVariables = builder.getLatentVariables().stream()
             .map(v -> new TensorflowVariable<>(computableGraph, v))
             .collect(Collectors.toList());
 
@@ -64,6 +64,11 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
     }
 
     @Override
+    public double logProbAfter(Map<VariableReference, Object> newValues, double logProbBefore) {
+        return 0;
+    }
+
+    @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
 
         if (logLikelihoodOp == null) {
@@ -72,6 +77,11 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
 
         DoubleTensor logLikelihood = computableGraph.compute(inputs, logLikelihoodOp);
         return logLikelihood.scalar();
+    }
+
+    @Override
+    public List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
+        return null;
     }
 
     @Override

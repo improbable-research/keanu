@@ -1,13 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,7 +41,7 @@ public class BetaVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfScalar() {
+    public void logProbMatchesKnownLogDensityOfScalar() {
         BetaVertex tensorBetaVertex = new BetaVertex(2., 3.);
         BetaDistribution betaDistribution = new BetaDistribution(2.0, 3.0);
         double expectedDensity = betaDistribution.logDensity(0.5);
@@ -46,12 +49,46 @@ public class BetaVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfVector() {
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        DoubleVertex alpha = ConstantVertex.of(2.);
+        DoubleVertex beta = ConstantVertex.of(3.);
+        BetaVertex tensorBetaVertex = new BetaVertex(alpha, beta);
+        LogProbGraph logProbGraph = tensorBetaVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, alpha, alpha.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, beta, beta.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, tensorBetaVertex, DoubleTensor.scalar(0.5));
+
+        BetaDistribution betaDistribution = new BetaDistribution(2., 3.);
+        double expectedDensity = betaDistribution.logDensity(0.5);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfVector() {
 
         BetaDistribution betaDistribution = new BetaDistribution(2, 3);
         double expectedLogDensity = betaDistribution.logDensity(0.25) + betaDistribution.logDensity(0.1);
         BetaVertex ndBetaVertex = new BetaVertex(2, 3);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndBetaVertex, new double[]{0.25, 0.1}, expectedLogDensity);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        DoubleVertex alpha = ConstantVertex.of(2., 2.);
+        DoubleVertex beta = ConstantVertex.of(3., 3.);
+        BetaVertex tensorBetaVertex = new BetaVertex(alpha, beta);
+        LogProbGraph logProbGraph = tensorBetaVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, alpha, alpha.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, beta, beta.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, tensorBetaVertex, DoubleTensor.create(0.25, 0.1));
+
+        BetaDistribution betaDistribution = new BetaDistribution(2., 3.);
+        double expectedDensity = betaDistribution.logDensity(0.25) + betaDistribution.logDensity(0.1);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Test

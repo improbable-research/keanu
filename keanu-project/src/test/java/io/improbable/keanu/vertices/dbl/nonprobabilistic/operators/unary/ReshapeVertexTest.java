@@ -91,10 +91,16 @@ public class ReshapeVertexTest {
         MultiplicationVertex F = D.times(E);
 
         DoubleTensor forwardWrtA = Differentiator.forwardModeAutoDiff(A, F).of(F);
-        PartialsOf backward = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A, B));
+        PartialsOf backwardA = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A));
+
+        DoubleTensor forwardWrtB = Differentiator.forwardModeAutoDiff(B, F).of(F);
+        PartialsOf backwardB = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(B));
 
         Assert.assertArrayEquals(new long[]{4, 1, 2, 2}, forwardWrtA.getShape());
-        Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backward.withRespectTo(A).asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(forwardWrtA.asFlatDoubleArray(), backwardA.withRespectTo(A).asFlatDoubleArray(), 1e-6);
+
+        Assert.assertArrayEquals(new long[]{4, 1, 2, 2}, forwardWrtB.getShape());
+        Assert.assertArrayEquals(forwardWrtB.asFlatDoubleArray(), backwardB.withRespectTo(B).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
@@ -122,7 +128,7 @@ public class ReshapeVertexTest {
         UniformVertex inputVertex = new UniformVertex(new long[]{4, 4}, -10.0, 10.0);
         ReshapeVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
 
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-10, 1e-10);
     }
 
 }

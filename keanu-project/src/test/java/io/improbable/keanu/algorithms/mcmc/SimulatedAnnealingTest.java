@@ -1,13 +1,15 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.Keanu;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,9 +17,6 @@ import org.junit.Test;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class SimulatedAnnealingTest {
 
@@ -44,34 +43,13 @@ public class SimulatedAnnealingTest {
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         network.probeForNonZeroProbability(100, random);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(network);
 
-        NetworkState maxAPosterioriSamples = SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(network, 10000);
+        NetworkState maxAPosterioriSamples = Keanu.Sampling.SimulatedAnnealing.withDefaultConfigFor(model, random).getMaxAPosteriori(model, 10000);
         NetworkState maxValuesFromVariational = findMAPWithOptimizer();
 
         assertEquals(maxValuesFromVariational.get(A).scalar(), maxAPosterioriSamples.get(A).scalar(), 0.05);
         assertEquals(maxValuesFromVariational.get(B).scalar(), maxAPosterioriSamples.get(B).scalar(), 0.05);
-    }
-
-    @Test
-    public void canDefaultToSettingsInBuilderAndIsConfigurableAfterBuilding() {
-
-        BayesianNetwork net = new BayesianNetwork(new GaussianVertex(0.0, 1.0).getConnectedGraph());
-        net.probeForNonZeroProbability(100, random);
-
-        SimulatedAnnealing algo = SimulatedAnnealing.builder()
-            .useCacheOnRejection(false)
-            .build();
-
-        assertNotNull(algo.getProposalDistribution());
-        assertNotNull(algo.getRandom());
-        assertNotNull(algo.getVariableSelector());
-
-        NetworkState networkMAP = algo.getMaxAPosteriori(net, 10);
-
-        algo.setVariableSelector(null);
-        assertNull(algo.getVariableSelector());
-
-        assertFalse(networkMAP.getVertexIds().isEmpty());
     }
 
     private NetworkState findMAPWithOptimizer() {

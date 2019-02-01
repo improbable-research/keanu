@@ -1,11 +1,13 @@
 package io.improbable.keanu.vertices;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
@@ -38,7 +40,7 @@ public class LogProbGraph {
 
     public static class DoublePlaceholderVertex extends DoubleVertex implements PlaceholderVertex, NonProbabilistic<DoubleTensor>, Differentiable {
 
-        public DoublePlaceholderVertex(@LoadShape long[] initialShape) {
+        public DoublePlaceholderVertex(@LoadShape long... initialShape) {
             super(initialShape);
         }
 
@@ -49,6 +51,23 @@ public class LogProbGraph {
 
         @Override
         public DoubleTensor sample(KeanuRandom random) {
+            return getPlaceholderVertexValue(this);
+        }
+    }
+
+    static public class IntegerPlaceHolderVertex extends IntegerVertex implements PlaceholderVertex, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
+
+        public IntegerPlaceHolderVertex(long... initialShape) {
+            super(initialShape);
+        }
+
+        @Override
+        public IntegerTensor calculate() {
+            return getPlaceholderVertexValue(this);
+        }
+
+        @Override
+        public IntegerTensor sample(KeanuRandom random) {
             return getPlaceholderVertexValue(this);
         }
     }

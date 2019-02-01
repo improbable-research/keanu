@@ -1,5 +1,7 @@
 package io.improbable.keanu.backend;
 
+import io.improbable.keanu.algorithms.VariableReference;
+
 import java.util.Collection;
 import java.util.Map;
 

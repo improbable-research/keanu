@@ -92,7 +92,7 @@ First we create a Bayesian Network from our distributions and find a non-zero st
 A.setValue(20.0);
 B.setValue(20.0);
 
-BayesianNetwork bayesNet = new BayesianNetwork(C.getConnectedGraph());
+KeanuProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
 ```
 
 Now let's use Metropolis Hastings to sample from this network.
@@ -106,10 +106,10 @@ Metropolis Hastings accepts the following arguments:
 We will be taking 100,000 samples from the distributions of A and B.
 
 ```java
-NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-    bayesNet,
-    bayesNet.getLatentVertices(),
-    30000
+NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+    model,
+    model.getLatentVariables(),
+    100000
 );
 ```
 
@@ -137,7 +137,7 @@ m.c.observe(43.)
 m.a.set_value(20.)
 m.b.set_value(20.)
 bayes_net = m.to_bayes_net()
-algo = MetropolisHastingsSampler()
+algo = MetropolisHastingsSampler(proposal_distribution='prior', latents=bayes_net.get_latent_vertices())
 posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
                            sampling_algorithm=algo, draws=30000)
 
@@ -193,29 +193,13 @@ The parameters are:
 * The vertices in the network to return samples for (latent vertices)
 * The number of samples to take
 
-##### Java
-
-```java
-NetworkSamples posteriorSamples = Hamiltonian.withDefaultConfig().getPosteriorSamples(
-    bayesNet,
-    bayesNet.getLatentVertices(),
-    2000
-);
-```
-
-##### Python
-
-```python
-algo = HamiltonianSampler()
-posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(),
-                           sampling_algorithm=algo, draws=2000)
-```
 
 ### NUTS
 
-#### Algorithm
+NUTS is an auto-tuning implementation of HMC.
 
-NUTS is built on top of HMC. 
+#### Algorithm
+ 
 As the sample moves through the distribution, there are features in place that stop it from performing 
 a U-turn and re-exploring locations. 
 Hence why it's called the 'No-U-Turn Sampler'. 
@@ -226,9 +210,9 @@ It also attempts to calculate and auto-tune those difficult leapfrog and step si
 ##### Java
 
 ```java
-NetworkSamples posteriorSamples = NUTS.withDefaultConfig().getPosteriorSamples(
-    bayesNet,
-    bayesNet.getLatentVertices(),
+NetworkSamples posteriorSamples = Keanu.Sampling.NUTS.withDefaultConfig().getPosteriorSamples(
+    model,
+    model.getLatentVariables(),
     2000
 );
 ```

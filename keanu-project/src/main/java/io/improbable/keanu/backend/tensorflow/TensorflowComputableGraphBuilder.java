@@ -1,8 +1,8 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraphBuilder;
 import io.improbable.keanu.backend.StringVariableReference;
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;
 import org.tensorflow.Graph;

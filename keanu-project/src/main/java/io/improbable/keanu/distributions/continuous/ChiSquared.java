@@ -1,10 +1,13 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class ChiSquared implements ContinuousDistribution {
 
@@ -26,10 +29,17 @@ public class ChiSquared implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        DoubleTensor halfK = k.toDouble().div(2);
-        DoubleTensor numerator = halfK.minus(1).timesInPlace(x.log()).minusInPlace(x.div(2));
-        DoubleTensor denominator = halfK.times(LOG_TWO).plusInPlace(halfK.logGamma());
+        final DoubleTensor halfK = k.toDouble().div(2.);
+        final DoubleTensor numerator = halfK.minus(1.).timesInPlace(x.log()).minusInPlace(x.div(2.));
+        final DoubleTensor denominator = halfK.times(LOG_TWO).plusInPlace(halfK.logGamma());
         return numerator.minusInPlace(denominator);
+    }
+
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, IntegerPlaceHolderVertex k) {
+        final DoubleVertex halfK = k.toDouble().div(2.);
+        final DoubleVertex numerator = halfK.minus(1.).times(x.log()).minus(x.div(2.));
+        final DoubleVertex denominator = halfK.times(LOG_TWO).plus(halfK.logGamma());
+        return numerator.minus(denominator);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.discrete.Categorical;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -10,7 +11,6 @@ import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
 import io.improbable.keanu.vertices.generic.GenericTensorVertex;

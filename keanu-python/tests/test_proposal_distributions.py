@@ -1,11 +1,21 @@
 import numpy as np
 import pytest
 
+from keanu import BayesNet, Model
 from keanu.algorithm._proposal_distribution import ProposalDistribution
+from keanu.vertex import Gaussian
 
 
-def test_you_can_create_a_prior_proposal_distribution() -> None:
-    ProposalDistribution("prior")
+@pytest.fixture
+def net() -> BayesNet:
+    with Model() as m:
+        m.gamma = Gaussian(0., 1.)
+
+    return m.to_bayes_net()
+
+
+def test_you_can_create_a_prior_proposal_distribution(net) -> None:
+    ProposalDistribution("prior", latents=net.get_latent_vertices())
 
 
 def test_you_can_create_a_gaussian_proposal_distribution() -> None:

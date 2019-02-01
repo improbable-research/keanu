@@ -40,8 +40,6 @@ public interface Probabilistic<T> extends Observable<T> {
 
     T getValue();
 
-    void setValue(T value);
-
     default double logProbAtValue() {
         return logProb(getValue());
     }

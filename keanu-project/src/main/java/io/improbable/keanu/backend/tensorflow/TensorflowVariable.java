@@ -1,14 +1,14 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
-import io.improbable.keanu.backend.Variable;
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.tensor.Tensor;
 import lombok.AllArgsConstructor;
 
 
 @AllArgsConstructor
-public class TensorflowVariable<T> implements Variable<T> {
+public class TensorflowVariable<T> implements Variable<T, TensorflowVariableState> {
 
     private final ComputableGraph graph;
     private final VariableReference variableReference;
@@ -31,5 +31,10 @@ public class TensorflowVariable<T> implements Variable<T> {
         } else {
             return new long[0];
         }
+    }
+
+    @Override
+    public TensorflowVariableState getState() {
+        return null;
     }
 }

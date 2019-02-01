@@ -1,14 +1,14 @@
 package io.improbable.keanu.vertices.utility;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
-import io.improbable.keanu.algorithms.mcmc.MCMC;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
@@ -22,6 +22,7 @@ import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
 
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -76,8 +77,8 @@ public class AssertVertexTest {
         GaussianVertex gaussian = new GaussianVertex(5, 1);
         gaussian.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
 
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(gaussian.getConnectedGraph());
-        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(bayesianNetwork, bayesianNetwork.getLatentVertices()).generate(10);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(gaussian.getConnectedGraph());
+        MetropolisHastings.withDefaultConfigFor(model).generatePosteriorSamples(model, model.getLatentVariables()).generate(10);
     }
 
     @Test
@@ -154,10 +155,10 @@ public class AssertVertexTest {
         firstThermometer.observe(25.);
         secondThermometer.observe(30.);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesNet,
-            bayesNet.getLatentVertices(),
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(temperature.getConnectedGraph());
+        MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+            model,
+            model.getLatentVariables(),
             100
         );
     }
@@ -219,8 +220,8 @@ public class AssertVertexTest {
         DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
         Cobserved.observe(46.0);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-        PosteriorSamplingAlgorithm samplingAlgorithm = MCMC.withDefaultConfig().forNetwork(bayesNet);
+        KeanuProbabilisticModel bayesNet = new KeanuProbabilisticModel(Arrays.asList(A, B, Cobserved));
+        PosteriorSamplingAlgorithm samplingAlgorithm = Keanu.Sampling.MCMC.withDefaultConfigFor(bayesNet);
         assertThat(samplingAlgorithm, instanceOf(NUTS.class));
     }
 

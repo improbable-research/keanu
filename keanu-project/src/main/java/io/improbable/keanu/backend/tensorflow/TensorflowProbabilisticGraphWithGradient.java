@@ -1,8 +1,8 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import io.improbable.keanu.backend.ProbabilisticGraphWithGradient;
-import io.improbable.keanu.backend.Variable;
-import io.improbable.keanu.backend.VariableReference;
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbObservation;
 import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbPrior;
 
-public class TensorflowProbabilisticGraphWithGradient extends TensorflowProbabilisticGraph implements ProbabilisticGraphWithGradient {
+public class TensorflowProbabilisticGraphWithGradient extends TensorflowProbabilisticGraph implements ProbabilisticModelWithGradient {
 
     public static TensorflowProbabilisticGraphWithGradient convert(BayesianNetwork network) {
 
@@ -48,7 +48,7 @@ public class TensorflowProbabilisticGraphWithGradient extends TensorflowProbabil
             latentVariablesReferences
         );
 
-        List<Variable<?>> latentVariables = builder.getLatentVariables().stream()
+        List<Variable<?, TensorflowVariableState>> latentVariables = builder.getLatentVariables().stream()
             .map(v -> new TensorflowVariable<>(computableGraph, v))
             .collect(Collectors.toList());
 

@@ -8,6 +8,8 @@ from typing import Any, Iterator, Iterable
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.network.BayesianNetwork")
+java_import(k.jvm_view(), "io.improbable.keanu.network.KeanuProbabilisticModel")
+java_import(k.jvm_view(), "io.improbable.keanu.network.KeanuProbabilisticModelWithGradient")
 
 
 class BayesNet(JavaObjectWrapper):
@@ -34,3 +36,16 @@ class BayesNet(JavaObjectWrapper):
 
     def probe_for_non_zero_probability(self, attempts: int, random: KeanuRandom) -> None:
         self.unwrap().probeForNonZeroProbability(attempts, random.unwrap())
+
+
+class ProbabilisticModel(JavaObjectWrapper):
+
+    def __init__(self, net: BayesNet) -> None:
+        super(ProbabilisticModel, self).__init__(k.jvm_view().KeanuProbabilisticModel(net.unwrap()))
+
+
+class ProbabilisticModelWithGradient(JavaObjectWrapper):
+
+    def __init__(self, net: BayesNet) -> None:
+        super(ProbabilisticModelWithGradient,
+              self).__init__(k.jvm_view().KeanuProbabilisticModelWithGradient(net.unwrap()))

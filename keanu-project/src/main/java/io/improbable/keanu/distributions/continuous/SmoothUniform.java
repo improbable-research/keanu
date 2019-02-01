@@ -1,9 +1,11 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
@@ -112,7 +114,6 @@ public class SmoothUniform implements ContinuousDistribution {
 
         DoubleTensor firstConditional = x.getGreaterThanOrEqualToMask(xMin);
         firstConditional = firstConditional.timesInPlace(x.getLessThanOrEqualToMask(xMax));
-        firstConditional.timesInPlace(x.getLessThanOrEqualToMask(xMax));
         final DoubleTensor firstConditionalResult = bodyHeight(shoulderWidth, bodyWidth);
 
         DoubleTensor secondConditional = x.getLessThanMask(xMin);
@@ -125,7 +126,34 @@ public class SmoothUniform implements ContinuousDistribution {
 
         return firstConditional.timesInPlace(firstConditionalResult)
             .plusInPlace(secondConditional.timesInPlace(secondConditionalResult))
-            .plusInPlace(thirdConditional.timesInPlace(thirdConditionalResult));
+            .plusInPlace(thirdConditional.timesInPlace(thirdConditionalResult))
+            .logInPlace();
+    }
+
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex xMin, DoublePlaceholderVertex xMax, double edgeSharpness) {
+        final DoubleVertex bodyWidth = xMax.minus(xMin);
+        final DoubleVertex shoulderWidth = bodyWidth.times(edgeSharpness);
+        final DoubleVertex rightCutoff = xMax.plus(shoulderWidth);
+        final DoubleVertex leftCutoff = xMin.minus(shoulderWidth);
+
+        final DoubleVertex firstConditional = x
+            .toGreaterThanOrEqualToMask(xMin)
+            .times(x.toLessThanOrEqualToMask(xMax));
+        final DoubleVertex firstConditionResult = bodyHeightVertex(shoulderWidth, bodyWidth);
+
+        final DoubleVertex secondConditional = x
+            .toLessThanMask(xMin)
+            .times(x.toGreaterThanMask(leftCutoff));
+        final DoubleVertex secondConditionalResult = shoulderVertex(shoulderWidth, bodyWidth, x.minus(leftCutoff));
+
+        final DoubleVertex thirdConditional = x.toGreaterThanMask(xMax)
+            .times(x.toLessThanMask(rightCutoff));
+        final DoubleVertex thirdConditionalResult = shoulderVertex(shoulderWidth, bodyWidth, shoulderWidth.minus(x).plus(xMax));
+
+        return firstConditional.times(firstConditionResult)
+            .plus(secondConditional.times(secondConditionalResult))
+            .plus(thirdConditional.times(thirdConditionalResult))
+            .log();
     }
 
     @Override
@@ -157,6 +185,12 @@ public class SmoothUniform implements ContinuousDistribution {
         return x.pow(3).timesInPlace(A).plusInPlace(x.pow(2).timesInPlace(B));
     }
 
+    private static DoubleVertex shoulderVertex(DoubleVertex Sw, DoubleVertex Bw, DoubleVertex x) {
+        final DoubleVertex A = getCubeCoefficientVertex(Sw, Bw);
+        final DoubleVertex B = getSquareCoefficientVertex(Sw, Bw);
+        return x.pow(3).times(A).plus(x.pow(2).times(B));
+    }
+
     private static DoubleTensor dShoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {
         final DoubleTensor A = getCubeCoefficient(Sw, Bw);
         final DoubleTensor B = getSquareCoefficient(Sw, Bw);
@@ -167,11 +201,24 @@ public class SmoothUniform implements ContinuousDistribution {
         return (Sw.pow(3).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(-2);
     }
 
+    private static DoubleVertex getCubeCoefficientVertex(DoubleVertex Sw, DoubleVertex Bw) {
+        return Sw.pow(3).times(Sw.plus(Bw)).reverseDiv(-2.);
+    }
+
     private static DoubleTensor getSquareCoefficient(DoubleTensor Sw, DoubleTensor Bw) {
         return (Sw.pow(2).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(3);
+    }
+
+    private static DoubleVertex getSquareCoefficientVertex(DoubleVertex Sw, DoubleVertex Bw) {
+        return Sw.pow(2).times(Sw.plus(Bw)).reverseDiv(3.);
     }
 
     private static DoubleTensor bodyHeight(DoubleTensor shoulderWidth, DoubleTensor bodyWidth) {
         return shoulderWidth.plus(bodyWidth).reciprocalInPlace();
     }
+
+    private static DoubleVertex bodyHeightVertex(DoubleVertex shoulderWidth, DoubleVertex bodyWidth) {
+        return shoulderWidth.plus(bodyWidth).reverseDiv(1.);
+    }
+
 }
