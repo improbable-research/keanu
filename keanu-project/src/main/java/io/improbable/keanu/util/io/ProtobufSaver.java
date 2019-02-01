@@ -27,45 +27,54 @@ import java.util.function.Consumer;
 public class ProtobufSaver implements NetworkSaver {
 
     private final BayesianNetwork net;
-    private KeanuSavedBayesNet.ProtoModel.Builder modelBuilder = null;
+    private SavedBayesNet.Graph.Builder graphBuilder = null;
 
     public ProtobufSaver(BayesianNetwork net) {
         this.net = net;
     }
-
-    protected KeanuSavedBayesNet.ProtoModel getModel(boolean withSavedValues, Map<String, String> metadata) {
-        createProtobufModel(withSavedValues, metadata);
-        return modelBuilder.build();
-    }
-
+    
     @Override
     public void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException {
         KeanuSavedBayesNet.ProtoModel protobufModel = getModel(saveValues, metadata);
         protobufModel.writeTo(output);
-        modelBuilder = null;
+        graphBuilder = null;
     }
 
-    private void createProtobufModel(boolean saveValues, Map<String, String> metadata) {
-        modelBuilder = KeanuSavedBayesNet.ProtoModel.newBuilder();
+    protected KeanuSavedBayesNet.ProtoModel getModel(boolean withSavedValues, Map<String, String> metadata) {
+        SavedBayesNet.Graph graph = getGraph(withSavedValues);
+        KeanuSavedBayesNet.ProtoModel.Builder builder = KeanuSavedBayesNet.ProtoModel.newBuilder().setGraph(graph);
+
+        if (metadata != null) {
+            builder.setMetadata(buildMetadata(metadata));
+        }
+
+        return builder.build();
+    }
+
+    protected SavedBayesNet.Graph getGraph(boolean withSavedValues) {
+        createGraph(withSavedValues);
+        return graphBuilder.build();
+    }
+
+    private void createGraph(boolean saveValues) {
+        graphBuilder = SavedBayesNet.Graph.newBuilder();
 
         net.save(this);
 
         if (saveValues) {
             net.saveValues(this);
         }
-        saveMetadata(metadata);
     }
 
-    private void saveMetadata(Map<String, String> metadata) {
-        if (metadata != null) {
-            KeanuSavedBayesNet.ModelMetadata.Builder metadataBuilder = KeanuSavedBayesNet.ModelMetadata.newBuilder();
-            String[] metadataKeys = metadata.keySet().toArray(new String[0]);
-            Arrays.sort(metadataKeys);
-            for (String metadataKey : metadataKeys) {
-                metadataBuilder.putMetadataInfo(metadataKey, metadata.get(metadataKey));
-            }
-            modelBuilder.setMetadata(metadataBuilder);
+    private KeanuSavedBayesNet.ModelMetadata buildMetadata(Map<String, String> metadata) {
+        KeanuSavedBayesNet.ModelMetadata.Builder metadataBuilder = KeanuSavedBayesNet.ModelMetadata.newBuilder();
+        String[] metadataKeys = metadata.keySet().toArray(new String[0]);
+        Arrays.sort(metadataKeys);
+        for (String metadataKey : metadataKeys) {
+            metadataBuilder.putMetadataInfo(metadataKey, metadata.get(metadataKey));
         }
+
+        return metadataBuilder.build();
     }
 
     @Override
@@ -74,7 +83,7 @@ public class ProtobufSaver implements NetworkSaver {
             throw new IllegalArgumentException("Trying to save a vertex that isn't Saveable");
         }
 
-        modelBuilder.getGraphBuilder().addVertices(buildVertex(vertex));
+        graphBuilder.addVertices(buildVertex(vertex));
     }
 
     private SavedBayesNet.Vertex buildVertex(Vertex vertex) {
@@ -229,7 +238,7 @@ public class ProtobufSaver implements NetworkSaver {
     public void saveValue(Vertex vertex) {
         if (vertex.hasValue()) {
             SavedBayesNet.StoredValue value = getValue(vertex, vertex.getValue().toString());
-            modelBuilder.getGraphBuilder().addDefaultState(value);
+            graphBuilder.addDefaultState(value);
         }
     }
 
@@ -237,7 +246,7 @@ public class ProtobufSaver implements NetworkSaver {
     public void saveValue(DoubleVertex vertex) {
         if (vertex.hasValue()) {
             SavedBayesNet.StoredValue value = getValue(vertex);
-            modelBuilder.getGraphBuilder().addDefaultState(value);
+            graphBuilder.addDefaultState(value);
         }
     }
 
@@ -245,7 +254,7 @@ public class ProtobufSaver implements NetworkSaver {
     public void saveValue(IntegerVertex vertex) {
         if (vertex.hasValue()) {
             SavedBayesNet.StoredValue value = getValue(vertex);
-            modelBuilder.getGraphBuilder().addDefaultState(value);
+            graphBuilder.addDefaultState(value);
         }
     }
 
@@ -253,7 +262,7 @@ public class ProtobufSaver implements NetworkSaver {
     public void saveValue(BooleanVertex vertex) {
         if (vertex.hasValue()) {
             SavedBayesNet.StoredValue value = getValue(vertex);
-            modelBuilder.getGraphBuilder().addDefaultState(value);
+            graphBuilder.addDefaultState(value);
         }
     }
 
