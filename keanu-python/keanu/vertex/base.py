@@ -50,7 +50,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def set_and_cascade(self, v: tensor_arg_types) -> None:
         self.unwrap().setAndCascade(Tensor(self.cast(v)).unwrap())
 
-    def set_label(self, label: str) -> None:
+    def set_label(self, label: Optional[str]) -> None:
         self.unwrap().setLabel(label)
 
     def sample(self) -> numpy_types:
