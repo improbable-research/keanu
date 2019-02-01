@@ -1,5 +1,7 @@
 ### Version 0.0.19 ###
 
+* Added `get_vertex_by_label` to `BayesNet`
+* Added optional param `label` for all vertices in Python (e.g. `Gaussian(0., 1., label="gaussian")`)
 * Reorganised the factory methods for building `PosteriorSamplingAlgorithm` objects. The following are available and give you access to either a default implementation or, when you need more control over the configuration, a Builder object:
   * `Keanu.Sampling.MetropolisHastings`
   * `Keanu.Sampling.NUTS`
@@ -20,6 +22,11 @@
 * `KeanuRandom` has been moved to package `io.improbable.keanu`
 * The `ProposalListener` interface has been changed: `onProposalApplied` is now called `onProposalCreated`.
   * This is because the `Proposal` interface no longer has `apply` and `reject` methods.
+* Reversed the ordering of namespace for `VertexLabel` (e.g. from `new VertexLabel("keanu", "improbable", "io")` to `new VertexLabel("io", "improbable", "keanu"))
+* Added better Python operator overloading support.
+  - Includes automatically casting to the correct datatype where possible.
+* Added Geometric Distribution vertex
+* Fixed issue with certain vertices not taking a list properly in Kotlin
 * Added `__version__` attribute to Python
 * Added a permute vertex
 * Added the release notes text file to the repo
