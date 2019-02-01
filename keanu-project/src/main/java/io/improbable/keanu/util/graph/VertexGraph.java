@@ -24,8 +24,8 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     private static final Color OBSERVED_COLOR = Color.BLUE;
     private static final Color DETERMINISTIC_COLOR = Color.CYAN;
 
-    private static final String LABEL_KEY = "label";
-    private static final String COLOR_KEY = "color";
+    public static final String LABEL_KEY = "label";
+    public static final String COLOR_KEY = "color";
     private static final Color DOUBLE_COLOR = Color.red;
     private static final Color INTEGER_COLOR = Color.green;
     private static final Color BOOLEAN_COLOR = Color.blue;
