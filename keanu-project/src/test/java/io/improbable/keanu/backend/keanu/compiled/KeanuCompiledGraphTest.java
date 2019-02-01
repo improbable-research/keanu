@@ -1,8 +1,8 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
 import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -85,8 +85,8 @@ public class KeanuCompiledGraphTest {
     public void canAddDirectlyToGraph() {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
 
-        GaussianVertex A = new GaussianVertex( 0, 1);
-        GaussianVertex B = new GaussianVertex( 0, 1);
+        GaussianVertex A = new GaussianVertex(0, 1);
+        GaussianVertex B = new GaussianVertex(0, 1);
 
         DoubleVertex C = A.times(B);
 

@@ -1,7 +1,7 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
-import io.improbable.keanu.backend.VariableReference;
 
 import java.util.Collection;
 import java.util.HashMap;

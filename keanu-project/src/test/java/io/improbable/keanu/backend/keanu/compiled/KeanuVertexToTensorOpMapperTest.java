@@ -1,6 +1,6 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
-import io.improbable.keanu.backend.VariableReference;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;

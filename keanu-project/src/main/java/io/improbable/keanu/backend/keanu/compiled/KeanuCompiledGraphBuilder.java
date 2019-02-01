@@ -1,16 +1,21 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.ComputableGraphBuilder;
 import io.improbable.keanu.backend.StringVariableReference;
-import io.improbable.keanu.backend.VariableReference;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.joor.Reflect;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
@@ -42,14 +47,18 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     private void startSource(StringBuilder sb) {
 
         sb.append("package io.improbable.keanu.backend.keanu;\n");
-        sb.append("import io.improbable.keanu.backend.VariableReference;\n");
         sb.append("import java.util.Collection;\n");
         sb.append("import java.util.Collections;\n");
         sb.append("import java.util.HashMap;\n");
         sb.append("import java.util.Map;\n");
-        sb.append("import io.improbable.keanu.tensor.dbl.DoubleTensor;\n");
+        sb.append(importString(VariableReference.class));
+        sb.append(importString(DoubleTensor.class));
 
         sb.append("public final class " + className + " implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {\n");
+    }
+
+    private String importString(Class<?> clazz) {
+        return "import " + clazz.getCanonicalName() + ";\n";
     }
 
     private void endSource(StringBuilder sb) {
