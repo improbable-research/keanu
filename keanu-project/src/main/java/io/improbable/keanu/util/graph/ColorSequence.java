@@ -56,6 +56,7 @@ public class ColorSequence<T> {
         } else {
             Color c = nextColor();
             assignments.put(src, c);
+            System.err.println("Assigning "+c+" to "+src);
             return c;
         }
     }
