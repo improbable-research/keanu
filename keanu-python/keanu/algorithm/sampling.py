@@ -216,9 +216,9 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
         for sample in samples:
             __add_sample_to_dict(sample, vertex_samples_multi, vertex_label)
 
-    tuple_hierarchy: Dict = {(vertex_label, tensor_index): values
+    tuple_hierarchy: Dict = {(vertex_label, shape_index): values
                              for vertex_label, tensor_index in vertex_samples_multi.items()
-                             for tensor_index, values in tensor_index.items()}
+                             for shape_index, values in tensor_index.items()}
 
     return tuple_hierarchy
 
