@@ -90,10 +90,10 @@ public class ProtobufTest {
         assertThat(readNet.getLatentVertices().size(), is(1));
         assertThat(readNet.getLatentVertices().get(0), instanceOf(GaussianVertex.class));
         GaussianVertex latentGaussianVertex = (GaussianVertex) readNet.getLatentVertices().get(0);
-        GaussianVertex labelGaussianVerted = (GaussianVertex) readNet.getVertexByLabel(new VertexLabel(gaussianLabel));
-        assertThat(latentGaussianVertex, equalTo(labelGaussianVerted));
+        GaussianVertex labelGaussianVertex = (GaussianVertex) readNet.getVertexByLabel(new VertexLabel(gaussianLabel));
+        assertThat(latentGaussianVertex, equalTo(labelGaussianVertex));
         assertThat(latentGaussianVertex.getMu().getValue(0), closeTo(3.0, 1e-10));
-        assertThat(labelGaussianVerted.getMu().getValue(2), closeTo(5.0, 1e-10));
+        assertThat(labelGaussianVertex.getMu().getValue(2), closeTo(5.0, 1e-10));
         assertThat(latentGaussianVertex.getSigma().getValue().scalar(), closeTo(1.0, 1e-10));
         latentGaussianVertex.sample();
     }
