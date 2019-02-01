@@ -15,7 +15,7 @@ public class LogProbFitnessFunctionGradient extends ProbabilityFitnessFunctionGr
     }
 
     public LogProbFitnessFunctionGradient(ProbabilisticModelWithGradient probabilisticModelWithGradient) {
-        super(probabilisticModelWithGradient, null);
+        super(probabilisticModelWithGradient);
     }
 
     @Override

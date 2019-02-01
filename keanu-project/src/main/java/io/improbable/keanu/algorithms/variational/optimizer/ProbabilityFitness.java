@@ -46,14 +46,16 @@ public enum ProbabilityFitness {
                                                        BiConsumer<Map<VariableReference, DoubleTensor>, Double> calculation);
 
     public FitnessFunction getFitnessFunction(ProbabilisticModel model) {
-        return getFitnessFunction(model, null);
+        return getFitnessFunction(model, (point, fitness) -> {
+        });
     }
 
     public abstract FitnessFunctionGradient getFitnessFunctionGradient(ProbabilisticModelWithGradient model,
                                                                        BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> calculation);
 
     public FitnessFunctionGradient getFitnessFunctionGradient(ProbabilisticModelWithGradient model) {
-        return getFitnessFunctionGradient(model, null);
+        return getFitnessFunctionGradient(model, (point, gradient) -> {
+        });
     }
 
 }

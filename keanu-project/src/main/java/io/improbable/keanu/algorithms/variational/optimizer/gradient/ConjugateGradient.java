@@ -9,6 +9,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -85,8 +86,10 @@ public class ConjugateGradient implements GradientOptimizationAlgorithm {
             new InitialGuess(startingPoint)
         );
 
-        Map<VariableReference, DoubleTensor> optimizedValues = Optimizer
-            .convertFromPoint(pointValuePair.getPoint(), latentVariables);
+        Map<VariableReference, DoubleTensor> optimizedValues = Optimizer.convertFromPoint(
+            pointValuePair.getPoint(),
+            latentVariables
+        );
 
         return new OptimizedResult(optimizedValues, pointValuePair.getValue());
     }
@@ -100,16 +103,25 @@ public class ConjugateGradient implements GradientOptimizationAlgorithm {
         private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
 
         public ConjugateGradientBuilder maxEvaluations(int maxEvaluations) {
+            if (maxEvaluations <= 0) {
+                throw new NotStrictlyPositiveException(maxEvaluations);
+            }
             this.maxEvaluations = maxEvaluations;
             return this;
         }
 
         public ConjugateGradientBuilder relativeThreshold(double relativeThreshold) {
+            if (relativeThreshold <= 0) {
+                throw new NotStrictlyPositiveException(relativeThreshold);
+            }
             this.relativeThreshold = relativeThreshold;
             return this;
         }
 
         public ConjugateGradientBuilder absoluteThreshold(double absoluteThreshold) {
+            if (absoluteThreshold <= 0) {
+                throw new NotStrictlyPositiveException(absoluteThreshold);
+            }
             this.absoluteThreshold = absoluteThreshold;
             return this;
         }

@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.ConvergenceChecker;
-import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.GradientOptimizationAlgorithmTestCase;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.HimmelblauTestCase;
@@ -36,9 +35,19 @@ public class GradientOptimizationAlgorithmTest {
                 .build();
         }),
 
-        NONLINEAR_CONJUGATE_GRADIENT(() -> {
+        CONJUGATE_GRADIENT_POLAK_RIBIERE(() -> {
 
-            return ConjugateGradient.builder().build();
+            return ConjugateGradient.builder()
+                .updateFormula(ConjugateGradient.UpdateFormula.POLAK_RIBIERE)
+                .build();
+        }),
+
+
+        CONJUGATE_GRADIENT_FLETCHER_REEVES(() -> {
+
+            return ConjugateGradient.builder()
+                .updateFormula(ConjugateGradient.UpdateFormula.FLETCHER_REEVES)
+                .build();
         });
 
         private Supplier<GradientOptimizationAlgorithm> getOptimizer;
@@ -73,12 +82,6 @@ public class GradientOptimizationAlgorithmTest {
 
         GradientOptimizationAlgorithm algo = type.getOptimizer.get();
 
-        OptimizedResult result = algo.optimize(
-            testCase.getVariables(),
-            testCase.getFitnessFunction(),
-            testCase.getFitnessFunctionGradient()
-        );
-
-        testCase.assertResult(result);
+        testCase.assertUsingOptimizer(algo);
     }
 }
