@@ -1,7 +1,9 @@
 package io.improbable.keanu.codegen.python.datamodel;
 
 import lombok.Getter;
+import lombok.Value;
 
+@Value
 public class VertexConstructor {
 
     @Getter
@@ -16,14 +18,5 @@ public class VertexConstructor {
     private String pythonParameters;
     @Getter
     private String docString;
-
-    public VertexConstructor(String javaClass, String pythonClass, String pythonVertexClass, String pythonTypedParameters, String pythonParameters, String docString) {
-        this.javaClass = javaClass;
-        this.pythonClass = pythonClass;
-        this.pythonVertexClass = pythonVertexClass;
-        this.pythonTypedParameters = pythonTypedParameters;
-        this.pythonParameters = pythonParameters;
-        this.docString = docString;
-    }
 
 }
