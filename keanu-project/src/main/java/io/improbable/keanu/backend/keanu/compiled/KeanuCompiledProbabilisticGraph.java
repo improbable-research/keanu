@@ -70,11 +70,6 @@ public class KeanuCompiledProbabilisticGraph implements ProbabilisticModel {
     }
 
     @Override
-    public double logProbAfter(Map<VariableReference, Object> newValues, double logProbBefore) {
-        return 0;
-    }
-
-    @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
 
         if (logLikelihoodOp == null) {
@@ -85,8 +80,4 @@ public class KeanuCompiledProbabilisticGraph implements ProbabilisticModel {
         return logLikelihood.scalar();
     }
 
-    @Override
-    public List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
-        return null;
-    }
 }
