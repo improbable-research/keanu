@@ -63,7 +63,7 @@ public class Keanu {
             public static io.improbable.keanu.algorithms.mcmc.MetropolisHastings withDefaultConfigFor(KeanuProbabilisticModel model, KeanuRandom random) {
                 List<Vertex> latentVertices = model.getLatentVertices();
                 return builder()
-                    .proposalDistribution(new PriorProposalDistribution(latentVertices))
+                    .proposalDistribution(new PriorProposalDistribution())
                     .rejectionStrategy(new RollBackToCachedValuesOnRejection(latentVertices))
                     .random(random)
                     .build();
@@ -101,7 +101,7 @@ public class Keanu {
 
             public static io.improbable.keanu.algorithms.mcmc.SimulatedAnnealing withDefaultConfigFor(KeanuProbabilisticModel model, KeanuRandom random) {
                 return builder()
-                    .proposalDistribution(new PriorProposalDistribution(model.getLatentVertices()))
+                    .proposalDistribution(new PriorProposalDistribution())
                     .rejectionStrategy(new RollbackAndCascadeOnRejection(model.getLatentVertices()))
                     .random(random)
                     .build();

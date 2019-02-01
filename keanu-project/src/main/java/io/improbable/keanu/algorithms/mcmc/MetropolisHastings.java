@@ -73,7 +73,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             random
         );
 
-        return new MetropolisHastingsSampler(model.getLatentVariables(), variablesToSampleFrom, mhStep, variableSelector, model.logProb());
+        return new MetropolisHastingsSampler(model.getProbabilisticVariables(), variablesToSampleFrom, mhStep, variableSelector, model.logProb());
     }
 
     public static class MetropolisHastingsBuilder {

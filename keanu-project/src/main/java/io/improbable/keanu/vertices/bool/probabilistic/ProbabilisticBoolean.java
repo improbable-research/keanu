@@ -3,12 +3,14 @@ package io.improbable.keanu.vertices.bool.probabilistic;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.ProbabilisticVariable;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexState;
 
 import java.util.Map;
 import java.util.Set;
 
-public interface ProbabilisticBoolean extends Probabilistic<BooleanTensor> {
+public interface ProbabilisticBoolean extends Probabilistic<BooleanTensor>, ProbabilisticVariable<BooleanTensor, VertexState<BooleanTensor>> {
 
     default double logPmf(boolean value) {
         return logPmf(BooleanTensor.scalar(value));

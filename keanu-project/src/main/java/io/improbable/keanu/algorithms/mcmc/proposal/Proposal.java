@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.vertices.ProbabilisticVariable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class Proposal {
         this.perVariableProposalFrom = new HashMap<>();
     }
 
-    public <T> void setProposal(Variable<T, ?> variable, T to) {
+    public <T> void setProposal(ProbabilisticVariable<T, ?> variable, T to) {
         perVariableProposalFrom.put(variable, variable.getValue());
         perVariableProposalTo.put(variable, to);
     }

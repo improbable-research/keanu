@@ -1,8 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,8 +18,8 @@ import static org.mockito.Mockito.when;
 
 public class AcceptanceRateTrackerTest {
 
-    private Vertex vertex1 = mock(Vertex.class);
-    private Vertex vertex2 = mock(Vertex.class);
+    private GaussianVertex vertex1 = mock(GaussianVertex.class);
+    private GaussianVertex vertex2 = mock(GaussianVertex.class);
     ProposalNotifier notifier;
     private AcceptanceRateTracker acceptanceRateTracker;
 
@@ -48,13 +50,13 @@ public class AcceptanceRateTrackerTest {
     @Test
     public void youCanTrackTheAcceptanceRateForASingleVertex() {
         Proposal proposal = new Proposal();
-        proposal.setProposal(vertex1, 1.);
+        proposal.setProposal(vertex1, DoubleTensor.scalar(1.));
         notifier.notifyProposalCreated(proposal);
         notifier.notifyProposalRejected();
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex1.getId()), equalTo(0.));
 
         proposal = new Proposal();
-        proposal.setProposal(vertex1, 2.);
+        proposal.setProposal(vertex1, DoubleTensor.scalar(2.));
         notifier.notifyProposalCreated(proposal);
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex1.getId()), equalTo(0.5));
     }
@@ -63,27 +65,27 @@ public class AcceptanceRateTrackerTest {
     @Test
     public void youCanTrackTheAcceptanceRateForDifferentSetsOfVertices() {
         Proposal proposal = new Proposal();
-        proposal.setProposal(vertex1, 1.);
+        proposal.setProposal(vertex1, DoubleTensor.scalar(1.));
         notifier.notifyProposalCreated(proposal);
         notifier.notifyProposalRejected();
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex1.getId()), equalTo(0.));
         expectRateToBeMissing(vertex2);
 
         proposal = new Proposal();
-        proposal.setProposal(vertex2, 1.);
+        proposal.setProposal(vertex2, DoubleTensor.scalar(1.));
         notifier.notifyProposalCreated(proposal);
         notifier.notifyProposalRejected();
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex1.getId()), equalTo(0.));
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex2.getId()), equalTo(0.));
 
         proposal = new Proposal();
-        proposal.setProposal(vertex1, 2.);
+        proposal.setProposal(vertex1, DoubleTensor.scalar(2.));
         notifier.notifyProposalCreated(proposal);
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex1.getId()), equalTo(0.5));
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex2.getId()), equalTo(0.));
 
         proposal = new Proposal();
-        proposal.setProposal(vertex2, 2.);
+        proposal.setProposal(vertex2, DoubleTensor.scalar(2.));
         notifier.notifyProposalCreated(proposal);
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex1.getId()), equalTo(0.5));
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex2.getId()), equalTo(0.5));
@@ -92,16 +94,16 @@ public class AcceptanceRateTrackerTest {
     @Test
     public void youCanTrackTheAcceptanceRateOfASetOfMultipleVertices() {
         Proposal proposal = new Proposal();
-        proposal.setProposal(vertex1, 1.);
-        proposal.setProposal(vertex2, 2.);
+        proposal.setProposal(vertex1, DoubleTensor.scalar(1.));
+        proposal.setProposal(vertex2, DoubleTensor.scalar(2.));
         notifier.notifyProposalCreated(proposal);
         notifier.notifyProposalRejected();
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex1.getId()), equalTo(0.));
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex2.getId()), equalTo(0.));
 
         proposal = new Proposal();
-        proposal.setProposal(vertex1, 3.);
-        proposal.setProposal(vertex2, 4.);
+        proposal.setProposal(vertex1, DoubleTensor.scalar(3.));
+        proposal.setProposal(vertex2, DoubleTensor.scalar(4.));
         notifier.notifyProposalCreated(proposal);
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex1.getId()), equalTo(0.5));
         assertThat(acceptanceRateTracker.getAcceptanceRate(vertex2.getId()), equalTo(0.5));

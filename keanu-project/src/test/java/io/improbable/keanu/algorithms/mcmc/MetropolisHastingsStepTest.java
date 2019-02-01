@@ -3,7 +3,6 @@ package io.improbable.keanu.algorithms.mcmc;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.ProbabilisticModel;
-import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
@@ -11,6 +10,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
+import io.improbable.keanu.vertices.ProbabilisticVariable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -52,7 +52,7 @@ public class MetropolisHastingsStepTest {
 
     @Test
     public void doesCalculateCorrectLogProbAfterAcceptingStep() {
-        DoubleVertex A = new GaussianVertex(0, 1);
+        GaussianVertex A = new GaussianVertex(0, 1);
         A.setValue(1.0);
         DoubleVertex B = A.times(2);
         DoubleVertex observedB = new GaussianVertex(B, 1);
@@ -64,7 +64,7 @@ public class MetropolisHastingsStepTest {
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             model,
-            new PriorProposalDistribution(bayesNet.getLatentVertices()),
+            new PriorProposalDistribution(),
             new RollBackToCachedValuesOnRejection(bayesNet.getLatentVertices()),
             alwaysAccept
         );
@@ -81,7 +81,7 @@ public class MetropolisHastingsStepTest {
     @Category(Slow.class)
     @Test
     public void doesAllowCustomProposalDistribution() {
-        DoubleVertex A = new GaussianVertex(0, 1);
+        GaussianVertex A = new GaussianVertex(0, 1);
         A.setValue(0.0);
         ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
@@ -98,7 +98,7 @@ public class MetropolisHastingsStepTest {
 
     @Test
     public void doesRejectOnImpossibleProposal() {
-        DoubleVertex A = new UniformVertex(0, 1);
+        UniformVertex A = new UniformVertex(0, 1);
         A.setValue(0.5);
         ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
@@ -116,7 +116,7 @@ public class MetropolisHastingsStepTest {
 
     @Test
     public void doesRejectWhenRejectProbabilityIsOne() {
-        DoubleVertex A = new GaussianVertex(0, 1);
+        GaussianVertex A = new GaussianVertex(0, 1);
         A.setValue(0.5);
         DoubleVertex B = A.times(2);
         DoubleVertex C = new GaussianVertex(B, 1);
@@ -159,9 +159,11 @@ public class MetropolisHastingsStepTest {
         }
 
         @Override
-        public Proposal getProposal(Set<Variable> variables, KeanuRandom random) {
+        public Proposal getProposal(Set<? extends ProbabilisticVariable> variables, KeanuRandom random) {
             Proposal proposal = new Proposal();
-            variables.forEach(variable -> proposal.setProposal(variable, DoubleTensor.scalar(constant)));
+            for (ProbabilisticVariable<DoubleTensor, ?> variable : variables) {
+                proposal.setProposal(variable, DoubleTensor.scalar(constant));
+            }
             return proposal;
         }
     }

@@ -8,6 +8,7 @@ import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.vertices.ProbabilisticVariable;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -70,11 +71,11 @@ public class SimulatedAnnealing {
         }
 
         Map<VariableReference, ?> maxSamplesByVariable = new HashMap<>();
-        List<? extends Variable> latentVariables = model.getLatentVariables();
+        List<? extends ProbabilisticVariable> probabilisticVariables = model.getProbabilisticVariables();
 
         double logProbabilityBeforeStep = model.logProb();
         double maxLogP = logProbabilityBeforeStep;
-        setSamplesAsMax(maxSamplesByVariable, latentVariables);
+        setSamplesAsMax(maxSamplesByVariable, probabilisticVariables);
 
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
@@ -86,7 +87,7 @@ public class SimulatedAnnealing {
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-            Variable<?, ?> chosenVariable = latentVariables.get(sampleNum % latentVariables.size());
+            ProbabilisticVariable<?, ?> chosenVariable = probabilisticVariables.get(sampleNum % probabilisticVariables.size());
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
             logProbabilityBeforeStep = mhStep.step(
@@ -97,7 +98,7 @@ public class SimulatedAnnealing {
 
             if (logProbabilityBeforeStep > maxLogP) {
                 maxLogP = logProbabilityBeforeStep;
-                setSamplesAsMax(maxSamplesByVariable, latentVariables);
+                setSamplesAsMax(maxSamplesByVariable, probabilisticVariables);
             }
         }
 

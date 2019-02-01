@@ -9,9 +9,11 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
+import io.improbable.keanu.vertices.ProbabilisticVariable;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexState;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -24,7 +26,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLen
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static java.util.Collections.singletonMap;
 
-public class UniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
+public class UniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier, ProbabilisticVariable<DoubleTensor, VertexState<DoubleTensor>> {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;

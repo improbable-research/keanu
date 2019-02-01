@@ -7,6 +7,7 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ProbabilisticVariable;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
@@ -28,6 +29,8 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     private final List<Vertex> latentVertices;
 
+    private final List<? extends ProbabilisticVariable> probabilisticVariables;
+
     private final List<Vertex> observedVertices;
 
     private final List<Vertex> latentOrObservedVertices;
@@ -42,6 +45,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
             .collect(toMap(Vertex::getId, v -> v));
 
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
+        this.probabilisticVariables = ImmutableList.copyOf(bayesianNetwork.getProbabilisticVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
         this.lambdaSectionSnapshot = new LambdaSectionSnapshot(latentVertices);
@@ -81,6 +85,11 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
     @Override
     public List<? extends Variable> getLatentVariables() {
         return this.latentVertices;
+    }
+
+    @Override
+    public List<? extends ProbabilisticVariable> getProbabilisticVariables() {
+        return this.probabilisticVariables;
     }
 
     public List<Vertex> getLatentVertices() {

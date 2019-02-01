@@ -3,9 +3,9 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ProbabilisticVariable;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;
@@ -44,18 +44,18 @@ public class GaussianProposalDistributionTest {
     private DoubleTensor sigma;
 
     @Before
-    public void setUpProposalDistribution() throws Exception {
+    public void setUpProposalDistribution() {
         sigma = DoubleTensor.scalar(1.);
         proposalDistribution = new GaussianProposalDistribution(sigma);
     }
 
     @Before
-    public void setRandomSeed() throws Exception {
+    public void setRandomSeed() {
         KeanuRandom.setDefaultRandomSeed(0);
     }
 
     @Before
-    public void setUpProposal() throws Exception {
+    public void setUpProposal() {
         when(vertex1.getValue()).thenReturn(DoubleTensor.scalar(currentState.getValue(0)));
         when(vertex2.getValue()).thenReturn(DoubleTensor.scalar(currentState.getValue(1)));
 
@@ -87,7 +87,7 @@ public class GaussianProposalDistributionTest {
         ProposalListener listener2 = mock(ProposalListener.class);
         List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
         proposalDistribution = new GaussianProposalDistribution(sigma, listeners);
-        Set<Variable> variables = ImmutableSet.of(vertex1, vertex2);
+        Set<ProbabilisticVariable> variables = ImmutableSet.of(vertex1, vertex2);
         Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
         verify(listener1).onProposalCreated(proposal);
         verify(listener2).onProposalCreated(proposal);

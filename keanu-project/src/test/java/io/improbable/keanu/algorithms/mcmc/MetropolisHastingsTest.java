@@ -43,7 +43,7 @@ public class MetropolisHastingsTest {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
         NetworkSamples posteriorSamples = MetropolisHastings.builder()
-            .proposalDistribution(new PriorProposalDistribution(model.getLatentVertices()))
+            .proposalDistribution(new PriorProposalDistribution())
             .rejectionStrategy(new RollBackToCachedValuesOnRejection(model.getLatentVertices()))
             .variableSelector(MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR)
             .build()
@@ -65,7 +65,7 @@ public class MetropolisHastingsTest {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
         NetworkSamples posteriorSamples = MetropolisHastings.builder()
-            .proposalDistribution(new PriorProposalDistribution(model.getLatentVertices()))
+            .proposalDistribution(new PriorProposalDistribution())
             .rejectionStrategy(new RollBackToCachedValuesOnRejection(model.getLatentVertices()))
             .variableSelector(MHStepVariableSelector.FULL_VARIABLE_SELECTOR)
             .build()
@@ -158,7 +158,7 @@ public class MetropolisHastingsTest {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
 
         NetworkSamples posteriorSamples = MetropolisHastings.builder()
-            .proposalDistribution(new PriorProposalDistribution(model.getLatentVertices()))
+            .proposalDistribution(new PriorProposalDistribution())
             .rejectionStrategy(new RollBackToCachedValuesOnRejection(model.getLatentVertices()))
             .variableSelector(MHStepVariableSelector.FULL_VARIABLE_SELECTOR)
             .build()
@@ -260,7 +260,7 @@ public class MetropolisHastingsTest {
         BayesianNetwork network = new BayesianNetwork(start.getConnectedGraph());
 
         MetropolisHastings.builder()
-            .proposalDistribution(new PriorProposalDistribution(network.getLatentVertices()))
+            .proposalDistribution(new PriorProposalDistribution())
             .rejectionStrategy(new RollBackToCachedValuesOnRejection(network.getLatentVertices()))
             .build()
             .getPosteriorSamples(

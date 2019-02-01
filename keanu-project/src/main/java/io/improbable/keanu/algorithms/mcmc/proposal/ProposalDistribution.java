@@ -3,12 +3,13 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.ProbabilisticVariable;
 
 import java.util.Set;
 
 public interface ProposalDistribution {
 
-    Proposal getProposal(Set<Variable> variables, KeanuRandom random);
+    Proposal getProposal(Set<? extends ProbabilisticVariable> variables, KeanuRandom random);
 
     <T> double logProb(Probabilistic<T> variable, T ofValue, T givenValue);
 

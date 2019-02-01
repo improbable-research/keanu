@@ -1,15 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.ProbabilisticVariable;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexState;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public interface ProbabilisticDouble extends Probabilistic<DoubleTensor> {
+public interface ProbabilisticDouble extends ProbabilisticVariable<DoubleTensor, VertexState<DoubleTensor>> {
     default double logPdf(double value) {
         return logPdf(DoubleTensor.scalar(value));
     }
