@@ -69,7 +69,7 @@ public class AdamTest {
     }
 
     @Test
-    public void canAddMaxIterations() {
+    public void canAddMaxEvaluations() {
 
         GradientOptimizationAlgorithmTestCase testCase = new SingleGaussianTestCase(ProbabilityFitness.MAP, new long[0]);
 
@@ -122,10 +122,10 @@ public class AdamTest {
         validateParameters(10, 0.1, 0.1, 0.1, -0.1);
     }
 
-    public void validateParameters(int maxIterations, double alpha, double beta1, double beta2, double epsilon) {
+    public void validateParameters(int maxEvaluations, double alpha, double beta1, double beta2, double epsilon) {
 
         Adam adamOptimizer = Adam.builder()
-            .maxEvaluations(maxIterations)
+            .maxEvaluations(maxEvaluations)
             .alpha(alpha)
             .beta1(beta1)
             .beta2(beta2)

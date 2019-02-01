@@ -1,20 +1,21 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.junit.Test;
 
 public class ConjugateGradientTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void throwsOnNegativeMaxIterations() {
+    @Test(expected = NotStrictlyPositiveException.class)
+    public void throwsOnNegativeMaxEvaluations() {
         validateParameters(-10, 0.1, 0.1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NotStrictlyPositiveException.class)
     public void throwsOnNegativeRelativeThreshold() {
         validateParameters(10, -0.1, 0.1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NotStrictlyPositiveException.class)
     public void throwsOnNegativeAbsoluteThreshold() {
         validateParameters(10, 0.1, -0.1);
     }
