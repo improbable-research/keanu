@@ -29,7 +29,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     private final List<Vertex> latentVertices;
 
-    private final List<? extends RandomVariable> probabilisticVariables;
+    private final List<? extends RandomVariable> randomVariables;
 
     private final List<Vertex> observedVertices;
 
@@ -45,7 +45,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
             .collect(toMap(Vertex::getId, v -> v));
 
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
-        this.probabilisticVariables = ImmutableList.copyOf(bayesianNetwork.getProbabilisticVertices());
+        this.randomVariables = ImmutableList.copyOf(bayesianNetwork.getProbabilisticVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
         this.lambdaSectionSnapshot = new LambdaSectionSnapshot(latentVertices);
@@ -88,8 +88,8 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
     }
 
     @Override
-    public List<? extends RandomVariable> getProbabilisticVariables() {
-        return this.probabilisticVariables;
+    public List<? extends RandomVariable> getRandomVariables() {
+        return this.randomVariables;
     }
 
     public List<Vertex> getLatentVertices() {

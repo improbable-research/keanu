@@ -71,7 +71,7 @@ public class SimulatedAnnealing {
         }
 
         Map<VariableReference, ?> maxSamplesByVariable = new HashMap<>();
-        List<? extends RandomVariable> probabilisticVariables = model.getProbabilisticVariables();
+        List<? extends RandomVariable> probabilisticVariables = model.getRandomVariables();
 
         double logProbabilityBeforeStep = model.logProb();
         double maxLogP = logProbabilityBeforeStep;

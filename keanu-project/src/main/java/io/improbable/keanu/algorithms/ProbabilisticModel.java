@@ -28,7 +28,7 @@ public interface ProbabilisticModel {
 
     List<? extends Variable> getLatentVariables();
 
-    List<? extends RandomVariable> getProbabilisticVariables();
+    List<? extends RandomVariable> getRandomVariables();
 
     List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables();
 }
