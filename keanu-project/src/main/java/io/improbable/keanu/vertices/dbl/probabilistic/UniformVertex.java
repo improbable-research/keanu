@@ -26,7 +26,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLen
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import static java.util.Collections.singletonMap;
 
-public class UniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier, RandomVariable<DoubleTensor, VertexState<DoubleTensor>> {
+public class UniformVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;

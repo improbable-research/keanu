@@ -71,11 +71,11 @@ public class SimulatedAnnealing {
         }
 
         Map<VariableReference, ?> maxSamplesByVariable = new HashMap<>();
-        List<? extends RandomVariable> probabilisticVariables = model.getRandomVariables();
+        List<? extends RandomVariable> latentVariables = model.getRandomVariables();
 
         double logProbabilityBeforeStep = model.logProb();
         double maxLogP = logProbabilityBeforeStep;
-        setSamplesAsMax(maxSamplesByVariable, probabilisticVariables);
+        setSamplesAsMax(maxSamplesByVariable, latentVariables);
 
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
@@ -87,7 +87,7 @@ public class SimulatedAnnealing {
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-            RandomVariable<?, ?> chosenVariable = probabilisticVariables.get(sampleNum % probabilisticVariables.size());
+            RandomVariable<?, ?> chosenVariable = latentVariables.get(sampleNum % latentVariables.size());
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
             logProbabilityBeforeStep = mhStep.step(
@@ -98,7 +98,7 @@ public class SimulatedAnnealing {
 
             if (logProbabilityBeforeStep > maxLogP) {
                 maxLogP = logProbabilityBeforeStep;
-                setSamplesAsMax(maxSamplesByVariable, probabilisticVariables);
+                setSamplesAsMax(maxSamplesByVariable, latentVariables);
             }
         }
 
