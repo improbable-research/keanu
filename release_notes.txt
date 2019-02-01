@@ -1,7 +1,0 @@
-### Version 0.0.19 ###
-
-* Added Geometric Distribution vertex
-* Fixed issue with certain vertices not taking a list properly in Kotlin
-* Added __version__ attribute to Python
-* Added a permute vertex
-* Added the release notes text file to the repo
