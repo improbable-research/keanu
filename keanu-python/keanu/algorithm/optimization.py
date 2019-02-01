@@ -126,7 +126,7 @@ class ConjugateGradient(JavaObjectWrapper):
 class Adam(JavaObjectWrapper):
 
     def __init__(self,
-                 max_iterations: Optional[int] = None,
+                 max_evaluations: Optional[int] = None,
                  alpha: Optional[float] = None,
                  beta1: Optional[float] = None,
                  beta2: Optional[float] = None,
@@ -135,8 +135,8 @@ class Adam(JavaObjectWrapper):
 
         builder = k.jvm_view().Adam.builder()
 
-        if max_iterations is not None:
-            builder.maxIterations(max_iterations)
+        if max_evaluations is not None:
+            builder.maxEvaluations(max_evaluations)
         if alpha is not None:
             builder.alpha(alpha)
         if beta1 is not None:

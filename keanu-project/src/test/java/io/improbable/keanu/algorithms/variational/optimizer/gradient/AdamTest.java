@@ -74,7 +74,7 @@ public class AdamTest {
 
         MutableInt i = new MutableInt(0);
         Adam adamOptimizer = Adam.builder()
-            .maxIterations(5)
+            .maxEvaluations(5)
             .convergenceChecker((theta, thetaNext) -> {
                 i.incrementAndGet();
                 return false;
@@ -89,6 +89,47 @@ public class AdamTest {
         );
 
         assertEquals(i.getValue(), new Integer(5));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsOnNegativeBeta1() {
+        validateParameters(10, 0.1, -0.1, 0.1, 0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsOnNegativeBeta2() {
+        validateParameters(10, 0.1, 0.1, -0.1, 0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsOnBigBeta1() {
+        validateParameters(10, 0.1, 1, 0.1, 0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsOnBigBeta2() {
+        validateParameters(10, 0.1, 0.1, 1, 0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsOnNegativeAlpha() {
+        validateParameters(10, -0.1, 0.1, 0.1, 0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsOnNegativeEpsilon() {
+        validateParameters(10, 0.1, 0.1, 0.1, -0.1);
+    }
+
+    public void validateParameters(int maxIterations, double alpha, double beta1, double beta2, double epsilon) {
+
+        Adam adamOptimizer = Adam.builder()
+            .maxEvaluations(maxIterations)
+            .alpha(alpha)
+            .beta1(beta1)
+            .beta2(beta2)
+            .epsilon(epsilon)
+            .build();
     }
 
 }

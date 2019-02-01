@@ -11,6 +11,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,7 @@ public class Adam implements GradientOptimizationAlgorithm {
     }
 
     private final ConvergenceChecker convergenceChecker;
-    private final int maxIterations;
+    private final int maxEvaluations;
     private final double alpha;
     private final double beta1;
     private final double beta2;
@@ -51,7 +52,7 @@ public class Adam implements GradientOptimizationAlgorithm {
         double beta1T = 1;
         double beta2T = 1;
 
-        for (int t = 1; !converged && t <= maxIterations; t++) {
+        for (int t = 1; !converged && t <= maxEvaluations; t++) {
 
             updateGradients(theta, thetaMap, gradients, latentVariables, fitnessFunctionGradient);
 
@@ -139,16 +140,19 @@ public class Adam implements GradientOptimizationAlgorithm {
 
     @ToString
     public static class AdamBuilder {
-        private ConvergenceChecker convergenceChecker = new RelativeConvergenceChecker(ConvergenceChecker.Norm.MAX_ABS, 1e-6);
+        private ConvergenceChecker convergenceChecker = new RelativeConvergenceChecker(ConvergenceChecker.Norm.L2, 1e-6);
 
-        private int maxIterations = Integer.MAX_VALUE;
+        private int maxEvaluations = Integer.MAX_VALUE;
         private double alpha = 0.001;
         private double beta1 = 0.9;
         private double beta2 = 0.999;
         private double epsilon = 1e-8;
 
-        public AdamBuilder maxIterations(int maxIterations) {
-            this.maxIterations = maxIterations;
+        public AdamBuilder maxEvaluations(int maxEvaluations) {
+            if (maxEvaluations <= 0) {
+                throw new NotStrictlyPositiveException(maxEvaluations);
+            }
+            this.maxEvaluations = maxEvaluations;
             return this;
         }
 
@@ -158,27 +162,39 @@ public class Adam implements GradientOptimizationAlgorithm {
         }
 
         public AdamBuilder alpha(double alpha) {
+            if (alpha <= 0) {
+                throw new NotStrictlyPositiveException(alpha);
+            }
             this.alpha = alpha;
             return this;
         }
 
         public AdamBuilder beta1(double beta1) {
+            if (beta1 < 0 || beta1 >= 1) {
+                throw new IllegalArgumentException("beta1 must be between 0 (inclusive) and 1 (exclusive)");
+            }
             this.beta1 = beta1;
             return this;
         }
 
         public AdamBuilder beta2(double beta2) {
+            if (beta2 < 0 || beta2 >= 1) {
+                throw new IllegalArgumentException("beta2 must be between 0 (inclusive) and 1 (exclusive)");
+            }
             this.beta2 = beta2;
             return this;
         }
 
         public AdamBuilder epsilon(double epsilon) {
+            if (epsilon <= 0) {
+                throw new NotStrictlyPositiveException(epsilon);
+            }
             this.epsilon = epsilon;
             return this;
         }
 
         public Adam build() {
-            return new Adam(convergenceChecker, maxIterations, alpha, beta1, beta2, epsilon);
+            return new Adam(convergenceChecker, maxEvaluations, alpha, beta1, beta2, epsilon);
         }
     }
 }
