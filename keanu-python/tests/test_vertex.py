@@ -338,6 +338,12 @@ def test_set_label() -> None:
     assert vertex.get_label() == label
 
 
+def test_can_set_none_label() -> None:
+    vertex = Gaussian(0., 1.)
+    vertex.set_label(None)
+    assert vertex.get_label() == None
+
+
 def test_label_is_required_param_for_proxy_vertices() -> None:
     with pytest.raises(TypeError):
         vertex = IntegerProxy([1, 1])  # type: ignore # this is expected to fail mypy
