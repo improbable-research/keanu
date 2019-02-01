@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms;
 
 import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
+import io.improbable.keanu.vertices.RandomVariable;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,13 +9,13 @@ import java.util.List;
 public interface PosteriorSamplingAlgorithm {
 
     default NetworkSamples getPosteriorSamples(ProbabilisticModel model,
-                                               Variable variableToSampleFrom,
+                                               RandomVariable variableToSampleFrom,
                                                int sampleCount) {
         return getPosteriorSamples(model, Collections.singletonList(variableToSampleFrom), sampleCount);
     }
 
     default NetworkSamples getPosteriorSamples(ProbabilisticModel model, int sampleCount) {
-        return getPosteriorSamples(model, model.getLatentVariables(), sampleCount);
+        return getPosteriorSamples(model, model.getRandomVariables(), sampleCount);
     }
 
     /**
@@ -24,11 +25,11 @@ public interface PosteriorSamplingAlgorithm {
      * @return samples for each variable
      */
     NetworkSamples getPosteriorSamples(ProbabilisticModel model,
-                                       List<? extends Variable> variablesToSampleFrom,
+                                       List<? extends RandomVariable> variablesToSampleFrom,
                                        int sampleCount);
 
     NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
-                                                     final List<? extends Variable> variableToSampleFrom);
+                                                     final List<? extends RandomVariable> variableToSampleFrom);
 
 
 }

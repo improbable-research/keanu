@@ -13,6 +13,7 @@ import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.status.StatusBar;
+import io.improbable.keanu.vertices.RandomVariable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -79,14 +80,14 @@ public class NUTS implements PosteriorSamplingAlgorithm {
      */
     @Override
     public NetworkSamples getPosteriorSamples(final ProbabilisticModel model,
-                                              final List<? extends Variable> variablesToSampleFrom,
+                                              final List<? extends RandomVariable> variablesToSampleFrom,
                                               final int sampleCount) {
         return generatePosteriorSamples(model, variablesToSampleFrom).generate(sampleCount);
     }
 
     @Override
     public NetworkSamplesGenerator generatePosteriorSamples(final ProbabilisticModel model,
-                                                            final List<? extends Variable> fromVariables) {
+                                                            final List<? extends RandomVariable> fromVariables) {
         Preconditions.checkArgument(model instanceof ProbabilisticModelWithGradient, "NUTS requires a model on which gradients can be calculated.");
         return new NetworkSamplesGenerator(setupSampler((ProbabilisticModelWithGradient) model, fromVariables), StatusBar::new);
     }
