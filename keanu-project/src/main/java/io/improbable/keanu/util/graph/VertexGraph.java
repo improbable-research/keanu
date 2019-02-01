@@ -44,8 +44,8 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * @param inputNetwork BayesianNetwork to create the graph from
-     * @param v target vertex in the graph
-     * @param degree degrees to include
+     * @param v            target vertex in the graph
+     * @param degree       degrees to include
      */
     public VertexGraph(BayesianNetwork inputNetwork, Vertex v, int degree) {
         this(inputNetwork.getSubgraph(v, degree));
@@ -72,7 +72,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
     }
 
     /**
-     * @param key  metadata key
+     * @param key   metadata key
      * @param value metadata vaule
      * @return itself so it's chainable
      */
@@ -83,6 +83,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * Automatically populates metadata about these verticies
+     *
      * @return itself so it's chainable
      */
     public VertexGraph autoPutMetadata() {
@@ -145,6 +146,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This removes all Deterministic vertices from the graph - but preserves connectivity.
+     *
      * @return itself so it's chainable
      */
     public VertexGraph removeDeterministicVertices() {
@@ -158,6 +160,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
      * * Deterministic
      * * Not constant
      * * Having children
+     *
      * @return itself so it's chainable
      */
     public VertexGraph removeIntermediateVertices() {
@@ -168,6 +171,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This removes a specified namespace from the graph - but preserves connectivity.
+     *
      * @param namespace namespace to remove
      * @return itself so it's chainable
      */
@@ -184,6 +188,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This removes all verticies matching the predicate from the graph, and any edges connected to them
+     *
      * @param f predicate of vertices to remove
      */
     public void removeVertices(Predicate<Vertex> f) {
@@ -200,6 +205,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This removes all verticies matching the predicate from the graph, but preserves connectivity
+     *
      * @param f predicate of vertices to remove
      */
     public void removeVerticesPreservingEdges(Predicate<Vertex> f) {
@@ -216,6 +222,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * Remove a vertex (and associated edges)
+     *
      * @param v vertex to remove
      */
     public void removeVertex(Vertex v) {
@@ -229,6 +236,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * Remove a vertex (preserving connectivity of associated edges)
+     *
      * @param v the vertex to remove
      */
     public void removeVertexPreservingEdges(Vertex v) {
@@ -252,6 +260,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This colours all vertex by state (Observer, Probabilistic, Deterministic or Constant)
+     *
      * @return itself - so it's chainable
      */
     public VertexGraph colorVerticesByState() {
@@ -262,6 +271,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This colours all vertex by data type
+     *
      * @return itself - so it's chainable
      */
     public VertexGraph colorVerticesByType() {
@@ -272,6 +282,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This colours all edges by their source (parent) color
+     *
      * @return itself - so it's chainable
      */
     public VertexGraph colorEdgesByParent() {
@@ -282,6 +293,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This colours all vertex by namespace
+     *
      * @return itself - so it's chainable
      */
     public VertexGraph colorVerticesByNamespace() {
@@ -293,6 +305,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This colours all vertex by a specified key
+     *
      * @param key the key to use to chose the color
      * @return itself - so it's chainable
      */
@@ -305,6 +318,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     private String getVertexNamespace(Vertex v) {
         VertexLabel label = v.getLabel();
+        System.out.println("Processing label " + label);
         if (label == null) return null;
         return label.getOuterNamespace().orElse("none");
     }
@@ -339,6 +353,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This labels all vertex by their value
+     *
      * @return itself - so it's chainable
      */
     public VertexGraph labelVerticesWithValue() {
@@ -349,6 +364,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This labels constant vertex by their value
+     *
      * @return itself - so it's chainable
      */
     public VertexGraph labelConstantVerticesWithValue() {
@@ -359,6 +375,7 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * This labels all edges by their parameter name
+     *
      * @return itself - so it's chainable
      */
     public VertexGraph labelEdgesWithParameters() {
@@ -408,8 +425,9 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * Sets a vertex metadata based on the Vertex
+     *
      * @param key The key to set
-     * @param f The mapping to define the new value
+     * @param f   The mapping to define the new value
      * @return itself - so it's chainable
      */
     public VertexGraph setVertexMetadata(String key, Function<Vertex, String> f) {
@@ -423,8 +441,9 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * Sets a vertex metadata based on the Node's existing metadata
+     *
      * @param key The key to set
-     * @param f The mapping to define the new value
+     * @param f   The mapping to define the new value
      * @return itself - so it's chainable
      */
     public VertexGraph setVertexNodeMetadata(String key, Function<BasicGraphNode, String> f) {
@@ -438,8 +457,9 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * Sets an edges metadata based on the Edge
+     *
      * @param key the key to set
-     * @param f the mapping to define the new value
+     * @param f   the mapping to define the new value
      * @return itself - so it's chainable
      */
     public VertexGraph setEdgeMetadata(String key, Function<BasicGraphEdge, String> f) {
@@ -471,12 +491,13 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * Updates any edge between two vertices
-     * @param a first vertex
-     * @param b second vertex
-     * @param key key to update
+     *
+     * @param a     first vertex
+     * @param b     second vertex
+     * @param key   key to update
      * @param value value to use
      * @return itself - so it's chainable
-     *
+     * <p>
      * this will look for any edge between a and b (regardless of direction)
      */
     public VertexGraph putEdgeMetadataBetween(Vertex a, Vertex b, String key, String value) {
@@ -494,13 +515,14 @@ public class VertexGraph extends AbstractGraph<BasicGraphNode, BasicGraphEdge> {
 
     /**
      * Updates the metadata for a specific vertex
-     * @param v the vertex to update
-     * @param key the key to set
+     *
+     * @param v     the vertex to update
+     * @param key   the key to set
      * @param value the value to set to the key
      */
     public void putNodeMetadata(Vertex v, String key, String value) {
-        if ( vertexNodes.containsKey(v) ){
-            vertexNodes.get(v).details.put(key,value);
+        if (vertexNodes.containsKey(v)) {
+            vertexNodes.get(v).details.put(key, value);
         }
     }
 
