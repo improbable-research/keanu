@@ -1,5 +1,6 @@
-from py4j.java_gateway import java_import, JavaObject, JavaClass
 from typing import Union, Optional, Tuple
+
+from py4j.java_gateway import java_import, JavaObject, JavaClass
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
@@ -12,6 +13,10 @@ k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.gradient.ConjugateGradient")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.RelativeConvergenceChecker")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.AbsoluteConvergenceChecker")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.ConvergenceChecker")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.gradient.Adam")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.nongradient.BOBYQA")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer")
@@ -19,7 +24,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.algorithms.variational.optimizer.
 
 class OptimizedResult(JavaObjectWrapper):
 
-    def __init__(self, result_object: JavaObject):
+    def __init__(self, result_object: JavaObject) -> None:
         super().__init__(result_object)
 
     def fitness(self) -> float:
@@ -27,6 +32,42 @@ class OptimizedResult(JavaObjectWrapper):
 
     def value_for(self, v: Vertex) -> numpy_types:
         return Tensor._to_ndarray(self.unwrap().getValueFor(v.unwrap().getReference()))
+
+
+_norm = dict(max_abs='MAX_ABS', l2="L2")
+
+
+def relative(norm: str, tolerance: float):
+    print(_norm[norm])
+    print(tolerance)
+    return k.jvm_view().RelativeConvergenceChecker(k.jvm_view().ConvergenceChecker.Norm.valueOf(_norm[norm]), tolerance)
+
+
+def absolute(norm: str, tolerance: float):
+    print(_norm[norm])
+    print(tolerance)
+    return k.jvm_view().AbsoluteConvergenceChecker(k.jvm_view().ConvergenceChecker.Norm.valueOf(_norm[norm]), tolerance)
+
+
+_difference = dict(relative=relative, absolute=absolute)
+
+
+class ConvergenceChecker(JavaObjectWrapper):
+    """Check to determine if optimizer has converged
+    Parameters
+    ----------
+    difference : str
+        one of {'absolute', 'relative'}
+    norm : srt
+        one of {'max_abs', 'l2'}
+        max_abs is max(abs(postion - next_position))
+        l2 is sqrt(sum((position-nex_position)**2))
+    tolerance : float
+        when the norm strategy is less than this, the optimizer is consider converged and will stop
+    """
+
+    def __init__(self, difference: str = 'relative', norm: str = 'max_abs', tolerance: float = 1e-6) -> None:
+        super().__init__(_difference[difference](norm, tolerance))
 
 
 class Optimizer:
@@ -54,13 +95,11 @@ class Optimizer:
 
 class GradientOptimizer(Optimizer):
 
-    def __init__(self,
-                 net: Union[BayesNet, Vertex],
-                 max_evaluations: Optional[int] = None,
-                 relative_threshold: Optional[float] = None,
-                 absolute_threshold: Optional[float] = None) -> None:
+    def __init__(self, net: Union[BayesNet, Vertex], algorithm: Optional[JavaObjectWrapper] = None) -> None:
         builder, net = Optimizer._build_bayes_net(k.jvm_view().KeanuOptimizer.Gradient, net)
-        builder.algorithm(ConjugateGradient(max_evaluations, relative_threshold, absolute_threshold).unwrap())
+
+        if algorithm is not None:
+            builder.algorithm(algorithm.unwrap())
 
         super(GradientOptimizer, self).__init__(builder.build(), net)
 
@@ -84,18 +123,41 @@ class ConjugateGradient(JavaObjectWrapper):
         super().__init__(builder.build())
 
 
-class NonGradientOptimizer(Optimizer):
+class Adam(JavaObjectWrapper):
 
     def __init__(self,
-                 net: Union[BayesNet, Vertex],
-                 max_evaluations: Optional[int] = None,
-                 bounds_range: Optional[float] = None,
-                 initial_trust_region_radius: Optional[float] = None,
-                 stopping_trust_region_radius: Optional[float] = None) -> None:
+                 max_iterations: Optional[int] = None,
+                 alpha: Optional[float] = None,
+                 beta1: Optional[float] = None,
+                 beta2: Optional[float] = None,
+                 epsilon: Optional[float] = None,
+                 convergence_checker: Optional[ConvergenceChecker] = None) -> None:
+
+        builder = k.jvm_view().Adam.builder()
+
+        if max_iterations is not None:
+            builder.maxIterations(max_iterations)
+        if alpha is not None:
+            builder.alpha(alpha)
+        if beta1 is not None:
+            builder.beta1(beta1)
+        if beta2 is not None:
+            builder.beta2(beta2)
+        if epsilon is not None:
+            builder.epsilon(epsilon)
+        if convergence_checker is not None:
+            builder.convergenceChecker(convergence_checker.unwrap())
+
+        super().__init__(builder.build())
+
+
+class NonGradientOptimizer(Optimizer):
+
+    def __init__(self, net: Union[BayesNet, Vertex], algorithm: Optional[JavaObjectWrapper] = None) -> None:
         builder, net = Optimizer._build_bayes_net(k.jvm_view().KeanuOptimizer.NonGradient, net)
 
-        builder.algorithm(
-            BOBYQA(max_evaluations, bounds_range, initial_trust_region_radius, stopping_trust_region_radius).unwrap())
+        if algorithm is not None:
+            builder.algorithm(algorithm.unwrap())
 
         super(NonGradientOptimizer, self).__init__(builder.build(), net)
 

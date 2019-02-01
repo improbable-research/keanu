@@ -30,6 +30,7 @@ public class GradientOptimizationAlgorithmTest {
         ADAM(() -> {
 
             return Adam.builder()
+                .maxIterations(100000)
                 .alpha(0.1)
                 .convergenceChecker(ConvergenceChecker.absoluteChecker(ConvergenceChecker.Norm.L2, 0.00001))
                 .build();

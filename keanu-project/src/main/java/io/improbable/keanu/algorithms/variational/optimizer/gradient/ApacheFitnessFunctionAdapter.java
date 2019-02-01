@@ -21,12 +21,9 @@ public class ApacheFitnessFunctionAdapter implements MultivariateFunction {
     @Override
     public double value(double[] point) {
 
-        Map<VariableReference, DoubleTensor> values = getValues(point);
+        Map<VariableReference, DoubleTensor> values = convertFromPoint(point, latentVariables);
 
         return fitnessFunction.getFitnessAt(values);
     }
 
-    private Map<VariableReference, DoubleTensor> getValues(double[] point) {
-        return convertFromPoint(point, latentVariables);
-    }
 }

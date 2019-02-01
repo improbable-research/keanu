@@ -22,15 +22,11 @@ public class ApacheFitnessFunctionGradientAdapter implements MultivariateVectorF
     @Override
     public double[] value(double[] point) {
 
-        Map<VariableReference, DoubleTensor> values = getValues(point);
+        Map<VariableReference, DoubleTensor> values = convertFromPoint(point, latentVariables);
 
         Map<? extends VariableReference, DoubleTensor> diffs = fitnessFunctionGradient.getGradientsAt(values);
 
         return alignGradientsToAppropriateIndex(diffs, latentVariables);
-    }
-
-    private Map<VariableReference, DoubleTensor> getValues(double[] point) {
-        return convertFromPoint(point, latentVariables);
     }
 
     private static double[] alignGradientsToAppropriateIndex(Map<? extends VariableReference, DoubleTensor> diffs,

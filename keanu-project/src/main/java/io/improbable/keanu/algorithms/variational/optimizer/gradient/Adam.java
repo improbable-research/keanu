@@ -51,7 +51,7 @@ public class Adam implements GradientOptimizationAlgorithm {
         double beta1T = 1;
         double beta2T = 1;
 
-        for (int t = 1; !converged && t < maxIterations; t++) {
+        for (int t = 1; !converged && t <= maxIterations; t++) {
 
             updateGradients(theta, thetaMap, gradients, latentVariables, fitnessFunctionGradient);
 
@@ -146,6 +146,11 @@ public class Adam implements GradientOptimizationAlgorithm {
         private double beta1 = 0.9;
         private double beta2 = 0.999;
         private double epsilon = 1e-8;
+
+        public AdamBuilder maxIterations(int maxIterations) {
+            this.maxIterations = maxIterations;
+            return this;
+        }
 
         public AdamBuilder convergenceChecker(ConvergenceChecker convergenceChecker) {
             this.convergenceChecker = convergenceChecker;

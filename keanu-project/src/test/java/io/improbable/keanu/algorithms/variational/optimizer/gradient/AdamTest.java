@@ -7,6 +7,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.testcase.Si
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class AdamTest {
@@ -64,6 +65,30 @@ public class AdamTest {
         );
 
         assertTrue(i.getValue() == 10);
+    }
+
+    @Test
+    public void canAddMaxIterations() {
+
+        GradientOptimizationAlgorithmTestCase testCase = new SingleGaussianTestCase(ProbabilityFitness.MAP, new long[0]);
+
+        MutableInt i = new MutableInt(0);
+        Adam adamOptimizer = Adam.builder()
+            .maxIterations(5)
+            .convergenceChecker((theta, thetaNext) -> {
+                i.incrementAndGet();
+                return false;
+            })
+            .alpha(0.1)
+            .build();
+
+        adamOptimizer.optimize(
+            testCase.getVariables(),
+            testCase.getFitnessFunction(),
+            testCase.getFitnessFunctionGradient()
+        );
+
+        assertEquals(i.getValue(), new Integer(5));
     }
 
 }
