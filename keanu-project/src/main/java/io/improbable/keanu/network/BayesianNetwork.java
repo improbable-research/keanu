@@ -9,8 +9,8 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.RandomVariable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 
@@ -128,7 +128,7 @@ public class BayesianNetwork {
         return getLatentVertices(Integer.MAX_VALUE);
     }
 
-    public List<? extends ProbabilisticVariable> getProbabilisticVertices() {
+    public List<? extends RandomVariable> getProbabilisticVertices() {
         return Probabilistic.keepOnlyProbabilisticVertices(this.getLatentVertices());
     }
 

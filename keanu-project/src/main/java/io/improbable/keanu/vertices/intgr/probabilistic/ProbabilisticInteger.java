@@ -3,14 +3,14 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
+import io.improbable.keanu.vertices.RandomVariable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexState;
 
 import java.util.Map;
 import java.util.Set;
 
-public interface ProbabilisticInteger extends Probabilistic<IntegerTensor>, ProbabilisticVariable<IntegerTensor, VertexState<IntegerTensor>> {
+public interface ProbabilisticInteger extends Probabilistic<IntegerTensor>, RandomVariable<IntegerTensor, VertexState<IntegerTensor>> {
     default double logPmf(int value) {
         return logPmf(IntegerTensor.scalar(value));
     }

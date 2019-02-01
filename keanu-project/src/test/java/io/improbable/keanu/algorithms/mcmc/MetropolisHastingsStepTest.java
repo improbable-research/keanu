@@ -10,7 +10,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
+import io.improbable.keanu.vertices.RandomVariable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -159,9 +159,9 @@ public class MetropolisHastingsStepTest {
         }
 
         @Override
-        public Proposal getProposal(Set<? extends ProbabilisticVariable> variables, KeanuRandom random) {
+        public Proposal getProposal(Set<? extends RandomVariable> variables, KeanuRandom random) {
             Proposal proposal = new Proposal();
-            for (ProbabilisticVariable<DoubleTensor, ?> variable : variables) {
+            for (RandomVariable<DoubleTensor, ?> variable : variables) {
                 proposal.setProposal(variable, DoubleTensor.scalar(constant));
             }
             return proposal;

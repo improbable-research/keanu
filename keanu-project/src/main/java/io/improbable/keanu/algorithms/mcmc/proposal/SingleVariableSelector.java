@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
 
-import io.improbable.keanu.vertices.ProbabilisticVariable;
+import io.improbable.keanu.vertices.RandomVariable;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,8 +15,8 @@ public final class SingleVariableSelector implements MHStepVariableSelector {
     }
 
     @Override
-    public Set<ProbabilisticVariable> select(List<? extends ProbabilisticVariable> latentVariables, int sampleNumber) {
-        ProbabilisticVariable chosenVariable = latentVariables.get(sampleNumber % latentVariables.size());
+    public Set<? extends RandomVariable> select(List<? extends RandomVariable> latentVariables, int sampleNumber) {
+        RandomVariable chosenVariable = latentVariables.get(sampleNumber % latentVariables.size());
         return Collections.singleton(chosenVariable);
     }
 }

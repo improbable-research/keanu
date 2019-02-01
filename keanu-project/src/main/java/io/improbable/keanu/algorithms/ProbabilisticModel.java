@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
+import io.improbable.keanu.vertices.RandomVariable;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +28,7 @@ public interface ProbabilisticModel {
 
     List<? extends Variable> getLatentVariables();
 
-    List<? extends ProbabilisticVariable> getProbabilisticVariables();
+    List<? extends RandomVariable> getProbabilisticVariables();
 
     List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables();
 }

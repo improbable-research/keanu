@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
+import io.improbable.keanu.vertices.RandomVariable;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,9 +21,9 @@ public class PriorProposalDistribution implements ProposalDistribution {
     }
 
     @Override
-    public Proposal getProposal(Set<? extends ProbabilisticVariable> variables, KeanuRandom random) {
+    public Proposal getProposal(Set<? extends RandomVariable> variables, KeanuRandom random) {
         Proposal proposal = new Proposal();
-        for (ProbabilisticVariable<?, ?> variable : variables) {
+        for (RandomVariable<?, ?> variable : variables) {
             setFor(variable, random, proposal);
         }
         proposalNotifier.notifyProposalCreated(proposal);
@@ -35,7 +35,7 @@ public class PriorProposalDistribution implements ProposalDistribution {
         return variable.logProb(ofValue);
     }
 
-    private <T> void setFor(ProbabilisticVariable<T, ?> variable, KeanuRandom random, Proposal proposal) {
+    private <T> void setFor(RandomVariable<T, ?> variable, KeanuRandom random, Proposal proposal) {
         proposal.setProposal(variable, variable.sample(random));
     }
 

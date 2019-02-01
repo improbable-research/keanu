@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
+import io.improbable.keanu.vertices.RandomVariable;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.Set;
 @Slf4j
 public class MetropolisHastingsSampler implements SamplingAlgorithm {
 
-    private final List<? extends ProbabilisticVariable> latentVariables;
+    private final List<? extends RandomVariable> latentVariables;
     private final List<? extends Variable> variablesToSampleFrom;
     private final MetropolisHastingsStep mhStep;
     private final MHStepVariableSelector variableSelector;
@@ -23,7 +23,7 @@ public class MetropolisHastingsSampler implements SamplingAlgorithm {
     private double logProbabilityBeforeStep;
     private int sampleNum;
 
-    public MetropolisHastingsSampler(List<? extends ProbabilisticVariable> latentVariables,
+    public MetropolisHastingsSampler(List<? extends RandomVariable> latentVariables,
                                      List<? extends Variable> variablesToSampleFrom,
                                      MetropolisHastingsStep mhStep,
                                      MHStepVariableSelector variableSelector,
@@ -38,7 +38,7 @@ public class MetropolisHastingsSampler implements SamplingAlgorithm {
 
     @Override
     public void step() {
-        Set<ProbabilisticVariable> chosenVariables = variableSelector.select(latentVariables, sampleNum);
+        Set<RandomVariable> chosenVariables = variableSelector.select(latentVariables, sampleNum);
 
         logProbabilityBeforeStep = mhStep.step(
             chosenVariables,

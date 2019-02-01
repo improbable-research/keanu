@@ -4,8 +4,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.ProbabilisticModel;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.RandomVariable;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +39,7 @@ public class MetropolisHastingsStep {
         this.random = random;
     }
 
-    public StepResult step(final Set<? extends ProbabilisticVariable> chosenVariables,
+    public StepResult step(final Set<? extends RandomVariable> chosenVariables,
                            final double logProbabilityBeforeStep) {
         return step(chosenVariables, logProbabilityBeforeStep, DEFAULT_TEMPERATURE);
     }
@@ -51,7 +51,7 @@ public class MetropolisHastingsStep {
      *                                 should be constant if no annealing is wanted
      * @return the log probability of the network after either accepting or rejecting the sample
      */
-    public StepResult step(final Set<? extends ProbabilisticVariable> chosenVariables,
+    public StepResult step(final Set<? extends RandomVariable> chosenVariables,
                            final double logProbabilityBeforeStep,
                            final double temperature) {
 

@@ -5,7 +5,7 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
+import io.improbable.keanu.vertices.RandomVariable;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,9 +26,9 @@ public class GaussianProposalDistribution implements ProposalDistribution {
     }
 
     @Override
-    public Proposal getProposal(Set<? extends ProbabilisticVariable> variables, KeanuRandom random) {
+    public Proposal getProposal(Set<? extends RandomVariable> variables, KeanuRandom random) {
         Proposal proposal = new Proposal();
-        for (ProbabilisticVariable variable : variables) {
+        for (RandomVariable variable : variables) {
             if (!(variable.getValue() instanceof DoubleTensor)) {
                 throw new IllegalStateException("Gaussian proposal function cannot be used for discrete variable " + variable);
             }

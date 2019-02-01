@@ -7,8 +7,8 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.RandomVariable;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     private final List<Vertex> latentVertices;
 
-    private final List<? extends ProbabilisticVariable> probabilisticVariables;
+    private final List<? extends RandomVariable> probabilisticVariables;
 
     private final List<Vertex> observedVertices;
 
@@ -88,7 +88,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
     }
 
     @Override
-    public List<? extends ProbabilisticVariable> getProbabilisticVariables() {
+    public List<? extends RandomVariable> getProbabilisticVariables() {
         return this.probabilisticVariables;
     }
 

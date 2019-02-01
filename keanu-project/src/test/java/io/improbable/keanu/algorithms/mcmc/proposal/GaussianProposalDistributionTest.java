@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
+import io.improbable.keanu.vertices.RandomVariable;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;
@@ -87,7 +87,7 @@ public class GaussianProposalDistributionTest {
         ProposalListener listener2 = mock(ProposalListener.class);
         List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
         proposalDistribution = new GaussianProposalDistribution(sigma, listeners);
-        Set<ProbabilisticVariable> variables = ImmutableSet.of(vertex1, vertex2);
+        Set<RandomVariable> variables = ImmutableSet.of(vertex1, vertex2);
         Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
         verify(listener1).onProposalCreated(proposal);
         verify(listener2).onProposalCreated(proposal);

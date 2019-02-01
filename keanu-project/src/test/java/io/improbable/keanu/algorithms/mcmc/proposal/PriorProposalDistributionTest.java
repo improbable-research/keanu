@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.vertices.ProbabilisticVariable;
+import io.improbable.keanu.vertices.RandomVariable;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +36,7 @@ public class PriorProposalDistributionTest {
         ProposalListener listener2 = mock(ProposalListener.class);
         List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
         proposalDistribution = new PriorProposalDistribution(listeners);
-        Set<ProbabilisticVariable> variables = ImmutableSet.of(vertex1, vertex2);
+        Set<RandomVariable> variables = ImmutableSet.of(vertex1, vertex2);
         Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
         verify(listener1).onProposalCreated(proposal);
         verify(listener2).onProposalCreated(proposal);
