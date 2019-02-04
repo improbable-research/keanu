@@ -1,5 +1,7 @@
 ### Version 0.0.19 ###
 
+* Added `get_vertex_by_label` to `BayesNet`
+* Added optional param `label` for all vertices in Python (e.g. `Gaussian(0., 1., label="gaussian")`). Now you must label vertices you are sampling from, otherwise Keanu will throw an exception.
 * Improved the structure of the Python sample dictionary
   * Scalar networks
     * If all sampled vertices are scalar then you are returned a dictionary keyed on vertex ID with the values containing a list of primitive values.

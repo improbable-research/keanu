@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
@@ -34,11 +33,6 @@ public class BooleanReduceVertex extends BooleanVertex implements NonProbabilist
 
     public BooleanReduceVertex(long[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
         this(shape, Arrays.asList(input), f);
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return applyReduce((vertex) -> vertex.sample(random));
     }
 
     @Override

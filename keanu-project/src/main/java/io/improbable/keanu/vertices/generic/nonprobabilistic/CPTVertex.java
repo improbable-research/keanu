@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
@@ -25,13 +24,6 @@ public class CPTVertex<OUT extends Tensor> extends GenericTensorVertex<OUT> impl
         addParents(inputs);
         addParents(conditions.values());
         addParent(defaultResult);
-    }
-
-    @Override
-    public OUT sample(KeanuRandom random) {
-        final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.sample(random).scalar());
-        Vertex<OUT> vertex = conditions.get(condition);
-        return vertex == null ? defaultResult.sample(random) : vertex.sample(random);
     }
 
     @Override

@@ -7,6 +7,7 @@ from .base import JavaObjectWrapper
 int_types = Union[int, integer]
 float_types = Union[float, floating]
 bool_types = Union[bool, bool_]
+str_types = Union[str]
 
 primitive_types = Union[int_types, float_types, bool_types]
 '''
@@ -38,6 +39,7 @@ runtime_primitive_types: Type[Any]
 runtime_int_types: Type[Any]
 runtime_float_types: Type[Any]
 runtime_bool_types: Type[Any]
+runtime_str_types: Type[Any]
 runtime_tensor_arg_types: Type[Any]
 runtime_wrapped_java_types: Type[Any]
 
@@ -49,5 +51,6 @@ if not TYPE_CHECKING:
     runtime_int_types = int_types.__args__
     runtime_float_types = float_types.__args__
     runtime_bool_types = bool_types.__args__
+    runtime_str_types = str_types
     runtime_tensor_arg_types = tensor_arg_types.__args__
     runtime_wrapped_java_types = wrapped_java_types

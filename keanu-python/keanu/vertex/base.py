@@ -11,7 +11,8 @@ from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_wrapped_java_types,
-                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, runtime_float_types)
+                            runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, runtime_float_types,
+                            runtime_str_types)
 
 k = KeanuContext()
 
@@ -21,7 +22,7 @@ vertex_constructor_param_types = Union['Vertex', tensor_arg_types, wrapped_java_
 
 class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
-    def __init__(self, val_or_ctor: Union[JavaMember, JavaObject],
+    def __init__(self, val_or_ctor: Union[JavaMember, JavaObject], label: Optional[str],
                  *args: Union[vertex_constructor_param_types, shape_types]) -> None:
         val: JavaObject
         if args:
@@ -31,6 +32,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             val = typing_cast(JavaObject, val_or_ctor)
 
         super(Vertex, self).__init__(val)
+        if label is not None:
+            self.set_label(label)
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return v
@@ -47,6 +50,11 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def set_and_cascade(self, v: tensor_arg_types) -> None:
         self.unwrap().setAndCascade(Tensor(self.cast(v)).unwrap())
 
+    def set_label(self, label: Optional[str]) -> None:
+        if label is None:
+            raise ValueError("label cannot be None.")
+        self.unwrap().setLabel(label)
+
     def sample(self) -> numpy_types:
         return Tensor._to_scalar_or_ndarray(self.unwrap().sample())
 
@@ -56,11 +64,12 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def get_connected_graph(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
-    def get_id(self) -> Tuple[JavaObject, ...]:
+    def get_id(self) -> Tuple[int, ...]:
         return Vertex._get_python_id(self.unwrap())
 
-    def get_label(self) -> str:
-        return self.unwrap().getLabel().getQualifiedName()
+    def get_label(self) -> Optional[str]:
+        label = self.unwrap().getLabel()
+        return None if label is None else label.getQualifiedName()
 
     """
     __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.
@@ -182,22 +191,22 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             return arg.unwrap()
         elif isinstance(arg, collections.Collection) and all(isinstance(x, runtime_primitive_types) for x in arg):
             return k.to_java_long_array(arg)
-        elif isinstance(arg, runtime_primitive_types) or isinstance(arg, JavaObject):
+        elif isinstance(arg, (runtime_primitive_types, JavaObject, runtime_str_types)):
             return arg
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
 
     @staticmethod
+    def _from_java_vertex(java_vertex: JavaObject) -> 'Vertex':
+        return Vertex(java_vertex, None)
+
+    @staticmethod
     def _to_generator(java_vertices: Union[JavaList, JavaArray]) -> Iterator['Vertex']:
-        return (Vertex(java_vertex) for java_vertex in java_vertices)
+        return (Vertex._from_java_vertex(java_vertex) for java_vertex in java_vertices)
 
     @staticmethod
-    def _get_python_id(java_vertex: JavaObject) -> Tuple[JavaObject, ...]:
+    def _get_python_id(java_vertex: JavaObject) -> Tuple[int, ...]:
         return tuple(java_vertex.getId().getValue())
-
-    @staticmethod
-    def _get_python_label(java_vertex: JavaObject) -> str:
-        return java_vertex.getLabel().getQualifiedName()
 
 
 class Double(Vertex):

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -36,11 +35,6 @@ public class DoubleSetWithMaskVertex extends DoubleVertex implements NonProbabil
     @Override
     public DoubleTensor calculate() {
         return operand.getValue().setWithMask(mask.getValue(), setValue.getValue().scalar());
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return this.getValue();
     }
 
     @SaveVertexParam(OPERAND_NAME)

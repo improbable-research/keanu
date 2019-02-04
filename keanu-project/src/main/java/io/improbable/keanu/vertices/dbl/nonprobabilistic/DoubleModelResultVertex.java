@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -28,11 +27,6 @@ public class DoubleModelResultVertex extends DoubleVertex implements ModelResult
     @Override
     public ModelVertex<DoubleTensor> getModel() {
         return delegate.getModel();
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return delegate.sample(random);
     }
 
     @Override

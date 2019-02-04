@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Iterable, Dict, List
+from typing import Any, Iterable, Dict, List, Tuple
 
 from numpy import ndenumerate, ndarray
 from py4j.java_collections import JavaList
@@ -103,7 +103,6 @@ def sample(net: BayesNet,
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from)
 
-    sample_from = list(sample_from)
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
     probabilistic_model = ProbabilisticModel(net) if isinstance(
@@ -112,10 +111,11 @@ def sample(net: BayesNet,
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
+    id_to_label = __check_if_vertices_are_labelled(sample_from)
     if __all_scalar(sample_from):
-        vertex_samples = __create_single_indexed_samples(network_samples, vertices_unwrapped)
+        vertex_samples = __create_single_indexed_samples(network_samples, vertices_unwrapped, id_to_label)
     else:
-        vertex_samples = __create_multi_indexed_samples(vertices_unwrapped, network_samples)
+        vertex_samples = __create_multi_indexed_samples(vertices_unwrapped, network_samples, id_to_label)
 
     if plot:
         traceplot(vertex_samples, ax=ax)
@@ -133,6 +133,7 @@ def generate_samples(net: BayesNet,
                      ax: Any = None) -> sample_generator_types:
 
     sample_from = list(sample_from)
+    id_to_label = __check_if_vertices_are_labelled(sample_from)
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from)
@@ -154,7 +155,8 @@ def generate_samples(net: BayesNet,
         live_plot=live_plot,
         refresh_every=refresh_every,
         ax=ax,
-        all_scalar=all_are_scalar)
+        all_scalar=all_are_scalar,
+        id_to_label=id_to_label)
 
 
 def __all_scalar(sample_from: List[Vertex]):
@@ -162,7 +164,7 @@ def __all_scalar(sample_from: List[Vertex]):
 
 
 def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList, live_plot: bool, refresh_every: int,
-                       ax: Any, all_scalar: bool) -> sample_generator_types:
+                       ax: Any, all_scalar: bool, id_to_label: Dict[Tuple[int, ...], str]) -> sample_generator_types:
     traces = []
     x0 = 0
     while (True):
@@ -170,12 +172,12 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
 
         if all_scalar:
             sample: sample_generator_dict_type = {
-                Vertex._get_python_label(vertex_unwrapped): Tensor._to_scalar_or_ndarray(
+                id_to_label[Vertex._get_python_id(vertex_unwrapped)]: Tensor._to_scalar_or_ndarray(
                     network_sample.get(vertex_unwrapped), return_as_primitive=True)
                 for vertex_unwrapped in vertices_unwrapped
             }
         else:
-            sample = __create_multi_indexed_samples_generated(vertices_unwrapped, network_sample)
+            sample = __create_multi_indexed_samples_generated(vertices_unwrapped, network_sample, id_to_label)
 
         if live_plot:
             traces.append(sample)
@@ -191,10 +193,22 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
         yield sample
 
 
-def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrapped: JavaList) -> sample_types:
+def __check_if_vertices_are_labelled(vertices: List[Vertex]) -> Dict[Tuple[int, ...], str]:
+    id_to_label = {}
+    for vertex in vertices:
+        label = vertex.get_label()
+        if label is None:
+            raise ValueError("Vertices in sample_from must be labelled.")
+        else:
+            id_to_label[vertex.get_id()] = label
+    return id_to_label
+
+
+def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrapped: JavaList,
+                                    id_to_label: Dict[Tuple[int, ...], str]) -> sample_types:
     vertex_samples: sample_types = {}
     for vertex_unwrapped in vertices_unwrapped:
-        vertex_label = Vertex._get_python_label(vertex_unwrapped)
+        vertex_label = id_to_label[Vertex._get_python_id(vertex_unwrapped)]
         samples_for_vertex = network_samples.get(vertex_unwrapped).asList()
         is_primitive = [True] * len(samples_for_vertex)
         samples_as_ndarray = map(Tensor._to_scalar_or_ndarray, samples_for_vertex, is_primitive)
@@ -202,10 +216,11 @@ def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrap
     return vertex_samples
 
 
-def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples: JavaObject) -> sample_types:
+def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples: JavaObject,
+                                   id_to_label: Dict[Tuple[int, ...], str]) -> sample_types:
     vertex_samples_multi: Dict = {}
     for vertex in vertices_unwrapped:
-        vertex_label = Vertex._get_python_label(vertex)
+        vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
         samples_for_vertex = network_samples.get(vertex).asList()
         is_primitive = [True] * len(samples_for_vertex)
@@ -221,11 +236,11 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
     return tuple_hierarchy
 
 
-def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList,
-                                             network_samples: JavaObject) -> sample_generator_dict_type:
+def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, network_samples: JavaObject,
+                                             id_to_label: Dict[Tuple[int, ...], str]) -> sample_generator_dict_type:
     vertex_samples_multi: Dict = {}
     for vertex in vertices_unwrapped:
-        vertex_label = Vertex._get_python_label(vertex)
+        vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
         sample = Tensor._to_scalar_or_ndarray(network_samples.get(vertex), return_as_primitive=True)
         __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])

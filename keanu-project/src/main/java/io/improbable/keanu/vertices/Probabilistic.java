@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface Probabilistic<T> extends Observable<T> {
+public interface Probabilistic<T> extends Observable<T>, Samplable<T> {
 
     /**
      * This is the natural log of the probability at the supplied value. In the
