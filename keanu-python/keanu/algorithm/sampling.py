@@ -48,7 +48,7 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
             latents=latents_copy,
             listeners=proposal_listeners)
 
-        rejection_strategy = k.jvm_view().RollBackToCachedValuesOnRejection(k.to_java_object_list(latents))
+        rejection_strategy = k.jvm_view().RollBackToCachedValuesOnRejection()
 
         builder = builder.proposalDistribution(proposal_distribution_object.unwrap())
         builder = builder.rejectionStrategy(rejection_strategy)
