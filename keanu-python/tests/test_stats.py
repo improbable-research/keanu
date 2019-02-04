@@ -18,15 +18,6 @@ def test_can_get_correct_autocorrelation() -> None:
     np.testing.assert_almost_equal(autocorr, expected)
 
 
-def test_autocorrelation_example_nd() -> None:
-    a = Gaussian(np.array([[20., 30.], [40., 60.]]), np.array([[1., 1.], [1., 1.]]))
-    a.set_label("a")
-    bayes_net = BayesNet(a.get_connected_graph())
-    posterior_samples = sample(net=bayes_net, sample_from=bayes_net.get_latent_vertices(), draws=10)
-    vertex_samples = posterior_samples[('a', '(0, 1)')]
-    ac = stats.autocorrelation(vertex_samples)
-
-
 def test_autocorr_returns_ndarray_of_correct_dtype() -> None:
     with Model() as m:
         m.uniform = Uniform(0, 1000)

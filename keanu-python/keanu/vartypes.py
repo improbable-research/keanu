@@ -2,7 +2,6 @@ from typing import Iterable, Union, Type, Any, TYPE_CHECKING, Dict, Tuple, List,
 from numpy import integer, floating, bool_, ndarray
 from pandas import Series, DataFrame
 from .base import JavaObjectWrapper
-from py4j.java_gateway import JavaObject
 
 # see numpy's scalar hierarchy: https://docs.scipy.org/doc/numpy/reference/arrays.scalars.html#scalars
 int_types = Union[int, integer]

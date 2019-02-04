@@ -100,17 +100,7 @@ def test_sample_dict_can_be_loaded_in_to_dataframe(net: BayesNet) -> None:
         assert type(df[column][0]) == np.float64
 
 
-def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe() -> None:
-    gamma = Gamma(np.array([1., 1., 1., 1.]).reshape((2, 2)), np.array([2., 2., 2., 2.]).reshape((2, 2)))
-    exp = Exponential(np.array([1., 1., 1., 1.]).reshape((2, 2)))
-    cauchy = Cauchy(gamma, exp)
-
-    gamma.set_label("gamma")
-    exp.set_label("exp")
-    cauchy.set_label("cauchy")
-
-    tensor_net = BayesNet(gamma.get_connected_graph())
-
+def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe(tensor_net: BayesNet) -> None:
     sample_from = list(tensor_net.get_latent_vertices())
     vertex_labels = [vertex.get_label() for vertex in sample_from]
 
@@ -196,7 +186,6 @@ def test_can_iter_through_tensor_samples(algo: Callable[[BayesNet], PosteriorSam
             for i in (0, 1):
                 for j in (0, 1):
                     assert ((distribution, '({}, {})'.format(i, j)) in sample)
-    plt.show()
     assert count == draws
 
 
@@ -287,7 +276,6 @@ def reorder_subplots(ax: Any) -> None:
 
 def __assert_valid_samples(draws: int, samples: Dict) -> None:
     for label, vertex_samples in samples.items():
-        assert label in samples
         assert len(vertex_samples) == draws
         assert type(vertex_samples) == list
         assert all(type(sample) == float for sample in vertex_samples)
