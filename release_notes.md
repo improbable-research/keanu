@@ -21,6 +21,9 @@
     * `samples[("gaussian", "(0, 1)")] = [5.734130, 5.734130, 5.035550] `
   * As a result, whenever keying into a sample dictionary, you are guaranteed to receive a list of primitives.
   * This greatly reduces the complexity of the `autocorrelation` and `traceplot` API's as they now simply expect a list of values.  
+* Added Adam optimizer
+* GradientOptimizer and NonGradientOptimizer now takes an algorithm argument that by default will use Conjugate Gradient and BOBYQA respectively.
+* GradientOptimizer and NonGradientOptimizer return a OptimizedResult object instead of just the optimized fitness as a double
 * Reorganised the factory methods for building `PosteriorSamplingAlgorithm` objects. The following are available and give you access to either a default implementation or, when you need more control over the configuration, a Builder object:
   * `Keanu.Sampling.MetropolisHastings`
   * `Keanu.Sampling.NUTS`
