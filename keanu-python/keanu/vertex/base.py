@@ -69,7 +69,10 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return Vertex._get_python_id(self.unwrap())
 
     def get_label(self) -> Optional[str]:
-        return Vertex._get_python_label(self.unwrap())
+        try:
+            return self.unwrap().getLabel().getQualifiedName()
+        except (AttributeError, Py4JError):
+            return None
 
     """
     __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.
@@ -207,13 +210,6 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     @staticmethod
     def _get_python_id(java_vertex: JavaObject) -> Tuple[int, ...]:
         return tuple(java_vertex.getId().getValue())
-
-    @staticmethod
-    def _get_python_label(java_vertex: JavaObject) -> Optional[str]:
-        try:
-            return java_vertex.getLabel().getQualifiedName()
-        except (AttributeError, Py4JError):
-            return None
 
 
 class Double(Vertex):
