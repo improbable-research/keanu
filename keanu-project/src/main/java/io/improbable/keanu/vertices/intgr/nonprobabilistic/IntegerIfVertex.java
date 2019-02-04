@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -44,11 +43,6 @@ public class IntegerIfVertex extends IntegerVertex implements NonProbabilistic<I
     @SaveVertexParam(ELSE_NAME)
     public IntegerVertex getEls() {
         return els;
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op(predicate.sample(random), thn.sample(random), els.sample(random));
     }
 
     @Override

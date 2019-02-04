@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -17,11 +16,6 @@ public abstract class UnaryOpVertex<IN, OUT> extends GenericVertex<OUT> implemen
         super(shape);
         this.inputVertex = inputVertex;
         setParents(inputVertex);
-    }
-
-    @Override
-    public OUT sample(KeanuRandom random) {
-        return op(inputVertex.sample(random));
     }
 
     @Override

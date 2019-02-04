@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -51,11 +50,6 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
     @SaveVertexParam(ELSE_NAME)
     public DoubleVertex getEls() {
         return els;
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op(predicate.sample(random), thn.sample(random), els.sample(random));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -33,11 +32,6 @@ public class IfVertex<T> extends GenericTensorVertex<Tensor<T>> implements NonPr
 
     private Tensor<T> op(BooleanTensor predicate, Tensor<T> thn, Tensor<T> els) {
         return predicate.where(thn, els);
-    }
-
-    @Override
-    public Tensor<T> sample(KeanuRandom random) {
-        return op(predicate.sample(random), thn.sample(random), els.sample(random));
     }
 
     @Override

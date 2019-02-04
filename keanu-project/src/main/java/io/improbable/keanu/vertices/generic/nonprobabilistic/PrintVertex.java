@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.base.Preconditions;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -44,11 +43,6 @@ public class PrintVertex<T> extends GenericVertex<T> implements NonProbabilistic
 
     public PrintVertex(Vertex<T> parent) {
         this(parent, "Calculated Vertex:\n", true);
-    }
-
-    @Override
-    public T sample(KeanuRandom random) {
-        return parent.sample(random);
     }
 
     @Override

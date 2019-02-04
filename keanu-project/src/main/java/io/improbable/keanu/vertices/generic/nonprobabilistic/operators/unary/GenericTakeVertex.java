@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.generic.GenericTensor;
@@ -24,11 +23,6 @@ public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;
-    }
-
-    @Override
-    public Tensor<T> sample(KeanuRandom random) {
-        return op(inputVertex.sample(random));
     }
 
     protected Tensor<T> op(Tensor<T> input) {

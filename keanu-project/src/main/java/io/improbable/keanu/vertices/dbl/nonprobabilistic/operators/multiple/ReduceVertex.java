@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
@@ -84,11 +83,6 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
         this(checkAllShapesMatch(inputs.stream().map(Vertex::getShape).collect(Collectors.toList())),
             inputs, reduceFunction, null, null
         );
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return applyReduce(vertex -> vertex.sample(random));
     }
 
     @Override

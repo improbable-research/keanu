@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -38,11 +37,6 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
         this.left = left;
         this.right = right;
         setParents(left, right);
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op(left.sample(random), right.sample(random));
     }
 
     @Override
