@@ -167,7 +167,7 @@ public class LambdaModelVertexTest {
 
         KeanuProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(chanceOfRainObservation.getConnectedGraph());
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfigFor(probabilisticModel, random).getPosteriorSamples(
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(
             probabilisticModel,
             inputToModel,
             200

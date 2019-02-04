@@ -250,7 +250,7 @@ public class BooleanVertexTest {
     public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean>> vertex, int sampleCount, KeanuRandom random) {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
 
-        long trueCount = MetropolisHastings.withDefaultConfigFor(model, random)
+        long trueCount = MetropolisHastings.withDefaultConfig(random)
             .generatePosteriorSamples(model, Collections.singletonList(vertex)).stream()
             .limit(sampleCount)
             .filter(state -> state.get(vertex).scalar())

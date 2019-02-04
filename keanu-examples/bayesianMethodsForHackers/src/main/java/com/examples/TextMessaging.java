@@ -53,7 +53,7 @@ public class TextMessaging {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
         final int numSamples = 1000;
-        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig()
             .generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(numSamples / 2)
             .downSampleInterval(model.getLatentVariables().size())

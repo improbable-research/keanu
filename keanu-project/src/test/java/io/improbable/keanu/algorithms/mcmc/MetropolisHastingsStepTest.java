@@ -11,7 +11,6 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -21,7 +20,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -64,8 +62,8 @@ public class MetropolisHastingsStepTest {
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             model,
-            new PriorProposalDistribution(bayesNet.getLatentVertices()),
-            new RollBackToCachedValuesOnRejection(bayesNet.getLatentVertices()),
+            new PriorProposalDistribution(),
+            new RollBackToCachedValuesOnRejection(),
             alwaysAccept
         );
 
@@ -135,12 +133,11 @@ public class MetropolisHastingsStepTest {
     }
 
     private MetropolisHastingsStep stepFunctionWithConstantProposal(ProbabilisticModel model, double constant, KeanuRandom random) {
-        List<Vertex> latentVertices = (List<Vertex>) model.getLatentVariables();
 
         return new MetropolisHastingsStep(
             model,
             constantProposal(constant),
-            new RollBackToCachedValuesOnRejection(latentVertices),
+            new RollBackToCachedValuesOnRejection(),
             random
         );
     }

@@ -34,7 +34,7 @@ public class Inference {
         //%%SNIPPET_END%% InfStartState
 
         //%%SNIPPET_START%% InfMetropolisHastings
-        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100000

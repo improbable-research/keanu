@@ -88,7 +88,7 @@ public class FoodPoisoningTest {
         myNet.probeForNonZeroProbability(100, random);
         assertNotEquals(Double.NEGATIVE_INFINITY, myNet.getLogOfMasterP());
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(myNet);
-        return MetropolisHastings.withDefaultConfigFor(model, random).getPosteriorSamples(model, myNet.getLatentVertices(), n);
+        return MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(model, myNet.getLatentVertices(), n);
     }
 
     public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) {

@@ -1,15 +1,12 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.Variable;
-import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.vertices.Vertex;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * When a proposal is created, take a snapshot of the vertices' values.
@@ -19,18 +16,19 @@ import java.util.stream.Collectors;
 public class RollbackAndCascadeOnRejection implements ProposalRejectionStrategy {
 
     private Map<Vertex, Object> fromValues;
-    private final Map<VariableReference, Vertex> vertexLookup;
-
-    public RollbackAndCascadeOnRejection(Collection<Vertex> vertices) {
-        vertexLookup = vertices.stream().collect(Collectors.toMap(Variable::getReference, v -> v));
-    }
 
     @Override
     public void onProposalCreated(Proposal proposal) {
 
         fromValues = new HashMap<>();
         for (Variable variable : proposal.getVariablesWithProposal()) {
-            fromValues.put(vertexLookup.get(variable.getReference()), variable.getValue());
+
+            if (variable instanceof Vertex) {
+                fromValues.put((Vertex) variable, variable.getValue());
+            } else {
+                throw new IllegalArgumentException(this.getClass().getSimpleName() + " is to only be used with Keanu's Vertex");
+            }
+
         }
     }
 

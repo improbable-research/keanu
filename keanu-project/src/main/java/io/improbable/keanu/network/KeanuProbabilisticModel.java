@@ -44,7 +44,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
         this.latentVertices = ImmutableList.copyOf(bayesianNetwork.getLatentVertices());
         this.observedVertices = ImmutableList.copyOf(bayesianNetwork.getObservedVertices());
         this.latentOrObservedVertices = ImmutableList.copyOf(bayesianNetwork.getLatentOrObservedVertices());
-        this.lambdaSectionSnapshot = new LambdaSectionSnapshot(latentVertices);
+        this.lambdaSectionSnapshot = new LambdaSectionSnapshot();
 
         resetModelToObservedState();
         checkBayesNetInHealthyState();

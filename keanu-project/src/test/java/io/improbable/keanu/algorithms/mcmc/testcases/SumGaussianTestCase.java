@@ -4,6 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import lombok.Getter;
 
 import java.util.Arrays;
 
@@ -11,7 +12,9 @@ import static org.junit.Assert.assertEquals;
 
 public class SumGaussianTestCase implements MCMCTestCase {
 
+    @Getter
     private final DoubleVertex A;
+    @Getter
     private final DoubleVertex B;
 
     private BayesianNetwork model;

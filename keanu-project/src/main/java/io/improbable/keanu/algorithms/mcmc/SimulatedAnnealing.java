@@ -5,6 +5,7 @@ import io.improbable.keanu.algorithms.ProbabilisticModel;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
+import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
@@ -56,7 +57,7 @@ public class SimulatedAnnealing {
     /**
      * Finds the MAP using the default annealing schedule, which is an exponential decay schedule.
      *
-     * @param model          a probabilistic model containing latent variables
+     * @param model             a probabilistic model containing latent variables
      * @param sampleCount       the number of samples to take
      * @param annealingSchedule the schedule to update T (temperature) as a function of sample number.
      * @return the NetworkState that represents the Max A Posteriori
@@ -135,9 +136,9 @@ public class SimulatedAnnealing {
 
     public static class SimulatedAnnealingBuilder {
         private KeanuRandom random = KeanuRandom.getDefaultRandom();
-        private ProposalDistribution proposalDistribution;
+        private ProposalDistribution proposalDistribution = new PriorProposalDistribution();
         private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
-        private ProposalRejectionStrategy rejectionStrategy;
+        private ProposalRejectionStrategy rejectionStrategy = new RollBackToCachedValuesOnRejection();
 
         SimulatedAnnealingBuilder() {
         }
