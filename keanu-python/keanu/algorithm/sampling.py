@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Iterable, Dict, List, Tuple, Generator
+from typing import Any, Iterable, Dict, List, Tuple
 
 from numpy import ndenumerate, ndarray
 from py4j.java_collections import JavaList
