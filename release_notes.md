@@ -1,5 +1,6 @@
 ### Version 0.0.19 ###
 
+* Buildkite
 * Added `get_vertex_by_label` to `BayesNet`
 * Added optional param `label` for all vertices in Python (e.g. `Gaussian(0., 1., label="gaussian")`). Now you must label vertices you are sampling from, otherwise Keanu will throw an exception.
 * Improved the structure of the Python sample dictionary
