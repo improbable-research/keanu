@@ -4,13 +4,13 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import com.google.protobuf.util.JsonFormat;
-import io.improbable.keanu.KeanuSavedBayesNet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.mir.KeanuSavedBayesNet;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -77,13 +77,13 @@ public class JsonTest {
 
     @Test
     public void jsonSaverSavesMetadata() throws IOException {
-        KeanuSavedBayesNet.Metadata.Builder metadataBuilder = KeanuSavedBayesNet.Metadata.newBuilder();
+        KeanuSavedBayesNet.ModelMetadata.Builder metadataBuilder = KeanuSavedBayesNet.ModelMetadata.newBuilder();
         for (Map.Entry<String, String> entry : someMetadata.entrySet()) {
             metadataBuilder.putMetadataInfo(entry.getKey(), entry.getValue());
         }
-        KeanuSavedBayesNet.Model.Builder modelBuilder = KeanuSavedBayesNet.Model.newBuilder();
+        KeanuSavedBayesNet.ProtoModel.Builder modelBuilder = KeanuSavedBayesNet.ProtoModel.newBuilder();
         JsonFormat.parser().merge(outputStream.toString(), modelBuilder);
-        KeanuSavedBayesNet.Model parsedModel = modelBuilder.build();
+        KeanuSavedBayesNet.ProtoModel parsedModel = modelBuilder.build();
 
         assertTrue(parsedModel.hasMetadata());
         assertEquals(parsedModel.getMetadata().getMetadataInfoMap().size(), (metadataBuilder.getMetadataInfoMap().size()));
