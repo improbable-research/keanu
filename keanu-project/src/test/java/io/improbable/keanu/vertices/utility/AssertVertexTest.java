@@ -76,7 +76,7 @@ public class AssertVertexTest {
         gaussian.greaterThan(new ConstantDoubleVertex(1000)).assertTrue();
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(gaussian.getConnectedGraph());
-        MetropolisHastings.withDefaultConfigFor(model).generatePosteriorSamples(model, model.getLatentVariables()).generate(10);
+        MetropolisHastings.withDefaultConfig().generatePosteriorSamples(model, model.getLatentVariables()).generate(10);
     }
 
     @Test
@@ -154,7 +154,7 @@ public class AssertVertexTest {
         secondThermometer.observe(30.);
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(temperature.getConnectedGraph());
-        MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             model,
             model.getLatentVariables(),
             100

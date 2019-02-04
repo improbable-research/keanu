@@ -3,7 +3,6 @@ package io.improbable.keanu;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.graphtraversal.DifferentiableChecker;
 import io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection;
-import io.improbable.keanu.algorithms.mcmc.RollbackAndCascadeOnRejection;
 import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
@@ -32,7 +31,7 @@ public class Keanu {
          * If the given network is differentiable, NUTS is proposed, otherwise Metropolis Hastings is chosen.
          *
          * Usage:
-         * PosteriorSamplingAlgorithm samplingAlgorithm = Keanu.Sampling.MCMC.withDefaultConfigFor(yourModel);
+         * PosteriorSamplingAlgorithm samplingAlgorithm = Keanu.Sampling.MCMC.withDefaultConfig(yourModel);
          * samplingAlgorithm.getPosteriorSamples(...);
          */
         public static class MCMC {
@@ -54,7 +53,7 @@ public class Keanu {
                 if (DifferentiableChecker.isDifferentiableWrtLatents(model.getLatentOrObservedVertices())) {
                     return Keanu.Sampling.NUTS.withDefaultConfig(random);
                 } else {
-                    return Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model, random);
+                    return Keanu.Sampling.MetropolisHastings.withDefaultConfig(random);
                 }
             }
         }
@@ -62,15 +61,14 @@ public class Keanu {
         @UtilityClass
         public static class MetropolisHastings {
 
-            public static io.improbable.keanu.algorithms.mcmc.MetropolisHastings withDefaultConfigFor(KeanuProbabilisticModel model) {
-                return withDefaultConfigFor(model, KeanuRandom.getDefaultRandom());
+            public static io.improbable.keanu.algorithms.mcmc.MetropolisHastings withDefaultConfig() {
+                return withDefaultConfig(KeanuRandom.getDefaultRandom());
             }
 
-            public static io.improbable.keanu.algorithms.mcmc.MetropolisHastings withDefaultConfigFor(KeanuProbabilisticModel model, KeanuRandom random) {
-                List<Vertex> latentVertices = model.getLatentVertices();
+            public static io.improbable.keanu.algorithms.mcmc.MetropolisHastings withDefaultConfig(KeanuRandom random) {
                 return builder()
-                    .proposalDistribution(new PriorProposalDistribution(latentVertices))
-                    .rejectionStrategy(new RollBackToCachedValuesOnRejection(latentVertices))
+                    .proposalDistribution(new PriorProposalDistribution())
+                    .rejectionStrategy(new RollBackToCachedValuesOnRejection())
                     .random(random)
                     .build();
             }
@@ -101,14 +99,14 @@ public class Keanu {
         @UtilityClass
         public static class SimulatedAnnealing {
 
-            public static io.improbable.keanu.algorithms.mcmc.SimulatedAnnealing withDefaultConfigFor(KeanuProbabilisticModel model) {
-                return withDefaultConfigFor(model, KeanuRandom.getDefaultRandom());
+            public static io.improbable.keanu.algorithms.mcmc.SimulatedAnnealing withDefaultConfig() {
+                return withDefaultConfig(KeanuRandom.getDefaultRandom());
             }
 
-            public static io.improbable.keanu.algorithms.mcmc.SimulatedAnnealing withDefaultConfigFor(KeanuProbabilisticModel model, KeanuRandom random) {
+            public static io.improbable.keanu.algorithms.mcmc.SimulatedAnnealing withDefaultConfig(KeanuRandom random) {
                 return builder()
-                    .proposalDistribution(new PriorProposalDistribution(model.getLatentVertices()))
-                    .rejectionStrategy(new RollbackAndCascadeOnRejection(model.getLatentVertices()))
+                    .proposalDistribution(new PriorProposalDistribution())
+                    .rejectionStrategy(new RollBackToCachedValuesOnRejection())
                     .random(random)
                     .build();
             }

@@ -5,7 +5,6 @@ import io.improbable.keanu.network.LambdaSectionSnapshot;
 import io.improbable.keanu.network.NetworkSnapshot;
 import io.improbable.keanu.vertices.Vertex;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,8 +16,8 @@ public class RollBackToCachedValuesOnRejection implements ProposalRejectionStrat
     private final LambdaSectionSnapshot lambdaSectionSnapshot;
     private NetworkSnapshot networkSnapshot;
 
-    public RollBackToCachedValuesOnRejection(List<Vertex> latentVariables) {
-        lambdaSectionSnapshot = new LambdaSectionSnapshot(latentVariables);
+    public RollBackToCachedValuesOnRejection() {
+        lambdaSectionSnapshot = new LambdaSectionSnapshot();
     }
 
     @Override

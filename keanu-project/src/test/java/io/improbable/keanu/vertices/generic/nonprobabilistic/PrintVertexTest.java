@@ -136,7 +136,7 @@ public class PrintVertexTest {
 
         final int nSamples = 100;
         MetropolisHastings
-            .withDefaultConfigFor(model)
+            .withDefaultConfig()
             .getPosteriorSamples(model, model.getLatentVariables(), nSamples);
 
         verify(printStream, atLeast(nSamples)).print(anyString());

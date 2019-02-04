@@ -58,7 +58,7 @@ public class IntegerIfVertexTest {
     private static double calculateMeanOfVertex(IntegerVertex vertex) {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(vertex.getConnectedGraph());
 
-        return MetropolisHastings.withDefaultConfigFor(model, KeanuRandom.getDefaultRandom())
+        return MetropolisHastings.withDefaultConfig(KeanuRandom.getDefaultRandom())
             .generatePosteriorSamples(model, Collections.singletonList(vertex)).stream()
             .limit(2000)
             .collect(Collectors.averagingInt((NetworkSample state) -> state.get(vertex).scalar()));

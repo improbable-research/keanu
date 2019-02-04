@@ -42,7 +42,7 @@ public class ABTesting {
         //infer the most probable probabilities
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(probabilityA.getConnectedGraph());
         int sampleCount = 100;
-        NetworkSamples networkSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+        NetworkSamples networkSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig()
             .getPosteriorSamples(model, Arrays.asList(probabilityA, probabilityB, delta), sampleCount)
             .drop(sampleCount/2).downSample(model.getLatentVariables().size());
 
