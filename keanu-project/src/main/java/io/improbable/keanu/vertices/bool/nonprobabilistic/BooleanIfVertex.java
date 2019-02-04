@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -31,11 +30,6 @@ public class BooleanIfVertex extends BooleanVertex implements NonProbabilistic<B
 
     protected BooleanTensor op(BooleanTensor predicate, BooleanTensor thn, BooleanTensor els) {
         return predicate.booleanWhere(thn, els);
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(predicate.sample(random), thn.sample(random), els.sample(random));
     }
 
     @Override

@@ -8,6 +8,7 @@ import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -209,13 +210,16 @@ public class BayesianNetwork {
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices, KeanuRandom random) {
         for (Vertex<?> vertex : vertices) {
+            if (!(vertex instanceof Probabilistic)) {
+                throw new IllegalArgumentException("Cannot sample from a non-probabilistic vertex. Vertex is: " + vertex);
+            }
             setValueFromSample(vertex, random);
         }
         VertexValuePropagation.cascadeUpdate(vertices);
     }
 
     private static <T> void setValueFromSample(Vertex<T> vertex, KeanuRandom random) {
-        vertex.setValue(vertex.sample(random));
+        vertex.setValue(((Probabilistic<T>) vertex).sample(random));
     }
 
     public List<Vertex<DoubleTensor>> getContinuousLatentVertices() {

@@ -170,4 +170,5 @@ public class HalfCauchyVertexTest {
         Assert.assertEquals(0.0, derivative.getValue(0), 1e-6);
         Assert.assertTrue(derivative.getValue(1) != 0.);
     }
+
 }

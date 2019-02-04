@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -49,11 +48,6 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
     @Override
     public IntegerTensor calculate() {
         return op(extractFromInputs(IntegerTensor.class, Vertex::getValue, input));
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(IntegerTensor.class, Vertex::sample, input));
     }
 
     private IntegerTensor op(IntegerTensor... inputs) {

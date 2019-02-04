@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import com.google.common.collect.Iterables;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -48,11 +47,6 @@ public class DoubleProxyVertex extends DoubleVertex implements Differentiable, P
     @Override
     public DoubleTensor calculate() {
         return getParent().getValue();
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return getParent().sample();
     }
 
     @Override

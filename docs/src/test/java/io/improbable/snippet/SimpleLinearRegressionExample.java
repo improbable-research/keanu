@@ -16,13 +16,13 @@ public class SimpleLinearRegressionExample {
         int numberOfSamples = 100;
 
         //Define random input data vertex by sampling from uniform probability distribution between 0 and 10
-        DoubleVertex xGenerator = new UniformVertex(new long[]{1, numberOfSamples}, 0, 10);
+        UniformVertex xGenerator = new UniformVertex(new long[]{1, numberOfSamples}, 0, 10);
 
         //Define the desired output vertices
         DoubleVertex yMu = xGenerator.multiply(weight).plus(offset);
 
         //Define a vertex for taking noisy readings of output data
-        DoubleVertex yGenerator = new GaussianVertex(yMu, 1.0);
+        GaussianVertex yGenerator = new GaussianVertex(yMu, 1.0);
 
         //Sample input data and then sample the corresponding noisy output data
         DoubleTensor xData = xGenerator.sample();

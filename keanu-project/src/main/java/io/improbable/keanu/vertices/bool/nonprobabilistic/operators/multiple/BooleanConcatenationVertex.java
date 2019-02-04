@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -48,11 +47,6 @@ public class BooleanConcatenationVertex extends BooleanVertex implements NonProb
     @Override
     public BooleanTensor calculate() {
         return op(extractFromInputs(BooleanTensor.class, Vertex::getValue, input));
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(BooleanTensor.class, Vertex::sample, input));
     }
 
     protected BooleanTensor op(BooleanTensor... inputs) {

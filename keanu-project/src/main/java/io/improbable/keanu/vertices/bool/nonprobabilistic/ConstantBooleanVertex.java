@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -32,11 +31,6 @@ public class ConstantBooleanVertex extends BooleanVertex implements ConstantVert
 
     public ConstantBooleanVertex(boolean[] data, long[] shape) {
         this(BooleanTensor.create(data, shape));
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return getValue();
     }
 
     @Override

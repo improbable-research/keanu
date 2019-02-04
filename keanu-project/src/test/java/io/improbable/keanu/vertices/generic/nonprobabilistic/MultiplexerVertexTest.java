@@ -31,7 +31,7 @@ public class MultiplexerVertexTest {
 
         IntegerVertex selectorOrigin = ConstantVertex.of(0);
         IntegerVertex selectorBound = ConstantVertex.of(2);
-        IntegerVertex selectorControlVertex = new UniformIntVertex(selectorOrigin, selectorBound);
+        UniformIntVertex selectorControlVertex = new UniformIntVertex(selectorOrigin, selectorBound);
         Map<TestEnum, Double> expected = new HashMap<>();
         expected.put(TestEnum.A, 0.25);
         expected.put(TestEnum.B, 0.25);
@@ -60,7 +60,7 @@ public class MultiplexerVertexTest {
             selectorControlVertex.setValue(selectorControlVertex.sample(random));
             select1.setValue(select1.sample(random));
             select2.setValue(select2.sample(random));
-            TestEnum s = multiplexerVertex.sample(random).scalar();
+            TestEnum s = multiplexerVertex.eval().scalar();
             frequencies.put(s, frequencies.get(s) + 1);
         }
 

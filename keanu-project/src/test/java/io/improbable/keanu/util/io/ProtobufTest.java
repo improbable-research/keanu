@@ -2,7 +2,6 @@ package io.improbable.keanu.util.io;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -459,15 +458,6 @@ public class ProtobufTest {
             super(new long[]{1, 1});
         }
 
-        @Override
-        public DoubleTensor sample(KeanuRandom random) {
-            return null;
-        }
-
-        @Override
-        public DoubleTensor sample() {
-            return null;
-        }
     }
 
     @Test(expected = IllegalArgumentException.class)

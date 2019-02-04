@@ -5,7 +5,6 @@ from typing import cast as typing_cast
 import numpy as np
 from py4j.java_collections import JavaList, JavaArray
 from py4j.java_gateway import JavaObject, JavaMember
-from py4j.protocol import Py4JError
 
 import keanu as kn
 from keanu.base import JavaObjectWrapper
@@ -57,19 +56,20 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         self.unwrap().setLabel(label)
 
     def sample(self) -> numpy_types:
-        return Tensor._to_ndarray(self.unwrap().sample())
+        return Tensor._to_scalar_or_ndarray(self.unwrap().sample())
 
     def get_value(self) -> numpy_types:
-        return Tensor._to_ndarray(self.unwrap().getValue())
+        return Tensor._to_scalar_or_ndarray(self.unwrap().getValue())
 
     def get_connected_graph(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
-    def get_id(self) -> Tuple[JavaObject, ...]:
+    def get_id(self) -> Tuple[int, ...]:
         return Vertex._get_python_id(self.unwrap())
 
     def get_label(self) -> Optional[str]:
-        return Vertex._get_python_label(self.unwrap())
+        label = self.unwrap().getLabel()
+        return None if label is None else label.getQualifiedName()
 
     """
     __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.
@@ -205,15 +205,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return (Vertex._from_java_vertex(java_vertex) for java_vertex in java_vertices)
 
     @staticmethod
-    def _get_python_id(java_vertex: JavaObject) -> Tuple[JavaObject, ...]:
+    def _get_python_id(java_vertex: JavaObject) -> Tuple[int, ...]:
         return tuple(java_vertex.getId().getValue())
-
-    @staticmethod
-    def _get_python_label(java_vertex: JavaObject) -> Optional[str]:
-        try:
-            return java_vertex.getLabel().getQualifiedName()
-        except (AttributeError, Py4JError):
-            return None
 
 
 class Double(Vertex):

@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -103,15 +102,6 @@ public class PrintVertexTest {
 
         assertThat(sut.getValue().scalar(), equalTo(30.0));
         assertThat(child.getValue().scalar(), equalTo(31.0));
-    }
-
-    @Test
-    public void whenSampleIsCalledThenKeanuRandomIsPassedToParentSample() {
-        final KeanuRandom random = mock(KeanuRandom.class);
-
-        final PrintVertex<DoubleTensor> sut = new PrintVertex<>(parent);
-        sut.sample(random);
-        verify(parent).sample(random);
     }
 
     @Test
