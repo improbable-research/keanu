@@ -33,5 +33,5 @@ class JavaObjectWrapper:
     def unwrap(self) -> JavaObject:
         return self._val
 
-    def get_class(self) -> str:
+    def get_class(self) -> JavaObject:
         return self.unwrap().getClass()
