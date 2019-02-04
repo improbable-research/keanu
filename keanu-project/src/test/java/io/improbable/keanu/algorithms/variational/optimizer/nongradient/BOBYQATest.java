@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -20,7 +20,7 @@ public class BOBYQATest {
         OptimizerBounds bounds = new OptimizerBounds();
         bounds.addBound(A.getId(), DoubleTensor.create(-1, -2), 0.9);
 
-        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient
+        NonGradientOptimizer optimizer = Keanu.Optimizer.NonGradient
             .builderFor(A.getConnectedGraph())
             .algorithm(BOBYQA.builder()
                 .boundsRange(10)

@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
@@ -56,7 +55,7 @@ public class SimulatedAnnealingTest {
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         network.probeForNonZeroProbability(100, random);
 
-        GradientOptimizer graphOptimizer = KeanuOptimizer.Gradient.of(network);
+        GradientOptimizer graphOptimizer = Keanu.Optimizer.Gradient.of(network);
         graphOptimizer.maxAPosteriori();
 
         return new SimpleNetworkState(network.getLatentVertices().stream()

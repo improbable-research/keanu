@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
@@ -25,7 +26,7 @@ public class OptimizerTest {
     @Test
     public void gradientOptimizerCanRemoveFitnessCalculationHandler() {
         GaussianVertex gaussianVertex = new GaussianVertex(0, 1);
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.of(gaussianVertex.getConnectedGraph());
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.of(gaussianVertex.getConnectedGraph());
         canRemoveFitnessCalculationHandler(optimizer);
     }
 
@@ -34,7 +35,7 @@ public class OptimizerTest {
         GaussianVertex A = new GaussianVertex(0, 1);
         GaussianVertex B = new GaussianVertex(0, 1);
         A.plus(B);
-        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.of(A.getConnectedGraph());
+        NonGradientOptimizer optimizer = Keanu.Optimizer.NonGradient.of(A.getConnectedGraph());
         canRemoveFitnessCalculationHandler(optimizer);
     }
 
