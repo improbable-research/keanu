@@ -6,12 +6,12 @@ from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.functional import Consumer
 from keanu.vertex import Vertex
+from keanu.vertex.label import _VertexLabel
 
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.plating.Plates")
 java_import(k.jvm_view(), "io.improbable.keanu.plating.PlateBuilder")
-java_import(k.jvm_view(), "io.improbable.keanu.vertices.VertexLabel")
 
 
 class Plate(JavaObjectWrapper):
@@ -20,7 +20,7 @@ class Plate(JavaObjectWrapper):
         self.unwrap().add(vertex.unwrap())
 
     def get(self, label: str) -> Vertex:
-        return self.unwrap().get(k.jvm_view().VertexLabel(label))
+        return self.unwrap().get(_VertexLabel(label).unwrap())
 
 
 class Plates(JavaObjectWrapper):
