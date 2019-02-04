@@ -6,7 +6,7 @@ from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
 from keanu.net import BayesNet, ProbabilisticModel, ProbabilisticModelWithGradient
-from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional
+from typing import Any, Iterable, Dict, List, Tuple, Generator
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 from keanu.plots import traceplot
 from itertools import tee
