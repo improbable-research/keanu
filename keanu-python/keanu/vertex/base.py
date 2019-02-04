@@ -57,10 +57,10 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         self.unwrap().setLabel(label)
 
     def sample(self) -> numpy_types:
-        return Tensor._to_ndarray(self.unwrap().sample())
+        return Tensor._to_scalar_or_ndarray(self.unwrap().sample())
 
     def get_value(self) -> numpy_types:
-        return Tensor._to_ndarray(self.unwrap().getValue())
+        return Tensor._to_scalar_or_ndarray(self.unwrap().getValue())
 
     def get_connected_graph(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
