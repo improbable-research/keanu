@@ -37,9 +37,9 @@ public class PriorProposalDistribution implements ProposalDistribution {
 
     private <T> void setFor(Variable<T, ?> variable, KeanuRandom random, Proposal proposal) {
 
-        if (variable instanceof Vertex) {
+        if (variable instanceof Vertex && variable instanceof Probabilistic) {
             Vertex<T> vertex = (Vertex<T>) variable;
-            proposal.setProposal(variable, vertex.sample(random));
+            proposal.setProposal(variable, ((Probabilistic<T>) vertex).sample(random));
         } else {
             throw new IllegalArgumentException(this.getClass().getSimpleName() + " is to only be used with Keanu's Vertex");
         }
@@ -49,4 +49,5 @@ public class PriorProposalDistribution implements ProposalDistribution {
     public void onProposalRejected() {
         proposalNotifier.notifyProposalRejected();
     }
+
 }

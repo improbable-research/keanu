@@ -120,8 +120,9 @@ public class ProcessModelVertexTest {
     @Test
     public void modelInsideVertexIsRecalculatedOnEachParentSample() {
         int numSamples = 50;
-        weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        GaussianVertex probabilisticInput = new GaussianVertex(21., 1.);
+        weatherModel.setInputToModel(probabilisticInput);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), probabilisticInput);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
 
@@ -130,8 +131,8 @@ public class ProcessModelVertexTest {
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
 
         for (int i = 0; i < numSamples; i++) {
-            double inputValue = inputToModel.sample().scalar();
-            inputToModel.setAndCascade(inputValue);
+            double inputValue = probabilisticInput.sample().scalar();
+            probabilisticInput.setAndCascade(inputValue);
             double expectedValue = (inputValue * 0.1) * (inputValue * 2);
             Assert.assertEquals(expectedValue, shouldIBringUmbrella.getValue().scalar(), 1e-6);
         }

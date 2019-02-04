@@ -74,7 +74,7 @@ def test_if_thn_or_els_is_not_float_it_gets_coerced(thn, els) -> None:
     result = If(True, thn, els)
     assert type(result) == Double
     assert result.unwrap().getClass().getSimpleName() == "DoubleIfVertex"
-    assert result.sample() == 1.
+    assert result.get_value() == 1.
 
 
 @pytest.mark.parametrize(["thn", "els"], [
@@ -85,7 +85,7 @@ def test_if_thn_or_els_is_not_int_it_gets_coerced(thn, els) -> None:
     result = If(True, thn, els)
     assert type(result) == Integer
     assert result.unwrap().getClass().getSimpleName() == "IntegerIfVertex"
-    assert result.sample() == 1
+    assert result.get_value() == 1
 
 
 @pytest.mark.parametrize("pred", [1, 1., 1.1])
@@ -93,4 +93,4 @@ def test_if_predicate_is_not_bool_it_gets_coerced(pred) -> None:
     result = If(pred, 1, 0)
     assert type(result) == Integer
     assert result.unwrap().getClass().getSimpleName() == "IntegerIfVertex"
-    assert result.sample() == 1
+    assert result.get_value() == 1

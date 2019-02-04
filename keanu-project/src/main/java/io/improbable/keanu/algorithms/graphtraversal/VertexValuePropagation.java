@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayDeque;
@@ -146,7 +147,7 @@ public class VertexValuePropagation {
     private static <T> void updateVertexValue(Vertex<T> vertex) {
         if (vertex.isProbabilistic()) {
             if (!vertex.hasValue()) {
-                vertex.setValue(vertex.sample());
+                vertex.setValue(((Probabilistic<T>) vertex).sample());
             }
         } else {
             if (!vertex.isObserved()) {

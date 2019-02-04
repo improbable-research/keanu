@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -29,11 +28,6 @@ public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
         super(removeDimension(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
-    }
-
-    @Override
-    public Tensor<T> sample(KeanuRandom random) {
-        return op(inputVertex.sample(random));
     }
 
     protected Tensor<T> op(Tensor<T> input) {

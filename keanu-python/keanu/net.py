@@ -3,7 +3,8 @@ from .base import JavaObjectWrapper
 from .context import KeanuContext
 from .vertex.base import Vertex
 from .keanu_random import KeanuRandom
-from typing import Any, Iterator, Iterable
+from typing import Any, Iterator, Iterable, Optional
+from .vertex.label import _VertexLabel
 
 k = KeanuContext()
 
@@ -36,6 +37,10 @@ class BayesNet(JavaObjectWrapper):
 
     def probe_for_non_zero_probability(self, attempts: int, random: KeanuRandom) -> None:
         self.unwrap().probeForNonZeroProbability(attempts, random.unwrap())
+
+    def get_vertex_by_label(self, label: str) -> Optional[Vertex]:
+        java_vertex = self.unwrap().getVertexByLabel(_VertexLabel(label).unwrap())
+        return Vertex._from_java_vertex(java_vertex) if java_vertex else None
 
 
 class ProbabilisticModel(JavaObjectWrapper):

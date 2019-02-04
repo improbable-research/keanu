@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-class DocString {
+public class DocString {
     private static final String THREE_QUOTES = "\"\"\"";
     private static final String NEW_LINE_TAB = "\n    ";
 
@@ -20,7 +20,7 @@ class DocString {
         return StringUtils.isEmpty(methodDescription) && parameterNameToDescriptionMap.isEmpty();
     }
 
-    String getAsString() {
+    public String getAsString() {
         if (isEmpty()) {
             return "";
         }

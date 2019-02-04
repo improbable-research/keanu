@@ -1,7 +1,7 @@
-import matplotlib.pyplot as plt
-
 from itertools import islice
+from typing import Any, Callable, Dict
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
@@ -10,11 +10,11 @@ from examples import thermometers
 from keanu import BayesNet, KeanuRandom, Model
 from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler, NUTSSampler,
                              PosteriorSamplingAlgorithm)
-from keanu.vertex import Gamma, Exponential, Cauchy, KeanuContext, Bernoulli, Gaussian
-from typing import Any, Callable
+from keanu.vertex import Gamma, Exponential, Cauchy, Gaussian
 
 
-def net_() -> BayesNet:
+@pytest.fixture
+def net() -> BayesNet:
     with Model() as m:
         m.gamma = Gamma(1., 1.)
         m.exp = Exponential(1.)
@@ -24,8 +24,13 @@ def net_() -> BayesNet:
 
 
 @pytest.fixture
-def net() -> BayesNet:
-    return net_()
+def tensor_net() -> BayesNet:
+    with Model() as m:
+        m.gamma = Gamma(np.array([1., 1., 1., 1.]).reshape((2, 2)), np.array([2., 2., 2., 2.]).reshape((2, 2)))
+        m.exp = Exponential(np.array([1., 1., 1., 1.]).reshape((2, 2)))
+        m.cauchy = Cauchy(m.gamma, m.exp)
+
+    return m.to_bayes_net()
 
 
 @pytest.mark.parametrize(
@@ -35,19 +40,80 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(
         algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
     draws = 5
     sample_from = list(net.get_latent_vertices())
-    vertex_labels = [vertex.get_label() for vertex in sample_from]
     samples = sample(net=net, sample_from=sample_from, sampling_algorithm=algo(net), draws=draws)
     assert len(samples) == len(sample_from)
     assert type(samples) == dict
+    __assert_valid_samples(draws, samples)
 
-    for label, vertex_samples in samples.items():
-        assert label in vertex_labels
 
-        assert len(vertex_samples) == draws
-        assert type(vertex_samples) == list
-        assert all(type(sample) == np.ndarray for sample in vertex_samples)
-        assert all(sample.dtype == float for sample in vertex_samples)
-        assert all(sample.shape == () for sample in vertex_samples)
+@pytest.mark.parametrize(
+    "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.get_latent_vertices())),
+             (lambda net: NUTSSampler())])
+def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sample_from(
+        algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], tensor_net: BayesNet) -> None:
+    draws = 5
+    sample_from = list(tensor_net.get_latent_vertices())
+    samples = sample(net=tensor_net, sample_from=sample_from, sampling_algorithm=algo(tensor_net), draws=draws)
+    assert type(samples) == dict
+    __assert_valid_samples(draws, samples)
+
+
+@pytest.mark.parametrize(
+    "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.get_latent_vertices())),
+             (lambda net: NUTSSampler())])
+def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_mixed_net(
+        algo: Callable[[BayesNet], PosteriorSamplingAlgorithm]) -> None:
+    exp = Exponential(1.)
+    add = exp + np.array([1., 2., 3., 4.]).reshape((2, 2))
+    gaussian = Gaussian(add, 2.)
+
+    exp.set_label("exp")
+    gaussian.set_label("gaussian")
+
+    mixed_net = BayesNet(exp.get_connected_graph())
+
+    draws = 5
+    sample_from = list(mixed_net.get_latent_vertices())
+    samples = sample(net=mixed_net, sample_from=sample_from, sampling_algorithm=algo(mixed_net), draws=draws)
+    assert type(samples) == dict
+
+    __assert_valid_samples(draws, samples)
+
+    assert ('exp', '(0)') in samples
+    for i in (0, 1):
+        for j in (0, 1):
+            assert (('gaussian', '({}, {})'.format(i, j)) in samples)
+
+
+def test_sample_dict_can_be_loaded_in_to_dataframe(net: BayesNet) -> None:
+    sample_from = list(net.get_latent_vertices())
+    vertex_labels = [vertex.get_label() for vertex in sample_from]
+
+    samples = sample(net=net, sample_from=sample_from, draws=5)
+    df = pd.DataFrame(samples)
+
+    for column in df:
+        header = df[column].name
+        vertex_label = header
+        assert vertex_label in vertex_labels
+        assert len(df[column]) == 5
+        assert type(df[column][0]) == np.float64
+
+
+def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe(tensor_net: BayesNet) -> None:
+    sample_from = list(tensor_net.get_latent_vertices())
+    vertex_labels = [vertex.get_label() for vertex in sample_from]
+
+    samples = sample(net=tensor_net, sample_from=sample_from, draws=5)
+    df = pd.DataFrame(samples)
+
+    for parent_column in df.columns.levels[0]:
+        assert parent_column in vertex_labels
+
+        for child_column in df.columns.levels[1]:
+            assert type(child_column) == str
+            assert len(df[parent_column][child_column]) == 5
+            assert type(df[parent_column][child_column][0]) == np.float64
 
 
 def test_dropping_samples(net: BayesNet) -> None:
@@ -98,6 +164,28 @@ def test_can_iter_through_samples(algo: Callable[[BayesNet], PosteriorSamplingAl
     count = 0
     for sample in islice(samples, draws):
         count += 1
+
+    assert count == draws
+
+
+@pytest.mark.parametrize(
+    "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.get_latent_vertices())),
+             (lambda net: NUTSSampler())])
+def test_can_iter_through_tensor_samples(algo: Callable[[BayesNet], PosteriorSamplingAlgorithm],
+                                         tensor_net: BayesNet) -> None:
+    draws = 10
+    samples = generate_samples(
+        net=tensor_net,
+        sample_from=tensor_net.get_latent_vertices(),
+        sampling_algorithm=algo(tensor_net),
+        down_sample_interval=1)
+    count = 0
+    for sample in islice(samples, draws):
+        count += 1
+        for distribution in ('exp', 'cauchy'):
+            for i in (0, 1):
+                for j in (0, 1):
+                    assert ((distribution, '({}, {})'.format(i, j)) in sample)
     assert count == draws
 
 
@@ -168,6 +256,28 @@ def test_can_specify_nuts_params(net: BayesNet) -> None:
     samples = sample(net, list(net.get_latent_vertices()), algo, draws=500, drop=100)
 
 
+def test_sample_throws_if_vertices_in_sample_from_are_missing_labels() -> None:
+    sigma = Gamma(1., 1)
+    vertex = Gaussian(0., sigma, label="gaussian")
+
+    assert sigma.get_label() is None
+
+    net = BayesNet([sigma, vertex])
+    with pytest.raises(ValueError, match="Vertices in sample_from must be labelled."):
+        samples = sample(net=net, sample_from=net.get_latent_vertices())
+
+
+def test_generate_samples_throws_if_vertices_in_sample_from_are_missing_labels() -> None:
+    sigma = Gamma(1., 1)
+    vertex = Gaussian(0., sigma, label="gaussian")
+
+    assert sigma.get_label() is None
+
+    net = BayesNet([sigma, vertex])
+    with pytest.raises(ValueError, match="Vertices in sample_from must be labelled."):
+        samples = generate_samples(net=net, sample_from=net.get_latent_vertices())
+
+
 def set_starting_state(model: Model) -> None:
     KeanuRandom.set_default_random_seed(1)
     model.temperature.set_value(model.temperature.sample())
@@ -184,3 +294,10 @@ def reorder_subplots(ax: Any) -> None:
     for plot in ax:
         new_position_index = sorted_titles.index(plot[0].get_title())
         plot[0].set_position(positions[new_position_index])
+
+
+def __assert_valid_samples(draws: int, samples: Dict) -> None:
+    for label, vertex_samples in samples.items():
+        assert len(vertex_samples) == draws
+        assert type(vertex_samples) == list
+        assert all(type(sample) == float for sample in vertex_samples)

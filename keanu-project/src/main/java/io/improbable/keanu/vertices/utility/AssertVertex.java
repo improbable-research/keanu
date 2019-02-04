@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.utility;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -60,11 +59,6 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
             stringBuilder.append(": " + errorMessage);
         }
         return stringBuilder.toString();
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return predicate.sample();
     }
 
     @SaveVertexParam(PREDICATE_NAME)
