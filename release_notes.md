@@ -6,6 +6,10 @@
   * `Keanu.Sampling.SimulatedAnnealing`
   * `Keanu.Sampling.MCMC` (to automatically choose between `MetropolisHastings` and `NUTS`)
 * The `PosteriorSamplingAlgorithm` objects are now immutable: you cannot set their values after construction.
+* When you choose a custom configuration of `MetropolisHastings` or `SimulatedAnnealing`, you can specify:
+  * the proposal distribution. Options are `PriorProposalDistribution` and `GaussianProposalDistribution`
+  * a proposal rejection strategy - options are `RollBackToCachedValuesOnRejection` and `RollbackAndCascadeOnRejection`
+    * (in Python, this is done for you)
 * `Hamiltonian` Monte Carlo has been removed: use `NUTS` instead which is an auto-tuning implementation of Hamiltonian Monte Carlo.
 * The `PosteriorSamplingAlgorithm` and `FitnessFunction` interfaces requires a `ProbabilisticModel` as its argument instead of a `BayesianNetwork`
   * You can create a `ProbabilisticModel` from a `BayesianNetwork`:
