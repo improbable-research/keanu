@@ -10,8 +10,10 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.util.io.ProtobufSaver")
 java_import(k.jvm_view(), "io.improbable.keanu.util.io.DotSaver")
 java_import(k.jvm_view(), "io.improbable.keanu.util.io.JsonSaver")
+java_import(k.jvm_view(), "io.improbable.keanu.util.io.MIRSaver")
 java_import(k.jvm_view(), "io.improbable.keanu.util.io.ProtobufLoader")
 java_import(k.jvm_view(), "io.improbable.keanu.util.io.JsonLoader")
+java_import(k.jvm_view(), "io.improbable.keanu.util.io.MIRLoader")
 java_import(k.jvm_view(), "java.io.FileOutputStream")
 java_import(k.jvm_view(), "java.io.FileInputStream")
 
@@ -47,6 +49,12 @@ class JsonSaver(NetworkSaver):
         super().__init__(k.jvm_view().JsonSaver(net.unwrap()))
 
 
+class MIRSaver(NetworkSaver):
+
+    def __init__(self, net: BayesNet):
+        super().__init__(k.jvm_view().MIRSaver(net.unwrap()))
+
+
 class NetworkLoader(JavaObjectWrapper):
 
     def __init__(self, loader_object: JavaObject):
@@ -68,3 +76,9 @@ class JsonLoader(NetworkLoader):
 
     def __init__(self) -> None:
         super().__init__(k.jvm_view().JsonLoader())
+
+
+class MIRLoader(NetworkLoader):
+
+    def __init__(self) -> None:
+        super().__init__(k.jvm_view().MIRLoader())
