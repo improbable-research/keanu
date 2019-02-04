@@ -122,6 +122,12 @@ public class AdamTest {
         validateParameters(10, 0.1, 0.1, 0.1, -0.1);
     }
 
+    @Test(expected = NotStrictlyPositiveException.class)
+    public void throwsOnNegativeMaxEvaluations() {
+        validateParameters(-10, 0.1, 0.1, 0.1, -0.1);
+
+    }
+
     public void validateParameters(int maxEvaluations, double alpha, double beta1, double beta2, double epsilon) {
 
         Adam adamOptimizer = Adam.builder()
