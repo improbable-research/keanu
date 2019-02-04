@@ -6,7 +6,7 @@ from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
 from keanu.net import BayesNet, ProbabilisticModel, ProbabilisticModelWithGradient
-from typing import Any, Iterable, Dict, List, Tuple, Generator
+from typing import Any, Iterable, Dict, List, Tuple, Generator, cast
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 from keanu.plots import traceplot
 from itertools import tee
@@ -110,7 +110,8 @@ def sample(net: BayesNet,
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
     vertex_samples = {
-        Vertex._get_python_label(vertex_unwrapped): list(
+        # label can't be None. See __check_if_vertices_are_labelled
+        cast(str, Vertex._get_python_label(vertex_unwrapped)): list(
             map(Tensor._to_ndarray,
                 network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped
     }
@@ -156,8 +157,9 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
     while (True):
         network_sample = sample_iterator.next()
         sample = {
-            Vertex._get_python_label(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped))
-            for vertex_unwrapped in vertices_unwrapped
+            # label can't be None. See __check_if_vertices_are_labelled
+            cast(str, Vertex._get_python_label(vertex_unwrapped)): Tensor._to_ndarray(
+                network_sample.get(vertex_unwrapped)) for vertex_unwrapped in vertices_unwrapped
         }
 
         if live_plot:
