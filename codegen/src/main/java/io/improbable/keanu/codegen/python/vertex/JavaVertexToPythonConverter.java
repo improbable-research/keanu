@@ -39,9 +39,9 @@ class JavaVertexToPythonConverter {
     private static final List<PythonParam> EXTRA_PARAMS = ImmutableList.of(
         LABEL_PARAM
     );
-    private Constructor javaConstructor;
-    private Map<String, DocString> docStringMap;
-    private List<PythonParam> allParams;
+    private final Constructor javaConstructor;
+    private final Map<String, DocString> docStringMap;
+    private final List<PythonParam> allParams;
 
     JavaVertexToPythonConverter(Constructor javaConstructor, Reflections reflections, Map<String, DocString> docStringMap) {
         this.javaConstructor = javaConstructor;

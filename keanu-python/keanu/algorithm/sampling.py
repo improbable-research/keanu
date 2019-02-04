@@ -96,7 +96,7 @@ def sample(net: BayesNet,
 
     sample_from_copy = list(sample_from)
 
-    __check_if_vertices_are_labelled(sample_from_copy)
+    id_to_label = __check_if_vertices_are_labelled(sample_from_copy)
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from_copy)
@@ -110,8 +110,7 @@ def sample(net: BayesNet,
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
     vertex_samples = {
-        # label can't be None. See __check_if_vertices_are_labelled
-        cast(str, Vertex._get_python_label(vertex_unwrapped)): list(
+        id_to_label[Vertex._get_python_id(vertex_unwrapped)]: list(
             map(Tensor._to_ndarray,
                 network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped
     }
@@ -132,8 +131,7 @@ def generate_samples(net: BayesNet,
                      ax: Any = None) -> sample_generator_types:
 
     sample_from_copy = list(sample_from)
-
-    __check_if_vertices_are_labelled(sample_from_copy)
+    id_to_label = __check_if_vertices_are_labelled(sample_from_copy)
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from_copy)
@@ -147,18 +145,22 @@ def generate_samples(net: BayesNet,
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
     return _samples_generator(
-        sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax)
+        sample_iterator,
+        vertices_unwrapped,
+        live_plot=live_plot,
+        refresh_every=refresh_every,
+        ax=ax,
+        id_to_label=id_to_label)
 
 
 def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList, live_plot: bool, refresh_every: int,
-                       ax: Any) -> sample_generator_types:
+                       ax: Any, id_to_label: Dict[Tuple[int, ...], str]) -> sample_generator_types:
     traces = []
     x0 = 0
     while (True):
         network_sample = sample_iterator.next()
         sample = {
-            # label can't be None. See __check_if_vertices_are_labelled
-            cast(str, Vertex._get_python_label(vertex_unwrapped)): Tensor._to_ndarray(
+            id_to_label[Vertex._get_python_id(vertex_unwrapped)]: Tensor._to_ndarray(
                 network_sample.get(vertex_unwrapped)) for vertex_unwrapped in vertices_unwrapped
         }
 
@@ -176,6 +178,12 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
         yield sample
 
 
-def __check_if_vertices_are_labelled(vertices: List[Vertex]) -> None:
-    if any(vertex.get_label() == None for vertex in vertices):
-        raise ValueError("Vertices in sample_from must be labelled.")
+def __check_if_vertices_are_labelled(vertices: List[Vertex]) -> Dict[Tuple[int, ...], str]:
+    id_to_label = {}
+    for vertex in vertices:
+        label = vertex.get_label()
+        if label is None:
+            raise ValueError("Vertices in sample_from must be labelled.")
+        else:
+            id_to_label[vertex.get_id()] = label
+    return id_to_label

@@ -9,11 +9,11 @@ import java.util.Objects;
  */
 public class PythonParam {
     @Getter
-    final private String name;
+    private final String name;
     @Getter
-    final private Class klass;
+    private final Class klass;
     @Getter
-    final private String defaultValue;
+    private final String defaultValue;
 
     public PythonParam(String name, Class klass, String defaultValue) {
         this.name = ParamStringProcessor.toLowerUnderscore(name);

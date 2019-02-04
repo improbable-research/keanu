@@ -65,7 +65,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def get_connected_graph(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
-    def get_id(self) -> Tuple[JavaObject, ...]:
+    def get_id(self) -> Tuple[int, ...]:
         return Vertex._get_python_id(self.unwrap())
 
     def get_label(self) -> Optional[str]:
@@ -205,7 +205,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return (Vertex._from_java_vertex(java_vertex) for java_vertex in java_vertices)
 
     @staticmethod
-    def _get_python_id(java_vertex: JavaObject) -> Tuple[JavaObject, ...]:
+    def _get_python_id(java_vertex: JavaObject) -> Tuple[int, ...]:
         return tuple(java_vertex.getId().getValue())
 
     @staticmethod
