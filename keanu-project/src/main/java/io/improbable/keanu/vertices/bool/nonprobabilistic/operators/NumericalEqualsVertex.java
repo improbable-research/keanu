@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -32,11 +31,6 @@ public class NumericalEqualsVertex extends BooleanVertex implements NonProbabili
         this.b = b;
         this.epsilon = epsilon;
         setParents(a, b, epsilon);
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(a.sample(random), b.sample(random), epsilon.sample(random));
     }
 
     @Override

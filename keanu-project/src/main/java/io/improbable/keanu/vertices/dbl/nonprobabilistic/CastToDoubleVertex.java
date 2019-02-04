@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -25,11 +24,6 @@ public class CastToDoubleVertex extends DoubleVertex implements NonProbabilistic
     @SaveVertexParam(INPUT_VERTEX_NAME)
     public Vertex<? extends NumberTensor> getInputVertex() {
         return inputVertex;
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return inputVertex.sample(random).toDouble();
     }
 
     @Override

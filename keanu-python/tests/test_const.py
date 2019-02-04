@@ -108,5 +108,16 @@ def test_const_takes_ndarray_of_rank_one() -> None:
     assert np.array_equal(v.get_value().flatten(), ndarray.flatten())
 
 
+def test_const_takes_label() -> None:
+    label = "const"
+    v = Const(3, label=label)
+    assert v.get_label() == label
+
+
+def test_const_takes_none_label() -> None:
+    v = Const(3, label=None)
+    assert v.get_label() == None
+
+
 def assert_java_class(java_object_wrapper: JavaObjectWrapper, java_class_str: str) -> None:
     assert java_object_wrapper.unwrap().getClass().getSimpleName() == java_class_str

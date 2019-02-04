@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -31,13 +30,6 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable, Non
         addParents(inputs);
         addParents(conditions.values());
         addParent(defaultResult);
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.sample(random).scalar());
-        DoubleVertex vertex = conditions.get(condition);
-        return vertex == null ? defaultResult.sample(random) : vertex.sample(random);
     }
 
     @Override
