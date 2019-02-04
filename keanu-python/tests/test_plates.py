@@ -5,8 +5,8 @@ from keanu.vertex import Bernoulli
 def test_you_can_iterate_over_the_plates() -> None:
     num_plates = 100
 
-    plates = Plates(count=num_plates, factory=lambda p : None)
-    plate_count=0
+    plates = Plates(count=num_plates, factory=lambda p: None)
+    plate_count = 0
     for plate in plates:
         plate_count += 1
 
@@ -28,8 +28,10 @@ def test_you_can_build_plates_with_fixed_count() -> None:
     for plate in plates:
         assert plate.get(vertexLabel) is not None
 
-def test_you_can_build_plates_from_csv():
+
+def test_you_can_build_plates_from_csv() -> None:
     pass
 
-def test_you_can_build_a_time_series():
+
+def test_you_can_build_a_time_series() -> None:
     pass

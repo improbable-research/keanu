@@ -15,16 +15,18 @@ java_import(k.jvm_view(), "io.improbable.keanu.vertices.VertexLabel")
 
 
 class Plate(JavaObjectWrapper):
+
     def add(self, vertex: Vertex) -> None:
         self.unwrap().add(vertex.unwrap())
 
     def get(self, label: str) -> Vertex:
         return self.unwrap().get(k.jvm_view().VertexLabel(label))
 
+
 class Plates(JavaObjectWrapper):
 
     def __init__(self, factory: Callable[[Plate], None], count: int):
-        consumer = Consumer(lambda p : factory(Plate(p)))
+        consumer = Consumer(lambda p: factory(Plate(p)))
         plates = k.jvm_view().PlateBuilder().count(count).withFactory(consumer).build()
         super(Plates, self).__init__(plates)
 
@@ -32,4 +34,3 @@ class Plates(JavaObjectWrapper):
         iterator = self.unwrap().iterator()
         while iterator.hasNext():
             yield Plate(iterator.next())
-
