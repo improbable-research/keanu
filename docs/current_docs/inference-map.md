@@ -61,7 +61,7 @@ whether to use the Gradient or Non-Gradient Optimizer. You can use the following
 
 ```java
 BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-Optimizer optimizer = KeanuOptimizer.of(bayesNet);
+Optimizer optimizer = Keanu.Optimizer.of(bayesNet);
 optimizer.maxAPosteriori();
 
 double calculatedTemperature = temperature.getValue().scalar();
@@ -79,7 +79,7 @@ how to use the builder to change all of the available parameters.
 #### Java
 
 ```java
-GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(temperature.getConnectedGraph())
+GradientOptimizer optimizer = Keanu.Optimizer.Gradient.builderFor(temperature.getConnectedGraph())
     .algorithm(ConjugateGradient.builder()
         .maxEvaluations(5000)
         .relativeThreshold(1e-8)
@@ -120,7 +120,7 @@ how to use the builder to change all of the available parameters.
 
 ```java
 OptimizerBounds temperatureBounds = new OptimizerBounds().addBound(temperature.getId(), -250., 250.0);
-NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.builderFor(temperature.getConnectedGraph())
+NonGradientOptimizer optimizer = Keanu.Optimizer.NonGradient.builderFor(temperature.getConnectedGraph())
     .algorithm(BOBYQA.builder()
         .maxEvaluations(5000)
         .boundsRange(100000)

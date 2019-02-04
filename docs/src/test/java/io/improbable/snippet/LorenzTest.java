@@ -1,6 +1,7 @@
 package io.improbable.snippet;
 
 import io.improbable.keanu.Keanu;
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -68,7 +69,7 @@ public class LorenzTest {
 
             BayesianNetwork net = new BayesianNetwork(xt0.getConnectedGraph());
 
-            io.improbable.keanu.algorithms.variational.optimizer.Optimizer graphOptimizer = Keanu.Optimizer.of(net);
+            Optimizer graphOptimizer = Keanu.Optimizer.of(net);
 
             graphOptimizer.maxAPosteriori();
 
