@@ -35,3 +35,27 @@ def test_you_can_create_vertex_array_from_different_types() -> None:
     array = context.to_java_vertex_array([a, b, c])
     d = Concatenation(0, [a, b, c])
     assert np.allclose(d.get_value(), [1., 2., 3., 4., 5., 6.])
+
+
+def test_you_can_create_java_object_list_from_primitives() -> None:
+    python_list = [1, 2, 3]
+
+    context = KeanuContext()
+    java_list = context.to_java_object_list(python_list)
+    assert type(java_list) == py4j.java_collections.JavaList
+    assert type(java_list.get(0)) == int
+    assert java_list.get(0) == 1
+    assert java_list.get(1) == 2
+    assert java_list.get(2) == 3
+
+
+def test_you_can_create_java_object_map_from_primitives() -> None:
+    python_map = {"a": 1, "b": 2, "c": 3}
+
+    context = KeanuContext()
+    java_map = context.to_java_map(python_map)
+    assert type(java_map) == py4j.java_collections.JavaMap
+    assert type(java_map["a"]) == int
+    assert java_map["a"] == 1
+    assert java_map["b"] == 2
+    assert java_map["c"] == 3
