@@ -98,12 +98,10 @@ def sample(net: BayesNet,
            plot: bool = False,
            ax: Any = None) -> sample_types:
 
-    sample_from = list(sample_from)
-    id_to_label = __check_if_vertices_are_labelled(sample_from)
-
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from)
 
+    sample_from = list(sample_from)
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
     probabilistic_model = ProbabilisticModel(net) if isinstance(
@@ -112,6 +110,7 @@ def sample(net: BayesNet,
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
+    id_to_label = __check_if_vertices_are_labelled(sample_from)
     if __all_scalar(sample_from):
         vertex_samples = __create_single_indexed_samples(network_samples, vertices_unwrapped, id_to_label)
     else:
