@@ -6,7 +6,7 @@ from keanu.context import KeanuContext
 from keanu.tensor import Tensor
 from keanu.vertex.base import Vertex
 from keanu.net import BayesNet, ProbabilisticModel, ProbabilisticModelWithGradient
-from typing import Any, Iterable, Dict, List, Tuple, Generator, Optional
+from typing import Any, Iterable, Dict, List, Tuple, Generator, cast
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types
 from keanu.plots import traceplot
 from itertools import tee
@@ -94,12 +94,14 @@ def sample(net: BayesNet,
            plot: bool = False,
            ax: Any = None) -> sample_types:
 
-    sample_from, sample_from_copy = tee(sample_from)
+    sample_from_copy = list(sample_from)
+
+    __check_if_vertices_are_labelled(sample_from_copy)
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from_copy)
 
-    vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
+    vertices_unwrapped: JavaList = k.to_java_object_list(sample_from_copy)
 
     probabilistic_model = ProbabilisticModel(net) if isinstance(
         sampling_algorithm, MetropolisHastingsSampler) else ProbabilisticModelWithGradient(net)
@@ -108,7 +110,8 @@ def sample(net: BayesNet,
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
     vertex_samples = {
-        Vertex._get_python_label(vertex_unwrapped): list(
+        # label can't be None. See __check_if_vertices_are_labelled
+        cast(str, Vertex._get_python_label(vertex_unwrapped)): list(
             map(Tensor._to_ndarray,
                 network_samples.get(vertex_unwrapped).asList())) for vertex_unwrapped in vertices_unwrapped
     }
@@ -128,12 +131,14 @@ def generate_samples(net: BayesNet,
                      refresh_every: int = 100,
                      ax: Any = None) -> sample_generator_types:
 
-    sample_from, sample_from_copy = tee(sample_from)
+    sample_from_copy = list(sample_from)
+
+    __check_if_vertices_are_labelled(sample_from_copy)
 
     if sampling_algorithm is None:
         sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from_copy)
 
-    vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
+    vertices_unwrapped: JavaList = k.to_java_object_list(sample_from_copy)
 
     probabilistic_model = ProbabilisticModel(net) if isinstance(
         sampling_algorithm, MetropolisHastingsSampler) else ProbabilisticModelWithGradient(net)
@@ -141,8 +146,6 @@ def generate_samples(net: BayesNet,
                                                                                     vertices_unwrapped)
     samples = samples.dropCount(drop).downSampleInterval(down_sample_interval)
     sample_iterator: JavaObject = samples.stream().iterator()
-
-    print(vertices_unwrapped)
     return _samples_generator(
         sample_iterator, vertices_unwrapped, live_plot=live_plot, refresh_every=refresh_every, ax=ax)
 
@@ -154,8 +157,9 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
     while (True):
         network_sample = sample_iterator.next()
         sample = {
-            Vertex._get_python_label(vertex_unwrapped): Tensor._to_ndarray(network_sample.get(vertex_unwrapped))
-            for vertex_unwrapped in vertices_unwrapped
+            # label can't be None. See __check_if_vertices_are_labelled
+            cast(str, Vertex._get_python_label(vertex_unwrapped)): Tensor._to_ndarray(
+                network_sample.get(vertex_unwrapped)) for vertex_unwrapped in vertices_unwrapped
         }
 
         if live_plot:
@@ -170,3 +174,8 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
                 traces = []
 
         yield sample
+
+
+def __check_if_vertices_are_labelled(vertices: List[Vertex]) -> None:
+    if any(vertex.get_label() == None for vertex in vertices):
+        raise ValueError("Vertices in sample_from must be labelled.")
