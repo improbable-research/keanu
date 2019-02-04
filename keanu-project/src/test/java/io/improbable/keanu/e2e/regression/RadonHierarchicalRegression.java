@@ -58,35 +58,9 @@ public class RadonHierarchicalRegression {
     }
 
     @Test
-    public void canPerformRegressionWithOneHierarchy() {
-        buildAndRunHierarchicalNetwork(radonData, 1);
-    }
-
-    @Test
-    public void canPerformRegressionWithTwoHierarchies() {
-        buildAndRunHierarchicalNetwork(radonData, 2);
-    }
-
-    @Test
-    public void canPerformRegressionWithFourHierarchies() {
-        buildAndRunHierarchicalNetwork(radonData, 4);
-    }
-
-    @Test
     public void canPerformRegressionWithEightHierarchies() {
         buildAndRunHierarchicalNetwork(radonData, 8);
     }
-
-    @Test
-    public void canPerformRegressionWithSixteenHierarchies() {
-        buildAndRunHierarchicalNetwork(radonData, 16);
-    }
-
-    @Test
-    public void canPerformRegressionWithThirtyTwoHierarchies() {
-        buildAndRunHierarchicalNetwork(radonData, 32);
-    }
-
 
     private RegressionModel linearRegression(Map<String, List<Data>> data) {
         // Build one non-hierarchical model combining all counties' data
@@ -162,8 +136,8 @@ public class RadonHierarchicalRegression {
             .maxTreeHeight(5)
             .adaptEnabled(true)
             .build()
-            .getPosteriorSamples(probabilisticModel, Arrays.asList(muAlpha, muBeta, sigmaAlpha, sigmaBeta), 100)
-            .downSample(2);
+            .getPosteriorSamples(probabilisticModel, Arrays.asList(muAlpha, muBeta, sigmaAlpha, sigmaBeta), 1000)
+            .downSample(10);
     }
 
     private void optimise(BayesianNetwork bayesianNetwork) {
