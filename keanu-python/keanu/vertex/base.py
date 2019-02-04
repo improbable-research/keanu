@@ -5,7 +5,6 @@ from typing import cast as typing_cast
 import numpy as np
 from py4j.java_collections import JavaList, JavaArray
 from py4j.java_gateway import JavaObject, JavaMember
-from py4j.protocol import Py4JError
 
 import keanu as kn
 from keanu.base import JavaObjectWrapper
@@ -69,10 +68,8 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         return Vertex._get_python_id(self.unwrap())
 
     def get_label(self) -> Optional[str]:
-        try:
-            return self.unwrap().getLabel().getQualifiedName()
-        except (AttributeError, Py4JError):
-            return None
+        label = self.unwrap().getLabel()
+        return None if label is None else label.getQualifiedName()
 
     """
     __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.
