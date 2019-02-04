@@ -32,3 +32,6 @@ class JavaObjectWrapper:
 
     def unwrap(self) -> JavaObject:
         return self._val
+
+    def get_class(self) -> str:
+        return self.unwrap().getClass()

@@ -71,7 +71,7 @@ def test_can_pass_pandas_series_to_vertex() -> None:
     assert sample.shape == (2,)
 
 
-def test_can_pass_vertex_to_vertex() -> None:
+def test_can_pass_vertex_to_vertex(jvm_view: JVMView) -> None:
     mu = Gaussian(0., 1.)
     gaussian = Vertex(jvm_view.GaussianVertex, "gaussian", mu, Const(1.))
     sample = gaussian.sample()

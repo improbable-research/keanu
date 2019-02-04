@@ -71,6 +71,12 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         label = self.unwrap().getLabel()
         return None if label is None else label.getQualifiedName()
 
+    def is_observed(self) -> bool:
+        return self.unwrap().isObserved()
+
+    def has_value(self) -> bool:
+        return self.unwrap().hasValue()
+
     """
     __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.
     Without this the right operators would fail.

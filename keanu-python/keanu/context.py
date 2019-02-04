@@ -3,6 +3,7 @@ import io
 import os
 import logging
 from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView, java_import
+from py4j.protocol import Py4JError
 from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
 from typing import Dict, Any, Iterable, List, Collection, Set
 from _io import TextIOWrapper
@@ -68,12 +69,12 @@ class KeanuContext(metaclass=Singleton):
         for (k, v) in python_map.items():
             try:
                 new_k = k.unwrap()
-            except (AttributeError):
+            except (AttributeError, Py4JError):
                 new_k = k
 
             try:
                 new_v = v.unwrap()
-            except (AttributeError):
+            except (AttributeError, Py4JError):
                 new_v = v
 
             m.put(new_k, new_v)
@@ -86,7 +87,7 @@ class KeanuContext(metaclass=Singleton):
         for o in l:
             try:
                 o = o.unwrap()
-            except (AttributeError):
+            except (AttributeError, Py4JError):
                 pass
 
             lst.add(o)

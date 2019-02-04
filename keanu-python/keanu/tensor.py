@@ -28,6 +28,9 @@ class Tensor(JavaObjectWrapper):
         else:
             raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(t)))
 
+    def is_scalar(self) -> bool:
+        return self.unwrap().isScalar()
+
     def apply(self, lambda_function):
         return self.unwrap().apply(Function(lambda_function))
 
