@@ -136,7 +136,7 @@ public class RadonHierarchicalRegression {
             .maxTreeHeight(5)
             .adaptEnabled(true)
             .build()
-            .getPosteriorSamples(probabilisticModel, Arrays.asList(muAlpha, muBeta, sigmaAlpha, sigmaBeta), 1000)
+            .getPosteriorSamples(probabilisticModel, Arrays.asList(muAlpha, muBeta, sigmaAlpha, sigmaBeta), 10)
             .downSample(10);
     }
 
