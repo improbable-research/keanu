@@ -31,7 +31,7 @@ public class TextMessaging {
         final int numberOfDays = (int) data.numberOfMessages.getLength();
 
         // These hyperparameters differ from the alpha used in the example book
-        // This is because the sampling algorithm of choice uses the prior distribution
+        // This is because the sampling algorithm of choice uses the sampling distribution
         // as its proposal distribution. The suggested parameters were too wide, resulting
         // in bad proposals and by extension bad samples.
         final double alpha = 10;

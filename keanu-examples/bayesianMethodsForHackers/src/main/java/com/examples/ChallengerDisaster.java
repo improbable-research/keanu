@@ -24,10 +24,10 @@ public class ChallengerDisaster {
             .load();
 
         // These hyperparameters differ from the alpha used in the example book
-        // This is because the sampling algorithm of choice uses the prior distribution
+        // This is because the sampling algorithm of choice uses the sampling distribution
         // as its proposal distribution. The suggested parameters were too wide, resulting
         // in bad proposals and by extension bad samples.
-        // When it is easier to decouple the prior from the proposal distribution, we should revisit this
+        // When it is easier to decouple the sampling from the proposal distribution, we should revisit this
         final double betaSigma = convertTauToSigma(0.01);
         final double alphaSigma = convertTauToSigma(0.005);
 
