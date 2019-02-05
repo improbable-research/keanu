@@ -13,7 +13,7 @@ from keanu.tensor import Tensor
 from keanu.vartypes import sample_types, sample_generator_types, numpy_types, sample_generator_dict_type
 from keanu.vertex.base import Vertex
 
-COLUMN_HEADER_FOR_SCALAR = '(0)'
+COLUMN_HEADER_FOR_SCALAR = (0,)
 
 k = KeanuContext()
 
@@ -259,4 +259,4 @@ def __add_sample_to_dict(sample_value: Any, vertex_sample: Dict):
         vertex_sample[COLUMN_HEADER_FOR_SCALAR].append(sample_value.item())
     else:
         for index, value in ndenumerate(sample_value):
-            vertex_sample[str(index)].append(value.item())
+            vertex_sample[index].append(value.item())
