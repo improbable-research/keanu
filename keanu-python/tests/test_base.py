@@ -25,6 +25,11 @@ def test_unwrapped_can_call_java_api(java_list_wrapper) -> None:
     assert not java_list_wrapper.unwrap().isEmpty()
 
 
+def test_wrapped_cant_call_java_api(java_list_wrapper) -> None:
+    with pytest.raises(AttributeError, match="{} has no attribute isEmpty".format(type(java_list_wrapper))):
+        java_list_wrapper.isEmpty()
+
+
 def test_wrapped_can_call_python_api(java_list_wrapper) -> None:
     assert java_list_wrapper.get(0) == 100
 

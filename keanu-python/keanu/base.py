@@ -14,9 +14,7 @@ class JavaObjectWrapper:
 
     def __getattr__(self, k: str) -> Callable:
         self.__check_if_unwrapped(k)
-        self.__check_if_java_object_has_attr(k)
-
-        return self.unwrap().__getattr__(k)
+        raise AttributeError("{} has no attribute {}".format(self.__class__, k))
 
     def __check_if_unwrapped(self, k: str) -> None:
         # better error message for when JavaObjectWrapper is passed to a method that expects JavaObject
@@ -25,10 +23,6 @@ class JavaObjectWrapper:
             raise TypeError(
                 "Trying to pass {} to a method that expects a JavaObject - did you forget to call unwrap()?".format(
                     self.__class__))
-
-    def __check_if_java_object_has_attr(self, k: str) -> None:
-        if not k in dir(self.unwrap()):
-            raise AttributeError("{} has no attribute {}".format(self.__class__, k))
 
     def unwrap(self) -> JavaObject:
         return self._val
