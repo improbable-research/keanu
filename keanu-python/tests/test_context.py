@@ -47,5 +47,6 @@ def test_you_can_get_info_from_a_java_exception() -> None:
         assert False, "Should have thrown a Py4JError"
 
     java_exception = context.from_java_exception(excinfo.value)
+    assert type(java_exception) == KeanuContext.JavaException
     assert java_exception.type == "java.lang.IllegalArgumentException"
     assert java_exception.message == "Illegal initial capacity: -1"
