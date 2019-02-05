@@ -68,5 +68,5 @@ def test_nonscalar_vertex_cast(value: Union[numpy_types, pandas_types], cast_fn:
 def test_cant_pass_vertex_to_cast_tensor_arg(cast_fn: Callable, cast_to_type: type) -> None:
     gaussian = Gaussian(0., 1.)
 
-    with pytest.raises(TypeError, match="Cannot cast {} to {}".format(type(gaussian), cast_to_type)):
+    with pytest.raises(TypeError, match=r"Cannot cast {} to {}".format(type(gaussian), cast_to_type)):
         cast_fn(gaussian)
