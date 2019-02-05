@@ -1,7 +1,10 @@
-from keanu.context import KeanuContext
-from keanu.vertex import ConstantInteger, ConstantDouble, ConstantBoolean, Concatenation
-import py4j
 import numpy as np
+import py4j
+import pytest
+from py4j.protocol import Py4JJavaError
+
+from keanu.context import KeanuContext
+from keanu.vertex import ConstantDouble, Concatenation
 
 
 def test_the_context_is_a_singleton() -> None:
@@ -35,3 +38,14 @@ def test_you_can_create_vertex_array_from_different_types() -> None:
     array = context.to_java_vertex_array([a, b, c])
     d = Concatenation(0, [a, b, c])
     assert np.allclose(d.get_value(), [1., 2., 3., 4., 5., 6.])
+
+
+def test_you_can_get_info_from_a_java_exception() -> None:
+    context = KeanuContext()
+    with pytest.raises(Py4JJavaError) as excinfo:
+        context.jvm_view().java.util.HashMap(-1)
+        assert False, "Should have thrown a Py4JError"
+
+    java_exception = context.from_java_exception(excinfo.value)
+    assert java_exception.type == "java.lang.IllegalArgumentException"
+    assert java_exception.message == "Illegal initial capacity: -1"
