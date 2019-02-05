@@ -134,7 +134,8 @@ def sample(net: BayesNet,
     :param Axes ax: `matplotlib.axes.Axes <https://matplotlib.org/api/axes_api.html>`_.
         If not set, a new one is created.
 
-    :return: Dictionary of samples at an index (tuple) for each vertex label (str). If all the vertices in `sample_from` are scalar, the dictionary is only keyed by label.
+    :return: Dictionary of samples at an index (tuple) for each vertex label (str).
+    If all the vertices in `sample_from` are scalar, the dictionary is only keyed by label.
 
     :raises ValueError: If `sample_from` contains vertices without labels.
     """
@@ -192,7 +193,8 @@ def generate_samples(net: BayesNet,
     :param Axes ax: `matplotlib.axes.Axes <https://matplotlib.org/api/axes_api.html>`_.
         If not set, a new one is created.
 
-    :yields: Dictionaries of samples at an index (tuple) for each vertex label (str). If all the vertices in `sample_from` are scalar, each dictionary is only keyed by label.
+    :yields: Dictionaries of samples at an index (tuple) for each vertex label (str).
+    If all the vertices in `sample_from` are scalar, each dictionary is only keyed by label.
 
     :raises ValueError: If `sample_from` contains vertices without labels.
     """
