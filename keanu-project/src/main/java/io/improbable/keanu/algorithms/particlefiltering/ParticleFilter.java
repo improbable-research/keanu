@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 
 /***
  * This class allows you to create particle filters to find likely states of a network (i.e. Particles)
@@ -132,7 +134,7 @@ public class ParticleFilter {
     }
 
     private <T> void sampleValueAndAddToParticle(Vertex<T> vertex, Particle particle) {
-        T sample = vertex.sample(random);
+        T sample = ((Probabilistic<T>) vertex).sample(random);
         particle.addLatentVertex(vertex, sample);
     }
 
@@ -169,4 +171,5 @@ public class ParticleFilter {
 
         return p;
     }
+
 }

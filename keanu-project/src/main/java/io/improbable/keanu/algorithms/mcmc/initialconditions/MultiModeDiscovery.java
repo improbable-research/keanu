@@ -28,7 +28,7 @@ public class MultiModeDiscovery {
         for (int i = 0; i < attempts; i++) {
             BayesianNetwork.setFromSampleAndCascade(sortedByDependency, random);
             KeanuProbabilisticModel model = new KeanuProbabilisticModel(network);
-            NetworkState maxAPosteriori = Keanu.Sampling.SimulatedAnnealing.withDefaultConfigFor(model, random).getMaxAPosteriori(model, samplesPerAttempt);
+            NetworkState maxAPosteriori = Keanu.Sampling.SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(model, samplesPerAttempt);
             maxSamples.add(maxAPosteriori);
         }
 

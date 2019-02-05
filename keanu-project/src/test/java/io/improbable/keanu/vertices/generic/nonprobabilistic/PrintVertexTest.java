@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -106,15 +105,6 @@ public class PrintVertexTest {
     }
 
     @Test
-    public void whenSampleIsCalledThenKeanuRandomIsPassedToParentSample() {
-        final KeanuRandom random = mock(KeanuRandom.class);
-
-        final PrintVertex<DoubleTensor> sut = new PrintVertex<>(parent);
-        sut.sample(random);
-        verify(parent).sample(random);
-    }
-
-    @Test
     public void whenPrefixIsSuppliedThenItIsUsedInPresentation() {
         final PrintVertex<DoubleTensor> sut = new PrintVertex<>(parent, "my vertex\n", false);
 
@@ -146,7 +136,7 @@ public class PrintVertexTest {
 
         final int nSamples = 100;
         MetropolisHastings
-            .withDefaultConfigFor(model)
+            .withDefaultConfig()
             .getPosteriorSamples(model, model.getLatentVariables(), nSamples);
 
         verify(printStream, atLeast(nSamples)).print(anyString());

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -28,11 +27,6 @@ public class BooleanModelResultVertex extends BooleanVertex implements ModelResu
     @Override
     public ModelVertex<BooleanTensor> getModel() {
         return delegate.getModel();
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return delegate.sample(random);
     }
 
     @Override

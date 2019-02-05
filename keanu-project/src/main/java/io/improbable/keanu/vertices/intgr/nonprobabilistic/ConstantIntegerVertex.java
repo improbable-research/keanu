@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -31,11 +30,6 @@ public class ConstantIntegerVertex extends IntegerVertex implements ConstantVert
 
     public ConstantIntegerVertex(int[] data, long[] shape) {
         this(IntegerTensor.create(data, shape));
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return getValue();
     }
 
     @Override

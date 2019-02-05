@@ -61,7 +61,7 @@ whether to use the Gradient or Non-Gradient Optimizer. You can use the following
 
 ```java
 BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-Optimizer optimizer = KeanuOptimizer.of(bayesNet);
+Optimizer optimizer = Keanu.Optimizer.of(bayesNet);
 optimizer.maxAPosteriori();
 
 double calculatedTemperature = temperature.getValue().scalar();
@@ -79,10 +79,12 @@ how to use the builder to change all of the available parameters.
 #### Java
 
 ```java
-GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(temperature.getConnectedGraph())
-    .maxEvaluations(5000)
-    .relativeThreshold(1e-8)
-    .absoluteThreshold(1e-8)
+GradientOptimizer optimizer = Keanu.Optimizer.Gradient.builderFor(temperature.getConnectedGraph())
+    .algorithm(ConjugateGradient.builder()
+        .maxEvaluations(5000)
+        .relativeThreshold(1e-8)
+        .absoluteThreshold(1e-8)
+        .build())
     .build();
 optimizer.maxAPosteriori();
 
@@ -97,8 +99,9 @@ double calculatedTemperature = temperature.getValue().scalar();
 #### Python
 
 ```python
-optimizer = GradientOptimizer(bayes_net, max_evaluations=5000,
-                              relative_threshold=1e-8, absolute_threshold=1e-8)
+optimizer = GradientOptimizer(bayes_net, algorithm=ConjugateGradient(max_evaluations=5000,
+                                                                     relative_threshold=1e-8,
+                                                                     absolute_threshold=1e-8))
 optimizer.max_a_posteriori()
 calculated_temperature = model.temperature.get_value()
 ```
@@ -117,12 +120,14 @@ how to use the builder to change all of the available parameters.
 
 ```java
 OptimizerBounds temperatureBounds = new OptimizerBounds().addBound(temperature.getId(), -250., 250.0);
-NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.builderFor(temperature.getConnectedGraph())
-    .maxEvaluations(5000)
-    .boundsRange(100000)
-    .optimizerBounds(temperatureBounds)
-    .initialTrustRegionRadius(5.)
-    .stoppingTrustRegionRadius(2e-8)
+NonGradientOptimizer optimizer = Keanu.Optimizer.NonGradient.builderFor(temperature.getConnectedGraph())
+    .algorithm(BOBYQA.builder()
+        .maxEvaluations(5000)
+        .boundsRange(100000)
+        .optimizerBounds(temperatureBounds)
+        .initialTrustRegionRadius(5.)
+        .stoppingTrustRegionRadius(2e-8)
+        .build())
     .build();
 optimizer.maxAPosteriori();
 
@@ -139,8 +144,10 @@ double calculatedTemperature = temperature.getValue().scalar();
 #### Python
 
 ```python
-optimizer = NonGradientOptimizer(bayes_net, max_evaluations=5000, bounds_range=100000.,
-                                 initial_trust_region_radius=5., stopping_trust_region_radius=2e-8)
+optimizer = NonGradientOptimizer(bayes_net, algorithm=BOBYQA(max_evaluations=5000,
+                                                             bounds_range=100000.,
+                                                             initial_trust_region_radius=5.,
+                                                             stopping_trust_region_radius=2e-8))
 optimizer.max_a_posteriori()
 calculated_temperature = model.temperature.get_value()
 ```

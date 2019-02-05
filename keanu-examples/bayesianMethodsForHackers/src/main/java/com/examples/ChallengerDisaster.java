@@ -46,7 +46,7 @@ public class ChallengerDisaster {
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(net);
 
         final int sampleCount = 3000;
-        NetworkSamples networkSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+        NetworkSamples networkSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig()
             .generatePosteriorSamples(model, model.getLatentVariables())
             .dropCount(sampleCount / 2)
             .downSampleInterval(model.getLatentVariables().size())

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -150,11 +149,6 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         }
 
         return splitPartials;
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(DoubleTensor.class, Vertex::sample, operands));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -32,12 +31,6 @@ public class MultiplexerVertex<T> extends GenericVertex<T> implements NonProbabi
     private Vertex<T> getSelector() {
         int optionGroupIdx = selectorControlVertex.getValue().scalar();
         return selectVertices[optionGroupIdx];
-    }
-
-    @Override
-    public T sample(KeanuRandom random) {
-        Vertex<T> selector = getSelector();
-        return selector.sample(random);
     }
 
     @Override

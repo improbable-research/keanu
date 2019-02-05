@@ -195,7 +195,9 @@ public class BinaryOperationTestHelpers {
         testWithFiniteDifference(op, new long[]{4}, new long[]{2, 3, 4});
     }
 
-    public static <T extends DoubleVertex & Differentiable> void testWithFiniteDifference(BiFunction<UniformVertex, UniformVertex, T> op, long[] leftShape, long[] rightShape) {
+    public static <T extends DoubleVertex & Differentiable> void testWithFiniteDifference(BiFunction<UniformVertex, UniformVertex, T> op,
+                                                                                          long[] leftShape,
+                                                                                          long[] rightShape) {
         UniformVertex A = new UniformVertex(leftShape, -10.0, 10.0);
         UniformVertex B = new UniformVertex(rightShape, -10.0, 10.0);
 

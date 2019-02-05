@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
@@ -52,11 +51,6 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differen
 
     public DoubleBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right, op, null, null);
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op.apply(left.sample(random), right.sample(random));
     }
 
     @Override
