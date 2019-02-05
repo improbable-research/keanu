@@ -44,7 +44,6 @@ def test_you_can_get_info_from_a_java_exception() -> None:
     context = KeanuContext()
     with pytest.raises(Py4JJavaError) as excinfo:
         context.jvm_view().java.util.HashMap(-1)
-        assert False, "Should have thrown a Py4JError"
 
     java_exception = context.from_java_exception(excinfo.value)
     assert type(java_exception) == KeanuContext.JavaException
