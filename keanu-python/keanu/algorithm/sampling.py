@@ -78,6 +78,7 @@ class NUTSSampler(PosteriorSamplingAlgorithm):
     :param float initial_step_size: Sets the initial step size. If none is given then a heuristic will be used to determine a good step size. Defaults to None.
     :param int max_tree_height: The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample. Defaults to None.
     """
+
     def __init__(self,
                  adapt_count: int = None,
                  target_acceptance_prob: float = None,
