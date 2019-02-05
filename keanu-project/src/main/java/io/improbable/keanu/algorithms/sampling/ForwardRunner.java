@@ -48,7 +48,7 @@ public class ForwardRunner {
                                         int sampleCount,
                                         KeanuRandom random) {
 
-        Set<Variable> chosenVariables = new HashSet<>(TopologicalSort.sort(fromVariables));
+        Set<Variable> chosenVariables = new HashSet<>(TopologicalSort.sortVariables(fromVariables));
         Map<VariableReference, List> samplesByVertex = new HashMap<>();
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {

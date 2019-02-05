@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TopologicalSort {
 
@@ -21,11 +22,20 @@ public class TopologicalSort {
      * This algorithm returns a linear ordering of vertices such that for every edge uv from
      * vertex u to vertex v; u comes before v in the ordering.
      *
-     * @param variables the variables to sort
-     * @return a linear ordering of variables by order of execution
+     * @param vertices the vertices to sort
+     * @return a linear ordering of vertices by order of execution
      */
-    public static List<? extends Variable> sort(Collection<? extends Variable> variables) {
-        return variables.stream().sorted(Comparator.comparing(Variable::getReference, Comparator.naturalOrder())).collect(Collectors.toList());
+    public static List<Vertex> sort(Collection<? extends Vertex> vertices) {
+        return vertices.stream().
+            sorted(Comparator.comparing(Vertex::getId, Comparator.naturalOrder())).
+            collect(Collectors.toList());
+    }
+
+    public static List<Variable> sortVariables(Collection<? extends Variable> variables) {
+        Stream<? extends Variable> sorted = variables.stream().
+            sorted(Comparator.comparing(Variable::getReference, Comparator.naturalOrder()));
+        List<Variable> sortedV = sorted.collect(Collectors.toList());
+        return sortedV;
     }
 
     public static Map<Vertex, Set<Vertex>> mapDependencies(Collection<? extends Vertex> vertices) {
