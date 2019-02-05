@@ -41,7 +41,7 @@ public class CheatingStudents {
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(answerTotal.getConnectedGraph());
 
-        NetworkSamplesGenerator samplesGenerator = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+        NetworkSamplesGenerator samplesGenerator = Keanu.Sampling.MetropolisHastings.withDefaultConfig()
             .generatePosteriorSamples(model, singletonList(probabilityOfCheating));
 
         NetworkSamples networkSamples = samplesGenerator
@@ -67,7 +67,7 @@ public class CheatingStudents {
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(answerTotal.getConnectedGraph());
 
-        NetworkSamplesGenerator samplesGenerator = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model)
+        NetworkSamplesGenerator samplesGenerator = Keanu.Sampling.MetropolisHastings.withDefaultConfig()
             .generatePosteriorSamples(model, singletonList(probabilityOfCheating));
 
         NetworkSamples networkSamples = samplesGenerator.dropCount(numberOfSamples / 10)

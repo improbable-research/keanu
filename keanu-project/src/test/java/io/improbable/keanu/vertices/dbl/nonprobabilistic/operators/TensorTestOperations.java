@@ -2,11 +2,14 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static org.junit.Assert.assertThat;
@@ -17,7 +20,13 @@ public class TensorTestOperations {
                                                               T outputVertex,
                                                               double incrementAmount,
                                                               Double delta) {
+        Map<T, DoubleTensor> cacheInputValues = inputVertices.stream()
+            .collect(Collectors.toMap(v -> v, Vertex::getValue));
+
         finiteDifferenceMatchesForwardModeGradient(inputVertices, outputVertex, incrementAmount, delta);
+
+        cacheInputValues.forEach(Vertex::setValue);
+
         finiteDifferenceMatchesReverseModeGradient(inputVertices, outputVertex, incrementAmount, delta);
     }
 

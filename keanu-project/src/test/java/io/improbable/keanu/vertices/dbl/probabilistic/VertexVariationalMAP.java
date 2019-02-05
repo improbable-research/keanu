@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -43,7 +43,7 @@ public class VertexVariationalMAP {
 
         inferNet.probeForNonZeroProbability(100, random);
 
-        GradientOptimizer gradientOptimizer = KeanuOptimizer.Gradient.of(inferNet);
+        GradientOptimizer gradientOptimizer = Keanu.Optimizer.Gradient.of(inferNet);
 
         gradientOptimizer.maxAPosteriori();
     }

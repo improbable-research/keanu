@@ -1,7 +1,7 @@
 package io.improbable.snippet;
 
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -30,7 +30,7 @@ public class Tensors {
         CObservation.observe(new double[]{6, 12});
 
         //Use algorithm to find MAP or posterior samples for A and/or B
-        Optimizer optimizer = KeanuOptimizer.of(new BayesianNetwork(A.getConnectedGraph()));
+        Optimizer optimizer = Keanu.Optimizer.of(new BayesianNetwork(A.getConnectedGraph()));
         optimizer.maxLikelihood();
         //%%SNIPPET_END%% TensorExample
 
@@ -109,7 +109,7 @@ public class Tensors {
         CObservation.observe(new double[]{6, 12});
 
         //Use algorithm to find MAP or posterior samples for A and/or B
-        Optimizer optimizer = KeanuOptimizer.of(new BayesianNetwork(A.getConnectedGraph()));
+        Optimizer optimizer = Keanu.Optimizer.of(new BayesianNetwork(A.getConnectedGraph()));
         optimizer.maxAPosteriori();
 
         //Retrieve the most likely estimate using MAP estimation

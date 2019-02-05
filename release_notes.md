@@ -18,19 +18,22 @@
     1  4.231334  5.017627  5.734130  3.904472   9.909033
     2  4.676046  4.308018  5.035550  6.240894  10.112683
     ```
-    * `samples[("gaussian", "(0, 1)")] = [5.734130, 5.734130, 5.035550] `
+    * `samples[("gaussian", (0, 1))] = [5.734130, 5.734130, 5.035550] `
   * As a result, whenever keying into a sample dictionary, you are guaranteed to receive a list of primitives.
   * This greatly reduces the complexity of the `autocorrelation` and `traceplot` API's as they now simply expect a list of values.  
+* Added Adam optimizer
+* GradientOptimizer and NonGradientOptimizer now takes an algorithm argument that by default will use Conjugate Gradient and BOBYQA respectively.
+* GradientOptimizer and NonGradientOptimizer return a OptimizedResult object instead of just the optimized fitness as a double
 * Reorganised the factory methods for building `PosteriorSamplingAlgorithm` objects. The following are available and give you access to either a default implementation or, when you need more control over the configuration, a Builder object:
   * `Keanu.Sampling.MetropolisHastings`
   * `Keanu.Sampling.NUTS`
   * `Keanu.Sampling.SimulatedAnnealing`
   * `Keanu.Sampling.MCMC` (to automatically choose between `MetropolisHastings` and `NUTS`)
 * The `PosteriorSamplingAlgorithm` objects are now immutable: you cannot set their values after construction.
-* When you choose a custom configuration of `MetropolisHastings` or `SimulatedAnnealing`, you must specify:
-  * the proposal distribution - the default option has been removed. Options are `PriorProposalDistribution` and `GaussianProposalDistribution`
+* When you choose a custom configuration of `MetropolisHastings` or `SimulatedAnnealing`, you can specify:
+  * the proposal distribution. Options are `PriorProposalDistribution` and `GaussianProposalDistribution`
   * a proposal rejection strategy - options are `RollBackToCachedValuesOnRejection` and `RollbackAndCascadeOnRejection`
-    * (in Python, this is done for you: you only have to pass in the set of latent vertices)
+    * (in Python, this is done for you)
 * `Hamiltonian` Monte Carlo has been removed: use `NUTS` instead which is an auto-tuning implementation of Hamiltonian Monte Carlo.
 * The `PosteriorSamplingAlgorithm` and `FitnessFunction` interfaces requires a `ProbabilisticModel` as its argument instead of a `BayesianNetwork`
   * You can create a `ProbabilisticModel` from a `BayesianNetwork`:

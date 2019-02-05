@@ -55,7 +55,7 @@ public class DescribingTheModel {
         B.observe(true);
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(C.getConnectedGraph());
-        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+        NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             model,
             Arrays.asList(A, B),
             100000

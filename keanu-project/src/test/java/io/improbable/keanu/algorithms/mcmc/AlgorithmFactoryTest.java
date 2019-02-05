@@ -11,7 +11,7 @@ public class AlgorithmFactoryTest {
     @Test
     public void youCanCreateADefaultMetropolisHastingsSampler() {
         KeanuProbabilisticModel model = mock(KeanuProbabilisticModel.class);
-        MetropolisHastings mh = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model);
+        MetropolisHastings mh = Keanu.Sampling.MetropolisHastings.withDefaultConfig();
     }
 
     @Test
