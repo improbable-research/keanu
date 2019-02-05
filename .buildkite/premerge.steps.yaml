@@ -18,7 +18,7 @@ common: &common
     # If you want to deploy/release, choose 'pusher'/'releaser' respectively.
     # See also: https://github.com/improbable/platform/blob/master/docs/product-groups/dev-workflow/buildkite/how-to-deploy-release-permissions.md
     - "permission_set=builder"
-    - "queue=${CI_BUILDER_QUEUE:-Configure me}"
+    - "queue=trigger-pipelines"
   timeout_in_minutes: 60 # TODO(ENG-548): reduce timeout once agent-cold-start is optimised.
   retry:
     automatic:
