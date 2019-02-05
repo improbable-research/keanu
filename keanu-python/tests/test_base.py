@@ -41,7 +41,7 @@ def test_you_can_overload_a_java_method_in_python(java_list_wrapper) -> None:
 
 
 def test_you_cannot_call_a_java_method_that_hasnt_been_overloaded(java_list_wrapper) -> None:
-    with pytest.raises(AttributeError, match="{} has no attribute size".format(type(java_list_wrapper))):
+    with pytest.raises(AttributeError, match="{} has no attribute isEmpty".format(type(java_list_wrapper))):
         java_list_wrapper.isEmpty()
 
 
