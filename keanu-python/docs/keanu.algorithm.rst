@@ -8,7 +8,7 @@ Inference
 .. automodule:: keanu.algorithm
     :members: sample, generate_samples
 
-Sampler
+Samplers
 ~~~~~~~
 
 .. automodule:: keanu.algorithm
