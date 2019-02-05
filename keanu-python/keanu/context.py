@@ -1,12 +1,13 @@
-import sys
 import io
-import os
 import logging
-from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView, java_import
-from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
-from py4j.protocol import Py4JError
-from typing import Dict, Any, Iterable, List, Collection, Set
+import os
+import sys
 from _io import TextIOWrapper
+from typing import Dict, Any, Iterable, Collection
+
+from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
+from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView, java_import
+from py4j.protocol import Py4JError, Py4JJavaError
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
@@ -121,6 +122,18 @@ class KeanuContext(metaclass=Singleton):
     def to_java_vertex_array(self, l: Collection[Any]) -> JavaArray:
         java_import(self.jvm_view(), "io.improbable.keanu.vertices.Vertex")
         return self.to_java_array(list(map(lambda x: x.unwrap(), l)), self.jvm_view().Vertex)
+
+    def from_java_exception(self, e: Py4JJavaError) -> 'KeanuContext.JavaException':
+        class JavaException:
+            def __init__(self, type, message):
+                self.type = type
+                self.message = message
+
+            def __repr__(self):
+                return "{}: {}".format(self.type, self.message)
+
+        return JavaException(e.java_exception.getClass().getName(), e.java_exception.getMessage())
+
 
     def __infer_class_from_array(self, l: Collection[Any]) -> JavaClass:
         if len(l) == 0:
