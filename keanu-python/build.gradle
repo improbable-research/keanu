@@ -141,3 +141,4 @@ test.dependsOn(formatCheck)
 test.dependsOn(pytest)
 
 buildWheelDistribution.dependsOn(test)
+build.finalizedBy(generateDocumentation)
