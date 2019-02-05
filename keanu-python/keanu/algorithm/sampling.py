@@ -32,6 +32,16 @@ class PosteriorSamplingAlgorithm:
 
 
 class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
+    """
+    :param str proposal_distribution: The proposal distribution for metropolis hastings. Options are 'gaussian' and 'prior'.
+    :param Iterable[Vertex] latents: All latent vertices.
+    :param List[] proposal_listeners: Listeners for proposal creation and rejection. Options are :class:`keanu.algorithm.AcceptanceRateTracker`.
+    :param ndarray proposal_distribution_sigma: Parameter sigma for 'gaussian' proposal distribution.
+
+    :raises TypeError: If you pass `proposal_listener` without specifying `proposal_distribution`.
+    :raises TypeError: If you choose 'gaussian' as `proposal_distribution` but did not specify `proposal_distribution_sigma`.
+    :raises TypeError: If you choose 'prior' as `proposal_distribution` but did not pass latent vertices.
+    """
 
     def __init__(self,
                  proposal_distribution: str,
@@ -61,7 +71,13 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
 
 
 class NUTSSampler(PosteriorSamplingAlgorithm):
-
+    """
+    :param int adapt_count: The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value. Defaults to None.
+    :param float target_acceptance_prob: The target acceptance probability. A suggested value of this is 0.65 (Beskos et al., 2010; Neal, 2011). Defaults to None.
+    :param bool adapt_enabled: Determines whether the step size will adapt during the first adaptCount samples. Defaults to None.
+    :param float initial_step_size: Sets the initial step size. If none is given then a heuristic will be used to determine a good step size. Defaults to None.
+    :param int max_tree_height: The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample. Defaults to None.
+    """
     def __init__(self,
                  adapt_count: int = None,
                  target_acceptance_prob: float = None,
@@ -97,6 +113,31 @@ def sample(net: BayesNet,
            down_sample_interval: int = 1,
            plot: bool = False,
            ax: Any = None) -> sample_types:
+    """
+    :param BayesNet net: Bayesian Network containing latent variables.
+    :param Iterable[Vertex] sample_from: Vertices to include in the returned samples.
+    :param PosteriorSamplingAlgorithm sampling_algorithm: The posterior sampling algorithm to use.
+        Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.
+        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'prior' as its proposal distribution.
+    :param int draws: The number of samples to take.
+        Defaults to 500.
+    :param int drop: The number of samples to drop before collecting anything.
+        If this is zero then no samples will be dropped before collecting. Defaults to 0.
+    :param int down_sample_interval: Collect 1 sample for every `down_sample_interval`.
+        If this is 1 then there will be no down-sampling.
+        If this is 2 then every other sample will be taken.
+        If this is 3 then 2 samples will be dropped before one is taken.
+        Defaults to 1.
+    :param bool plot: Flag for plotting the trace after sampling.
+        Call `matplotlib.pyplot.show <https://matplotlib.org/api/_as_gen/matplotlib.pyplot.show.html>`_ to display the plot.
+        Defaults to False.
+    :param Axes ax: `matplotlib.axes.Axes <https://matplotlib.org/api/axes_api.html>`_.
+        If not set, a new one is created.
+
+    :return: Dictionary of samples at an index (tuple) for each vertex label (str). If all the vertices in `sample_from` are scalar, the dictionary is only keyed by label.
+
+    :raises ValueError: If `sample_from` contains vertices without labels.
+    """
 
     sample_from = list(sample_from)
 
@@ -131,7 +172,30 @@ def generate_samples(net: BayesNet,
                      live_plot: bool = False,
                      refresh_every: int = 100,
                      ax: Any = None) -> sample_generator_types:
+    """
+    :param BayesNet net: Bayesian Network containing latent variables.
+    :param Iterable[Vertex] sample_from: Vertices to include in the returned samples.
+    :param PosteriorSamplingAlgorithm sampling_algorithm: The posterior sampling algorithm to use.
+        Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.
+        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'prior' as its proposal distribution.
+    :param int drop: The number of samples to drop before collecting anything.
+        If this is zero then no samples will be dropped before collecting. Defaults to 0.
+    :param int down_sample_interval: Collect 1 sample for every `down_sample_interval`.
+        If this is 1 then there will be no down-sampling.
+        If this is 2 then every other sample will be taken.
+        If this is 3 then 2 samples will be dropped before one is taken.
+        Defaults to 1.
+    :param bool live_plot: Flag for plotting the trace while sampling.
+        Call `matplotlib.pyplot.show <https://matplotlib.org/api/_as_gen/matplotlib.pyplot.show.html>`_ to display the plot.
+        Defaults to False.
+    :param int refresh_every: Period of plot updates (in sample number).
+    :param Axes ax: `matplotlib.axes.Axes <https://matplotlib.org/api/axes_api.html>`_.
+        If not set, a new one is created.
 
+    :yields: Dictionaries of samples at an index (tuple) for each vertex label (str). If all the vertices in `sample_from` are scalar, each dictionary is only keyed by label.
+
+    :raises ValueError: If `sample_from` contains vertices without labels.
+    """
     sample_from = list(sample_from)
     id_to_label = __check_if_vertices_are_labelled(sample_from)
 
