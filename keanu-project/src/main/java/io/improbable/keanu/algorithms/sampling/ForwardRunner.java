@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.sampling;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,38 +21,37 @@ import io.improbable.keanu.backend.ComputableGraph;
 
 public class ForwardRunner {
 
-    private final ProposalDistribution priorProposal;
+    private static final ProposalDistribution PRIOR_PROPOSAL = new PriorProposalDistribution();
 
     private ForwardRunner() {
-        this.priorProposal = new PriorProposalDistribution();
     }
 
     /**
-     * Samples from a Bayesian Network that only contains sampling information. No observations can have been made.
+     * Samples from a Computable Graph.
      * Samples are taken by calculating a linear ordering of the network and cascading the sampled values
      * through the network in priority order.
      *
-     * @param graph the sampling bayesian network to sample from
-     * @param fromVariables the vertices to sample from
+     * @param graph the computable graph to sample from
+     * @param fromVariables the variables to sample from
      * @param sampleCount the number of samples to take
-     * @return sampling samples of a bayesian network
+     * @return sampling samples of a computable graph
      */
-    public NetworkSamples sample(ComputableGraph graph,
+    public static NetworkSamples sample(ComputableGraph graph,
                                         List<? extends Variable> fromVariables,
                                         int sampleCount) {
         return sample(graph, fromVariables, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
-    public NetworkSamples sample(ComputableGraph graph,
+    public static NetworkSamples sample(ComputableGraph graph,
                                         List<? extends Variable> fromVariables,
                                         int sampleCount,
                                         KeanuRandom random) {
 
-        Set<Variable> chosenVariables = new HashSet<>(TopologicalSort.sortVariables(fromVariables));
+        Set<Variable> chosenVariables = new LinkedHashSet<>(TopologicalSort.sortVariables(fromVariables));
         Map<VariableReference, List> samplesByVertex = new HashMap<>();
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
-            Proposal proposal = priorProposal.getProposal(chosenVariables, random);
+            Proposal proposal = PRIOR_PROPOSAL.getProposal(chosenVariables, random);
             graph.compute(proposal.getProposalTo(), fromVariables.stream().map(Variable::getReference).collect(Collectors.toList()));
             takeSamples(samplesByVertex, fromVariables);
         }
