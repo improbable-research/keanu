@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.intgr;
 
-import io.improbable.keanu.algorithms.VertexSamples;
+import io.improbable.keanu.algorithms.Samples;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
@@ -11,7 +11,7 @@ import java.util.Optional;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 
-public class IntegerVertexSamples extends VertexSamples<IntegerTensor> {
+public class IntegerVertexSamples extends Samples<IntegerTensor> {
 
     public IntegerVertexSamples(List<IntegerTensor> samples) {
         super(samples);

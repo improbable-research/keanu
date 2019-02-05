@@ -4,8 +4,6 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.LinkedList;
@@ -18,35 +16,29 @@ public class BooleanMultipleOperatorTest {
     private List<Vertex<BooleanTensor>> allTrue = buildVertexList(15, 15);
     private List<Vertex<BooleanTensor>> allMixed = buildVertexList(18, 10);
     private List<Vertex<BooleanTensor>> allFalse = buildVertexList(15, 0);
-    private KeanuRandom random;
-
-    @Before
-    public void setup() {
-        this.random = new KeanuRandom(1);
-    }
 
     @Test
     public void testMultipleAnd() {
         BooleanVertex andTrue = new AndMultipleVertex(allTrue);
-        assertEquals(true, andTrue.sample(random).scalar());
+        assertEquals(true, andTrue.eval().scalar());
 
         BooleanVertex andMixed = new AndMultipleVertex(allMixed);
-        assertEquals(false, andMixed.sample(random).scalar());
+        assertEquals(false, andMixed.eval().scalar());
 
         BooleanVertex andFalse = new AndMultipleVertex(allFalse);
-        assertEquals(false, andFalse.sample(random).scalar());
+        assertEquals(false, andFalse.eval().scalar());
     }
 
     @Test
     public void testMultipleOr() {
         BooleanVertex orTrue = new OrMultipleVertex(allTrue);
-        assertEquals(true, orTrue.sample(random).scalar());
+        assertEquals(true, orTrue.eval().scalar());
 
         BooleanVertex orMixed = new OrMultipleVertex(allMixed);
-        assertEquals(true, orMixed.sample(random).scalar());
+        assertEquals(true, orMixed.eval().scalar());
 
         BooleanVertex orFalse = new OrMultipleVertex(allFalse);
-        assertEquals(false, orFalse.sample(random).scalar());
+        assertEquals(false, orFalse.eval().scalar());
     }
 
     private List<Vertex<BooleanTensor>> buildVertexList(int numberOfVertices, int numberThatAreTrue) {

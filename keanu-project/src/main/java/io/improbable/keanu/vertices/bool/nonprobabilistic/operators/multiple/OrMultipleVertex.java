@@ -10,7 +10,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkAllShapesMat
 
 public class OrMultipleVertex extends BooleanReduceVertex {
 
-    public OrMultipleVertex(Collection<Vertex<BooleanTensor>> input) {
+    public OrMultipleVertex(Collection<? extends Vertex<BooleanTensor>> input) {
         super(checkAllShapesMatch(
             input.stream().map(Vertex::getShape).collect(Collectors.toList())
             ),

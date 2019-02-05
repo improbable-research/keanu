@@ -1,9 +1,9 @@
 package io.improbable.keanu.distributions.discrete;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class Bernoulli implements Distribution<BooleanTensor> {
 

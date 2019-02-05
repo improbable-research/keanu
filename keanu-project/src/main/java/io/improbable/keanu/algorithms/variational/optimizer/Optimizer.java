@@ -1,10 +1,13 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.util.status.AverageTimeComponent;
+import io.improbable.keanu.util.status.StatusBar;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +22,10 @@ public interface Optimizer {
      * Adds a callback to be called whenever the optimizer evaluates the fitness of a point. E.g. for logging.
      *
      * @param fitnessCalculationHandler a function to be called whenever the optimizer evaluates the fitness of a point.
-     *                                  The double[] argument to the handler represents the point being evaluated.
-     *                                  The Double argument to the handler represents the fitness of that point.
+     *                                  The first argument to the handler represents the point being evaluated.
+     *                                  The second argument to the handler represents the fitness of that point.
      */
-    void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
+    void addFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler);
 
     /**
      * Removes a callback function that previously would have been called whenever the optimizer
@@ -30,7 +33,7 @@ public interface Optimizer {
      *
      * @param fitnessCalculationHandler the function to be removed from the list of fitness evaluation callbacks
      */
-    void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler);
+    void removeFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler);
 
     /**
      * This will use MAP estimation to optimize the values of latent vertices such that the
@@ -39,7 +42,7 @@ public interface Optimizer {
      *
      * @return the natural logarithm of the Maximum a posteriori (MAP)
      */
-    double maxAPosteriori();
+    OptimizedResult maxAPosteriori();
 
     /**
      * This method will use Maximum Likelihood estimation to optimize the values of latent vertices such that
@@ -48,9 +51,9 @@ public interface Optimizer {
      *
      * @return the natural logarithm of the maximum likelihood (MLE)
      */
-    double maxLikelihood();
+    OptimizedResult maxLikelihood();
 
-    static double[] convertToPoint(List<? extends Variable<? extends NumberTensor>> latentVariables) {
+    static double[] convertToArrayPoint(List<? extends Variable<? extends NumberTensor, ?>> latentVariables) {
 
         List<long[]> shapes = latentVariables.stream().map(Variable::getShape).collect(Collectors.toList());
 
@@ -63,13 +66,18 @@ public interface Optimizer {
         int position = 0;
         double[] point = new double[(int) totalLatentDimensions];
 
-        for (Variable<? extends NumberTensor> variable : latentVariables) {
+        for (Variable<? extends NumberTensor, ?> variable : latentVariables) {
             double[] values = variable.getValue().asFlatDoubleArray();
             System.arraycopy(values, 0, point, position, values.length);
             position += values.length;
         }
 
         return point;
+    }
+
+    static Map<VariableReference, DoubleTensor> convertToMapPoint(List<? extends Variable> variables) {
+        return variables.stream()
+            .collect(Collectors.toMap(Variable::getReference, v -> toDoubleTensorVariable(v).getValue()));
     }
 
     static Map<VariableReference, DoubleTensor> convertFromPoint(double[] point, List<? extends Variable> latentVariables) {
@@ -100,33 +108,38 @@ public interface Optimizer {
         return TensorShape.getLength(shape);
     }
 
-    static List<Variable<? extends DoubleTensor>> getAsDoubleTensors(List<? extends Variable> variables) {
+    static List<Variable<? extends DoubleTensor, ?>> getAsDoubleTensors(List<? extends Variable> variables) {
         return variables.stream()
-            .map(
-                v -> {
-                    if (v.getValue() instanceof DoubleTensor) {
-                        return (Variable<DoubleTensor>) v;
-                    } else {
-                        throw new UnsupportedOperationException(
-                            "Optimization unsupported on networks containing discrete latents. " +
-                                "Discrete latent : " + v.getReference() + " found.");
-                    }
-                }
-            ).collect(Collectors.toList());
+            .map(v -> toDoubleTensorVariable(v))
+            .collect(Collectors.toList());
     }
 
-    static ProgressBar createFitnessProgressBar(final Optimizer optimizerThatNeedsProgressBar) {
+    static Variable<DoubleTensor, ?> toDoubleTensorVariable(Variable<?, ?> v) {
+        if (v.getValue() instanceof DoubleTensor) {
+            return (Variable<DoubleTensor, ?>) v;
+        } else {
+            throw new UnsupportedOperationException(
+                "Optimization unsupported on networks containing discrete latents. " +
+                    "Discrete latent : " + v.getReference() + " found.");
+        }
+    }
+
+    static StatusBar createFitnessStatusBar(final Optimizer optimizerThatNeedsStatusBar) {
         AtomicInteger evalCount = new AtomicInteger(0);
-        ProgressBar progressBar = new ProgressBar();
-        BiConsumer<double[], Double> progressBarFitnessCalculationHandler = (position, logProb) -> {
-            progressBar.progress(
+        StatusBar statusBar = new StatusBar();
+        AverageTimeComponent averageTimeComponent = new AverageTimeComponent();
+        statusBar.addComponent(averageTimeComponent);
+
+        BiConsumer<Map<VariableReference, DoubleTensor>, Double> statusBarFitnessCalculationHandler = (position, logProb) -> {
+            statusBar.setMessage(
                 String.format("Fitness Evaluation #%d LogProb: %.2f", evalCount.incrementAndGet(), logProb)
             );
+            averageTimeComponent.step();
         };
 
-        optimizerThatNeedsProgressBar.addFitnessCalculationHandler(progressBarFitnessCalculationHandler);
-        progressBar.addFinishHandler(() -> optimizerThatNeedsProgressBar.removeFitnessCalculationHandler(progressBarFitnessCalculationHandler));
+        optimizerThatNeedsStatusBar.addFitnessCalculationHandler(statusBarFitnessCalculationHandler);
+        statusBar.addFinishHandler(() -> optimizerThatNeedsStatusBar.removeFitnessCalculationHandler(statusBarFitnessCalculationHandler));
 
-        return progressBar;
+        return statusBar;
     }
 }

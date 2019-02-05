@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
 
-import org.junit.Before;
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
@@ -9,20 +9,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class ProposalTest {
-    Proposal proposal;
-
-    @Before
-    public void createProposal() throws Exception {
-        proposal = new Proposal();
-    }
 
     @Test
     public void youCanAddAListener() {
         ProposalListener listener = mock(ProposalListener.class);
-        proposal.addListener(listener);
-        proposal.apply();
-        verify(listener).onProposalApplied(proposal);
-        proposal.reject();
+        ProposalNotifier notifier = new ProposalNotifier(ImmutableList.of(listener));
+        Proposal proposal = mock(Proposal.class);
+
+        notifier.notifyProposalCreated(proposal);
+        verify(listener).onProposalCreated(proposal);
+        notifier.notifyProposalRejected();
         verify(listener).onProposalRejected(proposal);
         verifyNoMoreInteractions(listener);
     }

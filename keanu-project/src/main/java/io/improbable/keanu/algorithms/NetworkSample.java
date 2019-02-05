@@ -1,8 +1,6 @@
 package io.improbable.keanu.algorithms;
 
 import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,39 +8,39 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A network sample contains the state of the network (vertex values) and the logOfMasterP at
+ * A network sample contains the state of the network (variable values) and the logOfMasterP at
  * a given point in time.
  */
 @AllArgsConstructor
 public class NetworkSample implements NetworkState {
 
-    private final Map<VertexId, ?> vertexValues;
+    private final Map<VariableReference, ?> variableStates;
 
     @Getter
     private final double logOfMasterP;
 
     /**
-     * @param vertex the vertex to get the values of
+     * @param variable the variable to get the values of
      * @param <T>    the type of the values that the vertex contains
-     * @return the values of the specified vertex
+     * @return the values of the specified variable
      */
     @Override
-    public <T> T get(Vertex<T> vertex) {
-        return (T) vertexValues.get(vertex.getId());
+    public <T> T get(Variable<T, ?> variable) {
+        return (T) variableStates.get(variable.getReference());
     }
 
     /**
-     * @param vertexId the ID of the vertex to get the values of
-     * @param <T>      the type of the values that the vertex contains
-     * @return the values of the specified vertex
+     * @param variableReference the reference to the variable to get the values of
+     * @param <T>      the type of the values that the variable contains
+     * @return the values of the specified variable
      */
     @Override
-    public <T> T get(VertexId vertexId) {
-        return (T) vertexValues.get(vertexId);
+    public <T> T get(VariableReference variableReference) {
+        return (T) variableStates.get(variableReference);
     }
 
     @Override
-    public Set<VertexId> getVertexIds() {
-        return vertexValues.keySet();
+    public Set<VariableReference> getVariableReferences() {
+        return variableStates.keySet();
     }
 }

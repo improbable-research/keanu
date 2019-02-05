@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.variational.optimizer.HasShape;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public interface SamplableWithManyScalars<T extends Tensor<?>> extends Samplable<T>, SamplableWithShape<T>, HasShape {
 

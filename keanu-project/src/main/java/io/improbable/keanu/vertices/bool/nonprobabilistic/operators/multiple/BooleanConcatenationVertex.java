@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -48,11 +47,6 @@ public class BooleanConcatenationVertex extends BooleanVertex implements NonProb
     @Override
     public BooleanTensor calculate() {
         return op(extractFromInputs(BooleanTensor.class, Vertex::getValue, input));
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(BooleanTensor.class, Vertex::sample, input));
     }
 
     protected BooleanTensor op(BooleanTensor... inputs) {

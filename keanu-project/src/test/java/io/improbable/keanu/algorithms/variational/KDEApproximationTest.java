@@ -1,13 +1,12 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.KDEVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract;
@@ -32,7 +31,7 @@ public class KDEApproximationTest {
     private static final double DELTA = 0.1;
 
     public DoubleVertexSamples generateGaussianSamples(double mu, double sigma, int nSamples) {
-        DoubleVertex gaussian = new GaussianVertex(mu, sigma);
+        GaussianVertex gaussian = new GaussianVertex(mu, sigma);
         List<DoubleTensor> samples = new ArrayList<>(nSamples);
 
         for (int i = 0; i < nSamples; i++) {

@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class ConstantIntegerVertex extends IntegerVertex implements ConstantVertex, NonProbabilistic<IntegerTensor> {
@@ -31,11 +30,6 @@ public class ConstantIntegerVertex extends IntegerVertex implements ConstantVert
 
     public ConstantIntegerVertex(int[] data, long[] shape) {
         this(IntegerTensor.create(data, shape));
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return getValue();
     }
 
     @Override

@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Map;
@@ -52,11 +51,6 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differen
 
     public DoubleBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right, op, null, null);
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op.apply(left.sample(random), right.sample(random));
     }
 
     @Override

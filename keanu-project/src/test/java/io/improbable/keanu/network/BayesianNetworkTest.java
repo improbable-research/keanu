@@ -1,13 +1,11 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -106,16 +104,6 @@ public class BayesianNetworkTest {
     }
 
     private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {
-        @Override
-        public DoubleTensor sample(KeanuRandom random) {
-            return null;
-        }
-
-        @Override
-        public DoubleTensor sample() {
-            return null;
-        }
-
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});
         }
@@ -151,9 +139,9 @@ public class BayesianNetworkTest {
         BooleanVertex b0 = new BernoulliVertex(0.5);
         BooleanVertex c = new BernoulliVertex(0.5);
 
-        a0.setLabel(new VertexLabel("0", "root", "a"));
-        a1.setLabel(new VertexLabel("1", "root", "a"));
-        b0.setLabel(new VertexLabel("0", "root", "b"));
+        a0.setLabel(new VertexLabel("root", "a", "0"));
+        a1.setLabel(new VertexLabel("root", "a", "1"));
+        b0.setLabel(new VertexLabel("root", "b", "0"));
 
         BayesianNetwork net = new BayesianNetwork(Arrays.asList(a0, a1, b0, c));
         List<Vertex> verticesInNamespace = net.getVerticesInNamespace("root");

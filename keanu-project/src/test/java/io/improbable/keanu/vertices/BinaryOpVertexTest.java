@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpLambda;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,9 @@ public class BinaryOpVertexTest {
         int N = 1000000;
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
-            samples.add(custom.sample(random).scalar());
+            bernoulliVertex.setValue(bernoulliVertex.sample(random));
+            gaussianVertex.setValue(gaussianVertex.sample(random));
+            samples.add(custom.lazyEval().scalar());
         }
 
         SummaryStatistics stats = new SummaryStatistics();

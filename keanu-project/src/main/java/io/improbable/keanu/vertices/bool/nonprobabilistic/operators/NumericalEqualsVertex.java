@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
  * Returns true if a vertex value is equal to another vertex value within an epsilon.
@@ -32,11 +31,6 @@ public class NumericalEqualsVertex extends BooleanVertex implements NonProbabili
         this.b = b;
         this.epsilon = epsilon;
         setParents(a, b, epsilon);
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(a.sample(random), b.sample(random), epsilon.sample(random));
     }
 
     @Override

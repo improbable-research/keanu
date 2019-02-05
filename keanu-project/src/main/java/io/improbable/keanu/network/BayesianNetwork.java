@@ -2,15 +2,16 @@ package io.improbable.keanu.network;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,10 +80,10 @@ public class BayesianNetwork {
     }
 
     public void setState(NetworkState state) {
-        for (VertexId vertexId : state.getVertexIds()) {
+        for (VariableReference reference : state.getVariableReferences()) {
             this.vertices.stream()
-                .filter(v -> v.getId() == vertexId)
-                .forEach(v -> v.setValue(state.get(vertexId)));
+                .filter(v -> v.getId() == reference)
+                .forEach(v -> v.setValue(state.get(reference)));
         }
     }
 
@@ -209,13 +210,16 @@ public class BayesianNetwork {
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices, KeanuRandom random) {
         for (Vertex<?> vertex : vertices) {
+            if (!(vertex instanceof Probabilistic)) {
+                throw new IllegalArgumentException("Cannot sample from a non-probabilistic vertex. Vertex is: " + vertex);
+            }
             setValueFromSample(vertex, random);
         }
         VertexValuePropagation.cascadeUpdate(vertices);
     }
 
     private static <T> void setValueFromSample(Vertex<T> vertex, KeanuRandom random) {
-        vertex.setValue(vertex.sample(random));
+        vertex.setValue(((Probabilistic<T>) vertex).sample(random));
     }
 
     public List<Vertex<DoubleTensor>> getContinuousLatentVertices() {

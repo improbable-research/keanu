@@ -11,7 +11,6 @@ import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
@@ -42,11 +41,6 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
     @Override
     public BooleanTensor calculate() {
         return getParent().getValue();
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return getParent().sample();
     }
 
     @Override

@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Collections;
@@ -46,11 +45,6 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         return Collections.emptyMap();
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return getValue();
     }
 
     public DoubleTensor calculate() {

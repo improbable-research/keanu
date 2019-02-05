@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.GenericVertex;
 
 public abstract class BinaryOpVertex<A, B, C> extends GenericVertex<C> implements NonProbabilistic<C> {
@@ -14,11 +13,6 @@ public abstract class BinaryOpVertex<A, B, C> extends GenericVertex<C> implement
         this.a = a;
         this.b = b;
         setParents(a, b);
-    }
-
-    @Override
-    public C sample(KeanuRandom random) {
-        return op(a.sample(random), b.sample(random));
     }
 
     @Override

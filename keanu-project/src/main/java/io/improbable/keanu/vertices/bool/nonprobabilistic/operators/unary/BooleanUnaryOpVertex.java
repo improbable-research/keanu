@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public abstract class BooleanUnaryOpVertex<T extends Tensor> extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
 
@@ -21,11 +20,6 @@ public abstract class BooleanUnaryOpVertex<T extends Tensor> extends BooleanVert
         super(shape);
         this.a = a;
         setParents(a);
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(a.sample(random));
     }
 
     @Override

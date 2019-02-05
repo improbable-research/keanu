@@ -5,7 +5,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +18,7 @@ public class BooleanReduceVertex extends BooleanVertex implements NonProbabilist
     private final List<? extends Vertex<BooleanTensor>> inputs;
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
-    public BooleanReduceVertex(long[] shape, Collection<Vertex<BooleanTensor>> input,
+    public BooleanReduceVertex(long[] shape, Collection<? extends Vertex<BooleanTensor>> input,
                                BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
         super(shape);
         if (input.size() < 2) {
@@ -34,11 +33,6 @@ public class BooleanReduceVertex extends BooleanVertex implements NonProbabilist
 
     public BooleanReduceVertex(long[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
         this(shape, Arrays.asList(input), f);
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return applyReduce((vertex) -> vertex.sample(random));
     }
 
     @Override

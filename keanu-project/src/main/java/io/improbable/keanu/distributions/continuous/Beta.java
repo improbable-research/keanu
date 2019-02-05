@@ -1,10 +1,12 @@
 package io.improbable.keanu.distributions.continuous;
 
 import com.google.common.base.Preconditions;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
@@ -53,12 +55,24 @@ public class Beta implements ContinuousDistribution {
         final DoubleTensor lnGammaAlpha = alpha.logGamma();
         final DoubleTensor lnGammaBeta = beta.logGamma();
         final DoubleTensor alphaPlusBetaLnGamma = (alpha.plus(beta)).logGammaInPlace();
-        final DoubleTensor alphaMinusOneTimesLnX = x.log().timesInPlace(alpha.minus(1));
-        final DoubleTensor betaMinusOneTimesOneMinusXLn = x.unaryMinus().plusInPlace(1).logInPlace().timesInPlace(beta.minus(1));
+        final DoubleTensor alphaMinusOneTimesLnX = x.log().timesInPlace(alpha.minus(1.));
+        final DoubleTensor betaMinusOneTimesOneMinusXLn = x.unaryMinus().plusInPlace(1.).logInPlace().timesInPlace(beta.minus(1.));
 
         final DoubleTensor betaFunction = lnGammaAlpha.plusInPlace(lnGammaBeta).minusInPlace(alphaPlusBetaLnGamma);
 
         return alphaMinusOneTimesLnX.plusInPlace(betaMinusOneTimesOneMinusXLn).minusInPlace(betaFunction);
+    }
+
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex alpha, DoublePlaceholderVertex beta) {
+        final DoubleVertex lnGammaAlpha = alpha.logGamma();
+        final DoubleVertex lnGammaBeta = beta.logGamma();
+        final DoubleVertex alphaPlusBetaLnGamma = (alpha.plus(beta)).logGamma();
+        final DoubleVertex alphaMinusOneTimesLnX = x.log().times(alpha.minus(1.));
+        final DoubleVertex betaMinusOneTimesOneMinusXLn = x.unaryMinus().plus(1.).log().times(beta.minus(1.));
+
+        final DoubleVertex betaFunction = lnGammaAlpha.plus(lnGammaBeta).minus(alphaPlusBetaLnGamma);
+
+        return alphaMinusOneTimesLnX.plus(betaMinusOneTimesOneMinusXLn).minus(betaFunction);
     }
 
     @Override

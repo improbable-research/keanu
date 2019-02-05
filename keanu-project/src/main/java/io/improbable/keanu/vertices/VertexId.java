@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices;
 
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.algorithms.variational.optimizer.VariableReference;
+import io.improbable.keanu.algorithms.VariableReference;
 import lombok.EqualsAndHashCode;
 
 import java.util.Arrays;

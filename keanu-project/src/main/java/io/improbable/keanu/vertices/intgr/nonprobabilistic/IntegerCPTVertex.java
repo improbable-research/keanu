@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.CPTCondition;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -28,13 +27,6 @@ public class IntegerCPTVertex extends IntegerVertex implements NonProbabilistic<
         addParents(inputs);
         addParents(conditions.values());
         addParent(defaultResult);
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.sample(random).scalar());
-        IntegerVertex vertex = conditions.get(condition);
-        return vertex == null ? defaultResult.sample(random) : vertex.sample(random);
     }
 
     @Override

@@ -2,15 +2,14 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.io.ProtobufLoader;
 import io.improbable.keanu.util.io.ProtobufSaver;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.UnaryOpVertex;
@@ -27,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -105,15 +105,6 @@ public class PrintVertexTest {
     }
 
     @Test
-    public void whenSampleIsCalledThenKeanuRandomIsPassedToParentSample() {
-        final KeanuRandom random = mock(KeanuRandom.class);
-
-        final PrintVertex<DoubleTensor> sut = new PrintVertex<>(parent);
-        sut.sample(random);
-        verify(parent).sample(random);
-    }
-
-    @Test
     public void whenPrefixIsSuppliedThenItIsUsedInPresentation() {
         final PrintVertex<DoubleTensor> sut = new PrintVertex<>(parent, "my vertex\n", false);
 
@@ -141,12 +132,12 @@ public class PrintVertexTest {
 
         new PrintVertex<>(temperature);
 
-        final BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(temperature.getConnectedGraph());
 
         final int nSamples = 100;
         MetropolisHastings
             .withDefaultConfig()
-            .getPosteriorSamples(bayesNet, bayesNet.getLatentVertices(), nSamples);
+            .getPosteriorSamples(model, model.getLatentVariables(), nSamples);
 
         verify(printStream, atLeast(nSamples)).print(anyString());
     }

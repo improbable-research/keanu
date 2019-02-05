@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 
@@ -26,11 +25,6 @@ public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> 
         this.a = a;
         this.b = b;
         setParents(a, b);
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(a.sample(random), b.sample(random));
     }
 
     @Override

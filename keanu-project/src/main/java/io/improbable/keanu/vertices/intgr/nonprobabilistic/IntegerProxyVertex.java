@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
@@ -42,11 +41,6 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
     @Override
     public IntegerTensor calculate() {
         return getParent().getValue();
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return getParent().sample();
     }
 
     @Override

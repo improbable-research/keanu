@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.KeanuRandom;
 
 public interface Samplable<T> {
     /**

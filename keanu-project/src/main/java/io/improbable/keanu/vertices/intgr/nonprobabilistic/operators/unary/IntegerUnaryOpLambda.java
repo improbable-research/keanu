@@ -4,7 +4,6 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.function.Function;
@@ -23,11 +22,6 @@ public class IntegerUnaryOpLambda<IN> extends IntegerVertex implements NonProbab
 
     public IntegerUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
         this(inputVertex.getShape(), inputVertex, op);
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op.apply(inputVertex.sample(random));
     }
 
     @Override

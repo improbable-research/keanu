@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.model.ModelResult;
 import io.improbable.keanu.vertices.model.ModelResultProvider;
 import io.improbable.keanu.vertices.model.ModelVertex;
@@ -28,11 +27,6 @@ public class DoubleModelResultVertex extends DoubleVertex implements ModelResult
     @Override
     public ModelVertex<DoubleTensor> getModel() {
         return delegate.getModel();
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return delegate.sample(random);
     }
 
     @Override

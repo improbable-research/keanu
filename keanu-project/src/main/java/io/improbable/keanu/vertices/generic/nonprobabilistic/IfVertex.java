@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 
 public class IfVertex<T> extends GenericTensorVertex<Tensor<T>> implements NonProbabilistic<Tensor<T>> {
@@ -16,11 +16,11 @@ public class IfVertex<T> extends GenericTensorVertex<Tensor<T>> implements NonPr
     private final static String THEN_NAME = "then";
     private final static String ELSE_NAME = "else";
 
-    private final Vertex<? extends BooleanTensor> predicate;
+    private final BooleanVertex predicate;
     private final Vertex<? extends Tensor<T>> thn;
     private final Vertex<? extends Tensor<T>> els;
 
-    public IfVertex(@LoadVertexParam(PREDICATE_NAME) Vertex<? extends BooleanTensor> predicate,
+    public IfVertex(@LoadVertexParam(PREDICATE_NAME) BooleanVertex predicate,
                     @LoadVertexParam(THEN_NAME) Vertex<? extends Tensor<T>> thn,
                     @LoadVertexParam(ELSE_NAME) Vertex<? extends Tensor<T>> els) {
         super(TensorShapeValidation.checkTernaryConditionShapeIsValid(predicate.getShape(), thn.getShape(), els.getShape()));
@@ -35,17 +35,12 @@ public class IfVertex<T> extends GenericTensorVertex<Tensor<T>> implements NonPr
     }
 
     @Override
-    public Tensor<T> sample(KeanuRandom random) {
-        return op(predicate.sample(random), thn.sample(random), els.sample(random));
-    }
-
-    @Override
     public Tensor<T> calculate() {
         return op(predicate.getValue(), thn.getValue(), els.getValue());
     }
 
     @SaveVertexParam(PREDICATE_NAME)
-    public Vertex<? extends BooleanTensor> getPredicate() {
+    public BooleanVertex getPredicate() {
         return predicate;
     }
 

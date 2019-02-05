@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
 
@@ -24,11 +23,6 @@ public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;
-    }
-
-    @Override
-    public Tensor<T> sample(KeanuRandom random) {
-        return op(inputVertex.sample(random));
     }
 
     protected Tensor<T> op(Tensor<T> input) {

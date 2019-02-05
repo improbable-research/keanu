@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 
 public class AssertVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor> {
@@ -60,11 +59,6 @@ public class AssertVertex extends BooleanVertex implements NonProbabilistic<Bool
             stringBuilder.append(": " + errorMessage);
         }
         return stringBuilder.toString();
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return predicate.sample();
     }
 
     @SaveVertexParam(PREDICATE_NAME)

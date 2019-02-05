@@ -99,9 +99,10 @@ def do_rewrites(file_name, in_loc, out_loc, snippet_store):
                  snippet_store)
 
 
-def for_all_in_dir(directory, action):
+def for_all_files_in_dir(directory, action):
     for file in os.listdir(directory):
-        action(file)
+        if os.path.isfile(directory + file):
+            action(file)
 
 
 def subtractStrings(str1, str2):
@@ -148,8 +149,8 @@ def main():
         logging.basicConfig(level=logging.DEBUG)
 
     snippet_store = {}
-    for_all_in_dir(args.java_src_dir, lambda x: read_file_snippets(args.java_src_dir + x, snippet_store))
-    for_all_in_dir(args.python_src_dir, lambda x: read_file_snippets(args.python_src_dir + x, snippet_store))
+    for_all_files_in_dir(args.java_src_dir, lambda x: read_file_snippets(args.java_src_dir + x, snippet_store))
+    for_all_files_in_dir(args.python_src_dir, lambda x: read_file_snippets(args.python_src_dir + x, snippet_store))
     stripped_snippet_store = {k: strip_block_whitespace(v) for k, v in snippet_store.items()}
     printd(str(stripped_snippet_store))
     check_output_dir_exists(args.output_dir)

@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class CastToDoubleVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
@@ -25,11 +24,6 @@ public class CastToDoubleVertex extends DoubleVertex implements NonProbabilistic
     @SaveVertexParam(INPUT_VERTEX_NAME)
     public Vertex<? extends NumberTensor> getInputVertex() {
         return inputVertex;
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return inputVertex.sample(random).toDouble();
     }
 
     @Override

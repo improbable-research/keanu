@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
 import java.util.Map;
@@ -44,11 +43,6 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
 
     public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op) {
         this(inputVertex.getShape(), inputVertex, op, null, null);
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op.apply(inputVertex.sample(random));
     }
 
     @Override

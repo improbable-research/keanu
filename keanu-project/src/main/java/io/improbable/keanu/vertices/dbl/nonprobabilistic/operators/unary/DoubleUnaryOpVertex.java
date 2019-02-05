@@ -4,7 +4,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
@@ -35,11 +34,6 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
     @SaveVertexParam(INPUT_VERTEX_NAME)
     public DoubleVertex getInputVertex() {
         return inputVertex;
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op(inputVertex.sample(random));
     }
 
     @Override

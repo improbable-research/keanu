@@ -1,13 +1,13 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSample;
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.Statistics;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,22 +21,20 @@ import java.util.Map;
 class NUTSSampler implements SamplingAlgorithm {
 
     private final KeanuRandom random;
-    private final List<Vertex<DoubleTensor>> latentVertices;
-    private final List<? extends Vertex> sampleFromVertices;
-    private final List<Vertex> probabilisticVertices;
+    private final List<? extends Variable<DoubleTensor, ?>> latentVariables;
+    private final List<? extends Variable> sampleFromVariables;
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
     private final Stepsize stepsize;
     private final Tree tree;
-    private final LogProbGradientCalculator logProbGradientCalculator;
+    private final ProbabilisticModelWithGradient logProbGradientCalculator;
     private final Statistics statistics;
     private final boolean saveStatistics;
     private int sampleNum;
 
     /**
-     * @param sampleFromVertices        vertices to sample from
-     * @param latentVertices            vertices that represent latent variables
-     * @param probabilisticVertices     vertices that contribute to total log probability (i.e. latent + observed)
+     * @param sampleFromVariables        variables to sample from
+     * @param latentVariables            variables that represent latent variables
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
      * @param adaptEnabled              enable the NUTS step size adaptation
      * @param stepsize                  configuration for tuning the stepsize, if adaptEnabled
@@ -46,10 +44,9 @@ class NUTSSampler implements SamplingAlgorithm {
      * @param statistics                the sampler statistics
      * @param saveStatistics            whether to record statistics
      */
-    public NUTSSampler(List<? extends Vertex> sampleFromVertices,
-                       List<Vertex<DoubleTensor>> latentVertices,
-                       List<Vertex> probabilisticVertices,
-                       LogProbGradientCalculator logProbGradientCalculator,
+    public NUTSSampler(List<? extends Variable> sampleFromVariables,
+                       List<? extends Variable<DoubleTensor, ?>> latentVariables,
+                       ProbabilisticModelWithGradient logProbGradientCalculator,
                        boolean adaptEnabled,
                        Stepsize stepsize,
                        Tree tree,
@@ -58,9 +55,8 @@ class NUTSSampler implements SamplingAlgorithm {
                        Statistics statistics,
                        boolean saveStatistics) {
 
-        this.sampleFromVertices = sampleFromVertices;
-        this.probabilisticVertices = probabilisticVertices;
-        this.latentVertices = latentVertices;
+        this.sampleFromVariables = sampleFromVariables;
+        this.latentVariables = latentVariables;
         this.logProbGradientCalculator = logProbGradientCalculator;
 
         this.tree = tree;
@@ -76,7 +72,7 @@ class NUTSSampler implements SamplingAlgorithm {
     }
 
     @Override
-    public void sample(Map<VertexId, List<?>> samples, List<Double> logOfMasterPForEachSample) {
+    public void sample(Map<VariableReference, List<?>> samples, List<Double> logOfMasterPForEachSample) {
         step();
         addSampleFromCache(samples, tree.getSampleAtAcceptedPosition());
         logOfMasterPForEachSample.add(tree.getLogOfMasterPAtAcceptedPosition());
@@ -91,7 +87,7 @@ class NUTSSampler implements SamplingAlgorithm {
     @Override
     public void step() {
 
-        initializeMomentumForEachVertex(latentVertices, tree.getForwardMomentum(), random);
+        initializeMomentumForEachVariable(latentVariables, tree.getForwardMomentum(), random);
         cache(tree.getForwardMomentum(), tree.getBackwardMomentum());
 
         double logOfMasterPMinusMomentumBeforeLeapfrog = tree.getLogOfMasterPAtAcceptedPosition() - 0.5 * dotProduct(tree.getForwardMomentum());
@@ -108,10 +104,9 @@ class NUTSSampler implements SamplingAlgorithm {
 
             Tree otherHalfTree = Tree.buildOtherHalfOfTree(
                 tree,
-                latentVertices,
-                probabilisticVertices,
+                latentVariables,
                 logProbGradientCalculator,
-                sampleFromVertices,
+                sampleFromVariables,
                 logU,
                 buildDirection,
                 treeHeight,
@@ -156,21 +151,21 @@ class NUTSSampler implements SamplingAlgorithm {
         tree.save(statistics);
     }
 
-    private static void initializeMomentumForEachVertex(List<Vertex<DoubleTensor>> vertices,
-                                                        Map<VertexId, DoubleTensor> momentums,
-                                                        KeanuRandom random) {
-        for (Vertex<DoubleTensor> vertex : vertices) {
-            momentums.put(vertex.getId(), random.nextGaussian(vertex.getShape()));
+    private static void initializeMomentumForEachVariable(List<? extends Variable<DoubleTensor, ?>> variables,
+                                                          Map<VariableReference, DoubleTensor> momentums,
+                                                          KeanuRandom random) {
+        for (Variable<DoubleTensor, ?> variable : variables) {
+            momentums.put(variable.getReference(), random.nextGaussian(variable.getShape()));
         }
     }
 
-    private static void cache(Map<VertexId, DoubleTensor> from, Map<VertexId, DoubleTensor> to) {
-        for (Map.Entry<VertexId, DoubleTensor> entry : from.entrySet()) {
+    private static void cache(Map<? extends VariableReference, DoubleTensor> from, Map<VariableReference, DoubleTensor> to) {
+        for (Map.Entry<? extends VariableReference, DoubleTensor> entry : from.entrySet()) {
             to.put(entry.getKey(), entry.getValue());
         }
     }
 
-    private static double dotProduct(Map<VertexId, DoubleTensor> momentums) {
+    private static double dotProduct(Map<? extends VariableReference, DoubleTensor> momentums) {
         double dotProduct = 0.0;
         for (DoubleTensor momentum : momentums.values()) {
             dotProduct += momentum.pow(2).sum();
@@ -184,15 +179,15 @@ class NUTSSampler implements SamplingAlgorithm {
      * @param samples      samples taken already
      * @param cachedSample a cached sample from before leapfrog
      */
-    private static void addSampleFromCache(Map<VertexId, List<?>> samples, Map<VertexId, ?> cachedSample) {
-        for (Map.Entry<VertexId, ?> sampleEntry : cachedSample.entrySet()) {
-            addSampleForVertex(sampleEntry.getKey(), sampleEntry.getValue(), samples);
+    private static void addSampleFromCache(Map<VariableReference, List<?>> samples, Map<VariableReference, ?> cachedSample) {
+        for (Map.Entry<VariableReference, ?> sampleEntry : cachedSample.entrySet()) {
+            addSampleForVariable(sampleEntry.getKey(), sampleEntry.getValue(), samples);
         }
     }
 
-    private static <T> void addSampleForVertex(VertexId id, T value, Map<VertexId, List<?>> samples) {
-        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(id, v -> new ArrayList<T>());
-        samplesForVertex.add(value);
+    private static <T> void addSampleForVariable(VariableReference id, T value, Map<VariableReference, List<?>> samples) {
+        List<T> samplesForVariable = (List<T>) samples.computeIfAbsent(id, v -> new ArrayList<T>());
+        samplesForVariable.add(value);
     }
 
 }

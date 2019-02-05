@@ -161,23 +161,13 @@ The parameters are:
 * The vertices in the network to return samples for (latent vertices)
 * The number of samples to take
 
-##### Java
-
-```java
-{% snippet InfHamiltonian %}
-```
-
-##### Python
-
-```python
-{% snippet PythonHamiltonianExample %}
-```
 
 ### NUTS
 
-#### Algorithm
+NUTS is an auto-tuning implementation of HMC.
 
-NUTS is built on top of HMC. 
+#### Algorithm
+ 
 As the sample moves through the distribution, there are features in place that stop it from performing 
 a U-turn and re-exploring locations. 
 Hence why it's called the 'No-U-Turn Sampler'. 

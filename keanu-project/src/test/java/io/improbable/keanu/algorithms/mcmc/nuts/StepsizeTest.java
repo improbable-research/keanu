@@ -1,12 +1,12 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -42,21 +42,19 @@ public class StepsizeTest {
 
     private double calculateStepsize(DoubleVertex vertex, double startingValue) {
         List<DoubleVertex> vertices = Arrays.asList(vertex);
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(vertex.getConnectedGraph());
+        KeanuProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(vertex.getConnectedGraph());
 
         VertexId vertexId = vertex.getId();
 
-        LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesianNetwork.getLatentOrObservedVertices(), vertices);
         vertex.setValue(DoubleTensor.scalar(startingValue));
-        Map<VertexId, DoubleTensor> position = Collections.singletonMap(vertexId, vertex.getValue());
-        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+        Map<VariableReference, DoubleTensor> position = Collections.singletonMap(vertexId, vertex.getValue());
+        Map<? extends VariableReference, DoubleTensor> gradient = model.logProbGradients();
 
         return Stepsize.findStartingStepSize(
             position,
             gradient,
             Collections.singletonList(vertex),
-            bayesianNetwork.getLatentVertices(),
-            logProbGradientCalculator,
+            model,
             ProbabilityCalculator.calculateLogProbFor(vertices),
             random
         );

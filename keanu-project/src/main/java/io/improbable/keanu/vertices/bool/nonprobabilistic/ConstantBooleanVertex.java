@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class ConstantBooleanVertex extends BooleanVertex implements ConstantVertex, NonProbabilistic<BooleanTensor> {
 
@@ -32,11 +31,6 @@ public class ConstantBooleanVertex extends BooleanVertex implements ConstantVert
 
     public ConstantBooleanVertex(boolean[] data, long[] shape) {
         this(BooleanTensor.create(data, shape));
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return getValue();
     }
 
     @Override

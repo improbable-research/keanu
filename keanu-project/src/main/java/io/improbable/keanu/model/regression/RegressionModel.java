@@ -1,7 +1,7 @@
 package io.improbable.keanu.model.regression;
 
-import io.improbable.keanu.model.Model;
 import io.improbable.keanu.model.ModelFitter;
+import io.improbable.keanu.model.PredictiveModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -22,7 +22,7 @@ import java.util.function.Function;
  *      .build();
  * </pre>
  */
-public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
+public class RegressionModel<OUTPUT> implements PredictiveModel<DoubleTensor, OUTPUT> {
     private static final double DEFAULT_OBSERVATION_SIGMA = 1.0;
     private final ModelFitter fitter;
     private final LinearRegressionGraph<OUTPUT> modelGraph;

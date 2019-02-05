@@ -1,13 +1,13 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.RollbackAndCascadeOnRejection;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.SamplingModelFitting;
 import io.improbable.keanu.model.regression.RegressionModel;
@@ -40,7 +40,7 @@ public class LinearRegressionTest {
         DoubleVertex y = new GaussianVertex(x.multiply(weight).plus(intercept), 5.0);
         y.observe(data.yTrain);
 
-        Optimizer optimizer = KeanuOptimizer.of(weight.getConnectedGraph());
+        io.improbable.keanu.algorithms.variational.optimizer.Optimizer optimizer = Keanu.Optimizer.of(weight.getConnectedGraph());
         optimizer.maxLikelihood();
 
         assertWeightsAndInterceptMatchTestData(
@@ -79,7 +79,7 @@ public class LinearRegressionTest {
         y.observe(data.yTrain);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.of(bayesNet);
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.of(bayesNet);
 
         optimizer.maxLikelihood();
 
@@ -116,7 +116,7 @@ public class LinearRegressionTest {
         y.observe(data.yTrain);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.of(bayesNet);
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.of(bayesNet);
         optimizer.maxLikelihood();
 
         assertWeightsAndInterceptMatchTestData(
@@ -150,9 +150,10 @@ public class LinearRegressionTest {
 
         ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(0.25));
 
-        SamplingModelFitting sampling = new SamplingModelFitting(MetropolisHastings.builder()
+        SamplingModelFitting sampling = new SamplingModelFitting(model -> MetropolisHastings.builder()
             .proposalDistribution(proposalDistribution)
             .variableSelector(MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR)
+            .rejectionStrategy(new RollbackAndCascadeOnRejection())
             .build(),
             samplingCount);
 

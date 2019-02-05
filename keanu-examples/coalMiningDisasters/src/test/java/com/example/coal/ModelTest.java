@@ -1,7 +1,7 @@
 package com.example.coal;
 
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 

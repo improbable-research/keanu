@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.lang.reflect.Array;
@@ -49,11 +48,6 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
     @Override
     public IntegerTensor calculate() {
         return op(extractFromInputs(IntegerTensor.class, Vertex::getValue, input));
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(IntegerTensor.class, Vertex::sample, input));
     }
 
     private IntegerTensor op(IntegerTensor... inputs) {

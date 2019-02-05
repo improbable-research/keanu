@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -89,14 +88,6 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     @Override
     public boolean hasValue() {
         return hasValue;
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        for (Vertex<? extends Tensor> input : inputs.values()) {
-            input.sample();
-        }
-        return calculate();
     }
 
     @Override

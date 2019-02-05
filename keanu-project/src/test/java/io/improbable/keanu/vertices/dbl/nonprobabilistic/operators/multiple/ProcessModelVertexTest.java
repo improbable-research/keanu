@@ -2,11 +2,10 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
-import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
@@ -27,6 +26,8 @@ import org.junit.experimental.categories.Category;
 import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import static io.improbable.keanu.Keanu.Sampling.MetropolisHastings;
 
 public class ProcessModelVertexTest {
 
@@ -83,7 +84,7 @@ public class ProcessModelVertexTest {
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
-        
+
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -119,8 +120,9 @@ public class ProcessModelVertexTest {
     @Test
     public void modelInsideVertexIsRecalculatedOnEachParentSample() {
         int numSamples = 50;
-        weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        GaussianVertex probabilisticInput = new GaussianVertex(21., 1.);
+        weatherModel.setInputToModel(probabilisticInput);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), probabilisticInput);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
 
@@ -129,8 +131,8 @@ public class ProcessModelVertexTest {
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
 
         for (int i = 0; i < numSamples; i++) {
-            double inputValue = inputToModel.sample().scalar();
-            inputToModel.setAndCascade(inputValue);
+            double inputValue = probabilisticInput.sample().scalar();
+            probabilisticInput.setAndCascade(inputValue);
             double expectedValue = (inputValue * 0.1) * (inputValue * 2);
             Assert.assertEquals(expectedValue, shouldIBringUmbrella.getValue().scalar(), 1e-6);
         }
@@ -155,7 +157,7 @@ public class ProcessModelVertexTest {
         temperatureReadingOne.observe(3.0);
         temperatureReadingTwo.observe(60.0);
 
-        NonGradientOptimizer nonGradientOptimizer = KeanuOptimizer.NonGradient.of(temperatureReadingTwo.getConnectedGraph());
+        NonGradientOptimizer nonGradientOptimizer = Keanu.Optimizer.NonGradient.of(temperatureReadingTwo.getConnectedGraph());
         nonGradientOptimizer.maxLikelihood();
         Assert.assertEquals(30.0, inputToModel.getValue().scalar(), 0.1);
     }
@@ -168,7 +170,7 @@ public class ProcessModelVertexTest {
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model = LambdaModelVertex.createFromProcess(inputs, COMMAND, weatherModel::updateValues);
-        
+
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -177,10 +179,10 @@ public class ProcessModelVertexTest {
         chanceOfRainObservation.observe(3.0);
         humidityObservation.observe(60.0);
 
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(chanceOfRainObservation.getConnectedGraph());
+        KeanuProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(chanceOfRainObservation.getConnectedGraph());
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
-            bayesianNetwork,
+            probabilisticModel,
             inputToModel,
             220
         );
