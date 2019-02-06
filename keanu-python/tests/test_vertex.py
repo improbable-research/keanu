@@ -31,14 +31,14 @@ def assert_vertex_value_equals_ndarray(vertex: Vertex, expected_type: Type, ndar
     vertex_value = vertex.get_value()
     expected_value = ndarray.astype(expected_type)
     assert np.array_equal(vertex_value, expected_value)
-    assert vertex_value.dtype == expected_type
+    assert np.issubdtype(vertex_value.dtype, expected_type)
 
 
 def assert_vertex_value_equals_pandas(vertex: Vertex, expected_type: Type, pandas: pandas_types) -> None:
     get_value = vertex.get_value()
     expected_value = pandas.values.astype(expected_type).reshape(get_value.shape)
     assert np.array_equal(get_value, expected_value)
-    assert get_value.dtype == expected_type
+    assert np.issubdtype(get_value.dtype, expected_type)
 
 
 def test_can_pass_scalar_to_vertex(jvm_view: JVMView) -> None:
