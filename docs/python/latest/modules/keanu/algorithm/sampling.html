@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>keanu.algorithm.sampling &#8212; keanu 0.0.19 documentation</title>
+    <title>keanu.algorithm.sampling &#8212; keanu 0.0.20 documentation</title>
     <link rel="stylesheet" href="../../../static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
@@ -115,10 +115,10 @@
 
 <div class="viewcode-block" id="MetropolisHastingsSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.MetropolisHastingsSampler">[docs]</a><span class="k">class</span> <span class="nc">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param str proposal_distribution: The proposal distribution for metropolis hastings. Options are &#39;gaussian&#39; and &#39;prior&#39;.</span>
-<span class="sd">    :param Iterable[Vertex] latents: All latent vertices.</span>
-<span class="sd">    :param List[] proposal_listeners: Listeners for proposal creation and rejection. Options are :class:`keanu.algorithm.AcceptanceRateTracker`.</span>
-<span class="sd">    :param ndarray proposal_distribution_sigma: Parameter sigma for &#39;gaussian&#39; proposal distribution.</span>
+<span class="sd">    :param proposal_distribution: The proposal distribution for metropolis hastings. Options are &#39;gaussian&#39; and &#39;prior&#39;.</span>
+<span class="sd">    :param latents: All latent vertices.</span>
+<span class="sd">    :param proposal_listeners: Listeners for proposal creation and rejection. Options are :class:`keanu.algorithm.AcceptanceRateTracker`.</span>
+<span class="sd">    :param proposal_distribution_sigma: Parameter sigma for &#39;gaussian&#39; proposal distribution.</span>
 
 <span class="sd">    :raises TypeError: If you pass `proposal_listener` without specifying `proposal_distribution`.</span>
 <span class="sd">    :raises TypeError: If you choose &#39;gaussian&#39; as `proposal_distribution` but did not specify `proposal_distribution_sigma`.</span>
@@ -154,11 +154,11 @@
 
 <div class="viewcode-block" id="NUTSSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.NUTSSampler">[docs]</a><span class="k">class</span> <span class="nc">NUTSSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param int adapt_count: The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value. Defaults to None.</span>
-<span class="sd">    :param float target_acceptance_prob: The target acceptance probability. A suggested value of this is 0.65 (Beskos et al., 2010; Neal, 2011). Defaults to None.</span>
-<span class="sd">    :param bool adapt_enabled: Determines whether the step size will adapt during the first adaptCount samples. Defaults to None.</span>
-<span class="sd">    :param float initial_step_size: Sets the initial step size. If none is given then a heuristic will be used to determine a good step size. Defaults to None.</span>
-<span class="sd">    :param int max_tree_height: The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample. Defaults to None.</span>
+<span class="sd">    :param adapt_count: The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value.</span>
+<span class="sd">    :param target_acceptance_prob: The target acceptance probability. A suggested value of this is 0.65 (Beskos et al., 2010; Neal, 2011).</span>
+<span class="sd">    :param adapt_enabled: Determines whether the step size will adapt during the first adaptCount samples.</span>
+<span class="sd">    :param initial_step_size: Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.</span>
+<span class="sd">    :param max_tree_height: The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -197,30 +197,26 @@
            <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
            <span class="n">ax</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sample_types</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param BayesNet net: Bayesian Network containing latent variables.</span>
-<span class="sd">    :param Iterable[Vertex] sample_from: Vertices to include in the returned samples.</span>
-<span class="sd">    :param PosteriorSamplingAlgorithm sampling_algorithm: The posterior sampling algorithm to use.</span>
+<span class="sd">    :param net: Bayesian Network containing latent variables.</span>
+<span class="sd">    :param sample_from: Vertices to include in the returned samples.</span>
+<span class="sd">    :param sampling_algorithm: The posterior sampling algorithm to use.</span>
 <span class="sd">        Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.</span>
 <span class="sd">        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with &#39;prior&#39; as its proposal distribution.</span>
-<span class="sd">    :param int draws: The number of samples to take.</span>
-<span class="sd">        Defaults to 500.</span>
-<span class="sd">    :param int drop: The number of samples to drop before collecting anything.</span>
-<span class="sd">        If this is zero then no samples will be dropped before collecting. Defaults to 0.</span>
-<span class="sd">    :param int down_sample_interval: Collect 1 sample for every `down_sample_interval`.</span>
+<span class="sd">    :param draws: The number of samples to take.</span>
+<span class="sd">    :param drop: The number of samples to drop before collecting anything.</span>
+<span class="sd">        If this is zero then no samples will be dropped before collecting.</span>
+<span class="sd">    :param down_sample_interval: Collect 1 sample for every `down_sample_interval`.</span>
 <span class="sd">        If this is 1 then there will be no down-sampling.</span>
 <span class="sd">        If this is 2 then every other sample will be taken.</span>
 <span class="sd">        If this is 3 then 2 samples will be dropped before one is taken.</span>
-<span class="sd">        Defaults to 1.</span>
-<span class="sd">    :param bool plot: Flag for plotting the trace after sampling.</span>
+<span class="sd">    :param plot: Flag for plotting the trace after sampling.</span>
 <span class="sd">        Call `matplotlib.pyplot.show &lt;https://matplotlib.org/api/_as_gen/matplotlib.pyplot.show.html&gt;`_ to display the plot.</span>
-<span class="sd">        Defaults to False.</span>
 <span class="sd">    :param Axes ax: `matplotlib.axes.Axes &lt;https://matplotlib.org/api/axes_api.html&gt;`_.</span>
 <span class="sd">        If not set, a new one is created.</span>
 
-<span class="sd">    :return: Dictionary of samples at an index (tuple) for each vertex label (str).</span>
-<span class="sd">    If all the vertices in `sample_from` are scalar, the dictionary is only keyed by label.</span>
-
 <span class="sd">    :raises ValueError: If `sample_from` contains vertices without labels.</span>
+
+<span class="sd">    :return: Dictionary of samples at an index (tuple) for each vertex label (str). If all the vertices in `sample_from` are scalar, the dictionary is only keyed by label.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">sample_from</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
@@ -257,29 +253,26 @@
                      <span class="n">refresh_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
                      <span class="n">ax</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sample_generator_types</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param BayesNet net: Bayesian Network containing latent variables.</span>
-<span class="sd">    :param Iterable[Vertex] sample_from: Vertices to include in the returned samples.</span>
-<span class="sd">    :param PosteriorSamplingAlgorithm sampling_algorithm: The posterior sampling algorithm to use.</span>
+<span class="sd">    :param net: Bayesian Network containing latent variables.</span>
+<span class="sd">    :param sample_from: Vertices to include in the returned samples.</span>
+<span class="sd">    :param sampling_algorithm: The posterior sampling algorithm to use.</span>
 <span class="sd">        Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.</span>
 <span class="sd">        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with &#39;prior&#39; as its proposal distribution.</span>
-<span class="sd">    :param int drop: The number of samples to drop before collecting anything.</span>
-<span class="sd">        If this is zero then no samples will be dropped before collecting. Defaults to 0.</span>
-<span class="sd">    :param int down_sample_interval: Collect 1 sample for every `down_sample_interval`.</span>
+<span class="sd">    :param drop: The number of samples to drop before collecting anything.</span>
+<span class="sd">        If this is zero then no samples will be dropped before collecting.</span>
+<span class="sd">    :param down_sample_interval: Collect 1 sample for every `down_sample_interval`.</span>
 <span class="sd">        If this is 1 then there will be no down-sampling.</span>
 <span class="sd">        If this is 2 then every other sample will be taken.</span>
 <span class="sd">        If this is 3 then 2 samples will be dropped before one is taken.</span>
-<span class="sd">        Defaults to 1.</span>
-<span class="sd">    :param bool live_plot: Flag for plotting the trace while sampling.</span>
+<span class="sd">    :param live_plot: Flag for plotting the trace while sampling.</span>
 <span class="sd">        Call `matplotlib.pyplot.show &lt;https://matplotlib.org/api/_as_gen/matplotlib.pyplot.show.html&gt;`_ to display the plot.</span>
-<span class="sd">        Defaults to False.</span>
-<span class="sd">    :param int refresh_every: Period of plot updates (in sample number).</span>
+<span class="sd">    :param refresh_every: Period of plot updates (in sample number).</span>
 <span class="sd">    :param Axes ax: `matplotlib.axes.Axes &lt;https://matplotlib.org/api/axes_api.html&gt;`_.</span>
 <span class="sd">        If not set, a new one is created.</span>
 
-<span class="sd">    :yields: Dictionaries of samples at an index (tuple) for each vertex label (str).</span>
-<span class="sd">    If all the vertices in `sample_from` are scalar, each dictionary is only keyed by label.</span>
-
 <span class="sd">    :raises ValueError: If `sample_from` contains vertices without labels.</span>
+
+<span class="sd">    :return: Dictionary of samples at an index (tuple) for each vertex label (str). If all the vertices in `sample_from` are scalar, the dictionary is only keyed by label.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sample_from</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
     <span class="n">id_to_label</span> <span class="o">=</span> <span class="n">__check_if_vertices_are_labelled</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
@@ -421,7 +414,7 @@
       &copy;2018, Improbable.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

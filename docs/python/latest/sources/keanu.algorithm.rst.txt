@@ -9,7 +9,7 @@ Inference
     :members: sample, generate_samples
 
 Samplers
-~~~~~~~
+~~~~~~~~
 
 .. automodule:: keanu.algorithm
     :members: MetropolisHastingsSampler, NUTSSampler
