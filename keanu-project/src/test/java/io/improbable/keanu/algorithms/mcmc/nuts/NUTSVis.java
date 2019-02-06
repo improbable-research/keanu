@@ -28,7 +28,7 @@ public class NUTSVis extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        ModelForNUTSVis modelForVis = new ModelForVis();
+        ModelForNUTSVis modelForVis = new RadonForVis();
 
         int sampleCount = modelForVis.getSampleCount();
         List<Vertex> toPlot = modelForVis.getToPlot();

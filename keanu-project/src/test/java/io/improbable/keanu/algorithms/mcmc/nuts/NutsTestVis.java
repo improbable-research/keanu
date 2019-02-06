@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class NutsTestVis {
 
     public static void main(String[] args) {
-        new NutsTestVis().showSingleGaussian();
+        new NutsTestVis().sumGaussian();
     }
 
 
@@ -67,5 +67,58 @@ public class NutsTestVis {
 
         Vizer.histogram(samples, "NUTS");
         Vizer.histogram(samplesDirect, "Direct");
+    }
+
+    public void donut(){
+        BayesianNetwork donutBayesNet = MCMCTestDistributions.create2DDonutDistribution();
+        ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(donutBayesNet);
+
+        NUTS nuts = NUTS.builder()
+            .adaptCount(20000)
+            .saveStatistics(true)
+            .build();
+
+        NetworkSamples samples = nuts.getPosteriorSamples(
+            model,
+            model.getLatentVariables(),
+            20000
+        );
+
+        Vertex<DoubleTensor> A = donutBayesNet.getContinuousLatentVertices().get(0);
+        Vertex<DoubleTensor> B = donutBayesNet.getContinuousLatentVertices().get(1);
+
+        List<Double> samplesA = samples.get(A).asList().stream().map(v -> v.scalar()).collect(Collectors.toList());
+        List<Double> samplesB = samples.get(B).asList().stream().map(v -> v.scalar()).collect(Collectors.toList());
+
+        double averageMTA = nuts.getStatistics().get(NUTS.Metrics.MEAN_TREE_ACCEPT).stream().mapToDouble(v -> v).average().getAsDouble();
+        double averageTreeSize = nuts.getStatistics().get(NUTS.Metrics.TREE_SIZE).stream().mapToDouble(v -> v).average().getAsDouble();
+        double averageStepSize = nuts.getStatistics().get(NUTS.Metrics.STEPSIZE).stream().mapToDouble(v -> v).average().getAsDouble();
+
+        Vizer.scatter(samplesA, samplesB, "donut");
+    }
+
+    public void sumGaussian(){
+        BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 15.0);
+        ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(bayesNet);
+
+        int sampleCount = 6000;
+        NUTS nuts = NUTS.builder()
+            .adaptCount(sampleCount)
+            .maxTreeHeight(7)
+            .build();
+
+        NetworkSamples samples = nuts.getPosteriorSamples(
+            model,
+            model.getLatentVariables(),
+            sampleCount
+        ).drop(sampleCount / 4);
+
+        Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
+        Vertex<DoubleTensor> B = bayesNet.getContinuousLatentVertices().get(1);
+
+        List<Double> samplesA = samples.get(A).asList().stream().map(v -> v.scalar()).collect(Collectors.toList());
+        List<Double> samplesB = samples.get(B).asList().stream().map(v -> v.scalar()).collect(Collectors.toList());
+
+        Vizer.scatter(samplesA, samplesB, "Gaussian Sum");
     }
 }

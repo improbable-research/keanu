@@ -37,14 +37,14 @@ public class RadonForVis implements ModelForNUTSVis {
             throw new IllegalArgumentException("Not enough data for " + numberOfModels + " models!");
         }
 
-        GaussianVertex muAlpha = new GaussianVertex(0, 10).setLabel("MuIntercept");
-        GaussianVertex muBeta = new GaussianVertex(0, 10).setLabel("MuGradient");
+        GaussianVertex muAlpha = new GaussianVertex(0, 5).setLabel("MuIntercept");
+        GaussianVertex muBeta = new GaussianVertex(0, 5).setLabel("MuGradient");
 
 //        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(0.5).setLabel("SigmaIntercept");
 //        HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(0.5).setLabel("SigmaGradient");
 
-        DoubleVertex sigmaAlpha = new GaussianVertex(new long[]{1, 1}, 0, 0.5).pow(2).pow(0.5).plus(1e-6).setLabel("SigmaIntercept");
-        DoubleVertex sigmaBeta = new GaussianVertex(new long[]{1, 1}, 0, 0.5).pow(2).pow(0.5).plus(1e-6).setLabel("SigmaGradient");
+        DoubleVertex sigmaAlpha = new GaussianVertex(new long[]{1, 1}, 0, 0.5).pow(2).pow(0.5).setLabel("SigmaIntercept");
+        DoubleVertex sigmaBeta = new GaussianVertex(new long[]{1, 1}, 0, 0.5).pow(2).pow(0.5).setLabel("SigmaGradient");
 
         radonData.keySet().stream()
             .sorted()
@@ -88,9 +88,9 @@ public class RadonForVis implements ModelForNUTSVis {
     @Override
     public NUTS getSamplingAlgorithm() {
         return NUTS.builder()
-            .maxTreeHeight(8)
-            .adaptEnabled(false)
-            .initialStepSize(0.15)
+            .maxTreeHeight(5)
+//            .adaptEnabled(false)
+//            .initialStepSize(0.15)
             .saveStatistics(true)
             .build();
     }

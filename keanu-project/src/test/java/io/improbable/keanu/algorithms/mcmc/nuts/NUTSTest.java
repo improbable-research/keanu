@@ -123,13 +123,13 @@ public class NUTSTest {
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(donutBayesNet);
 
         NUTS nuts = NUTS.builder()
-            .adaptCount(1000)
+            .adaptCount(2000)
             .build();
 
         NetworkSamples samples = nuts.getPosteriorSamples(
             model,
             model.getLatentVariables(),
-            1000
+            2000
         );
 
         Vertex<DoubleTensor> A = donutBayesNet.getContinuousLatentVertices().get(0);

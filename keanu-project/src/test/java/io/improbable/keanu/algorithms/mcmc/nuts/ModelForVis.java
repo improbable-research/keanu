@@ -29,10 +29,10 @@ public class ModelForVis implements ModelForNUTSVis {
 
         GaussianVertex A = new GaussianVertex(20, 1);
         A.setLabel("A");
-        A.setValue(10);
+//        A.setValue(-10);
         GaussianVertex B = new GaussianVertex(20, 1);
         B.setLabel("B");
-        B.setValue(10);
+//        B.setValue(-10);
         AdditionVertex D = A.plus(B);
         GaussianVertex C = new GaussianVertex(D, 1);
         C.observe(46);
@@ -40,14 +40,15 @@ public class ModelForVis implements ModelForNUTSVis {
         model = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
 //        KeanuOptimizer.Gradient.builderFor(A.getConnectedGraph()).build().maxAPosteriori();
 
+        sampleCount = 6000;
+
         samplingAlgorithm = Keanu.Sampling.NUTS.builder()
-            .adaptCount(500)
+            .adaptCount(sampleCount)
+            .maxTreeHeight(7)
 //            .adaptEnabled(false)
             .saveStatistics(true)
             .build();
 
         toPlot = Arrays.asList(A, B);
-
-        sampleCount = 500;
     }
 }
