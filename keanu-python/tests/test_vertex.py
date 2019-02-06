@@ -364,7 +364,7 @@ def test_java_vertex_to_python_vertex_persists_label() -> None:
 
 def test_can_get_parents_and_children() -> None:
 
-    def labels_match(lhs, rhs):
+    def labels_match(lhs, rhs) -> bool:
         return [l.get_label() for l in lhs] == [r.get_label() for r in rhs]
 
     parents = (Gaussian(0, 1, label="parent1"), Gaussian(0, 1, label="parent2"))
