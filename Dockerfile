@@ -68,20 +68,11 @@ RUN /var/lib/dpkg/info/ca-certificates-java.postinst configure
 
 RUN pip install JPype1==0.6.3
 
-#install Gradle
-RUN wget -q https://services.gradle.org/distributions/gradle-5.1-bin.zip \
-    && unzip gradle-5.1-bin.zip -d /opt \
-    && rm gradle-5.1-bin.zip
-
-# Set Gradle in the environment variables
-ENV GRADLE_HOME /opt/gradle-5.1
-ENV PATH $PATH:/opt/gradle-5.1/bin
-
 COPY . /home/gradle/project/
 
 USER root
 
 WORKDIR /home/gradle/project/var/keanu
-RUN gradle build
+RUN ./gradlew build
 
 WORKDIR /home/gradle/project
