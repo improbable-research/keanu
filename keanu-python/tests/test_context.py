@@ -51,3 +51,12 @@ def test_you_can_get_info_from_a_java_exception() -> None:
     assert java_exception.get_message() == "Illegal initial capacity: -1"
     assert str(java_exception) == "java.lang.IllegalArgumentException: Illegal initial capacity: -1"
     assert java_exception.unwrap().getCause() == None
+
+
+def test_you_can_throw_a_java_exception() -> None:
+    with pytest.raises(JavaException, match="Illegal initial capacity: -1"):
+        context = KeanuContext()
+        try:
+            context.jvm_view().java.util.HashMap(-1)
+        except Py4JJavaError as e:
+            raise JavaException(e)

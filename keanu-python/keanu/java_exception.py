@@ -3,7 +3,7 @@ from py4j.protocol import Py4JJavaError
 from keanu.base import JavaObjectWrapper
 
 
-class JavaException(JavaObjectWrapper):
+class JavaException(JavaObjectWrapper, Exception):
 
     def __init__(self, e: Py4JJavaError):
         super().__init__(e.java_exception)
