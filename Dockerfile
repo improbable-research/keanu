@@ -1,5 +1,16 @@
 FROM python:3.6.6-stretch
 
+
+# A few reasons for installing distribution-provided OpenJDK:
+#
+#  1. Oracle.  Licensing prevents us from redistributing the official JDK.
+#
+#  2. Compiling OpenJDK also requires the JDK to be installed, and it gets
+#     really hairy.
+#
+#     For some sample build times, see Debian's buildd logs:
+#       https://buildd.debian.org/status/logs.php?pkg=openjdk-8
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		bzip2 \
 		unzip \
@@ -66,9 +77,11 @@ RUN wget -q https://services.gradle.org/distributions/gradle-5.1-bin.zip \
 ENV GRADLE_HOME /opt/gradle-5.1
 ENV PATH $PATH:/opt/gradle-5.1/bin
 
-
-# Do gradle build
 COPY . /home/gradle/project/
+
+USER root
+#RUN chown -R gradle /home/gradle/project
+#USER gradle
 
 WORKDIR /home/gradle/project/var/keanu
 RUN git checkout develop
