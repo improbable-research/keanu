@@ -7,8 +7,12 @@ class JavaException(JavaObjectWrapper):
 
     def __init__(self, e: Py4JJavaError):
         super().__init__(e.java_exception)
-        self.type: str = e.java_exception.getClass().getName()
-        self.message: str = e.java_exception.getMessage()
+
+    def get_name(self) -> str:
+        return self.unwrap().getClass().getName()
+
+    def get_message(self) -> str:
+        return self.unwrap().getMessage()
 
     def __repr__(self) -> str:
-        return "{}: {}".format(self.type, self.message)
+        return self.unwrap().toString()
