@@ -58,7 +58,7 @@ class Leapfrog {
         return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient);
     }
 
-    private Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor, ?>> latentVariables, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<? extends VariableReference, DoubleTensor> position) {
+    private static Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor, ?>> latentVariables, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<? extends VariableReference, DoubleTensor> position) {
         Map<VariableReference, DoubleTensor> nextPosition = new HashMap<>();
 
         for (Variable<DoubleTensor, ?> latent : latentVariables) {
@@ -75,7 +75,7 @@ class Leapfrog {
         return nextPosition;
     }
 
-    private Map<VariableReference, DoubleTensor> stepMomentum(double halfTimeStep, Map<? extends VariableReference, DoubleTensor> momentum, Map<? extends VariableReference, DoubleTensor> gradient) {
+    private static Map<VariableReference, DoubleTensor> stepMomentum(double halfTimeStep, Map<? extends VariableReference, DoubleTensor> momentum, Map<? extends VariableReference, DoubleTensor> gradient) {
         Map<VariableReference, DoubleTensor> nextMomentum = new HashMap<>();
         for (Map.Entry<? extends VariableReference, DoubleTensor> rEntry : momentum.entrySet()) {
             final DoubleTensor updatedMomentum = gradient.get(rEntry.getKey()).times(halfTimeStep).plusInPlace(rEntry.getValue());
@@ -98,10 +98,6 @@ class Leapfrog {
 
     public Map<? extends VariableReference, DoubleTensor> getGradient() {
         return gradient;
-    }
-
-    public Leapfrog makeJumpTo(Map<VariableReference, DoubleTensor> position, Map<? extends VariableReference, DoubleTensor> gradient) {
-        return new Leapfrog(position, getMomentum(), gradient);
     }
 
     private static double dotProduct(Map<? extends VariableReference, DoubleTensor> momentums) {

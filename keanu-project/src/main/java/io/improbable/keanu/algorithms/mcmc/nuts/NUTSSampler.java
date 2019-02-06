@@ -10,6 +10,7 @@ import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,15 +27,15 @@ class NUTSSampler implements SamplingAlgorithm {
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
     private final Stepsize stepsize;
-    private final Tree tree;
+    private Tree tree;
     private final ProbabilisticModelWithGradient logProbGradientCalculator;
     private final Statistics statistics;
     private final boolean saveStatistics;
     private int sampleNum;
 
     /**
-     * @param sampleFromVariables        variables to sample from
-     * @param latentVariables            variables that represent latent variables
+     * @param sampleFromVariables       variables to sample from
+     * @param latentVariables           variables that represent latent variables
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
      * @param adaptEnabled              enable the NUTS step size adaptation
      * @param stepsize                  configuration for tuning the stepsize, if adaptEnabled
@@ -87,15 +88,23 @@ class NUTSSampler implements SamplingAlgorithm {
     @Override
     public void step() {
 
-        initializeMomentumForEachVariable(latentVariables, tree.getForwardMomentum(), random);
-        cache(tree.getForwardMomentum(), tree.getBackwardMomentum());
 
-        double logOfMasterPMinusMomentumBeforeLeapfrog = tree.getLogOfMasterPAtAcceptedPosition() - 0.5 * dotProduct(tree.getForwardMomentum());
+        Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
+        initializeMomentumForEachVariable(latentVariables, momentum, random);
+
+        tree = Tree.createInitialTree(
+            tree.getAcceptedPosition(),
+            momentum,
+            tree.getGradientAtAcceptedPosition(),
+            tree.getLogOfMasterPAtAcceptedPosition(),
+            tree.getSampleAtAcceptedPosition()
+        );
+
+        double logOfMasterPMinusMomentumBeforeLeapfrog = tree.getLogOfMasterPAtAcceptedPosition() - 0.5 * dotProduct(momentum);
 
         double logU = Math.log(random.nextDouble()) + logOfMasterPMinusMomentumBeforeLeapfrog;
 
         int treeHeight = 0;
-        tree.resetTreeBeforeSample();
 
         while (tree.shouldContinue() && treeHeight < maxTreeHeight) {
 
@@ -110,13 +119,13 @@ class NUTSSampler implements SamplingAlgorithm {
                 logU,
                 buildDirection,
                 treeHeight,
-                stepsize.getStepsize(),
+                stepsize.getStepSize(),
                 logOfMasterPMinusMomentumBeforeLeapfrog,
                 random
             );
 
             if (otherHalfTree.shouldContinue()) {
-                final double acceptanceProb = (double) otherHalfTree.getAcceptedLeapfrogCount() / tree.getAcceptedLeapfrogCount();
+                final double acceptanceProb = Math.min(1, (double) otherHalfTree.getAcceptedLeapfrogCount() / (double)tree.getAcceptedLeapfrogCount());
 
                 Tree.acceptOtherPositionWithProbability(
                     acceptanceProb,
@@ -126,9 +135,12 @@ class NUTSSampler implements SamplingAlgorithm {
                 );
             }
 
-            tree.incrementLeapfrogCount(otherHalfTree.getAcceptedLeapfrogCount());
-            tree.setDeltaLikelihoodOfLeapfrog(otherHalfTree.getDeltaLikelihoodOfLeapfrog());
-            tree.setTreeSize(otherHalfTree.getTreeSize());
+            tree.setAcceptedLeapfrogCount(tree.getAcceptedLeapfrogCount() + otherHalfTree.getAcceptedLeapfrogCount());
+
+            tree.setDeltaLikelihoodOfLeapfrog(tree.getDeltaLikelihoodOfLeapfrog() + otherHalfTree.getDeltaLikelihoodOfLeapfrog());
+
+            tree.setTreeSize(tree.getTreeSize() + otherHalfTree.getTreeSize());
+
             tree.continueIfNotUTurning(otherHalfTree);
 
             treeHeight++;
@@ -142,7 +154,6 @@ class NUTSSampler implements SamplingAlgorithm {
             stepsize.adaptStepSize(tree, sampleNum);
         }
 
-        tree.acceptPositionAndGradient();
         sampleNum++;
     }
 
@@ -156,12 +167,6 @@ class NUTSSampler implements SamplingAlgorithm {
                                                           KeanuRandom random) {
         for (Variable<DoubleTensor, ?> variable : variables) {
             momentums.put(variable.getReference(), random.nextGaussian(variable.getShape()));
-        }
-    }
-
-    private static void cache(Map<? extends VariableReference, DoubleTensor> from, Map<VariableReference, DoubleTensor> to) {
-        for (Map.Entry<? extends VariableReference, DoubleTensor> entry : from.entrySet()) {
-            to.put(entry.getKey(), entry.getValue());
         }
     }
 

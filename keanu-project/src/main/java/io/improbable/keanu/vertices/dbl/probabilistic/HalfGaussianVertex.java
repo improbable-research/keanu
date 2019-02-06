@@ -52,15 +52,15 @@ public class HalfGaussianVertex extends GaussianVertex {
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Map<Vertex, DoubleTensor> logProb = super.dLogProb(value, withRespectTo);
+        Map<Vertex, DoubleTensor> dLogProb = super.dLogProb(value, withRespectTo);
         if (value.greaterThanOrEqual(MU_ZERO).allTrue()) {
-            return logProb;
+            return dLogProb;
         } else {
-            for (Map.Entry<Vertex, DoubleTensor> entry : logProb.entrySet()) {
+            for (Map.Entry<Vertex, DoubleTensor> entry : dLogProb.entrySet()) {
                 DoubleTensor v = entry.getValue();
-                logProb.put(entry.getKey(), v.setWithMaskInPlace(value.getLessThanMask(DoubleTensor.scalar(MU_ZERO)), 0.0));
+                dLogProb.put(entry.getKey(), v.setWithMaskInPlace(value.getLessThanMask(DoubleTensor.scalar(MU_ZERO)), 0.0));
             }
-            return logProb;
+            return dLogProb;
         }
     }
 

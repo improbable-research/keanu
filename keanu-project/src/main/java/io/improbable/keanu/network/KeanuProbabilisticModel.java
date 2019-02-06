@@ -52,7 +52,9 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
-        cascadeValues(inputs);
+        if (!inputs.isEmpty()) {
+            cascadeValues(inputs);
+        }
         return ProbabilityCalculator.calculateLogProbFor(this.latentOrObservedVertices);
     }
 
@@ -74,7 +76,9 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
-        cascadeValues(inputs);
+        if(!inputs.isEmpty()) {
+            cascadeValues(inputs);
+        }
         return ProbabilityCalculator.calculateLogProbFor(this.observedVertices);
     }
 

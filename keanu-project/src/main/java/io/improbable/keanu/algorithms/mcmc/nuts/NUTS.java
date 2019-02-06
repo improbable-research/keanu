@@ -19,7 +19,9 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static io.improbable.keanu.algorithms.mcmc.nuts.Stepsize.findStartingStepSizeSimple;
+import static java.util.stream.Collectors.toMap;
 
 
 /**
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
 public class NUTS implements PosteriorSamplingAlgorithm {
 
     private static final int DEFAULT_ADAPT_COUNT = 1000;
-    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.65;
+    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.8;
 
     private final Statistics statistics = new Statistics(Metrics.values());
 
@@ -73,7 +75,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     /**
      * Sample from the posterior of a probabilistic model using the No-U-Turn-Sampling algorithm
      *
-     * @param model           the probabilistic model to sample from
+     * @param model                 the probabilistic model to sample from
      * @param variablesToSampleFrom the variables inside the probabilistic model to sample from
      * @return Samples taken with NUTS
      */
@@ -98,21 +100,28 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         final List<? extends Variable<DoubleTensor, ?>> latentVariables = model.getContinuousLatentVariables();
 
-        Map<VariableReference, DoubleTensor> startingSample = SamplingAlgorithm.takeSample(latentVariables);
-        Map<VariableReference, DoubleTensor> position = startingSample.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (DoubleTensor) e.getValue()));
+        Map<VariableReference, ?> startingSample = SamplingAlgorithm.takeSample(sampleFromVariables);
+
+        Map<VariableReference, DoubleTensor> position = latentVariables.stream()
+            .collect(toMap(Variable::getReference, Variable::getValue));
+
         Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
         Map<? extends VariableReference, DoubleTensor> gradient = model.logProbGradients();
 
         double initialLogOfMasterP = model.logProb(position);
 
-        double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(
-            position,
-            gradient,
-            latentVariables,
-            model,
-            initialLogOfMasterP,
-            random
-        ) : initialStepSize;
+        double startingStepSize = (initialStepSize == null) ?
+            findStartingStepSizeSimple(0.25, latentVariables) :
+            initialStepSize;
+
+//        double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(
+//            position,
+//            gradient,
+//            latentVariables,
+//            model,
+//            initialLogOfMasterP,
+//            random
+//        ) : initialStepSize;
 
         Stepsize stepsize = new Stepsize(
             startingStepSize,
