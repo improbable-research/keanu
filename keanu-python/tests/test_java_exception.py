@@ -26,7 +26,13 @@ def test_you_can_throw_a_java_exception() -> None:
 
 
 def test_its_repr_method_gives_you_the_stack_trace():
-    expected_string = """An error occurred while calling None.java.util.HashMap.
+    context = KeanuContext()
+    with pytest.raises(Py4JJavaError) as excinfo:
+        context.jvm_view().java.util.HashMap(-1)
+
+    java_exception = JavaException(excinfo.value)
+
+    assert str(java_exception) == """An error occurred while calling None.java.util.HashMap.
 : java.lang.IllegalArgumentException: Illegal initial capacity: -1
 	at java.util.HashMap.<init>(HashMap.java:449)
 	at java.util.HashMap.<init>(HashMap.java:468)
@@ -42,13 +48,3 @@ def test_its_repr_method_gives_you_the_stack_trace():
 	at py4j.GatewayConnection.run(GatewayConnection.java:238)
 	at java.lang.Thread.run(Thread.java:748)
 """
-
-    context = KeanuContext()
-    with pytest.raises(Py4JJavaError) as excinfo:
-        context.jvm_view().java.util.HashMap(-1)
-
-    java_exception = JavaException(excinfo.value)
-
-    assert str(java_exception) == expected_string
-
-
