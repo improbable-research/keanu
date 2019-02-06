@@ -1,10 +1,7 @@
 import numpy as np
 import py4j
-import pytest
-from py4j.protocol import Py4JJavaError
 
 from keanu.context import KeanuContext
-from keanu.java_exception import JavaException
 from keanu.vertex import ConstantDouble, Concatenation
 
 
@@ -39,24 +36,3 @@ def test_you_can_create_vertex_array_from_different_types() -> None:
     array = context.to_java_vertex_array([a, b, c])
     d = Concatenation(0, [a, b, c])
     assert np.allclose(d.get_value(), [1., 2., 3., 4., 5., 6.])
-
-
-def test_you_can_get_info_from_a_java_exception() -> None:
-    context = KeanuContext()
-    with pytest.raises(Py4JJavaError) as excinfo:
-        context.jvm_view().java.util.HashMap(-1)
-
-    java_exception = JavaException(excinfo.value)
-    assert java_exception.get_name() == "java.lang.IllegalArgumentException"
-    assert java_exception.get_message() == "Illegal initial capacity: -1"
-    assert str(java_exception) == "java.lang.IllegalArgumentException: Illegal initial capacity: -1"
-    assert java_exception.unwrap().getCause() == None
-
-
-def test_you_can_throw_a_java_exception() -> None:
-    with pytest.raises(JavaException, match="Illegal initial capacity: -1"):
-        context = KeanuContext()
-        try:
-            context.jvm_view().java.util.HashMap(-1)
-        except Py4JJavaError as e:
-            raise JavaException(e)
