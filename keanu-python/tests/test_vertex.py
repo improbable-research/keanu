@@ -360,3 +360,18 @@ def test_java_vertex_to_python_vertex_persists_label() -> None:
     java_vertex = Gaussian(0., 1., label=label).unwrap()
     python_vertex = Vertex._from_java_vertex(java_vertex)
     assert python_vertex.get_label() == label
+
+
+def test_can_get_parents_and_children() -> None:
+
+    def labels_match(lhs, rhs):
+        return [l.get_label() for l in lhs] == [r.get_label() for r in rhs]
+
+    parents = (Gaussian(0, 1, label="parent1"), Gaussian(0, 1, label="parent2"))
+    children = tuple(Gaussian(parents[0], parents[1], label="child%d" % i) for i in range(5))
+
+    for parent in parents:
+        assert labels_match(parent.get_children(), children)
+
+    for child in children:
+        assert labels_match(child.get_parents(), parents)

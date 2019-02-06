@@ -76,6 +76,12 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         label = self.unwrap().getLabel()
         return None if label is None else label.getQualifiedName()
 
+    def get_parents(self) -> Iterator['Vertex']:
+        return Vertex._to_generator(self.unwrap().getParents())
+
+    def get_children(self) -> Iterator['Vertex']:
+        return Vertex._to_generator(self.unwrap().getChildren())
+
     """
     __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.
     Without this the right operators would fail.
