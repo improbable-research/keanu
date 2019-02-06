@@ -26,6 +26,9 @@ class JavaObjectWrapper:
             raise TypeError("Trying to call %s on a JavaObjectWrapper - did you forget to call %s.unwrap()?" %
                             (python_name, self._class))
 
+        if python_name in ("_val", "_class"):
+            raise ValueError("Object did not get properly constructed - probably due to an earlier unhandled Error.")
+
         java_name = _to_camel_case_name(k)
         return self.unwrap().__getattr__(java_name)
 
