@@ -11,7 +11,7 @@ def test_you_can_get_info_from_a_java_exception() -> None:
         context.jvm_view().java.util.HashMap(-1)
 
     java_exception = JavaException(excinfo.value)
-    assert java_exception.get_name() == "java.lang.IllegalArgumentException"
+    assert java_exception.get_class() == "java.lang.IllegalArgumentException"
     assert java_exception.get_message() == "Illegal initial capacity: -1"
     assert java_exception.unwrap().getCause() == None
 
