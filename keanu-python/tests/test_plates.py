@@ -57,11 +57,7 @@ def test_you_can_build_a_time_series() -> None:
         plate.add(x, label=x_label)
         plate.add(y, label=y_label)
 
-    plates = Plates(
-        initial_state={x_label: initial_x},
-        count = num_plates,
-        factory = create_time_step
-    )
+    plates = Plates(initial_state={x_label: initial_x}, count=num_plates, factory=create_time_step)
     assert plates.size() == num_plates
 
     x_from_previous_plate = None

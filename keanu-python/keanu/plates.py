@@ -15,6 +15,7 @@ java_import(k.jvm_view(), "io.improbable.keanu.plating.Plates")
 java_import(k.jvm_view(), "io.improbable.keanu.plating.PlateBuilder")
 java_import(k.jvm_view(), "io.improbable.keanu.vertices.SimpleVertexDictionary")
 
+
 class Plate(JavaObjectWrapper):
 
     def add(self, vertex: Vertex, label: Optional[str] = None) -> None:
@@ -32,23 +33,21 @@ class Plates(JavaObjectWrapper):
     def __init__(self,
                  count: int,
                  factory: Callable[[Plate], None],
-                 initial_state: Dict[str, vertex_constructor_param_types] = None
-                 ):
+                 initial_state: Dict[str, vertex_constructor_param_types] = None):
         consumer = Consumer(lambda p: factory(Plate(p)))
         builder = k.jvm_view().PlateBuilder()
 
         if initial_state is not None:
-            initial_state_java = k.to_java_map({_VertexLabel(k): cast_to_double_vertex(v).unwrap() for (k, v) in initial_state.items()})
+            initial_state_java = k.to_java_map(
+                {_VertexLabel(k): cast_to_double_vertex(v).unwrap() for (k, v) in initial_state.items()})
             vertex_dictionary = k.jvm_view().SimpleVertexDictionary.backedBy(initial_state_java)
             builder = builder.withInitialState(vertex_dictionary)
 
         builder = builder.count(count)
         builder = builder.withFactory(consumer)
 
-
         plates = builder.build()
         super(Plates, self).__init__(plates)
-
 
     def __iter__(self) -> Generator[Plate, None, None]:
         iterator = self.unwrap().iterator()
@@ -57,7 +56,6 @@ class Plates(JavaObjectWrapper):
 
     def size(self) -> int:
         return self.unwrap().size()
-
 
     @staticmethod
     def proxy_for(label: str) -> str:

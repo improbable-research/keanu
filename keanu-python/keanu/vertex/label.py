@@ -51,4 +51,3 @@ class _VertexLabel(JavaObjectWrapper):
             raise ValueError('No namespace separator "{}" found in {}'.format(_VertexLabel.__separator, label))
         name_array = label.split(_VertexLabel.__separator)
         return _VertexLabel(name_array[0], *name_array[1:])
-
