@@ -1,5 +1,9 @@
+from typing import Any, Dict
+
+import pytest
+
 from keanu.plates import Plates, Plate
-from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson
+from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, KeanuContext
 
 
 def test_you_can_iterate_over_the_plates() -> None:
@@ -29,9 +33,36 @@ def test_you_can_build_plates_with_fixed_count() -> None:
         assert plate.get(vertexLabel) is not None
 
 
-def test_you_can_build_plates_from_csv() -> None:
-    pass
+def test_you_can_build_plates_from_data() -> None:
+    num_plates = 10
 
+    data_generator = ({"x": i, "y": -i} for i in range(num_plates))
+
+    def create_vertices(plate: Plate, point: Dict[str, Any]) -> None:
+        plate.add(Const(point["x"], label="x"))
+        plate.add(Const(point["y"], label="y"))
+
+    plates = Plates(data_generator=data_generator, factory=create_vertices)
+    assert plates.size() == num_plates
+
+    i = 0
+    for plate in plates:
+        assert plate.get("x").get_value() == i
+        assert plate.get("y").get_value() == -i
+        i += 1
+
+
+def test_you_must_pass_count_or_data_generator() -> None:
+    with pytest.raises(AssertionError, match="You must specify either a count or a data_generator"):
+        Plates(factory=lambda _ : None)
+
+
+def test_you_cannot_pass_both_count_and_data_generator() -> None:
+    with pytest.raises(AssertionError, match="You must specify either a count or a data_generator"):
+        Plates(
+            factory=lambda _ : None,
+            count=1,
+            data_generator=({} for _ in []))
 
 def test_you_can_build_a_time_series() -> None:
     """

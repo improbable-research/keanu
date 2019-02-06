@@ -1,11 +1,12 @@
-from typing import Callable, Generator, Dict, Optional
+from typing import Callable, Generator, Dict, Optional, Any, Iterator
 
 from py4j.java_gateway import java_import
-from py4j.protocol import Py4JJavaError
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.functional import Consumer
+from keanu.functional import BiConsumer
+from keanu.functional import JavaIterator
 from keanu.vertex import Vertex, cast_to_double_vertex, vertex_constructor_param_types
 from keanu.vertex.label import _VertexLabel
 
@@ -31,10 +32,11 @@ class Plate(JavaObjectWrapper):
 class Plates(JavaObjectWrapper):
 
     def __init__(self,
-                 count: int,
-                 factory: Callable[[Plate], None],
+                 factory: Callable[..., None],
+                 count: int = None,
+                 data_generator: Iterator[Dict[str, Any]] = None,
                  initial_state: Dict[str, vertex_constructor_param_types] = None):
-        consumer = Consumer(lambda p: factory(Plate(p)))
+
         builder = k.jvm_view().PlateBuilder()
 
         if initial_state is not None:
@@ -43,8 +45,18 @@ class Plates(JavaObjectWrapper):
             vertex_dictionary = k.jvm_view().SimpleVertexDictionary.backedBy(initial_state_java)
             builder = builder.withInitialState(vertex_dictionary)
 
-        builder = builder.count(count)
-        builder = builder.withFactory(consumer)
+        assert (count is None) ^ (data_generator is None), "You must specify either a count or a data_generator"
+
+        if count is not None:
+            function = lambda p: factory(Plate(p))
+            consumer = Consumer(function)
+            builder = builder.count(count).withFactory(consumer)
+
+        if data_generator is not None:
+            bifunction = lambda p, b: factory(Plate(p), b)
+            biconsumer = BiConsumer(bifunction)
+            data_generator_java = (k.to_java_map(m) for m in data_generator)
+            builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactory(biconsumer)
 
         plates = builder.build()
         super(Plates, self).__init__(plates)
