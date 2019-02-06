@@ -46,7 +46,7 @@ def test_you_can_build_a_time_series() -> None:
     y_label = "y"
     x_previous_label = Plates.proxy_for(x_label)
 
-    num_plates = 100
+    num_plates = 10
     initial_x = 1.
 
     def create_time_step(plate):
