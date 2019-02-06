@@ -16,3 +16,12 @@ class _VertexLabel(JavaObjectWrapper):
         else:
             java_object = k.jvm_view().VertexLabel(first, k.to_java_string_array(remainder))
         super(_VertexLabel, self).__init__(java_object)
+
+    @staticmethod
+    def create_with_namespace(label: str) -> '_VertexLabel':
+        separator = "."
+        if separator not in label:
+            raise ValueError('No namespace separator "{}" found in {}'.format(separator, label))
+        name_array = label.split(separator)
+        return _VertexLabel(name_array[0], *name_array[1:])
+
