@@ -80,11 +80,8 @@ ENV PATH $PATH:/opt/gradle-5.1/bin
 COPY . /home/gradle/project/
 
 USER root
-#RUN chown -R gradle /home/gradle/project
-#USER gradle
 
 WORKDIR /home/gradle/project/var/keanu
-RUN git checkout develop
 RUN gradle build
 
 WORKDIR /home/gradle/project
