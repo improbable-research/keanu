@@ -34,8 +34,7 @@ public class TopologicalSort {
     public static List<Variable> sortVariables(Collection<? extends Variable> variables) {
         Stream<? extends Variable> sorted = variables.stream().
             sorted(Comparator.comparing(Variable::getReference, Comparator.naturalOrder()));
-        List<Variable> sortedVariables = sorted.collect(Collectors.toList());
-        return sortedVariables;
+        return sorted.collect(Collectors.toList());
     }
 
     public static Map<Vertex, Set<Vertex>> mapDependencies(Collection<? extends Vertex> vertices) {

@@ -19,11 +19,12 @@ import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.backend.ComputableGraph;
 
-public class ForwardRunner {
+public class ForwardSampler {
 
+    private static final double LOG_PROB_OF_PRIOR = 0.;
     private static final ProposalDistribution PRIOR_PROPOSAL = new PriorProposalDistribution();
 
-    private ForwardRunner() {
+    private ForwardSampler() {
     }
 
     /**
@@ -56,7 +57,7 @@ public class ForwardRunner {
             takeSamples(samplesByVertex, fromVariables);
         }
 
-        ArrayList<Double> logProb = new ArrayList<>(Collections.nCopies(sampleCount, 0.));
+        ArrayList<Double> logProb = new ArrayList<>(Collections.nCopies(sampleCount, LOG_PROB_OF_PRIOR));
         return new NetworkSamples(samplesByVertex, logProb, sampleCount);
     }
 

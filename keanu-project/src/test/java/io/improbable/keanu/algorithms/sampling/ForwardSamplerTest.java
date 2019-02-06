@@ -1,12 +1,16 @@
 package io.improbable.keanu.algorithms.sampling;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.math3.analysis.function.Add;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +21,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.TestGraphGenerator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -24,8 +29,10 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
+import lombok.extern.slf4j.Slf4j;
 
-public class ForwardRunnerTest {
+@Slf4j
+public class ForwardSamplerTest {
 
     private KeanuRandom random;
 
@@ -39,11 +46,14 @@ public class ForwardRunnerTest {
         GaussianVertex A = new GaussianVertex(100.0, 1);
         GaussianVertex B = new GaussianVertex(A, 1);
         GaussianVertex C = new GaussianVertex(B, 1);
-        BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
-        KeanuComputableGraph graph = new KeanuComputableGraph(C.getConnectedGraph());
+        DoubleVertex D = B.plus(C);
+        GaussianVertex E = new GaussianVertex(D, 1);
+
+        BayesianNetwork net = new BayesianNetwork(E.getConnectedGraph());
+        KeanuComputableGraph graph = new KeanuComputableGraph(E.getConnectedGraph());
 
         final int sampleCount = 1000;
-        NetworkSamples samples = ForwardRunner.sample(graph, net.getLatentVertices(), sampleCount, random);
+        NetworkSamples samples = ForwardSampler.sample(graph, net.getLatentVertices(), sampleCount, random);
 
         double averageC = samples.getDoubleTensorSamples(C).getAverages().scalar();
 
@@ -70,11 +80,26 @@ public class ForwardRunnerTest {
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         KeanuComputableGraph graph = new KeanuComputableGraph(A.getConnectedGraph());
 
-        ForwardRunner.sample(graph, network.getLatentVertices(), 1);
+        ForwardSampler.sample(graph, network.getLatentVertices(), 1);
 
         assertEquals(trackerOne.getId(), ids.get(0));
         assertEquals(trackerTwo.getId(), ids.get(1));
         assertEquals(trackerThree.getId(), ids.get(2));
+    }
+
+    @Test
+    public void nonProbabilisticVerticesAreRecomputedDuringForwardSample() {
+        AtomicInteger opCount = new AtomicInteger(0);
+
+        GaussianVertex A = new GaussianVertex(0, 1);
+        TestGraphGenerator.PassThroughVertex B = new TestGraphGenerator.PassThroughVertex(A, opCount, null, id -> log.info("OP on id:" + id));
+        GaussianVertex C = new GaussianVertex(B, 1.);
+
+        KeanuComputableGraph graph = new KeanuComputableGraph(C.getConnectedGraph());
+
+        ForwardSampler.sample(graph, Arrays.asList(A, C), 100, random);
+
+        assertEquals(100, opCount.get());
     }
 
     public static class IDTrackerVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble {
