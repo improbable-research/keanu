@@ -38,6 +38,11 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
         return v
 
+    def __bool__(self) -> bool:
+        raise TypeError(
+            'Keanu vertices cannot be used as a predicate in a Python "if" statement. Please use keanu.vertex.If instead.'
+        )
+
     def __hash__(self) -> int:
         return hash(self.get_id())
 
