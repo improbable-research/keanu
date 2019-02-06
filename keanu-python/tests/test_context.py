@@ -4,6 +4,7 @@ import pytest
 from py4j.protocol import Py4JJavaError
 
 from keanu.context import KeanuContext
+from keanu.java_exception import JavaException
 from keanu.vertex import ConstantDouble, Concatenation
 
 
@@ -45,7 +46,7 @@ def test_you_can_get_info_from_a_java_exception() -> None:
     with pytest.raises(Py4JJavaError) as excinfo:
         context.jvm_view().java.util.HashMap(-1)
 
-    java_exception = context.from_java_exception(excinfo.value)
-    assert type(java_exception) == KeanuContext.JavaException
+    java_exception = JavaException(excinfo.value)
     assert java_exception.type == "java.lang.IllegalArgumentException"
     assert java_exception.message == "Illegal initial capacity: -1"
+    assert java_exception.unwrap().getCause() == None

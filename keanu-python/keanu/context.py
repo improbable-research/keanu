@@ -9,6 +9,8 @@ from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
 from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView, java_import
 from py4j.protocol import Py4JError, Py4JJavaError
 
+from keanu.java_exception import JavaException
+
 PATH = os.path.abspath(os.path.dirname(__file__))
 ND4J_CLASSPATH_ENVIRONMENT_VARIABLE = "KEANU_ND4J_CLASSPATH"
 
@@ -122,18 +124,6 @@ class KeanuContext(metaclass=Singleton):
     def to_java_vertex_array(self, l: Collection[Any]) -> JavaArray:
         java_import(self.jvm_view(), "io.improbable.keanu.vertices.Vertex")
         return self.to_java_array(list(map(lambda x: x.unwrap(), l)), self.jvm_view().Vertex)
-
-    class JavaException:
-
-        def __init__(self, type: str, message: str):
-            self.type = type
-            self.message = message
-
-        def __repr__(self) -> str:
-            return "{}: {}".format(self.type, self.message)
-
-    def from_java_exception(self, e: Py4JJavaError) -> 'KeanuContext.JavaException':
-        return KeanuContext.JavaException(e.java_exception.getClass().getName(), e.java_exception.getMessage())
 
     def __infer_class_from_array(self, l: Collection[Any]) -> JavaClass:
         if len(l) == 0:
