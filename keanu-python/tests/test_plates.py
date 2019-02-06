@@ -54,15 +54,13 @@ def test_you_can_build_plates_from_data() -> None:
 
 def test_you_must_pass_count_or_data_generator() -> None:
     with pytest.raises(AssertionError, match="You must specify either a count or a data_generator"):
-        Plates(factory=lambda _ : None)
+        Plates(factory=lambda _: None)
 
 
 def test_you_cannot_pass_both_count_and_data_generator() -> None:
     with pytest.raises(AssertionError, match="You must specify either a count or a data_generator"):
-        Plates(
-            factory=lambda _ : None,
-            count=1,
-            data_generator=({} for _ in []))
+        Plates(factory=lambda _: None, count=1, data_generator=({} for _ in []))
+
 
 def test_you_can_build_a_time_series() -> None:
     """
