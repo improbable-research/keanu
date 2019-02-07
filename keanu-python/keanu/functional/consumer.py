@@ -9,6 +9,11 @@ class Consumer:
         self.lambda_function = lambda_function
 
     def accept(self, arg: JavaObject) -> None:
+        """
+        >>> c = Consumer(lambda x : print(x))
+        >>> c.accept("foo")
+        foo
+        """
         self.lambda_function(arg)
 
     class Java:
