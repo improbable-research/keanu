@@ -1,7 +1,23 @@
 package io.improbable.keanu.algorithms.sampling;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.backend.KeanuComputableGraph;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.TestGraphGenerator;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,31 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.math3.analysis.function.Add;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.sun.tools.internal.jxc.ap.Const;
-
-import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.backend.KeanuComputableGraph;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.TestGraphGenerator;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
-import lombok.extern.slf4j.Slf4j;
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
 public class ForwardSamplerTest {

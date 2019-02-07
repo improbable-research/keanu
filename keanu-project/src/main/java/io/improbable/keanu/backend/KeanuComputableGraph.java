@@ -1,7 +1,8 @@
 package io.improbable.keanu.backend;
 
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toMap;
+import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,9 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.vertices.Vertex;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toMap;
 
 public class KeanuComputableGraph implements ComputableGraph {
 

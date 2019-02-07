@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TopologicalSort {
 

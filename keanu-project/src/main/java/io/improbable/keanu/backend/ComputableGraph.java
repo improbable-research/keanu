@@ -1,11 +1,11 @@
 package io.improbable.keanu.backend;
 
-import static java.util.Collections.singletonList;
+import io.improbable.keanu.algorithms.VariableReference;
 
 import java.util.Collection;
 import java.util.Map;
 
-import io.improbable.keanu.algorithms.VariableReference;
+import static java.util.Collections.singletonList;
 
 public interface ComputableGraph extends AutoCloseable {
 

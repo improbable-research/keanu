@@ -36,11 +36,11 @@ public class ForwardSampler {
 
     /**
      * Samples from a Computable Graph.
-     * Samples are taken by calculating a linear ordering of the network and cascading the sampled values
-     * through the network in priority order.
+     * Samples are taken by sampling from the prior of the provided random variables and propagating these values
+     * to any non probabilistic variables that the user may also want to sample from
      *
      * @param graph the computable graph to sample from
-     * @param fromVariables the variables to sample from
+     * @param fromVariables the variables to sample from, can be probabilistic or non probabilistic
      * @param sampleCount the number of samples to take
      * @return sampling samples of a computable graph
      */

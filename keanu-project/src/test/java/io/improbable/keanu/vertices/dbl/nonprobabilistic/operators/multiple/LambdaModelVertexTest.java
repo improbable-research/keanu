@@ -158,7 +158,7 @@ public class LambdaModelVertexTest {
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
-        //My sampling belief is the temperature is 29.0.
+        //My prior belief is the temperature is 29.0.
         //These observations are indicative of a temperature of 30.
         DoubleVertex chanceOfRainObservation = new GaussianVertex(chanceOfRain, 5);
         DoubleVertex humidityObservation = new GaussianVertex(humidity, 5);

@@ -52,10 +52,10 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     }
 
     /**
-     * Set the input parameters to the distribution describing the sampling belief about the weights of the regression model
+     * Set the input parameters to the distribution describing the prior belief about the weights of the regression model
      *
-     * @param means           An array of means of the distribution describing the sampling belief about the regression weights
-     * @param scaleParameters An array of scale parameters of the distribution describing the sampling belief about the regression weights.
+     * @param means           An array of means of the distribution describing the prior belief about the regression weights
+     * @param scaleParameters An array of scale parameters of the distribution describing the prior belief about the regression weights.
      *                        This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return this
      */
@@ -77,10 +77,10 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     }
 
     /**
-     * Set the input parameters to the distribution describing the sampling belief about the intercept of the regression model
+     * Set the input parameters to the distribution describing the prior belief about the intercept of the regression model
      *
-     * @param mean           The mean of the distribution describing the sampling belief about the regression intercept
-     * @param scaleParameter The scale parameter of the distribution describing the sampling belief about the regression intercept.
+     * @param mean           The mean of the distribution describing the prior belief about the regression intercept
+     * @param scaleParameter The scale parameter of the distribution describing the prior belief about the regression intercept.
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return this
      */
@@ -99,10 +99,10 @@ public class RegressionModelBuilder<OUTPUT extends Tensor> {
     }
 
     /**
-     * Set the input parameters to the distribution describing the sampling belief about both the intercept and weights of the regression model
+     * Set the input parameters to the distribution describing the prior belief about both the intercept and weights of the regression model
      *
-     * @param mean           The mean of the distribution describing the sampling belief about both the regression intercept and weights
-     * @param scaleParameter The scale parameter of the distribution describing the sampling belief about both regression intercept and weights.
+     * @param mean           The mean of the distribution describing the prior belief about both the regression intercept and weights
+     * @param scaleParameter The scale parameter of the distribution describing the prior belief about both regression intercept and weights.
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
      * @return this
      */
