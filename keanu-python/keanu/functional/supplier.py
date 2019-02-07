@@ -9,6 +9,11 @@ class Supplier:
         self.lambda_function = lambda_function
 
     def get(self) -> JavaObject:
+        """
+        >>> f = Supplier(lambda : "foo")
+        >>> f.get()
+        'foo'
+        """
         return self.lambda_function()
 
     class Java:

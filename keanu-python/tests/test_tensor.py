@@ -103,7 +103,7 @@ def test_convert_java_tensor_to_ndarray(value: numpy_types) -> None:
 
 
 def assert_java_class(java_object_wrapper: JavaObjectWrapper, java_class_str: str) -> None:
-    assert java_object_wrapper.get_class().getSimpleName() == java_class_str
+    assert java_object_wrapper._class == java_class_str
 
 
 @pytest.mark.parametrize("value, expected_result",
