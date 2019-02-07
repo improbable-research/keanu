@@ -115,7 +115,7 @@
 
 <div class="viewcode-block" id="MetropolisHastingsSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.MetropolisHastingsSampler">[docs]</a><span class="k">class</span> <span class="nc">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param proposal_distribution: The proposal distribution for metropolis hastings. Options are &#39;gaussian&#39; and &#39;prior&#39;.</span>
+<span class="sd">    :param proposal_distribution: The proposal distribution for Metropolis Hastings. Options are &#39;gaussian&#39; and &#39;prior&#39;.</span>
 <span class="sd">    :param latents: All latent vertices.</span>
 <span class="sd">    :param proposal_listeners: Listeners for proposal creation and rejection. Options are :class:`keanu.algorithm.AcceptanceRateTracker`.</span>
 <span class="sd">    :param proposal_distribution_sigma: Parameter sigma for &#39;gaussian&#39; proposal distribution.</span>
@@ -154,11 +154,11 @@
 
 <div class="viewcode-block" id="NUTSSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.NUTSSampler">[docs]</a><span class="k">class</span> <span class="nc">NUTSSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param adapt_count: The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value.</span>
-<span class="sd">    :param target_acceptance_prob: The target acceptance probability. A suggested value of this is 0.65 (Beskos et al., 2010; Neal, 2011).</span>
-<span class="sd">    :param adapt_enabled: Determines whether the step size will adapt during the first adaptCount samples.</span>
+<span class="sd">    :param adapt_count: The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value. Defaults to 1000.</span>
+<span class="sd">    :param target_acceptance_prob: The target acceptance probability. Defaults to 0.65 (Beskos et al., 2010; Neal, 2011).</span>
+<span class="sd">    :param adapt_enabled: Determines whether the step size will adapt during the first adaptCount samples. Defaults to True.</span>
 <span class="sd">    :param initial_step_size: Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.</span>
-<span class="sd">    :param max_tree_height: The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample.</span>
+<span class="sd">    :param max_tree_height: The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample. Defaults to 10.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
