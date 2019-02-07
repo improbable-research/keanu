@@ -12,6 +12,7 @@ public class Py4jUtils {
 
     public byte[] toByteArray(double[] doubleArray) {
         ByteBuffer doubleBuffer = ByteBuffer.allocate(JAVA_DOUBLE_SIZE * doubleArray.length);
+        // Java defaults to BIG_ENDIAN. LITTLE_ENDIAN is what is expected by numpy to construct an ndarray.
         doubleBuffer.order(ByteOrder.LITTLE_ENDIAN);
         for (double element : doubleArray) {
             doubleBuffer.putDouble(element);
@@ -22,6 +23,7 @@ public class Py4jUtils {
 
     public byte[] toByteArray(int[] integerArray) {
         ByteBuffer integerBuffer = ByteBuffer.allocate(JAVA_INT_SIZE * integerArray.length);
+        // Java defaults to BIG_ENDIAN. LITTLE_ENDIAN is what is expected by numpy to construct an ndarray.
         integerBuffer.order(ByteOrder.LITTLE_ENDIAN);
         for (int element : integerArray) {
             integerBuffer.putInt(element);
