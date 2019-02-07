@@ -2,8 +2,15 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -12,6 +19,9 @@ public class GeometricVertexTest {
     @Rule
     public DeterministicRule myRule = new DeterministicRule();
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void logProbIsCorrectScalar() {
         double p = 0.25;
@@ -19,6 +29,20 @@ public class GeometricVertexTest {
 
         for (int i = 1; i < 20; i++) {
             assertEquals(getExpectedPmf(p, i), myVertex.logProb(IntegerTensor.create(i)), 1e-6);
+        }
+    }
+
+    @Test
+    public void logProbGraphIsCorrectScalar() {
+        DoubleVertex p = ConstantVertex.of(0.25);
+        GeometricVertex myVertex = new GeometricVertex(p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+
+        for (int i = 1; i < 20; i++) {
+            LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, myVertex, IntegerTensor.scalar(i));
+            LogProbGraphContract.matchesKnownLogDensity(logProbGraph, getExpectedPmf(0.25, i));
         }
     }
 
@@ -36,6 +60,25 @@ public class GeometricVertexTest {
         }
 
         assertEquals(expectedP, calculatedP, 1e-6);
+    }
+
+    @Test
+    public void logProbGraphIsCorrectVector() {
+        DoubleVertex p = ConstantVertex.of(0.8);
+        int[] values = new int[] {3, 5, 15};
+        GeometricVertex myVertex = new GeometricVertex(new long[] {values.length}, p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.create(values));
+
+        double expectedP = 0.0;
+
+        for (int value : values) {
+            expectedP += getExpectedPmf(0.8, value);
+        }
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedP);
     }
 
     private double getExpectedPmf(double p, int n) {
@@ -63,6 +106,19 @@ public class GeometricVertexTest {
 
         assertEquals(expectedMean, actualMean, 1e-3);
         assertEquals(expectedStdDeviation, actualStdDeviation, 1e-2);
+    }
+
+    @Test
+    public void throwsIfParamsNotValidInLogProbGraph() {
+        DoubleVertex p = ConstantVertex.of(2.);
+        GeometricVertex myVertex = new GeometricVertex(p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.scalar(10));
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("p must be between 0. and 1. exclusively.");
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, p, p.getValue());
     }
 
     @Test
