@@ -4,11 +4,13 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 /**
@@ -45,10 +47,13 @@ public class Geometric implements DiscreteDistribution {
     }
 
     public static DoubleVertex logProbOutput(IntegerPlaceHolderVertex k, DoublePlaceholderVertex p) {
-        BooleanVertex parameterIsValid = p.greaterThan(0.).and(p.lessThan(1.));
-        BooleanVertex assertParameterIsValid = parameterIsValid.assertTrue("p must be between 0. and 1. exclusively.");
+        ConstantDoubleVertex zero = ConstantVertex.of(DoubleTensor.zeros(k.getShape()));
+        ConstantDoubleVertex one = ConstantVertex.of(DoubleTensor.ones(k.getShape()));
 
-        return calculateLogProb(k, p);
+        BooleanVertex parameterIsValid = p.greaterThan(zero).and(p.lessThan(one));
+        return If.isTrue(parameterIsValid)
+            .then(calculateLogProb(k, p))
+            .orElse(ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, k.getShape())));
     }
 
     private DoubleTensor calculateLogProb(IntegerTensor k) {
@@ -74,7 +79,7 @@ public class Geometric implements DiscreteDistribution {
     }
 
     private static DoubleVertex setProbToZeroForInvalidK(IntegerVertex k, DoubleVertex results) {
-        DoubleVertex invalidK = k.toDouble().toLessThanMask(new ConstantDoubleVertex(new double[] {1.}, k.getShape()));
+        DoubleVertex invalidK = k.toDouble().toLessThanMask(1.);
 
         return results.setWithMask(invalidK, Double.NEGATIVE_INFINITY);
     }

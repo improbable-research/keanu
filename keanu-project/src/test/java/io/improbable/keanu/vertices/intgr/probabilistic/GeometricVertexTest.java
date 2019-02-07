@@ -7,10 +7,8 @@ import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -18,9 +16,6 @@ public class GeometricVertexTest {
 
     @Rule
     public DeterministicRule myRule = new DeterministicRule();
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void logProbIsCorrectScalar() {
@@ -86,10 +81,57 @@ public class GeometricVertexTest {
     }
 
     @Test
-    public void lobProbIsNegativeInfinityOutsideSupport() {
+    public void lobProbIsNegativeInfinityOutsideKSupport() {
         GeometricVertex myVertex = new GeometricVertex(0.5);
         double logProb = myVertex.logPmf(0);
         assertEquals(Double.NEGATIVE_INFINITY, logProb, 1e-10);
+    }
+
+    @Test
+    public void logProbGraphIsNegativeInfinityOutsideKSupport() {
+        DoubleVertex p = ConstantVertex.of(0.5);
+        GeometricVertex myVertex = new GeometricVertex(p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.scalar(0));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
+    }
+
+    @Test
+    public void lobProbIsNegativeInfinityIfPGreaterThanOrEqualToOne() {
+        GeometricVertex myVertex = new GeometricVertex(1.);
+        double logProb = myVertex.logPmf(10);
+        assertEquals(Double.NEGATIVE_INFINITY, logProb, 1e-10);
+    }
+
+    @Test
+    public void logProbGraphIsNegativeInfinityIfPGreaterThanOrEqualToOne() {
+        DoubleVertex p = ConstantVertex.of(1.);
+        GeometricVertex myVertex = new GeometricVertex(p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.scalar(10));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
+    }
+
+    @Test
+    public void lobProbIsNegativeInfinityIfLessThanOrEqualToZero() {
+        GeometricVertex myVertex = new GeometricVertex(0.);
+        double logProb = myVertex.logPmf(10);
+        assertEquals(Double.NEGATIVE_INFINITY, logProb, 1e-10);
+    }
+
+    @Test
+    public void logProbGraphIsNegativeInfinityIfPLessThanOrEqualToZero() {
+        DoubleVertex p = ConstantVertex.of(0.);
+        GeometricVertex myVertex = new GeometricVertex(p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.scalar(10));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
     }
 
     @Test
@@ -109,16 +151,8 @@ public class GeometricVertexTest {
     }
 
     @Test
-    public void throwsIfParamsNotValidInLogProbGraph() {
-        DoubleVertex p = ConstantVertex.of(2.);
-        GeometricVertex myVertex = new GeometricVertex(p);
-        LogProbGraph logProbGraph = myVertex.logProbGraph();
-        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.scalar(10));
+    public void negativeIfParamsNotValidInLogProbGraph() {
 
-        thrown.expect(GraphAssertionException.class);
-        thrown.expectMessage("p must be between 0. and 1. exclusively.");
-
-        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, p, p.getValue());
     }
 
     @Test
