@@ -32,7 +32,7 @@ def test_its_repr_method_gives_you_the_stack_trace() -> None:
 
     java_exception = JavaException(excinfo.value)
 
-    assert str(java_exception).replace("\r","") == """An error occurred while calling None.java.util.HashMap.
+    assert str(java_exception).replace("\r", "") == """An error occurred while calling None.java.util.HashMap.
 : java.lang.IllegalArgumentException: Illegal initial capacity: -1
 	at java.util.HashMap.<init>(HashMap.java:449)
 	at java.util.HashMap.<init>(HashMap.java:468)
