@@ -127,6 +127,7 @@ def sample(net: BayesNet,
         If this is 1 then there will be no down-sampling.
         If this is 2 then every other sample will be taken.
         If this is 3 then 2 samples will be dropped before one is taken.
+        And so on.
     :param plot: Flag for plotting the trace after sampling.
         Call `matplotlib.pyplot.show <https://matplotlib.org/api/_as_gen/matplotlib.pyplot.show.html>`_ to display the plot.
     :param Axes ax: `matplotlib.axes.Axes <https://matplotlib.org/api/axes_api.html>`_.
