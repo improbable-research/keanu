@@ -75,34 +75,41 @@ class NUTSSampler implements SamplingAlgorithm {
     @Override
     public void sample(Map<VariableReference, List<?>> samples, List<Double> logOfMasterPForEachSample) {
         step();
-        addSampleFromCache(samples, tree.getSampleAtAcceptedPosition());
-        logOfMasterPForEachSample.add(tree.getLogOfMasterPAtAcceptedPosition());
+        addSampleFromCache(samples, tree.getProposal().getSample());
+        logOfMasterPForEachSample.add(tree.getProposal().getLogProb());
     }
 
     @Override
     public NetworkSample sample() {
         step();
-        return new NetworkSample(tree.getSampleAtAcceptedPosition(), tree.getLogOfMasterPAtAcceptedPosition());
+        return new NetworkSample(tree.getProposal().getSample(), tree.getProposal().getLogProb());
     }
 
     @Override
     public void step() {
 
+        Map<VariableReference, DoubleTensor> initialMomentum = new HashMap<>();
+        initializeMomentumForEachVariable(latentVariables, initialMomentum, random);
 
-        Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
-        initializeMomentumForEachVariable(latentVariables, momentum, random);
+        Proposal previousProposal = tree.getProposal();
 
-        tree = Tree.createInitialTree(
-            tree.getAcceptedPosition(),
-            momentum,
-            tree.getGradientAtAcceptedPosition(),
-            tree.getLogOfMasterPAtAcceptedPosition(),
-            tree.getSampleAtAcceptedPosition()
+        Leapfrog startState = new Leapfrog(
+            previousProposal.getPosition(),
+            initialMomentum,
+            previousProposal.getGradient(),
+            previousProposal.getLogProb()
         );
 
-        double logOfMasterPMinusMomentumBeforeLeapfrog = tree.getLogOfMasterPAtAcceptedPosition() - 0.5 * dotProduct(momentum);
+        Proposal initialProposal = new Proposal(
+            previousProposal.getPosition(),
+            previousProposal.getGradient(),
+            previousProposal.getSample(),
+            previousProposal.getEnergy(),
+            1.0,
+            previousProposal.getLogProb()
+        );
 
-        double logU = Math.log(random.nextDouble()) + logOfMasterPMinusMomentumBeforeLeapfrog;
+        tree = new Tree(startState, initialProposal, 0.0, true, 0.0, 1, startState.getEnergy());
 
         int treeHeight = 0;
 
@@ -116,34 +123,42 @@ class NUTSSampler implements SamplingAlgorithm {
                 latentVariables,
                 logProbGradientCalculator,
                 sampleFromVariables,
-                logU,
                 buildDirection,
                 treeHeight,
                 stepsize.getStepSize(),
-                logOfMasterPMinusMomentumBeforeLeapfrog,
                 random
             );
 
-            if (otherHalfTree.shouldContinue()) {
-                final double acceptanceProb = Math.min(1, (double) otherHalfTree.getAcceptedLeapfrogCount() / (double)tree.getAcceptedLeapfrogCount());
-
-                Tree.acceptOtherPositionWithProbability(
-                    acceptanceProb,
-                    tree,
-                    otherHalfTree,
-                    random
-                );
-            }
-
-            tree.setAcceptedLeapfrogCount(tree.getAcceptedLeapfrogCount() + otherHalfTree.getAcceptedLeapfrogCount());
-
-            tree.setDeltaLikelihoodOfLeapfrog(tree.getDeltaLikelihoodOfLeapfrog() + otherHalfTree.getDeltaLikelihoodOfLeapfrog());
-
+            treeHeight++;
+            tree.setAcceptSum(tree.getAcceptSum() + otherHalfTree.getAcceptSum());
             tree.setTreeSize(tree.getTreeSize() + otherHalfTree.getTreeSize());
 
-            tree.continueIfNotUTurning(otherHalfTree);
+            if (!otherHalfTree.shouldContinue()) {
+                break;
+            }
 
-            treeHeight++;
+            if (Tree.acceptOtherPositionWithProbability(otherHalfTree.getLogSize() - tree.getLogSize(), random)) {
+                tree.setProposal(otherHalfTree.getProposal());
+            }
+
+            final double newLogSize = Tree.logSumExp(tree.getLogSize(), otherHalfTree.getLogSize());
+
+            if (Tree.isNotUsableNumber(newLogSize)) {
+                throw new IllegalStateException("New logsize is " + newLogSize);
+            }
+
+            tree.setLogSize(newLogSize);
+
+            tree.setPSum(Tree.add(tree.getPSum(), otherHalfTree.getPSum()));
+
+            tree.setShouldContinueFlag(
+                Tree.isNotUTurning(
+                    tree.getLeapfrogForward().getVelocity(),
+                    tree.getLeapfrogBackward().getVelocity(),
+                    tree.getPSum()
+                )
+            );
+
         }
 
         if (saveStatistics) {
@@ -168,14 +183,6 @@ class NUTSSampler implements SamplingAlgorithm {
         for (Variable<DoubleTensor, ?> variable : variables) {
             momentums.put(variable.getReference(), random.nextGaussian(variable.getShape()));
         }
-    }
-
-    private static double dotProduct(Map<? extends VariableReference, DoubleTensor> momentums) {
-        double dotProduct = 0.0;
-        for (DoubleTensor momentum : momentums.values()) {
-            dotProduct += momentum.pow(2).sum();
-        }
-        return dotProduct;
     }
 
     /**

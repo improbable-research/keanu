@@ -1,16 +1,11 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.SaveStatistics;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.Variable;
-import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 /**
@@ -81,12 +76,12 @@ class Stepsize implements SaveStatistics {
 //            ));
 //
 //        Leapfrog leapfrog = new Leapfrog(position, momentums, gradient);
-//        double pThetaR = initialLogOfMasterP - leapfrog.halfDotProductMomentum();
+//        double pThetaR = initialLogOfMasterP - leapfrog.getEnergy();
 //
 //        Leapfrog delta = leapfrog.step(variables, probabilisticModelWithGradient, STARTING_STEPSIZE);
 //
 //        double probAfterLeapfrog = probabilisticModelWithGradient.logProb();
-//        double pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
+//        double pThetaRAfterLeapFrog = probAfterLeapfrog - delta.getEnergy();
 //
 //        double logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
 //        double scalingFactor = logLikelihoodRatio > Math.log(0.5) ? 1 : -1;
@@ -96,7 +91,7 @@ class Stepsize implements SaveStatistics {
 //
 //            delta = leapfrog.step(variables, probabilisticModelWithGradient, stepsize);
 //            probAfterLeapfrog = probabilisticModelWithGradient.logProb();
-//            pThetaRAfterLeapFrog = probAfterLeapfrog - delta.halfDotProductMomentum();
+//            pThetaRAfterLeapFrog = probAfterLeapfrog - delta.getEnergy();
 //
 //            logLikelihoodRatio = pThetaRAfterLeapFrog - pThetaR;
 //        }
@@ -126,7 +121,7 @@ class Stepsize implements SaveStatistics {
 
     private double updateLogStepSize(Tree tree, int m) {
 
-        final double alpha = tree.getDeltaLikelihoodOfLeapfrog();
+        final double alpha = tree.getAcceptSum();
         final double nuAlpha = tree.getTreeSize();
 
         final double w = 1.0 / (m + t0);

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class NutsTestVis {
 
     public static void main(String[] args) {
-        new NutsTestVis().sumGaussian();
+        new NutsTestVis().donut();
     }
 
 
@@ -74,14 +74,14 @@ public class NutsTestVis {
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(donutBayesNet);
 
         NUTS nuts = NUTS.builder()
-            .adaptCount(20000)
+            .adaptCount(2000)
             .saveStatistics(true)
             .build();
 
         NetworkSamples samples = nuts.getPosteriorSamples(
             model,
             model.getLatentVariables(),
-            20000
+            2000
         );
 
         Vertex<DoubleTensor> A = donutBayesNet.getContinuousLatentVertices().get(0);

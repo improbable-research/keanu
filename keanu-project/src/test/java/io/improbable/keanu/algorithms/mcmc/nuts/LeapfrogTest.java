@@ -68,7 +68,7 @@ public class LeapfrogTest {
 
     @Test
     public void canLeapForward() {
-        Leapfrog start = new Leapfrog(position, momentum, gradient);
+        Leapfrog start = new Leapfrog(position, momentum, gradient, 0);
         Leapfrog leap = start.step(vertices, mockedGradientCalculator, EPSILON);
 
         Assert.assertEquals(1.0, leap.getPosition().get(aID).scalar(), 1e-6);
@@ -83,7 +83,7 @@ public class LeapfrogTest {
 
     @Test
     public void canLeapForwardAndBackToOriginalPosition() {
-        Leapfrog start = new Leapfrog(position, momentum, gradient);
+        Leapfrog start = new Leapfrog(position, momentum, gradient, 0);
         Leapfrog leapForward = start.step(vertices, mockedGradientCalculator, EPSILON);
 
         Map<VariableReference, DoubleTensor> momentum = new HashMap<>(leapForward.getMomentum());
@@ -95,6 +95,11 @@ public class LeapfrogTest {
 
         assertThat(start.getPosition(), Matchers.equalTo(leapBackToStart.getPosition()));
         assertThat(momentum, Matchers.equalTo(revertDirectionOfMap(leapBackToStart.getMomentum())));
+    }
+
+    @Test
+    public void doesIncreaseKineticEnergyWhenLogProbIncreases(){
+        //TODO:
     }
 
     private void fillMap(Map<VariableReference, DoubleTensor> map, DoubleTensor value) {

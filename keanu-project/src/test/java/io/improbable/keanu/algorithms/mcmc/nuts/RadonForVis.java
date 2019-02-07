@@ -28,7 +28,7 @@ public class RadonForVis implements ModelForNUTSVis {
             .collect(Collectors.groupingBy(d -> d.county));
 
 
-        buildAndRunHierarchicalNetwork(radonData, 8);
+        buildAndRunHierarchicalNetwork(radonData, 2);
     }
 
     private void buildAndRunHierarchicalNetwork(Map<String, List<Data>> radonData, int numberOfModels) {
@@ -43,8 +43,8 @@ public class RadonForVis implements ModelForNUTSVis {
 //        HalfGaussianVertex sigmaAlpha = new HalfGaussianVertex(0.5).setLabel("SigmaIntercept");
 //        HalfGaussianVertex sigmaBeta = new HalfGaussianVertex(0.5).setLabel("SigmaGradient");
 
-        DoubleVertex sigmaAlpha = new GaussianVertex(new long[]{1, 1}, 0, 0.5).pow(2).pow(0.5).setLabel("SigmaIntercept");
-        DoubleVertex sigmaBeta = new GaussianVertex(new long[]{1, 1}, 0, 0.5).pow(2).pow(0.5).setLabel("SigmaGradient");
+        DoubleVertex sigmaAlpha = new GaussianVertex(0, 0.5).pow(2).pow(0.5).setLabel("SigmaIntercept");
+        DoubleVertex sigmaBeta = new GaussianVertex(0, 0.5).pow(2).pow(0.5).setLabel("SigmaGradient");
 
         radonData.keySet().stream()
             .sorted()
@@ -88,7 +88,7 @@ public class RadonForVis implements ModelForNUTSVis {
     @Override
     public NUTS getSamplingAlgorithm() {
         return NUTS.builder()
-            .maxTreeHeight(5)
+            .maxTreeHeight(8)
 //            .adaptEnabled(false)
 //            .initialStepSize(0.15)
             .saveStatistics(true)

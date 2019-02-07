@@ -121,7 +121,7 @@ We can perform the same steps in Python.
 
 Hamiltonian Monte Carlo (HMC) brings two new concepts to Metropolis Hastings: Hamiltonian physics and gradient calculations.
 
-Hamiltonian physics introduces the idea of a position and a momentum for a sample. Put simply, by knowing the gradient, we
+Hamiltonian physics introduces the idea of a position and a velocity for a sample. Put simply, by knowing the gradient, we
 can understand if the distribution is steep or shallow at our current position. We can then use Hamiltonian physics to move 
 our samples around using this information.
 
@@ -131,7 +131,7 @@ This is crucial to understand in order to tweak the parameters of HMC, it's very
 * Step size
 
 A leapfrog is how a sample moves around the distribution. 
-It's where the position and momentum of a sample are updated for a timestep.
+It's where the position and velocity of a sample are updated for a timestep.
 The step size is how much time will pass between timesteps. 
 The larger the stepsize, the more the position will change during each timestep.
 The leapfrog count determines how many leapfrogs we will take in one sample. 

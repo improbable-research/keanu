@@ -28,7 +28,7 @@ public class NUTSVis extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        ModelForNUTSVis modelForVis = new RadonForVis();
+        ModelForNUTSVis modelForVis = new SingleGaussianForVis();
 
         int sampleCount = modelForVis.getSampleCount();
         List<Vertex> toPlot = modelForVis.getToPlot();
@@ -80,8 +80,6 @@ public class NUTSVis extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
-        System.out.println("Done!");
-
     }
 
     public static class TracePlot {

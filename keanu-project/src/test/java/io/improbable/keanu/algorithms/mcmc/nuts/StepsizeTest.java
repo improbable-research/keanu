@@ -2,22 +2,11 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -86,7 +75,7 @@ public class StepsizeTest {
         );
 
         Tree mockedLessLikelyTree = mock(Tree.class);
-        when(mockedLessLikelyTree.getDeltaLikelihoodOfLeapfrog()).thenAnswer(i -> -50.);
+        when(mockedLessLikelyTree.getAcceptSum()).thenAnswer(i -> -50.);
         when(mockedLessLikelyTree.getTreeSize()).thenAnswer(i -> 8);
         double adaptedStepSizeLessLikely = tune.adaptStepSize(mockedLessLikelyTree, 1);
 
@@ -94,7 +83,7 @@ public class StepsizeTest {
         assertThat(adaptedStepSizeLessLikely, Matchers.lessThan(startingStepsize));
 
         Tree mockedLikelyTree = mock(Tree.class);
-        when(mockedLikelyTree.getDeltaLikelihoodOfLeapfrog()).thenAnswer(i -> 50.);
+        when(mockedLikelyTree.getAcceptSum()).thenAnswer(i -> 50.);
         when(mockedLikelyTree.getTreeSize()).thenAnswer(i -> 8);
         double adaptedStepSizeMoreLikely = tune.adaptStepSize(mockedLikelyTree, 1);
 

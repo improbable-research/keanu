@@ -13,6 +13,7 @@ import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.status.StatusBar;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -100,28 +101,23 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         final List<? extends Variable<DoubleTensor, ?>> latentVariables = model.getContinuousLatentVariables();
 
-        Map<VariableReference, ?> startingSample = SamplingAlgorithm.takeSample(sampleFromVariables);
-
         Map<VariableReference, DoubleTensor> position = latentVariables.stream()
             .collect(toMap(Variable::getReference, Variable::getValue));
 
-        Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
+        double initialLogOfMasterP = model.logProb(position);
+
+        Preconditions.checkArgument(
+            !ProbabilityCalculator.isImpossibleLogProb(initialLogOfMasterP),
+            "Sampler starting position is invalid. Please start from a non-zero probability position."
+        );
+
         Map<? extends VariableReference, DoubleTensor> gradient = model.logProbGradients();
 
-        double initialLogOfMasterP = model.logProb(position);
+        Map<VariableReference, ?> startingSample = SamplingAlgorithm.takeSample(sampleFromVariables);
 
         double startingStepSize = (initialStepSize == null) ?
             findStartingStepSizeSimple(0.25, latentVariables) :
             initialStepSize;
-
-//        double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(
-//            position,
-//            gradient,
-//            latentVariables,
-//            model,
-//            initialLogOfMasterP,
-//            random
-//        ) : initialStepSize;
 
         Stepsize stepsize = new Stepsize(
             startingStepSize,
@@ -129,7 +125,11 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, startingSample);
+        Leapfrog startState = new Leapfrog(position, new HashMap<>(), gradient, initialLogOfMasterP);
+
+        Proposal initialProposal = new Proposal(position, gradient, startingSample, startState.getEnergy(), 1.0, initialLogOfMasterP);
+
+        Tree tree = new Tree(startState, initialProposal, 0.0, true, 0.0, 1, startState.getEnergy());
 
         return new NUTSSampler(
             sampleFromVariables,

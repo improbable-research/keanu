@@ -13,8 +13,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,7 +24,12 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
@@ -78,14 +83,14 @@ public class NUTSTest {
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()
-            .adaptCount(3000)
+//            .adaptCount(1000)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             model,
             model.getLatentVariables(),
-            3000
-        ).drop(500);
+            1000
+        );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
 
@@ -160,6 +165,22 @@ public class NUTSTest {
         );
 
         assertFalse(posteriorSamples.get(A).asList().isEmpty());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfStartingPositionIsZeroProbability() {
+
+        GaussianVertex A = new HalfGaussianVertex(1.0);
+        A.setValue(-1.0);
+
+        BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
+
+        ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(net);
+
+        NUTS nuts = NUTS.builder()
+            .build();
+
+        nuts.getPosteriorSamples(model, 2);
     }
 
     @Category(Slow.class)
