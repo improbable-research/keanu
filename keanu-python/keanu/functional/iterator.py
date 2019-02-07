@@ -2,6 +2,7 @@ from typing import TypeVar, Optional, Iterator
 
 T = TypeVar('T')
 
+
 class JavaIterator:
     """
     Wraps a python iterator in an object that implements Java's Iterator interface.
