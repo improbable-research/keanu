@@ -28,6 +28,7 @@ Distributions
 * :meth:`keanu.vertex.Multinomial`
 * :meth:`keanu.vertex.Poisson`
 * :meth:`keanu.vertex.UniformInt`
+* :meth:`keanu.vertex.Geometric`
 
 Vertices
 ~~~~~~~~
