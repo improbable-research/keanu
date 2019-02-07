@@ -19,4 +19,4 @@ docker build -t gradle-image .
 exec docker run \
     --rm \
     gradle-image \
-    gradle -x test -s build
+    ./gradlew clean build

@@ -73,6 +73,6 @@ COPY . /home/gradle/project/
 USER root
 
 WORKDIR /home/gradle/project/var/keanu
-RUN ./gradlew build
+RUN ./gradlew clean build
 
 WORKDIR /home/gradle/project
