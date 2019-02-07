@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 public class Pareto implements ContinuousDistribution {
 
@@ -58,15 +59,18 @@ public class Pareto implements ContinuousDistribution {
     }
 
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex location, DoublePlaceholderVertex scale) {
-        final DoubleVertex zero = ConstantVertex.of(0.);
+        final DoubleVertex zero = ConstantVertex.of(DoubleTensor.zeros(x.getShape()));
         final BooleanVertex paramsAreValid = location.greaterThan(zero)
             .and(scale.greaterThan(zero));
-        paramsAreValid.assertTrue("Location and scale must be strictly positive");
 
         final DoubleVertex invalidXMask = x.toLessThanOrEqualToMask(location);
         final DoubleVertex ifValid = scale.log().plus(location.log().times(scale))
             .minus(scale.plus(1.).times(x.log()));
-        return ifValid.setWithMask(invalidXMask, Double.NEGATIVE_INFINITY);
+        final DoubleVertex result = ifValid.setWithMask(invalidXMask, Double.NEGATIVE_INFINITY);
+
+        return If.isTrue(paramsAreValid)
+            .then(result)
+            .orElse(ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, x.getShape())));
     }
 
     private boolean checkParamsAreValid() {

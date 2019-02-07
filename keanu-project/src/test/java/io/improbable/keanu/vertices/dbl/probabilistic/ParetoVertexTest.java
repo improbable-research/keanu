@@ -34,9 +34,6 @@ public class ParetoVertexTest {
 
     private KeanuRandom random;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Before
     public void setup() {
         random = new KeanuRandom(1);
@@ -99,11 +96,9 @@ public class ParetoVertexTest {
 
         LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
 
-        thrown.expect(GraphAssertionException.class);
-        thrown.expectMessage("Location and scale must be strictly positive");
-
-        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
     }
 
     @Test
@@ -115,11 +110,9 @@ public class ParetoVertexTest {
 
         LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
 
-        thrown.expect(GraphAssertionException.class);
-        thrown.expectMessage("Location and scale must be strictly positive");
-
-        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
     }
 
     @Test
@@ -131,11 +124,9 @@ public class ParetoVertexTest {
 
         LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
 
-        thrown.expect(GraphAssertionException.class);
-        thrown.expectMessage("Location and scale must be strictly positive");
-
-        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
     }
 
     @Test
