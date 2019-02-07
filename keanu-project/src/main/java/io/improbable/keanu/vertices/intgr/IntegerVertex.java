@@ -124,6 +124,10 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerAbsVertex(this);
     }
 
+    public IntegerVertex sum(int... sumOverDimensions) {
+        return new IntegerSumVertex(this, sumOverDimensions);
+    }
+
     public IntegerVertex sum() {
         return new IntegerSumVertex(this);
     }
@@ -193,6 +197,10 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
 
     public <T extends NumberTensor> BooleanVertex greaterThanOrEqualTo(Vertex<T> rhs) {
         return new GreaterThanOrEqualVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BooleanVertex greaterThanOrEqualTo(int rhs) {
+        return greaterThanOrEqualTo(new ConstantIntegerVertex(rhs));
     }
 
     public <T extends NumberTensor> BooleanVertex lessThan(Vertex<T> rhs) {

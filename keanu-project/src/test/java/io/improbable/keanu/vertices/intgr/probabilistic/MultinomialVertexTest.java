@@ -13,15 +13,19 @@ import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
@@ -35,6 +39,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
+import org.junit.rules.ExpectedException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,11 +48,34 @@ public class MultinomialVertexTest {
     @Rule
     public DeterministicRule rule = new DeterministicRule();
 
-    @Test(expected = IllegalArgumentException.class)
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Test
     public void itThrowsIfTheProbabilitiesDontSumToOne() {
-        IntegerTensor n = IntegerTensor.scalar(100).reshape(1, 1);
-        DoubleTensor p = DoubleTensor.create(0.1, 0.1, 0.1, 0.1).reshape(4, 1);
-        Multinomial.withParameters(n, p);
+        IntegerVertex n = ConstantVertex.of(100);
+        DoubleVertex p = ConstantVertex.of(0.1, 0.1, 0.1, 0.1);
+        MultinomialVertex multinomialVertex = new MultinomialVertex(new long[] {4}, n, p);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Probabilities must sum to one");
+
+        multinomialVertex.logProb(IntegerTensor.ONE_SCALAR);
+    }
+
+    @Test
+    public void logProbGraphThrowsIfTheProbabilitiesDontSumToOne() {
+        IntegerVertex n = ConstantVertex.of(100);
+        DoubleVertex p = ConstantVertex.of(0.1, 0.1, 0.1, 0.1);
+        MultinomialVertex myVertex = new MultinomialVertex(new long[] {4}, n, p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, n, n.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.ONE_SCALAR);
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("Probabilities must sum to one.");
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, p, p.getValue());
     }
 
     @Test(expected = TensorValueException.class)
@@ -62,18 +90,26 @@ public class MultinomialVertexTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheParametersAreDifferentHighRankShapes() {
-        IntegerTensor n = IntegerTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4);
-        DoubleTensor p = DoubleTensor.linspace(0, 1, 18).reshape(3, 2, 3);
-        Multinomial.withParameters(n, p);
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(1, 2, 3, 4, 5, 6, 7, 8).reshape(2, 4));
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.linspace(0, 1, 18).reshape(3, 2, 3));
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Proposed shape [2, 4] does not match other non length one shapes [2, 3]");
+
+        new MultinomialVertex(n, p);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheParametersAreDifferentShapes() {
-        IntegerTensor n = IntegerTensor.create(1, 2).reshape(1, 2);
-        DoubleTensor p = DoubleTensor.linspace(0, 1, 9).reshape(3, 3);
-        Multinomial.withParameters(n, p);
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(1, 2).reshape(1, 2));
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.linspace(0, 1, 9).reshape(3, 3));
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Proposed shape [1, 2] does not match other non length one shapes [3]");
+
+        new MultinomialVertex(n, p);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -90,38 +126,122 @@ public class MultinomialVertexTest {
         multinomial.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void itThrowsIfTheLogProbShapeDoesntMatchTheNumberOfCategories() {
-        IntegerTensor n = IntegerTensor.create(100).reshape(1, 1);
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(4, 1);
-        Multinomial multinomial = Multinomial.withParameters(n, p);
-        multinomial.logProb(IntegerTensor.scalar(1));
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(100).reshape(1, 1));
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(4, 1));
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Shape mismatch. k: [], p: [4, 1]");
+
+        multinomialVertex.logProb(IntegerTensor.scalar(1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    public void itThrowsIfTheLogProbGraphShapeDoesntMatchTheNumberOfCategories() {
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(100).reshape(1, 1));
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.1, 0.2, .3, 0.4).reshape(4, 1));
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Shape mismatch. k: [1, 1], p: [4, 1]");
+
+        multinomialVertex.logProbGraph();
+    }
+
+    @Test
     public void itThrowsIfTheLogProbStateDoesntSumToN() {
-        IntegerTensor n = IntegerTensor.scalar(10).reshape(1, 1);
-        DoubleTensor p = DoubleTensor.create(0.2, 0.8).reshape(2, 1);
-        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
-        multinomial.logProb(IntegerTensor.create(5, 6).transpose());
+        IntegerTensor n = IntegerTensor.create(10, 10);
+        DoubleTensor p = DoubleTensor.create(0.2, 0.8);
+        IntegerTensor k = IntegerTensor.create(5, 6);
+        MultinomialVertex multinomialVertex = new MultinomialVertex(ConstantVertex.of(n), ConstantVertex.of(p));
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(String.format("Inputs %s must sum to n = %s", k, n));
+
+        multinomialVertex.logProb(k);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    public void itThrowsIfTheLogProbGraphStateDoesntSumToN() {
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(10, 10));
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.2, 0.8));
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+        LogProbGraph logProbGraph = multinomialVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, n, n.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("Inputs must sum to n.");
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, multinomialVertex, IntegerTensor.create(5, 6));
+    }
+
+    @Test
     public void itThrowsIfTheLogProbStateContainsNegativeNumbers() {
-        IntegerTensor n = IntegerTensor.scalar(10).reshape(1, 1);
-        DoubleTensor p = DoubleTensor.create(0.2, 0.8).reshape(2, 1);
-        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
-        multinomial.logProb(IntegerTensor.create(-1, 11).transpose());
+        IntegerTensor n = IntegerTensor.create(10, 10);
+        DoubleTensor p = DoubleTensor.create(0.2, 0.8);
+        IntegerTensor k = IntegerTensor.create(-1, 11);
+        MultinomialVertex multinomialVertex = new MultinomialVertex(ConstantVertex.of(n), ConstantVertex.of(p));
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(String.format("Inputs %s cannot be negative", k));
+
+        multinomialVertex.logProb(k);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    public void itThrowsIfTheLogProbGraphStateContainsNegativeNumbers() {
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(10, 10));
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.2, 0.8));
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+        LogProbGraph logProbGraph = multinomialVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, n, n.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("Inputs cannot be negative.");
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, multinomialVertex, IntegerTensor.create(-1, 11));
+    }
+
+    @Test
     public void itThrowsIfTheLogProbStateContainsNumbersGreaterThanN() {
-        IntegerTensor n = IntegerTensor.scalar(10).reshape(1, 1);
-        DoubleTensor p = DoubleTensor.create(0.2, 0.3, 0.5).reshape(3, 1);
-        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
         int[] state = new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE, 12};
         assertThat(state[0] + state[1] + state[2], equalTo(10));
-        multinomial.logProb(IntegerTensor.create(state).transpose());
+        IntegerTensor k = IntegerTensor.create(state);
+
+        IntegerTensor n = IntegerTensor.create(10, 10, 10);
+        DoubleTensor p = DoubleTensor.create(0.2, 0.3, 0.5);
+        MultinomialVertex multinomialVertex = new MultinomialVertex(ConstantVertex.of(n), ConstantVertex.of(p));
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(String.format("Inputs %s must sum to n = %s", k, n));
+
+        multinomialVertex.logProb(k);
+    }
+
+    @Test
+    public void itThrowsIfTheLogProbGraphStateContainsNumbersGreaterThanN() {
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(10, 10, 10));
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(0.2, 0.3, 0.5));
+        MultinomialVertex multinomialVertex = new MultinomialVertex(n, p);
+        LogProbGraph logProbGraph = multinomialVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, n, n.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+
+        int[] state = new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE, 12};
+        assertThat(state[0] + state[1] + state[2], equalTo(10));
+        IntegerTensor k = IntegerTensor.create(state);
+
+        thrown.expect(GraphAssertionException.class);
+        thrown.expectMessage("Inputs must sum to n.");
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, multinomialVertex, IntegerTensor.create(state));
     }
 
     @Test

@@ -9,6 +9,10 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -20,7 +24,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
+public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
@@ -52,8 +56,22 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     }
 
     @Override
-    public double logProb(IntegerTensor kTensor) {
-        return Multinomial.withParameters(n.getValue(), p.getValue()).logProb(kTensor).sum();
+    public double logProb(IntegerTensor k) {
+        return Multinomial.withParameters(n.getValue(), p.getValue()).logProb(k).sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        IntegerPlaceHolderVertex kPlaceholder = new IntegerPlaceHolderVertex(this.getShape());
+        IntegerPlaceHolderVertex nPlaceholder = new IntegerPlaceHolderVertex(n.getShape());
+        DoublePlaceholderVertex pPlaceholder = new DoublePlaceholderVertex(p.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, kPlaceholder)
+            .input(n, nPlaceholder)
+            .input(p, pPlaceholder)
+            .logProbOutput(Multinomial.logProbOutput(kPlaceholder, nPlaceholder, pPlaceholder))
+            .build();
     }
 
     @Override

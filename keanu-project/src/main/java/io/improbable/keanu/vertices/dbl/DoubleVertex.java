@@ -293,10 +293,6 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new GreaterThanVertex<>(this, rhs);
     }
 
-    public <T extends NumberTensor> BooleanVertex greaterThan(double rhs) {
-        return greaterThan(new ConstantDoubleVertex(rhs));
-    }
-
     public DoubleVertex toGreaterThanMask(DoubleVertex rhs) {
         return new DoubleGreaterThanMaskVertex(this, rhs);
     }
@@ -319,10 +315,6 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public <T extends NumberTensor> BooleanVertex lessThan(Vertex<T> rhs) {
         return new LessThanVertex<>(this, rhs);
-    }
-
-    public <T extends NumberTensor> BooleanVertex lessThan(double rhs) {
-        return lessThan(new ConstantDoubleVertex(rhs));
     }
 
     public DoubleVertex toLessThanMask(DoubleVertex rhs) {
