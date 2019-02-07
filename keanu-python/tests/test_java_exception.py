@@ -25,7 +25,7 @@ def test_you_can_throw_a_java_exception() -> None:
             raise JavaException(e)
 
 
-def test_its_repr_method_gives_you_the_stack_trace():
+def test_its_repr_method_gives_you_the_stack_trace() -> None:
     context = KeanuContext()
     with pytest.raises(Py4JJavaError) as excinfo:
         context.jvm_view().java.util.HashMap(-1)
