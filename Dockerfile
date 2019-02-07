@@ -73,6 +73,4 @@ COPY . /home/gradle/project/
 USER root
 
 WORKDIR /home/gradle/project/var/keanu
-RUN ./gradlew clean build
-
-WORKDIR /home/gradle/project
+RUN ./gradlew clean
