@@ -4,6 +4,8 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class UniformInt implements DiscreteDistribution {
 
@@ -37,6 +39,18 @@ public class UniformInt implements DiscreteDistribution {
         DoubleTensor logOfWithinBounds = maxBound.minus(minBound).logInPlace().unaryMinusInPlace();
         logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(xDouble.getGreaterThanOrEqualToMask(maxBound), Double.NEGATIVE_INFINITY);
         logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(xDouble.getLessThanMask(minBound), Double.NEGATIVE_INFINITY);
+
+        return logOfWithinBounds;
+    }
+
+    public static DoubleVertex logProbOutput(IntegerPlaceHolderVertex x, IntegerPlaceHolderVertex xMin, IntegerPlaceHolderVertex xMax) {
+        DoubleVertex maxBound = xMax.toDouble();
+        DoubleVertex minBound = xMin.toDouble();
+        DoubleVertex xDouble = x.toDouble();
+
+        DoubleVertex logOfWithinBounds = maxBound.minus(minBound).log().unaryMinus();
+        logOfWithinBounds = logOfWithinBounds.setWithMask(xDouble.toGreaterThanOrEqualToMask(maxBound), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMask(xDouble.toLessThanMask(minBound), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
     }
