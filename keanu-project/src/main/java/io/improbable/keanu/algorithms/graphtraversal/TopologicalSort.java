@@ -31,12 +31,6 @@ public class TopologicalSort {
             collect(Collectors.toList());
     }
 
-    public static List<Variable> sortVariables(Collection<? extends Variable> variables) {
-        Stream<? extends Variable> sorted = variables.stream().
-            sorted(Comparator.comparing(Variable::getReference, Comparator.naturalOrder()));
-        return sorted.collect(Collectors.toList());
-    }
-
     public static Map<Vertex, Set<Vertex>> mapDependencies(Collection<? extends Vertex> vertices) {
 
         Map<Vertex, Set<Vertex>> deps = new HashMap<>();

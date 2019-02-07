@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +15,8 @@ import org.apache.commons.math3.analysis.function.Add;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sun.tools.internal.jxc.ap.Const;
+
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.backend.KeanuComputableGraph;
@@ -21,12 +24,15 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.TestGraphGenerator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 import lombok.extern.slf4j.Slf4j;
@@ -41,24 +47,33 @@ public class ForwardSamplerTest {
         random = new KeanuRandom(1);
     }
 
-    @Test
-    public void samplesFromPrior() {
+    @Test(expected = IllegalArgumentException.class)
+    public void throwIfSampleFromHasUpstreamRandomVariables() {
         GaussianVertex A = new GaussianVertex(100.0, 1);
-        GaussianVertex B = new GaussianVertex(A, 1);
-        GaussianVertex C = new GaussianVertex(B, 1);
-        DoubleVertex D = B.plus(C);
-        GaussianVertex E = new GaussianVertex(D, 1);
+        DoubleVertex B = A.plus(ConstantVertex.of(5.));
+        GaussianVertex C = new GaussianVertex(B, 1.);
 
-        BayesianNetwork net = new BayesianNetwork(E.getConnectedGraph());
-        KeanuComputableGraph graph = new KeanuComputableGraph(E.getConnectedGraph());
+        KeanuComputableGraph graph = new KeanuComputableGraph(A.getConnectedGraph());
+
+        ForwardSampler.sample(graph, Collections.singletonList(C), 1000, random);
+    }
+
+    @Test
+    public void canSampleFromPrior() {
+        GaussianVertex A = new GaussianVertex(100.0, 1);
+        DoubleVertex B = A.plus(ConstantVertex.of(5.));
+
+        KeanuComputableGraph graph = new KeanuComputableGraph(A.getConnectedGraph());
 
         final int sampleCount = 1000;
-        NetworkSamples samples = ForwardSampler.sample(graph, net.getLatentVertices(), sampleCount, random);
+        NetworkSamples samples = ForwardSampler.sample(graph, Arrays.asList(A, B), sampleCount, random);
 
-        double averageC = samples.getDoubleTensorSamples(C).getAverages().scalar();
+        double averageA = samples.getDoubleTensorSamples(A).getAverages().scalar();
+        double averageB = samples.getDoubleTensorSamples(B).getAverages().scalar();
 
         assertEquals(sampleCount, samples.size());
-        assertEquals(100.0, averageC, 0.1);
+        assertEquals(100.0, averageA, 0.1);
+        assertEquals(105.0, averageB, 0.1);
     }
 
     @Test
@@ -71,20 +86,20 @@ public class ForwardSamplerTest {
 
         IDTrackerVertex trackerOne = new IDTrackerVertex(A, B, ids);
         IDTrackerVertex trackerTwo = new IDTrackerVertex(B, C, ids);
-        IDTrackerVertex trackerThree = new IDTrackerVertex(trackerOne, trackerTwo, ids);
+        NonProbabilisticIDTrackerVertex trackerThree = new NonProbabilisticIDTrackerVertex(trackerOne, trackerTwo, ids);
+        NonProbabilisticIDTrackerVertex trackerFour = new NonProbabilisticIDTrackerVertex(trackerThree, ConstantVertex.of(5.0), ids);
 
         trackerOne.setValue(1.);
         trackerTwo.setValue(1.);
-        trackerThree.setValue(1.);
 
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         KeanuComputableGraph graph = new KeanuComputableGraph(A.getConnectedGraph());
 
-        ForwardSampler.sample(graph, network.getLatentVertices(), 1);
+        ForwardSampler.sample(graph, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour), 1);
 
         assertEquals(trackerOne.getId(), ids.get(0));
         assertEquals(trackerTwo.getId(), ids.get(1));
         assertEquals(trackerThree.getId(), ids.get(2));
+        assertEquals(trackerFour.getId(), ids.get(3));
     }
 
     @Test
@@ -93,11 +108,9 @@ public class ForwardSamplerTest {
 
         GaussianVertex A = new GaussianVertex(0, 1);
         TestGraphGenerator.PassThroughVertex B = new TestGraphGenerator.PassThroughVertex(A, opCount, null, id -> log.info("OP on id:" + id));
-        GaussianVertex C = new GaussianVertex(B, 1.);
 
-        KeanuComputableGraph graph = new KeanuComputableGraph(C.getConnectedGraph());
-
-        ForwardSampler.sample(graph, Arrays.asList(A, C), 100, random);
+        KeanuComputableGraph graph = new KeanuComputableGraph(A.getConnectedGraph());
+        ForwardSampler.sample(graph, Arrays.asList(A, B), 100, random);
 
         assertEquals(100, opCount.get());
     }
@@ -126,6 +139,22 @@ public class ForwardSamplerTest {
         @Override
         public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor atValue, Set<? extends Vertex> withRespectTo) {
             return null;
+        }
+    }
+
+    public static class NonProbabilisticIDTrackerVertex extends DoubleBinaryOpVertex implements Differentiable {
+
+        private final List<VertexId> ids;
+
+        public NonProbabilisticIDTrackerVertex(@LoadVertexParam("left")DoubleVertex left, @LoadVertexParam("right")DoubleVertex right, List<VertexId> ids) {
+            super(left, right);
+            this.ids = ids;
+        }
+
+        @Override
+        protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+            ids.add(this.getId());
+            return DoubleTensor.ZERO_SCALAR;
         }
     }
 

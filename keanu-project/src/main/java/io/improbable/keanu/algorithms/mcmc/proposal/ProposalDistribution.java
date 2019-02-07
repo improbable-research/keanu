@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface ProposalDistribution {
 
-    Proposal  getProposal(Set<Variable> variables, KeanuRandom random);
+    Proposal getProposal(Set<Variable> variables, KeanuRandom random);
 
     <T> double logProb(Probabilistic<T> variable, T ofValue, T givenValue);
 

@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.nd4j.base.Preconditions;
+
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.Variable;
@@ -18,6 +20,11 @@ import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.backend.ComputableGraph;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.LambdaSection;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import kotlin.jvm.internal.Lambda;
 
 public class ForwardSampler {
 
@@ -48,17 +55,28 @@ public class ForwardSampler {
                                         int sampleCount,
                                         KeanuRandom random) {
 
-        Set<Variable> chosenVariables = new LinkedHashSet<>(TopologicalSort.sortVariables(fromVariables));
+        Set<Variable> probabilisticSubset = fromVariables.stream().filter(v -> v instanceof Probabilistic).collect(Collectors.toSet());
+        upstreamDoesNotContainRandomVariables(probabilisticSubset);
         Map<VariableReference, List> samplesByVertex = new HashMap<>();
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
-            Proposal proposal = PRIOR_PROPOSAL.getProposal(chosenVariables, random);
+            Proposal proposal = PRIOR_PROPOSAL.getProposal(probabilisticSubset, random);
             graph.compute(proposal.getProposalTo(), fromVariables.stream().map(Variable::getReference).collect(Collectors.toList()));
             takeSamples(samplesByVertex, fromVariables);
         }
 
         ArrayList<Double> logProb = new ArrayList<>(Collections.nCopies(sampleCount, LOG_PROB_OF_PRIOR));
         return new NetworkSamples(samplesByVertex, logProb, sampleCount);
+    }
+
+    private static void upstreamDoesNotContainRandomVariables(Set<Variable> vertices) {
+        for (Variable variable : vertices) {
+            Vertex vertex = (Vertex) variable;
+            LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(vertex, false);
+            Set<Vertex> upstreamRandomVariables = upstreamLambdaSection.getAllVertices();
+
+            Preconditions.checkArgument(upstreamRandomVariables.size() == 1, "Vertex: [" + vertex + "] has a random variable in its upstream lambda section");
+        }
     }
 
     private static void takeSamples(Map<VariableReference, List> samples, List<? extends Variable> fromVertices) {
