@@ -1,7 +1,11 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.algorithms.*;
+import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.SaveStatistics;
+import io.improbable.keanu.algorithms.Statistics;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.List;
@@ -25,6 +29,7 @@ class Stepsize implements SaveStatistics {
 
     private double stepsize;
     private double averageAcceptanceProb;
+    private double averageTreeAcceptanceProb;
     private double logStepSizeFrozen;
     private double logStepSize;
 
@@ -37,6 +42,7 @@ class Stepsize implements SaveStatistics {
         this.targetAcceptanceProb = targetAcceptanceProb;
         this.stepsize = stepsize;
         this.averageAcceptanceProb = 0;
+        this.averageTreeAcceptanceProb = 0;
         this.logStepSize = Math.log(stepsize);
         this.logStepSizeFrozen = Math.log(1);
         this.adaptCount = adaptCount;
@@ -119,7 +125,7 @@ class Stepsize implements SaveStatistics {
         double proportionalAcceptanceProb = (1 - percentageLeftToTune) * averageAcceptanceProb;
 
         //alpha/nu_alpha
-        double averageTreeAcceptanceProb = tree.getDeltaLikelihoodOfLeapfrog() / tree.getTreeSize();
+        averageTreeAcceptanceProb = tree.getDeltaLikelihoodOfLeapfrog() / tree.getTreeSize();
 
         //delta - alpha/nu_alpha
         double acceptanceProb = targetAcceptanceProb - averageTreeAcceptanceProb;
@@ -156,6 +162,6 @@ class Stepsize implements SaveStatistics {
     @Override
     public void save(Statistics statistics) {
         statistics.store(NUTS.Metrics.STEPSIZE, stepsize);
-        statistics.store(NUTS.Metrics.MEAN_TREE_ACCEPT, averageAcceptanceProb);
+        statistics.store(NUTS.Metrics.MEAN_TREE_ACCEPT, averageTreeAcceptanceProb);
     }
 }
