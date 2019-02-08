@@ -43,7 +43,7 @@ public class Bernoulli implements Distribution<BooleanTensor> {
 
         DoubleVertex probability = x.doubleWhere(
             probTrueClamped,
-            probTrueClamped.unaryMinus().plus(1.0)
+            probTrueClamped.unaryMinus().plus(1.)
         );
 
         return probability.log();

@@ -7,6 +7,10 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
@@ -38,9 +42,20 @@ public class BernoulliVertexTest {
     public void doesExpectedLogProbOnTensor() {
         double probTrue = 0.25;
         BernoulliVertex bernoulliVertex = new BernoulliVertex(new long[]{1, 2}, probTrue);
-        double actualLogPmf = bernoulliVertex.logPmf(BooleanTensor.create(new boolean[]{true, false}));
+        double actualLogPmf = bernoulliVertex.logPmf(BooleanTensor.create(true, false));
         double expectedLogPmf = Math.log(probTrue) + Math.log(1 - probTrue);
         assertEquals(expectedLogPmf, actualLogPmf, 1e-10);
+    }
+
+    @Test
+    public void doesExpectedLogProbGraphOnTensor() {
+        DoubleVertex probTrue = ConstantVertex.of(0.25, 0.25);
+        BernoulliVertex bernoulliVertex = new BernoulliVertex(probTrue);
+        LogProbGraph logProbGraph = bernoulliVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, probTrue, probTrue.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, bernoulliVertex, BooleanTensor.create(true, false));
+        double expectedDensity = Math.log(0.25) + Math.log(0.75);
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 
     @Test
@@ -53,14 +68,14 @@ public class BernoulliVertexTest {
         DoubleVertex C = A.times(B);
         BernoulliVertex D = new BernoulliVertex(C);
 
-        D.observe(BooleanTensor.create(new boolean[]{true, false}));
+        D.observe(BooleanTensor.create(true, false));
 
         LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(ImmutableList.of(D), ImmutableList.of(A, B));
 
         Map<VertexId, DoubleTensor> dLogPmf = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
-        DoubleTensor expectedWrtA = DoubleTensor.create(new double[]{(1.0 / 0.125) * 0.5, (-1.0 / 0.88) * 0.2});
-        DoubleTensor expectedWrtB = DoubleTensor.create(new double[]{(1.0 / 0.125) * 0.25, (-1.0 / 0.88) * 0.6});
+        DoubleTensor expectedWrtA = DoubleTensor.create((1.0 / 0.125) * 0.5, (-1.0 / 0.88) * 0.2);
+        DoubleTensor expectedWrtB = DoubleTensor.create((1.0 / 0.125) * 0.25, (-1.0 / 0.88) * 0.6);
 
         assertEquals(expectedWrtA, dLogPmf.get(A.getId()));
         assertEquals(expectedWrtB, dLogPmf.get(B.getId()));

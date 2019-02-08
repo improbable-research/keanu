@@ -1,9 +1,10 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
+package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class ClampVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
@@ -29,5 +30,20 @@ public class ClampVertex extends DoubleVertex implements NonProbabilistic<Double
     @Override
     public DoubleTensor calculate() {
         return operand.getValue().clamp(min.getValue(), max.getValue());
+    }
+
+    @SaveVertexParam(OPERAND_NAME)
+    public DoubleVertex getOperand() {
+        return operand;
+    }
+
+    @SaveVertexParam(MIN_NAME)
+    public DoubleVertex getMin() {
+        return min;
+    }
+
+    @SaveVertexParam(MAX_NAME)
+    public DoubleVertex getMax() {
+        return max;
     }
 }

@@ -30,9 +30,9 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVer
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ClampVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.ClampVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.DoubleSetWithMaskVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;

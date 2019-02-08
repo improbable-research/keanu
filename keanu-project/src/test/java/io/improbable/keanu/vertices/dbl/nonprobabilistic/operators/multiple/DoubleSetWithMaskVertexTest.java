@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
