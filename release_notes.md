@@ -1,3 +1,7 @@
+### Version 0.0.20 ###
+
+* Added Python docstrings for sampling
+
 ### Version 0.0.19 ###
 
 * Added `get_vertex_by_label` to `BayesNet`
