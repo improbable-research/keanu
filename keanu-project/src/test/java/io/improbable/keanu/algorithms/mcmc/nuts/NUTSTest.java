@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.Statistics;
@@ -13,8 +12,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -164,6 +163,22 @@ public class NUTSTest {
         );
 
         assertFalse(posteriorSamples.get(A).asList().isEmpty());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfStartingPositionIsZeroProbability() {
+
+        GaussianVertex A = new HalfGaussianVertex(1.0);
+        A.setValue(-1.0);
+
+        BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
+
+        ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(net);
+
+        NUTS nuts = NUTS.builder()
+            .build();
+
+        nuts.getPosteriorSamples(model, 2);
     }
 
     @Category(Slow.class)
