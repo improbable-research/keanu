@@ -1,13 +1,20 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-public class ClampVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class ClampVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final static String OPERAND_NAME = "operand";
     private final static String MIN_NAME = "min";
@@ -45,5 +52,47 @@ public class ClampVertex extends DoubleVertex implements NonProbabilistic<Double
     @SaveVertexParam(MAX_NAME)
     public DoubleVertex getMax() {
         return max;
+    }
+
+    @Override
+    public PartialDerivative forwardModeAutoDifferentiation(Map<Vertex, PartialDerivative> derivativeOfParentsWithRespectToInput) {
+
+        PartialDerivative operandPartial = derivativeOfParentsWithRespectToInput.getOrDefault(operand, PartialDerivative.EMPTY);
+        PartialDerivative minPartial = derivativeOfParentsWithRespectToInput.getOrDefault(min, PartialDerivative.EMPTY);
+        PartialDerivative maxPartial = derivativeOfParentsWithRespectToInput.getOrDefault(max, PartialDerivative.EMPTY);
+
+        DoubleTensor operandValue = operand.getValue();
+        DoubleTensor minValue = min.getValue();
+        DoubleTensor maxValue = max.getValue();
+
+        DoubleTensor lessThanMinMask = operandValue.getLessThanMask(minValue);
+        DoubleTensor greaterThanMaxMask = operandValue.getGreaterThanMask(maxValue);
+        DoubleTensor inSupportMask = lessThanMinMask.plus(greaterThanMaxMask).unaryMinusInPlace().plusInPlace(1.);
+
+        return  operandPartial.multiplyAlongOfDimensions(inSupportMask)
+            .add(minPartial.multiplyAlongOfDimensions(lessThanMinMask))
+            .add(maxPartial.multiplyAlongOfDimensions(greaterThanMaxMask));
+    }
+
+    @Override
+    public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        Map<Vertex, PartialDerivative> partials = new HashMap<>();
+
+        DoubleTensor operandValue = operand.getValue();
+        DoubleTensor minValue = min.getValue();
+        DoubleTensor maxValue = max.getValue();
+
+        DoubleTensor lessThanMinMask = operandValue.getLessThanMask(minValue);
+        DoubleTensor greaterThanMaxMask = operandValue.getGreaterThanMask(maxValue);
+        DoubleTensor inSupportMask = lessThanMinMask.plus(greaterThanMaxMask).unaryMinusInPlace().plusInPlace(1.);
+
+        partials.put(operand, derivativeOfOutputWithRespectToSelf
+            .multiplyAlongOfDimensions(inSupportMask));
+        partials.put(min, derivativeOfOutputWithRespectToSelf
+            .multiplyAlongOfDimensions(lessThanMinMask));
+        partials.put(max, derivativeOfOutputWithRespectToSelf
+            .multiplyAlongOfDimensions(greaterThanMaxMask));
+
+        return partials;
     }
 }
