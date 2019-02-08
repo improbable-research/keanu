@@ -31,7 +31,7 @@ public class VertexDotLabel {
     }
 
     public String inDotFormat() {
-        // Output value if value is set, but also add some descriptive info for non-constant vertices.
+        // Output value if value is set, but also add some descriptive info.
         if (!value.isEmpty()) {
             StringBuilder dotLabel = new StringBuilder();
             dotLabel.append(vertex.getId().hashCode()).append(DOT_LABEL_OPENING).append(value);
