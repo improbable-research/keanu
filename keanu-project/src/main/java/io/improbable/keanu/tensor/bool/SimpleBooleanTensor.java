@@ -406,4 +406,9 @@ public class SimpleBooleanTensor implements BooleanTensor {
         return ArrayUtils.toObject(data);
     }
 
+    @Override
+    public boolean[] asFlatBooleanArray() {
+        return data;
+    }
+
 }
