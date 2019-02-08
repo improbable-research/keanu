@@ -34,14 +34,14 @@ public class VertexDotLabel {
         // Output value if value is set, but also add some descriptive info for non-constant vertices.
         if (!value.isEmpty()) {
             StringBuilder dotLabel = new StringBuilder();
-            dotLabel.append(vertex.getId().hashCode() + DOT_LABEL_OPENING + value);
-            extraLabelInfoForVertexWithValue().ifPresent(info -> dotLabel.append(" (" + info + ")"));
+            dotLabel.append(vertex.getId().hashCode()).append(DOT_LABEL_OPENING).append(value);
+            getDescriptiveInfoForVertexWithValue().ifPresent(info -> dotLabel.append(" (").append(info).append(")"));
             return dotLabel.append(DOT_LABEL_CLOSING).toString();
         }
         return vertex.getId().hashCode() + DOT_LABEL_OPENING + getDescriptiveInfo() + DOT_LABEL_CLOSING;
     }
 
-    private Optional<String> extraLabelInfoForVertexWithValue() {
+    private Optional<String> getDescriptiveInfoForVertexWithValue() {
         if (!vertexLabel.isEmpty()) {
             return Optional.of(vertexLabel);
         }
