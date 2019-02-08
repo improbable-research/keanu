@@ -200,6 +200,7 @@ public class NUTSTest {
         NUTS nuts = NUTS.builder()
             .adaptCount(5)
             .targetAcceptanceProb(0.65)
+            .maxTreeHeight(10)
             .build();
 
         NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
@@ -212,12 +213,32 @@ public class NUTSTest {
 
         List<DoubleTensor> samples = posteriorSamples.get(vertex).asList();
 
-        Assert.assertEquals(3.0, samples.get(0).scalar(), 1e-9);
-        Assert.assertEquals(3.0, samples.get(1).scalar(), 1e-9);
-        Assert.assertEquals(0.9374092571432446, samples.get(2).scalar(), 1e-9);
-        Assert.assertEquals(0.05720950629236243, samples.get(3).scalar(), 1e-9);
-        Assert.assertEquals(0.33119352888492626, samples.get(4).scalar(), 1e-9);
-        Assert.assertEquals(0.9124861769925321, samples.get(19).scalar(), 1e-9);
+        double epsilon = 1e-9;
+
+        //for (int i = 0; i < samples.size(); i++) {
+        //    System.out.println("Assert.assertEquals(" + samples.get(i).scalar() + ", samples.get(" + i + ").scalar(), epsilon);");
+        //}
+
+        Assert.assertEquals(2.6909707917024925, samples.get(0).scalar(), epsilon);
+        Assert.assertEquals(2.6909707917024925, samples.get(1).scalar(), epsilon);
+        Assert.assertEquals(2.4304568786472975, samples.get(2).scalar(), epsilon);
+        Assert.assertEquals(-1.6185857471490803, samples.get(3).scalar(), epsilon);
+        Assert.assertEquals(-1.598778524224911, samples.get(4).scalar(), epsilon);
+        Assert.assertEquals(-1.7575419400993966, samples.get(5).scalar(), epsilon);
+        Assert.assertEquals(-0.5030063973316112, samples.get(6).scalar(), epsilon);
+        Assert.assertEquals(0.18023500808380366, samples.get(7).scalar(), epsilon);
+        Assert.assertEquals(-0.1955595499753091, samples.get(8).scalar(), epsilon);
+        Assert.assertEquals(0.2666907097341884, samples.get(9).scalar(), epsilon);
+        Assert.assertEquals(0.41303962378878667, samples.get(10).scalar(), epsilon);
+        Assert.assertEquals(0.8839649089092166, samples.get(11).scalar(), epsilon);
+        Assert.assertEquals(-0.30586548530994595, samples.get(12).scalar(), epsilon);
+        Assert.assertEquals(0.8257544975729242, samples.get(13).scalar(), epsilon);
+        Assert.assertEquals(0.8257544975729242, samples.get(14).scalar(), epsilon);
+        Assert.assertEquals(-2.560285900162394, samples.get(15).scalar(), epsilon);
+        Assert.assertEquals(-0.7808507597890151, samples.get(16).scalar(), epsilon);
+        Assert.assertEquals(-2.382764225608147, samples.get(17).scalar(), epsilon);
+        Assert.assertEquals(-1.6570948400056273, samples.get(18).scalar(), epsilon);
+        Assert.assertEquals(-0.9505077026917006, samples.get(19).scalar(), epsilon);
 
     }
 }

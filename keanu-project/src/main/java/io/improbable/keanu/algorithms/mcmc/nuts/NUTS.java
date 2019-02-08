@@ -20,7 +20,7 @@ import lombok.Getter;
 import java.util.List;
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.nuts.Stepsize.findStartingStepSizeSimple;
+import static io.improbable.keanu.algorithms.mcmc.nuts.AdaptiveStepSize.findStartingStepSizeSimple;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.ones;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 import static java.util.stream.Collectors.toMap;
@@ -120,7 +120,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             findStartingStepSizeSimple(0.25, latentVariables) :
             initialStepSize;
 
-        Stepsize stepsize = new Stepsize(
+        AdaptiveStepSize stepsize = new AdaptiveStepSize(
             startingStepSize,
             targetAcceptanceProb,
             adaptCount

@@ -27,14 +27,14 @@ class Tree implements SaveStatistics {
     private static final double DELTA_MAX = 1000.0;
 
     @Getter
-    private Leapfrog leapfrogForward;
+    private Leapfrog forward;
 
     @Getter
-    private Leapfrog leapfrogBackward;
+    private Leapfrog backward;
 
     @Getter
     @Setter
-    private Map<VariableReference, DoubleTensor> pSum;
+    private Map<VariableReference, DoubleTensor> sumMomentum;
 
     @Getter
     @Setter
@@ -42,7 +42,7 @@ class Tree implements SaveStatistics {
 
     @Getter
     @Setter
-    private double logSize;
+    private double logSumWeight;
 
     @Getter
     @Setter
@@ -50,7 +50,7 @@ class Tree implements SaveStatistics {
 
     @Getter
     @Setter
-    private double acceptSum;
+    private double sumMetropolisAcceptanceProbability;
 
     @Getter
     @Setter
@@ -60,28 +60,30 @@ class Tree implements SaveStatistics {
     private double startEnergy;
 
     /**
-     * @param startState         The result of the forward leapfrog
-     * @param proposal           ??
-     * @param logSize            ?????
-     * @param shouldContinueFlag False if we are U-Turning
-     * @param acceptSum          ?????
-     * @param treeSize           The size of the tree
+     * @param startState                         The leap frog for is initial step in the tree.
+     * @param proposal                           The current accepted position.
+     * @param logSumWeight                       ?????
+     * @param shouldContinueFlag                 False if the tree is U-Turning
+     * @param sumMetropolisAcceptanceProbability A summation of the metropolis acceptance probability
+     *                                           over each step in tree.
+     * @param treeSize                           The size of the tree.
+     * @param startEnergy                        The
      */
     Tree(Leapfrog startState,
          Proposal proposal,
-         double logSize,
+         double logSumWeight,
          boolean shouldContinueFlag,
-         double acceptSum,
+         double sumMetropolisAcceptanceProbability,
          int treeSize,
          double startEnergy) {
 
-        this.leapfrogForward = startState;
-        this.leapfrogBackward = startState;
-        this.pSum = startState.getMomentum();
+        this.forward = startState;
+        this.backward = startState;
+        this.sumMomentum = startState.getMomentum();
         this.proposal = proposal;
-        this.logSize = logSize;
+        this.logSumWeight = logSumWeight;
         this.shouldContinueFlag = shouldContinueFlag;
-        this.acceptSum = acceptSum;
+        this.sumMetropolisAcceptanceProbability = sumMetropolisAcceptanceProbability;
         this.treeSize = treeSize;
         this.startEnergy = startEnergy;
     }
@@ -100,7 +102,7 @@ class Tree implements SaveStatistics {
             latentVariables,
             logProbGradientCalculator,
             sampleFromVariables,
-            buildDirection == -1 ? currentTree.leapfrogBackward : currentTree.leapfrogForward,
+            buildDirection == -1 ? currentTree.backward : currentTree.forward,
             buildDirection,
             treeHeight,
             epsilon,
@@ -109,9 +111,9 @@ class Tree implements SaveStatistics {
         );
 
         if (buildDirection == -1) {
-            currentTree.leapfrogBackward = otherHalfTree.leapfrogBackward;
+            currentTree.backward = otherHalfTree.backward;
         } else {
-            currentTree.leapfrogForward = otherHalfTree.leapfrogForward;
+            currentTree.forward = otherHalfTree.forward;
         }
 
         return otherHalfTree;
@@ -171,27 +173,23 @@ class Tree implements SaveStatistics {
 
                 if (otherHalfTree.shouldContinueFlag) {
 
-                    tree.setPSum(VariableValues.add(tree.pSum, otherHalfTree.pSum));
+                    tree.setSumMomentum(VariableValues.add(tree.sumMomentum, otherHalfTree.sumMomentum));
 
-                    boolean notUTurning = isNotUTurning(tree.leapfrogForward.getVelocity(), tree.leapfrogBackward.getVelocity(), tree.pSum);
+                    boolean notUTurning = isNotUTurning(tree.forward.getVelocity(), tree.backward.getVelocity(), tree.sumMomentum);
 
                     tree.setShouldContinueFlag(notUTurning);
 
-                    final double newLogSize = logSumExp(tree.logSize, otherHalfTree.logSize);
+                    final double newLogSize = logSumExp(tree.logSumWeight, otherHalfTree.logSumWeight);
 
-                    if (Tree.isNotUsableNumber(newLogSize)) {
-                        throw new IllegalStateException("New logsize is " + newLogSize);
-                    }
+                    tree.setLogSumWeight(newLogSize);
 
-                    tree.setLogSize(newLogSize);
-
-                    if (acceptOtherPositionWithProbability(otherHalfTree.logSize - newLogSize, random)) {
+                    if (acceptOtherPositionWithProbability(otherHalfTree.logSumWeight - newLogSize, random)) {
                         tree.setProposal(otherHalfTree.proposal);
                     }
 
                 }
 
-                tree.acceptSum += otherHalfTree.acceptSum;
+                tree.sumMetropolisAcceptanceProbability += otherHalfTree.sumMetropolisAcceptanceProbability;
                 tree.treeSize += otherHalfTree.treeSize;
             }
 
@@ -223,17 +221,17 @@ class Tree implements SaveStatistics {
 
         if (shouldContinueFlag) {
 
-            final double logSize = -energyChange;
+            final double logSumWeight = -energyChange;
 
-            final double pAccept = Math.min(
+            final double metropolisAcceptanceProbability = Math.min(
                 1.0,
-                Math.exp(logSize)
+                Math.exp(logSumWeight)
             );
 
             final Map<VariableReference, ?> sample = takeSample(sampleFromVariables);
 
-            if (isNotUsableNumber(logSize) || isNotUsableNumber(pAccept)) {
-                throw new IllegalStateException("acceptSum is " + pAccept + " logSize is " + logSize);
+            if (isNotUsableNumber(logSumWeight) || isNotUsableNumber(metropolisAcceptanceProbability)) {
+                throw new IllegalStateException("acceptProbability is " + metropolisAcceptanceProbability + " logSumWeight is " + logSumWeight);
             }
 
             Proposal proposal = new Proposal(
@@ -241,16 +239,16 @@ class Tree implements SaveStatistics {
                 leapfrogAfterStep.getGradient(),
                 sample,
                 energyAfterStep,
-                pAccept,
+                metropolisAcceptanceProbability,
                 leapfrogAfterStep.getLogProb()
             );
 
             return new Tree(
                 leapfrogAfterStep,
                 proposal,
-                logSize,
+                logSumWeight,
                 true,
-                pAccept,
+                metropolisAcceptanceProbability,
                 1,
                 startEnergy
             );

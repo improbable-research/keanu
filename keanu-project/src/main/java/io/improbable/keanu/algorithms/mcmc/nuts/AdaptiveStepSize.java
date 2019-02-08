@@ -9,9 +9,11 @@ import java.util.List;
 
 
 /**
- * Used by NUTS as an epsilon for the leap frog
+ * This is based on Algorithm 5 from https://arxiv.org/pdf/1111.4246.pdf.
+ * <p>
+ * The step size is used by NUTS as an epsilon for the leap frog integration.
  */
-class Stepsize implements SaveStatistics {
+class AdaptiveStepSize implements SaveStatistics {
 
     private static final double t0 = 10;
     private static final double gamma = 0.05;
@@ -24,7 +26,8 @@ class Stepsize implements SaveStatistics {
     private double stepSize;
     private double hBar;
     private double acceptRate;
-    private double logStepSizeFrozen;
+
+    private double logStepSizeBar;
     private double logStepSize;
 
     /**
@@ -32,12 +35,12 @@ class Stepsize implements SaveStatistics {
      * @param sigma      the target acceptance probability (lower target equates to a higher step size when tuning)
      * @param adaptCount the number of samples to adapt for
      */
-    Stepsize(double stepSize, double sigma, int adaptCount) {
+    AdaptiveStepSize(double stepSize, double sigma, int adaptCount) {
         this.sigma = sigma;
         this.stepSize = stepSize;
         this.hBar = 0;
         this.logStepSize = Math.log(stepSize);
-        this.logStepSizeFrozen = logStepSize;//Math.log(1);
+        this.logStepSizeBar = logStepSize;
         this.adaptCount = adaptCount;
         this.mu = Math.log(10 * stepSize);
     }
@@ -63,7 +66,7 @@ class Stepsize implements SaveStatistics {
         if (sampleNum < adaptCount) {
             logStepSizeAtSample = updateLogStepSize(tree, sampleNum);
         } else {
-            logStepSizeAtSample = logStepSizeFrozen;
+            logStepSizeAtSample = logStepSizeBar;
         }
 
         stepSize = Math.exp(logStepSizeAtSample);
@@ -72,7 +75,7 @@ class Stepsize implements SaveStatistics {
 
     private double updateLogStepSize(Tree tree, int m) {
 
-        final double alpha = tree.getAcceptSum();
+        final double alpha = tree.getSumMetropolisAcceptanceProbability();
         final double nuAlpha = tree.getTreeSize();
 
         final double w = 1.0 / (m + t0);
@@ -84,7 +87,7 @@ class Stepsize implements SaveStatistics {
         logStepSize = mu - (Math.sqrt(m) / gamma) * hBar;
 
         double tendToZero = Math.pow(m, -kappa);
-        logStepSizeFrozen = tendToZero * logStepSize + (1 - tendToZero) * logStepSizeFrozen;
+        logStepSizeBar = tendToZero * logStepSize + (1 - tendToZero) * logStepSizeBar;
 
         return logStepSize;
     }

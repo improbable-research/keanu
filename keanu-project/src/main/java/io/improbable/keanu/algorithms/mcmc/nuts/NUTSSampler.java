@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static io.improbable.keanu.algorithms.mcmc.nuts.Tree.logSumExp;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
 
 /**
@@ -27,7 +28,7 @@ class NUTSSampler implements SamplingAlgorithm {
     private final List<? extends Variable> sampleFromVariables;
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
-    private final Stepsize stepsize;
+    private final AdaptiveStepSize stepsize;
     private Tree tree;
     private final ProbabilisticModelWithGradient logProbGradientCalculator;
     private final Statistics statistics;
@@ -54,7 +55,7 @@ class NUTSSampler implements SamplingAlgorithm {
                        ProbabilisticModelWithGradient logProbGradientCalculator,
                        Potential potential,
                        boolean adaptEnabled,
-                       Stepsize stepsize,
+                       AdaptiveStepSize stepsize,
                        Tree tree,
                        int maxTreeHeight,
                        KeanuRandom random,
@@ -116,7 +117,15 @@ class NUTSSampler implements SamplingAlgorithm {
             previousProposal.getLogProb()
         );
 
-        tree = new Tree(startState, initialProposal, 0.0, true, 0.0, 1, startState.getEnergy());
+        tree = new Tree(
+            startState,
+            initialProposal,
+            0.0,
+            true,
+            0.0,
+            1,
+            startState.getEnergy()
+        );
 
         int treeHeight = 0;
 
@@ -136,35 +145,31 @@ class NUTSSampler implements SamplingAlgorithm {
                 random
             );
 
-            treeHeight++;
-            tree.setAcceptSum(tree.getAcceptSum() + otherHalfTree.getAcceptSum());
+            tree.setSumMetropolisAcceptanceProbability(tree.getSumMetropolisAcceptanceProbability() + otherHalfTree.getSumMetropolisAcceptanceProbability());
+
             tree.setTreeSize(tree.getTreeSize() + otherHalfTree.getTreeSize());
 
-            if (!otherHalfTree.shouldContinue()) {
-                break;
+            if (otherHalfTree.shouldContinue()) {
+
+                if (Tree.acceptOtherPositionWithProbability(otherHalfTree.getLogSumWeight() - tree.getLogSumWeight(), random)) {
+                    tree.setProposal(otherHalfTree.getProposal());
+                }
+
+                tree.setLogSumWeight(logSumExp(tree.getLogSumWeight(), otherHalfTree.getLogSumWeight()));
+
+                tree.setSumMomentum(add(tree.getSumMomentum(), otherHalfTree.getSumMomentum()));
             }
-
-            if (Tree.acceptOtherPositionWithProbability(otherHalfTree.getLogSize() - tree.getLogSize(), random)) {
-                tree.setProposal(otherHalfTree.getProposal());
-            }
-
-            final double newLogSize = Tree.logSumExp(tree.getLogSize(), otherHalfTree.getLogSize());
-
-            if (Tree.isNotUsableNumber(newLogSize)) {
-                throw new IllegalStateException("New logsize is " + newLogSize);
-            }
-
-            tree.setLogSize(newLogSize);
-
-            tree.setPSum(add(tree.getPSum(), otherHalfTree.getPSum()));
 
             tree.setShouldContinueFlag(
-                Tree.isNotUTurning(
-                    tree.getLeapfrogForward().getVelocity(),
-                    tree.getLeapfrogBackward().getVelocity(),
-                    tree.getPSum()
-                )
+                otherHalfTree.shouldContinue() &&
+                    Tree.isNotUTurning(
+                        tree.getForward().getVelocity(),
+                        tree.getBackward().getVelocity(),
+                        tree.getSumMomentum()
+                    )
             );
+
+            treeHeight++;
 
         }
 
