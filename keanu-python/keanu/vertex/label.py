@@ -30,6 +30,6 @@ class _VertexLabel(JavaObjectWrapper):
         return self.get_name().split(".").__repr__()
 
     @staticmethod
-    def create_from_list(*names: str) -> str:
+    def create_from_list(*names: str) -> '_VertexLabel':
         names_joined = _VertexLabel.__separator.join(names)
         return _VertexLabel(names_joined)
