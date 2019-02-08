@@ -20,6 +20,7 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.MetropolisHastings")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.nuts.NUTS")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.sampling.ForwardSampler")
 
 
 class PosteriorSamplingAlgorithm:
@@ -29,6 +30,12 @@ class PosteriorSamplingAlgorithm:
 
     def get_sampler(self) -> JavaObject:
         return self._sampler
+
+
+class ForwardSampler(PosteriorSamplingAlgorithm):
+
+    def __init__(self):
+        super().__init__(k.jvm_view().ForwardSampler())
 
 
 class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
@@ -118,7 +125,7 @@ def sample(net: BayesNet,
     :param net: Bayesian Network containing latent variables.
     :param sample_from: Vertices to include in the returned samples.
     :param sampling_algorithm: The posterior sampling algorithm to use.
-        Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.
+        Options are :class:`keanu.algorithm.MetropolisHastingsSampler`, :class:`keanu.algorithm.NUTSSampler` and :class:`keanu.algorithm.ForwardSampler`
         If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'prior' as its proposal distribution.
     :param draws: The number of samples to take.
     :param drop: The number of samples to drop before collecting anything.
@@ -149,7 +156,10 @@ def sample(net: BayesNet,
         sampling_algorithm, MetropolisHastingsSampler) else ProbabilisticModelWithGradient(net)
 
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
-        probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
+        probabilistic_model.unwrap(),
+        vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval) if not isinstance(
+            sampling_algorithm, ForwardSampler) else sampling_algorithm.get_sampler().sample(
+                net.unwrap(), vertices_unwrapped, draws)
 
     id_to_label = __check_if_vertices_are_labelled(sample_from)
     if __all_scalar(sample_from):

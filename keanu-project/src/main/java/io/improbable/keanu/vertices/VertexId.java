@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * graph exists - ie depth 1 is the outermost graph, depth 2 is a graph within a graph etc.
  */
 @EqualsAndHashCode
-public class VertexId implements VariableReference, Comparable<VertexId> {
+public class VertexId implements Comparable<VertexId>, VariableReference {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
     private static final int TOP_LEVEL_ARRAY_SIZE = 1;
