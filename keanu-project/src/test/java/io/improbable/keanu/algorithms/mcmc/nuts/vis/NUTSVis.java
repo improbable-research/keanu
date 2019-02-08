@@ -1,9 +1,10 @@
-package io.improbable.keanu.algorithms.mcmc.nuts;
+package io.improbable.keanu.algorithms.mcmc.nuts.vis;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Getter;

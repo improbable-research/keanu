@@ -1,8 +1,9 @@
-package io.improbable.keanu.algorithms.mcmc.nuts;
+package io.improbable.keanu.algorithms.mcmc.nuts.vis;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
+import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.algorithms.mcmc.testcases.MCMCTestDistributions;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;

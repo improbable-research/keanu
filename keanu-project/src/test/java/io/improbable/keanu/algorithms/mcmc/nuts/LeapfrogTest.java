@@ -42,7 +42,6 @@ public class LeapfrogTest {
     private Map<VariableReference, DoubleTensor> gradient = new HashMap<>();
 
     private ProbabilisticModelWithGradient mockedGradientCalculator;
-    private ProbabilisticModelWithGradient mockedReverseGradientCalculator;
     private Potential potential;
 
     @Before
@@ -56,7 +55,6 @@ public class LeapfrogTest {
     @Before
     public void setupGradientMocks() {
         mockedGradientCalculator = setUpMock(1., -1.);
-        mockedReverseGradientCalculator = setUpMock(-1., 1.);
     }
 
     private ProbabilisticModelWithGradient setUpMock(double aValue, double bValue) {
@@ -91,20 +89,23 @@ public class LeapfrogTest {
         Leapfrog start = new Leapfrog(position, momentum, gradient, 0, potential);
         Leapfrog leapForward = start.step(vertices, mockedGradientCalculator, EPSILON);
 
-        Map<VariableReference, DoubleTensor> momentum = new HashMap<>(leapForward.getMomentum());
+        Assert.assertEquals(2.0, leapForward.getPosition().get(aID).scalar(), 1e-6);
+        Assert.assertEquals(2.0, leapForward.getPosition().get(bID).scalar(), 1e-6);
 
-        fillMap(leapForward.getMomentum(), DoubleTensor.scalar(-1.0));
-        fillMap((Map<VariableReference, DoubleTensor>) leapForward.getGradient(), DoubleTensor.scalar(-2.0));
+        Leapfrog leapBackToStart = leapForward.step(vertices, mockedGradientCalculator, -EPSILON);
 
-        Leapfrog leapBackToStart = leapForward.step(vertices, mockedReverseGradientCalculator, EPSILON);
-
-        assertThat(start.getPosition(), Matchers.equalTo(leapBackToStart.getPosition()));
-        assertThat(momentum, Matchers.equalTo(revertDirectionOfMap(leapBackToStart.getMomentum())));
+        Assert.assertEquals(0.0, leapBackToStart.getPosition().get(aID).scalar(), 1e-6);
+        Assert.assertEquals(0.0, leapBackToStart.getPosition().get(bID).scalar(), 1e-6);
     }
 
     @Test
     public void doesIncreaseKineticEnergyWhenLogProbIncreases() {
-        //TODO:
+        Leapfrog start = new Leapfrog(position, momentum, gradient, 0, potential);
+        double startEnergy = start.getEnergy();
+        Leapfrog leap = start.step(vertices, mockedGradientCalculator, EPSILON);
+        double afterLeapEnergy = leap.getEnergy();
+
+
     }
 
     private void fillMap(Map<VariableReference, DoubleTensor> map, DoubleTensor value) {

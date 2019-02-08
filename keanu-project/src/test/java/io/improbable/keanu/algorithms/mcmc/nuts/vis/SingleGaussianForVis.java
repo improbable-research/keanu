@@ -1,17 +1,17 @@
-package io.improbable.keanu.algorithms.mcmc.nuts;
+package io.improbable.keanu.algorithms.mcmc.nuts.vis;
 
 import io.improbable.keanu.Keanu;
+import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class SumGaussiansForVis implements ModelForNUTSVis {
+public class SingleGaussianForVis implements ModelForNUTSVis {
 
     @Getter
     private NUTS samplingAlgorithm;
@@ -25,30 +25,20 @@ public class SumGaussiansForVis implements ModelForNUTSVis {
     @Getter
     private int sampleCount;
 
-    public SumGaussiansForVis() {
+    public SingleGaussianForVis() {
 
-        GaussianVertex A = new GaussianVertex(20, 1);
-        A.setLabel("A");
-//        A.setValue(-10);
-        GaussianVertex B = new GaussianVertex(20, 1);
-        B.setLabel("B");
-//        B.setValue(-10);
-        AdditionVertex D = A.plus(B);
-        GaussianVertex C = new GaussianVertex(D, 1);
-        C.observe(46);
+        GaussianVertex A = new GaussianVertex(0, 1);
+//        A.setValue(3.0);
 
         model = new KeanuProbabilisticModelWithGradient(new BayesianNetwork(A.getConnectedGraph()));
-//        KeanuOptimizer.Gradient.builderFor(A.getConnectedGraph()).build().maxAPosteriori();
 
-        sampleCount = 6000;
+        sampleCount = 3000;
 
         samplingAlgorithm = Keanu.Sampling.NUTS.builder()
             .adaptCount(sampleCount)
-            .maxTreeHeight(7)
-//            .adaptEnabled(false)
             .saveStatistics(true)
             .build();
 
-        toPlot = Arrays.asList(A, B);
+        toPlot = Arrays.asList(A);
     }
 }
