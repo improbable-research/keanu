@@ -1,20 +1,19 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -25,84 +24,9 @@ public class OptimizerTest {
     public DeterministicRule deterministicRule = new DeterministicRule();
 
     @Test
-    public void gradientOptimizerCanMLE() {
-        assertCanCalculateMaxLikelihood(getGradientOptimizer());
-    }
-
-    @Test
-    public void nonGradientOptimizerCanMLE() {
-        assertCanCalculateMaxLikelihood(getNonGradientOptimizer());
-    }
-
-    @Test
-    public void gradientOptimizerCanMAP() {
-        assertCanCalculateMaxAPosteriori(getGradientOptimizer());
-    }
-
-    @Test
-    public void nonGradientOptimizerCanMAP() {
-        assertCanCalculateMaxAPosteriori(getNonGradientOptimizer());
-    }
-
-    private Function<BayesianNetwork, Optimizer> getGradientOptimizer() {
-        return (bayesNet) -> KeanuOptimizer.Gradient.of(bayesNet);
-    }
-
-    private Function<BayesianNetwork, Optimizer> getNonGradientOptimizer() {
-        return (bayesNet) -> KeanuOptimizer.NonGradient.of(bayesNet);
-    }
-
-    private void assertCanCalculateMaxLikelihood(Function<BayesianNetwork, Optimizer> optimizerMapper) {
-
-        DoubleVertex A = new GaussianVertex(20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(20.0, 1.0);
-
-        A.setValue(20.0);
-        B.setAndCascade(20.0);
-
-        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
-
-        Cobserved.observe(44.0);
-
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-
-        Optimizer optimizer = optimizerMapper.apply(bayesNet);
-
-        optimizer.maxLikelihood();
-        double maxA = A.getValue().scalar();
-        double maxB = B.getValue().scalar();
-
-        assertEquals(44, maxA + maxB, 0.1);
-    }
-
-    public void assertCanCalculateMaxAPosteriori(Function<BayesianNetwork, Optimizer> optimizerMapper) {
-
-        DoubleVertex A = new GaussianVertex(20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(20.0, 1.0);
-
-        A.setValue(21.5);
-        B.setAndCascade(21.5);
-
-        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
-
-        Cobserved.observe(46.0);
-
-        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-
-        Optimizer optimizer = optimizerMapper.apply(bayesNet);
-
-        optimizer.maxAPosteriori();
-        double maxA = A.getValue().scalar();
-        double maxB = B.getValue().scalar();
-
-        assertEquals(22, maxA, 0.1);
-        assertEquals(22, maxB, 0.1);
-    }
-
-    @Test
     public void gradientOptimizerCanRemoveFitnessCalculationHandler() {
         GaussianVertex gaussianVertex = new GaussianVertex(0, 1);
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.of(gaussianVertex.getConnectedGraph());
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.of(gaussianVertex.getConnectedGraph());
         canRemoveFitnessCalculationHandler(optimizer);
     }
 
@@ -111,7 +35,7 @@ public class OptimizerTest {
         GaussianVertex A = new GaussianVertex(0, 1);
         GaussianVertex B = new GaussianVertex(0, 1);
         A.plus(B);
-        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.of(A.getConnectedGraph());
+        NonGradientOptimizer optimizer = Keanu.Optimizer.NonGradient.of(A.getConnectedGraph());
         canRemoveFitnessCalculationHandler(optimizer);
     }
 
@@ -119,7 +43,7 @@ public class OptimizerTest {
 
         AtomicBoolean didCallFitness = new AtomicBoolean(false);
 
-        BiConsumer<double[], Double> fitnessHandler = mock(BiConsumer.class);
+        BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessHandler = mock(BiConsumer.class);
 
         optimizer.addFitnessCalculationHandler(fitnessHandler);
         optimizer.removeFitnessCalculationHandler(fitnessHandler);

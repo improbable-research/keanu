@@ -106,7 +106,7 @@ Metropolis Hastings accepts the following arguments:
 We will be taking 100,000 samples from the distributions of A and B.
 
 ```java
-NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfigFor(model).getPosteriorSamples(
+NetworkSamples posteriorSamples = Keanu.Sampling.MetropolisHastings.withDefaultConfig().getPosteriorSamples(
     model,
     model.getLatentVariables(),
     100000

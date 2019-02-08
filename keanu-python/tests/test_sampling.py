@@ -64,25 +64,46 @@ def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sa
 def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_mixed_net(
         algo: Callable[[BayesNet], PosteriorSamplingAlgorithm]) -> None:
     exp = Exponential(1.)
-    add = exp + np.array([1., 2., 3., 4.]).reshape((2, 2))
-    gaussian = Gaussian(add, 2.)
+    add_rank_2 = exp + np.array([1., 2., 3., 4.]).reshape((2, 2))
+    add_rank_3 = exp + np.array([1., 2., 3., 4., 1., 2., 3., 4.]).reshape((2, 2, 2))
+    gaussian_rank_2 = Gaussian(add_rank_2, 2.)
+    gaussian_rank_3 = Gaussian(add_rank_3, 1.)
 
     exp.set_label("exp")
-    gaussian.set_label("gaussian")
+    gaussian_rank_2.set_label("gaussian")
+    gaussian_rank_3.set_label("gaussian2")
 
     mixed_net = BayesNet(exp.get_connected_graph())
 
     draws = 5
     sample_from = list(mixed_net.get_latent_vertices())
+    vertex_labels = [vertex.get_label() for vertex in sample_from]
+
     samples = sample(net=mixed_net, sample_from=sample_from, sampling_algorithm=algo(mixed_net), draws=draws)
     assert type(samples) == dict
 
     __assert_valid_samples(draws, samples)
 
-    assert ('exp', '(0)') in samples
+    assert ('exp', (0,)) in samples
     for i in (0, 1):
         for j in (0, 1):
-            assert (('gaussian', '({}, {})'.format(i, j)) in samples)
+            assert (('gaussian', (i, j)) in samples)
+
+    df = pd.DataFrame(samples)
+
+    expected_num_columns = {"exp": 1, "gaussian": 4, "gaussian2": 8}
+
+    expected_tuple_size = {"exp": 1, "gaussian": 2, "gaussian2": 3}
+
+    assert len(df.columns.levels[0]) == 3
+    for parent_column in df.columns.levels[0]:
+        assert parent_column in vertex_labels
+        assert len(df[parent_column].columns) == expected_num_columns[parent_column]
+        for child_column in df[parent_column].columns:
+            assert type(child_column) == tuple
+            assert len(child_column) == expected_tuple_size[parent_column]
+            assert len(df[parent_column][child_column]) == 5
+            assert type(df[parent_column][child_column][0]) == np.float64
 
 
 def test_sample_dict_can_be_loaded_in_to_dataframe(net: BayesNet) -> None:
@@ -111,7 +132,7 @@ def test_multi_indexed_sample_dict_can_be_loaded_in_to_dataframe(tensor_net: Bay
         assert parent_column in vertex_labels
 
         for child_column in df.columns.levels[1]:
-            assert type(child_column) == str
+            assert type(child_column) == tuple
             assert len(df[parent_column][child_column]) == 5
             assert type(df[parent_column][child_column][0]) == np.float64
 
@@ -185,7 +206,7 @@ def test_can_iter_through_tensor_samples(algo: Callable[[BayesNet], PosteriorSam
         for distribution in ('exp', 'cauchy'):
             for i in (0, 1):
                 for j in (0, 1):
-                    assert ((distribution, '({}, {})'.format(i, j)) in sample)
+                    assert ((distribution, (i, j)) in sample)
     assert count == draws
 
 
@@ -263,7 +284,7 @@ def test_sample_throws_if_vertices_in_sample_from_are_missing_labels() -> None:
     assert sigma.get_label() is None
 
     net = BayesNet([sigma, vertex])
-    with pytest.raises(ValueError, match="Vertices in sample_from must be labelled."):
+    with pytest.raises(ValueError, match=r"Vertices in sample_from must be labelled."):
         samples = sample(net=net, sample_from=net.get_latent_vertices())
 
 
@@ -274,7 +295,7 @@ def test_generate_samples_throws_if_vertices_in_sample_from_are_missing_labels()
     assert sigma.get_label() is None
 
     net = BayesNet([sigma, vertex])
-    with pytest.raises(ValueError, match="Vertices in sample_from must be labelled."):
+    with pytest.raises(ValueError, match=r"Vertices in sample_from must be labelled."):
         samples = generate_samples(net=net, sample_from=net.get_latent_vertices())
 
 

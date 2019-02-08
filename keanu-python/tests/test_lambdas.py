@@ -39,9 +39,9 @@ def evaluate_and_check_for_increment(model: LambdaModel, v_in: Vertex) -> None:
     v_out: Vertex = model.get_double_model_output_vertex("out")
 
     v_in.set_value(1.)
-    v_out.eval()
+    v_out.unwrap().eval()
     assert v_out.get_value() == 2.
 
     v_in.set_value(1.1)
-    v_out.eval()
+    v_out.unwrap().eval()
     assert v_out.get_value() == 2.1

@@ -1,32 +1,23 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-import com.google.common.base.Preconditions;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
-import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class PriorProposalDistribution implements ProposalDistribution {
-    private final Map<VariableReference, Vertex> vertexLookup;
     private final ProposalNotifier proposalNotifier;
 
-    public PriorProposalDistribution(Collection<Vertex> vertices) {
-        this(vertices, Collections.emptyList());
+    public PriorProposalDistribution() {
+        this(Collections.emptyList());
     }
 
-    public PriorProposalDistribution(Collection<Vertex> vertices, List<ProposalListener> listeners) {
-        checkAllVerticesAreProbabilistic(vertices);
-        vertexLookup = vertices.stream().collect(Collectors.toMap(Vertex::getReference, v -> v));
+    public PriorProposalDistribution(List<ProposalListener> listeners) {
         this.proposalNotifier = new ProposalNotifier(listeners);
-
     }
 
     @Override
@@ -45,8 +36,13 @@ public class PriorProposalDistribution implements ProposalDistribution {
     }
 
     private <T> void setFor(Variable<T, ?> variable, KeanuRandom random, Proposal proposal) {
-        Vertex<T> vertex = vertexLookup.get(variable.getReference());
-        proposal.setProposal(variable, (((Probabilistic<T>) vertex).sample(random)));
+
+        if (variable instanceof Vertex && variable instanceof Probabilistic) {
+            Vertex<T> vertex = (Vertex<T>) variable;
+            proposal.setProposal(variable, ((Probabilistic<T>) vertex).sample(random));
+        } else {
+            throw new IllegalArgumentException(this.getClass().getSimpleName() + " is to only be used with Keanu's Vertex");
+        }
     }
 
     @Override
@@ -54,9 +50,4 @@ public class PriorProposalDistribution implements ProposalDistribution {
         proposalNotifier.notifyProposalRejected();
     }
 
-    private void checkAllVerticesAreProbabilistic(Collection<Vertex> vertices) {
-        for (Vertex v : vertices) {
-            Preconditions.checkArgument(v instanceof Probabilistic, "Prior proposal vertices must be probabilistic. Vertex is: " + v);
-        }
-    }
 }

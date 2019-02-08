@@ -3,8 +3,8 @@ import io
 import os
 import logging
 from py4j.java_gateway import JavaGateway, CallbackServerParameters, JavaObject, JavaClass, JVMView, java_import
-from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
 from py4j.protocol import Py4JError
+from py4j.java_collections import JavaList, JavaArray, JavaSet, JavaMap
 from typing import Dict, Any, Iterable, List, Collection, Set
 from _io import TextIOWrapper
 

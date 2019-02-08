@@ -6,6 +6,7 @@ import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.ProbabilisticModel;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
+import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.util.status.StatusBar;
 import lombok.AllArgsConstructor;
@@ -78,12 +79,9 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     public static class MetropolisHastingsBuilder {
         private KeanuRandom random = KeanuRandom.getDefaultRandom();
-        private ProposalDistribution proposalDistribution;
+        private ProposalDistribution proposalDistribution = new PriorProposalDistribution();
         private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
-        private ProposalRejectionStrategy rejectionStrategy;
-
-        MetropolisHastingsBuilder() {
-        }
+        private ProposalRejectionStrategy rejectionStrategy = new RollBackToCachedValuesOnRejection();
 
         public MetropolisHastingsBuilder random(KeanuRandom random) {
             this.random = random;
