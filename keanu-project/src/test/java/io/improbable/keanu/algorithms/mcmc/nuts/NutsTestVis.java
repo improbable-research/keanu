@@ -27,7 +27,7 @@ public class NutsTestVis {
         KeanuRandom.setDefaultRandomSeed(0);
         double mu = 0.0;
         double sigma = 1.0;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 0, KeanuRandom.getDefaultRandom());
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 0);
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()

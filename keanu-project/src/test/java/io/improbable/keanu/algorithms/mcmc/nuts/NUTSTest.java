@@ -45,7 +45,7 @@ public class NUTSTest {
         double sigma = 1.0;
         double initStepSize = 1;
         int maxTreeHeight = 4;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, KeanuRandom.getDefaultRandom());
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3);
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()
@@ -79,7 +79,7 @@ public class NUTSTest {
     public void samplesGaussian() {
         double mu = 0.0;
         double sigma = 1.0;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, KeanuRandom.getDefaultRandom());
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3);
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         int sampleCount = 400;
@@ -194,7 +194,7 @@ public class NUTSTest {
     public void checksSamplesAgainstMagicNumbers() {
         double mu = 0.0;
         double sigma = 1.0;
-        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3, KeanuRandom.getDefaultRandom());
+        BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, 3);
         KeanuProbabilisticModel model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()
