@@ -35,27 +35,20 @@ public class VertexDotLabel {
         if (!value.isEmpty()) {
             StringBuilder dotLabel = new StringBuilder();
             dotLabel.append(vertex.getId().hashCode()).append(DOT_LABEL_OPENING).append(value);
-            getDescriptiveInfoForVertexWithValue().ifPresent(info -> dotLabel.append(" (").append(info).append(")"));
+            getDescriptiveInfo().ifPresent(info -> dotLabel.append(" (").append(info).append(")"));
             return dotLabel.append(DOT_LABEL_CLOSING).toString();
         }
-        return vertex.getId().hashCode() + DOT_LABEL_OPENING + getDescriptiveInfo() + DOT_LABEL_CLOSING;
+        return vertex.getId().hashCode() + DOT_LABEL_OPENING + getDescriptiveInfo().orElse("") + DOT_LABEL_CLOSING;
     }
 
-    private Optional<String> getDescriptiveInfoForVertexWithValue() {
+    private Optional<String> getDescriptiveInfo() {
         if (!vertexLabel.isEmpty()) {
             return Optional.of(vertexLabel);
-        }
-        if (!(vertex instanceof ConstantVertex)) {
+        } else if (value.isEmpty() || !(vertex instanceof ConstantVertex)) {
             return Optional.of(getAnnotationIfPresentElseSimpleName());
+        } else {
+            return Optional.empty();
         }
-        return Optional.empty();
-    }
-
-    private String getDescriptiveInfo() {
-        if (!vertexLabel.isEmpty()) {
-            return vertexLabel;
-        }
-        return getAnnotationIfPresentElseSimpleName();
     }
 
     private String getAnnotationIfPresentElseSimpleName() {
