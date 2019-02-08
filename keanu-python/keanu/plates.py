@@ -23,10 +23,10 @@ class Plate(JavaObjectWrapper):
         if label is None:
             self.unwrap().add(vertex.unwrap())
         else:
-            self.unwrap().add(_VertexLabel.create_maybe_with_namespace(label).unwrap(), vertex.unwrap())
+            self.unwrap().add(_VertexLabel(label).unwrap(), vertex.unwrap())
 
     def get(self, label: str) -> Vertex:
-        return Vertex._from_java_vertex(self.unwrap().get(_VertexLabel.create_maybe_with_namespace(label).unwrap()))
+        return Vertex._from_java_vertex(self.unwrap().get(_VertexLabel(label).unwrap()))
 
 
 class Plates(JavaObjectWrapper):
@@ -71,5 +71,10 @@ class Plates(JavaObjectWrapper):
 
     @staticmethod
     def proxy_for(label: str) -> str:
-        proxy_label = k.jvm_view().PlateBuilder.proxyFor(_VertexLabel(label).unwrap())
-        return proxy_label.getQualifiedName()
+        """
+        >>> Plates.proxy_for("foo")
+        'proxy_for.foo'
+        """
+        label_java = _VertexLabel(label).unwrap()
+        proxy_label_java = k.jvm_view().PlateBuilder.proxyFor(label_java)
+        return proxy_label_java.getQualifiedName()

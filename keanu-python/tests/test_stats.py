@@ -32,13 +32,13 @@ def test_autocorr_returns_ndarray_of_correct_dtype() -> None:
 
 def test_cant_get_autocorrelation_of_np_bools() -> None:
     x: List[primitive_types] = [True, False, False]
-    with pytest.raises(ValueError, match="Autocorrelation must be run on a list of floating types"):
+    with pytest.raises(ValueError, match=r"Autocorrelation must be run on a list of floating types"):
         stats.autocorrelation(x)
 
 
 def test_cant_get_autocorrelation_of_np_ints() -> None:
     x: List[primitive_types] = [1, 2, 3]
-    with pytest.raises(ValueError, match="Autocorrelation must be run on a list of floating types"):
+    with pytest.raises(ValueError, match=r"Autocorrelation must be run on a list of floating types"):
         stats.autocorrelation(x)
 
 

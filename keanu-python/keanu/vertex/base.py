@@ -59,7 +59,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def set_label(self, label: Optional[str]) -> None:
         if label is None:
             raise ValueError("label cannot be None.")
-        self.unwrap().setLabel(_VertexLabel.create_maybe_with_namespace(label).unwrap())
+        self.unwrap().setLabel(_VertexLabel(label).unwrap())
 
     def sample(self) -> numpy_types:
         return Tensor._to_scalar_or_ndarray(self.unwrap().sample())
@@ -82,6 +82,12 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
 
     def get_children(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getChildren())
+
+    def is_observed(self) -> bool:
+        return self.unwrap().isObserved()
+
+    def has_value(self) -> bool:
+        return self.unwrap().hasValue()
 
     """
     __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.

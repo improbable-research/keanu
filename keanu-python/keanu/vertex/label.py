@@ -12,42 +12,22 @@ class _VertexLabel(JavaObjectWrapper):
 
     __separator = "."
 
-    def __init__(self, first: str, *remainder: str):
-        if len(remainder) == 0:
-            java_object = k.jvm_view().VertexLabel(first)
+    def __init__(self, name: str):
+        parts = name.split(_VertexLabel.__separator)
+
+        if len(parts) == 1:
+            java_object = k.jvm_view().VertexLabel(name)
         else:
-            java_object = k.jvm_view().VertexLabel(first, k.to_java_string_array(remainder))
+            java_object = k.jvm_view().VertexLabel(parts[0], k.to_java_string_array(parts[1:]))
         super(_VertexLabel, self).__init__(java_object)
 
-    @staticmethod
-    def create_maybe_with_namespace(label: str) -> '_VertexLabel':
-        """
-        >>> l1 = _VertexLabel.create_maybe_with_namespace("foo")
-        >>> l1.get_unqualified_name()
-        'foo'
-        >>> l1.get_qualified_name()
-        'foo'
-        >>> l2 = _VertexLabel.create_maybe_with_namespace("outer.inner.foo")
-        >>> l2.get_unqualified_name()
-        'foo'
-        >>> l2.get_qualified_name()
-        'outer.inner.foo'
-        """
-        if _VertexLabel.__separator in label:
-            return _VertexLabel.create_with_namespace(label)
-        else:
-            return _VertexLabel(label)
+    def get_name(self) -> str:
+        return self.unwrap().getQualifiedName()
+
+    def __repr__(self) -> str:
+        return self.get_name().split(".").__repr__()
 
     @staticmethod
-    def create_with_namespace(label: str) -> '_VertexLabel':
-        """
-        >>> l = _VertexLabel.create_with_namespace("outer.inner.foo")
-        >>> l.get_unqualified_name()
-        'foo'
-        >>> l.get_qualified_name()
-        'outer.inner.foo'
-        """
-        if _VertexLabel.__separator not in label:
-            raise ValueError('No namespace separator "{}" found in {}'.format(_VertexLabel.__separator, label))
-        name_array = label.split(_VertexLabel.__separator)
-        return _VertexLabel(name_array[0], *name_array[1:])
+    def create_from_list(*names: str) -> '_VertexLabel':
+        names_joined = _VertexLabel.__separator.join(names)
+        return _VertexLabel(names_joined)
