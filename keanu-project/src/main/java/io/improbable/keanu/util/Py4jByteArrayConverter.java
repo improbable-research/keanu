@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 @UtilityClass
-public class Py4jUtils {
+public class Py4jByteArrayConverter {
 
     public byte[] toByteArray(double[] doubleArray) {
         ByteBuffer doubleBuffer = ByteBuffer.allocate(Double.SIZE / Byte.SIZE * doubleArray.length);
