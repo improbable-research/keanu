@@ -34,3 +34,6 @@ class Plates(JavaObjectWrapper):
         iterator = self.unwrap().iterator()
         while iterator.hasNext():
             yield Plate(iterator.next())
+
+    def size(self) -> int:
+        return self.unwrap().size()

@@ -19,18 +19,24 @@ class _VertexLabel(JavaObjectWrapper):
             java_object = k.jvm_view().VertexLabel(first, k.to_java_string_array(remainder))
         super(_VertexLabel, self).__init__(java_object)
 
+    def get_name(self) -> str:
+        return self.unwrap().getQualifiedName()
+
+    def __repr__(self) -> str:
+        return self.get_name()
+
     @staticmethod
     def create_maybe_with_namespace(label: str) -> '_VertexLabel':
         """
         >>> l1 = _VertexLabel.create_maybe_with_namespace("foo")
-        >>> l1.get_unqualified_name()
+        >>> l1.unwrap().getUnqualifiedName()
         'foo'
-        >>> l1.get_qualified_name()
+        >>> l1.get_name()
         'foo'
         >>> l2 = _VertexLabel.create_maybe_with_namespace("outer.inner.foo")
-        >>> l2.get_unqualified_name()
+        >>> l2.unwrap().getUnqualifiedName()
         'foo'
-        >>> l2.get_qualified_name()
+        >>> l2.get_name()
         'outer.inner.foo'
         """
         if _VertexLabel.__separator in label:
@@ -42,13 +48,12 @@ class _VertexLabel(JavaObjectWrapper):
     def create_with_namespace(label: str) -> '_VertexLabel':
         """
         >>> l = _VertexLabel.create_with_namespace("outer.inner.foo")
-        >>> l.get_unqualified_name()
+        >>> l.unwrap().getUnqualifiedName()
         'foo'
-        >>> l.get_qualified_name()
+        >>> l.get_name()
         'outer.inner.foo'
         """
         if _VertexLabel.__separator not in label:
             raise ValueError('No namespace separator "{}" found in {}'.format(_VertexLabel.__separator, label))
         name_array = label.split(_VertexLabel.__separator)
         return _VertexLabel(name_array[0], *name_array[1:])
-

@@ -126,18 +126,6 @@ class KeanuContext(metaclass=Singleton):
         java_import(self.jvm_view(), "io.improbable.keanu.vertices.Vertex")
         return self.to_java_array(list(map(lambda x: x.unwrap(), l)), self.jvm_view().Vertex)
 
-    def from_java_exception(self, e: Py4JJavaError) -> 'KeanuContext.JavaException':
-        class JavaException:
-            def __init__(self, type, message):
-                self.type = type
-                self.message = message
-
-            def __repr__(self):
-                return "{}: {}".format(self.type, self.message)
-
-        return JavaException(e.java_exception.getClass().getName(), e.java_exception.getMessage())
-
-
     def __infer_class_from_array(self, l: Collection[Any]) -> JavaClass:
         if len(l) == 0:
             raise ValueError("Cannot infer type because array is empty")
