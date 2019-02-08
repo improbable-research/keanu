@@ -284,7 +284,7 @@ def test_sample_throws_if_vertices_in_sample_from_are_missing_labels() -> None:
     assert sigma.get_label() is None
 
     net = BayesNet([sigma, vertex])
-    with pytest.raises(ValueError, match="Vertices in sample_from must be labelled."):
+    with pytest.raises(ValueError, match=r"Vertices in sample_from must be labelled."):
         samples = sample(net=net, sample_from=net.get_latent_vertices())
 
 
@@ -295,7 +295,7 @@ def test_generate_samples_throws_if_vertices_in_sample_from_are_missing_labels()
     assert sigma.get_label() is None
 
     net = BayesNet([sigma, vertex])
-    with pytest.raises(ValueError, match="Vertices in sample_from must be labelled."):
+    with pytest.raises(ValueError, match=r"Vertices in sample_from must be labelled."):
         samples = generate_samples(net=net, sample_from=net.get_latent_vertices())
 
 
