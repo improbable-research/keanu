@@ -90,7 +90,6 @@ class Tree implements SaveStatistics {
 
 
     public static Tree buildOtherHalfOfTree(Tree currentTree,
-                                            List<? extends Variable<DoubleTensor, ?>> latentVariables,
                                             ProbabilisticModelWithGradient logProbGradientCalculator,
                                             final List<? extends Variable> sampleFromVariables,
                                             int buildDirection,
@@ -99,7 +98,6 @@ class Tree implements SaveStatistics {
                                             KeanuRandom random) {
 
         Tree otherHalfTree = buildTree(
-            latentVariables,
             logProbGradientCalculator,
             sampleFromVariables,
             buildDirection == -1 ? currentTree.backward : currentTree.forward,
@@ -119,8 +117,7 @@ class Tree implements SaveStatistics {
         return otherHalfTree;
     }
 
-    private static Tree buildTree(List<? extends Variable<DoubleTensor, ?>> latentVariables,
-                                  ProbabilisticModelWithGradient logProbGradientCalculator,
+    private static Tree buildTree(ProbabilisticModelWithGradient logProbGradientCalculator,
                                   final List<? extends Variable> sampleFromVariables,
                                   Leapfrog leapfrog,
                                   int buildDirection,
@@ -133,7 +130,6 @@ class Tree implements SaveStatistics {
             //Base case-take one leapfrog step in the build direction
 
             return treeBuilderBaseCase(
-                latentVariables,
                 logProbGradientCalculator,
                 sampleFromVariables,
                 leapfrog,
@@ -146,7 +142,6 @@ class Tree implements SaveStatistics {
             //Recursion-implicitly build the left and right subtrees.
 
             Tree tree = buildTree(
-                latentVariables,
                 logProbGradientCalculator,
                 sampleFromVariables,
                 leapfrog,
@@ -162,7 +157,6 @@ class Tree implements SaveStatistics {
 
                 Tree otherHalfTree = buildOtherHalfOfTree(
                     tree,
-                    latentVariables,
                     logProbGradientCalculator,
                     sampleFromVariables,
                     buildDirection,
@@ -203,15 +197,14 @@ class Tree implements SaveStatistics {
         return max + Math.log(Math.exp(a - max) + Math.exp(b - max));
     }
 
-    private static Tree treeBuilderBaseCase(final List<? extends Variable<DoubleTensor, ?>> latentVariables,
-                                            final ProbabilisticModelWithGradient logProbGradientCalculator,
+    private static Tree treeBuilderBaseCase(final ProbabilisticModelWithGradient logProbGradientCalculator,
                                             final List<? extends Variable> sampleFromVariables,
                                             final Leapfrog leapfrog,
                                             final int buildDirection,
                                             final double epsilon,
                                             final double startEnergy) {
 
-        Leapfrog leapfrogAfterStep = leapfrog.step(latentVariables, logProbGradientCalculator, epsilon * buildDirection);
+        Leapfrog leapfrogAfterStep = leapfrog.step(logProbGradientCalculator, epsilon * buildDirection);
 
         final double energyAfterStep = leapfrogAfterStep.getEnergy();
 

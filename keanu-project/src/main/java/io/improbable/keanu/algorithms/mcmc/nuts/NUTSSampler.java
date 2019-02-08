@@ -136,7 +136,6 @@ class NUTSSampler implements SamplingAlgorithm {
 
             Tree otherHalfTree = Tree.buildOtherHalfOfTree(
                 tree,
-                latentVariables,
                 logProbGradientCalculator,
                 sampleFromVariables,
                 buildDirection,

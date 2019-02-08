@@ -1,13 +1,11 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
-import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.Getter;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -64,14 +62,11 @@ class Leapfrog {
     /**
      * Performs one leapfrog of the variables with a time delta as defined by epsilon
      *
-     * @param latentVariables           the latent variables
      * @param logProbGradientCalculator the calculator for the log prob gradient
      * @param epsilon                   the time delta
      * @return a new leapfrog having taken one step through space
      */
-    public Leapfrog step(final List<? extends Variable<DoubleTensor, ?>> latentVariables,
-                         final ProbabilisticModelWithGradient logProbGradientCalculator,
-                         final double epsilon) {
+    public Leapfrog step(final ProbabilisticModelWithGradient logProbGradientCalculator, final double epsilon) {
 
         final double halfTimeStep = epsilon / 2.0;
 
@@ -79,7 +74,7 @@ class Leapfrog {
 
         Map<VariableReference, DoubleTensor> nextVelocity = potential.getVelocity(nextMomentum);
 
-        Map<VariableReference, DoubleTensor> nextPosition = stepPosition(latentVariables, epsilon, nextVelocity, position);
+        Map<VariableReference, DoubleTensor> nextPosition = stepPosition(epsilon, nextVelocity, position);
 
         Map<? extends VariableReference, DoubleTensor> nextPositionGradient = logProbGradientCalculator.logProbGradients(nextPosition);
         final double nextPositionLogProb = logProbGradientCalculator.logProb();
@@ -89,21 +84,20 @@ class Leapfrog {
         return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient, nextPositionLogProb, potential);
     }
 
-    private static Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor, ?>> latentVariables,
-                                                                     double dt,
+    private static Map<VariableReference, DoubleTensor> stepPosition(double dt,
                                                                      Map<VariableReference, DoubleTensor> velocity,
                                                                      Map<VariableReference, DoubleTensor> position) {
 
         Map<VariableReference, DoubleTensor> nextPosition = new HashMap<>();
 
-        for (Variable<DoubleTensor, ?> latent : latentVariables) {
+        for (VariableReference variableReference : position.keySet()) {
 
-            final DoubleTensor variablePosition = position.get(latent.getReference());
-            final DoubleTensor variableVelocity = velocity.get(latent.getReference());
+            final DoubleTensor variablePosition = position.get(variableReference);
+            final DoubleTensor variableVelocity = velocity.get(variableReference);
 
             final DoubleTensor nextPositionForLatent = variableVelocity.times(dt).plusInPlace(variablePosition);
 
-            nextPosition.put(latent.getReference(), nextPositionForLatent);
+            nextPosition.put(variableReference, nextPositionForLatent);
         }
 
         return nextPosition;
