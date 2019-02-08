@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toMap;
 
-public class KeanuComputableGraph implements ComputableGraph {
+public class KeanuComputableModel implements ComputableModel {
 
     private final Map<VariableReference, Vertex> vertexLookup;
 
-    public KeanuComputableGraph(Set<Vertex> vertices) {
+    public KeanuComputableModel(Set<Vertex> vertices) {
         this.vertexLookup = vertices.stream()
             .collect(toMap(Vertex::getReference, v -> v));
     }

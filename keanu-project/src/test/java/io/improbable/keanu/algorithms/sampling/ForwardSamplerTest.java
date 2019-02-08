@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.backend.KeanuComputableGraph;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -45,9 +45,20 @@ public class ForwardSamplerTest {
         DoubleVertex B = A.plus(ConstantVertex.of(5.));
         GaussianVertex C = new GaussianVertex(B, 1.);
 
-        KeanuComputableGraph graph = new KeanuComputableGraph(A.getConnectedGraph());
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        ForwardSampler.sample(graph, Collections.singletonList(C), 1000, random);
+        ForwardSampler.sample(network, Collections.singletonList(C), 1000, random);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwIfSampleFromHasObservations() {
+        GaussianVertex A = new GaussianVertex(100.0, 1);
+        DoubleVertex B = A.plus(ConstantVertex.of(5.));
+        A.observe(100.);
+
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+
+        ForwardSampler.sample(network, Arrays.asList(A, B), 1000, random);
     }
 
     @Test
@@ -55,10 +66,10 @@ public class ForwardSamplerTest {
         GaussianVertex A = new GaussianVertex(100.0, 1);
         DoubleVertex B = A.plus(ConstantVertex.of(5.));
 
-        KeanuComputableGraph graph = new KeanuComputableGraph(A.getConnectedGraph());
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
         final int sampleCount = 1000;
-        NetworkSamples samples = ForwardSampler.sample(graph, Arrays.asList(A, B), sampleCount, random);
+        NetworkSamples samples = ForwardSampler.sample(network, Arrays.asList(A, B), sampleCount, random);
 
         double averageA = samples.getDoubleTensorSamples(A).getAverages().scalar();
         double averageB = samples.getDoubleTensorSamples(B).getAverages().scalar();
@@ -84,9 +95,9 @@ public class ForwardSamplerTest {
         trackerOne.setValue(1.);
         trackerTwo.setValue(1.);
 
-        KeanuComputableGraph graph = new KeanuComputableGraph(A.getConnectedGraph());
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        ForwardSampler.sample(graph, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour), 1);
+        ForwardSampler.sample(network, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour), 1);
 
         assertEquals(trackerOne.getId(), ids.get(0));
         assertEquals(trackerTwo.getId(), ids.get(1));
@@ -101,8 +112,8 @@ public class ForwardSamplerTest {
         GaussianVertex A = new GaussianVertex(0, 1);
         TestGraphGenerator.PassThroughVertex B = new TestGraphGenerator.PassThroughVertex(A, opCount, null, id -> log.info("OP on id:" + id));
 
-        KeanuComputableGraph graph = new KeanuComputableGraph(A.getConnectedGraph());
-        ForwardSampler.sample(graph, Arrays.asList(A, B), 100, random);
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+        ForwardSampler.sample(network, Arrays.asList(A, B), 100, random);
 
         assertEquals(100, opCount.get());
     }

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import static java.util.Collections.singletonList;
 
-public interface ComputableGraph extends AutoCloseable {
+public interface ComputableModel extends AutoCloseable {
 
     default <T> T compute(Map<VariableReference, ?> inputs, VariableReference output) {
         return (T) compute(inputs, singletonList(output)).get(output);

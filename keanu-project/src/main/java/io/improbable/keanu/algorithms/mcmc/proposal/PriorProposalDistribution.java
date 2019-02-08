@@ -21,7 +21,7 @@ public class PriorProposalDistribution implements ProposalDistribution {
     }
 
     @Override
-    public Proposal getProposal(Set<Variable> variables, KeanuRandom random) {
+    public Proposal getProposal(Set<? extends Variable> variables, KeanuRandom random) {
         Proposal proposal = new Proposal();
         for (Variable<?, ?> variable : variables) {
             setFor(variable, random, proposal);
