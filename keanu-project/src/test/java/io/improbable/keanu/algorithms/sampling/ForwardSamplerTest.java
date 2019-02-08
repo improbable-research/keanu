@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.sampling;
 
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -47,7 +48,7 @@ public class ForwardSamplerTest {
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        ForwardSampler.sample(network, Collections.singletonList(C), 1000, random);
+        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Collections.singletonList(C), 1000, random);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -58,7 +59,7 @@ public class ForwardSamplerTest {
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        ForwardSampler.sample(network, Arrays.asList(A, B), 1000, random);
+        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(A, B), 1000, random);
     }
 
     @Test
@@ -69,7 +70,7 @@ public class ForwardSamplerTest {
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
         final int sampleCount = 1000;
-        NetworkSamples samples = ForwardSampler.sample(network, Arrays.asList(A, B), sampleCount, random);
+        NetworkSamples samples = Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(A, B), sampleCount, random);
 
         double averageA = samples.getDoubleTensorSamples(A).getAverages().scalar();
         double averageB = samples.getDoubleTensorSamples(B).getAverages().scalar();
@@ -97,7 +98,7 @@ public class ForwardSamplerTest {
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        ForwardSampler.sample(network, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour), 1);
+        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour), 1);
 
         assertEquals(trackerOne.getId(), ids.get(0));
         assertEquals(trackerTwo.getId(), ids.get(1));
@@ -113,7 +114,7 @@ public class ForwardSamplerTest {
         TestGraphGenerator.PassThroughVertex B = new TestGraphGenerator.PassThroughVertex(A, opCount, null, id -> log.info("OP on id:" + id));
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        ForwardSampler.sample(network, Arrays.asList(A, B), 100, random);
+        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(A, B), 100, random);
 
         assertEquals(100, opCount.get());
     }

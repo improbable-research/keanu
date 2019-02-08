@@ -32,26 +32,27 @@ public class ForwardSampler {
     private static final double LOG_PROB_OF_PRIOR = 0.;
     private static final ProposalDistribution PRIOR_PROPOSAL = new PriorProposalDistribution();
 
-    private ForwardSampler() {
+    public ForwardSampler() {
     }
 
     /**
      * Samples from a Bayesian Network.
      * Samples are taken by sampling from the prior of the desired variables.
      * Probabilistic variables are sampled first.
+     * Non probabilistic variables are computed second.
      *
      * @param network the network to sample from
      * @param fromVariables the variables to sample from
      * @param sampleCount the number of samples to take
      * @return sampling samples of a computable graph
      */
-    public static NetworkSamples sample(BayesianNetwork network,
+    public NetworkSamples sample(BayesianNetwork network,
                                         List<? extends Variable> fromVariables,
                                         int sampleCount) {
         return sample(network, fromVariables, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
-    public static NetworkSamples sample(BayesianNetwork network,
+    public NetworkSamples sample(BayesianNetwork network,
                                         List<? extends Variable> fromVariables,
                                         int sampleCount,
                                         KeanuRandom random) {
@@ -71,7 +72,7 @@ public class ForwardSampler {
         return sample(graph, probabilisticSubset, nonProbabilisticSubset, proposalApplicationStrategy, sampleCount, random);
     }
 
-    public static NetworkSamples sample(ComputableModel graph,
+    private NetworkSamples sample(ComputableModel graph,
                                         Set<? extends Variable> probabilisticFromVariables,
                                         Set<? extends Variable> nonProbabilisticFromVariables,
                                         ProposalApplicationStrategy proposalApplicationStrategy,
@@ -93,16 +94,16 @@ public class ForwardSampler {
         return new NetworkSamples(samplesByVariable, logProb, sampleCount);
     }
 
-    private static void takeSamples(Map<VariableReference, List> samples, Set<? extends Variable> fromVariables) {
+    private void takeSamples(Map<VariableReference, List> samples, Set<? extends Variable> fromVariables) {
         fromVariables.forEach(variable -> addVariableValue(variable, samples));
     }
 
-    private static void addVariableValue(Variable variable, Map<VariableReference, List> samples) {
+    private void addVariableValue(Variable variable, Map<VariableReference, List> samples) {
         List samplesForVariable = samples.computeIfAbsent(variable.getReference(), v -> new ArrayList<>());
         samplesForVariable.add(variable.getValue());
     }
 
-    private static void upstreamOfProbabilisticDoesNotContainProbabilistic(Set<Vertex> vertices) {
+    private void upstreamOfProbabilisticDoesNotContainProbabilistic(Set<Vertex> vertices) {
         for (Vertex vertex : vertices) {
             LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(vertex, false);
             Set<Vertex> upstreamRandomVariables = upstreamLambdaSection.getAllVertices();
