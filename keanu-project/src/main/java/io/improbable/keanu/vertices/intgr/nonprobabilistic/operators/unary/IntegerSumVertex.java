@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.SaveVertexParam;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerSumVertex extends IntegerUnaryOpVertex {

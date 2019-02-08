@@ -4,7 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class UniformInt implements DiscreteDistribution {
@@ -43,7 +43,7 @@ public class UniformInt implements DiscreteDistribution {
         return logOfWithinBounds;
     }
 
-    public static DoubleVertex logProbOutput(IntegerPlaceHolderVertex x, IntegerPlaceHolderVertex xMin, IntegerPlaceHolderVertex xMax) {
+    public static DoubleVertex logProbOutput(IntegerPlaceholderVertex x, IntegerPlaceholderVertex xMin, IntegerPlaceholderVertex xMax) {
         DoubleVertex maxBound = xMax.toDouble();
         DoubleVertex minBound = xMin.toDouble();
         DoubleVertex xDouble = x.toDouble();

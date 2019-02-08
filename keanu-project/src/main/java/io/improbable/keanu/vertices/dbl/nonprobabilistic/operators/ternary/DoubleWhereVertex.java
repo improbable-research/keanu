@@ -1,13 +1,14 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
 public class DoubleWhereVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 

@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -74,7 +74,7 @@ public class GeometricVertex extends IntegerVertex implements ProbabilisticInteg
 
     @Override
     public LogProbGraph logProbGraph() {
-        IntegerPlaceHolderVertex xPlaceholder = new IntegerPlaceHolderVertex(this.getShape());
+        IntegerPlaceholderVertex xPlaceholder = new IntegerPlaceholderVertex(this.getShape());
         DoublePlaceholderVertex pPlaceholder = new DoublePlaceholderVertex(p.getShape());
 
         return LogProbGraph.builder()

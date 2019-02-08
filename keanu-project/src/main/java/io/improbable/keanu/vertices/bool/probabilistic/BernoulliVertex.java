@@ -9,7 +9,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
-import io.improbable.keanu.vertices.LogProbGraph.BooleanPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.BooleanPlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
@@ -76,7 +76,7 @@ public class BernoulliVertex extends BooleanVertex implements ProbabilisticBoole
 
     @Override
     public LogProbGraph logProbGraph() {
-        BooleanPlaceHolderVertex valuePlaceholder = new BooleanPlaceHolderVertex(this.getShape());
+        BooleanPlaceholderVertex valuePlaceholder = new BooleanPlaceholderVertex(this.getShape());
         DoublePlaceholderVertex probTruePlaceholder = new DoublePlaceholderVertex(probTrue.getShape());
 
         return LogProbGraph.builder()

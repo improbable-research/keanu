@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -73,7 +73,7 @@ public class StudentTVertex extends DoubleVertex implements Differentiable, Prob
     @Override
     public LogProbGraph logProbGraph() {
         final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
-        final IntegerPlaceHolderVertex vPlaceholder = new IntegerPlaceHolderVertex(v.getShape());
+        final IntegerPlaceholderVertex vPlaceholder = new IntegerPlaceholderVertex(v.getShape());
 
         return LogProbGraph.builder()
             .input(this, xPlaceholder)

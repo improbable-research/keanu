@@ -6,8 +6,8 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 /**
