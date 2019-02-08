@@ -93,11 +93,9 @@ def test_cannot_pass_generic_to_vertex(jvm_view: JVMView) -> None:
     class GenericExampleClass:
         pass
 
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError, match=r"Can't parse generic argument. Was given {}".format(GenericExampleClass)):
         Vertex(  # type: ignore # this is expected to fail mypy
             jvm_view.GaussianVertex, "gaussian", GenericExampleClass(), GenericExampleClass())
-
-    assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(GenericExampleClass)
 
 
 def test_int_vertex_value_is_a_numpy_array() -> None:
@@ -340,12 +338,12 @@ def test_set_label() -> None:
 
 def test_cannot_set_none_label() -> None:
     vertex = Gaussian(0., 1., label="gaussian")
-    with pytest.raises(ValueError, match="label cannot be None"):
+    with pytest.raises(ValueError, match=r"label cannot be None"):
         vertex.set_label(None)
 
 
 def test_label_is_required_param_for_proxy_vertices() -> None:
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"IntegerProxy\(\) missing 1 required positional argument: 'label'"):
         vertex = IntegerProxy([1, 1])  # type: ignore # this is expected to fail mypy
 
 

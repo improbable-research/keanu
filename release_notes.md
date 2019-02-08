@@ -2,6 +2,7 @@
 
 ## Python
 * Improved performance of getting samples.
+* Added Python docstrings for sampling
 
 ### Version 0.0.19 ###
 

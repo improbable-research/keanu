@@ -338,10 +338,9 @@ def test_can_do_round() -> None:
 
 
 def test_rounding_is_only_supported_to_zero_digits() -> None:
-    with pytest.raises(NotImplementedError) as excinfo:
+    with pytest.raises(NotImplementedError, match=r"Keanu only supports rounding to 0 digits"):
         v = Const(1.55)
         round(v, 1)
-    assert str(excinfo.value) == "Keanu only supports rounding to 0 digits"
 
 
 def test_can_do_floor() -> None:

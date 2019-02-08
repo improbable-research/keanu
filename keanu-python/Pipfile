@@ -15,6 +15,7 @@ mypy = "*"
 sphinx = "*"
 yapf = "*"
 matplotlib = "*"
+sphinx-autodoc-typehints = "*"
 
 [requires]
 python_version = "3.6"
