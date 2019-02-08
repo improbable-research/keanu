@@ -9,6 +9,10 @@ java_import(k.jvm_view(), "io.improbable.keanu.vertices.VertexLabel")
 
 
 class _VertexLabel(JavaObjectWrapper):
+    """
+    This class is intended for private use - as a user you should only need to specify string values.
+    It's used behind the scenes e.g. in :class:`keanu.vertex.lambda_model.LambdaModel`
+    """
 
     __separator = "."
 
@@ -29,5 +33,8 @@ class _VertexLabel(JavaObjectWrapper):
 
     @staticmethod
     def create_from_list(*names: str) -> '_VertexLabel':
+        if len(names) == 0:
+            raise ValueError("You must pass in at least one string")
+
         names_joined = _VertexLabel.__separator.join(names)
         return _VertexLabel(names_joined)

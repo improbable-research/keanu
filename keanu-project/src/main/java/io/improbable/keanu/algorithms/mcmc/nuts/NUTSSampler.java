@@ -127,8 +127,8 @@ class NUTSSampler implements SamplingAlgorithm {
             }
 
             tree.incrementLeapfrogCount(otherHalfTree.getAcceptedLeapfrogCount());
-            tree.setDeltaLikelihoodOfLeapfrog(otherHalfTree.getDeltaLikelihoodOfLeapfrog());
-            tree.setTreeSize(otherHalfTree.getTreeSize());
+            tree.setDeltaLikelihoodOfLeapfrog(tree.getDeltaLikelihoodOfLeapfrog() + otherHalfTree.getDeltaLikelihoodOfLeapfrog());
+            tree.setTreeSize(tree.getTreeSize() + otherHalfTree.getTreeSize());
             tree.continueIfNotUTurning(otherHalfTree);
 
             treeHeight++;

@@ -13,13 +13,15 @@ import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.status.StatusBar;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 
 /**
@@ -73,7 +75,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     /**
      * Sample from the posterior of a probabilistic model using the No-U-Turn-Sampling algorithm
      *
-     * @param model           the probabilistic model to sample from
+     * @param model                 the probabilistic model to sample from
      * @param variablesToSampleFrom the variables inside the probabilistic model to sample from
      * @return Samples taken with NUTS
      */
@@ -98,12 +100,19 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         final List<? extends Variable<DoubleTensor, ?>> latentVariables = model.getContinuousLatentVariables();
 
-        Map<VariableReference, DoubleTensor> startingSample = SamplingAlgorithm.takeSample(latentVariables);
-        Map<VariableReference, DoubleTensor> position = startingSample.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> (DoubleTensor) e.getValue()));
-        Map<VariableReference, DoubleTensor> momentum = new HashMap<>();
-        Map<? extends VariableReference, DoubleTensor> gradient = model.logProbGradients();
+        Map<VariableReference, DoubleTensor> position = latentVariables.stream()
+            .collect(toMap(Variable::getReference, Variable::getValue));
 
         double initialLogOfMasterP = model.logProb(position);
+
+        Preconditions.checkArgument(
+            !ProbabilityCalculator.isImpossibleLogProb(initialLogOfMasterP),
+            "Sampler starting position is invalid. Please start from a non-zero probability position."
+        );
+
+        Map<? extends VariableReference, DoubleTensor> gradient = model.logProbGradients();
+
+        Map<VariableReference, ?> startingSample = SamplingAlgorithm.takeSample(sampleFromVariables);
 
         double startingStepSize = (initialStepSize == null) ? Stepsize.findStartingStepSize(
             position,
@@ -120,7 +129,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        Tree tree = Tree.createInitialTree(position, momentum, gradient, initialLogOfMasterP, startingSample);
+        Tree tree = Tree.createInitialTree(position, new HashMap<>(), gradient, initialLogOfMasterP, startingSample);
 
         return new NUTSSampler(
             sampleFromVariables,

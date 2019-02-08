@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc.testcases;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -14,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 public class MCMCTestDistributions {
 
-    public static BayesianNetwork createSimpleGaussian(double mu, double sigma, double initialValue, KeanuRandom random) {
+    public static BayesianNetwork createSimpleGaussian(double mu, double sigma, double initialValue) {
         GaussianVertex A = new GaussianVertex(new long[]{2, 1}, mu, sigma);
         A.setAndCascade(initialValue);
         return new BayesianNetwork(A.getConnectedGraph());
