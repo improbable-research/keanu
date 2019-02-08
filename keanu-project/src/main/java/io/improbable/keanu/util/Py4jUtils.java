@@ -7,11 +7,9 @@ import java.nio.ByteOrder;
 
 @UtilityClass
 public class Py4jUtils {
-    private static final int JAVA_DOUBLE_SIZE = 8;
-    private static final int JAVA_INT_SIZE = 4;
 
     public byte[] toByteArray(double[] doubleArray) {
-        ByteBuffer doubleBuffer = ByteBuffer.allocate(JAVA_DOUBLE_SIZE * doubleArray.length);
+        ByteBuffer doubleBuffer = ByteBuffer.allocate(Double.SIZE / Byte.SIZE * doubleArray.length);
         // Java defaults to BIG_ENDIAN. LITTLE_ENDIAN is what is expected by numpy to construct an ndarray.
         doubleBuffer.order(ByteOrder.LITTLE_ENDIAN);
         for (double element : doubleArray) {
@@ -22,7 +20,7 @@ public class Py4jUtils {
     }
 
     public byte[] toByteArray(int[] integerArray) {
-        ByteBuffer integerBuffer = ByteBuffer.allocate(JAVA_INT_SIZE * integerArray.length);
+        ByteBuffer integerBuffer = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE * integerArray.length);
         // Java defaults to BIG_ENDIAN. LITTLE_ENDIAN is what is expected by numpy to construct an ndarray.
         integerBuffer.order(ByteOrder.LITTLE_ENDIAN);
         for (int element : integerArray) {
