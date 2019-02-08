@@ -74,28 +74,22 @@ def test_const_takes_num(num: Union[primitive_types, numpy_types], expected_java
 
 def test_const_does_not_take_generic_ndarray(generic) -> None:
     ndarray = np.array([[generic]])
-    with pytest.raises(NotImplementedError) as excinfo:
+    with pytest.raises(NotImplementedError, match=r"Generic types in an ndarray are not supported. Was given object"):
         Const(ndarray)
-
-    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given object"
 
 
 def test_const_does_not_take_generic(generic) -> None:
-    with pytest.raises(NotImplementedError) as excinfo:
+    with pytest.raises(
+            NotImplementedError,
+            match=r"Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(
+                type(generic))):
         Const(generic)
-
-    assert str(
-        excinfo.
-        value) == "Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(
-            type(generic))
 
 
 def test_const_does_not_take_empty_ndarray() -> None:
     ndarray = np.array([])
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError, match=r"Cannot infer type because array is empty"):
         Const(ndarray)
-
-    assert str(excinfo.value) == "Cannot infer type because array is empty"
 
 
 def test_const_takes_ndarray_of_rank_one() -> None:
