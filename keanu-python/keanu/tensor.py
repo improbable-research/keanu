@@ -100,7 +100,7 @@ class Tensor(JavaObjectWrapper):
             intArray = np.frombuffer(byteArray, np.int32)
             return intArray
         elif is_instance_of(k._gateway, java_tensor, "io.improbable.keanu.tensor.bool.BooleanTensor"):
-            byteArray = k.jvm_view().Py4jUtils.toByteArray(java_tensor.asFlatArray())
+            byteArray = k.jvm_view().Py4jUtils.toByteArray(java_tensor.asFlatBooleanArray())
             boolArray = np.frombuffer(byteArray, bool)
             return boolArray
         else:
