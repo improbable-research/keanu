@@ -1,5 +1,8 @@
 ### Version 0.0.20 ###
 
+## Python
+* Improved performance of getting samples.
+
 ### Version 0.0.19 ###
 
 * Added `get_vertex_by_label` to `BayesNet`
