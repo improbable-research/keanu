@@ -33,5 +33,8 @@ class _VertexLabel(JavaObjectWrapper):
 
     @staticmethod
     def create_from_list(*names: str) -> '_VertexLabel':
+        if len(names) == 0:
+            raise ValueError("You must pass in at least one string")
+
         names_joined = _VertexLabel.__separator.join(names)
         return _VertexLabel(names_joined)
