@@ -177,7 +177,7 @@ class NUTSSampler implements SamplingAlgorithm {
         }
 
         if (this.adaptEnabled) {
-            stepsize.adaptStepSize(tree, sampleNum);
+            stepsize.adaptStepSize(tree);
             potential.update(tree.getProposal().getPosition(), tree.getProposal().getGradient(), sampleNum);
         }
 

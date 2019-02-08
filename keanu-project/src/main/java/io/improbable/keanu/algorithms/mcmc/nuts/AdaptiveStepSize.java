@@ -30,6 +30,8 @@ class AdaptiveStepSize implements SaveStatistics {
     private double logStepSizeBar;
     private double logStepSize;
 
+    private int stepNum;
+
     /**
      * @param stepSize   the step size
      * @param sigma      the target acceptance probability (lower target equates to a higher step size when tuning)
@@ -43,6 +45,7 @@ class AdaptiveStepSize implements SaveStatistics {
         this.logStepSizeBar = logStepSize;
         this.adaptCount = adaptCount;
         this.mu = Math.log(10 * stepSize);
+        this.stepNum = 0;
     }
 
     public static double findStartingStepSizeSimple(double stepScale, List<? extends Variable<DoubleTensor, ?>> variables) {
@@ -56,15 +59,16 @@ class AdaptiveStepSize implements SaveStatistics {
     /**
      * Adapts the step size based on the state of the tree and network after computing a sample
      *
-     * @param tree      the balanced binary tree
-     * @param sampleNum the number of samples that have been taken
+     * @param tree the balanced binary tree
      * @return a new step size
      */
-    public double adaptStepSize(Tree tree, int sampleNum) {
+    public double adaptStepSize(Tree tree) {
+
+        stepNum++;
 
         final double logStepSizeAtSample;
-        if (sampleNum < adaptCount) {
-            logStepSizeAtSample = updateLogStepSize(tree, sampleNum);
+        if (stepNum <= adaptCount) {
+            logStepSizeAtSample = updateLogStepSize(tree);
         } else {
             logStepSizeAtSample = logStepSizeBar;
         }
@@ -73,20 +77,20 @@ class AdaptiveStepSize implements SaveStatistics {
         return stepSize;
     }
 
-    private double updateLogStepSize(Tree tree, int m) {
+    private double updateLogStepSize(Tree tree) {
 
         final double alpha = tree.getSumMetropolisAcceptanceProbability();
         final double nuAlpha = tree.getTreeSize();
 
-        final double w = 1.0 / (m + t0);
+        final double w = 1.0 / (stepNum + t0);
 
         acceptRate = (alpha / nuAlpha);
 
         hBar = (1 - w) * hBar + w * (sigma - acceptRate);
 
-        logStepSize = mu - (Math.sqrt(m) / gamma) * hBar;
+        logStepSize = mu - (Math.sqrt(stepNum) / gamma) * hBar;
 
-        double tendToZero = Math.pow(m, -kappa);
+        double tendToZero = Math.pow(stepNum, -kappa);
         logStepSizeBar = tendToZero * logStepSize + (1 - tendToZero) * logStepSizeBar;
 
         return logStepSize;
