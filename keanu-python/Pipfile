@@ -7,6 +7,7 @@ name = "pypi"
 "py4j" = "*"
 numpy = "*"
 keanu = {editable = true, path = "."}
+nd4j = {editable = true, path = "./nd4j"}
 pandas = "*"
 
 [dev-packages]
