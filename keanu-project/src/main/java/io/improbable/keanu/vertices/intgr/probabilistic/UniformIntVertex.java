@@ -9,7 +9,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -96,9 +96,9 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
 
     @Override
     public LogProbGraph logProbGraph() {
-        IntegerPlaceHolderVertex valuePlaceholder = new IntegerPlaceHolderVertex(this.getShape());
-        IntegerPlaceHolderVertex minPlaceholder = new IntegerPlaceHolderVertex(min.getShape());
-        IntegerPlaceHolderVertex maxPlaceholder = new IntegerPlaceHolderVertex(max.getShape());
+        IntegerPlaceholderVertex valuePlaceholder = new IntegerPlaceholderVertex(this.getShape());
+        IntegerPlaceholderVertex minPlaceholder = new IntegerPlaceholderVertex(min.getShape());
+        IntegerPlaceholderVertex maxPlaceholder = new IntegerPlaceholderVertex(max.getShape());
 
         return LogProbGraph.builder()
             .input(this, valuePlaceholder)

@@ -12,7 +12,7 @@ import io.improbable.keanu.tensor.validate.DebugTensorValidator;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.lang3.ArrayUtils;
@@ -145,7 +145,7 @@ public class Multinomial implements DiscreteDistribution {
         return kLogP.plusInPlace(gammaN).minusInPlace(gammaKs);
     }
 
-    public static DoubleVertex logProbOutput(IntegerPlaceHolderVertex k, IntegerPlaceHolderVertex n, DoublePlaceholderVertex p) {
+    public static DoubleVertex logProbOutput(IntegerPlaceholderVertex k, IntegerPlaceholderVertex n, DoublePlaceholderVertex p) {
         checkkHasExpectedShape(k.getShape(), p.getShape());
 
         BooleanVertex pSumEqualToOne = p.sum(0)

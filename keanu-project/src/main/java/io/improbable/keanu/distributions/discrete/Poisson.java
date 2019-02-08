@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 /**
@@ -85,7 +85,7 @@ public class Poisson implements DiscreteDistribution {
         return kDouble.timesInPlace(mu.log()).minusInPlace(mu).minusInPlace(logFactorialK);
     }
 
-    public static DoubleVertex logProbOutput(IntegerPlaceHolderVertex k, DoublePlaceholderVertex mu) {
+    public static DoubleVertex logProbOutput(IntegerPlaceholderVertex k, DoublePlaceholderVertex mu) {
 
         DoubleVertex kDouble = k.toDouble();
         DoubleVertex logFactorialK = kDouble.plus(1).logGamma();

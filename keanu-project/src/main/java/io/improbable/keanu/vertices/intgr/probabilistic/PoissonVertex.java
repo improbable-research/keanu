@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -83,7 +83,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
 
     @Override
     public LogProbGraph logProbGraph() {
-        IntegerPlaceHolderVertex kPlaceholder = new IntegerPlaceHolderVertex(this.getShape());
+        IntegerPlaceholderVertex kPlaceholder = new IntegerPlaceholderVertex(this.getShape());
         DoublePlaceholderVertex muPlaceholder = new DoublePlaceholderVertex(mu.getShape());
 
         return LogProbGraph.builder()

@@ -13,16 +13,22 @@ public class IntegerSumVertex extends IntegerUnaryOpVertex {
     private final int[] overDimensions;
 
     /**
-     * Performs a sum across each value stored in a vertex
-     *
-     * @param inputVertex the vertex to have its values summed
-     */
+    * Performs a sum across specified dimensions. Negative dimension indexing is not supported.
+    *
+    * @param inputVertex    the vertex to have its values summed
+    * @param overDimensions dimensions to sum over
+    */
     public IntegerSumVertex(@LoadVertexParam(INPUT_NAME) IntegerVertex inputVertex,
                             @LoadVertexParam(DIMENSION_NAME) int[] overDimensions) {
         super(inputVertex.getShape(), inputVertex);
         this.overDimensions = overDimensions;
     }
 
+    /**
+    * Performs a sum across all dimensions
+    *
+    * @param inputVertex the vertex to have its values summed
+    */
     @ExportVertexToPythonBindings
     public IntegerSumVertex(IntegerVertex inputVertex) {
         this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getRank()));

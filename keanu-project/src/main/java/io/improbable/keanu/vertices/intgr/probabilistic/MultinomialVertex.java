@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -62,8 +62,8 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
     @Override
     public LogProbGraph logProbGraph() {
-        IntegerPlaceHolderVertex kPlaceholder = new IntegerPlaceHolderVertex(this.getShape());
-        IntegerPlaceHolderVertex nPlaceholder = new IntegerPlaceHolderVertex(n.getShape());
+        IntegerPlaceholderVertex kPlaceholder = new IntegerPlaceholderVertex(this.getShape());
+        IntegerPlaceholderVertex nPlaceholder = new IntegerPlaceholderVertex(n.getShape());
         DoublePlaceholderVertex pPlaceholder = new DoublePlaceholderVertex(p.getShape());
 
         return LogProbGraph.builder()
