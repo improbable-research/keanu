@@ -23,7 +23,7 @@ class _VertexLabel(JavaObjectWrapper):
         return self.unwrap().getQualifiedName()
 
     def __repr__(self) -> str:
-        return self.get_name()
+        return self.get_name().split(".").__repr__()
 
     @staticmethod
     def create_maybe_with_namespace(label: str) -> '_VertexLabel':

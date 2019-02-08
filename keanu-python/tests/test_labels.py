@@ -35,3 +35,8 @@ def test_theres_a_factory_for_when_you_dont_know_if_the_string_is_namespaced() -
 def test_it_throws_if_you_use_the_wrong_separator() -> None:
     with pytest.raises(ValueError, match='No namespace separator "." found in outer/inner/foo'):
         _VertexLabel.create_with_namespace("outer/inner/foo")
+
+
+def test_the_repr_method_makes_it_clear_what_the_namespace_is() -> None:
+    label = _VertexLabel.create_with_namespace("outer.inner.foo")
+    assert str(label) == "['outer', 'inner', 'foo']"
