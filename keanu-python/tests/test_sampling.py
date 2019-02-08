@@ -204,7 +204,7 @@ def test_can_iter_through_tensor_samples(algo: Callable[[BayesNet], PosteriorSam
     count = 0
     for sample in islice(samples, draws):
         count += 1
-        for distribution in ('exp', 'cauchy'):
+        for distribution in ('exp', 'gamma'):
             for i in (0, 1):
                 for j in (0, 1):
                     assert ((distribution, (i, j)) in sample)
