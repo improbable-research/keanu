@@ -9,6 +9,7 @@ import java.util.Map;
 
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.divide;
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.dotProduct;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.pow;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.reciprocol;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.subtract;
@@ -16,13 +17,13 @@ import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.times;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 
 
-public class QuadPotentialDiagAdapt implements Potential {
+public class AdaptiveQuadraticPotential implements Potential {
 
     private final int adaptCount;
 
     private Map<VariableReference, DoubleTensor> variance;
-    private Map<VariableReference, DoubleTensor> stds;
-    private Map<VariableReference, DoubleTensor> inverseStds;
+    private Map<VariableReference, DoubleTensor> standardDeviation;
+    private Map<VariableReference, DoubleTensor> inverseStandardDeviation;
 
     private WeightedVariance forwardVariance;
     private WeightedVariance backgroundVariance;
@@ -33,18 +34,17 @@ public class QuadPotentialDiagAdapt implements Potential {
 
     private KeanuRandom random;
 
-
-    public QuadPotentialDiagAdapt(Map<VariableReference, DoubleTensor> initialMean,
-                                  Map<VariableReference, DoubleTensor> initialDiag,
-                                  double initialWeight,
-                                  int adaptCount,
-                                  KeanuRandom random) {
+    public AdaptiveQuadraticPotential(Map<VariableReference, DoubleTensor> initialMean,
+                                      Map<VariableReference, DoubleTensor> initialVarianceDiagonal,
+                                      double initialWeight,
+                                      int adaptCount,
+                                      KeanuRandom random) {
 
         this.adaptCount = adaptCount;
-        this.variance = initialDiag;
-        this.stds = pow(initialDiag, 0.5);
-        this.inverseStds = reciprocol(this.stds);
-        this.forwardVariance = new WeightedVariance(initialMean, initialDiag, initialWeight);
+        this.variance = initialVarianceDiagonal;
+        this.standardDeviation = pow(initialVarianceDiagonal, 0.5);
+        this.inverseStandardDeviation = reciprocol(this.standardDeviation);
+        this.forwardVariance = new WeightedVariance(initialMean, initialVarianceDiagonal, initialWeight);
         this.backgroundVariance = new WeightedVariance(zeros(initialMean), zeros(initialMean), 0);
         this.nSamples = 0;
         this.adaptionWindow = 101;
@@ -73,16 +73,16 @@ public class QuadPotentialDiagAdapt implements Potential {
 
     private void updateFromWeightVar(WeightedVariance weightedVariance) {
         this.variance = weightedVariance.currentVariance();
-        this.stds = pow(this.variance, 0.5);
-        this.inverseStds = reciprocol(this.stds);
+        this.standardDeviation = pow(this.variance, 0.5);
+        this.inverseStandardDeviation = reciprocol(this.standardDeviation);
     }
 
     @Override
     public Map<VariableReference, DoubleTensor> random() {
 
         Map<VariableReference, DoubleTensor> result = new HashMap<>();
-        for (VariableReference variable : inverseStds.keySet()) {
-            DoubleTensor inverseStdForVariable = inverseStds.get(variable);
+        for (VariableReference variable : inverseStandardDeviation.keySet()) {
+            DoubleTensor inverseStdForVariable = inverseStandardDeviation.get(variable);
             DoubleTensor randomForVariable = random.nextGaussian(inverseStdForVariable.getShape()).timesInPlace(inverseStdForVariable);
             result.put(variable, randomForVariable);
 
@@ -100,19 +100,19 @@ public class QuadPotentialDiagAdapt implements Potential {
     public double getKineticEnergy(Map<VariableReference, DoubleTensor> momentum,
                                    Map<VariableReference, DoubleTensor> velocity) {
 
-        return 0.5 * VariableValues.dotProduct(momentum, velocity);
+        return 0.5 * dotProduct(momentum, velocity);
     }
 
     private static class WeightedVariance {
 
         private double weightSum;
         private Map<VariableReference, DoubleTensor> mean;
-        private Map<VariableReference, DoubleTensor> rawVar;
+        private Map<VariableReference, DoubleTensor> rawVariance;
 
         WeightedVariance(Map<VariableReference, DoubleTensor> initialMean, Map<VariableReference, DoubleTensor> initialVariance, double initialWeight) {
             this.weightSum = initialWeight;
             this.mean = initialMean;
-            this.rawVar = times(initialVariance, weightSum);
+            this.rawVariance = times(initialVariance, weightSum);
         }
 
         private void addSample(Map<VariableReference, DoubleTensor> sample) {
@@ -125,12 +125,12 @@ public class QuadPotentialDiagAdapt implements Potential {
             this.mean = add(this.mean, times(oldDiff, proportion));
 
             final Map<VariableReference, DoubleTensor> newDiff = VariableValues.subtract(sample, mean);
-            this.rawVar = add(this.rawVar, times(oldDiff, newDiff));
+            this.rawVariance = add(this.rawVariance, times(oldDiff, newDiff));
         }
 
         private Map<VariableReference, DoubleTensor> currentVariance() {
 
-            return divide(rawVar, weightSum);
+            return divide(rawVariance, weightSum);
         }
 
     }

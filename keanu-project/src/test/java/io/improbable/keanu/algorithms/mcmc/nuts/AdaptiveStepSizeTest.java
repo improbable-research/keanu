@@ -28,7 +28,7 @@ public class AdaptiveStepSizeTest {
     }
 
     @Test
-    public void canReduceStepsizeFromLargeInitialToSmallToExploreSmallSpace() {
+    public void canReduceStepSizeFromLargeInitialToSmallToExploreSmallSpace() {
         double startingStepSize = 10.;
 
         AdaptiveStepSize tune = new AdaptiveStepSize(

@@ -50,7 +50,7 @@ public class LeapfrogTest {
         fillMap(position, DoubleTensor.scalar(0.0));
         fillMap(momentum, DoubleTensor.scalar(1.0));
         fillMap(gradient, DoubleTensor.scalar(2.0));
-        potential = new QuadPotentialDiagAdapt(zeros(position), ones(position), 1, 100, KeanuRandom.getDefaultRandom());
+        potential = new AdaptiveQuadraticPotential(zeros(position), ones(position), 1, 100, KeanuRandom.getDefaultRandom());
     }
 
     @Before

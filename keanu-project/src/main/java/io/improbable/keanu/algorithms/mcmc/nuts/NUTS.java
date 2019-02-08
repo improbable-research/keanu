@@ -126,7 +126,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        Potential potential = new QuadPotentialDiagAdapt(zeros(position), ones(position), 10.0, adaptCount, random);
+        Potential potential = new AdaptiveQuadraticPotential(zeros(position), ones(position), 10.0, adaptCount, random);
 
         Leapfrog startState = new Leapfrog(position, potential.random(), gradient, initialLogOfMasterP, potential);
 
