@@ -1,6 +1,9 @@
 ### Version 0.0.20 ###
 
 * Added Python docstrings for sampling
+* `ForwardSampler`
+  * Samples from the prior of a bayesian network. The network cannot have observations or conditional probability.
+  * It's accessible from the `Keanu` factory like so: `Keanu.Sampling.Forward.withDefaultConfig().sample`
 
 ### Version 0.0.19 ###
 
