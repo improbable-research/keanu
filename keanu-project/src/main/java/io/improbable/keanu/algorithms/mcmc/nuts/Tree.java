@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
 
 
 /**
@@ -167,7 +168,7 @@ class Tree implements SaveStatistics {
 
                 if (otherHalfTree.shouldContinueFlag) {
 
-                    tree.setSumMomentum(VariableValues.add(tree.sumMomentum, otherHalfTree.sumMomentum));
+                    tree.setSumMomentum(add(tree.sumMomentum, otherHalfTree.sumMomentum));
 
                     boolean notUTurning = isNotUTurning(tree.forward.getVelocity(), tree.backward.getVelocity(), tree.sumMomentum);
 

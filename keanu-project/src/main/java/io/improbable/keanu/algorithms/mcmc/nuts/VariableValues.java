@@ -24,7 +24,7 @@ public class VariableValues {
         return result;
     }
 
-    public static Map<VariableReference, DoubleTensor> reciprocol(Map<VariableReference, DoubleTensor> values) {
+    public static Map<VariableReference, DoubleTensor> reciprocal(Map<VariableReference, DoubleTensor> values) {
         Map<VariableReference, DoubleTensor> result = new HashMap<>();
         for (VariableReference v : values.keySet()) {
             result.put(v, values.get(v).reciprocal());
@@ -56,13 +56,6 @@ public class VariableValues {
         return result;
     }
 
-    public static Map<VariableReference, DoubleTensor> subtract(Map<VariableReference, DoubleTensor> left, Map<VariableReference, DoubleTensor> right) {
-        Map<VariableReference, DoubleTensor> result = new HashMap<>();
-        for (VariableReference v : left.keySet()) {
-            result.put(v, left.get(v).minus(right.get(v)));
-        }
-        return result;
-    }
 
     public static Map<VariableReference, DoubleTensor> add(Map<VariableReference, DoubleTensor> left, Map<VariableReference, DoubleTensor> right) {
         Map<VariableReference, DoubleTensor> result = new HashMap<>();
