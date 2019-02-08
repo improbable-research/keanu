@@ -1,7 +1,7 @@
-from typing import Any
-
 import numpy as np
-from py4j.java_gateway import java_import, JavaObject, JavaMember
+from numpy import ndarray
+from py4j.java_gateway import java_import, JavaObject, JavaMember, is_instance_of
+from typing import Any
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
@@ -15,6 +15,7 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.dbl.DoubleTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k.jvm_view(), "io.improbable.keanu.tensor.intgr.IntegerTensor")
+java_import(k.jvm_view(), "io.improbable.keanu.util.Py4jByteArrayConverter")
 
 
 class Tensor(JavaObjectWrapper):
@@ -84,4 +85,23 @@ class Tensor(JavaObjectWrapper):
             scalar_array = np.array(java_tensor.scalar())
             return scalar_array.item() if return_as_primitive else scalar_array
         else:
-            return np.array(list(java_tensor.asFlatArray())).reshape(java_tensor.getShape())
+            return Tensor.__get_ndarray_from_tensor(java_tensor).reshape(java_tensor.getShape())
+
+    @staticmethod
+    def __get_ndarray_from_tensor(java_tensor) -> ndarray:
+        # Performance is much better using byte arrays where possible.
+        # https://stackoverflow.com/questions/39095994/fast-conversion-of-java-array-to-numpy-array-py4j
+        if is_instance_of(k._gateway, java_tensor, "io.improbable.keanu.tensor.dbl.DoubleTensor"):
+            byteArray = k.jvm_view().Py4jByteArrayConverter.toByteArray(java_tensor.asFlatDoubleArray())
+            doubleArray = np.frombuffer(byteArray, np.float64)
+            return doubleArray
+        elif is_instance_of(k._gateway, java_tensor, "io.improbable.keanu.tensor.intgr.IntegerTensor"):
+            byteArray = k.jvm_view().Py4jByteArrayConverter.toByteArray(java_tensor.asFlatIntegerArray())
+            intArray = np.frombuffer(byteArray, np.int32)
+            return intArray
+        elif is_instance_of(k._gateway, java_tensor, "io.improbable.keanu.tensor.bool.BooleanTensor"):
+            byteArray = k.jvm_view().Py4jByteArrayConverter.toByteArray(java_tensor.asFlatBooleanArray())
+            boolArray = np.frombuffer(byteArray, bool)
+            return boolArray
+        else:
+            return np.array(list(java_tensor.asFlatArray()))

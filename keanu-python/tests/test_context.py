@@ -1,7 +1,8 @@
-from keanu.context import KeanuContext
-from keanu.vertex import ConstantInteger, ConstantDouble, ConstantBoolean, Concatenation
-import py4j
 import numpy as np
+import py4j
+
+from keanu.context import KeanuContext
+from keanu.vertex import ConstantDouble, Concatenation
 
 
 def test_the_context_is_a_singleton() -> None:

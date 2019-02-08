@@ -98,4 +98,6 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
     @Override
     BooleanTensor slice(int dimension, long index);
 
+    boolean[] asFlatBooleanArray();
+
 }

@@ -27,7 +27,7 @@ def test_you_can_call_a_java_method_on_the_unwrapped_object(java_list_wrapper) -
 
 
 def test_you_cannot_call_a_java_method_with_snake_case_on_the_unwrapped_object(java_list_wrapper) -> None:
-    with pytest.raises(Py4JError, match="Method is_empty\(\[\]\) does not exist"):
+    with pytest.raises(Py4JError, match=r"Method is_empty\(\[\]\) does not exist"):
         java_list_wrapper.unwrap().is_empty()
 
 
