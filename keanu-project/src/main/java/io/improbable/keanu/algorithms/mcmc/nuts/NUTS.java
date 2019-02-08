@@ -17,11 +17,12 @@ import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static io.improbable.keanu.algorithms.mcmc.nuts.Stepsize.findStartingStepSizeSimple;
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.ones;
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 import static java.util.stream.Collectors.toMap;
 
 
@@ -125,7 +126,9 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        Leapfrog startState = new Leapfrog(position, new HashMap<>(), gradient, initialLogOfMasterP);
+        Potential potential = new QuadPotentialDiagAdapt(zeros(position), ones(position), 10.0, adaptCount, random);
+
+        Leapfrog startState = new Leapfrog(position, potential.random(), gradient, initialLogOfMasterP, potential);
 
         Proposal initialProposal = new Proposal(position, gradient, startingSample, startState.getEnergy(), 1.0, initialLogOfMasterP);
 
@@ -135,6 +138,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             sampleFromVariables,
             latentVariables,
             model,
+            potential,
             adaptEnabled,
             stepsize,
             tree,

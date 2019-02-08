@@ -35,6 +35,8 @@ class Leapfrog {
     @Getter
     private final double logProb;
 
+    private final Potential potential;
+
     @Getter
     private final double kineticEnergy;
 
@@ -46,17 +48,16 @@ class Leapfrog {
     Leapfrog(Map<VariableReference, DoubleTensor> position,
              Map<VariableReference, DoubleTensor> momentum,
              Map<? extends VariableReference, DoubleTensor> gradient,
-             double logProb) {
+             double logProb,
+             Potential potential) {
 
         this.position = position;
         this.momentum = momentum;
-        this.velocity = momentum;
+        this.velocity = potential.getVelocity(momentum);
         this.gradient = gradient;
-
-        //moment is equal to velocity at the moment because mass is 1
-        this.kineticEnergy = 0.5 * dotProduct(velocity);
+        this.potential = potential;
+        this.kineticEnergy = potential.getKineticEnergy(momentum, velocity);
         this.energy = kineticEnergy - logProb;
-
         this.logProb = logProb;
     }
 
@@ -74,27 +75,33 @@ class Leapfrog {
 
         final double halfTimeStep = epsilon / 2.0;
 
-        Map<VariableReference, DoubleTensor> nextMomentum = stepMomentum(halfTimeStep, velocity, gradient);
-        Map<VariableReference, DoubleTensor> nextPosition = stepPosition(latentVariables, halfTimeStep, nextMomentum, position);
+        Map<VariableReference, DoubleTensor> nextMomentum = stepMomentum(halfTimeStep, momentum, gradient);
+
+        Map<VariableReference, DoubleTensor> nextVelocity = potential.getVelocity(nextMomentum);
+
+        Map<VariableReference, DoubleTensor> nextPosition = stepPosition(latentVariables, epsilon, nextVelocity, position);
 
         Map<? extends VariableReference, DoubleTensor> nextPositionGradient = logProbGradientCalculator.logProbGradients(nextPosition);
-        double logProbAtPosition = logProbGradientCalculator.logProb();
+        final double nextPositionLogProb = logProbGradientCalculator.logProb();
 
         nextMomentum = stepMomentum(halfTimeStep, nextMomentum, nextPositionGradient);
 
-        return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient, logProbAtPosition);
+        return new Leapfrog(nextPosition, nextMomentum, nextPositionGradient, nextPositionLogProb, potential);
     }
 
-    private static Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor, ?>> latentVariables, double halfTimeStep, Map<VariableReference, DoubleTensor> nextMomentum, Map<? extends VariableReference, DoubleTensor> position) {
+    private static Map<VariableReference, DoubleTensor> stepPosition(List<? extends Variable<DoubleTensor, ?>> latentVariables,
+                                                                     double dt,
+                                                                     Map<VariableReference, DoubleTensor> velocity,
+                                                                     Map<VariableReference, DoubleTensor> position) {
+
         Map<VariableReference, DoubleTensor> nextPosition = new HashMap<>();
 
         for (Variable<DoubleTensor, ?> latent : latentVariables) {
 
-            final DoubleTensor nextPositionForLatent = nextMomentum.get(latent.getReference()).
-                times(halfTimeStep).
-                plusInPlace(
-                    position.get(latent.getReference())
-                );
+            final DoubleTensor variablePosition = position.get(latent.getReference());
+            final DoubleTensor variableVelocity = velocity.get(latent.getReference());
+
+            final DoubleTensor nextPositionForLatent = variableVelocity.times(dt).plusInPlace(variablePosition);
 
             nextPosition.put(latent.getReference(), nextPositionForLatent);
         }
@@ -102,21 +109,15 @@ class Leapfrog {
         return nextPosition;
     }
 
-    private static Map<VariableReference, DoubleTensor> stepMomentum(double halfTimeStep, Map<? extends VariableReference, DoubleTensor> momentum, Map<? extends VariableReference, DoubleTensor> gradient) {
+    private static Map<VariableReference, DoubleTensor> stepMomentum(double dt,
+                                                                     Map<? extends VariableReference, DoubleTensor> momentum,
+                                                                     Map<? extends VariableReference, DoubleTensor> gradient) {
         Map<VariableReference, DoubleTensor> nextMomentum = new HashMap<>();
         for (Map.Entry<? extends VariableReference, DoubleTensor> rEntry : momentum.entrySet()) {
-            final DoubleTensor updatedMomentum = gradient.get(rEntry.getKey()).times(halfTimeStep).plusInPlace(rEntry.getValue());
+            final DoubleTensor updatedMomentum = gradient.get(rEntry.getKey()).times(dt).plusInPlace(rEntry.getValue());
             nextMomentum.put(rEntry.getKey(), updatedMomentum);
         }
         return nextMomentum;
-    }
-
-    private static double dotProduct(Map<? extends VariableReference, DoubleTensor> values) {
-        double dotProduct = 0.0;
-        for (DoubleTensor value : values.values()) {
-            dotProduct += value.times(value).sum();
-        }
-        return dotProduct;
     }
 
 }

@@ -4,7 +4,6 @@ import io.improbable.keanu.Keanu;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import lombok.Getter;
 
@@ -36,8 +35,6 @@ public class SingleGaussianForVis implements ModelForNUTSVis {
 
         samplingAlgorithm = Keanu.Sampling.NUTS.builder()
             .adaptCount(sampleCount)
-//            .maxTreeHeight(7)
-//            .adaptEnabled(false)
             .saveStatistics(true)
             .build();
 

@@ -28,7 +28,7 @@ public class RadonForVis implements ModelForNUTSVis {
             .collect(Collectors.groupingBy(d -> d.county));
 
 
-        buildAndRunHierarchicalNetwork(radonData, 2);
+        buildAndRunHierarchicalNetwork(radonData, 8);
     }
 
     private void buildAndRunHierarchicalNetwork(Map<String, List<Data>> radonData, int numberOfModels) {
@@ -88,9 +88,7 @@ public class RadonForVis implements ModelForNUTSVis {
     @Override
     public NUTS getSamplingAlgorithm() {
         return NUTS.builder()
-            .maxTreeHeight(8)
-//            .adaptEnabled(false)
-//            .initialStepSize(0.15)
+            .maxTreeHeight(10)
             .saveStatistics(true)
             .build();
     }

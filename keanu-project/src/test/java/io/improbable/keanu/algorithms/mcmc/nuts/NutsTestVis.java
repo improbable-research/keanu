@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class NutsTestVis {
 
     public static void main(String[] args) {
-        new NutsTestVis().donut();
+        new NutsTestVis().showSingleGaussian();
     }
 
 
@@ -62,14 +62,14 @@ public class NutsTestVis {
         SummaryStatistics stats = new SummaryStatistics();
         samples.forEach(stats::addValue);
 
-        SummaryStatistics statsDirect= new SummaryStatistics();
+        SummaryStatistics statsDirect = new SummaryStatistics();
         samplesDirect.forEach(statsDirect::addValue);
 
         Vizer.histogram(samples, "NUTS");
         Vizer.histogram(samplesDirect, "Direct");
     }
 
-    public void donut(){
+    public void donut() {
         BayesianNetwork donutBayesNet = MCMCTestDistributions.create2DDonutDistribution();
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(donutBayesNet);
 
@@ -97,7 +97,7 @@ public class NutsTestVis {
         Vizer.scatter(samplesA, samplesB, "donut");
     }
 
-    public void sumGaussian(){
+    public void sumGaussian() {
         BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46., 15.0);
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(bayesNet);
 

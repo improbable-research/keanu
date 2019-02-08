@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -16,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.ones;
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
@@ -25,10 +28,10 @@ public class LeapfrogTest {
 
     private static final double EPSILON = 1.0;
 
-    private DoubleVertex vertexA = new GaussianVertex(0, 1);;
-    private DoubleVertex vertexB = new GaussianVertex(0, 1);;
+    private DoubleVertex vertexA = new GaussianVertex(0, 1);
+    private DoubleVertex vertexB = new GaussianVertex(0, 1);
 
-    private VariableReference aID = vertexA.getId();;
+    private VariableReference aID = vertexA.getId();
     private VariableReference bID = vertexB.getId();
 
     private List<Vertex<DoubleTensor>> vertices = Arrays.asList(vertexA, vertexB);
@@ -40,12 +43,14 @@ public class LeapfrogTest {
 
     private ProbabilisticModelWithGradient mockedGradientCalculator;
     private ProbabilisticModelWithGradient mockedReverseGradientCalculator;
+    private Potential potential;
 
     @Before
     public void setupGraphForLeapfrog() {
         fillMap(position, DoubleTensor.scalar(0.0));
         fillMap(momentum, DoubleTensor.scalar(1.0));
         fillMap(gradient, DoubleTensor.scalar(2.0));
+        potential = new QuadPotentialDiagAdapt(zeros(position), ones(position), 1, 100, KeanuRandom.getDefaultRandom());
     }
 
     @Before
@@ -68,11 +73,11 @@ public class LeapfrogTest {
 
     @Test
     public void canLeapForward() {
-        Leapfrog start = new Leapfrog(position, momentum, gradient, 0);
+        Leapfrog start = new Leapfrog(position, momentum, gradient, 0, potential);
         Leapfrog leap = start.step(vertices, mockedGradientCalculator, EPSILON);
 
-        Assert.assertEquals(1.0, leap.getPosition().get(aID).scalar(), 1e-6);
-        Assert.assertEquals(1.0, leap.getPosition().get(bID).scalar(), 1e-6);
+        Assert.assertEquals(2.0, leap.getPosition().get(aID).scalar(), 1e-6);
+        Assert.assertEquals(2.0, leap.getPosition().get(bID).scalar(), 1e-6);
 
         Assert.assertEquals(2.5, leap.getMomentum().get(aID).scalar(), 1e-6);
         Assert.assertEquals(1.5, leap.getMomentum().get(bID).scalar(), 1e-6);
@@ -83,7 +88,7 @@ public class LeapfrogTest {
 
     @Test
     public void canLeapForwardAndBackToOriginalPosition() {
-        Leapfrog start = new Leapfrog(position, momentum, gradient, 0);
+        Leapfrog start = new Leapfrog(position, momentum, gradient, 0, potential);
         Leapfrog leapForward = start.step(vertices, mockedGradientCalculator, EPSILON);
 
         Map<VariableReference, DoubleTensor> momentum = new HashMap<>(leapForward.getMomentum());
@@ -98,7 +103,7 @@ public class LeapfrogTest {
     }
 
     @Test
-    public void doesIncreaseKineticEnergyWhenLogProbIncreases(){
+    public void doesIncreaseKineticEnergyWhenLogProbIncreases() {
         //TODO:
     }
 

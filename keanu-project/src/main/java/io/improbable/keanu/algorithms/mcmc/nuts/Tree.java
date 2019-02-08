@@ -10,12 +10,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm.takeSample;
 
@@ -175,7 +171,7 @@ class Tree implements SaveStatistics {
 
                 if (otherHalfTree.shouldContinueFlag) {
 
-                    tree.setPSum(add(tree.pSum, otherHalfTree.pSum));
+                    tree.setPSum(VariableValues.add(tree.pSum, otherHalfTree.pSum));
 
                     boolean notUTurning = isNotUTurning(tree.leapfrogForward.getVelocity(), tree.leapfrogBackward.getVelocity(), tree.pSum);
 
@@ -209,16 +205,6 @@ class Tree implements SaveStatistics {
         return max + Math.log(Math.exp(a - max) + Math.exp(b - max));
     }
 
-    public static Map<VariableReference, DoubleTensor> add(Map<VariableReference, DoubleTensor> a, Map<VariableReference, DoubleTensor> b) {
-        Map<VariableReference, DoubleTensor> sum = new HashMap<>();
-        for (Map.Entry<VariableReference, DoubleTensor> e : a.entrySet()) {
-            sum.put(e.getKey(), e.getValue().plus(b.get(e.getKey())));
-        }
-        return sum;
-    }
-
-    private static Set<Leapfrog> leapfrogs = new HashSet<>();
-
     private static Tree treeBuilderBaseCase(final List<? extends Variable<DoubleTensor, ?>> latentVariables,
                                             final ProbabilisticModelWithGradient logProbGradientCalculator,
                                             final List<? extends Variable> sampleFromVariables,
@@ -226,11 +212,8 @@ class Tree implements SaveStatistics {
                                             final int buildDirection,
                                             final double epsilon,
                                             final double startEnergy) {
-        leapfrogs.add(leapfrog);
 
         Leapfrog leapfrogAfterStep = leapfrog.step(latentVariables, logProbGradientCalculator, epsilon * buildDirection);
-
-        leapfrogs.add(leapfrogAfterStep);
 
         final double energyAfterStep = leapfrogAfterStep.getEnergy();
 

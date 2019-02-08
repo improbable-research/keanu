@@ -1,9 +1,9 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
+import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.Variable;
-import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import javafx.application.Application;
@@ -28,7 +28,7 @@ public class NUTSVis extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        ModelForNUTSVis modelForVis = new SingleGaussianForVis();
+        ModelForNUTSVis modelForVis = new RadonForVis();
 
         int sampleCount = modelForVis.getSampleCount();
         List<Vertex> toPlot = modelForVis.getToPlot();
@@ -59,18 +59,27 @@ public class NUTSVis extends Application {
 
         Scene scene = new Scene(root);
 
-        NetworkSamplesGenerator networkSamplesGenerator = samplingAlgorithm.generatePosteriorSamples(
+        NetworkSamples posteriorSamples = samplingAlgorithm.getPosteriorSamples(
             model,
-            toPlot
+            toPlot,
+            sampleCount
         );
 
-        networkSamplesGenerator.stream()
-            .limit(sampleCount)
-            .forEach(s -> {
-                tracePlotByVertex.forEach((v, plot) -> {
-                    plot.addPoint(s.get((Variable<DoubleTensor, ?>) v).scalar());
-                });
-            });
+//        networkSamplesGenerator.stream()
+//            .limit(sampleCount)
+//            .forEach(s -> {
+//                tracePlotByVertex.forEach((v, plot) -> {
+//                    plot.addPoint(s.get((Variable<DoubleTensor, ?>) v).scalar());
+//                });
+//            });
+
+        tracePlotByVertex.forEach((v, plot) -> {
+            plot.addPoints(
+                posteriorSamples.get((Variable<DoubleTensor, ?>) v).asList().stream()
+                    .map(t -> t.scalar())
+                    .collect(Collectors.toList())
+            );
+        });
 
         Statistics statistics = samplingAlgorithm.getStatistics();
 

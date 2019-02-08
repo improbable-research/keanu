@@ -10,9 +10,10 @@ import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
 
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
@@ -33,10 +34,13 @@ class NUTSSampler implements SamplingAlgorithm {
     private final boolean saveStatistics;
     private int sampleNum;
 
+    private Potential potential;
+
     /**
      * @param sampleFromVariables       variables to sample from
      * @param latentVariables           variables that represent latent variables
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
+     * @param potential                 ????
      * @param adaptEnabled              enable the NUTS step size adaptation
      * @param stepsize                  configuration for tuning the stepsize, if adaptEnabled
      * @param tree                      initial tree that will contain the state of the tree build
@@ -48,6 +52,7 @@ class NUTSSampler implements SamplingAlgorithm {
     public NUTSSampler(List<? extends Variable> sampleFromVariables,
                        List<? extends Variable<DoubleTensor, ?>> latentVariables,
                        ProbabilisticModelWithGradient logProbGradientCalculator,
+                       Potential potential,
                        boolean adaptEnabled,
                        Stepsize stepsize,
                        Tree tree,
@@ -70,6 +75,8 @@ class NUTSSampler implements SamplingAlgorithm {
         this.saveStatistics = saveStatistics;
 
         this.sampleNum = 1;
+
+        this.potential = potential;
     }
 
     @Override
@@ -88,8 +95,7 @@ class NUTSSampler implements SamplingAlgorithm {
     @Override
     public void step() {
 
-        Map<VariableReference, DoubleTensor> initialMomentum = new HashMap<>();
-        initializeMomentumForEachVariable(latentVariables, initialMomentum, random);
+        Map<VariableReference, DoubleTensor> initialMomentum = potential.random();
 
         Proposal previousProposal = tree.getProposal();
 
@@ -97,7 +103,8 @@ class NUTSSampler implements SamplingAlgorithm {
             previousProposal.getPosition(),
             initialMomentum,
             previousProposal.getGradient(),
-            previousProposal.getLogProb()
+            previousProposal.getLogProb(),
+            potential
         );
 
         Proposal initialProposal = new Proposal(
@@ -149,7 +156,7 @@ class NUTSSampler implements SamplingAlgorithm {
 
             tree.setLogSize(newLogSize);
 
-            tree.setPSum(Tree.add(tree.getPSum(), otherHalfTree.getPSum()));
+            tree.setPSum(add(tree.getPSum(), otherHalfTree.getPSum()));
 
             tree.setShouldContinueFlag(
                 Tree.isNotUTurning(
@@ -167,6 +174,7 @@ class NUTSSampler implements SamplingAlgorithm {
 
         if (this.adaptEnabled) {
             stepsize.adaptStepSize(tree, sampleNum);
+            potential.update(tree.getProposal().getPosition(), tree.getProposal().getGradient(), sampleNum);
         }
 
         sampleNum++;
@@ -175,14 +183,6 @@ class NUTSSampler implements SamplingAlgorithm {
     private void recordSamplerStatistics() {
         stepsize.save(statistics);
         tree.save(statistics);
-    }
-
-    private static void initializeMomentumForEachVariable(List<? extends Variable<DoubleTensor, ?>> variables,
-                                                          Map<VariableReference, DoubleTensor> momentums,
-                                                          KeanuRandom random) {
-        for (Variable<DoubleTensor, ?> variable : variables) {
-            momentums.put(variable.getReference(), random.nextGaussian(variable.getShape()));
-        }
     }
 
     /**

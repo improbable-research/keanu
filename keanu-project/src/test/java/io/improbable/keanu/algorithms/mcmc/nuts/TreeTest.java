@@ -40,7 +40,7 @@ public class TreeTest {
             B.getReference(), DoubleTensor.create(7, 8)
         );
 
-        Map<VariableReference, DoubleTensor> sum = Tree.add(left, right);
+        Map<VariableReference, DoubleTensor> sum = VariableValues.add(left, right);
 
         DoubleTensor expectedA = DoubleTensor.create(6, 8);
         DoubleTensor expectedB = DoubleTensor.create(10, 12);
