@@ -31,4 +31,15 @@ public class Py4jUtils {
         byte[] byteArray = integerBuffer.array();
         return byteArray;
     }
+
+    public byte[] toByteArray(Boolean[] booleanArray) {
+        ByteBuffer booleanBuffer = ByteBuffer.allocate(booleanArray.length);
+        booleanBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        for (boolean element : booleanArray) {
+            byte booleanByte = element ? (byte) 0x01 : 0x00;
+            booleanBuffer.put(booleanByte);
+        }
+        byte[] byteArray = booleanBuffer.array();
+        return byteArray;
+    }
 }
