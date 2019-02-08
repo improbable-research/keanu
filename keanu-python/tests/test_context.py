@@ -1,7 +1,5 @@
 import numpy as np
 import py4j
-import pytest
-from py4j.protocol import Py4JJavaError
 
 from keanu.context import KeanuContext
 from keanu.vertex import ConstantDouble, Concatenation
