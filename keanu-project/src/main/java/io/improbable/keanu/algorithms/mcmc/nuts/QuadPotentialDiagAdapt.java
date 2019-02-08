@@ -3,7 +3,6 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import lombok.AllArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
