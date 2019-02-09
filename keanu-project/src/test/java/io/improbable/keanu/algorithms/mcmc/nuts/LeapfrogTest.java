@@ -80,7 +80,7 @@ public class LeapfrogTest {
         assertThat(startEnergy, greaterThan(afterLeapEnergy));
     }
 
-    private Leapfrog leapfrogAt(GaussianVertex vertex, double position, double momentum) {
+    public static Leapfrog leapfrogAt(GaussianVertex vertex, double position, double momentum) {
 
         DoubleTensor tensorPosition = scalar(position);
 

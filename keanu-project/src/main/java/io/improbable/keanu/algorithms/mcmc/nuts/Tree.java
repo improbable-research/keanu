@@ -26,19 +26,20 @@ import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
  */
 class Tree implements SaveStatistics {
 
-    private final double maxEnergyChange;
-
-    private Leapfrog forward;
-    private Leapfrog backward;
-
-    @Getter
-    private Proposal proposal;
-
     private final ProbabilisticModelWithGradient logProbGradientCalculator;
 
     private final List<? extends Variable> sampleFromVariables;
 
     private final KeanuRandom random;
+
+    @Getter
+    private Leapfrog forward;
+
+    @Getter
+    private Leapfrog backward;
+
+    @Getter
+    private Proposal proposal;
 
     private Map<VariableReference, DoubleTensor> sumMomentum;
 
@@ -46,6 +47,8 @@ class Tree implements SaveStatistics {
      * The energy at the start state
      */
     private final double startEnergy;
+
+    private final double maxEnergyChange;
 
     private double logSumWeight;
 
@@ -57,6 +60,9 @@ class Tree implements SaveStatistics {
 
     @Getter
     private int treeSize;
+
+    @Getter
+    private int treeHeight;
 
     private boolean shouldContinueFlag;
 
@@ -86,12 +92,12 @@ class Tree implements SaveStatistics {
         this.logSumWeight = 0.0;
         this.sumMetropolisAcceptanceProbability = 0.0;
         this.treeSize = 1;
+        this.treeHeight = 0;
         this.shouldContinueFlag = true;
     }
 
-    public void growTree(int treeHeight,
-                         int buildDirection,
-                         double epsilon) {
+    public void grow(int buildDirection,
+                     double epsilon) {
 
         SubTree otherHalfTree = buildTree(
             buildDirection == -1 ? backward : forward,
@@ -126,6 +132,8 @@ class Tree implements SaveStatistics {
             backward.getVelocity(),
             sumMomentum
         );
+
+        treeHeight++;
     }
 
     /**

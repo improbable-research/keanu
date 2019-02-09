@@ -9,12 +9,12 @@ import java.util.Map;
  */
 public interface ProbabilisticModelWithGradient extends ProbabilisticModel {
 
-    Map<? extends VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs);
+    Map<VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs);
 
-    Map<? extends VariableReference, DoubleTensor> logProbGradients();
+    Map<VariableReference, DoubleTensor> logProbGradients();
 
-    Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs);
+    Map<VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs);
 
-    Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients();
+    Map<VariableReference, DoubleTensor> logLikelihoodGradients();
 
 }

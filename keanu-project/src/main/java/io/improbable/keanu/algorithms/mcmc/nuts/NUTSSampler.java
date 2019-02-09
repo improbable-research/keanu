@@ -111,16 +111,12 @@ class NUTSSampler implements SamplingAlgorithm {
             random
         );
 
-        int treeHeight = 0;
-
-        while (tree.shouldContinue() && treeHeight < maxTreeHeight) {
+        while (tree.shouldContinue() && tree.getTreeHeight() < maxTreeHeight) {
 
             //build tree direction -1 = backwards OR 1 = forwards
             int buildDirection = random.nextBoolean() ? 1 : -1;
 
-            tree.growTree(treeHeight, buildDirection, stepSize.getStepSize());
-
-            treeHeight++;
+            tree.grow(buildDirection, stepSize.getStepSize());
         }
 
         this.proposal = tree.getProposal();
