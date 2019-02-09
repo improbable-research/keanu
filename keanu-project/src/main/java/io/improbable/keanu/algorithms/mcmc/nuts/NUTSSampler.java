@@ -24,21 +24,22 @@ class NUTSSampler implements SamplingAlgorithm {
     private final List<? extends Variable> sampleFromVariables;
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
-    private final AdaptiveStepSize stepsize;
-    private Proposal proposal;
+    private final AdaptiveStepSize stepSize;
+    private final double maxEnergyChange;
     private final ProbabilisticModelWithGradient logProbGradientCalculator;
     private final Statistics statistics;
     private final boolean saveStatistics;
-    private int sampleNum;
+    private final Potential potential;
 
-    private Potential potential;
+    private Proposal proposal;
+    private int sampleNum;
 
     /**
      * @param sampleFromVariables       variables to sample from
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
      * @param potential                 ????
      * @param adaptEnabled              enable the NUTS step size adaptation
-     * @param stepSize                  configuration for tuning the stepsize, if adaptEnabled
+     * @param stepSize                  configuration for tuning the stepSize, if adaptEnabled
      * @param initialProposal           the starting proposal for the tree
      * @param maxTreeHeight             The largest tree height before stopping the hamilitonian process
      * @param random                    the source of randomness
@@ -50,6 +51,7 @@ class NUTSSampler implements SamplingAlgorithm {
                        Potential potential,
                        boolean adaptEnabled,
                        AdaptiveStepSize stepSize,
+                       double maxEnergyChange,
                        Proposal initialProposal,
                        int maxTreeHeight,
                        KeanuRandom random,
@@ -60,7 +62,8 @@ class NUTSSampler implements SamplingAlgorithm {
         this.logProbGradientCalculator = logProbGradientCalculator;
 
         this.proposal = initialProposal;
-        this.stepsize = stepSize;
+        this.stepSize = stepSize;
+        this.maxEnergyChange = maxEnergyChange;
         this.maxTreeHeight = maxTreeHeight;
         this.adaptEnabled = adaptEnabled;
 
@@ -102,11 +105,7 @@ class NUTSSampler implements SamplingAlgorithm {
         Tree tree = new Tree(
             startState,
             proposal,
-            0.0,
-            true,
-            0.0,
-            1,
-            startState.getEnergy(),
+            maxEnergyChange,
             logProbGradientCalculator,
             sampleFromVariables,
             random
@@ -119,7 +118,7 @@ class NUTSSampler implements SamplingAlgorithm {
             //build tree direction -1 = backwards OR 1 = forwards
             int buildDirection = random.nextBoolean() ? 1 : -1;
 
-            tree.buildTree(treeHeight, buildDirection, stepsize.getStepSize());
+            tree.growTree(treeHeight, buildDirection, stepSize.getStepSize());
 
             treeHeight++;
         }
@@ -127,12 +126,12 @@ class NUTSSampler implements SamplingAlgorithm {
         this.proposal = tree.getProposal();
 
         if (saveStatistics) {
-            stepsize.save(statistics);
+            stepSize.save(statistics);
             tree.save(statistics);
         }
 
         if (this.adaptEnabled) {
-            stepsize.adaptStepSize(tree);
+            stepSize.adaptStepSize(tree);
             potential.update(proposal.getPosition(), proposal.getGradient(), sampleNum);
         }
 

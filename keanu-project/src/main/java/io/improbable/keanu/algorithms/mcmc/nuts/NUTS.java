@@ -34,11 +34,6 @@ import static java.util.stream.Collectors.toMap;
 @AllArgsConstructor
 public class NUTS implements PosteriorSamplingAlgorithm {
 
-    private static final int DEFAULT_ADAPT_COUNT = 1000;
-    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.8;
-
-    private final Statistics statistics = new Statistics(Metrics.values());
-
     public static NUTSBuilder builder() {
         return new NUTSBuilder();
     }
@@ -67,12 +62,16 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     //Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.
     private Double initialStepSize;
 
+    private double maxEnergyChange;
+
     //The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This
     //will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample.
     private int maxTreeHeight;
 
     //Sets whether or not to save debug STATISTICS. The STATISTICS available are: Step size, Log Prob, Mean Tree Acceptance Prob, Tree Size.
     private boolean saveStatistics;
+
+    private final Statistics statistics = new Statistics(Metrics.values());
 
     /**
      * Sample from the posterior of a probabilistic model using the No-U-Turn-Sampling algorithm
@@ -136,6 +135,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             potential,
             adaptEnabled,
             stepsize,
+            maxEnergyChange,
             initialProposal,
             maxTreeHeight,
             random,
@@ -150,10 +150,11 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     public static class NUTSBuilder {
         private KeanuRandom random = KeanuRandom.getDefaultRandom();
-        private int adaptCount = DEFAULT_ADAPT_COUNT;
-        private double targetAcceptanceProb = DEFAULT_TARGET_ACCEPTANCE_PROB;
+        private int adaptCount = 1000;
+        private double targetAcceptanceProb = 0.8;
         private boolean adaptEnabled = true;
         private Double initialStepSize = null;
+        private double maxEnergyChange = 1000.0;
         private int maxTreeHeight = 10;
         private boolean saveStatistics = false;
 
@@ -185,6 +186,11 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             return this;
         }
 
+        public NUTSBuilder maxEnergyChange(double maxEnergyChange) {
+            this.maxEnergyChange = maxEnergyChange;
+            return this;
+        }
+
         public NUTSBuilder maxTreeHeight(int maxTreeHeight) {
             this.maxTreeHeight = maxTreeHeight;
             return this;
@@ -196,7 +202,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         }
 
         public NUTS build() {
-            return new NUTS(random, adaptCount, targetAcceptanceProb, adaptEnabled, initialStepSize, maxTreeHeight, saveStatistics);
+            return new NUTS(random, adaptCount, targetAcceptanceProb, adaptEnabled, initialStepSize, maxEnergyChange, maxTreeHeight, saveStatistics);
         }
 
         public String toString() {
