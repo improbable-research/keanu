@@ -20,11 +20,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 
-public class LeapfrogTest {
+public class LeapfrogIntegratorTest {
 
     private GaussianVertex vertex;
     private KeanuProbabilisticModelWithGradient gradientCalculator;
-    private Leapfrog start;
+    private LeapfrogState start;
+    private LeapfrogIntegrator integrator;
 
     private double initialPosition = 0.0;
     private double initialMomentum = 0.5;
@@ -37,32 +38,38 @@ public class LeapfrogTest {
             new BayesianNetwork(vertex.getConnectedGraph())
         );
 
-        start = leapfrogAt(vertex, initialPosition, initialMomentum);
+        Map<VariableReference, DoubleTensor> p = ImmutableMap.of(vertex.getId(), scalar(0));
+
+        Potential potential = new AdaptiveQuadraticPotential(zeros(p), ones(p), 1, 100, KeanuRandom.getDefaultRandom());
+
+        start = leapfrogAt(vertex, initialPosition, initialMomentum, potential);
+
+        integrator = new LeapfrogIntegrator(potential);
     }
 
     @Test
     public void canLeapForward() {
 
-        Leapfrog leap = start.step(gradientCalculator, 1.0);
+        LeapfrogState leap = integrator.step(start, gradientCalculator, 1.0);
         assertEquals(0.5, leap.getPosition().get(vertex.getId()).scalar(), 1e-6);
     }
 
     @Test
     public void canLeapForwardAndBack() {
 
-        Leapfrog leap = start.step(gradientCalculator, 1.0);
+        LeapfrogState leap = integrator.step(start, gradientCalculator, 1.0);
         assertEquals(initialMomentum, leap.getPosition().get(vertex.getId()).scalar(), 1e-6);
 
-        Leapfrog leapBack = leap.step(gradientCalculator, -1.0);
+        LeapfrogState leapBack = integrator.step(leap, gradientCalculator, -1.0);
         assertEquals(initialPosition, leapBack.getPosition().get(vertex.getId()).scalar(), 1e-6);
     }
 
     @Test
     public void leapsForwardWithMinimalEnergyLoss() {
 
-        Leapfrog leap = start;
+        LeapfrogState leap = start;
         for (int i = 0; i < 1000; i++) {
-            leap = start.step(gradientCalculator, 1e-3);
+            leap = integrator.step(leap, gradientCalculator, 1e-3);
         }
 
         assertEquals(start.getEnergy(), leap.getEnergy(), 1e-6);
@@ -73,14 +80,14 @@ public class LeapfrogTest {
 
         double startEnergy = start.getKineticEnergy();
 
-        Leapfrog leap = start.step(gradientCalculator, 1e-3);
+        LeapfrogState leap = integrator.step(start, gradientCalculator, 1e-3);
 
         double afterLeapEnergy = leap.getKineticEnergy();
 
         assertThat(startEnergy, greaterThan(afterLeapEnergy));
     }
 
-    public static Leapfrog leapfrogAt(GaussianVertex vertex, double position, double momentum) {
+    public static LeapfrogState leapfrogAt(GaussianVertex vertex, double position, double momentum, Potential potential) {
 
         DoubleTensor tensorPosition = scalar(position);
 
@@ -91,9 +98,7 @@ public class LeapfrogTest {
         Map<VariableReference, DoubleTensor> m = ImmutableMap.of(vertex.getId(), scalar(momentum));
         Map<VariableReference, DoubleTensor> g = ImmutableMap.of(vertex.getId(), scalar(gradient));
 
-        Potential potential = new AdaptiveQuadraticPotential(zeros(p), ones(p), 1, 100, KeanuRandom.getDefaultRandom());
-
-        return new Leapfrog(p, m, g, logProb, potential);
+        return new LeapfrogState(p, m, g, logProb, potential);
     }
 
 }

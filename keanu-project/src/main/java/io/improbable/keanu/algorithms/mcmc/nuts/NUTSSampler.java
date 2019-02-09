@@ -27,6 +27,7 @@ class NUTSSampler implements SamplingAlgorithm {
     private final AdaptiveStepSize stepSize;
     private final double maxEnergyChange;
     private final ProbabilisticModelWithGradient logProbGradientCalculator;
+    private final LeapfrogIntegrator leapfrogIntegrator;
     private final Statistics statistics;
     private final boolean saveStatistics;
     private final Potential potential;
@@ -60,6 +61,7 @@ class NUTSSampler implements SamplingAlgorithm {
 
         this.sampleFromVariables = sampleFromVariables;
         this.logProbGradientCalculator = logProbGradientCalculator;
+        this.leapfrogIntegrator = new LeapfrogIntegrator(potential);
 
         this.proposal = initialProposal;
         this.stepSize = stepSize;
@@ -94,7 +96,7 @@ class NUTSSampler implements SamplingAlgorithm {
 
         Map<VariableReference, DoubleTensor> initialMomentum = potential.random();
 
-        Leapfrog startState = new Leapfrog(
+        LeapfrogState startState = new LeapfrogState(
             proposal.getPosition(),
             initialMomentum,
             proposal.getGradient(),
@@ -107,6 +109,7 @@ class NUTSSampler implements SamplingAlgorithm {
             proposal,
             maxEnergyChange,
             logProbGradientCalculator,
+            leapfrogIntegrator,
             sampleFromVariables,
             random
         );

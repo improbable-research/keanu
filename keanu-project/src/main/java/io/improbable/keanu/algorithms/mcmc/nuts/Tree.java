@@ -28,28 +28,34 @@ class Tree implements SaveStatistics {
 
     private final ProbabilisticModelWithGradient logProbGradientCalculator;
 
+    private final LeapfrogIntegrator leapfrogIntegrator;
+
     private final List<? extends Variable> sampleFromVariables;
 
     private final KeanuRandom random;
 
     @Getter
-    private Leapfrog forward;
+    private LeapfrogState forward;
 
     @Getter
-    private Leapfrog backward;
+    private LeapfrogState backward;
 
     @Getter
     private Proposal proposal;
 
+    @Getter
     private Map<VariableReference, DoubleTensor> sumMomentum;
 
     /*
      * The energy at the start state
      */
+    @Getter
     private final double startEnergy;
 
+    @Getter
     private final double maxEnergyChange;
 
+    @Getter
     private double logSumWeight;
 
     /*
@@ -73,10 +79,11 @@ class Tree implements SaveStatistics {
      * @param sampleFromVariables       Variables to sample from at proposals
      * @param random                    Source of randomness
      */
-    public Tree(Leapfrog startState,
+    public Tree(LeapfrogState startState,
                 Proposal proposal,
                 double maxEnergyChange,
                 ProbabilisticModelWithGradient logProbGradientCalculator,
+                LeapfrogIntegrator leapfrogIntegrator,
                 List<? extends Variable> sampleFromVariables,
                 KeanuRandom random) {
 
@@ -85,13 +92,14 @@ class Tree implements SaveStatistics {
         this.proposal = proposal;
         this.maxEnergyChange = maxEnergyChange;
         this.logProbGradientCalculator = logProbGradientCalculator;
+        this.leapfrogIntegrator = leapfrogIntegrator;
         this.sampleFromVariables = sampleFromVariables;
         this.random = random;
         this.sumMomentum = startState.getMomentum();
         this.startEnergy = startState.getEnergy();
         this.logSumWeight = 0.0;
         this.sumMetropolisAcceptanceProbability = 0.0;
-        this.treeSize = 1;
+        this.treeSize = 0;
         this.treeHeight = 0;
         this.shouldContinueFlag = true;
     }
@@ -143,7 +151,7 @@ class Tree implements SaveStatistics {
      * @param epsilon        The time step delta for each new step
      * @return A subtree with treeHeight height
      */
-    private SubTree buildTree(Leapfrog buildFrom,
+    private SubTree buildTree(LeapfrogState buildFrom,
                               int buildDirection,
                               int treeHeight,
                               double epsilon) {
@@ -217,13 +225,13 @@ class Tree implements SaveStatistics {
         return max + Math.log(Math.exp(a - max) + Math.exp(b - max));
     }
 
-    private SubTree treeBuilderBaseCase(final Leapfrog leapfrog,
+    private SubTree treeBuilderBaseCase(final LeapfrogState leapfrogState,
                                         final int buildDirection,
                                         final double epsilon) {
 
-        Leapfrog leapfrogAfterStep = leapfrog.step(logProbGradientCalculator, epsilon * buildDirection);
+        LeapfrogState leapfrogStateAfterStep = leapfrogIntegrator.step(leapfrogState, logProbGradientCalculator, epsilon * buildDirection);
 
-        final double energyAfterStep = leapfrogAfterStep.getEnergy();
+        final double energyAfterStep = leapfrogStateAfterStep.getEnergy();
 
         final double energyChange = energyAfterStep - startEnergy;
 
@@ -245,16 +253,16 @@ class Tree implements SaveStatistics {
             }
 
             Proposal proposal = new Proposal(
-                leapfrogAfterStep.getPosition(),
-                leapfrogAfterStep.getGradient(),
+                leapfrogStateAfterStep.getPosition(),
+                leapfrogStateAfterStep.getGradient(),
                 sample,
-                leapfrogAfterStep.getLogProb()
+                leapfrogStateAfterStep.getLogProb()
             );
 
             return new SubTree(
-                leapfrogAfterStep,
-                leapfrogAfterStep,
-                leapfrogAfterStep.getMomentum(),
+                leapfrogStateAfterStep,
+                leapfrogStateAfterStep,
+                leapfrogStateAfterStep.getMomentum(),
                 proposal,
                 logSumWeight,
                 true,
@@ -265,9 +273,9 @@ class Tree implements SaveStatistics {
         } else {
 
             return new SubTree(
-                leapfrogAfterStep,
-                leapfrogAfterStep,
-                leapfrogAfterStep.getMomentum(),
+                leapfrogStateAfterStep,
+                leapfrogStateAfterStep,
+                leapfrogStateAfterStep.getMomentum(),
                 null,
                 Double.NEGATIVE_INFINITY,
                 false,
@@ -330,12 +338,12 @@ class Tree implements SaveStatistics {
         /**
          * The leap frog at the forward most step in the tree.
          */
-        private Leapfrog forward;
+        private LeapfrogState forward;
 
         /**
          * The leap frog at the backward most step in the tree
          */
-        private Leapfrog backward;
+        private LeapfrogState backward;
 
         /**
          * The sum of all of the momentum from each step

@@ -13,12 +13,17 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.nuts.LeapfrogTest.leapfrogAt;
+import static io.improbable.keanu.algorithms.mcmc.nuts.LeapfrogIntegratorTest.leapfrogAt;
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.ones;
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
+import static io.improbable.keanu.tensor.dbl.DoubleTensor.scalar;
 import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -27,9 +32,10 @@ import static org.mockito.Mockito.when;
 
 public class TreeTest {
 
-    GaussianVertex vertex;
-    Leapfrog start;
-    KeanuProbabilisticModelWithGradient gradientCalculator;
+    private GaussianVertex vertex;
+    private LeapfrogState start;
+    private KeanuProbabilisticModelWithGradient gradientCalculator;
+    private LeapfrogIntegrator leapfrogIntegrator;
 
     @Before
     public void setup() {
@@ -39,7 +45,13 @@ public class TreeTest {
             new BayesianNetwork(vertex.getConnectedGraph())
         );
 
-        start = leapfrogAt(vertex, 0.0, 0.5);
+        Map<VariableReference, DoubleTensor> p = ImmutableMap.of(vertex.getId(), scalar(0));
+
+        Potential potential = new AdaptiveQuadraticPotential(zeros(p), ones(p), 1, 100, KeanuRandom.getDefaultRandom());
+
+        start = leapfrogAt(vertex, 0.0, 0.5, potential);
+
+        leapfrogIntegrator = new LeapfrogIntegrator(potential);
     }
 
     @Test
@@ -50,6 +62,7 @@ public class TreeTest {
             null,
             1000,
             gradientCalculator,
+            leapfrogIntegrator,
             singletonList(vertex),
             KeanuRandom.getDefaultRandom()
         );
@@ -58,8 +71,8 @@ public class TreeTest {
         tree.grow(-1, 1e-6);
         tree.grow(-1, 1e-6);
 
-        assertEquals(tree.getTreeHeight(), 3);
-        assertEquals(tree.getTreeSize(), (int) Math.pow(2, tree.getTreeHeight()));
+        assertEquals(3, tree.getTreeHeight());
+        assertEquals((int) Math.pow(2, tree.getTreeHeight()) - 1, tree.getTreeSize());
     }
 
     @Test
@@ -77,21 +90,22 @@ public class TreeTest {
             null,
             1000,
             mockModel,
+            leapfrogIntegrator,
             singletonList(vertex),
             KeanuRandom.getDefaultRandom()
         );
 
         tree.grow(1, 1e-6);
-        verify(mockModel, times(tree.getTreeSize() - 1)).logProbGradients(anyMap());
+        verify(mockModel, times(tree.getTreeSize())).logProbGradients(anyMap());
 
         tree.grow(-1, 1e-6);
-        verify(mockModel, times(tree.getTreeSize() - 1)).logProbGradients(anyMap());
+        verify(mockModel, times(tree.getTreeSize())).logProbGradients(anyMap());
 
         tree.grow(-1, 1e-6);
-        verify(mockModel, times(tree.getTreeSize() - 1)).logProbGradients(anyMap());
+        verify(mockModel, times(tree.getTreeSize())).logProbGradients(anyMap());
 
         tree.grow(1, 1e-6);
-        verify(mockModel, times(tree.getTreeSize() - 1)).logProbGradients(anyMap());
+        verify(mockModel, times(tree.getTreeSize())).logProbGradients(anyMap());
     }
 
     @Test
@@ -102,6 +116,7 @@ public class TreeTest {
             null,
             1000,
             gradientCalculator,
+            leapfrogIntegrator,
             singletonList(vertex),
             KeanuRandom.getDefaultRandom()
         );
@@ -130,6 +145,54 @@ public class TreeTest {
             assertThat(backwardPositionBefore, not(closeTo(backwardPositionAfter, 1e-8)));
             assertThat(forwardPositionBefore, closeTo(forwardPositionAfter, 1e-8));
         }
+    }
+
+    @Test
+    public void doesSumMomentumAndMetropolisAcceptanceProbAndLogSumWeight() {
+
+        LeapfrogIntegrator leapfrogIntegrator = mock(LeapfrogIntegrator.class);
+
+        double startEnergy = start.getEnergy();
+        double energyChange = -2.0;
+
+        LeapfrogState constantLeapfrogState = new LeapfrogState(
+            start.getPosition(),
+            start.getMomentum(),
+            start.getVelocity(),
+            start.getGradient(),
+            start.getKineticEnergy(),
+            start.getLogProb() + energyChange,
+            startEnergy + energyChange
+        );
+
+        when(leapfrogIntegrator.step(any(), any(), anyDouble()))
+            .thenReturn(constantLeapfrogState);
+
+        Tree tree = new Tree(
+            start,
+            null,
+            1000,
+            gradientCalculator,
+            leapfrogIntegrator,
+            singletonList(vertex),
+            KeanuRandom.getDefaultRandom()
+        );
+
+        tree.grow(1, 1e-3);
+        tree.grow(1, 1e-3);
+        tree.grow(1, 1e-3);
+
+        double expectedSumMetropolisAcceptanceProb = tree.getTreeSize();
+        assertThat(tree.getSumMetropolisAcceptanceProbability(), closeTo(expectedSumMetropolisAcceptanceProb, 1e-6));
+
+        double expectedLogSumWeight = 0;
+        for (int i = 0; i < tree.getTreeSize(); i++) {
+            expectedLogSumWeight = Tree.logSumExp(expectedLogSumWeight, -energyChange);
+        }
+        assertThat(tree.getLogSumWeight(), closeTo(expectedLogSumWeight, 1e-6));
+
+        double expectedSumMomentum = (tree.getTreeSize() + 1) * start.getMomentum().get(vertex.getReference()).scalar();
+        assertThat(expectedSumMomentum, closeTo(tree.getSumMomentum().get(vertex.getReference()).scalar(), 1e-6));
     }
 
     @Test
