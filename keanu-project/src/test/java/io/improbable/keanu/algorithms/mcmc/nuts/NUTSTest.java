@@ -15,7 +15,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -185,11 +184,13 @@ public class NUTSTest {
     }
 
     @Category(Slow.class)
-    @Ignore
     @Test
-    /**
+    /*
      * This test assumes the functional logic of NUTS has not been changed.
      * It simply checks that the samples produced are identical to a previous build.
+     * If this test fails, it may still be functionally correct. Please make sure
+     * you understand why the samples have changed before accepting them by updating these
+     * magic numbers.
      */
     public void checksSamplesAgainstMagicNumbers() {
         double mu = 0.0;
@@ -215,6 +216,7 @@ public class NUTSTest {
 
         double epsilon = 1e-9;
 
+        //Use this if you're sure you want to accept a change in the nuts walk given the above setup
         //for (int i = 0; i < samples.size(); i++) {
         //    System.out.println("Assert.assertEquals(" + samples.get(i).scalar() + ", samples.get(" + i + ").scalar(), epsilon);");
         //}
@@ -224,21 +226,22 @@ public class NUTSTest {
         Assert.assertEquals(2.4304568786472975, samples.get(2).scalar(), epsilon);
         Assert.assertEquals(-1.6185857471490803, samples.get(3).scalar(), epsilon);
         Assert.assertEquals(-1.598778524224911, samples.get(4).scalar(), epsilon);
-        Assert.assertEquals(-1.7575419400993966, samples.get(5).scalar(), epsilon);
-        Assert.assertEquals(-0.5030063973316112, samples.get(6).scalar(), epsilon);
-        Assert.assertEquals(0.18023500808380366, samples.get(7).scalar(), epsilon);
-        Assert.assertEquals(-0.1955595499753091, samples.get(8).scalar(), epsilon);
-        Assert.assertEquals(0.2666907097341884, samples.get(9).scalar(), epsilon);
-        Assert.assertEquals(0.41303962378878667, samples.get(10).scalar(), epsilon);
-        Assert.assertEquals(0.8839649089092166, samples.get(11).scalar(), epsilon);
-        Assert.assertEquals(-0.30586548530994595, samples.get(12).scalar(), epsilon);
-        Assert.assertEquals(0.8257544975729242, samples.get(13).scalar(), epsilon);
-        Assert.assertEquals(0.8257544975729242, samples.get(14).scalar(), epsilon);
-        Assert.assertEquals(-2.560285900162394, samples.get(15).scalar(), epsilon);
-        Assert.assertEquals(-0.7808507597890151, samples.get(16).scalar(), epsilon);
-        Assert.assertEquals(-2.382764225608147, samples.get(17).scalar(), epsilon);
-        Assert.assertEquals(-1.6570948400056273, samples.get(18).scalar(), epsilon);
-        Assert.assertEquals(-0.9505077026917006, samples.get(19).scalar(), epsilon);
+        Assert.assertEquals(-1.7380741525321777, samples.get(5).scalar(), epsilon);
+        Assert.assertEquals(-0.4749777008462286, samples.get(6).scalar(), epsilon);
+        Assert.assertEquals(0.2020327939976143, samples.get(7).scalar(), epsilon);
+        Assert.assertEquals(-0.27218608467482364, samples.get(8).scalar(), epsilon);
+        Assert.assertEquals(-0.5001984163571884, samples.get(9).scalar(), epsilon);
+        Assert.assertEquals(0.03823243970577073, samples.get(10).scalar(), epsilon);
+        Assert.assertEquals(0.11793091693478674, samples.get(11).scalar(), epsilon);
+        Assert.assertEquals(-0.09602338453736009, samples.get(12).scalar(), epsilon);
+        Assert.assertEquals(0.8303417946309364, samples.get(13).scalar(), epsilon);
+        Assert.assertEquals(-0.9030125998311471, samples.get(14).scalar(), epsilon);
+        Assert.assertEquals(-0.9402339435331832, samples.get(15).scalar(), epsilon);
+        Assert.assertEquals(-1.4759759769687184, samples.get(16).scalar(), epsilon);
+        Assert.assertEquals(0.06660024604101977, samples.get(17).scalar(), epsilon);
+        Assert.assertEquals(0.06660024604101977, samples.get(18).scalar(), epsilon);
+        Assert.assertEquals(-0.21934807314807941, samples.get(19).scalar(), epsilon);
+
 
     }
 }
