@@ -7,10 +7,12 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.divide;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.dotProduct;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.pow;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.reciprocal;
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.subtract;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.times;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 
@@ -112,33 +114,20 @@ public class AdaptiveQuadraticPotential implements Potential {
             this.rawVariance = times(initialVariance, weightSum);
         }
 
-        private void addSample(Map<VariableReference, DoubleTensor> samples) {
+        private void addSample(Map<VariableReference, DoubleTensor> sample) {
 
             this.weightSum += 1.0;
 
             final double proportion = 1.0 / weightSum;
 
-            for (VariableReference v : samples.keySet()) {
+            final Map<VariableReference, DoubleTensor> oldDiff = subtract(sample, mean);
+            this.mean = add(this.mean, times(oldDiff, proportion));
 
-                final DoubleTensor oldMean = mean.get(v);
-                final DoubleTensor sample = samples.get(v);
-
-                final DoubleTensor oldDiff = sample.minus(oldMean);
-
-                final DoubleTensor newMean = oldMean.plus(oldDiff.times(proportion));
-
-                this.mean.put(v, newMean);
-
-                DoubleTensor newDiff = sample.minus(newMean);
-
-                DoubleTensor oldVariance = this.rawVariance.get(v);
-
-                this.rawVariance.put(v, oldVariance.plus(oldDiff.times(newDiff)));
-            }
+            final Map<VariableReference, DoubleTensor> newDiff = subtract(sample, mean);
+            this.rawVariance = add(this.rawVariance, times(oldDiff, newDiff));
         }
 
         private Map<VariableReference, DoubleTensor> currentVariance() {
-
             return divide(rawVariance, weightSum);
         }
 

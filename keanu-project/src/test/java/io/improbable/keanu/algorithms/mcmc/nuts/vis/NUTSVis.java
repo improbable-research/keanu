@@ -66,14 +66,6 @@ public class NUTSVis extends Application {
             sampleCount
         );
 
-//        networkSamplesGenerator.stream()
-//            .limit(sampleCount)
-//            .forEach(s -> {
-//                tracePlotByVertex.forEach((v, plot) -> {
-//                    plot.addPoint(s.get((Variable<DoubleTensor, ?>) v).scalar());
-//                });
-//            });
-
         tracePlotByVertex.forEach((v, plot) -> {
             plot.addPoints(
                 posteriorSamples.get((Variable<DoubleTensor, ?>) v).asList().stream()
