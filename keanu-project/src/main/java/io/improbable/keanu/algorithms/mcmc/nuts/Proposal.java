@@ -11,9 +11,7 @@ public class Proposal {
 
     private final Map<VariableReference, DoubleTensor> position;
     private final Map<? extends VariableReference, DoubleTensor> gradient;
-    private Map<VariableReference, ?> sample;
-    private final double energy;
-    private final double pAccept;
+    private final Map<VariableReference, ?> sample;
     private final double logProb;
 
 }

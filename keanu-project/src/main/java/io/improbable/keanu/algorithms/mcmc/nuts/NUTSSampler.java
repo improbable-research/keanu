@@ -13,9 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.nuts.Tree.logSumExp;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
-
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
@@ -24,12 +21,11 @@ import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
 class NUTSSampler implements SamplingAlgorithm {
 
     private final KeanuRandom random;
-    private final List<? extends Variable<DoubleTensor, ?>> latentVariables;
     private final List<? extends Variable> sampleFromVariables;
     private final int maxTreeHeight;
     private final boolean adaptEnabled;
     private final AdaptiveStepSize stepsize;
-    private Tree tree;
+    private Proposal proposal;
     private final ProbabilisticModelWithGradient logProbGradientCalculator;
     private final Statistics statistics;
     private final boolean saveStatistics;
@@ -39,35 +35,32 @@ class NUTSSampler implements SamplingAlgorithm {
 
     /**
      * @param sampleFromVariables       variables to sample from
-     * @param latentVariables           variables that represent latent variables
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
      * @param potential                 ????
      * @param adaptEnabled              enable the NUTS step size adaptation
-     * @param stepsize                  configuration for tuning the stepsize, if adaptEnabled
-     * @param tree                      initial tree that will contain the state of the tree build
+     * @param stepSize                  configuration for tuning the stepsize, if adaptEnabled
+     * @param initialProposal           the starting proposal for the tree
      * @param maxTreeHeight             The largest tree height before stopping the hamilitonian process
      * @param random                    the source of randomness
      * @param statistics                the sampler statistics
      * @param saveStatistics            whether to record statistics
      */
     public NUTSSampler(List<? extends Variable> sampleFromVariables,
-                       List<? extends Variable<DoubleTensor, ?>> latentVariables,
                        ProbabilisticModelWithGradient logProbGradientCalculator,
                        Potential potential,
                        boolean adaptEnabled,
-                       AdaptiveStepSize stepsize,
-                       Tree tree,
+                       AdaptiveStepSize stepSize,
+                       Proposal initialProposal,
                        int maxTreeHeight,
                        KeanuRandom random,
                        Statistics statistics,
                        boolean saveStatistics) {
 
         this.sampleFromVariables = sampleFromVariables;
-        this.latentVariables = latentVariables;
         this.logProbGradientCalculator = logProbGradientCalculator;
 
-        this.tree = tree;
-        this.stepsize = stepsize;
+        this.proposal = initialProposal;
+        this.stepsize = stepSize;
         this.maxTreeHeight = maxTreeHeight;
         this.adaptEnabled = adaptEnabled;
 
@@ -83,14 +76,14 @@ class NUTSSampler implements SamplingAlgorithm {
     @Override
     public void sample(Map<VariableReference, List<?>> samples, List<Double> logOfMasterPForEachSample) {
         step();
-        addSampleFromCache(samples, tree.getProposal().getSample());
-        logOfMasterPForEachSample.add(tree.getProposal().getLogProb());
+        addSampleFromCache(samples, proposal.getSample());
+        logOfMasterPForEachSample.add(proposal.getLogProb());
     }
 
     @Override
     public NetworkSample sample() {
         step();
-        return new NetworkSample(tree.getProposal().getSample(), tree.getProposal().getLogProb());
+        return new NetworkSample(proposal.getSample(), proposal.getLogProb());
     }
 
     @Override
@@ -98,33 +91,25 @@ class NUTSSampler implements SamplingAlgorithm {
 
         Map<VariableReference, DoubleTensor> initialMomentum = potential.random();
 
-        Proposal previousProposal = tree.getProposal();
-
         Leapfrog startState = new Leapfrog(
-            previousProposal.getPosition(),
+            proposal.getPosition(),
             initialMomentum,
-            previousProposal.getGradient(),
-            previousProposal.getLogProb(),
+            proposal.getGradient(),
+            proposal.getLogProb(),
             potential
         );
 
-        Proposal initialProposal = new Proposal(
-            previousProposal.getPosition(),
-            previousProposal.getGradient(),
-            previousProposal.getSample(),
-            previousProposal.getEnergy(),
-            1.0,
-            previousProposal.getLogProb()
-        );
-
-        tree = new Tree(
+        Tree tree = new Tree(
             startState,
-            initialProposal,
+            proposal,
             0.0,
             true,
             0.0,
             1,
-            startState.getEnergy()
+            startState.getEnergy(),
+            logProbGradientCalculator,
+            sampleFromVariables,
+            random
         );
 
         int treeHeight = 0;
@@ -134,59 +119,24 @@ class NUTSSampler implements SamplingAlgorithm {
             //build tree direction -1 = backwards OR 1 = forwards
             int buildDirection = random.nextBoolean() ? 1 : -1;
 
-            Tree otherHalfTree = Tree.buildOtherHalfOfTree(
-                tree,
-                logProbGradientCalculator,
-                sampleFromVariables,
-                buildDirection,
-                treeHeight,
-                stepsize.getStepSize(),
-                random
-            );
-
-            tree.setSumMetropolisAcceptanceProbability(tree.getSumMetropolisAcceptanceProbability() + otherHalfTree.getSumMetropolisAcceptanceProbability());
-
-            tree.setTreeSize(tree.getTreeSize() + otherHalfTree.getTreeSize());
-
-            if (otherHalfTree.shouldContinue()) {
-
-                if (Tree.acceptOtherPositionWithProbability(otherHalfTree.getLogSumWeight() - tree.getLogSumWeight(), random)) {
-                    tree.setProposal(otherHalfTree.getProposal());
-                }
-
-                tree.setLogSumWeight(logSumExp(tree.getLogSumWeight(), otherHalfTree.getLogSumWeight()));
-
-                tree.setSumMomentum(add(tree.getSumMomentum(), otherHalfTree.getSumMomentum()));
-            }
-
-            tree.setShouldContinueFlag(
-                otherHalfTree.shouldContinue() &&
-                    Tree.isNotUTurning(
-                        tree.getForward().getVelocity(),
-                        tree.getBackward().getVelocity(),
-                        tree.getSumMomentum()
-                    )
-            );
+            tree.buildTree(treeHeight, buildDirection, stepsize.getStepSize());
 
             treeHeight++;
-
         }
 
+        this.proposal = tree.getProposal();
+
         if (saveStatistics) {
-            recordSamplerStatistics();
+            stepsize.save(statistics);
+            tree.save(statistics);
         }
 
         if (this.adaptEnabled) {
             stepsize.adaptStepSize(tree);
-            potential.update(tree.getProposal().getPosition(), tree.getProposal().getGradient(), sampleNum);
+            potential.update(proposal.getPosition(), proposal.getGradient(), sampleNum);
         }
 
         sampleNum++;
-    }
-
-    private void recordSamplerStatistics() {
-        stepsize.save(statistics);
-        tree.save(statistics);
     }
 
     /**

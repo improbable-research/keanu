@@ -128,20 +128,15 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         Potential potential = new AdaptiveQuadraticPotential(zeros(position), ones(position), 10.0, adaptCount, random);
 
-        Leapfrog startState = new Leapfrog(position, potential.random(), gradient, initialLogOfMasterP, potential);
-
-        Proposal initialProposal = new Proposal(position, gradient, startingSample, startState.getEnergy(), 1.0, initialLogOfMasterP);
-
-        Tree tree = new Tree(startState, initialProposal, 0.0, true, 0.0, 1, startState.getEnergy());
+        Proposal initialProposal = new Proposal(position, gradient, startingSample, initialLogOfMasterP);
 
         return new NUTSSampler(
             sampleFromVariables,
-            latentVariables,
             model,
             potential,
             adaptEnabled,
             stepsize,
-            tree,
+            initialProposal,
             maxTreeHeight,
             random,
             statistics,
