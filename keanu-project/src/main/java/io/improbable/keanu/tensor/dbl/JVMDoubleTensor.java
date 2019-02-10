@@ -220,15 +220,6 @@ public class JVMDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor times(double value) {
-        double[] result = new double[buffer.length];
-        for (int i = 0; i < buffer.length; i++) {
-            result[i] = buffer[i] * value;
-        }
-        return new JVMDoubleTensor(result, shapeCopy());
-    }
-
-    @Override
     public DoubleTensor div(double value) {
         double[] result = new double[buffer.length];
         for (int i = 0; i < buffer.length; i++) {
@@ -326,19 +317,6 @@ public class JVMDoubleTensor implements DoubleTensor {
 
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] = buffer[i] + thatBuffer[i];
-        }
-
-        return this;
-    }
-
-    @Override
-    public DoubleTensor timesInPlace(DoubleTensor that) {
-        checkElementwiseShapeMatch(that.getShape());
-
-        double[] thatBuffer = that.asFlatDoubleArray();
-
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = buffer[i] * thatBuffer[i];
         }
 
         return this;
@@ -767,14 +745,6 @@ public class JVMDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor timesInPlace(double value) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = buffer[i] * value;
-        }
-        return this;
-    }
-
-    @Override
     public DoubleTensor divInPlace(double value) {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] = buffer[i] / value;
@@ -1079,10 +1049,45 @@ public class JVMDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor timesInPlace(double value) {
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = buffer[i] * value;
+        }
+        return this;
+    }
+
+    @Override
+    public DoubleTensor times(double value) {
+        double[] result = new double[buffer.length];
+        for (int i = 0; i < buffer.length; i++) {
+            result[i] = buffer[i] * value;
+        }
+        return new JVMDoubleTensor(result, shapeCopy());
+    }
+
+    @Override
+    public DoubleTensor timesInPlace(DoubleTensor that) {
+
+        //ensure left is highest rank
+        if (that.getRank() > this.getRank()) {
+            return that.times(this);
+        }
+
+        double[] thatBuffer = that.asFlatDoubleArray();
+        int thatLength = thatBuffer.length;
+
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = buffer[i] * thatBuffer[i % thatLength];
+        }
+
+        return this;
+    }
+
+    @Override
     public DoubleTensor times(DoubleTensor that) {
 
-        //ensure left is biggest
-        if (that.getLength() > this.getLength()) {
+        //ensure left is highest rank
+        if (that.getRank() > this.getRank()) {
             return that.times(this);
         }
 

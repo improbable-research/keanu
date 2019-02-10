@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.dbl;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertDivideInPlaceOperationEquals;
@@ -15,13 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 public class Nd4jBroadcastTensorTest {
 
-    Nd4jDoubleTensor matrixA;
-
-    @Before
-    public void setup() {
-        matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-    }
-
     @Test
     public void canBroadcastMultiplyRank4ContainingVectorAndMatrix() {
 
@@ -34,7 +26,7 @@ public class Nd4jBroadcastTensorTest {
          */
 
         DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2, 1});
-        DoubleTensor matrix = matrixA.reshape(2, 2, 1, 1);
+        DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2}).reshape(2, 2, 1, 1);
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{1, 2, 6, 8, 15, 18, 28, 32}, new long[]{2, 2, 2, 1});
 
         assertTimesOperationEquals(rank4, matrix, expected);
@@ -95,7 +87,7 @@ public class Nd4jBroadcastTensorTest {
             4, 3, 2, 1, 7, 5, 8, 6
         }, new long[]{2, 2, 2, 2});
 
-        DoubleTensor matrix = matrixA.reshape(2, 2, 1, 1);
+        DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2}).reshape(2, 2, 1, 1);
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
             1, 2, 3, 4, 10, 12, 14, 16,
             12, 9, 6, 3, 28, 20, 32, 24
@@ -155,7 +147,7 @@ public class Nd4jBroadcastTensorTest {
             6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3
         }, new long[]{2, 2, 2, 2, 2});
 
-        DoubleTensor matrix = matrixA.reshape(2, 2, 1, 1, 1);
+        DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2}).reshape(2, 2, 1, 1, 1);
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 8, 6, 4, 2, 14, 10, 16, 12,
             18, 9, 6, 27, 9, 12, 21, 18, 24, 8, 20, 16, 0, 8, 4, 12
