@@ -35,6 +35,34 @@ public class JVMDoubleTensorBroadcast {
             double op(double left, double right) {
                 return left / right;
             }
+        },
+
+        GT_MASK {
+            @Override
+            double op(double left, double right) {
+                return left > right ? 1.0 : 0.0;
+            }
+        },
+
+        GTE_MASK {
+            @Override
+            double op(double left, double right) {
+                return left >= right ? 1.0 : 0.0;
+            }
+        },
+
+        LT_MASK {
+            @Override
+            double op(double left, double right) {
+                return left < right ? 1.0 : 0.0;
+            }
+        },
+
+        LTE_MASK {
+            @Override
+            double op(double left, double right) {
+                return left <= right ? 1.0 : 0.0;
+            }
         };
 
         abstract double op(double left, double right);
@@ -52,6 +80,13 @@ public class JVMDoubleTensorBroadcast {
             return elementwise(leftBuffer, rightBuffer, outputBuffer, op);
         } else {
 
+            //Short circuit for broadcast with scalars
+            if (leftShape.length == 0) {
+                return scalarLeft(leftBuffer[0], rightBuffer, outputBuffer, op);
+            } else if (rightShape.length == 0) {
+                return scalarRight(leftBuffer, rightBuffer[0], outputBuffer, op);
+            }
+
             final long[] rightStride = right.getStride();
             //Allow broadcasting from left and right
             if (leftShape.length > rightShape.length || leftBuffer.length > rightBuffer.length) {
@@ -66,8 +101,26 @@ public class JVMDoubleTensorBroadcast {
 
     private static double[] elementwise(double[] leftBuffer, double[] rightBuffer, double[] outputBuffer, BroadcastableDoubleOperation op) {
 
-        for (int i = 0; i < leftBuffer.length; i++) {
+        for (int i = 0; i < outputBuffer.length; i++) {
             outputBuffer[i] = op.op(leftBuffer[i], rightBuffer[i]);
+        }
+
+        return outputBuffer;
+    }
+
+    private static double[] scalarLeft(double left, double[] rightBuffer, double[] outputBuffer, BroadcastableDoubleOperation op) {
+
+        for (int i = 0; i < outputBuffer.length; i++) {
+            outputBuffer[i] = op.op(left, rightBuffer[i]);
+        }
+
+        return outputBuffer;
+    }
+
+    private static double[] scalarRight(double[] leftBuffer, double right, double[] outputBuffer, BroadcastableDoubleOperation op) {
+
+        for (int i = 0; i < leftBuffer.length; i++) {
+            outputBuffer[i] = op.op(leftBuffer[i], right);
         }
 
         return outputBuffer;

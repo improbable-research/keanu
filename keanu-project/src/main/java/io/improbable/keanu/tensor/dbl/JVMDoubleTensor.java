@@ -4,6 +4,9 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import org.apache.commons.math3.linear.BlockRealMatrix;
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.util.FastMath;
 import org.nd4j.linalg.api.shape.Shape;
@@ -15,6 +18,10 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.ADD;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.DIV;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.GTE_MASK;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.GT_MASK;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.LTE_MASK;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.LT_MASK;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.MUL;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.SUB;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.opWithAutoBroadcast;
@@ -25,6 +32,18 @@ public class JVMDoubleTensor implements DoubleTensor {
     private long[] shape;
     private long[] stride;
     private double[] buffer;
+
+    public JVMDoubleTensor(double value) {
+        this.shape = new long[0];
+        this.stride = new long[0];
+        this.buffer = new double[]{value};
+    }
+
+    private JVMDoubleTensor(double[] data, long[] shape) {
+        this.shape = shape;
+        this.stride = TensorShape.getRowFirstStride(shape);
+        this.buffer = data;
+    }
 
     public static JVMDoubleTensor scalar(double scalarValue) {
         return new JVMDoubleTensor(scalarValue);
@@ -61,18 +80,6 @@ public class JVMDoubleTensor implements DoubleTensor {
             }
         }
         return new JVMDoubleTensor(buffer, new long[]{n, n});
-    }
-
-    public JVMDoubleTensor(double value) {
-        this.shape = new long[0];
-        this.stride = new long[0];
-        this.buffer = new double[]{value};
-    }
-
-    private JVMDoubleTensor(double[] data, long[] shape) {
-        this.shape = shape;
-        this.stride = TensorShape.getRowFirstStride(shape);
-        this.buffer = data;
     }
 
     private double[] newBuffer() {
@@ -156,7 +163,13 @@ public class JVMDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor elementwiseEquals(Double value) {
-        return null;
+        boolean[] newBuffer = new boolean[buffer.length];
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = value.equals(buffer[i]);
+        }
+
+        return BooleanTensor.create(newBuffer, shapeCopy());
     }
 
     @Override
@@ -213,8 +226,28 @@ public class JVMDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor matrixMultiply(DoubleTensor value) {
+    public DoubleTensor matrixMultiply(DoubleTensor that) {
+
+        RealMatrix thisMatrix = asApacheRealMatrix(this);
+        RealMatrix thatMatrix = asApacheRealMatrix(that);
+
         return null;
+    }
+
+    private static RealMatrix asApacheRealMatrix(DoubleTensor matrix) {
+        long[] shape = matrix.getShape();
+        if (shape.length != 2) {
+            throw new IllegalArgumentException("Cannot convert tensor of shape " + Arrays.toString(shape) + " to a matrix.");
+        }
+
+        BlockRealMatrix out = new BlockRealMatrix((int) shape[0], (int) shape[1]);
+        for (int i = 0; i < shape[0]; i++) {
+            for (int j = 0; j < shape[1]; j++) {
+                double value = matrix.getValue(i, j);
+                out.setEntry(i, j, value);
+            }
+        }
+        return out;
     }
 
     @Override
@@ -238,36 +271,6 @@ public class JVMDoubleTensor implements DoubleTensor {
 
     @Override
     public IntegerTensor argMax(int axis) {
-        return null;
-    }
-
-    @Override
-    public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
-        return null;
-    }
-
-    @Override
-    public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanThis) {
-        return null;
-    }
-
-    @Override
-    public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
-        return null;
-    }
-
-    @Override
-    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis) {
-        return null;
-    }
-
-    @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
-        return null;
-    }
-
-    @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         return null;
     }
 
@@ -324,23 +327,143 @@ public class JVMDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public BooleanTensor lessThan(DoubleTensor value) {
-        return null;
+    public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
+        return broadcastableOp(GT_MASK, greaterThanThis);
     }
 
     @Override
-    public BooleanTensor lessThanOrEqual(DoubleTensor value) {
-        return null;
+    public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanThis) {
+        return broadcastableOp(GTE_MASK, greaterThanThis);
     }
 
     @Override
-    public BooleanTensor greaterThan(DoubleTensor value) {
-        return null;
+    public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
+        return broadcastableOp(LT_MASK, lessThanThis);
     }
 
     @Override
-    public BooleanTensor greaterThanOrEqual(DoubleTensor value) {
-        return null;
+    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis) {
+        return broadcastableOp(LTE_MASK, lessThanThis);
+    }
+
+    @Override
+    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
+        checkElementwiseShapeMatch(mask.getShape());
+
+        double[] maskBuffer = mask.asFlatDoubleArray();
+
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = maskBuffer[i] == 1.0 ? value : buffer[i];
+        }
+
+        return this;
+    }
+
+    @Override
+    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
+        checkElementwiseShapeMatch(mask.getShape());
+
+        double[] newBuffer = new double[buffer.length];
+        double[] maskBuffer = mask.asFlatDoubleArray();
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = maskBuffer[i] == 1.0 ? value : buffer[i];
+        }
+
+        return new JVMDoubleTensor(newBuffer, shapeCopy());
+    }
+
+    @Override
+    public BooleanTensor lessThan(DoubleTensor that) {
+        boolean[] newBuffer = new boolean[buffer.length];
+        double[] thatBuffer = that.asFlatDoubleArray();
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = buffer[i] < thatBuffer[i];
+        }
+
+        return BooleanTensor.create(newBuffer, shapeCopy());
+    }
+
+    @Override
+    public BooleanTensor lessThanOrEqual(DoubleTensor that) {
+        boolean[] newBuffer = new boolean[buffer.length];
+        double[] thatBuffer = that.asFlatDoubleArray();
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = buffer[i] <= thatBuffer[i];
+        }
+
+        return BooleanTensor.create(newBuffer, shapeCopy());
+    }
+
+    @Override
+    public BooleanTensor greaterThan(DoubleTensor that) {
+
+        boolean[] newBuffer = new boolean[buffer.length];
+        double[] thatBuffer = that.asFlatDoubleArray();
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = buffer[i] > thatBuffer[i];
+        }
+
+        return BooleanTensor.create(newBuffer, shapeCopy());
+    }
+
+    @Override
+    public BooleanTensor greaterThanOrEqual(DoubleTensor that) {
+        boolean[] newBuffer = new boolean[buffer.length];
+        double[] thatBuffer = that.asFlatDoubleArray();
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = buffer[i] >= thatBuffer[i];
+        }
+
+        return BooleanTensor.create(newBuffer, shapeCopy());
+    }
+
+    @Override
+    public BooleanTensor lessThan(double value) {
+        boolean[] newBuffer = new boolean[buffer.length];
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = buffer[i] < value;
+        }
+
+        return BooleanTensor.create(newBuffer, shapeCopy());
+    }
+
+    @Override
+    public BooleanTensor lessThanOrEqual(double value) {
+        boolean[] newBuffer = new boolean[buffer.length];
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = buffer[i] <= value;
+        }
+
+        return BooleanTensor.create(newBuffer, shapeCopy());
+    }
+
+    @Override
+    public BooleanTensor greaterThan(double value) {
+        boolean[] newBuffer = new boolean[buffer.length];
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = buffer[i] > value;
+        }
+
+        return BooleanTensor.create(newBuffer, shapeCopy());
+    }
+
+    @Override
+    public BooleanTensor greaterThanOrEqual(double value) {
+        boolean[] newBuffer = new boolean[buffer.length];
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = buffer[i] >= value;
+        }
+
+        return BooleanTensor.create(newBuffer, shapeCopy());
     }
 
     @Override
@@ -885,55 +1008,11 @@ public class JVMDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public BooleanTensor lessThan(double value) {
-        boolean[] newBuffer = new boolean[buffer.length];
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] < value;
-        }
-
-        return BooleanTensor.create(newBuffer, shapeCopy());
-    }
-
-    @Override
-    public BooleanTensor lessThanOrEqual(double value) {
-        boolean[] newBuffer = new boolean[buffer.length];
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] <= value;
-        }
-
-        return BooleanTensor.create(newBuffer, shapeCopy());
-    }
-
-    @Override
-    public BooleanTensor greaterThan(double value) {
-        boolean[] newBuffer = new boolean[buffer.length];
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] > value;
-        }
-
-        return BooleanTensor.create(newBuffer, shapeCopy());
-    }
-
-    @Override
-    public BooleanTensor greaterThanOrEqual(double value) {
-        boolean[] newBuffer = new boolean[buffer.length];
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] >= value;
-        }
-
-        return BooleanTensor.create(newBuffer, shapeCopy());
-    }
-
-    @Override
     public BooleanTensor notNaN() {
         boolean[] newBuffer = new boolean[buffer.length];
 
         for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = Double.isNaN(buffer[i]);
+            newBuffer[i] = !Double.isNaN(buffer[i]);
         }
 
         return BooleanTensor.create(newBuffer, shapeCopy());
@@ -1092,9 +1171,7 @@ public class JVMDoubleTensor implements DoubleTensor {
             outputBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
         }
 
-        opWithAutoBroadcast(buffer, shape, stride, that, outputBuffer, op);
-
-        this.buffer = outputBuffer;
+        this.buffer = opWithAutoBroadcast(buffer, shape, stride, that, outputBuffer, op);;
         this.shape = resultShape;
 
         return this;
