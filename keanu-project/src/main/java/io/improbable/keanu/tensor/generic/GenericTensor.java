@@ -76,11 +76,6 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public boolean isShapePlaceholder() {
-        return data == null;
-    }
-
-    @Override
     public T getValue(long... index) {
         return data[checkedCast(getFlatIndex(shape, stride, index))];
     }

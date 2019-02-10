@@ -264,11 +264,6 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public boolean isShapePlaceholder() {
-        return data == null;
-    }
-
-    @Override
     public Boolean getValue(long... index) {
         return data[checkedCast(getFlatIndex(shape, stride, index))];
     }

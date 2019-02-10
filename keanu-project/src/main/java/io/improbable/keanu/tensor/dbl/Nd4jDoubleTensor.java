@@ -122,11 +122,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return tensor.lengthLong();
     }
 
-    @Override
-    public boolean isShapePlaceholder() {
-        return tensor == null;
-    }
-
     public Double getValue(long... index) {
         return tensor.getDouble(index);
     }

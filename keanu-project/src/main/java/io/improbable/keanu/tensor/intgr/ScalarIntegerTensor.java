@@ -44,12 +44,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public long getLength() {
-        return isShapePlaceholder() ? 0L : 1L;
-    }
-
-    @Override
-    public boolean isShapePlaceholder() {
-        return value == null;
+        return 1;
     }
 
     @Override

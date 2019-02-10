@@ -569,11 +569,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public boolean isShapePlaceholder() {
-        return tensor == null;
-    }
-
-    @Override
     public Integer getValue(long... index) {
         return (int) tensor.getDouble(index);
     }
