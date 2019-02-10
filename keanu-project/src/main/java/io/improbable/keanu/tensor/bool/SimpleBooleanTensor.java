@@ -259,6 +259,11 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public long[] getStride() {
+        return stride;
+    }
+
+    @Override
     public long getLength() {
         return data.length;
     }

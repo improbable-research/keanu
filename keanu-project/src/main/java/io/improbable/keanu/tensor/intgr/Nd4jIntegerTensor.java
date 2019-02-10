@@ -564,6 +564,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public long[] getStride() {
+        return tensor.stride();
+    }
+
+    @Override
     public long getLength() {
         return tensor.lengthLong();
     }

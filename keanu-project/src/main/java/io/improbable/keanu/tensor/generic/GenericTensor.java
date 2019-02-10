@@ -71,6 +71,11 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
+    public long[] getStride() {
+        return stride;
+    }
+
+    @Override
     public long getLength() {
         return TensorShape.getLength(shape);
     }

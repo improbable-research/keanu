@@ -111,7 +111,7 @@ public class JVMDoubleTensorTest {
 
     @Test
     public void canSetWhereGreaterThanAMatrix() {
-        DoubleTensor mask = matrixA.getGreaterThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
+        DoubleTensor mask = matrixA.getGreaterThanMask(JVMDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{1, 2, -2, -2}, result.asFlatDoubleArray(), 0.0);
@@ -119,7 +119,7 @@ public class JVMDoubleTensorTest {
 
     @Test
     public void canSetWhereGreaterThanAScalar() {
-        DoubleTensor mask = matrixA.getGreaterThanMask(Nd4jDoubleTensor.scalar(2.0));
+        DoubleTensor mask = matrixA.getGreaterThanMask(JVMDoubleTensor.scalar(2.0));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{1, 2, -2, -2}, result.asFlatDoubleArray(), 0.0);
@@ -127,7 +127,7 @@ public class JVMDoubleTensorTest {
 
     @Test
     public void canSetWhereLessThanOrEqualAMatrix() {
-        DoubleTensor mask = matrixA.getLessThanOrEqualToMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
+        DoubleTensor mask = matrixA.getLessThanOrEqualToMask(JVMDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, -2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -135,7 +135,7 @@ public class JVMDoubleTensorTest {
 
     @Test
     public void canSetWhereLessThanOrEqualAScalar() {
-        DoubleTensor mask = matrixA.getLessThanOrEqualToMask(Nd4jDoubleTensor.scalar(2.0));
+        DoubleTensor mask = matrixA.getLessThanOrEqualToMask(JVMDoubleTensor.scalar(2.0));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, -2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -143,7 +143,7 @@ public class JVMDoubleTensorTest {
 
     @Test
     public void canSetWhereLessThanAMatrix() {
-        DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
+        DoubleTensor mask = matrixA.getLessThanMask(JVMDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -151,7 +151,7 @@ public class JVMDoubleTensorTest {
 
     @Test
     public void canSetWhereLessThanAScalar() {
-        DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.scalar(2.0));
+        DoubleTensor mask = matrixA.getLessThanMask(JVMDoubleTensor.scalar(2.0));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -163,7 +163,7 @@ public class JVMDoubleTensorTest {
     @Test
 
     public void canSetToZero() {
-        DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
+        DoubleTensor mask = matrixA.getLessThanMask(JVMDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, 0.0);
 
         assertArrayEquals(new double[]{0, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -171,13 +171,13 @@ public class JVMDoubleTensorTest {
 
     @Test
     public void canTestIfIsNaN() {
-        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new long[]{2, 2});
+        JVMDoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new long[]{2, 2});
         assertThat(matrix.isNaN(), hasValue(false, false, true, false));
     }
 
     @Test
     public void canSetWhenNaN() {
-        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new long[]{2, 2});
+        JVMDoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new long[]{2, 2});
 
         DoubleTensor mask = DoubleTensor.ones(matrix.getShape());
         DoubleTensor result = matrix.setWithMaskInPlace(mask, -2.0);
@@ -187,7 +187,7 @@ public class JVMDoubleTensorTest {
 
     @Test
     public void canSetToZeroWhenNaN() {
-        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new long[]{2, 2});
+        JVMDoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new long[]{2, 2});
 
         DoubleTensor mask = DoubleTensor.ones(matrix.getShape());
         DoubleTensor result = matrix.setWithMaskInPlace(mask, 0.0);

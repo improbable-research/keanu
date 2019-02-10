@@ -47,6 +47,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public long[] getStride() {
+        return new long[0];
+    }
+
+    @Override
     public long getLength() {
         return 1;
     }

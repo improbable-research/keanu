@@ -43,6 +43,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public long[] getStride() {
+        return new long[0];
+    }
+
+    @Override
     public long getLength() {
         return 1;
     }
