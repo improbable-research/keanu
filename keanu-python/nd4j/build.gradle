@@ -11,3 +11,14 @@ task copyNd4jJars(type: Copy) {
     into "nd4j/classpath/"
     from configurations.compile
 }
+
+task deleteUnneededJarsFromNd4jClasspath(type: Delete) {
+    mustRunAfter(copyNd4jJars)
+    delete fileTree("./nd4j/classpath/") {
+        include "*-android-*"
+        include "*-ios-*"
+        include "*-x86.jar"
+        include "*-ppc64le.jar"
+        include "*-armhf.jar"
+    }
+}
