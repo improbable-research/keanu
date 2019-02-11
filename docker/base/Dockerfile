@@ -1,15 +1,6 @@
 FROM python:3.6.6-stretch
 
-
-# A few reasons for installing distribution-provided OpenJDK:
-#
-#  1. Oracle.  Licensing prevents us from redistributing the official JDK.
-#
-#  2. Compiling OpenJDK also requires the JDK to be installed, and it gets
-#     really hairy.
-#
-#     For some sample build times, see Debian's buildd logs:
-#       https://buildd.debian.org/status/logs.php?pkg=openjdk-8
+# Installing distribution-provided OpenJDK:
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		bzip2 \
@@ -20,8 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Default to UTF-8 file.encoding
 ENV LANG C.UTF-8
 
-# add a simple script that can auto-detect the appropriate JAVA_HOME value
-# based on whether the JDK or only the JRE is installed
+# Auto-detect the appropriate JAVA_HOME value based on whether the JDK or only the JRE is installed
 RUN { \
 		echo '#!/bin/sh'; \
 		echo 'set -e'; \
@@ -30,7 +20,6 @@ RUN { \
 	} > /usr/local/bin/docker-java-home \
 	&& chmod +x /usr/local/bin/docker-java-home
 
-# do some fancy footwork to create a JAVA_HOME that's cross-architecture-safe
 RUN ln -svT "/usr/lib/jvm/java-8-openjdk-$(dpkg --print-architecture)" /docker-java-home
 ENV JAVA_HOME /docker-java-home
 
@@ -67,10 +56,3 @@ RUN set -ex; \
 RUN /var/lib/dpkg/info/ca-certificates-java.postinst configure
 
 RUN pip install JPype1==0.6.3
-
-COPY . /home/gradle/project/
-
-USER root
-
-WORKDIR /home/gradle/project/var/keanu
-RUN ./gradlew clean
