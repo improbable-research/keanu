@@ -329,6 +329,12 @@ def test_can_pass_none_label() -> None:
     assert vertex.get_label() == None
 
 
+def test_can_pass_namespaced_label() -> None:
+    vertex = Gaussian(0., 1., label="outer.inner.foo")
+    assert vertex.get_label() == "outer.inner.foo"
+    assert vertex.unwrap().getLabel().getUnqualifiedName() == "foo"
+
+
 def test_set_label() -> None:
     label = "gaussian_vertex"
     vertex = Gaussian(0., 1.)
