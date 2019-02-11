@@ -10,13 +10,8 @@ fi
 repo_top_level_dir=`git rev-parse --show-toplevel`
 cd ${repo_top_level_dir}/java
 
-# clone dependencies
-dependency='keanu'
-rm -rf ./var/${dependency}
-git clone "git@github.com:improbable-research/${dependency}.git" "./var/${dependency}"
-
-docker build -t gradle-image .
+docker build -t build-image -f docker/build/Dockerfile .
 exec docker run \
     --rm \
-    gradle-image \
+    build-image \
     ./gradlew clean build
