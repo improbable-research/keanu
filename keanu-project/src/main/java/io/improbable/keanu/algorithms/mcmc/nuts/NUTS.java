@@ -14,6 +14,7 @@ import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -31,7 +32,7 @@ import static java.util.stream.Collectors.toMap;
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class NUTS implements PosteriorSamplingAlgorithm {
 
     public static NUTSBuilder builder() {
@@ -43,33 +44,35 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     }
 
     @Getter
-    private KeanuRandom random;
-
-    //The number of samples for which the step size will be tuned. For the remaining samples
-    //in which it is not tuned, the step size will be frozen to its last calculated value
-    @Getter
-    private int adaptCount;
+    private final KeanuRandom random;
 
     //The target acceptance probability, a suggested value of this is 0.65,
     //Beskos et al., 2010; Neal, 2011
     @Getter
-    private double targetAcceptanceProb;
+    private final double targetAcceptanceProb;
+
+    //The number of samples for which the step size and potential will be tuned. For the remaining samples
+    //in which it is not tuned, the step size will be frozen to its last calculated value
+    @Getter
+    private final int adaptCount;
 
     //Determines whether the step size wil
     // l adapt during the first adaptCount samples
-    private boolean adaptEnabled;
+    private final boolean adaptStepSizeEnabled;
 
     //Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.
-    private Double initialStepSize;
+    private final Double initialStepSize;
 
-    private double maxEnergyChange;
+    private final boolean adaptPotentialEnabled;
+
+    private final double maxEnergyChange;
 
     //The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This
     //will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample.
-    private int maxTreeHeight;
+    private final int maxTreeHeight;
 
     //Sets whether or not to save debug STATISTICS. The STATISTICS available are: Step size, Log Prob, Mean Tree Acceptance Prob, Tree Size.
-    private boolean saveStatistics;
+    private final boolean saveStatistics;
 
     private final Statistics statistics = new Statistics(Metrics.values());
 
@@ -119,7 +122,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             findStartingStepSizeSimple(0.25, latentVariables) :
             initialStepSize;
 
-        AdaptiveStepSize stepsize = new AdaptiveStepSize(
+        AdaptiveStepSize stepSize = new AdaptiveStepSize(
             startingStepSize,
             targetAcceptanceProb,
             adaptCount
@@ -132,9 +135,10 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         return new NUTSSampler(
             sampleFromVariables,
             model,
+            adaptPotentialEnabled,
             potential,
-            adaptEnabled,
-            stepsize,
+            adaptStepSizeEnabled,
+            stepSize,
             maxEnergyChange,
             initialProposal,
             maxTreeHeight,
@@ -150,48 +154,69 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     public static class NUTSBuilder {
         private KeanuRandom random = KeanuRandom.getDefaultRandom();
+
         private int adaptCount = 1000;
-        private double targetAcceptanceProb = 0.8;
-        private boolean adaptEnabled = true;
+        private boolean adaptStepSizeEnabled = true;
         private Double initialStepSize = null;
+        private boolean adaptPotentialEnabled = true;
+
+        private double targetAcceptanceProb = 0.8;
         private double maxEnergyChange = 1000.0;
         private int maxTreeHeight = 10;
-        private boolean saveStatistics = false;
 
-        NUTSBuilder() {
-        }
+        private boolean saveStatistics = false;
 
         public NUTSBuilder random(KeanuRandom random) {
             this.random = random;
             return this;
         }
 
-        public NUTSBuilder adaptCount(int adaptCount) {
-            this.adaptCount = adaptCount;
-            return this;
-        }
-
         public NUTSBuilder targetAcceptanceProb(double targetAcceptanceProb) {
+            if (targetAcceptanceProb > 1.0 || targetAcceptanceProb < 0) {
+                throw new IllegalArgumentException("Target acceptance probability must be between 0.0 and 1.");
+            }
             this.targetAcceptanceProb = targetAcceptanceProb;
             return this;
         }
 
-        public NUTSBuilder adaptEnabled(boolean adaptEnabled) {
-            this.adaptEnabled = adaptEnabled;
+        public NUTSBuilder adaptStepSizeEnabled(boolean adaptEnabled) {
+            this.adaptStepSizeEnabled = adaptEnabled;
+            return this;
+        }
+
+        public NUTSBuilder adaptCount(int adaptCount) {
+            if (adaptCount < 0) {
+                throw new IllegalArgumentException("Adapt count must be greater than or equal to 0");
+            }
+            this.adaptCount = adaptCount;
             return this;
         }
 
         public NUTSBuilder initialStepSize(Double initialStepSize) {
+            if (initialStepSize <= 0) {
+                throw new IllegalArgumentException("Initial step size must be greater than 0");
+            }
             this.initialStepSize = initialStepSize;
             return this;
         }
 
+        public NUTSBuilder adaptPotentialEnabled(boolean adaptPotentialEnabled) {
+            this.adaptPotentialEnabled = adaptPotentialEnabled;
+            return this;
+        }
+
         public NUTSBuilder maxEnergyChange(double maxEnergyChange) {
+            if (maxEnergyChange <= 0) {
+                throw new IllegalArgumentException("Max energy change must be greater than 0");
+            }
             this.maxEnergyChange = maxEnergyChange;
             return this;
         }
 
         public NUTSBuilder maxTreeHeight(int maxTreeHeight) {
+            if (maxTreeHeight <= 0) {
+                throw new IllegalArgumentException("Max tree height must be greater than 0");
+            }
             this.maxTreeHeight = maxTreeHeight;
             return this;
         }
@@ -202,11 +227,15 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         }
 
         public NUTS build() {
-            return new NUTS(random, adaptCount, targetAcceptanceProb, adaptEnabled, initialStepSize, maxEnergyChange, maxTreeHeight, saveStatistics);
+            return new NUTS(random, targetAcceptanceProb, adaptCount, adaptStepSizeEnabled, initialStepSize,
+                adaptPotentialEnabled, maxEnergyChange, maxTreeHeight, saveStatistics);
         }
 
         public String toString() {
-            return "NUTS.NUTSBuilder(random=" + this.random + ", adaptCount=" + this.adaptCount + ", targetAcceptanceProb=" + this.targetAcceptanceProb + ", adaptEnabled=" + this.adaptEnabled + ", initialStepSize=" + this.initialStepSize + ", maxTreeHeight=" + this.maxTreeHeight + ", saveStatistics=" + this.saveStatistics + ")";
+            return "NUTS.NUTSBuilder(random=" + this.random + ", adaptCount=" + this.adaptCount +
+                ", targetAcceptanceProb=" + this.targetAcceptanceProb + ", adaptStepSizeEnabled=" +
+                this.adaptStepSizeEnabled + ", initialStepSize=" + this.initialStepSize + ", maxTreeHeight=" +
+                this.maxTreeHeight + ", saveStatistics=" + this.saveStatistics + ")";
         }
     }
 }

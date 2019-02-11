@@ -46,7 +46,7 @@ public class SumGaussiansForVis implements ModelForNUTSVis {
         samplingAlgorithm = Keanu.Sampling.NUTS.builder()
             .adaptCount(sampleCount)
             .maxTreeHeight(7)
-//            .adaptEnabled(false)
+//            .adaptStepSizeEnabled(false)
             .saveStatistics(true)
             .build();
 

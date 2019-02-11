@@ -87,4 +87,24 @@ public class AdaptiveStepSizeTest {
         return tune.adaptStepSize(mockedTree);
     }
 
+    @Test
+    public void givenAdaptStepSizeZeroThenShouldReturnInitialStepSize() {
+
+        double initialStepSize = 0.1;
+        AdaptiveStepSize tune = new AdaptiveStepSize(
+            initialStepSize,
+            0.65,
+            0
+        );
+
+        assertEquals(initialStepSize, tune.getStepSize());
+
+        Tree mockedTree = mock(Tree.class);
+        when(mockedTree.getSumMetropolisAcceptanceProbability()).thenAnswer(i -> 0.65);
+        when(mockedTree.getTreeSize()).thenAnswer(i -> 1);
+
+        assertEquals(initialStepSize, tune.adaptStepSize(mockedTree), 1e-9);
+        assertEquals(initialStepSize, tune.getStepSize(), 1e-9);
+    }
+
 }

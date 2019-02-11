@@ -48,7 +48,7 @@ public class NUTSTest {
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(simpleGaussian);
 
         NUTS nuts = NUTS.builder()
-            .adaptEnabled(false)
+            .adaptStepSizeEnabled(false)
             .initialStepSize(initStepSize)
             .maxTreeHeight(maxTreeHeight)
             .saveStatistics(true)
@@ -244,4 +244,35 @@ public class NUTSTest {
         Assert.assertEquals(-1.3168733581639154, samples.get(19).scalar(), epsilon);
 
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateAdapStepSizeCount() {
+        NUTS.builder().adaptCount(-1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateInitialStepSize() {
+        NUTS.builder().initialStepSize(-0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateTargetAcceptanceUpper() {
+        NUTS.builder().targetAcceptanceProb(1.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateTargetAcceptanceLower() {
+        NUTS.builder().targetAcceptanceProb(-0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateMaxEnergyChange() {
+        NUTS.builder().maxEnergyChange(-0.1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesValidateMaxTreeHeight() {
+        NUTS.builder().maxTreeHeight(0);
+    }
+
 }

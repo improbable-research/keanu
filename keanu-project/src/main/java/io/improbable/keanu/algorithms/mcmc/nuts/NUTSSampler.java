@@ -22,25 +22,33 @@ class NUTSSampler implements SamplingAlgorithm {
 
     private final KeanuRandom random;
     private final List<? extends Variable> sampleFromVariables;
+
     private final int maxTreeHeight;
-    private final boolean adaptEnabled;
+
+    private final boolean adaptStepSizeEnabled;
     private final AdaptiveStepSize stepSize;
+
     private final double maxEnergyChange;
     private final ProbabilisticModelWithGradient logProbGradientCalculator;
     private final LeapfrogIntegrator leapfrogIntegrator;
+
     private final Statistics statistics;
     private final boolean saveStatistics;
+
+    private final boolean adapPotentialEnabled;
     private final Potential potential;
 
     private Proposal proposal;
+
     private int sampleNum;
 
     /**
      * @param sampleFromVariables       variables to sample from
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
+     * @param adapPotentialEnabled      enabled the potential adaption
      * @param potential                 ????
-     * @param adaptEnabled              enable the NUTS step size adaptation
-     * @param stepSize                  configuration for tuning the stepSize, if adaptEnabled
+     * @param adaptStepSizeEnabled      enable the NUTS step size adaptation
+     * @param stepSize                  configuration for tuning the stepSize, if adaptStepSizeEnabled
      * @param initialProposal           the starting proposal for the tree
      * @param maxTreeHeight             The largest tree height before stopping the hamilitonian process
      * @param random                    the source of randomness
@@ -49,8 +57,9 @@ class NUTSSampler implements SamplingAlgorithm {
      */
     public NUTSSampler(List<? extends Variable> sampleFromVariables,
                        ProbabilisticModelWithGradient logProbGradientCalculator,
+                       boolean adapPotentialEnabled,
                        Potential potential,
-                       boolean adaptEnabled,
+                       boolean adaptStepSizeEnabled,
                        AdaptiveStepSize stepSize,
                        double maxEnergyChange,
                        Proposal initialProposal,
@@ -67,7 +76,7 @@ class NUTSSampler implements SamplingAlgorithm {
         this.stepSize = stepSize;
         this.maxEnergyChange = maxEnergyChange;
         this.maxTreeHeight = maxTreeHeight;
-        this.adaptEnabled = adaptEnabled;
+        this.adaptStepSizeEnabled = adaptStepSizeEnabled;
 
         this.random = random;
         this.statistics = statistics;
@@ -75,6 +84,7 @@ class NUTSSampler implements SamplingAlgorithm {
 
         this.sampleNum = 1;
 
+        this.adapPotentialEnabled = adapPotentialEnabled;
         this.potential = potential;
     }
 
@@ -129,8 +139,11 @@ class NUTSSampler implements SamplingAlgorithm {
             tree.save(statistics);
         }
 
-        if (this.adaptEnabled) {
+        if (this.adaptStepSizeEnabled) {
             stepSize.adaptStepSize(tree);
+        }
+
+        if (this.adapPotentialEnabled) {
             potential.update(proposal.getPosition(), proposal.getGradient(), sampleNum);
         }
 
