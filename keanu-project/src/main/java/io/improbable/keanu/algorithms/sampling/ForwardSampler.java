@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.sampling;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
@@ -38,14 +39,15 @@ public class ForwardSampler {
      * Non probabilistic variables are computed second.
      *
      * @param network the network to sample from
-     * @param fromVariables the variables to sample from
+     * @param fromVertices the variables to sample from
      * @param sampleCount the number of samples to take
      * @return sampling samples of a computable graph
      */
+
     public NetworkSamples sample(BayesianNetwork network,
-                                        List<Vertex> fromVariables,
-                                        int sampleCount) {
-        return sample(network, fromVariables, sampleCount, KeanuRandom.getDefaultRandom());
+                                 List<Vertex> fromVertices,
+                                 int sampleCount) {
+        return sample(network, fromVertices, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
     public NetworkSamples sample(BayesianNetwork network,
@@ -60,10 +62,12 @@ public class ForwardSampler {
         Set<Vertex> allUpstreamVertices = upstreamVertices(fromVertices);
         List<Vertex> sortedVertices = TopologicalSort.sort(allUpstreamVertices);
 
+        sortedVertices = pruneNonProbabilistic(sortedVertices);
+
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
             for (Vertex vertex : sortedVertices) {
                 if (vertex instanceof Probabilistic) {
-                    vertex.setValue(((Probabilistic) vertex).sample());
+                    vertex.setValue(((Probabilistic) vertex).sample(random));
                 } else if (vertex instanceof NonProbabilistic){
                     vertex.setValue(((NonProbabilistic) vertex).calculate());
                 }
@@ -73,6 +77,18 @@ public class ForwardSampler {
 
         ArrayList<Double> logProb = new ArrayList<>(Collections.nCopies(sampleCount, LOG_PROB_OF_PRIOR));
         return new NetworkSamples(samplesByVertex, logProb, sampleCount);
+    }
+
+    private List<Vertex> pruneNonProbabilistic(List<Vertex> vertices) {
+        for (int i = 0; i < vertices.size(); i++) {
+            Vertex vertex = vertices.get(i);
+            if (!(vertex instanceof Probabilistic)) {
+                vertices.remove(i);
+            } else {
+                break;
+            }
+        }
+        return vertices;
     }
 
     private Set<Vertex> upstreamVertices(List<Vertex> fromVertices) {

@@ -71,6 +71,19 @@ public class ForwardSamplerTest {
     }
 
     @Test
+    public void nonProbabilisticVerticesAreRecomputedDuringForwardSample() {
+        AtomicInteger opCount = new AtomicInteger(0);
+
+        GaussianVertex A = new GaussianVertex(0, 1);
+        TestGraphGenerator.PassThroughVertex B = new TestGraphGenerator.PassThroughVertex(A, opCount, null, id -> log.info("OP on id:" + id));
+
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(A, B), 100, random);
+
+        assertEquals(100, opCount.get());
+    }
+
+    @Test
     public void samplesInTopologicalOrder() {
         ConstantDoubleVertex A = ConstantVertex.of(1.0);
         ConstantDoubleVertex B = ConstantVertex.of(2.0);
@@ -120,16 +133,28 @@ public class ForwardSamplerTest {
     }
 
     @Test
-    public void nonProbabilisticVerticesAreRecomputedDuringForwardSample() {
-        AtomicInteger opCount = new AtomicInteger(0);
+    public void removesNonProbabilisticVerticesAtTopOfTree() {
+        ConstantDoubleVertex A = ConstantVertex.of(1.0);
+        ConstantDoubleVertex B = ConstantVertex.of(2.0);
+        ConstantDoubleVertex C = ConstantVertex.of(3.0);
 
-        GaussianVertex A = new GaussianVertex(0, 1);
-        TestGraphGenerator.PassThroughVertex B = new TestGraphGenerator.PassThroughVertex(A, opCount, null, id -> log.info("OP on id:" + id));
+        ArrayList<VertexId> ids = new ArrayList<>();
+
+        NonProbabilisticIDTrackerVertex trackerOne = new NonProbabilisticIDTrackerVertex(A, B, ids);
+        NonProbabilisticIDTrackerVertex trackerTwo = new NonProbabilisticIDTrackerVertex(B, C, ids);
+
+        IDTrackerVertex trackerThree = new IDTrackerVertex(trackerOne, trackerTwo, ids);
+        IDTrackerVertex trackerFour = new IDTrackerVertex(trackerThree, ConstantVertex.of(5.0), ids);
+
+        NonProbabilisticIDTrackerVertex trackerFive = new NonProbabilisticIDTrackerVertex(trackerThree, trackerFour, ids);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(A, B), 100, random);
 
-        assertEquals(100, opCount.get());
+        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour, trackerFive), 1);
+
+        assertEquals(trackerThree.getId(), ids.get(0));
+        assertEquals(trackerFour.getId(), ids.get(1));
+        assertEquals(trackerFive.getId(), ids.get(2));
     }
 
     public static class IDTrackerVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble {
