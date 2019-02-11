@@ -14,6 +14,7 @@ task copyNd4jJars(type: Copy) {
 
 task deleteUnneededJarsFromNd4jClasspath(type: Delete) {
     mustRunAfter(copyNd4jJars)
+    mustRunAfter(":keanu-python:deleteDuplicatedJars")
     delete fileTree("./nd4j/classpath/") {
         include "*-android-*"
         include "*-ios-*"
