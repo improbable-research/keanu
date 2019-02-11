@@ -41,21 +41,11 @@ public class ForwardSamplerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void throwIfSampleFromHasUpstreamRandomVariables() {
+    public void throwIfSampleFromHasObservationsDownstreamOfLatents() {
         GaussianVertex A = new GaussianVertex(100.0, 1);
         DoubleVertex B = A.plus(ConstantVertex.of(5.));
         GaussianVertex C = new GaussianVertex(B, 1.);
-
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-
-        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Collections.singletonList(C), 1000, random);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void throwIfSampleFromHasObservations() {
-        GaussianVertex A = new GaussianVertex(100.0, 1);
-        DoubleVertex B = A.plus(ConstantVertex.of(5.));
-        A.observe(100.);
+        C.observe(100.);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
@@ -90,20 +80,43 @@ public class ForwardSamplerTest {
 
         IDTrackerVertex trackerOne = new IDTrackerVertex(A, B, ids);
         IDTrackerVertex trackerTwo = new IDTrackerVertex(B, C, ids);
+
         NonProbabilisticIDTrackerVertex trackerThree = new NonProbabilisticIDTrackerVertex(trackerOne, trackerTwo, ids);
         NonProbabilisticIDTrackerVertex trackerFour = new NonProbabilisticIDTrackerVertex(trackerThree, ConstantVertex.of(5.0), ids);
 
-        trackerOne.setValue(1.);
-        trackerTwo.setValue(1.);
+        IDTrackerVertex trackerFive = new IDTrackerVertex(trackerTwo, trackerFour, ids);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour), 1);
+        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour, trackerFive), 1);
 
         assertEquals(trackerOne.getId(), ids.get(0));
         assertEquals(trackerTwo.getId(), ids.get(1));
         assertEquals(trackerThree.getId(), ids.get(2));
         assertEquals(trackerFour.getId(), ids.get(3));
+        assertEquals(trackerFive.getId(), ids.get(4));
+    }
+
+    @Test
+    public void correctlySamplesFromVariablesThatAreInUpstreamOfSampleFrom() {
+        ConstantDoubleVertex A = ConstantVertex.of(1.0);
+        ConstantDoubleVertex B = ConstantVertex.of(2.0);
+        ConstantDoubleVertex C = ConstantVertex.of(3.0);
+
+        ArrayList<VertexId> ids = new ArrayList<>();
+
+        IDTrackerVertex trackerOne = new IDTrackerVertex(A, B, ids);
+        IDTrackerVertex trackerTwo = new IDTrackerVertex(B, C, ids);
+
+        IDTrackerVertex trackerThree = new IDTrackerVertex(trackerOne, trackerTwo, ids);
+
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+
+        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Collections.singletonList(trackerThree), 1);
+
+        assertEquals(trackerOne.getId(), ids.get(0));
+        assertEquals(trackerTwo.getId(), ids.get(1));
+        assertEquals(trackerThree.getId(), ids.get(2));
     }
 
     @Test

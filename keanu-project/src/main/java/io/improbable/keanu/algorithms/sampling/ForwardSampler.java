@@ -5,15 +5,12 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.algorithms.mcmc.KeanuProposalApplicationStrategy;
-import io.improbable.keanu.algorithms.mcmc.ProposalApplicationStrategy;
+import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
-import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.backend.ComputableModel;
-import io.improbable.keanu.backend.KeanuComputableModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.LambdaSection;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import org.nd4j.base.Preconditions;
@@ -25,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ForwardSampler {
 
@@ -47,63 +43,58 @@ public class ForwardSampler {
      * @return sampling samples of a computable graph
      */
     public NetworkSamples sample(BayesianNetwork network,
-                                        List<? extends Variable> fromVariables,
+                                        List<Vertex> fromVariables,
                                         int sampleCount) {
         return sample(network, fromVariables, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
     public NetworkSamples sample(BayesianNetwork network,
-                                        List<? extends Variable> fromVariables,
+                                        List<Vertex> fromVertices,
                                         int sampleCount,
                                         KeanuRandom random) {
 
-        Preconditions.checkArgument(network.getObservedVertices().size() == 0, "Cannot forward sample from a network with observations");
+        Map<VariableReference, List<?>> samplesByVertex = new HashMap<>();
+        List<Vertex> observedVertices = network.getObservedVertices();
+        upstreamOfObservedDoesNotContainProbabilistic(observedVertices);
 
-        List<Vertex> fromVertices = fromVariables.stream().map(v -> (Vertex) v).collect(Collectors.toList());
-
-        Set<Vertex> probabilisticSubset = fromVertices.stream().filter(v -> v instanceof Probabilistic).collect(Collectors.toSet());
-        Set<Vertex> nonProbabilisticSubset = fromVertices.stream().filter( v -> !(v instanceof Probabilistic)).collect(Collectors.toSet());
-
-        upstreamOfProbabilisticDoesNotContainProbabilistic(probabilisticSubset);
-
-        ComputableModel graph = new KeanuComputableModel(new HashSet<>(network.getAllVertices()));
-        KeanuProposalApplicationStrategy proposalApplicationStrategy = new KeanuProposalApplicationStrategy(probabilisticSubset);
-
-        return sample(graph, probabilisticSubset, nonProbabilisticSubset, proposalApplicationStrategy, sampleCount, random);
-    }
-
-    private NetworkSamples sample(ComputableModel graph,
-                                        Set<? extends Variable> probabilisticFromVariables,
-                                        Set<? extends Variable> nonProbabilisticFromVariables,
-                                        ProposalApplicationStrategy proposalApplicationStrategy,
-                                        int sampleCount,
-                                        KeanuRandom random) {
-
-        Set<? extends Variable> allSampleFromVariables = Sets.union(probabilisticFromVariables, nonProbabilisticFromVariables);
-        Map<VariableReference, List> samplesByVariable = new HashMap<>();
+        Set<Vertex> allUpstreamVertices = upstreamVertices(fromVertices);
+        List<Vertex> sortedVertices = TopologicalSort.sort(allUpstreamVertices);
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
-            Proposal probabilisticVariableProposal = PRIOR_PROPOSAL.getProposal(probabilisticFromVariables, random);
-            proposalApplicationStrategy.apply(probabilisticVariableProposal);
-            graph.compute(Collections.EMPTY_MAP, nonProbabilisticFromVariables.stream().map(Variable::getReference).collect(Collectors.toList()));
-            takeSamples(samplesByVariable, allSampleFromVariables);
+            for (Vertex vertex : sortedVertices) {
+                if (vertex instanceof Probabilistic) {
+                    vertex.setValue(((Probabilistic) vertex).sample());
+                } else if (vertex instanceof NonProbabilistic){
+                    vertex.setValue(((NonProbabilistic) vertex).calculate());
+                }
+            }
+            takeSamples(samplesByVertex, fromVertices);
         }
 
         ArrayList<Double> logProb = new ArrayList<>(Collections.nCopies(sampleCount, LOG_PROB_OF_PRIOR));
-
-        return new NetworkSamples(samplesByVariable, logProb, sampleCount);
+        return new NetworkSamples(samplesByVertex, logProb, sampleCount);
     }
 
-    private void takeSamples(Map<VariableReference, List> samples, Set<? extends Variable> fromVariables) {
-        fromVariables.forEach(variable -> addVariableValue(variable, samples));
+    private Set<Vertex> upstreamVertices(List<Vertex> fromVertices) {
+        Set<Vertex> upstream = new HashSet<>();
+        for (Vertex vertex : fromVertices) {
+            LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(vertex, true);
+            Set<Vertex> vertexUpsteam = upstreamLambdaSection.getAllVertices();
+            upstream = Sets.union(upstream, vertexUpsteam);
+        }
+        return upstream;
     }
 
-    private void addVariableValue(Variable variable, Map<VariableReference, List> samples) {
+    private void takeSamples(Map<VariableReference, List<?>> samples, List<Vertex> fromVertices) {
+        fromVertices.forEach(variable -> addVariableValue(variable, samples));
+    }
+
+    private void addVariableValue(Variable variable, Map<VariableReference, List<?>> samples) {
         List samplesForVariable = samples.computeIfAbsent(variable.getReference(), v -> new ArrayList<>());
         samplesForVariable.add(variable.getValue());
     }
 
-    private void upstreamOfProbabilisticDoesNotContainProbabilistic(Set<Vertex> vertices) {
+    private void upstreamOfObservedDoesNotContainProbabilistic(List<Vertex> vertices) {
         for (Vertex vertex : vertices) {
             LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(vertex, false);
             Set<Vertex> upstreamRandomVariables = upstreamLambdaSection.getAllVertices();
