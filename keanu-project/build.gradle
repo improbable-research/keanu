@@ -186,6 +186,7 @@ task deleteUnneededJarsFromPythonClasspath(type: Delete) {
 
 task preparePythonClasspath {
     dependsOn deleteUnneededJarsFromPythonClasspath
+    dependsOn(":keanu-python:nd4j:copyNd4jJars")
     dependsOn copyJarsIntoPythonClasspath
 }
 //Break build on javadoc warnings
