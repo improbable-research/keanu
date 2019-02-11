@@ -41,10 +41,18 @@ task installDependencies {
     }
 }
 
+task deleteDupJars(type: Delete) {
+    mustRunAfter(":keanu-python:nd4j:copyNd4jJars")
+    delete fileTree("keanu/classpath/") {
+        include fileTree("nd4j/nd4j/classpath").files.name
+    }
+}
+
 task preparePythonEnvironment {
     dependsOn(installPipenv)
     dependsOn(installDependencies)
     dependsOn(":keanu-project:preparePythonClasspath")
+    dependsOn(deleteDupJars)
     dependsOn(":codegen:runCodeGeneration")
 }
 
@@ -131,6 +139,8 @@ task buildWheelDistribution {
         }
     }
 }
+
+
 
 pythonVersionInfo.mustRunAfter(installPipenv)
 installDependencies.dependsOn(installPipenv)
