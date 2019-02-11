@@ -23,3 +23,13 @@ task deleteUnneededJarsFromNd4jClasspath(type: Delete) {
         include "*-armhf.jar"
     }
 }
+
+task buildWheelDistribution {
+    mustRunAfter(":keanu-python:preparePythonEnvironment")
+
+    doLast {
+        exec {
+            commandLine 'pipenv', 'run', 'python', project.file("setup.py"), 'sdist', 'bdist_wheel'
+        }
+    }
+}
