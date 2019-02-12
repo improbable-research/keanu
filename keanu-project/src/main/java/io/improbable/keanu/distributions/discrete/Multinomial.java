@@ -10,11 +10,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.DebugTensorValidator;
 import io.improbable.keanu.tensor.validate.TensorValidator;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
@@ -129,7 +124,13 @@ public class Multinomial implements DiscreteDistribution {
 
     @Override
     public DoubleTensor logProb(IntegerTensor k) {
-        checkkHasExpectedShape(k.getShape(), p.getShape());
+        long[] expectedShape = p.getShape();
+        TensorShapeValidation.checkAllShapesMatch(
+            String.format("Shape mismatch. k: %s, p: %s",
+                Arrays.toString(k.getShape()),
+                Arrays.toString(expectedShape)),
+            k.getShape(), expectedShape
+        );
         Preconditions.checkArgument(
             k.sum(0).elementwiseEquals(this.n).allTrue(),
             String.format("Inputs %s must sum to n = %s", k, this.n)
@@ -143,33 +144,5 @@ public class Multinomial implements DiscreteDistribution {
         DoubleTensor gammaKs = k.plus(1).toDouble().logGammaInPlace().sum(0);
         DoubleTensor kLogP = p.log().timesInPlace(k.toDouble()).sum(0);
         return kLogP.plusInPlace(gammaN).minusInPlace(gammaKs);
-    }
-
-    public static DoubleVertex logProbOutput(IntegerPlaceholderVertex k, IntegerPlaceholderVertex n, DoublePlaceholderVertex p) {
-        checkkHasExpectedShape(k.getShape(), p.getShape());
-
-        BooleanVertex pSumEqualToOne = p.sum(0)
-            .equalTo(ConstantVertex.of(DoubleTensor.create(1., n.getShape())));
-        pSumEqualToOne.assertTrue("Probabilities must sum to one.");
-
-        BooleanVertex kSumEqualToN = k.sum(0).equalTo(n);
-        kSumEqualToN.assertTrue("Inputs must sum to n.");
-
-        BooleanVertex kGreaterThanOrEqualToZero = k.greaterThanOrEqualTo(0);
-        kGreaterThanOrEqualToZero.assertTrue("Inputs cannot be negative.");
-
-        DoubleVertex gammaN = n.plus(1).toDouble().logGamma();
-        DoubleVertex gammaKs = k.plus(1).toDouble().logGamma().sum(0);
-        DoubleVertex kLogP = p.log().times(k.toDouble()).sum(0);
-        return kLogP.plus(gammaN).minus(gammaKs);
-    }
-
-    private static void checkkHasExpectedShape(long[] kShape, long[] expectedShape) {
-         TensorShapeValidation.checkAllShapesMatch(
-            String.format("Shape mismatch. k: %s, p: %s",
-                Arrays.toString(kShape),
-                Arrays.toString(expectedShape)),
-            kShape, expectedShape
-         );
     }
 }
