@@ -100,7 +100,7 @@ public class Forward implements PosteriorSamplingAlgorithm {
         return upstream;
     }
 
-    private void assertUpstreamOfObservedDoesNotContainProbabilistic(List<Vertex> vertices) {
+    private void checkUpstreamOfObservedDoesNotContainProbabilistic(List<Vertex> vertices) {
         for (Vertex vertex : vertices) {
             LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(vertex, false);
             Set<Vertex> upstreamRandomVariables = upstreamLambdaSection.getAllVertices();
