@@ -1,6 +1,8 @@
+keanu.vertex
+------------
+
 Distributions
-=============
-This lists all of the distributons currently available in Keanu Python.
+~~~~~~~~~~~~~
 
 * :meth:`keanu.vertex.Bernoulli`
 * :meth:`keanu.vertex.Beta`
@@ -26,3 +28,12 @@ This lists all of the distributons currently available in Keanu Python.
 * :meth:`keanu.vertex.Multinomial`
 * :meth:`keanu.vertex.Poisson`
 * :meth:`keanu.vertex.UniformInt`
+* :meth:`keanu.vertex.Geometric`
+
+Vertices
+~~~~~~~~
+
+.. automodule:: keanu.vertex
+    :members:
+    :undoc-members:
+    :show-inheritance:

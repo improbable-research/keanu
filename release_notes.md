@@ -1,5 +1,12 @@
 ### Version 0.0.20 ###
 
+## Common
+* Saving a network as a DOT file includes labels on constant vertices.
+
+## Python
+* Improved performance of getting samples by using byte streams.
+* Added Python docstrings for sampling
+
 ### Version 0.0.19 ###
 
 * Added `get_vertex_by_label` to `BayesNet`

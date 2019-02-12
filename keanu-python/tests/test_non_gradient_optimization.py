@@ -31,16 +31,14 @@ def test_non_gradient_op_vertex(model: Model) -> None:
 
 
 def test_non_gradient_op_throws_with_invalid_net_param() -> None:
-    with pytest.raises(TypeError) as excinfo:
+    with pytest.raises(TypeError, match=r"net must be a Vertex or a BayesNet. Was given {}".format(int)):
         NonGradientOptimizer(500)  # type: ignore # this is expected to fail mypy
-
-    assert str(excinfo.value) == "net must be a Vertex or a BayesNet. Was given {}".format(int)
 
 
 def test_non_gradient_can_set_max_eval_builder_properties(model: Model) -> None:
     non_gradient_optimizer = NonGradientOptimizer(model.a, BOBYQA(max_evaluations=5))
 
-    with pytest.raises(Py4JJavaError):
+    with pytest.raises(Py4JJavaError, match=r"An error occurred while calling o[\d]*.maxAPosteriori."):
         # This throws a Gradient Optimizer: "Reached Max Evaluations" error
         logProb = non_gradient_optimizer.max_a_posteriori()
 

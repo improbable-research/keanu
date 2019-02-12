@@ -1,5 +1,4 @@
 import logging
-from .case_conversion import _to_camel_case_name, _to_snake_case_name
 from typing import Callable
 from py4j.java_gateway import JavaObject
 
@@ -14,22 +13,21 @@ class JavaObjectWrapper:
         return "[{0} => {1}]".format(self._class, type(self))
 
     def __getattr__(self, k: str) -> Callable:
-        python_name = _to_snake_case_name(k)
+        self.__check_if_constructed_without_error(k)
+        self.__check_if_unwrapped(k)
+        raise AttributeError("{} has no attribute {}".format(self.__class__, k))
 
-        if k != python_name:
-            if python_name in self.__class__.__dict__:
-                raise AttributeError("{} has no attribute {}. Did you mean {}?".format(self.__class__, k, python_name))
+    def __check_if_constructed_without_error(self, k: str) -> None:
+        if k in ("_val", "_class"):
+            raise ValueError("Object did not get properly constructed - probably due to an earlier unhandled Error.")
 
-            raise AttributeError("{} has no attribute {}".format(self.__class__, k))
-
-        if python_name == "_get_object_id":
-            raise TypeError("Trying to call %s on a JavaObjectWrapper - did you forget to call %s.unwrap()?" %
-                            (python_name, self._class))
-
-        java_name = _to_camel_case_name(k)
-        logging.getLogger("keanu").warning(
-            "\"{}\" is not implemented so Java API \"{}\" was called directly instead".format(k, java_name))
-        return self.unwrap().__getattr__(java_name)
+    def __check_if_unwrapped(self, k: str) -> None:
+        # better error message for when JavaObjectWrapper is passed to a method that expects JavaObject
+        # see: https://www.py4j.org/advanced_topics.html#converting-python-collections-to-java-collections
+        if k == "_get_object_id":
+            raise TypeError(
+                "Trying to pass {} to a method that expects a JavaObject - did you forget to call unwrap()?".format(
+                    self.__class__))
 
     def unwrap(self) -> JavaObject:
         return self._val
