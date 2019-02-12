@@ -1,15 +1,13 @@
 import pytest
 from py4j.protocol import Py4JJavaError
 
-from keanu import KeanuRandom, Model, BayesNet
+from keanu import Model, BayesNet
 from keanu.algorithm import NonGradientOptimizer, BOBYQA
 from keanu.vertex import Gaussian
 
 
 @pytest.fixture
 def model() -> Model:
-    KeanuRandom.set_default_random_seed(1)
-
     with Model() as m:
         m.a = Gaussian(0., 50.)
         m.b = Gaussian(0., 50.)
