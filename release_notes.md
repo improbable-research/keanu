@@ -1,5 +1,10 @@
 ### Version 0.0.20 ###
 
+## Common
+* Saving a network as a DOT file includes labels on constant vertices.
+
+## Python
+* Improved performance of getting samples by using byte streams.
 * Added Python docstrings for sampling
 * `ForwardSampler`
   * Samples from the prior of a bayesian network. The network cannot have observations that are dependent on random variables.

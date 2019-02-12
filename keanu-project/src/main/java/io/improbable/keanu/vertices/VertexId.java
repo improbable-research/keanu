@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @EqualsAndHashCode
 public class VertexId implements Comparable<VertexId>, VariableReference {
 
-    public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
+    private static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
     private static final int TOP_LEVEL_ARRAY_SIZE = 1;
 
     private long[] idValues = new long[TOP_LEVEL_ARRAY_SIZE];
@@ -83,5 +83,9 @@ public class VertexId implements Comparable<VertexId>, VariableReference {
 
     public long[] getValue() {
         return Arrays.copyOf(idValues, idValues.length);
+    }
+
+    public static void resetIdGenerator() {
+        ID_GENERATOR.set(0);
     }
 }
