@@ -79,7 +79,7 @@ public class PowerVertex extends DoubleBinaryOpVertex implements Differentiable 
         DoubleTensor baseValue = getBase().getValue();
         DoubleTensor exponentValue = getExponent().getValue();
         DoubleTensor basePowExponent = getValue();
-        DoubleTensor dSelfWrtBase = exponentValue.div(baseValue).timesInPlace(basePowExponent);
+        DoubleTensor dSelfWrtBase = exponentValue.times(baseValue.pow(exponentValue.minus(1)));
         DoubleTensor dSelfWrtExponent = basePowExponent.times(baseValue.log());
 
         PartialDerivative dOutputsWrtBase = derivativeOfOutputWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase);

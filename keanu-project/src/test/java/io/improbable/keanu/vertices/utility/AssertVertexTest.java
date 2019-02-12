@@ -4,8 +4,6 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
@@ -103,7 +101,7 @@ public class AssertVertexTest {
         GaussianVertex observedTemp = new GaussianVertex(temperature, 1);
         observedTemp.observe(29);
         temperature.greaterThan(new ConstantDoubleVertex(34)).assertTrue();
-        KeanuOptimizer.of(temperature.getConnectedGraph()).maxAPosteriori();
+        Keanu.Optimizer.of(temperature.getConnectedGraph()).maxAPosteriori();
     }
 
     @Test
@@ -178,7 +176,7 @@ public class AssertVertexTest {
         secondThermometer.greaterThan(new ConstantDoubleVertex(28)).assertTrue();
 
         BayesianNetwork bayesNet = new BayesianNetwork(temperature.getConnectedGraph());
-        KeanuOptimizer.of(bayesNet).maxAPosteriori();
+        Keanu.Optimizer.of(bayesNet).maxAPosteriori();
         assertEquals(26, temperature.getValue().scalar(), 0.1);
     }
 
@@ -196,7 +194,7 @@ public class AssertVertexTest {
         Cobserved.observe(46.0);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-        Optimizer optimizer = KeanuOptimizer.of(bayesNet);
+        io.improbable.keanu.algorithms.variational.optimizer.Optimizer optimizer = Keanu.Optimizer.of(bayesNet);
         assertThat(optimizer, instanceOf(GradientOptimizer.class));
 
         optimizer.maxAPosteriori();

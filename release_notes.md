@@ -1,3 +1,12 @@
+### Version 0.0.20 ###
+
+## Common
+* Saving a network as a DOT file includes labels on constant vertices.
+
+## Python
+* Improved performance of getting samples by using byte streams.
+* Added Python docstrings for sampling
+
 ### Version 0.0.19 ###
 
 * Buildkite
@@ -19,9 +28,12 @@
     1  4.231334  5.017627  5.734130  3.904472   9.909033
     2  4.676046  4.308018  5.035550  6.240894  10.112683
     ```
-    * `samples[("gaussian", "(0, 1)")] = [5.734130, 5.734130, 5.035550] `
+    * `samples[("gaussian", (0, 1))] = [5.734130, 5.734130, 5.035550] `
   * As a result, whenever keying into a sample dictionary, you are guaranteed to receive a list of primitives.
   * This greatly reduces the complexity of the `autocorrelation` and `traceplot` API's as they now simply expect a list of values.  
+* Added Adam optimizer
+* GradientOptimizer and NonGradientOptimizer now takes an algorithm argument that by default will use Conjugate Gradient and BOBYQA respectively.
+* GradientOptimizer and NonGradientOptimizer return a OptimizedResult object instead of just the optimized fitness as a double
 * Reorganised the factory methods for building `PosteriorSamplingAlgorithm` objects. The following are available and give you access to either a default implementation or, when you need more control over the configuration, a Builder object:
   * `Keanu.Sampling.MetropolisHastings`
   * `Keanu.Sampling.NUTS`

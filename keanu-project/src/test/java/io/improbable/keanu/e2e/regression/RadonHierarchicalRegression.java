@@ -1,9 +1,9 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.ConjugateGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.model.regression.RegressionRegularization;
@@ -132,18 +132,21 @@ public class RadonHierarchicalRegression {
 
         // note that way too few samples are taken due to time constraints
         KeanuProbabilisticModelWithGradient probabilisticModel = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
-        return NUTS.builder()
+        return Keanu.Sampling.NUTS.builder()
             .maxTreeHeight(5)
             .adaptEnabled(true)
             .build()
-            .getPosteriorSamples(probabilisticModel, Arrays.asList(muAlpha, muBeta, sigmaAlpha, sigmaBeta), 1000)
+            .getPosteriorSamples(probabilisticModel, Arrays.asList(muAlpha, muBeta, sigmaAlpha, sigmaBeta), 10)
             .downSample(10);
     }
 
     private void optimise(BayesianNetwork bayesianNetwork) {
-        GradientOptimizer optimizer = KeanuOptimizer.Gradient.builderFor(bayesianNetwork)
-            .maxEvaluations(10000)
-            .build();
+        bayesianNetwork.probeForNonZeroProbability(100);
+        GradientOptimizer optimizer = Keanu.Optimizer.Gradient.builderFor(bayesianNetwork)
+            .algorithm(ConjugateGradient.builder()
+                .maxEvaluations(10000)
+                .build()
+            ).build();
         optimizer.maxAPosteriori();
     }
 
@@ -158,11 +161,11 @@ public class RadonHierarchicalRegression {
         double averagePosteriorMuB = samples.getDoubleTensorSamples(muBeta).getAverages().scalar();
         double averagePosteriorSigmaB = samples.getDoubleTensorSamples(sigmaBeta).getAverages().scalar();
 
-        assertThat(averagePosteriorMuB, allOf(greaterThan(-0.9), lessThan(-0.4 )));
-        assertThat(averagePosteriorMuA, allOf(greaterThan(1.2), lessThan(1.8 )));
+        assertThat(averagePosteriorMuB, allOf(greaterThan(-0.9), lessThan(-0.4)));
+        assertThat(averagePosteriorMuA, allOf(greaterThan(1.2), lessThan(1.8)));
 
-        assertThat(averagePosteriorSigmaB, allOf(greaterThan(0.), lessThan(0.5 )));
-        assertThat(averagePosteriorSigmaA, allOf(greaterThan(0.), lessThan(0.5 )));
+        assertThat(averagePosteriorSigmaB, allOf(greaterThan(0.), lessThan(0.5)));
+        assertThat(averagePosteriorSigmaA, allOf(greaterThan(0.), lessThan(0.5)));
 
         for (RegressionModel subModel : models) {
             double weight = subModel.getWeightVertex().getValue().scalar();

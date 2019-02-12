@@ -26,7 +26,7 @@ class Tree implements SaveStatistics {
     private static final int STARTING_ACCEPTED_LEAPFROG = 1;
     private static final boolean STARTING_SHOULD_CONTINUE = true;
     private static final double STARTING_DELTA_LIKELIHOOD = 0.;
-    private static final int STARTING_TREE_SIZE = 1;
+    private static final int STARTING_TREE_SIZE = 0;
 
     private Leapfrog leapfrogForward;
     private Leapfrog leapfrogBackward;
@@ -224,7 +224,7 @@ class Tree implements SaveStatistics {
         final int acceptedLeapfrogCount = logU <= logOfMasterPMinusMomentum ? 1 : 0;
         final boolean shouldContinueFlag = logU < DELTA_MAX + logOfMasterPMinusMomentum;
 
-        final Map<VariableReference, ?> sampleAtAcceptedPosition = takeSample((List<? extends Variable<Object, ?>>)sampleFromVariables);
+        final Map<VariableReference, ?> sampleAtAcceptedPosition = takeSample(sampleFromVariables);
 
         final double deltaLikelihoodOfLeapfrog = Math.min(
             1.0,
@@ -238,7 +238,7 @@ class Tree implements SaveStatistics {
             acceptedLeapfrogCount,
             shouldContinueFlag,
             deltaLikelihoodOfLeapfrog,
-            STARTING_TREE_SIZE
+            1
         );
     }
 
