@@ -4,9 +4,11 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph.BooleanPlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 public class Bernoulli implements Distribution<BooleanTensor> {
 
@@ -39,12 +41,13 @@ public class Bernoulli implements Distribution<BooleanTensor> {
     }
 
     public static DoubleVertex logProbGraph(BooleanPlaceholderVertex x, DoublePlaceholderVertex probTrue) {
-        DoubleVertex probTrueClamped = probTrue.clamp(0., 1.);
+        DoubleVertex zero = ConstantVertex.of(DoubleTensor.zeros(x.getShape()));
+        DoubleVertex one = ConstantVertex.of(DoubleTensor.ones(x.getShape()));
+        DoubleVertex probTrueClamped = DoubleVertex.min(DoubleVertex.max(probTrue, zero), one);
 
-        DoubleVertex probability = x.doubleWhere(
-            probTrueClamped,
-            probTrueClamped.unaryMinus().plus(1.)
-        );
+        DoubleVertex probability = If.isTrue(x)
+            .then(probTrueClamped)
+            .orElse(probTrueClamped.unaryMinus().plus(1.));
 
         return probability.log();
     }

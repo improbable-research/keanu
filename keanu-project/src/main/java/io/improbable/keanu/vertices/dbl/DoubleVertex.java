@@ -31,7 +31,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVer
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.ClampVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
@@ -235,14 +234,6 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public PermuteVertex permute(int... rearrange) {
         return new PermuteVertex(this, rearrange);
-    }
-
-    public ClampVertex clamp(DoubleVertex min, DoubleVertex max) {
-        return new ClampVertex(this, min, max);
-    }
-
-    public ClampVertex clamp(double min, double max) {
-        return clamp(new ConstantDoubleVertex(min), new ConstantDoubleVertex(max));
     }
 
     public DoubleUnaryOpLambda<DoubleTensor> lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
