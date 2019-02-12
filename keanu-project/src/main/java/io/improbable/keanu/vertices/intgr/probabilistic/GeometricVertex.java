@@ -74,13 +74,13 @@ public class GeometricVertex extends IntegerVertex implements ProbabilisticInteg
 
     @Override
     public LogProbGraph logProbGraph() {
-        IntegerPlaceholderVertex xPlaceholder = new IntegerPlaceholderVertex(this.getShape());
+        IntegerPlaceholderVertex valuePlaceholder = new IntegerPlaceholderVertex(this.getShape());
         DoublePlaceholderVertex pPlaceholder = new DoublePlaceholderVertex(p.getShape());
 
         return LogProbGraph.builder()
-            .input(this, xPlaceholder)
+            .input(this, valuePlaceholder)
             .input(p, pPlaceholder)
-            .logProbOutput(Geometric.logProbOutput(xPlaceholder, pPlaceholder))
+            .logProbOutput(Geometric.logProbOutput(valuePlaceholder, pPlaceholder))
             .build();
     }
 

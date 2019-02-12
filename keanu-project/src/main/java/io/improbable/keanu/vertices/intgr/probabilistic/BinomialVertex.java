@@ -73,21 +73,21 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     }
 
     @Override
-    public double logProb(IntegerTensor kTensor) {
-        return Binomial.withParameters(p.getValue(), n.getValue()).logProb(kTensor).sum();
+    public double logProb(IntegerTensor k) {
+        return Binomial.withParameters(p.getValue(), n.getValue()).logProb(k).sum();
     }
 
     @Override
     public LogProbGraph logProbGraph() {
-        IntegerPlaceholderVertex xPlaceholder = new IntegerPlaceholderVertex(this.getShape());
+        IntegerPlaceholderVertex kPlaceholder = new IntegerPlaceholderVertex(this.getShape());
         DoublePlaceholderVertex pPlaceholder = new DoublePlaceholderVertex(p.getShape());
         IntegerPlaceholderVertex nPlaceholder = new IntegerPlaceholderVertex(n.getShape());
 
         return LogProbGraph.builder()
-            .input(this, xPlaceholder)
+            .input(this, kPlaceholder)
             .input(p, pPlaceholder)
             .input(n, nPlaceholder)
-            .logProbOutput(Binomial.logProbOutput(xPlaceholder, pPlaceholder, nPlaceholder))
+            .logProbOutput(Binomial.logProbOutput(kPlaceholder, pPlaceholder, nPlaceholder))
             .build();
     }
 

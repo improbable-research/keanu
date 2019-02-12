@@ -83,13 +83,13 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
 
     @Override
     public LogProbGraph logProbGraph() {
-        IntegerPlaceholderVertex kPlaceholder = new IntegerPlaceholderVertex(this.getShape());
+        IntegerPlaceholderVertex valuePlaceholder = new IntegerPlaceholderVertex(this.getShape());
         DoublePlaceholderVertex muPlaceholder = new DoublePlaceholderVertex(mu.getShape());
 
         return LogProbGraph.builder()
-            .input(this, kPlaceholder)
+            .input(this, valuePlaceholder)
             .input(mu, muPlaceholder)
-            .logProbOutput(Poisson.logProbOutput(kPlaceholder, muPlaceholder))
+            .logProbOutput(Poisson.logProbOutput(valuePlaceholder, muPlaceholder))
             .build();
     }
 

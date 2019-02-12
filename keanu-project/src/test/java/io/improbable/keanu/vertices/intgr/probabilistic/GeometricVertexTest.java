@@ -151,11 +151,6 @@ public class GeometricVertexTest {
     }
 
     @Test
-    public void negativeIfParamsNotValidInLogProbGraph() {
-
-    }
-
-    @Test
     public void samplesMatchPMF() {
         double p = 0.2;
 
