@@ -111,7 +111,7 @@ public class ForwardSamplerTest {
     }
 
     @Test
-    public void correctlySamplesFromVariablesThatAreInUpstreamOfSampleFrom() {
+    public void samplesFromRandomVariablesThatAreInUpstreamOfSampleFrom() {
         ConstantDoubleVertex A = ConstantVertex.of(1.0);
         ConstantDoubleVertex B = ConstantVertex.of(2.0);
         ConstantDoubleVertex C = ConstantVertex.of(3.0);
@@ -133,7 +133,7 @@ public class ForwardSamplerTest {
     }
 
     @Test
-    public void removesNonProbabilisticVerticesAtTopOfTree() {
+    public void doesNotSampleFromNonProbabilisticVerticesThatAreBeforeRandomVariablesInTheGraph() {
         ConstantDoubleVertex A = ConstantVertex.of(1.0);
         ConstantDoubleVertex B = ConstantVertex.of(2.0);
         ConstantDoubleVertex C = ConstantVertex.of(3.0);
@@ -150,7 +150,7 @@ public class ForwardSamplerTest {
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour, trackerFive), 1);
+        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(trackerThree, trackerFour, trackerFive), 1);
 
         assertEquals(trackerThree.getId(), ids.get(0));
         assertEquals(trackerFour.getId(), ids.get(1));

@@ -25,11 +25,8 @@ import static java.util.stream.Collectors.toMap;
 public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     private final Map<VariableReference, Vertex> vertexLookup;
-
     private final List<Vertex> latentVertices;
-
     private final List<Vertex> observedVertices;
-
     private final List<Vertex> latentOrObservedVertices;
     private final LambdaSectionSnapshot lambdaSectionSnapshot;
 
