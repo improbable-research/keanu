@@ -152,12 +152,12 @@ def sample(net: BayesNet,
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
-    probabilistic_model = ProbabilisticModel(net) if (isinstance(
-        sampling_algorithm, MetropolisHastingsSampler) or isinstance(sampling_algorithm, ForwardSampler)) else ProbabilisticModelWithGradient(net)
+    probabilistic_model = ProbabilisticModel(net) if (
+        isinstance(sampling_algorithm, MetropolisHastingsSampler) or
+        isinstance(sampling_algorithm, ForwardSampler)) else ProbabilisticModelWithGradient(net)
 
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
-        probabilistic_model.unwrap(),
-        vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
+        probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
     id_to_label = __check_if_vertices_are_labelled(sample_from)
     if __all_scalar(sample_from):
