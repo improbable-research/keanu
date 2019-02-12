@@ -12,7 +12,7 @@ public class CheatingStudentsTest {
     @Before
     public void setup() {
         KeanuRandom.setDefaultRandomSeed(1);
-        VertexId.ID_GENERATOR.set(1);
+        VertexId.resetIdGenerator();
     }
 
     private final int numberOfStudents = 100;

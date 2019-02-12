@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 from py4j.java_gateway import JVMView
 
+from keanu import set_deterministic_state
 from keanu.context import KeanuContext
 from keanu.vartypes import tensor_arg_types, primitive_types, numpy_types, pandas_types
 from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli, IntegerProxy
@@ -191,6 +192,14 @@ def test_get_vertex_id() -> None:
     python_id = gaussian.get_id()
 
     assert all(value in python_id for value in java_id)
+
+
+def test_ids_are_reset() -> None:
+    gaussian = Gaussian(0., 1.)
+    set_deterministic_state()
+    gaussian2 = Gaussian(0., 1.)
+
+    assert gaussian.get_id() == gaussian2.get_id()
 
 
 @pytest.mark.parametrize("vertex, expected_type", [(Gaussian(0., 1.), np.floating), (UniformInt(0, 10), np.integer),
