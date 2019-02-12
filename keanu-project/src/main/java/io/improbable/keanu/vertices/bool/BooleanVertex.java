@@ -92,14 +92,6 @@ public abstract class BooleanVertex extends Vertex<BooleanTensor> implements Boo
 
     public AssertVertex assertTrue(String errorMessage) { return new AssertVertex(this, errorMessage); }
 
-    public DoubleVertex doubleWhere(double trueValue, double falseValue) {
-        return doubleWhere(new ConstantDoubleVertex(trueValue), new ConstantDoubleVertex(falseValue));
-    }
-
-    public DoubleVertex doubleWhere(DoubleVertex trueValue, DoubleVertex falseValue) {
-        return new DoubleWhereVertex(this, trueValue, falseValue);
-    }
-
     public BooleanVertex equalTo(BooleanVertex rhs) {
         return new EqualsVertex<>(this, rhs);
     }
