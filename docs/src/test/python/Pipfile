@@ -9,6 +9,3 @@ verify_ssl = true
 keanu = {editable = true,path = "./../../../../keanu-python"}
 pytest = "*"
 numpy = "*"
-
-[requires]
-python_version = "3.6"
