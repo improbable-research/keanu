@@ -10,4 +10,8 @@ fi
 repo_top_level_dir=`git rev-parse --show-toplevel`
 cd ${repo_top_level_dir}
 
-./gradlew clean build
+docker build -t build-image -f docker/builder/Dockerfile .
+exec docker run \
+    --rm \
+    build-image \
+    ./gradlew clean build
