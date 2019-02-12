@@ -20,7 +20,7 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.MetropolisHastings")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.nuts.NUTS")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection")
-java_import(k.jvm_view(), "io.improbable.keanu.algorithms.sampling.ForwardSampler")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.sampling.Forward")
 
 
 class PosteriorSamplingAlgorithm:
@@ -35,7 +35,7 @@ class PosteriorSamplingAlgorithm:
 class ForwardSampler(PosteriorSamplingAlgorithm):
 
     def __init__(self) -> None:
-        super().__init__(k.jvm_view().ForwardSampler())
+        super().__init__(k.jvm_view().Forward())
 
 
 class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
@@ -152,14 +152,12 @@ def sample(net: BayesNet,
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
-    probabilistic_model = ProbabilisticModel(net) if isinstance(
-        sampling_algorithm, MetropolisHastingsSampler) else ProbabilisticModelWithGradient(net)
+    probabilistic_model = ProbabilisticModel(net) if (isinstance(
+        sampling_algorithm, MetropolisHastingsSampler) or isinstance(sampling_algorithm, ForwardSampler)) else ProbabilisticModelWithGradient(net)
 
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
         probabilistic_model.unwrap(),
-        vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval) if not isinstance(
-            sampling_algorithm, ForwardSampler) else sampling_algorithm.get_sampler().sample(
-                net.unwrap(), vertices_unwrapped, draws)
+        vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
     id_to_label = __check_if_vertices_are_labelled(sample_from)
     if __all_scalar(sample_from):

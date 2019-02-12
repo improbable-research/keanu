@@ -26,6 +26,10 @@ public class Forward implements PosteriorSamplingAlgorithm {
 
     private final KeanuRandom random;
 
+    public Forward() {
+        this(KeanuRandom.getDefaultRandom());
+    }
+
     public Forward(KeanuRandom random) {
         this.random = random;
     }

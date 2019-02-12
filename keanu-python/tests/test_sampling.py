@@ -10,7 +10,7 @@ from examples import thermometers
 from keanu import BayesNet, KeanuRandom, Model
 from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler, NUTSSampler,
                              ForwardSampler, PosteriorSamplingAlgorithm)
-from keanu.vertex import Gamma, Exponential, Cauchy, Gaussian
+from keanu.vertex import Gamma, Exponential, Gaussian
 
 
 @pytest.fixture
