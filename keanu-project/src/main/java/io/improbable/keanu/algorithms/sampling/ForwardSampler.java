@@ -20,7 +20,7 @@ public class ForwardSampler implements SamplingAlgorithm {
     private final List<Vertex> topologicallySortedVertices;
     private final KeanuRandom random;
 
-    public ForwardSampler(List<Variable> variablesToSampleFrom, List<Vertex> topologicallySortedVertices, KeanuRandom random) {
+    public ForwardSampler(List<? extends Variable> variablesToSampleFrom, List<Vertex> topologicallySortedVertices, KeanuRandom random) {
         this.variablesToSampleFrom = variablesToSampleFrom;
         this.topologicallySortedVertices = topologicallySortedVertices;
         this.random = random;
