@@ -4,10 +4,10 @@ repositories {
 }
 
 dependencies {
-    compile 'org.nd4j:nd4j-native-platform:1.0.0-beta3'
+    compile group: 'org.nd4j', name: 'nd4j-native-platform', version: project.property('nd4jVersion')
 }
 
-task copyNd4jJars(type: Copy) {
+task copyJarsIntoPythonClasspath(type: Copy) {
     into "nd4j/classpath/"
     from configurations.compile
 }

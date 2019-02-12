@@ -37,7 +37,7 @@ task installDependencies {
 }
 
 task populatePythonClasspaths {
-    dependsOn(":keanu-python:nd4j:copyNd4jJars")
+    dependsOn(":keanu-python:nd4j:copyJarsIntoPythonClasspath")
     dependsOn(":keanu-project:copyJarsIntoPythonClasspath")
 }
 
