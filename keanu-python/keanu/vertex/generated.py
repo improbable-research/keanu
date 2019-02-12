@@ -79,7 +79,6 @@ java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilist
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex")
-java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleWhereVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex")
 java_import(context.jvm_view(), "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex")
@@ -370,10 +369,6 @@ def Concatenation(dimension: int, operands: Collection[Vertex], label: Optional[
 
 def DoubleSetWithMask(operand: vertex_constructor_param_types, mask: vertex_constructor_param_types, set_value: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
     return Double(context.jvm_view().DoubleSetWithMaskVertex, label, cast_to_double_vertex(operand), cast_to_double_vertex(mask), cast_to_double_vertex(set_value))
-
-
-def DoubleWhere(condition: vertex_constructor_param_types, true_value: vertex_constructor_param_types, false_value: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
-    return Double(context.jvm_view().DoubleWhereVertex, label, cast_to_boolean_vertex(condition), cast_to_double_vertex(true_value), cast_to_double_vertex(false_value))
 
 
 def Abs(input_vertex: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:
