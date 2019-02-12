@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.ones;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 import static org.junit.Assert.assertEquals;
 
@@ -26,12 +25,13 @@ public class VarianceCalculatorTest {
         Map<VariableReference, DoubleTensor> position = ImmutableMap.of(v.getReference(), v.getValue());
 
         KeanuRandom random = new KeanuRandom(0);
-        VarianceCalculator varianceCalculator = new VarianceCalculator(zeros(position), ones(position), 0);
+        VarianceCalculator varianceCalculator = new VarianceCalculator(zeros(position), zeros(position), 0);
 
+        double targetStandardDeviation = 2;
         SummaryStatistics statistics = new SummaryStatistics();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 500; i++) {
 
-            double s = random.nextGaussian();
+            double s = random.nextGaussian() * targetStandardDeviation;
             statistics.addValue(s);
 
             Map<VariableReference, DoubleTensor> sample = ImmutableMap.of(v.getReference(), DoubleTensor.scalar(s));
@@ -43,5 +43,7 @@ public class VarianceCalculatorTest {
 
             assertEquals(expected, variance, 1e-3);
         }
+
+        assertEquals(targetStandardDeviation, Math.sqrt(varianceCalculator.currentVariance().get(v.getReference()).scalar()), 1e-2);
     }
 }

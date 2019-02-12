@@ -16,6 +16,14 @@ public class VariableValues {
         return dotProduct;
     }
 
+    public static Map<VariableReference, DoubleTensor> pow(Map<VariableReference, DoubleTensor> values, double exponent) {
+        Map<VariableReference, DoubleTensor> result = new HashMap<>();
+        for (VariableReference v : values.keySet()) {
+            result.put(v, values.get(v).pow(exponent));
+        }
+        return result;
+    }
+
     public static Map<VariableReference, DoubleTensor> divide(Map<VariableReference, DoubleTensor> left, double right) {
         Map<VariableReference, DoubleTensor> result = new HashMap<>();
         for (VariableReference v : left.keySet()) {

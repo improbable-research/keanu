@@ -30,7 +30,7 @@ public class AdaptiveQuadraticPotentialTest {
             ones(position),
             10,
             10,
-            101,
+            100,
             KeanuRandom.getDefaultRandom()
         );
 
@@ -43,6 +43,9 @@ public class AdaptiveQuadraticPotentialTest {
         assertEquals(0.5 * Math.pow(0.5, 2), kineticEnergy, 1e-6);
     }
 
+    /**
+     * The random momentum variance should be inversely proportional to the sample variance
+     */
     @Test
     public void doesUpdateAfterAdaptSample() {
         DoubleVertex v = new GaussianVertex(0, 1);
@@ -50,19 +53,107 @@ public class AdaptiveQuadraticPotentialTest {
 
         Map<VariableReference, DoubleTensor> position = ImmutableMap.of(v.getReference(), v.getValue());
 
+        KeanuRandom random = new KeanuRandom(0);
+
         AdaptiveQuadraticPotential potential = new AdaptiveQuadraticPotential(
             zeros(position),
             ones(position),
-            10,
-            10,
-            101,
-            KeanuRandom.getDefaultRandom()
+            0,
+            1500,
+            1500,
+            random
         );
 
-        potential.update(position);
+        double targetStandardDeviation = 2;
+        for (int i = 0; i < 1000; i++) {
+            double r = random.nextGaussian() * targetStandardDeviation;
+            potential.update(ImmutableMap.of(v.getReference(), DoubleTensor.scalar(r)));
+        }
 
-        Map<VariableReference, DoubleTensor> momentum = ImmutableMap.of(v.getReference(), DoubleTensor.scalar(0.5));
+        SummaryStatistics statistics = new SummaryStatistics();
+        for (int i = 0; i < 1000; i++) {
+            double sample = potential.randomMomentum().get(v.getReference()).scalar();
+            statistics.addValue(sample);
+        }
 
+        assertEquals(1.0 / targetStandardDeviation, statistics.getStandardDeviation(), 1e-2);
+    }
 
+    /**
+     *
+     */
+    @Test
+    public void doesUseWindowsForAdaption() {
+        DoubleVertex v = new GaussianVertex(0, 1);
+        v.setValue(1.0);
+
+        Map<VariableReference, DoubleTensor> position = ImmutableMap.of(v.getReference(), v.getValue());
+
+        KeanuRandom random = new KeanuRandom(0);
+
+        int windowSize = 1000;
+        AdaptiveQuadraticPotential potential = new AdaptiveQuadraticPotential(
+            zeros(position),
+            ones(position),
+            0,
+            5 * windowSize,
+            windowSize,
+            random
+        );
+
+        SummaryStatistics statisticsWindow1And2 = new SummaryStatistics();
+
+        double targetStandardDeviationWindow1 = 2;
+        for (int i = 0; i < windowSize; i++) {
+            double r = random.nextGaussian() * targetStandardDeviationWindow1;
+            statisticsWindow1And2.addValue(r);
+            potential.update(ImmutableMap.of(v.getReference(), DoubleTensor.scalar(r)));
+        }
+
+        assertEquals(
+            statisticsWindow1And2.getStandardDeviation(),
+            potential.getStandardDeviation().get(v.getReference()).scalar(), 1e-2
+        );
+
+        SummaryStatistics statisticsWindow2And3 = new SummaryStatistics();
+
+        double targetStandardDeviationWindow2 = 3;
+        for (int i = 0; i < windowSize; i++) {
+            double r = random.nextGaussian() * targetStandardDeviationWindow2;
+            statisticsWindow1And2.addValue(r);
+            statisticsWindow2And3.addValue(r);
+            potential.update(ImmutableMap.of(v.getReference(), DoubleTensor.scalar(r)));
+        }
+
+        assertEquals(
+            statisticsWindow1And2.getStandardDeviation(),
+            potential.getStandardDeviation().get(v.getReference()).scalar(),
+            1e-2
+        );
+
+        SummaryStatistics statisticsWindow3And4 = new SummaryStatistics();
+
+        double targetStandardDeviationWindow3 = 4;
+        for (int i = 0; i < windowSize; i++) {
+            double r = random.nextGaussian() * targetStandardDeviationWindow3;
+            statisticsWindow2And3.addValue(r);
+            statisticsWindow3And4.addValue(r);
+            potential.update(ImmutableMap.of(v.getReference(), DoubleTensor.scalar(r)));
+        }
+
+        assertEquals(
+            statisticsWindow2And3.getStandardDeviation(),
+            potential.getStandardDeviation().get(v.getReference()).scalar(),
+            1e-2
+        );
+
+        potential.update(ImmutableMap.of(v.getReference(), DoubleTensor.scalar(random.nextGaussian() * targetStandardDeviationWindow3)));
+        potential.update(ImmutableMap.of(v.getReference(), DoubleTensor.scalar(random.nextGaussian() * targetStandardDeviationWindow3)));
+
+        assertEquals(
+            statisticsWindow3And4.getStandardDeviation(),
+            potential.getStandardDeviation().get(v.getReference()).scalar(),
+            1e-2
+        );
     }
 }

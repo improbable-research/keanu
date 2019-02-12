@@ -104,7 +104,7 @@ class NUTSSampler implements SamplingAlgorithm {
     @Override
     public void step() {
 
-        Map<VariableReference, DoubleTensor> initialMomentum = potential.random();
+        Map<VariableReference, DoubleTensor> initialMomentum = potential.randomMomentum();
 
         LeapfrogState startState = new LeapfrogState(
             proposal.getPosition(),
@@ -113,6 +113,12 @@ class NUTSSampler implements SamplingAlgorithm {
             proposal.getLogProb(),
             potential
         );
+
+        final double startEnergy = startState.getEnergy();
+
+        if (Double.isInfinite(startEnergy) || Double.isNaN(startEnergy)) {
+            throw new IllegalStateException("Start energy is invalid");
+        }
 
         Tree tree = new Tree(
             startState,

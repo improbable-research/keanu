@@ -9,7 +9,7 @@ public interface Potential {
 
     void update(Map<VariableReference, DoubleTensor> position);
 
-    Map<VariableReference, DoubleTensor> random();
+    Map<VariableReference, DoubleTensor> randomMomentum();
 
     Map<VariableReference, DoubleTensor> getVelocity(Map<VariableReference, DoubleTensor> momentum);
 
