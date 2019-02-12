@@ -1,0 +1,4 @@
+digraph BayesianNetwork {
+90[label="0.0"]
+91[label="1.0"]
+}

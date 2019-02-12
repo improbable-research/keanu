@@ -16,8 +16,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,45 +61,63 @@ public class DotSaver implements NetworkSaver {
     @Override
     public void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException {
         Preconditions.checkArgument(bayesianNetwork.getAllVertices().size() > 0, "Network must contain at least one vertex.");
-        Vertex anyVertex = bayesianNetwork.getAllVertices().get(0);
-        save(output, anyVertex, INFINITE_NETWORK_DEGREE, saveValues, metadata);
+        List<Vertex> anyVertices = getRepresentativeVerticesForAllConnectedSubGraphs();
+        save(output, anyVertices, INFINITE_NETWORK_DEGREE, saveValues, metadata);
+    }
+
+    private List<Vertex> getRepresentativeVerticesForAllConnectedSubGraphs() {
+        List<Vertex> vertices = new ArrayList<>();
+        List<Vertex> processedVertices = new ArrayList<>();
+
+        for (Vertex vertex : bayesianNetwork.getAllVertices()) {
+            if (!processedVertices.contains(vertex)) {
+                vertices.add(vertex);
+                processedVertices.addAll(vertex.getConnectedGraph());
+            }
+        }
+
+        return vertices;
     }
 
     /**
-     * Outputs a subgraph around the specified vertex to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
+     * Outputs a subgraph around the specified vertices to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
      * @param output     output stream to use for writing
-     * @param vertex     vertex around which the subgraph will be centered
+     * @param vertices   vertices around which the subGraphs will be centered
      * @param degree     degree of connections to be visualized; for instance, if the degree is 1,
-     *                   only connections between the vertex and its parents and children will be written out to the DOT file.
+     *                   only connections between the vertices and its parents and children will be written out to the DOT file.
      * @param saveValues specify whether you want to output values of non-constant scalar vertices
      * @throws IOException Any errors that occur during saving to the output stream
      */
-    public void save(OutputStream output, Vertex vertex, int degree, boolean saveValues) throws IOException {
-        save(output, vertex, degree, saveValues, null);
+    public void save(OutputStream output, List<Vertex> vertices, int degree, boolean saveValues) throws IOException {
+        save(output, vertices, degree, saveValues, null);
     }
 
     /**
-     * Outputs a subgraph around the specified vertex to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
+     * Outputs a subgraph around the specified vertices to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
      * @param output     output stream to use for writing
-     * @param vertex     vertex around which the subgraph will be centered
+     * @param vertices   vertices around which the subGraphs will be centered
      * @param degree     degree of connections to be visualized; for instance, if the degree is 1,
-     *                   only connections between the vertex and its parents and children will be written out to the DOT file.
+     *                   only connections between the vertices and its parents and children will be written out to the DOT file.
      * @param saveValues specify whether you want to output values of non-constant scalar vertices
      * @param metadata   metadata to be added to the output as comments
      * @throws IOException Any errors that occur during saving to the output stream
      */
-    public void save(OutputStream output, Vertex vertex, int degree, boolean saveValues, Map<String, String> metadata) throws IOException {
+    public void save(OutputStream output, List<Vertex> vertices, int degree, boolean saveValues, Map<String, String> metadata) throws IOException {
 
         dotLabels = new HashSet<>();
         graphEdges = new HashSet<>();
         Writer outputWriter = new OutputStreamWriter(output);
 
-        Set<Vertex> subGraph = bayesianNetwork.getSubgraph(vertex, degree);
-        for (Vertex v : subGraph) {
+        Set<Vertex> verticesInSubGraphs = new HashSet<>();
+        for (Vertex v : vertices) {
+            verticesInSubGraphs.addAll(bayesianNetwork.getSubgraph(v, degree));
+        }
+
+        for (Vertex v : verticesInSubGraphs) {
             if (saveValues) {
                 v.saveValue(this);
             } else {
@@ -107,7 +127,7 @@ public class DotSaver implements NetworkSaver {
 
         outputWriter.write(DOT_HEADER);
         outputMetadata(metadata, outputWriter);
-        outputEdges(graphEdges, outputWriter, subGraph);
+        outputEdges(graphEdges, outputWriter, verticesInSubGraphs);
         outputLabels(dotLabels, outputWriter);
         outputWriter.write(DOT_ENDING);
         outputWriter.close();
