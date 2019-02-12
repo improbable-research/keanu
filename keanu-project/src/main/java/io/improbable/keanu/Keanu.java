@@ -100,8 +100,12 @@ public class Keanu {
         @UtilityClass
         public static class Forward {
 
-            public static ForwardSampler withDefaultConfig() {
-                return new ForwardSampler();
+            public static io.improbable.keanu.algorithms.sampling.Forward withDefaultConfig() {
+                return new io.improbable.keanu.algorithms.sampling.Forward(KeanuRandom.getDefaultRandom());
+            }
+
+            public static io.improbable.keanu.algorithms.sampling.Forward withDefaultConfig(KeanuRandom random) {
+                return new io.improbable.keanu.algorithms.sampling.Forward(random);
             }
         }
 

@@ -3,7 +3,10 @@ package io.improbable.keanu.algorithms.sampling;
 import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.ProbabilisticModel;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -48,8 +51,9 @@ public class ForwardSamplerTest {
         C.observe(100.);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+        ProbabilisticModel model = new KeanuProbabilisticModel(network);
 
-        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(A, B), 1000, random);
+        Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 1000);
     }
 
     @Test
@@ -58,9 +62,10 @@ public class ForwardSamplerTest {
         DoubleVertex B = A.plus(ConstantVertex.of(5.));
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+        ProbabilisticModel model = new KeanuProbabilisticModel(network);
 
         final int sampleCount = 1000;
-        NetworkSamples samples = Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(A, B), sampleCount, random);
+        NetworkSamples samples = Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), sampleCount);
 
         double averageA = samples.getDoubleTensorSamples(A).getAverages().scalar();
         double averageB = samples.getDoubleTensorSamples(B).getAverages().scalar();
@@ -78,7 +83,9 @@ public class ForwardSamplerTest {
         TestGraphGenerator.PassThroughVertex B = new TestGraphGenerator.PassThroughVertex(A, opCount, null, id -> log.info("OP on id:" + id));
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(A, B), 100, random);
+        ProbabilisticModel model = new KeanuProbabilisticModel(network);
+
+        Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 100);
 
         assertEquals(100, opCount.get());
     }
@@ -100,8 +107,9 @@ public class ForwardSamplerTest {
         IDTrackerVertex trackerFive = new IDTrackerVertex(trackerTwo, trackerFour, ids);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+        ProbabilisticModel model = new KeanuProbabilisticModel(network);
 
-        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour, trackerFive), 1);
+        Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour, trackerFive), 1);
 
         assertEquals(trackerOne.getId(), ids.get(0));
         assertEquals(trackerTwo.getId(), ids.get(1));
@@ -124,8 +132,9 @@ public class ForwardSamplerTest {
         IDTrackerVertex trackerThree = new IDTrackerVertex(trackerOne, trackerTwo, ids);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+        ProbabilisticModel model = new KeanuProbabilisticModel(network);
 
-        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Collections.singletonList(trackerThree), 1);
+        Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Collections.singletonList(trackerThree), 1);
 
         assertEquals(trackerOne.getId(), ids.get(0));
         assertEquals(trackerTwo.getId(), ids.get(1));
@@ -149,12 +158,34 @@ public class ForwardSamplerTest {
         NonProbabilisticIDTrackerVertex trackerFive = new NonProbabilisticIDTrackerVertex(trackerThree, trackerFour, ids);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+        ProbabilisticModel model = new KeanuProbabilisticModel(network);
 
-        Keanu.Sampling.Forward.withDefaultConfig().sample(network, Arrays.asList(trackerThree, trackerFour, trackerFive), 1);
+        Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(trackerThree, trackerFour, trackerFive), 1);
 
         assertEquals(trackerThree.getId(), ids.get(0));
         assertEquals(trackerFour.getId(), ids.get(1));
         assertEquals(trackerFive.getId(), ids.get(2));
+    }
+
+    @Test
+    public void canStreamSamples() {
+
+        int sampleCount = 1000;
+        int dropCount = 100;
+        int downSampleInterval = 1;
+        GaussianVertex A = new GaussianVertex(0, 1);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+        Forward algo = Keanu.Sampling.Forward.withDefaultConfig(random);
+
+        double averageA = algo.generatePosteriorSamples(model, model.getLatentVariables())
+            .dropCount(dropCount)
+            .downSampleInterval(downSampleInterval)
+            .stream()
+            .limit(sampleCount)
+            .mapToDouble(networkState -> networkState.get(A).scalar())
+            .average().getAsDouble();
+
+        assertEquals(0.0, averageA, 0.1);
     }
 
     public static class IDTrackerVertex extends DoubleVertex implements Differentiable, ProbabilisticDouble {

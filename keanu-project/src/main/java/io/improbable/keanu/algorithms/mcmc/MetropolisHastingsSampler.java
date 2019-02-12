@@ -50,7 +50,7 @@ public class MetropolisHastingsSampler implements SamplingAlgorithm {
     @Override
     public void sample(Map<VariableReference, List<?>> samplesByVariable, List<Double> logOfMasterPForEachSample) {
         step();
-        takeSamples(samplesByVariable, variablesToSampleFrom);
+        SamplingAlgorithm.takeSamples(samplesByVariable, variablesToSampleFrom);
         logOfMasterPForEachSample.add(logProbabilityBeforeStep);
     }
 
@@ -58,15 +58,6 @@ public class MetropolisHastingsSampler implements SamplingAlgorithm {
     public NetworkSample sample() {
         step();
         return new NetworkSample(SamplingAlgorithm.takeSample((List<? extends Variable<Object, ?>>) variablesToSampleFrom), logProbabilityBeforeStep);
-    }
-    private static void takeSamples(Map<VariableReference, List<?>> samples, List<? extends Variable> fromVariables) {
-        fromVariables.forEach(variable -> addSampleForVariable((Variable<?, ?>) variable, samples));
-    }
-
-    private static <T> void addSampleForVariable(Variable<T, ?> variable, Map<VariableReference, List<?>> samples) {
-        List<T> samplesForVariable = (List<T>) samples.computeIfAbsent(variable.getReference(), v -> new ArrayList<T>());
-        T value = variable.getValue();
-        samplesForVariable.add(value);
     }
 
 }
