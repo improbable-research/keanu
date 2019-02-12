@@ -25,6 +25,6 @@ class KeanuRandom(JavaObjectWrapper):
         k.jvm_view().KeanuRandom.setDefaultRandomSeed(seed)
 
 
-def set_deterministic_state():
+def set_deterministic_state() -> None:
     KeanuRandom.set_default_random_seed(0)
     k.jvm_view().VertexId.resetIdGenerator()
