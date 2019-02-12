@@ -28,9 +28,17 @@ import static java.util.stream.Collectors.toMap;
 
 
 /**
+ * NUTS with multinomial sampling
+ * <p>
+ * References:
+ * <p>
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
+ * <p>
+ * A Conceptual Introduction to
+ * Hamiltonian Monte Carlo by Michael Betancourt
+ * https://arxiv.org/pdf/1701.02434.pdf
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class NUTS implements PosteriorSamplingAlgorithm {
@@ -46,32 +54,24 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     @Getter
     private final KeanuRandom random;
 
-    //The target acceptance probability, a suggested value of this is 0.65,
-    //Beskos et al., 2010; Neal, 2011
     @Getter
     private final double targetAcceptanceProb;
 
-    //The number of samples for which the step size and potential will be tuned. For the remaining samples
-    //in which it is not tuned, the step size will be frozen to its last calculated value
     @Getter
     private final int adaptCount;
 
-    //Determines whether the step size wil
-    // l adapt during the first adaptCount samples
     private final boolean adaptStepSizeEnabled;
 
-    //Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.
     private final Double initialStepSize;
+
+    private final int potentialAdaptWindowSize;
 
     private final boolean adaptPotentialEnabled;
 
     private final double maxEnergyChange;
 
-    //The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This
-    //will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample.
     private final int maxTreeHeight;
 
-    //Sets whether or not to save debug STATISTICS. The STATISTICS available are: Step size, Log Prob, Mean Tree Acceptance Prob, Tree Size.
     private final boolean saveStatistics;
 
     private final Statistics statistics = new Statistics(Metrics.values());
@@ -128,7 +128,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        Potential potential = new AdaptiveQuadraticPotential(zeros(position), ones(position), 10.0, adaptCount, 101, random);
+        Potential potential = new AdaptiveQuadraticPotential(zeros(position), ones(position), 10.0, adaptCount, potentialAdaptWindowSize, random);
 
         Proposal initialProposal = new Proposal(position, gradient, startingSample, initialLogOfMasterP);
 
@@ -158,6 +158,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         private int adaptCount = 1000;
         private boolean adaptStepSizeEnabled = true;
         private Double initialStepSize = null;
+
+        private int potentialAdaptWindowSize = 100;
         private boolean adaptPotentialEnabled = true;
 
         private double targetAcceptanceProb = 0.8;
@@ -171,6 +173,10 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             return this;
         }
 
+        /**
+         * @param targetAcceptanceProb The targeted acceptance rate for the step size adaption. This defaults to 0.8.
+         * @return
+         */
         public NUTSBuilder targetAcceptanceProb(double targetAcceptanceProb) {
             if (targetAcceptanceProb > 1.0 || targetAcceptanceProb < 0) {
                 throw new IllegalArgumentException("Target acceptance probability must be between 0.0 and 1.");
@@ -179,11 +185,21 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             return this;
         }
 
+        /**
+         * @param adaptEnabled Set to true if step size adaption is wanted.
+         * @return
+         */
         public NUTSBuilder adaptStepSizeEnabled(boolean adaptEnabled) {
             this.adaptStepSizeEnabled = adaptEnabled;
             return this;
         }
 
+        /**
+         * @param adaptCount The number of samples for which the step size and potential will be tuned. For the
+         *                   remaining samples in which it is not tuned, the step size will be frozen to its last
+         *                   calculated value.
+         * @return
+         */
         public NUTSBuilder adaptCount(int adaptCount) {
             if (adaptCount < 0) {
                 throw new IllegalArgumentException("Adapt count must be greater than or equal to 0");
@@ -192,6 +208,11 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             return this;
         }
 
+        /**
+         * @param initialStepSize The initial step size. If this is null then a step size will be calculated using
+         *                        heuristics.
+         * @return
+         */
         public NUTSBuilder initialStepSize(Double initialStepSize) {
             if (initialStepSize <= 0) {
                 throw new IllegalArgumentException("Initial step size must be greater than 0");
@@ -200,11 +221,31 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             return this;
         }
 
+        /**
+         * @param adaptPotentialEnabled Set to true if adapting of the mass matrix is wanted.
+         * @return
+         */
         public NUTSBuilder adaptPotentialEnabled(boolean adaptPotentialEnabled) {
             this.adaptPotentialEnabled = adaptPotentialEnabled;
             return this;
         }
 
+        /**
+         * @param potentialAdaptWindowSize The window size for adapting the mass matrix.
+         * @return
+         */
+        public NUTSBuilder potentialAdaptWindowSize(int potentialAdaptWindowSize) {
+            if (potentialAdaptWindowSize <= 0) {
+                throw new IllegalArgumentException("Potential Adapt Window Size must be greater than to 0");
+            }
+            this.potentialAdaptWindowSize = potentialAdaptWindowSize;
+            return this;
+        }
+
+        /**
+         * @param maxEnergyChange The maximum energy change for a step to be considered divergent.
+         * @return
+         */
         public NUTSBuilder maxEnergyChange(double maxEnergyChange) {
             if (maxEnergyChange <= 0) {
                 throw new IllegalArgumentException("Max energy change must be greater than 0");
@@ -213,6 +254,13 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             return this;
         }
 
+
+        /**
+         * @param maxTreeHeight The maximum tree size for the sampler. This controls how long a sample walk can
+         *                      be before it terminates. This will set at a maximum approximately 2^treeSize
+         *                      number of logProb evaluations for a sample.
+         * @return
+         */
         public NUTSBuilder maxTreeHeight(int maxTreeHeight) {
             if (maxTreeHeight <= 0) {
                 throw new IllegalArgumentException("Max tree height must be greater than 0");
@@ -221,6 +269,12 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             return this;
         }
 
+        /**
+         * @param saveStatistics Set to true if sampling statistics are wanted. Sets whether or not to save
+         *                       debug STATISTICS. The STATISTICS available are: Step size, Log Prob,
+         *                       Mean Tree Acceptance Prob, Tree Size.
+         * @return
+         */
         public NUTSBuilder saveStatistics(boolean saveStatistics) {
             this.saveStatistics = saveStatistics;
             return this;
@@ -228,7 +282,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         public NUTS build() {
             return new NUTS(random, targetAcceptanceProb, adaptCount, adaptStepSizeEnabled, initialStepSize,
-                adaptPotentialEnabled, maxEnergyChange, maxTreeHeight, saveStatistics);
+                potentialAdaptWindowSize, adaptPotentialEnabled, maxEnergyChange, maxTreeHeight, saveStatistics);
         }
 
         public String toString() {

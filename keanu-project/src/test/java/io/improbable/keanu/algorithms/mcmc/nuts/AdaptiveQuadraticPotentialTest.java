@@ -80,7 +80,7 @@ public class AdaptiveQuadraticPotentialTest {
     }
 
     /**
-     *
+     * Samples from 2 windows ago should not affect the potential variance
      */
     @Test
     public void doesUseWindowsForAdaption() {
@@ -147,7 +147,6 @@ public class AdaptiveQuadraticPotentialTest {
             1e-2
         );
 
-        potential.update(ImmutableMap.of(v.getReference(), DoubleTensor.scalar(random.nextGaussian() * targetStandardDeviationWindow3)));
         potential.update(ImmutableMap.of(v.getReference(), DoubleTensor.scalar(random.nextGaussian() * targetStandardDeviationWindow3)));
 
         assertEquals(

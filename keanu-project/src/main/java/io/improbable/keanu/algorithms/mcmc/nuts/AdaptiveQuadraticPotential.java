@@ -60,15 +60,15 @@ public class AdaptiveQuadraticPotential implements Potential {
             return;
         }
 
-        forwardVariance.addSample(position);
-        backgroundVariance.addSample(position);
-
-        this.setVariance(forwardVariance.currentVariance());
-
         if (nSamples > 0 && nSamples % adaptionWindowSize == 0) {
             forwardVariance = backgroundVariance;
             backgroundVariance = new VarianceCalculator(zeros(variance), zeros(variance), 0);
         }
+
+        forwardVariance.addSample(position);
+        backgroundVariance.addSample(position);
+
+        this.setVariance(forwardVariance.currentVariance());
 
         nSamples++;
     }
