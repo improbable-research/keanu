@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 about = {}
 with open(os.path.join(here, 'nd4j', '__version__.py'), 'r', encoding='utf-8') as f:
-    exec (f.read(), about)
+    exec(f.read(), about)
 
 setup(
     name='nd4j',
