@@ -3,7 +3,6 @@ package io.improbable.keanu.algorithms.mcmc;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
 import java.util.List;
