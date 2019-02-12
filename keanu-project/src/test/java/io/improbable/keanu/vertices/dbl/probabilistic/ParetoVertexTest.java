@@ -70,9 +70,9 @@ public class ParetoVertexTest {
 
     @Test
     public void logProbGraphMatchesKnownLogDensityOfVector() {
-        DoubleVertex location = ConstantVertex.of(1., 1.);
+        DoubleVertex location = ConstantVertex.of(1.);
         DoubleVertex scale = ConstantVertex.of(1.5, 1.5);
-        ParetoVertex paretoVertex = new ParetoVertex(location, scale);
+        ParetoVertex paretoVertex = new ParetoVertex(new long[]{2}, location, scale);
         LogProbGraph logProbGraph = paretoVertex.logProbGraph();
 
         LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());

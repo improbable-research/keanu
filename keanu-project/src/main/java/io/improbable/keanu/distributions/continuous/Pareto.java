@@ -59,7 +59,7 @@ public class Pareto implements ContinuousDistribution {
     }
 
     public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, DoublePlaceholderVertex location, DoublePlaceholderVertex scale) {
-        final DoubleVertex zero = ConstantVertex.of(DoubleTensor.zeros(x.getShape()));
+        final DoubleVertex zero = ConstantVertex.of(DoubleTensor.create(0., x.getShape()));
         final BooleanVertex paramsAreValid = location.greaterThan(zero)
             .and(scale.greaterThan(zero));
 
