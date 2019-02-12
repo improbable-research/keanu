@@ -40,7 +40,7 @@ public class LeapfrogIntegratorTest {
 
         Map<VariableReference, DoubleTensor> p = ImmutableMap.of(vertex.getId(), scalar(0));
 
-        Potential potential = new AdaptiveQuadraticPotential(zeros(p), ones(p), 1, 100, KeanuRandom.getDefaultRandom());
+        Potential potential = new AdaptiveQuadraticPotential(zeros(p), ones(p), 1, 100, 101, KeanuRandom.getDefaultRandom());
 
         start = leapfrogAt(vertex, initialPosition, initialMomentum, potential);
 

@@ -7,12 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.divide;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.dotProduct;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.pow;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.reciprocal;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.subtract;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.times;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 
@@ -20,70 +15,65 @@ import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 public class AdaptiveQuadraticPotential implements Potential {
 
     private final int adaptCount;
+    private final int adaptionWindowSize;
+    private final KeanuRandom random;
 
     private Map<VariableReference, DoubleTensor> variance;
-    private Map<VariableReference, DoubleTensor> standardDeviation;
-    private Map<VariableReference, DoubleTensor> inverseStandardDeviation;
 
-    private WeightedVariance forwardVariance;
-    private WeightedVariance backgroundVariance;
+    private VarianceCalculator forwardVariance;
+    private VarianceCalculator backgroundVariance;
 
-    private final int adaptionWindow;
-
-    private int nSamples;
-
-    private KeanuRandom random;
+    private long nSamples;
 
     public AdaptiveQuadraticPotential(Map<VariableReference, DoubleTensor> initialMean,
                                       Map<VariableReference, DoubleTensor> initialVarianceDiagonal,
                                       double initialWeight,
                                       int adaptCount,
+                                      int adaptionWindowSize,
                                       KeanuRandom random) {
 
         this.adaptCount = adaptCount;
         this.variance = initialVarianceDiagonal;
-        this.standardDeviation = pow(initialVarianceDiagonal, 0.5);
-        this.inverseStandardDeviation = reciprocal(this.standardDeviation);
-        this.forwardVariance = new WeightedVariance(initialMean, initialVarianceDiagonal, initialWeight);
-        this.backgroundVariance = new WeightedVariance(zeros(initialMean), zeros(initialMean), 0);
-        this.nSamples = 0;
-        this.adaptionWindow = 101;
+
+        this.forwardVariance = new VarianceCalculator(initialMean, initialVarianceDiagonal, initialWeight);
+        this.backgroundVariance = new VarianceCalculator(zeros(initialMean), zeros(initialMean), 0);
+        this.adaptionWindowSize = adaptionWindowSize;
         this.random = random;
+        this.nSamples = 0;
     }
 
     @Override
-    public void update(Map<VariableReference, DoubleTensor> position, Map<? extends VariableReference, DoubleTensor> gradient, int sampleNum) {
+    public void update(Map<VariableReference, DoubleTensor> position) {
 
-        if (sampleNum > adaptCount) {
+        if (nSamples >= adaptCount) {
             return;
         }
 
         forwardVariance.addSample(position);
         backgroundVariance.addSample(position);
 
-        updateFromWeightVar(forwardVariance);
+        this.variance = forwardVariance.currentVariance();
 
-        if (nSamples > 0 && nSamples % adaptionWindow == 0) {
+        if (nSamples > 0 && nSamples % adaptionWindowSize == 0) {
             forwardVariance = backgroundVariance;
-            backgroundVariance = new WeightedVariance(zeros(variance), zeros(variance), 0);
+            backgroundVariance = new VarianceCalculator(zeros(variance), zeros(variance), 0);
         }
 
         nSamples++;
-    }
-
-    private void updateFromWeightVar(WeightedVariance weightedVariance) {
-        this.variance = weightedVariance.currentVariance();
-        this.standardDeviation = pow(this.variance, 0.5);
-        this.inverseStandardDeviation = reciprocal(this.standardDeviation);
     }
 
     @Override
     public Map<VariableReference, DoubleTensor> random() {
 
         Map<VariableReference, DoubleTensor> result = new HashMap<>();
-        for (VariableReference variable : inverseStandardDeviation.keySet()) {
-            DoubleTensor inverseStdForVariable = inverseStandardDeviation.get(variable);
-            DoubleTensor randomForVariable = random.nextGaussian(inverseStdForVariable.getShape()).timesInPlace(inverseStdForVariable);
+        for (VariableReference variable : variance.keySet()) {
+
+            DoubleTensor varianceForVariable = variance.get(variable);
+
+            DoubleTensor randomForVariable = random
+                .nextGaussian(varianceForVariable.getShape())
+                .divInPlace(varianceForVariable.pow(0.5));
+
             result.put(variable, randomForVariable);
         }
 
@@ -102,34 +92,4 @@ public class AdaptiveQuadraticPotential implements Potential {
         return 0.5 * dotProduct(momentum, velocity);
     }
 
-    private static class WeightedVariance {
-
-        private double weightSum;
-        private Map<VariableReference, DoubleTensor> mean;
-        private Map<VariableReference, DoubleTensor> rawVariance;
-
-        WeightedVariance(Map<VariableReference, DoubleTensor> initialMean, Map<VariableReference, DoubleTensor> initialVariance, double initialWeight) {
-            this.weightSum = initialWeight;
-            this.mean = initialMean;
-            this.rawVariance = times(initialVariance, weightSum);
-        }
-
-        private void addSample(Map<VariableReference, DoubleTensor> sample) {
-
-            this.weightSum += 1.0;
-
-            final double proportion = 1.0 / weightSum;
-
-            final Map<VariableReference, DoubleTensor> oldDiff = subtract(sample, mean);
-            this.mean = add(this.mean, times(oldDiff, proportion));
-
-            final Map<VariableReference, DoubleTensor> newDiff = subtract(sample, mean);
-            this.rawVariance = add(this.rawVariance, times(oldDiff, newDiff));
-        }
-
-        private Map<VariableReference, DoubleTensor> currentVariance() {
-            return divide(rawVariance, weightSum);
-        }
-
-    }
 }

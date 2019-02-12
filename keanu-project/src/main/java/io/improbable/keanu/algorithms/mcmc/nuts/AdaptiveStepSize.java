@@ -45,7 +45,7 @@ class AdaptiveStepSize implements SaveStatistics {
         this.logStepSizeBar = logStepSize;
         this.adaptCount = adaptCount;
         this.mu = Math.log(10 * stepSize);
-        this.stepNum = 0;
+        this.stepNum = 1;
     }
 
     public static double findStartingStepSizeSimple(double stepScale, List<? extends Variable<DoubleTensor, ?>> variables) {
@@ -64,16 +64,17 @@ class AdaptiveStepSize implements SaveStatistics {
      */
     public double adaptStepSize(Tree tree) {
 
-        stepNum++;
-
-        final double logStepSizeAtSample;
         if (stepNum <= adaptCount) {
-            logStepSizeAtSample = updateLogStepSize(tree);
-        } else {
-            logStepSizeAtSample = logStepSizeBar;
+
+            stepSize = Math.exp(updateLogStepSize(tree));
+
+        } else if (stepNum == adaptCount + 1) {
+
+            stepSize = Math.exp(logStepSizeBar);
         }
 
-        stepSize = Math.exp(logStepSizeAtSample);
+        stepNum++;
+
         return stepSize;
     }
 
@@ -90,7 +91,7 @@ class AdaptiveStepSize implements SaveStatistics {
 
         logStepSize = mu - (Math.sqrt(stepNum) / gamma) * hBar;
 
-        double tendToZero = Math.pow(stepNum, -kappa);
+        final double tendToZero = Math.pow(stepNum, -kappa);
         logStepSizeBar = tendToZero * logStepSize + (1 - tendToZero) * logStepSizeBar;
 
         return logStepSize;

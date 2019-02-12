@@ -144,7 +144,7 @@ class NUTSSampler implements SamplingAlgorithm {
         }
 
         if (this.adapPotentialEnabled) {
-            potential.update(proposal.getPosition(), proposal.getGradient(), sampleNum);
+            potential.update(proposal.getPosition());
         }
 
         sampleNum++;

@@ -128,7 +128,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        Potential potential = new AdaptiveQuadraticPotential(zeros(position), ones(position), 10.0, adaptCount, random);
+        Potential potential = new AdaptiveQuadraticPotential(zeros(position), ones(position), 10.0, adaptCount, 101, random);
 
         Proposal initialProposal = new Proposal(position, gradient, startingSample, initialLogOfMasterP);
 

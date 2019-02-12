@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface Potential {
 
-    void update(Map<VariableReference, DoubleTensor> position, Map<? extends VariableReference, DoubleTensor> gradient, int sampleNum);
+    void update(Map<VariableReference, DoubleTensor> position);
 
     Map<VariableReference, DoubleTensor> random();
 
