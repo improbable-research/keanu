@@ -66,17 +66,18 @@ public class DotSaver implements NetworkSaver {
     }
 
     private List<Vertex> getAnyVertexFromEachConnectedGraph() {
-        List<Vertex> vertices = new ArrayList<>();
+        List<Vertex> anyVertices = new ArrayList<>();
         List<Vertex> processedVertices = new ArrayList<>();
+        List<Vertex> allVertices = bayesianNetwork.getAllVertices();
 
-        for (Vertex vertex : bayesianNetwork.getAllVertices()) {
+        for (Vertex vertex : allVertices) {
             if (!processedVertices.contains(vertex)) {
-                vertices.add(vertex);
+                anyVertices.add(vertex);
                 processedVertices.addAll(vertex.getConnectedGraph());
             }
         }
 
-        return vertices;
+        return anyVertices;
     }
 
     /**
