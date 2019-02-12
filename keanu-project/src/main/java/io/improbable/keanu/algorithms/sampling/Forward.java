@@ -66,7 +66,7 @@ public class Forward implements PosteriorSamplingAlgorithm {
         BayesianNetwork network = new BayesianNetwork(((Vertex) latent).getConnectedGraph());
 
         List<Vertex> observedVertices = network.getObservedVertices();
-        assertUpstreamOfObservedDoesNotContainProbabilistic(observedVertices);
+        checkUpstreamOfObservedDoesNotContainProbabilistic(observedVertices);
 
         List<Vertex> verticesToSampleFrom = variablesToSampleFrom.stream().map(v -> (Vertex) v).collect(Collectors.toList());
         Set<Vertex> allUpstreamVertices = allUpstreamVertices(verticesToSampleFrom);
