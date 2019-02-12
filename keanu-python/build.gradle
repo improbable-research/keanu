@@ -54,7 +54,6 @@ task deleteDuplicatedJars() {
 task preparePythonClasspath {
     dependsOn(populatePythonClasspaths)
     dependsOn(deleteDuplicatedJars)
-    dependsOn(":keanu-python:nd4j:deleteUnneededJarsFromNd4jClasspath")
 }
 
 task preparePythonEnvironment {
