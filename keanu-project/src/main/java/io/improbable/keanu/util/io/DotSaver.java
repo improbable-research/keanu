@@ -61,11 +61,11 @@ public class DotSaver implements NetworkSaver {
     @Override
     public void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException {
         Preconditions.checkArgument(bayesianNetwork.getAllVertices().size() > 0, "Network must contain at least one vertex.");
-        List<Vertex> anyVertices = getRepresentativeVerticesForAllConnectedSubGraphs();
+        List<Vertex> anyVertices = getAnyVertexFromEachSubGraph();
         save(output, anyVertices, INFINITE_NETWORK_DEGREE, saveValues, metadata);
     }
 
-    private List<Vertex> getRepresentativeVerticesForAllConnectedSubGraphs() {
+    private List<Vertex> getAnyVertexFromEachSubGraph() {
         List<Vertex> vertices = new ArrayList<>();
         List<Vertex> processedVertices = new ArrayList<>();
 

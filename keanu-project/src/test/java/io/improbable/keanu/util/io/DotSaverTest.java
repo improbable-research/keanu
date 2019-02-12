@@ -47,7 +47,6 @@ public class DotSaverTest {
     private static final String OUTPUT_WITH_METADATA_FILENAME = resourcesFolder + "/OutputWithMetadata.dot";
     private static final String OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME = resourcesFolder + "/OutputWithDisconnectedVertices.dot";
     private static final String VERTEX_DEGREE1__OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME = resourcesFolder + "/VertexDegree1OutputWithDisconnectedVertices.dot";
-    private static final String VERTEX_DEGREE2__OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME = resourcesFolder + "/VertexDegree2OutputWithDisconnectedVertices.dot";
 
     @BeforeClass
     public static void setUpComplexNet() {
@@ -154,17 +153,6 @@ public class DotSaverTest {
     }
 
     @Test
-    public void dotSaveShowsDisconnectedVertices() throws IOException {
-        DoubleVertex v1 = new ConstantDoubleVertex(0.);
-        DoubleVertex v2 = new ConstantDoubleVertex(1.);
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(Arrays.asList(v1, v2));
-        DotSaver dotSaver = new DotSaver(bayesianNetwork);
-        dotSaver.save(outputWriter, true);
-        String expectedOutputWithValues = readFileToString(OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME);
-        checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
-    }
-
-    @Test
     public void dotSaveShowsDisconnectedVerticesWithDegree1() throws IOException {
         DoubleVertex v1 = new ConstantDoubleVertex(0.);
         DoubleVertex v2 = new ConstantDoubleVertex(1.);
@@ -188,7 +176,7 @@ public class DotSaverTest {
     }
 
     @Test
-    public void dotSaveShowsDisconnectedVerticesWithDegree2() throws IOException {
+    public void dotSaveShowsAllDisconnectedVertices() throws IOException {
         DoubleVertex v1 = new ConstantDoubleVertex(0.);
         DoubleVertex v2 = new ConstantDoubleVertex(1.);
         DoubleVertex gamma1 = new GammaVertex(1., v2);
@@ -206,7 +194,7 @@ public class DotSaverTest {
         BayesianNetwork bayesianNetwork = new BayesianNetwork(Arrays.asList(v1, v2, gamma1, gaussian1, v3, v4, gamma2, gaussian2));
         DotSaver dotSaver = new DotSaver(bayesianNetwork);
         dotSaver.save(outputWriter, Arrays.asList(gaussian1, gaussian2), 2, true);
-        String expectedOutputWithValues = readFileToString(VERTEX_DEGREE2__OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME);
+        String expectedOutputWithValues = readFileToString(OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
     }
 
