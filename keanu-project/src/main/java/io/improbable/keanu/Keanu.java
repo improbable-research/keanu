@@ -4,7 +4,6 @@ import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.graphtraversal.DifferentiableChecker;
 import io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection;
 import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
-import io.improbable.keanu.algorithms.sampling.ForwardSampler;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;

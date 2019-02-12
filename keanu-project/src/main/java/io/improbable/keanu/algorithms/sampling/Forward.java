@@ -1,15 +1,6 @@
 package io.improbable.keanu.algorithms.sampling;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.nd4j.base.Preconditions;
-
 import com.google.common.collect.Sets;
-
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
@@ -23,6 +14,13 @@ import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import org.nd4j.base.Preconditions;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Forward implements PosteriorSamplingAlgorithm {
 

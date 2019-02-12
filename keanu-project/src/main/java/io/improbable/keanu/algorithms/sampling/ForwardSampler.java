@@ -1,8 +1,5 @@
 package io.improbable.keanu.algorithms.sampling;
 
-import java.util.List;
-import java.util.Map;
-
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.Variable;
@@ -11,6 +8,9 @@ import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
+
+import java.util.List;
+import java.util.Map;
 
 public class ForwardSampler implements SamplingAlgorithm {
 
