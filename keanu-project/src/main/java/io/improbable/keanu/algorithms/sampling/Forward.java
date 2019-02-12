@@ -77,10 +77,10 @@ public class Forward implements PosteriorSamplingAlgorithm {
         return new ForwardSampler(verticesToSampleFrom, sortedVertices, random);
     }
 
-    private List<Vertex> removeNonProbabilisticVerticesBeforeTheFirstProbabilistic(List<Vertex> vertices) {
-        List<Vertex> copy = new ArrayList<>(vertices);
+    private List<Vertex> removeNonProbabilisticVerticesBeforeTheFirstProbabilistic(List<Vertex> topologicalVertices) {
+        List<Vertex> copy = new ArrayList<>(topologicalVertices);
 
-        for (Vertex vertex : vertices) {
+        for (Vertex vertex : topologicalVertices) {
             if (vertex instanceof Probabilistic) {
                 break;
             } else {
