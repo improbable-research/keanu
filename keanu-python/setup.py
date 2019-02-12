@@ -28,7 +28,7 @@ setup(
     license='MIT',
     packages=find_packages(exclude=["examples"]),
     include_package_data=True,
-    install_requires=['py4j', 'numpy', 'pandas', 'nd4j'],
+    install_requires=['py4j', 'numpy', 'pandas', 'nd4j==1.0.0-beta3'],
     classifiers=[
         'Development Status :: 1 - Planning', 'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.6'
