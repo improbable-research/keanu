@@ -5,11 +5,11 @@ keanu.algorithm
 Inference
 ~~~~~~~~~
 
-.. automodule:: keanu.algorithm
+.. automodule:: keanu.algorithm.sampling
     :members: sample, generate_samples
 
 Samplers
 ~~~~~~~~
 
-.. automodule:: keanu.algorithm
-    :members: MetropolisHastingsSampler, NUTSSampler
+.. autoclass:: keanu.algorithm.sampling.MetropolisHastingsSampler
+.. autoclass:: keanu.algorithm.sampling.NUTSSampler

@@ -44,8 +44,8 @@
 <li class="toctree-l2 current"><a class="reference internal" href="keanu.html#submodules">Submodules</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="keanu.vertex.html">keanu.vertex</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">keanu.algorithm</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#module-keanu.algorithm">Inference</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-keanu.algorithm">Samplers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-keanu.algorithm.sampling">Inference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#samplers">Samplers</a></li>
 </ul>
 </li>
 </ul>
@@ -94,11 +94,11 @@
             
   <div class="section" id="keanu-algorithm">
 <h1>keanu.algorithm<a class="headerlink" href="#keanu-algorithm" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-keanu.algorithm">
-<span id="inference"></span><h2>Inference<a class="headerlink" href="#module-keanu.algorithm" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-keanu.algorithm.sampling">
+<span id="inference"></span><h2>Inference<a class="headerlink" href="#module-keanu.algorithm.sampling" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="keanu.algorithm.sample">
-<code class="descclassname">keanu.algorithm.</code><code class="descname">sample</code><span class="sig-paren">(</span><em>net</em>, <em>sample_from</em>, <em>sampling_algorithm=None</em>, <em>draws=500</em>, <em>drop=0</em>, <em>down_sample_interval=1</em>, <em>plot=False</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.sample" title="Permalink to this definition">¶</a></dt>
+<dt id="keanu.algorithm.sampling.sample">
+<code class="descclassname">keanu.algorithm.sampling.</code><code class="descname">sample</code><span class="sig-paren">(</span><em>net</em>, <em>sample_from</em>, <em>sampling_algorithm=None</em>, <em>draws=500</em>, <em>drop=0</em>, <em>down_sample_interval=1</em>, <em>plot=False</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.sampling.sample" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -107,8 +107,8 @@
 <li><strong>net</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">BayesNet</span></code>) – Bayesian Network containing latent variables.</li>
 <li><strong>sample_from</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code>]) – Vertices to include in the returned samples.</li>
 <li><strong>sampling_algorithm</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PosteriorSamplingAlgorithm</span></code>]) – The posterior sampling algorithm to use.
-Options are <a class="reference internal" href="#keanu.algorithm.MetropolisHastingsSampler" title="keanu.algorithm.MetropolisHastingsSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code></a> and <a class="reference internal" href="#keanu.algorithm.NUTSSampler" title="keanu.algorithm.NUTSSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.NUTSSampler</span></code></a>.
-If not set, <a class="reference internal" href="#keanu.algorithm.MetropolisHastingsSampler" title="keanu.algorithm.MetropolisHastingsSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code></a> is chosen with ‘prior’ as its proposal distribution.</li>
+Options are <code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.NUTSSampler</span></code>.
+If not set, <code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code> is chosen with ‘prior’ as its proposal distribution.</li>
 <li><strong>draws</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of samples to take.</li>
 <li><strong>drop</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of samples to drop before collecting anything.
 If this is zero then no samples will be dropped before collecting.</li>
@@ -138,8 +138,8 @@ If not set, a new one is created.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="keanu.algorithm.generate_samples">
-<code class="descclassname">keanu.algorithm.</code><code class="descname">generate_samples</code><span class="sig-paren">(</span><em>net</em>, <em>sample_from</em>, <em>sampling_algorithm=None</em>, <em>drop=0</em>, <em>down_sample_interval=1</em>, <em>live_plot=False</em>, <em>refresh_every=100</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#generate_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.generate_samples" title="Permalink to this definition">¶</a></dt>
+<dt id="keanu.algorithm.sampling.generate_samples">
+<code class="descclassname">keanu.algorithm.sampling.</code><code class="descname">generate_samples</code><span class="sig-paren">(</span><em>net</em>, <em>sample_from</em>, <em>sampling_algorithm=None</em>, <em>drop=0</em>, <em>down_sample_interval=1</em>, <em>live_plot=False</em>, <em>refresh_every=100</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#generate_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.sampling.generate_samples" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -148,8 +148,8 @@ If not set, a new one is created.</li>
 <li><strong>net</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">BayesNet</span></code>) – Bayesian Network containing latent variables.</li>
 <li><strong>sample_from</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code>]) – Vertices to include in the returned samples.</li>
 <li><strong>sampling_algorithm</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PosteriorSamplingAlgorithm</span></code>]) – The posterior sampling algorithm to use.
-Options are <a class="reference internal" href="#keanu.algorithm.MetropolisHastingsSampler" title="keanu.algorithm.MetropolisHastingsSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code></a> and <a class="reference internal" href="#keanu.algorithm.NUTSSampler" title="keanu.algorithm.NUTSSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.NUTSSampler</span></code></a>.
-If not set, <a class="reference internal" href="#keanu.algorithm.MetropolisHastingsSampler" title="keanu.algorithm.MetropolisHastingsSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code></a> is chosen with ‘prior’ as its proposal distribution.</li>
+Options are <code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.NUTSSampler</span></code>.
+If not set, <code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code> is chosen with ‘prior’ as its proposal distribution.</li>
 <li><strong>drop</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of samples to drop before collecting anything.
 If this is zero then no samples will be dropped before collecting.</li>
 <li><strong>down_sample_interval</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Collect 1 sample for every <cite>down_sample_interval</cite>.
@@ -180,11 +180,11 @@ If not set, a new one is created.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-keanu.algorithm">
-<span id="samplers"></span><h2>Samplers<a class="headerlink" href="#module-keanu.algorithm" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="samplers">
+<h2>Samplers<a class="headerlink" href="#samplers" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="keanu.algorithm.MetropolisHastingsSampler">
-<em class="property">class </em><code class="descclassname">keanu.algorithm.</code><code class="descname">MetropolisHastingsSampler</code><span class="sig-paren">(</span><em>proposal_distribution</em>, <em>latents</em>, <em>proposal_listeners=[]</em>, <em>proposal_distribution_sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#MetropolisHastingsSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.MetropolisHastingsSampler" title="Permalink to this definition">¶</a></dt>
+<dt id="keanu.algorithm.sampling.MetropolisHastingsSampler">
+<em class="property">class </em><code class="descclassname">keanu.algorithm.sampling.</code><code class="descname">MetropolisHastingsSampler</code><span class="sig-paren">(</span><em>proposal_distribution</em>, <em>latents</em>, <em>proposal_listeners=[]</em>, <em>proposal_distribution_sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#MetropolisHastingsSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.sampling.MetropolisHastingsSampler" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -209,8 +209,8 @@ If not set, a new one is created.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="keanu.algorithm.NUTSSampler">
-<em class="property">class </em><code class="descclassname">keanu.algorithm.</code><code class="descname">NUTSSampler</code><span class="sig-paren">(</span><em>adapt_count=None</em>, <em>target_acceptance_prob=None</em>, <em>adapt_enabled=None</em>, <em>initial_step_size=None</em>, <em>max_tree_height=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#NUTSSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.NUTSSampler" title="Permalink to this definition">¶</a></dt>
+<dt id="keanu.algorithm.sampling.NUTSSampler">
+<em class="property">class </em><code class="descclassname">keanu.algorithm.sampling.</code><code class="descname">NUTSSampler</code><span class="sig-paren">(</span><em>adapt_count=None</em>, <em>target_acceptance_prob=None</em>, <em>adapt_enabled=None</em>, <em>initial_step_size=None</em>, <em>max_tree_height=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#NUTSSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.sampling.NUTSSampler" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
