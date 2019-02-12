@@ -1,6 +1,7 @@
 ### Version 0.0.20 ###
 
 ## Common
+* Can save dot files with disconnected vertices in BayesianNetwork.
 * Saving a network as a DOT file includes labels on constant vertices.
 
 ## Python
