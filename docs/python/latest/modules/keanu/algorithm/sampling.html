@@ -113,7 +113,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampler</span>
 
 
-<div class="viewcode-block" id="MetropolisHastingsSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.MetropolisHastingsSampler">[docs]</a><span class="k">class</span> <span class="nc">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
+<div class="viewcode-block" id="MetropolisHastingsSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.MetropolisHastingsSampler">[docs]</a><span class="k">class</span> <span class="nc">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param proposal_distribution: The proposal distribution for Metropolis Hastings. Options are &#39;gaussian&#39; and &#39;prior&#39;.</span>
 <span class="sd">    :param latents: All latent vertices.</span>
@@ -152,7 +152,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="NUTSSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.NUTSSampler">[docs]</a><span class="k">class</span> <span class="nc">NUTSSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
+<div class="viewcode-block" id="NUTSSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.NUTSSampler">[docs]</a><span class="k">class</span> <span class="nc">NUTSSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param adapt_count: The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value. Defaults to 1000.</span>
 <span class="sd">    :param target_acceptance_prob: The target acceptance probability. Defaults to 0.65 (Beskos et al., 2010; Neal, 2011).</span>
@@ -188,7 +188,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">builder</span><span class="o">.</span><span class="n">build</span><span class="p">())</span></div>
 
 
-<span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="n">net</span><span class="p">:</span> <span class="n">BayesNet</span><span class="p">,</span>
+<div class="viewcode-block" id="sample"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.sample">[docs]</a><span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="n">net</span><span class="p">:</span> <span class="n">BayesNet</span><span class="p">,</span>
            <span class="n">sample_from</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Vertex</span><span class="p">],</span>
            <span class="n">sampling_algorithm</span><span class="p">:</span> <span class="n">PosteriorSamplingAlgorithm</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
            <span class="n">draws</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
@@ -242,10 +242,10 @@
     <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
         <span class="n">traceplot</span><span class="p">(</span><span class="n">vertex_samples</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">vertex_samples</span>
+    <span class="k">return</span> <span class="n">vertex_samples</span></div>
 
 
-<span class="k">def</span> <span class="nf">generate_samples</span><span class="p">(</span><span class="n">net</span><span class="p">:</span> <span class="n">BayesNet</span><span class="p">,</span>
+<div class="viewcode-block" id="generate_samples"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.generate_samples">[docs]</a><span class="k">def</span> <span class="nf">generate_samples</span><span class="p">(</span><span class="n">net</span><span class="p">:</span> <span class="n">BayesNet</span><span class="p">,</span>
                      <span class="n">sample_from</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Vertex</span><span class="p">],</span>
                      <span class="n">sampling_algorithm</span><span class="p">:</span> <span class="n">PosteriorSamplingAlgorithm</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                      <span class="n">drop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -299,7 +299,7 @@
         <span class="n">refresh_every</span><span class="o">=</span><span class="n">refresh_every</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
         <span class="n">all_scalar</span><span class="o">=</span><span class="n">all_are_scalar</span><span class="p">,</span>
-        <span class="n">id_to_label</span><span class="o">=</span><span class="n">id_to_label</span><span class="p">)</span>
+        <span class="n">id_to_label</span><span class="o">=</span><span class="n">id_to_label</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">__all_scalar</span><span class="p">(</span><span class="n">sample_from</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Vertex</span><span class="p">]):</span>

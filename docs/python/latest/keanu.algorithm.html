@@ -44,7 +44,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="keanu.html#submodules">Submodules</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="keanu.vertex.html">keanu.vertex</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">keanu.algorithm</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#inference">Inference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-keanu.algorithm">Inference</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#samplers">Samplers</a></li>
 </ul>
 </li>
@@ -94,11 +94,11 @@
             
   <div class="section" id="keanu-algorithm">
 <h1>keanu.algorithm<a class="headerlink" href="#keanu-algorithm" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="inference">
-<h2>Inference<a class="headerlink" href="#inference" title="Permalink to this headline">¶</a></h2>
-<dl class="method">
+<div class="section" id="module-keanu.algorithm">
+<span id="inference"></span><h2>Inference<a class="headerlink" href="#module-keanu.algorithm" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
 <dt id="keanu.algorithm.sample">
-<code class="descclassname">algorithm.</code><code class="descname">sample</code><span class="sig-paren">(</span><em>sample_from</em>, <em>sampling_algorithm=None</em>, <em>draws=500</em>, <em>drop=0</em>, <em>down_sample_interval=1</em>, <em>plot=False</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#keanu.algorithm.sample" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.algorithm.</code><code class="descname">sample</code><span class="sig-paren">(</span><em>net</em>, <em>sample_from</em>, <em>sampling_algorithm=None</em>, <em>draws=500</em>, <em>drop=0</em>, <em>down_sample_interval=1</em>, <em>plot=False</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.sample" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -137,9 +137,9 @@ If not set, a new one is created.</li>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="function">
 <dt id="keanu.algorithm.generate_samples">
-<code class="descclassname">algorithm.</code><code class="descname">generate_samples</code><span class="sig-paren">(</span><em>sample_from</em>, <em>sampling_algorithm=None</em>, <em>drop=0</em>, <em>down_sample_interval=1</em>, <em>live_plot=False</em>, <em>refresh_every=100</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#keanu.algorithm.generate_samples" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">keanu.algorithm.</code><code class="descname">generate_samples</code><span class="sig-paren">(</span><em>net</em>, <em>sample_from</em>, <em>sampling_algorithm=None</em>, <em>drop=0</em>, <em>down_sample_interval=1</em>, <em>live_plot=False</em>, <em>refresh_every=100</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#generate_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.generate_samples" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

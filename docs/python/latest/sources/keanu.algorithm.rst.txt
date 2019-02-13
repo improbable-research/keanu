@@ -5,8 +5,9 @@ keanu.algorithm
 Inference
 ~~~~~~~~~
 
-.. automethod:: keanu.algorithm.sample
-.. automethod:: keanu.algorithm.generate_samples
+.. automodule:: keanu.algorithm
+    :members: sample, generate_samples
+
 
 Samplers
 ~~~~~~~~
