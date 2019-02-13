@@ -6,9 +6,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.divide;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.subtract;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.times;
 
 /**
@@ -27,20 +25,32 @@ public class VarianceCalculator {
         this.M2 = times(initialVariance, count);
     }
 
-    public void addSample(Map<VariableReference, DoubleTensor> sample) {
+    public void addSample(Map<VariableReference, DoubleTensor> sampleForLatents) {
 
         this.count += 1.0;
 
-        final Map<VariableReference, DoubleTensor> delta = subtract(sample, mean);
+        for (Map.Entry<VariableReference, DoubleTensor> sampleForVariable : sampleForLatents.entrySet()) {
 
-        this.mean = add(this.mean, divide(delta, count));
+            final VariableReference v = sampleForVariable.getKey();
+            final DoubleTensor sample = sampleForVariable.getValue();
 
-        final Map<VariableReference, DoubleTensor> delta2 = subtract(sample, mean);
+            final DoubleTensor oldMean = mean.get(v);
 
-        this.M2 = add(this.M2, times(delta, delta2));
+            final DoubleTensor delta = sample.minus(oldMean);
+
+            final DoubleTensor newMean = oldMean.plus(delta.div(count));
+
+            final DoubleTensor delta2 = sample.minus(newMean);
+
+            final DoubleTensor oldM2 = this.M2.get(v);
+            final DoubleTensor newM2 = oldM2.plus(delta.times(delta2));
+
+            mean.put(v, newMean);
+            M2.put(v, newM2);
+        }
     }
 
-    public Map<VariableReference, DoubleTensor> currentVariance() {
+    public Map<VariableReference, DoubleTensor> calculateCurrentVariance() {
         return divide(M2, count);
     }
 

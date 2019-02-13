@@ -38,12 +38,12 @@ public class VarianceCalculatorTest {
 
             varianceCalculator.addSample(sample);
 
-            double variance = varianceCalculator.currentVariance().get(v.getReference()).scalar();
+            double variance = varianceCalculator.calculateCurrentVariance().get(v.getReference()).scalar();
             double expected = statistics.getPopulationVariance();
 
             assertEquals(expected, variance, 1e-3);
         }
 
-        assertEquals(targetStandardDeviation, Math.sqrt(varianceCalculator.currentVariance().get(v.getReference()).scalar()), 1e-2);
+        assertEquals(targetStandardDeviation, Math.sqrt(varianceCalculator.calculateCurrentVariance().get(v.getReference()).scalar()), 1e-2);
     }
 }

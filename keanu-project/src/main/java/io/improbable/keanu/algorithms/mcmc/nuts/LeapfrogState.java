@@ -31,9 +31,11 @@ public class LeapfrogState {
     private final double energy;
 
     /**
-     * @param position the position of the variables
-     * @param momentum the velocity of the variables
-     * @param gradient the gradient of the variables
+     * @param position  the position of the variables
+     * @param momentum  the velocity of the variables
+     * @param gradient  the gradient of the variables
+     * @param logProb   the log probability at the position
+     * @param potential the potential to use for calculating velocity and kinetic energy
      */
     public LeapfrogState(Map<VariableReference, DoubleTensor> position,
                          Map<VariableReference, DoubleTensor> momentum,

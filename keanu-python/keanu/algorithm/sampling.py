@@ -48,7 +48,6 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
                  latents: Iterable[Vertex],
                  proposal_listeners=[],
                  proposal_distribution_sigma: numpy_types = None):
-
         if (proposal_distribution is None and len(proposal_listeners) > 0):
             raise TypeError("If you pass in proposal_listeners you must also specify proposal_distribution")
 
@@ -81,9 +80,12 @@ class NUTSSampler(PosteriorSamplingAlgorithm):
 
     def __init__(self,
                  adapt_count: int = None,
+                 adapt_step_size_enabled: bool = None,
+                 adapt_potential_enabled: bool = None,
                  target_acceptance_prob: float = None,
-                 adapt_enabled: bool = None,
                  initial_step_size: float = None,
+                 potential_adapt_window_size: int = None,
+                 max_energy_change: float = None,
                  max_tree_height: int = None):
 
         builder: JavaObject = k.jvm_view().NUTS.builder()
@@ -94,11 +96,20 @@ class NUTSSampler(PosteriorSamplingAlgorithm):
         if target_acceptance_prob is not None:
             builder.targetAcceptanceProb(target_acceptance_prob)
 
-        if adapt_enabled is not None:
-            builder.adaptEnabled(adapt_enabled)
+        if adapt_step_size_enabled is not None:
+            builder.adaptStepSizeEnabled(adapt_step_size_enabled)
+
+        if adapt_potential_enabled is not None:
+            builder.adaptPotentialEnabled(adapt_potential_enabled)
+
+        if potential_adapt_window_size is not None:
+            builder.potentialAdaptWindowSize(potential_adapt_window_size)
 
         if initial_step_size is not None:
             builder.initialStepSize(initial_step_size)
+
+        if max_energy_change is not None:
+            builder.maxEnergyChange(max_energy_change)
 
         if max_tree_height is not None:
             builder.maxTreeHeight(max_tree_height)

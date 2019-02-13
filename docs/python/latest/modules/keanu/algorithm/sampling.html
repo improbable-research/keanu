@@ -130,7 +130,6 @@
                  <span class="n">latents</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Vertex</span><span class="p">],</span>
                  <span class="n">proposal_listeners</span><span class="o">=</span><span class="p">[],</span>
                  <span class="n">proposal_distribution_sigma</span><span class="p">:</span> <span class="n">numpy_types</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="p">(</span><span class="n">proposal_distribution</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">proposal_listeners</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;If you pass in proposal_listeners you must also specify proposal_distribution&quot;</span><span class="p">)</span>
 
@@ -163,9 +162,12 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">adapt_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">adapt_step_size_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">adapt_potential_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">target_acceptance_prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">adapt_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">initial_step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">potential_adapt_window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">max_energy_change</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">max_tree_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
         <span class="n">builder</span><span class="p">:</span> <span class="n">JavaObject</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">NUTS</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span>
@@ -176,11 +178,20 @@
         <span class="k">if</span> <span class="n">target_acceptance_prob</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">builder</span><span class="o">.</span><span class="n">targetAcceptanceProb</span><span class="p">(</span><span class="n">target_acceptance_prob</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">adapt_enabled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">builder</span><span class="o">.</span><span class="n">adaptEnabled</span><span class="p">(</span><span class="n">adapt_enabled</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">adapt_step_size_enabled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">adaptStepSizeEnabled</span><span class="p">(</span><span class="n">adapt_step_size_enabled</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">adapt_potential_enabled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">adaptPotentialEnabled</span><span class="p">(</span><span class="n">adapt_potential_enabled</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">potential_adapt_window_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">potentialAdaptWindowSize</span><span class="p">(</span><span class="n">potential_adapt_window_size</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">initial_step_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">builder</span><span class="o">.</span><span class="n">initialStepSize</span><span class="p">(</span><span class="n">initial_step_size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">max_energy_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">maxEnergyChange</span><span class="p">(</span><span class="n">max_energy_change</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">max_tree_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">builder</span><span class="o">.</span><span class="n">maxTreeHeight</span><span class="p">(</span><span class="n">max_tree_height</span><span class="p">)</span>

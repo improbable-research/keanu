@@ -68,7 +68,7 @@ public class AdaptiveQuadraticPotential implements Potential {
         forwardVariance.addSample(position);
         backgroundVariance.addSample(position);
 
-        this.setVariance(forwardVariance.currentVariance());
+        this.setVariance(forwardVariance.calculateCurrentVariance());
 
         nSamples++;
     }

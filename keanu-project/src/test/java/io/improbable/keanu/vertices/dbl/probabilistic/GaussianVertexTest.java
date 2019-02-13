@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -194,20 +193,6 @@ public class GaussianVertexTest {
         double bucketSize = 0.05;
 
         ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(vertex, from, to, bucketSize, 1e-2, random);
-    }
-
-    @Test
-    public void gaussianSampleMatchesKnownMeanAndVariance() {
-        GaussianVertex vertex = new GaussianVertex(3, 2);
-
-        SummaryStatistics statistics = new SummaryStatistics();
-
-        for (int i = 0; i < 10000; i++) {
-            statistics.addValue(vertex.sample().scalar());
-        }
-
-        assertEquals(statistics.getStandardDeviation(), 2, 1e-2);
-        assertEquals(statistics.getMean(), 3, 1e-2);
     }
 
     @Test

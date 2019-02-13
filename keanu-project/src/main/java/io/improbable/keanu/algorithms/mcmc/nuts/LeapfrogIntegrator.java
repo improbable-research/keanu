@@ -16,6 +16,7 @@ public class LeapfrogIntegrator {
     /**
      * Performs one leapfrog of the variables with a time delta as defined by epsilon
      *
+     * @param fromState                 the state to leap from
      * @param logProbGradientCalculator the calculator for the log prob gradient
      * @param epsilon                   the time delta
      * @return a new leapfrog having taken one step through space

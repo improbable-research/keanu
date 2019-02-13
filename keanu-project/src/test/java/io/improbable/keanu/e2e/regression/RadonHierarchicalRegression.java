@@ -8,16 +8,18 @@ import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.HalfCauchyVertex;
 import lombok.Value;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +58,7 @@ public class RadonHierarchicalRegression {
     }
 
     @Test
+    @Category(Slow.class)
     public void canPerformRegressionWithEightHierarchies() {
         buildAndRunHierarchicalNetwork(radonData, 8);
     }
@@ -81,83 +84,94 @@ public class RadonHierarchicalRegression {
             throw new IllegalArgumentException("Not enough data for " + numberOfModels + " models!");
         }
 
-        GaussianVertex muAlpha = new GaussianVertex(0, 10).setLabel("MuIntercept");
-        GaussianVertex muBeta = new GaussianVertex(0, 10).setLabel("MuGradient");
+        GaussianVertex muIntercept = new GaussianVertex(0, 1.0).setLabel("MuIntercept");
+        GaussianVertex muGradient = new GaussianVertex(0, 1.0).setLabel("MuGradient");
 
-        DoubleVertex sigmaAlpha = new HalfGaussianVertex(0.5).setLabel("SigmaIntercept");
-        DoubleVertex sigmaBeta = new HalfGaussianVertex(0.5).setLabel("SigmaGradient");
+        DoubleVertex sigmaIntercept = new HalfCauchyVertex(1.0).setLabel("SigmaIntercept");
+        DoubleVertex sigmaGradient = new HalfCauchyVertex(1.0).setLabel("SigmaGradient");
 
-//        DoubleVertex sigmaAlpha = new GaussianVertex(0, 0.5).pow(2).pow(0.5).setLabel("SigmaIntercept");
-//        DoubleVertex sigmaBeta = new GaussianVertex(0, 0.5).pow(2).pow(0.5).setLabel("SigmaGradient");
+        DoubleVertex eps = new HalfCauchyVertex(1.0).setLabel("Eps");
 
         final List<SubModel> models = radonData.keySet().stream()
             .sorted()
             .limit(numberOfModels)
-            .map(county -> createSubModel(radonData.get(county), muBeta, muAlpha, sigmaBeta, sigmaAlpha))
+            .map(county -> createSubModel(radonData.get(county), muGradient, muIntercept, sigmaGradient, sigmaIntercept, eps))
             .collect(Collectors.toList());
 
-        BayesianNetwork net = new BayesianNetwork(muAlpha.getConnectedGraph());
+        BayesianNetwork net = new BayesianNetwork(muIntercept.getConnectedGraph());
 
-        final NetworkSamples samples = sampleWithNUTS(net, Arrays.asList(muAlpha, muBeta, sigmaAlpha, sigmaBeta));
+        final NetworkSamples samples = sampleWithNUTS(net, Arrays.asList(muIntercept, muGradient, sigmaIntercept, sigmaGradient, eps));
 
-        assertSampleAveragesAreCorrect(muAlpha, muBeta, sigmaAlpha, sigmaBeta, models, samples);
+        assertSampleAveragesAreCorrect(muIntercept, muGradient, sigmaIntercept, sigmaGradient, eps, models, samples);
     }
 
     private SubModel createSubModel(List<Data> data,
                                     DoubleVertex muGradient,
                                     DoubleVertex muIntercept,
                                     DoubleVertex sigmaGradient,
-                                    DoubleVertex sigmaIntercept) {
+                                    DoubleVertex sigmaIntercept,
+                                    DoubleVertex eps) {
 
         double[] floorForSubModel = data.stream().mapToDouble(d -> d.floor).toArray();
         double[] radonForSubModel = data.stream().mapToDouble(d -> d.log_radon).toArray();
 
-        DoubleVertex x = ConstantVertex.of(DoubleTensor.create(floorForSubModel, floorForSubModel.length, 1));
+        DoubleVertex x = ConstantVertex.of(DoubleTensor.create(floorForSubModel, floorForSubModel.length));
 
         DoubleVertex gradient = new GaussianVertex(muGradient, sigmaGradient);
         DoubleVertex intercept = new GaussianVertex(muIntercept, sigmaIntercept);
 
         DoubleVertex y = x.times(gradient).plus(intercept);
 
-        DoubleVertex yObs = new GaussianVertex(y, 1);
-        yObs.observe(DoubleTensor.create(radonForSubModel, floorForSubModel.length, 1));
+        DoubleVertex yObs = new GaussianVertex(y, eps);
+        yObs.observe(DoubleTensor.create(radonForSubModel, floorForSubModel.length));
 
         return new SubModel(gradient, intercept);
     }
 
     private NetworkSamples sampleWithNUTS(BayesianNetwork bayesianNetwork, List<Vertex> sampleFrom) {
 
-        // note that way too few samples are taken due to time constraints
+        int sampleCount = 1500;
         KeanuProbabilisticModelWithGradient probabilisticModel = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
         return NUTS.builder()
-            .maxTreeHeight(8)
-            .adaptCount(1000)
+            .adaptCount(sampleCount)
             .build()
-            .getPosteriorSamples(probabilisticModel, sampleFrom, 1000)
-            .drop(100);
+            .getPosteriorSamples(probabilisticModel, sampleFrom, sampleCount)
+            .drop(sampleCount / 4);
     }
 
-    private void assertSampleAveragesAreCorrect(final DoubleVertex muAlpha,
-                                                final DoubleVertex muBeta,
-                                                final DoubleVertex sigmaAlpha,
-                                                final DoubleVertex sigmaBeta,
+    private void assertSampleAveragesAreCorrect(final DoubleVertex muIntercept,
+                                                final DoubleVertex muGradient,
+                                                final DoubleVertex sigmaIntercept,
+                                                final DoubleVertex sigmaGradient,
+                                                final DoubleVertex eps,
                                                 final List<SubModel> models,
                                                 final NetworkSamples samples) {
-        double averagePosteriorMuA = samples.getDoubleTensorSamples(muAlpha).getAverages().scalar();
-        double averagePosteriorSigmaA = samples.getDoubleTensorSamples(sigmaAlpha).getAverages().scalar();
-        double averagePosteriorMuB = samples.getDoubleTensorSamples(muBeta).getAverages().scalar();
-        double averagePosteriorSigmaB = samples.getDoubleTensorSamples(sigmaBeta).getAverages().scalar();
 
-        assertThat(averagePosteriorMuB, allOf(greaterThan(-0.9), lessThan(-0.4)));
-        assertThat(averagePosteriorMuA, allOf(greaterThan(1.2), lessThan(1.8)));
+        double averagePosteriorMuIntercept = samples.getDoubleTensorSamples(muIntercept).getAverages().scalar();
+        double averagePosteriorSigmaIntercept = samples.getDoubleTensorSamples(sigmaIntercept).getAverages().scalar();
+        double averagePosteriorMuGradient = samples.getDoubleTensorSamples(muGradient).getAverages().scalar();
+        double averagePosteriorSigmaGradient = samples.getDoubleTensorSamples(sigmaGradient).getAverages().scalar();
+        double averagePosteriorEps = samples.getDoubleTensorSamples(eps).getAverages().scalar();
 
-        assertThat(averagePosteriorSigmaB, allOf(greaterThan(0.), lessThan(0.5)));
-        assertThat(averagePosteriorSigmaA, allOf(greaterThan(0.), lessThan(0.5)));
+        //-0.65
+        assertThat(averagePosteriorMuGradient, allOf(greaterThan(-0.9), lessThan(-0.4)));
+
+        //1.49
+        assertThat(averagePosteriorMuIntercept, allOf(greaterThan(1.2), lessThan(1.8)));
+
+        //0.3
+        assertThat(averagePosteriorSigmaGradient, allOf(greaterThan(0.), lessThan(0.5)));
+
+        //0.325
+        assertThat(averagePosteriorSigmaIntercept, allOf(greaterThan(0.), lessThan(0.5)));
+
+        //0.72
+        assertThat(averagePosteriorEps, allOf(greaterThan(0.6), lessThan(0.8)));
 
         for (SubModel subModel : models) {
             double weight = subModel.getWeightVertex().getValue().scalar();
             double intercept = subModel.getInterceptVertex().getValue().scalar();
-            assertThat(weight, both(greaterThan(-3.0)).and(lessThan(0.)));
+            assertThat(weight, both(greaterThan(-3.0)).and(lessThan(1.0)));
             assertThat(intercept, both(greaterThan(0.)).and(lessThan(3.0)));
         }
     }
