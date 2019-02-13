@@ -231,7 +231,6 @@ def test_iter_returns_same_result_as_sample() -> None:
 
 
 def test_iter_with_live_plot(net: BayesNet) -> None:
-    KeanuRandom.set_default_random_seed(1)
     num_plots = 3
     _, ax = plt.subplots(num_plots, 1, squeeze=False)
     samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), live_plot=True, refresh_every=5, ax=ax)

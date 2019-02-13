@@ -59,9 +59,11 @@ public class Forward implements PosteriorSamplingAlgorithm {
         List<? extends Variable> latentVariables = model.getLatentVariables();
         Preconditions.checkArgument(latentVariables.size() > 0, "Your model must contain latent variables in order to forward sample.");
 
-        Variable latent = latentVariables.get(0);
-        Preconditions.checkArgument(latent instanceof Vertex, "The Forward Sampler only works for Variables of type Vertex.");
+        for (Variable variable : variablesToSampleFrom) {
+            Preconditions.checkArgument(variable instanceof Vertex, "The Forward Sampler only works for Variables of type Vertex. Received : " + variable);
+        }
 
+        Variable latent = latentVariables.get(0);
         BayesianNetwork network = new BayesianNetwork(((Vertex) latent).getConnectedGraph());
 
         List<Vertex> observedVertices = network.getObservedVertices();
