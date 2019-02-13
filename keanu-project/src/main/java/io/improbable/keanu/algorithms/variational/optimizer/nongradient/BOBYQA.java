@@ -10,7 +10,6 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
-
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -23,9 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsDoubleTensors;
-
 import static java.util.stream.Collectors.toList;
-
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 @AllArgsConstructor
