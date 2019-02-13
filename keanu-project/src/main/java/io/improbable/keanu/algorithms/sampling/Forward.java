@@ -16,6 +16,7 @@ import io.improbable.keanu.vertices.Vertex;
 import org.nd4j.base.Preconditions;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -76,13 +77,13 @@ public class Forward implements PosteriorSamplingAlgorithm {
     }
 
     private List<Vertex> removeNonProbabilisticVerticesBeforeTheFirstProbabilistic(List<Vertex> topologicalVertices) {
-        List<Vertex> copy = new ArrayList<>(topologicalVertices);
+        List<Vertex> copy = new LinkedList<>(topologicalVertices);
 
         for (Vertex vertex : topologicalVertices) {
             if (vertex instanceof Probabilistic) {
                 break;
             } else {
-                copy.remove(vertex);
+                copy.remove(0);
             }
         }
         return copy;
