@@ -59,6 +59,42 @@ public class BernoulliVertexTest {
     }
 
     @Test
+    public void logProbClampsProbTrueTo1() {
+        double probTrue = 2.;
+        BernoulliVertex bernoulliVertex = new BernoulliVertex(probTrue);
+        double actualLogPmf = bernoulliVertex.logPmf(BooleanTensor.create(true));
+        assertEquals(0., actualLogPmf, 1e-10);
+    }
+
+    @Test
+    public void logProbGraphClampsProbTrueTo1() {
+        DoubleVertex probTrue = ConstantVertex.of(2.);
+        BernoulliVertex bernoulliVertex = new BernoulliVertex(probTrue);
+        LogProbGraph logProbGraph = bernoulliVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, probTrue, probTrue.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, bernoulliVertex, BooleanTensor.scalar(true));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, 0.);
+    }
+
+    @Test
+    public void logProbClampsProbTrueTo0() {
+        double probTrue = -1.;
+        BernoulliVertex bernoulliVertex = new BernoulliVertex(probTrue);
+        double actualLogPmf = bernoulliVertex.logPmf(BooleanTensor.create(false));
+        assertEquals(0., actualLogPmf, 1e-10);
+    }
+
+    @Test
+    public void logProbGraphClampsProbTrueTo0() {
+        DoubleVertex probTrue = ConstantVertex.of(-1.);
+        BernoulliVertex bernoulliVertex = new BernoulliVertex(probTrue);
+        LogProbGraph logProbGraph = bernoulliVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, probTrue, probTrue.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, bernoulliVertex, BooleanTensor.scalar(false));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, 0.);
+    }
+
+    @Test
     public void doesCalculateDiffLogProbWithRespectToHyperParamHandCalculated() {
 
         DoubleVertex A = new GaussianVertex(new long[]{1, 2}, 0, 1);
