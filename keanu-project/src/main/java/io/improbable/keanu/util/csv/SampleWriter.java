@@ -1,10 +1,12 @@
 package io.improbable.keanu.util.csv;
 
+import com.opencsv.CSVWriter;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +23,8 @@ public class SampleWriter extends Writer {
     }
 
     @Override
-    public File toFile(File file) {
-        List<String[]> data = new ArrayList<>();
+    public File toFile(File file) throws IOException {
+        CSVWriter writer = prepareWriter(file);
 
         for (int i = 0; i < samples.size(); i++) {
             List<String> row = new ArrayList<>();
@@ -33,11 +35,11 @@ public class SampleWriter extends Writer {
                     row.add(flatList.get(j).toString());
                 }
             }
-            String[] rowToString = new String[row.size()];
-            data.add(row.toArray(rowToString));
+            String[] rowA = new String[row.size()];
+            writer.writeNext(row.toArray(rowA), false);
         }
-
-        return writeToFile(file, data);
+        writer.close();
+        return file;
     }
 
     @Override

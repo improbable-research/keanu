@@ -1,9 +1,11 @@
 package io.improbable.keanu.util.csv;
 
+import com.opencsv.CSVWriter;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +27,8 @@ public class RowWriter extends Writer {
     }
 
     @Override
-    public File toFile(File file) {
-        List<String[]> data = new ArrayList<>();
+    public File toFile(File file) throws IOException {
+        CSVWriter writer = prepareWriter(file);
         int maxSize = findLongestTensor(vertices);
 
         for (Vertex<? extends Tensor> vertex : vertices) {
@@ -35,10 +37,11 @@ public class RowWriter extends Writer {
             for (int i = 0; i < maxSize; i++) {
                 row.add(i < flatList.size() ? flatList.get(i).toString() : getEmptyValue());
             }
-            String[] rowToString = new String[row.size()];
-            data.add(row.toArray(rowToString));
+            String[] rowA = new String[row.size()];
+            writer.writeNext(row.toArray(rowA), false);
         }
-        return writeToFile(file, data);
+        writer.close();
+        return file;
     }
 
     @Override
