@@ -4,9 +4,11 @@ import io.improbable.keanu.vertices.Vertex;
 import lombok.Value;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -84,6 +86,26 @@ public class LambdaSection {
     }
 
     /**
+     * @param vertices                 the starting vertices
+     * @param includeNonProbabilistic false if only the probabilistic or observed vertices are wanted
+     * @return All upstream vertices up to probabilistic or observed vertices if includeNonProbabilistic
+     * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
+     * includeNonProbabilistic is false.
+     */
+    public static LambdaSection getUpstreamLambdaSectionCollection(List<Vertex> vertices, boolean includeNonProbabilistic) {
+
+        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
+
+        Set<Vertex> upstreamVertices = getVerticesCollection(
+            vertices,
+            Vertex::getParents,
+            shouldAdd
+        );
+
+        return new LambdaSection(upstreamVertices);
+    }
+
+    /**
      * @param vertex       Vertex to start propagation from
      * @param nextVertices The next vertices to move to given a current vertex. E.g getChildren for downstream or
      *                     getParents for upstream.
@@ -117,6 +139,59 @@ public class LambdaSection {
                     queued.add(next);
                 }
             }
+        }
+
+        return result;
+    }
+
+    /**
+     * @param vertices       vertices to start propagation from
+     * @param nextVertices The next vertices to move to given a current vertex. E.g getChildren for downstream or
+     *                     getParents for upstream.
+     * @param shouldAdd    true when a given vertex should be included in the result, false otherwise
+     * @return A Set of vertices that are in the direction implied by nextVertices and filtered by shouldAdd
+     */
+    public static Set<Vertex> getVerticesCollection(List<Vertex> vertices,
+                                                    Function<Vertex, Collection<Vertex>> nextVertices,
+                                                    Predicate<Vertex> shouldAdd) {
+
+        List<Vertex> copy = new ArrayList<>(vertices);
+        Vertex firstVertex = copy.remove(0);
+
+        Set<Vertex> queued = new HashSet<>(copy);
+        Set<Vertex> visited = new HashSet<>();
+        Deque<Vertex> stack = new ArrayDeque<>(copy);
+
+        Collection<Vertex> initialNext = nextVertices.apply(firstVertex);
+        queued.addAll(initialNext);
+        stack.addAll(initialNext);
+
+        Set<Vertex> result = new HashSet<>();
+        result.add(firstVertex);
+        result.addAll(copy);
+
+        while (!stack.isEmpty()) {
+            Vertex visiting = stack.pop();
+
+            if (visited.contains(visiting)) {
+                continue;
+            }
+
+            if (shouldAdd.test(visiting)) {
+                result.add(visiting);
+            }
+
+            if (visiting.isObserved() || visiting.isProbabilistic()) {
+                continue;
+            }
+
+            for (Vertex next : nextVertices.apply(visiting)) {
+                if (!queued.contains(next)) {
+                    stack.add(next);
+                    queued.add(next);
+                }
+            }
+            visited.add(visiting);
         }
 
         return result;

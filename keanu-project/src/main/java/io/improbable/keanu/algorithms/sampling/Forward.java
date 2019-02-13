@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.sampling;
 
-import com.google.common.collect.Sets;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
@@ -17,7 +16,6 @@ import io.improbable.keanu.vertices.Vertex;
 import org.nd4j.base.Preconditions;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -91,13 +89,7 @@ public class Forward implements PosteriorSamplingAlgorithm {
     }
 
     private Set<Vertex> allUpstreamVertices(List<Vertex> fromVertices) {
-        Set<Vertex> upstream = new HashSet<>();
-        for (Vertex vertex : fromVertices) {
-            LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(vertex, true);
-            Set<Vertex> vertexUpsteam = upstreamLambdaSection.getAllVertices();
-            upstream = Sets.union(upstream, vertexUpsteam);
-        }
-        return upstream;
+        return LambdaSection.getUpstreamLambdaSectionCollection(fromVertices, true).getAllVertices();
     }
 
     private void checkUpstreamOfObservedDoesNotContainProbabilistic(List<Vertex> vertices) {
