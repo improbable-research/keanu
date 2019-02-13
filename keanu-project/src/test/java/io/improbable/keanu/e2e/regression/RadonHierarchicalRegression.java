@@ -3,8 +3,6 @@ package io.improbable.keanu.e2e.regression;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.nuts.NUTS;
-import io.improbable.keanu.model.regression.RegressionModel;
-import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -52,30 +50,9 @@ public class RadonHierarchicalRegression {
     }
 
     @Test
-    public void canPerformSimpleLinearRegression() {
-        RegressionModel model = linearRegression(radonData);
-        assertLinearRegressionIsCorrect(model);
-    }
-
-    @Test
     @Category(Slow.class)
     public void canPerformRegressionWithEightHierarchies() {
         buildAndRunHierarchicalNetwork(radonData, 8);
-    }
-
-    private RegressionModel linearRegression(Map<String, List<Data>> data) {
-        // Build one non-hierarchical model combining all counties' data
-        double[] radon = data.values().stream().flatMapToDouble(l -> l.stream().mapToDouble(k -> k.log_radon)).toArray();
-        double[] floor = data.values().stream().flatMapToDouble(l -> l.stream().mapToDouble(k -> k.floor)).toArray();
-        DoubleTensor y = DoubleTensor.create(radon, radon.length, 1);
-        DoubleTensor x = DoubleTensor.create(floor, floor.length, 1);
-
-        return RegressionModel.
-            withTrainingData(x, y).
-            withRegularization(RegressionRegularization.RIDGE).
-            withPriorOnWeights(0., 5.).
-            withPriorOnIntercept(0., 5.).
-            build();
     }
 
     public void buildAndRunHierarchicalNetwork(Map<String, List<Data>> radonData, int numberOfModels) {
@@ -130,10 +107,11 @@ public class RadonHierarchicalRegression {
 
     private NetworkSamples sampleWithNUTS(BayesianNetwork bayesianNetwork, List<Vertex> sampleFrom) {
 
-        int sampleCount = 1500;
+        int sampleCount = 1000;
         KeanuProbabilisticModelWithGradient probabilisticModel = new KeanuProbabilisticModelWithGradient(bayesianNetwork);
         return NUTS.builder()
             .adaptCount(sampleCount)
+            .maxTreeHeight(8)
             .build()
             .getPosteriorSamples(probabilisticModel, sampleFrom, sampleCount)
             .drop(sampleCount / 4);
@@ -174,13 +152,6 @@ public class RadonHierarchicalRegression {
             assertThat(weight, both(greaterThan(-3.0)).and(lessThan(1.0)));
             assertThat(intercept, both(greaterThan(0.)).and(lessThan(3.0)));
         }
-    }
-
-    private void assertLinearRegressionIsCorrect(final RegressionModel linearRegressionModel) {
-        assertThat(linearRegressionModel.getWeightVertex().getValue().scalar(),
-            both(greaterThan(-0.7)).and(lessThan(-0.4)));
-        assertThat(linearRegressionModel.getInterceptVertex().getValue().scalar(),
-            both(greaterThan(1.2)).and(lessThan(1.5)));
     }
 
     @Value
