@@ -30,7 +30,9 @@ public class ForwardSampler implements SamplingAlgorithm {
     public void step() {
         for (Vertex vertex : topologicallySortedVertices) {
             if (vertex instanceof Probabilistic) {
-                vertex.setValue(((Probabilistic) vertex).sample(random));
+                if (!(vertex.isObserved())) {
+                    vertex.setValue(((Probabilistic) vertex).sample(random));
+                }
             } else if (vertex instanceof NonProbabilistic) {
                 vertex.setValue(((NonProbabilistic) vertex).calculate());
             }
