@@ -21,7 +21,11 @@ import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -73,6 +77,44 @@ public class TreeTest {
 
         assertEquals(3, tree.getTreeHeight());
         assertEquals((int) Math.pow(2, tree.getTreeHeight()) - 1, tree.getTreeSize());
+    }
+
+    @Test
+    public void treeGrowthStopsOnDivergence() {
+
+        ProbabilisticModelWithGradient model = mock(ProbabilisticModelWithGradient.class);
+
+        Tree tree = new Tree(
+            start,
+            null,
+            1000,
+            model,
+            leapfrogIntegrator,
+            singletonList(vertex),
+            KeanuRandom.getDefaultRandom()
+        );
+
+        when(model.logProbGradients(anyMap())).thenReturn(ImmutableMap.of(vertex.getReference(), DoubleTensor.scalar(1.0)));
+        when(model.logProb()).thenReturn(-1.0);
+
+        tree.grow(1, 1e-6);
+
+        assertTrue(tree.shouldContinue());
+        assertThat(tree.getTreeSize(), equalTo(1));
+
+        tree.grow(-1, 1e-6);
+
+        assertTrue(tree.shouldContinue());
+        assertThat(tree.getTreeSize(), equalTo(3));
+
+        when(model.logProbGradients(anyMap())).thenReturn(ImmutableMap.of(vertex.getReference(), DoubleTensor.scalar(0.0)));
+        when(model.logProb()).thenReturn(Double.NEGATIVE_INFINITY);
+
+        tree.grow(-1, 1e-6);
+
+        assertFalse(tree.shouldContinue());
+        assertThat(tree.getProposal().getLogProb(), greaterThan(Double.NEGATIVE_INFINITY));
+        assertThat(tree.getTreeSize(), equalTo(4));
     }
 
     @Test
