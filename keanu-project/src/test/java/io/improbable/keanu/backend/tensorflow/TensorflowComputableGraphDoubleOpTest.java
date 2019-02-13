@@ -87,10 +87,10 @@ public class TensorflowComputableGraphDoubleOpTest {
     }
 
     private void testDoubleBinaryOperation(long[] leftShape, long[] rightShape, BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
-        DoubleVertex A = new UniformVertex(leftShape, 0.1, 1);
+        UniformVertex A = new UniformVertex(leftShape, 0.1, 1);
         A.setValue(A.sample());
 
-        DoubleVertex B = new UniformVertex(rightShape, 0.1, 1);
+        UniformVertex B = new UniformVertex(rightShape, 0.1, 1);
         B.setValue(B.sample());
 
         DoubleVertex out = op.apply(A, B);
@@ -135,7 +135,7 @@ public class TensorflowComputableGraphDoubleOpTest {
     }
 
     private void testDoubleUnaryOperation(long[] shape, Function<DoubleVertex, DoubleVertex> op) {
-        DoubleVertex A = new UniformVertex(shape, 0.1, 1);
+        UniformVertex A = new UniformVertex(shape, 0.1, 1);
         A.setValue(A.sample());
 
         DoubleVertex out = op.apply(A);

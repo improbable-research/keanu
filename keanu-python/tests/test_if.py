@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from keanu.vartypes import tensor_arg_types
-from keanu.vertex import If, Bernoulli, Gaussian, Const, Double, Poisson, Integer, Boolean, Exponential, Vertex
+from keanu.vertex import If, Bernoulli, Gaussian, Const, Double, Poisson, Integer, Boolean, Exponential, Vertex, Uniform
 
 
 @pytest.mark.parametrize(
@@ -74,7 +74,7 @@ def test_if_thn_or_els_is_not_float_it_gets_coerced(thn, els) -> None:
     result = If(True, thn, els)
     assert type(result) == Double
     assert result.unwrap().getClass().getSimpleName() == "DoubleIfVertex"
-    assert result.sample() == 1.
+    assert result.get_value() == 1.
 
 
 @pytest.mark.parametrize(["thn", "els"], [
@@ -85,7 +85,7 @@ def test_if_thn_or_els_is_not_int_it_gets_coerced(thn, els) -> None:
     result = If(True, thn, els)
     assert type(result) == Integer
     assert result.unwrap().getClass().getSimpleName() == "IntegerIfVertex"
-    assert result.sample() == 1
+    assert result.get_value() == 1
 
 
 @pytest.mark.parametrize("pred", [1, 1., 1.1])
@@ -93,4 +93,14 @@ def test_if_predicate_is_not_bool_it_gets_coerced(pred) -> None:
     result = If(pred, 1, 0)
     assert type(result) == Integer
     assert result.unwrap().getClass().getSimpleName() == "IntegerIfVertex"
-    assert result.sample() == 1
+    assert result.get_value() == 1
+
+
+def test_you_get_a_useful_error_message_when_you_use_a_boolean_vertex_in_a_python_if_clause() -> None:
+    with pytest.raises(
+            TypeError,
+            match=
+            'Keanu vertices cannot be used as a predicate in a Python "if" statement. Please use keanu.vertex.If instead.'
+    ):
+        if Uniform(0, 1) == 100:
+            pass

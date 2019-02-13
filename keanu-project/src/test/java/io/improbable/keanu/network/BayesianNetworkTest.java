@@ -1,7 +1,5 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.KeanuRandom;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -106,16 +104,6 @@ public class BayesianNetworkTest {
     }
 
     private class TestNonSaveableVertex extends DoubleVertex implements NonSaveableVertex {
-        @Override
-        public DoubleTensor sample(KeanuRandom random) {
-            return null;
-        }
-
-        @Override
-        public DoubleTensor sample() {
-            return null;
-        }
-
         private TestNonSaveableVertex() {
             super(new long[]{1, 1});
         }

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -46,11 +45,6 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     @Override
     public Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
         return Collections.emptyMap();
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return getValue();
     }
 
     public DoubleTensor calculate() {

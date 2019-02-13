@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 import com.google.common.collect.Iterables;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -42,11 +41,6 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
     @Override
     public IntegerTensor calculate() {
         return getParent().getValue();
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return getParent().sample();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -41,11 +40,6 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
         this.left = left;
         this.right = right;
         setParents(left, right);
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return op(left.sample(random), right.sample(random));
     }
 
     @Override

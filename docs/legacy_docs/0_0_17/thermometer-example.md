@@ -116,7 +116,7 @@ Experiment with the size of the sigma in each thermometer (the inaccuracy) and s
 estimated temperature.
 
 ```java
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
+import io.improbable.keanu.Keanu.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;

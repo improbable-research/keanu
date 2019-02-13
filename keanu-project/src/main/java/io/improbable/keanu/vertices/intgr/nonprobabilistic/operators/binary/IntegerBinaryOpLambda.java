@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
@@ -31,11 +30,6 @@ public class IntegerBinaryOpLambda<A, B> extends IntegerVertex implements NonPro
 
     public IntegerBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, IntegerTensor> op) {
         this(checkHasOneNonLengthOneShapeOrAllLengthOne(left.getShape(), right.getShape()), left, right, op);
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op.apply(left.sample(random), right.sample(random));
     }
 
     @Override

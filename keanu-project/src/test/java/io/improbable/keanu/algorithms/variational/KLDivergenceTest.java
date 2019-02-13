@@ -87,7 +87,7 @@ public class KLDivergenceTest {
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
-            .withDefaultConfigFor(model)
+            .withDefaultConfig()
             .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
 
         ProbabilisticDouble q1 = new GaussianVertex(0.1, 1.);
@@ -104,7 +104,7 @@ public class KLDivergenceTest {
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
-            .withDefaultConfigFor(model)
+            .withDefaultConfig()
             .getPosteriorSamples(model, Collections.singletonList(v1), 1000);
 
         QDistribution q1 = new TestGaussianQDistribution(0.1, 1.);
@@ -121,7 +121,7 @@ public class KLDivergenceTest {
 
         KeanuProbabilisticModel model = new KeanuProbabilisticModel(v3.getConnectedGraph());
         NetworkSamples samples = MetropolisHastings
-            .withDefaultConfigFor(model)
+            .withDefaultConfig()
             .getPosteriorSamples(model, Arrays.asList(v1, v3), 1000);
         ProbabilisticDouble q = new GaussianVertex(0.1, 1.);
 

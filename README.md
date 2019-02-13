@@ -53,7 +53,7 @@ Want to see an example and run it yourself? Head over to [Getting Started](https
 ## Documentation
 
 Want to learn more? Head over to the [Documentation](https://improbable-research.github.io/keanu/).
-You can also see our [JavaDocs](https://www.javadoc.io/doc/io.improbable/keanu) or our [Python Docs](https://improbable-research.github.io/keanu/python)
+You can also see our [JavaDocs](https://www.javadoc.io/doc/io.improbable/keanu) or our [Python Docs](https://improbable-research.github.io/keanu/python/latest)
 
 ## Future
 
@@ -83,7 +83,7 @@ We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle
 
 #### Python Code Generation
 
-[Custom annotations](keanu-project/src/main/java/io/improbable/keanu/annotation) are used for python code generation. The minimum version requirement is Python 3.6. Simply run `./gradlew codeGen` to generate the code and commit the changes.
+[Custom annotations](keanu-project/src/main/java/io/improbable/keanu/annotation) are used for python code generation. It depends on Oracle JDK to build (i.e. does not support open source JDKs). The minimum version requirement is Python 3.6. Simply run `./gradlew codeGen` to generate the code and commit the changes.
 
 
 ## Hiring

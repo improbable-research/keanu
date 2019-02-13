@@ -1,46 +1,59 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.Keanu;
+import io.improbable.keanu.algorithms.ProbabilisticModel;
+import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
+import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
 public class NonGradientOptimizerTest {
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void doesCallOnFitnessHandler() {
         AtomicInteger timesCalled = new AtomicInteger(0);
-        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient.ofConnectedGraph(new GaussianVertex(new GaussianVertex(0, 1), 1));
+        NonGradientOptimizer optimizer = Keanu.Optimizer.NonGradient.ofConnectedGraph(new GaussianVertex(new GaussianVertex(0, 1), 1));
         optimizer.addFitnessCalculationHandler((point, fitness) -> timesCalled.incrementAndGet());
         optimizer.maxAPosteriori();
         assertTrue(timesCalled.get() > 0);
     }
 
     @Test
-    public void canFindMAPGivenBounds() {
+    public void doesCheckForZeroProbability() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Cannot start optimizer on zero probability network");
+        runMAPOnZeroProbability(true);
+    }
 
-        DoubleVertex A = new GaussianVertex(new long[]{2}, ConstantVertex.of(new double[]{1, -3}), 1);
-        A.setValue(new double[]{0, 0});
+    @Test
+    public void doesNotCheckForZeroProbabilityWhenChecksAreTurnedOff() {
+        runMAPOnZeroProbability(false);
+    }
 
-        OptimizerBounds bounds = new OptimizerBounds();
-        bounds.addBound(A.getId(), DoubleTensor.create(-1, -2), 0.9);
+    private void runMAPOnZeroProbability(boolean enableCheck) {
+        HalfGaussianVertex B = new HalfGaussianVertex(1);
+        HalfGaussianVertex A = new HalfGaussianVertex(B);
+        A.observe(-1);
 
-        NonGradientOptimizer optimizer = KeanuOptimizer.NonGradient
-            .builderFor(A.getConnectedGraph())
-            .boundsRange(10)
-            .optimizerBounds(bounds)
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+
+        NonGradientOptimizer optimizer = Keanu.Optimizer.NonGradient.builderFor(A.getConnectedGraph())
+            .probabilisticModel(model)
+            .algorithm((vars, fitness) -> new OptimizedResult(null, 0))
+            .checkInitialFitnessConditions(enableCheck)
             .build();
 
         optimizer.maxAPosteriori();
-
-        assertArrayEquals(new double[]{0.9, -2}, A.getValue().asFlatDoubleArray(), 1e-2);
     }
 
 }

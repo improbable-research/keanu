@@ -64,10 +64,10 @@ def test_series_passed_to_Tensor_creates_tensor(data: List[primitive_types], exp
 
 
 def test_cannot_pass_generic_to_Tensor(generic) -> None:
-    with pytest.raises(NotImplementedError) as excinfo:
+    with pytest.raises(
+            NotImplementedError, match=r"Generic types in an ndarray are not supported. Was given {}".format(
+                type(generic))):
         Tensor(generic)
-
-    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
 
 
 @pytest.mark.parametrize("arr, expected_java_class", [([1, 2], "Nd4jIntegerTensor"), ([3.4, 2.], "Nd4jDoubleTensor"),
@@ -80,17 +80,13 @@ def test_ndarray_passed_to_Tensor_creates_nonscalar_tensor(arr: primitive_types,
 
 
 def test_cannot_pass_generic_ndarray_to_Tensor(generic) -> None:
-    with pytest.raises(NotImplementedError) as excinfo:
+    with pytest.raises(NotImplementedError, match=r"Generic types in an ndarray are not supported. Was given object"):
         Tensor(np.array([generic, generic]))
-
-    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given object"
 
 
 def test_can_pass_empty_ndarray_to_Tensor() -> None:
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError, match=r"Cannot infer type because array is empty"):
         Tensor(np.array([]))
-
-    assert str(excinfo.value) == "Cannot infer type because array is empty"
 
 
 @pytest.mark.parametrize("value", [(np.array([[1, 2], [3, 4]])), np.array([3])])
@@ -103,7 +99,7 @@ def test_convert_java_tensor_to_ndarray(value: numpy_types) -> None:
 
 
 def assert_java_class(java_object_wrapper: JavaObjectWrapper, java_class_str: str) -> None:
-    assert java_object_wrapper.get_class().getSimpleName() == java_class_str
+    assert java_object_wrapper._class == java_class_str
 
 
 @pytest.mark.parametrize("value, expected_result",

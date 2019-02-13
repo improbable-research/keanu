@@ -25,8 +25,8 @@ public class LeapfrogTest {
 
     private static final double EPSILON = 1.0;
 
-    private DoubleVertex vertexA = new GaussianVertex(0, 1);;
-    private DoubleVertex vertexB = new GaussianVertex(0, 1);;
+    private DoubleVertex vertexA = new GaussianVertex(0, 1);
+    private DoubleVertex vertexB = new GaussianVertex(0, 1);
 
     private VariableReference aID = vertexA.getId();;
     private VariableReference bID = vertexB.getId();
@@ -71,8 +71,8 @@ public class LeapfrogTest {
         Leapfrog start = new Leapfrog(position, momentum, gradient);
         Leapfrog leap = start.step(vertices, mockedGradientCalculator, EPSILON);
 
-        Assert.assertEquals(1.0, leap.getPosition().get(aID).scalar(), 1e-6);
-        Assert.assertEquals(1.0, leap.getPosition().get(bID).scalar(), 1e-6);
+        Assert.assertEquals(2.0, leap.getPosition().get(aID).scalar(), 1e-6);
+        Assert.assertEquals(2.0, leap.getPosition().get(bID).scalar(), 1e-6);
 
         Assert.assertEquals(2.5, leap.getMomentum().get(aID).scalar(), 1e-6);
         Assert.assertEquals(1.5, leap.getMomentum().get(bID).scalar(), 1e-6);

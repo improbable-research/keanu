@@ -48,7 +48,7 @@ public class DotSaverTest {
 
     @BeforeClass
     public static void setUpComplexNet() {
-        VertexId.ID_GENERATOR.set(0);
+        VertexId.resetIdGenerator();
         complexResultVertex = ((new GammaVertex(0, 1))
             .lessThan(new ConstantIntegerVertex(-1)))
             .or((new GaussianVertex(0, 1))
@@ -60,7 +60,7 @@ public class DotSaverTest {
 
     @Before
     public void resetVertexIdsAndOutputStream() {
-        VertexId.ID_GENERATOR.set(0);
+        VertexId.resetIdGenerator();
         outputWriter = new ByteArrayOutputStream();
     }
 

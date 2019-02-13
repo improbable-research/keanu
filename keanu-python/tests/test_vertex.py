@@ -5,9 +5,10 @@ import pandas as pd
 import pytest
 from py4j.java_gateway import JVMView
 
+from keanu import set_deterministic_state
 from keanu.context import KeanuContext
 from keanu.vartypes import tensor_arg_types, primitive_types, numpy_types, pandas_types
-from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli
+from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli, IntegerProxy
 from keanu.vertex.base import Vertex
 
 
@@ -31,17 +32,17 @@ def assert_vertex_value_equals_ndarray(vertex: Vertex, expected_type: Type, ndar
     vertex_value = vertex.get_value()
     expected_value = ndarray.astype(expected_type)
     assert np.array_equal(vertex_value, expected_value)
-    assert vertex_value.dtype == expected_type
+    assert np.issubdtype(vertex_value.dtype, expected_type)
 
 
 def assert_vertex_value_equals_pandas(vertex: Vertex, expected_type: Type, pandas: pandas_types) -> None:
     get_value = vertex.get_value()
     expected_value = pandas.values.astype(expected_type).reshape(get_value.shape)
     assert np.array_equal(get_value, expected_value)
-    assert get_value.dtype == expected_type
+    assert np.issubdtype(get_value.dtype, expected_type)
 
 
-def test_can_pass_scalar_to_vertex(jvm_view: JVMView) -> None:
+def test_can_pass_scalar_to_vertex() -> None:
     gaussian = Gaussian(0., 1.)
     sample = gaussian.sample()
 
@@ -50,21 +51,21 @@ def test_can_pass_scalar_to_vertex(jvm_view: JVMView) -> None:
     assert sample.dtype == float
 
 
-def test_can_pass_ndarray_to_vertex(jvm_view: JVMView) -> None:
+def test_can_pass_ndarray_to_vertex() -> None:
     gaussian = Gaussian(np.array([0.1, 0.4]), np.array([0.4, 0.5]))
     sample = gaussian.sample()
 
     assert sample.shape == (2,)
 
 
-def test_can_pass_pandas_dataframe_to_vertex(jvm_view: JVMView) -> None:
+def test_can_pass_pandas_dataframe_to_vertex() -> None:
     gaussian = Gaussian(pd.DataFrame(data=[0.1, 0.4]), pd.DataFrame(data=[0.1, 0.4]))
     sample = gaussian.sample()
 
     assert sample.shape == (2, 1)
 
 
-def test_can_pass_pandas_series_to_vertex(jvm_view):
+def test_can_pass_pandas_series_to_vertex() -> None:
     gaussian = Gaussian(pd.Series(data=[0.1, 0.4]), pd.Series(data=[0.1, 0.4]))
     sample = gaussian.sample()
 
@@ -73,7 +74,7 @@ def test_can_pass_pandas_series_to_vertex(jvm_view):
 
 def test_can_pass_vertex_to_vertex(jvm_view: JVMView) -> None:
     mu = Gaussian(0., 1.)
-    gaussian = Vertex(jvm_view.GaussianVertex, mu, Const(1.))
+    gaussian = Vertex(jvm_view.GaussianVertex, "gaussian", mu, Const(1.))
     sample = gaussian.sample()
 
     assert type(sample) == numpy_types
@@ -82,7 +83,7 @@ def test_can_pass_vertex_to_vertex(jvm_view: JVMView) -> None:
 
 
 def test_can_pass_array_to_vertex(jvm_view: JVMView) -> None:
-    gaussian = Vertex(jvm_view.GaussianVertex, [3, 3], Const(0.), Const(1.))
+    gaussian = Vertex(jvm_view.GaussianVertex, "gaussian", [3, 3], Const(0.), Const(1.))
     sample = gaussian.sample()
 
     assert sample.shape == (3, 3)
@@ -93,11 +94,9 @@ def test_cannot_pass_generic_to_vertex(jvm_view: JVMView) -> None:
     class GenericExampleClass:
         pass
 
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError, match=r"Can't parse generic argument. Was given {}".format(GenericExampleClass)):
         Vertex(  # type: ignore # this is expected to fail mypy
-            jvm_view.GaussianVertex, GenericExampleClass(), GenericExampleClass())
-
-    assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(GenericExampleClass)
+            jvm_view.GaussianVertex, "gaussian", GenericExampleClass(), GenericExampleClass())
 
 
 def test_int_vertex_value_is_a_numpy_array() -> None:
@@ -147,14 +146,14 @@ def test_vertex_sample_is_a_numpy_array() -> None:
     assert value.shape == (2, 2)
 
 
-def test_get_connected_graph(jvm_view: JVMView) -> None:
+def test_get_connected_graph() -> None:
     gaussian = Gaussian(0., 1.)
     connected_graph = set(gaussian.get_connected_graph())
 
     assert len(connected_graph) == 3
 
 
-def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view: JVMView) -> None:
+def test_id_str_of_downstream_vertex_is_higher_than_upstream() -> None:
     hyper_params = Gaussian(0., 1.)
     gaussian = Gaussian(0., hyper_params)
 
@@ -167,14 +166,14 @@ def test_id_str_of_downstream_vertex_is_higher_than_upstream(jvm_view: JVMView) 
     assert hyper_params_id < gaussian_id
 
 
-def test_construct_vertex_with_java_vertex(jvm_view: JVMView) -> None:
+def test_construct_vertex_with_java_vertex() -> None:
     java_vertex = Gaussian(0., 1.).unwrap()
-    python_vertex = Vertex(java_vertex)
+    python_vertex = Vertex._from_java_vertex(java_vertex)
 
     assert tuple(java_vertex.getId().getValue()) == python_vertex.get_id()
 
 
-def test_java_collections_to_generator(jvm_view: JVMView) -> None:
+def test_java_collections_to_generator() -> None:
     gaussian = Gaussian(0., 1.)
 
     java_collections = gaussian.unwrap().getConnectedGraph()
@@ -186,13 +185,21 @@ def test_java_collections_to_generator(jvm_view: JVMView) -> None:
     assert all(type(element) == Vertex and element.get_id() in java_vertex_ids for element in python_list)
 
 
-def test_get_vertex_id(jvm_view: JVMView) -> None:
+def test_get_vertex_id() -> None:
     gaussian = Gaussian(0., 1.)
 
     java_id = gaussian.unwrap().getId().getValue()
     python_id = gaussian.get_id()
 
     assert all(value in python_id for value in java_id)
+
+
+def test_ids_are_reset() -> None:
+    gaussian = Gaussian(0., 1.)
+    set_deterministic_state()
+    gaussian2 = Gaussian(0., 1.)
+
+    assert gaussian.get_id() == gaussian2.get_id()
 
 
 @pytest.mark.parametrize("vertex, expected_type", [(Gaussian(0., 1.), np.floating), (UniformInt(0, 10), np.integer),
@@ -279,7 +286,7 @@ def test_you_can_set_and_cascade(ctor: Callable, args: Union[Tuple[float, ...], 
 @pytest.mark.parametrize("ctor, args, expected_type, value", [(Gaussian, (0., 1.), float, 4.),
                                                               (UniformInt, (0, 10), int, 5),
                                                               (Bernoulli, (0.5,), bool, True)])
-def test_you_can_set_and_cascade_scalar(ctor, args, expected_type, value):
+def test_you_can_set_and_cascade_scalar(ctor, args, expected_type, value) -> None:
     test_you_can_set_and_cascade(ctor, args, expected_type, value, assert_vertex_value_equals_scalar)
 
 
@@ -316,5 +323,47 @@ def test_you_can_observe(ctor: Callable, args: Union[Tuple[float, ...], Tuple[in
 @pytest.mark.parametrize("ctor, args, expected_type, value", [(Gaussian, (0., 1.), float, 4.),
                                                               (UniformInt, (0, 10), int, 5),
                                                               (Bernoulli, (0.5,), bool, True)])
-def test_you_can_observe_scalar(ctor, args, expected_type, value):
+def test_you_can_observe_scalar(ctor, args, expected_type, value) -> None:
     test_you_can_observe(ctor, args, expected_type, value, assert_vertex_value_equals_scalar)
+
+
+def test_pass_label_as_an_optional_param() -> None:
+    label = "gaussian_vertex"
+    vertex = Gaussian(0., 1., label=label)
+    assert vertex.get_label() == label
+
+
+def test_can_pass_none_label() -> None:
+    vertex = Gaussian(0., 1., label=None)
+    assert vertex.get_label() == None
+
+
+def test_set_label() -> None:
+    label = "gaussian_vertex"
+    vertex = Gaussian(0., 1.)
+    vertex.set_label(label)
+    assert vertex.get_label() == label
+
+
+def test_cannot_set_none_label() -> None:
+    vertex = Gaussian(0., 1., label="gaussian")
+    with pytest.raises(ValueError, match=r"label cannot be None"):
+        vertex.set_label(None)
+
+
+def test_label_is_required_param_for_proxy_vertices() -> None:
+    with pytest.raises(TypeError, match=r"IntegerProxy\(\) missing 1 required positional argument: 'label'"):
+        vertex = IntegerProxy([1, 1])  # type: ignore # this is expected to fail mypy
+
+
+def test_proxy_vertex_takes_string_as_required_param() -> None:
+    label = "proxy_vertex"
+    vertex = IntegerProxy([1, 1], label)
+    assert vertex.get_label() == label
+
+
+def test_java_vertex_to_python_vertex_persists_label() -> None:
+    label = "gaussian"
+    java_vertex = Gaussian(0., 1., label=label).unwrap()
+    python_vertex = Vertex._from_java_vertex(java_vertex)
+    assert python_vertex.get_label() == label
