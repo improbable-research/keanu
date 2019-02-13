@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.math3.linear.BlockRealMatrix;
-import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.util.FastMath;
@@ -49,11 +48,11 @@ public class JVMDoubleTensor implements DoubleTensor {
         return new JVMDoubleTensor(scalarValue);
     }
 
-    public static JVMDoubleTensor create(double[] values, long[] shape) {
+    public static JVMDoubleTensor create(double[] values, long... shape) {
         return new JVMDoubleTensor(values, shape);
     }
 
-    public static JVMDoubleTensor create(double value, long[] shape) {
+    public static JVMDoubleTensor create(double value, long... shape) {
         long length = TensorShape.getLength(shape);
         double[] buffer = new double[Ints.checkedCast(length)];
         Arrays.fill(buffer, value);
@@ -64,7 +63,7 @@ public class JVMDoubleTensor implements DoubleTensor {
         return create(1.0, shape);
     }
 
-    public static JVMDoubleTensor zeros(long[] shape) {
+    public static JVMDoubleTensor zeros(long... shape) {
         return create(0.0, shape);
     }
 
@@ -1171,7 +1170,8 @@ public class JVMDoubleTensor implements DoubleTensor {
             outputBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
         }
 
-        this.buffer = opWithAutoBroadcast(buffer, shape, stride, that, outputBuffer, op);;
+        this.buffer = opWithAutoBroadcast(buffer, shape, stride, that, outputBuffer, op);
+        ;
         this.shape = resultShape;
 
         return this;

@@ -17,6 +17,9 @@ import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
+//    DoubleTensorFactory factory = new JVMDoubleTensorFactory();
+    DoubleTensorFactory factory = new Nd4jDoubleTensorFactory();
+
     DoubleTensor MINUS_ONE_SCALAR = scalar(-1.0);
 
     DoubleTensor ZERO_SCALAR = scalar(0.0);
@@ -29,7 +32,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(value);
         } else {
-            return Nd4jDoubleTensor.create(value, shape);
+            return factory.create(value, shape);
         }
     }
 
@@ -37,7 +40,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
             return new ScalarDoubleTensor(values[0]);
         } else {
-            return Nd4jDoubleTensor.create(values, shape);
+            return factory.create(values, shape);
         }
     }
 
@@ -49,7 +52,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(1.0);
         } else {
-            return Nd4jDoubleTensor.ones(shape);
+            return factory.ones(shape);
         }
     }
 
@@ -57,7 +60,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         if (n == 1) {
             return new ScalarDoubleTensor(1.0);
         } else {
-            return Nd4jDoubleTensor.eye(n);
+            return factory.eye(n);
         }
     }
 
@@ -65,12 +68,12 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(0.0);
         } else {
-            return Nd4jDoubleTensor.zeros(shape);
+            return factory.zeros(shape);
         }
     }
 
     static DoubleTensor linspace(double start, double end, int numberOfPoints) {
-        return Nd4jDoubleTensor.linspace(start, end, numberOfPoints);
+        return factory.linspace(start, end, numberOfPoints);
     }
 
     /**
@@ -79,7 +82,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
      * @return a vector of numbers from start incrementing by one to end (exclusively)
      */
     static DoubleTensor arange(double start, double end) {
-        return Nd4jDoubleTensor.arange(start, end);
+        return factory.arange(start, end);
     }
 
     /**
@@ -89,7 +92,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
      * @return a vector of numbers starting at start and stepping to end (exclusively)
      */
     static DoubleTensor arange(double start, double end, double stepSize) {
-        return Nd4jDoubleTensor.arange(start, end, stepSize);
+        return factory.arange(start, end, stepSize);
     }
 
     static DoubleTensor scalar(double scalarValue) {
@@ -97,9 +100,9 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     }
 
     /**
-     * @param dimension  the dimension along which toStack are stacked
-     * @param toStack    an array of DoubleTensor's of the same shape
-     * @return  a DoubleTensor with toStack joined along a new dimension
+     * @param dimension the dimension along which toStack are stacked
+     * @param toStack   an array of DoubleTensor's of the same shape
+     * @return a DoubleTensor with toStack joined along a new dimension
      * <p>
      * e.g. A, B, C = DoubleTensor.ones(4, 2)
      * <p>
@@ -129,10 +132,10 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return concat(0, toConcat);
     }
 
-     /**
+    /**
      * @param dimension the dimension along which the tensors will be joined
      * @param toConcat  an array of DoubleTensor
-     * @return  a DoubleTensor with toConcat joined along an existing dimension
+     * @return a DoubleTensor with toConcat joined along an existing dimension
      * <p>
      * e.g. A, B, C = DoubleTensor.ones(4, 2)
      * <p>

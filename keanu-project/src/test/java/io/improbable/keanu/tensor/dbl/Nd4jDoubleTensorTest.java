@@ -32,11 +32,11 @@ public class Nd4jDoubleTensorTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    Nd4jDoubleTensor matrixA;
-    Nd4jDoubleTensor matrixB;
-    Nd4jDoubleTensor scalarA;
-    Nd4jDoubleTensor vectorA;
-    Nd4jDoubleTensor rankThreeTensor;
+    private DoubleTensor matrixA;
+    private DoubleTensor matrixB;
+    private DoubleTensor scalarA;
+    private DoubleTensor vectorA;
+    private DoubleTensor rankThreeTensor;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

@@ -66,12 +66,16 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.scalar(scalarValue, BUFFER_TYPE));
     }
 
-    public static Nd4jDoubleTensor create(double[] values, long[] shape) {
+    public static Nd4jDoubleTensor create(double[] values, long... shape) {
         return new Nd4jDoubleTensor(values, shape);
     }
 
-    public static Nd4jDoubleTensor create(double value, long[] shape) {
+    public static Nd4jDoubleTensor create(double value, long... shape) {
         return new Nd4jDoubleTensor(valueArrayOf(shape, value, BUFFER_TYPE));
+    }
+
+    public static Nd4jDoubleTensor create(double[] values) {
+        return create(values, values.length);
     }
 
     public static Nd4jDoubleTensor ones(long... shape) {
