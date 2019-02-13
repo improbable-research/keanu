@@ -81,7 +81,7 @@ public class GeometricVertexTest {
     }
 
     @Test
-    public void lobProbIsNegativeInfinityOutsideKSupport() {
+    public void logProbIsNegativeInfinityOutsideKSupport() {
         GeometricVertex myVertex = new GeometricVertex(0.5);
         double logProb = myVertex.logPmf(0);
         assertEquals(Double.NEGATIVE_INFINITY, logProb, 1e-10);
@@ -99,7 +99,7 @@ public class GeometricVertexTest {
     }
 
     @Test
-    public void lobProbIsNegativeInfinityIfPGreaterThanOrEqualToOne() {
+    public void logProbIsNegativeInfinityIfPGreaterThanOrEqualToOne() {
         GeometricVertex myVertex = new GeometricVertex(1.);
         double logProb = myVertex.logPmf(10);
         assertEquals(Double.NEGATIVE_INFINITY, logProb, 1e-10);
@@ -117,7 +117,7 @@ public class GeometricVertexTest {
     }
 
     @Test
-    public void lobProbIsNegativeInfinityIfLessThanOrEqualToZero() {
+    public void logProbIsNegativeInfinityIfPLessThanOrEqualToZero() {
         GeometricVertex myVertex = new GeometricVertex(0.);
         double logProb = myVertex.logPmf(10);
         assertEquals(Double.NEGATIVE_INFINITY, logProb, 1e-10);
