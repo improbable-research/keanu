@@ -191,6 +191,8 @@ class Tree implements SaveStatistics {
                     subTree.forward = extendedSubTree.forward;
                 }
 
+                subTree.shouldContinueFlag = extendedSubTree.shouldContinueFlag;
+
                 if (extendedSubTree.shouldContinueFlag) {
 
                     subTree.sumMomentum = add(subTree.sumMomentum, extendedSubTree.sumMomentum);
