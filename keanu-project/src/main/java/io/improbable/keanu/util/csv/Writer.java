@@ -6,9 +6,7 @@ import com.opencsv.ICSVWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 public abstract class Writer {

@@ -1,5 +1,6 @@
 package io.improbable.keanu.util.csv;
 
+import com.opencsv.CSVWriter;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -8,8 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.opencsv.CSVWriter;
 
 public class SampleWriter extends Writer {
 
