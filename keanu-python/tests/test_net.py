@@ -110,9 +110,3 @@ def test_get_vertex_by_label() -> None:
     retrieved_vertex = net.get_vertex_by_label("gamma")
     assert retrieved_vertex is not None
     assert retrieved_vertex.get_id() == vertex.get_id()
-
-
-def test_get_vertex_by_label_returns_none_if_not_found() -> None:
-    vertex = Gamma(1., 1., label="gamma")
-    net = BayesNet([vertex])
-    assert net.get_vertex_by_label("gaussian") is None
