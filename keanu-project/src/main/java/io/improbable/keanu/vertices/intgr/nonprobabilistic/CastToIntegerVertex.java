@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -20,11 +19,6 @@ public class CastToIntegerVertex extends IntegerVertex implements NonProbabilist
         super(inputVertex.getShape());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
-    }
-
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return inputVertex.sample(random).toInteger();
     }
 
     @Override

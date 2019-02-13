@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import com.google.common.collect.Iterables;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -42,11 +41,6 @@ public class BooleanProxyVertex extends BooleanVertex implements ProxyVertex<Boo
     @Override
     public BooleanTensor calculate() {
         return getParent().getValue();
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return getParent().sample();
     }
 
     @Override

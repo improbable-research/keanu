@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import com.google.common.collect.ImmutableMap;
+import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.variational.optimizer.KeanuOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.Tensor;
@@ -106,8 +106,9 @@ public class LambdaModelVertexTest {
     @Test
     public void modelInsideVertexIsRecalculatedOnEachParentSample() {
         int numSamples = 50;
-        weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        GaussianVertex probabilisticInput = new GaussianVertex(21., 1.);
+        weatherModel.setInputToModel(probabilisticInput);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), probabilisticInput);
 
         ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
@@ -115,8 +116,8 @@ public class LambdaModelVertexTest {
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
 
         for (int i = 0; i < numSamples; i++) {
-            double inputValue = inputToModel.sample(random).scalar();
-            inputToModel.setAndCascade(inputValue);
+            double inputValue = probabilisticInput.sample().scalar();
+            probabilisticInput.setAndCascade(inputValue);
             double expectedValue = (inputValue * 0.1) * (inputValue * 2);
             Assert.assertEquals(expectedValue, shouldIBringUmbrella.getValue().scalar(), 1e-6);
         }
@@ -140,7 +141,7 @@ public class LambdaModelVertexTest {
         temperatureReadingOne.observe(3.0);
         temperatureReadingTwo.observe(60.0);
 
-        NonGradientOptimizer nonGradientOptimizer = KeanuOptimizer.NonGradient.of(temperatureReadingTwo.getConnectedGraph());
+        NonGradientOptimizer nonGradientOptimizer = Keanu.Optimizer.NonGradient.of(temperatureReadingTwo.getConnectedGraph());
         nonGradientOptimizer.maxLikelihood();
         Assert.assertEquals(30.0, inputToModel.getValue().scalar(), 0.1);
     }
@@ -166,7 +167,7 @@ public class LambdaModelVertexTest {
 
         KeanuProbabilisticModel probabilisticModel = new KeanuProbabilisticModel(chanceOfRainObservation.getConnectedGraph());
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfigFor(probabilisticModel, random).getPosteriorSamples(
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(
             probabilisticModel,
             inputToModel,
             200

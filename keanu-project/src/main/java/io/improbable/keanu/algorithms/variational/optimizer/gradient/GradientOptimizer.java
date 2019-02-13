@@ -2,29 +2,22 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
+import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunctionGradient;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.ProbabilityFitness;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import org.apache.commons.math3.optim.InitialGuess;
-import org.apache.commons.math3.optim.MaxEval;
-import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.SimpleValueChecker;
-import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
-import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-
-import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.getAsDoubleTensors;
-import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class GradientOptimizer implements Optimizer {
@@ -35,46 +28,23 @@ public class GradientOptimizer implements Optimizer {
         return new GradientOptimizerBuilder();
     }
 
-    public enum UpdateFormula {
-        POLAK_RIBIERE(NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE),
-        FLETCHER_REEVES(NonLinearConjugateGradientOptimizer.Formula.FLETCHER_REEVES);
+    private final ProbabilisticModelWithGradient probabilisticModelWithGradient;
 
-        NonLinearConjugateGradientOptimizer.Formula apacheMapping;
+    private final GradientOptimizationAlgorithm gradientOptimizationAlgorithm;
 
-        UpdateFormula(NonLinearConjugateGradientOptimizer.Formula apacheMapping) {
-            this.apacheMapping = apacheMapping;
-        }
-    }
+    private final boolean checkInitialFitnessConditions;
 
-
-    private ProbabilisticModelWithGradient probabilisticModel;
-
-    /**
-     * maxEvaluations the maximum number of objective function evaluations before throwing an exception
-     * indicating convergence failure.
-     */
-    private int maxEvaluations;
-
-    private double relativeThreshold;
-
-    private double absoluteThreshold;
-
-    /**
-     * Specifies what formula to use to update the Beta parameter of the Nonlinear conjugate gradient method optimizer.
-     */
-    private UpdateFormula updateFormula;
-
-    private final List<BiConsumer<double[], double[]>> onGradientCalculations = new ArrayList<>();
-    private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
+    private final List<BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>>> onGradientCalculations = new ArrayList<>();
+    private final List<BiConsumer<Map<VariableReference, DoubleTensor>, Double>> onFitnessCalculations = new ArrayList<>();
 
     /**
      * Adds a callback to be called whenever the optimizer evaluates the gradient at a point.
      *
      * @param gradientCalculationHandler a function to be called whenever the optimizer evaluates the gradient at a point.
-     *                                   The double[] argument to the handler represents the point being evaluated.
-     *                                   The double[] argument to the handler represents the gradient of that point.
+     *                                   The first argument to the handler represents the point being evaluated.
+     *                                   The second argument to the handler represents the gradient of that point.
      */
-    public void addGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
+    public void addGradientCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> gradientCalculationHandler) {
         this.onGradientCalculations.add(gradientCalculationHandler);
     }
 
@@ -84,109 +54,97 @@ public class GradientOptimizer implements Optimizer {
      *
      * @param gradientCalculationHandler the function to be removed from the list of gradient evaluation callbacks
      */
-    public void removeGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
+    public void removeGradientCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> gradientCalculationHandler) {
         this.onGradientCalculations.remove(gradientCalculationHandler);
     }
 
-    private void handleGradientCalculation(double[] point, double[] gradients) {
-        for (BiConsumer<double[], double[]> gradientCalculationHandler : onGradientCalculations) {
+    private void handleGradientCalculation(Map<VariableReference, DoubleTensor> point, Map<? extends VariableReference, DoubleTensor> gradients) {
+        for (BiConsumer<Map<VariableReference, DoubleTensor>, Map<? extends VariableReference, DoubleTensor>> gradientCalculationHandler : onGradientCalculations) {
             gradientCalculationHandler.accept(point, gradients);
         }
     }
 
     @Override
-    public void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
+    public void addFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler) {
         this.onFitnessCalculations.add(fitnessCalculationHandler);
     }
 
     @Override
-    public void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
+    public void removeFitnessCalculationHandler(BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler) {
         this.onFitnessCalculations.remove(fitnessCalculationHandler);
     }
 
-    private void handleFitnessCalculation(double[] point, Double fitness) {
-        for (BiConsumer<double[], Double> fitnessCalculationHandler : onFitnessCalculations) {
+    private void handleFitnessCalculation(Map<VariableReference, DoubleTensor> point, Double fitness) {
+        for (BiConsumer<Map<VariableReference, DoubleTensor>, Double> fitnessCalculationHandler : onFitnessCalculations) {
             fitnessCalculationHandler.accept(point, fitness);
         }
     }
 
     private void assertHasLatents() {
-        if (probabilisticModel.getLatentVariables().isEmpty()) {
+        if (probabilisticModelWithGradient.getLatentVariables().isEmpty()) {
             throw new IllegalArgumentException("Cannot find MAP of network without any latent variables");
         }
     }
 
     @Override
     public OptimizedResult maxAPosteriori() {
-        assertHasLatents();
-
-        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
-            probabilisticModel,
-            false,
-            this::handleGradientCalculation,
-            this::handleFitnessCalculation
-        );
-
-        return optimize(fitnessFunction);
+        return optimize(ProbabilityFitness.MAP);
     }
 
     @Override
     public OptimizedResult maxLikelihood() {
+        return optimize(ProbabilityFitness.MLE);
+    }
+
+    private OptimizedResult optimize(ProbabilityFitness probabilityFitness) {
         assertHasLatents();
 
-        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
-            probabilisticModel,
-            true,
-            this::handleGradientCalculation,
+        FitnessFunction fitnessFunction = probabilityFitness.getFitnessFunction(
+            probabilisticModelWithGradient,
             this::handleFitnessCalculation
         );
 
-        return optimize(fitnessFunction);
+        FitnessFunctionGradient fitnessFunctionGradient = probabilityFitness.getFitnessFunctionGradient(
+            probabilisticModelWithGradient,
+            this::handleGradientCalculation
+        );
+
+        return optimize(fitnessFunction, fitnessFunctionGradient);
     }
 
-    private OptimizedResult optimize(FitnessFunctionWithGradient fitnessFunction) {
+    private OptimizedResult optimize(FitnessFunction fitnessFunction, FitnessFunctionGradient fitnessFunctionGradient) {
 
         StatusBar statusBar = Optimizer.createFitnessStatusBar(this);
 
-        ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
-        ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
+        if (checkInitialFitnessConditions) {
+            Map<VariableReference, DoubleTensor> startingPoint = Optimizer.convertToMapPoint(probabilisticModelWithGradient.getLatentVariables());
 
-        double[] startingPoint = Optimizer.convertToPoint(getAsDoubleTensors(probabilisticModel.getLatentVariables()));
+            double initialFitness = fitnessFunction.getFitnessAt(startingPoint);
 
-        double initialFitness = fitness.getObjectiveFunction().value(startingPoint);
-        double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
+            if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
+                throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
+            }
 
-        if (ProbabilityCalculator.isImpossibleLogProb(initialFitness)) {
-            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
+            Map<? extends VariableReference, DoubleTensor> initialGradient = fitnessFunctionGradient.getGradientsAt(startingPoint);
+            throwIfGradientIsFlat(initialGradient);
         }
 
-        warnIfGradientIsFlat(initialGradient);
-
-        NonLinearConjugateGradientOptimizer optimizer;
-
-        optimizer = new NonLinearConjugateGradientOptimizer(
-            updateFormula.apacheMapping,
-            new SimpleValueChecker(relativeThreshold, absoluteThreshold)
-        );
-
-        PointValuePair pointValuePair = optimizer.optimize(
-            new MaxEval(maxEvaluations),
-            fitness,
-            gradient,
-            MAXIMIZE,
-            new InitialGuess(startingPoint)
+        OptimizedResult result = gradientOptimizationAlgorithm.optimize(
+            probabilisticModelWithGradient.getLatentVariables(),
+            fitnessFunction,
+            fitnessFunctionGradient
         );
 
         statusBar.finish();
 
-        Map<VariableReference, DoubleTensor> optimizedValues = Optimizer
-            .convertFromPoint(pointValuePair.getPoint(), probabilisticModel.getLatentVariables());
-
-        return new OptimizedResult(optimizedValues, pointValuePair.getValue());
+        return result;
     }
 
-    private static void warnIfGradientIsFlat(double[] gradient) {
-        double maxGradient = Arrays.stream(gradient).max().orElseThrow(IllegalArgumentException::new);
+    private static void throwIfGradientIsFlat(Map<? extends VariableReference, DoubleTensor> gradient) {
+        double maxGradient = gradient.values().stream()
+            .flatMap(v -> Arrays.stream(v.asFlatDoubleArray()).boxed())
+            .mapToDouble(v -> v).max().orElseThrow(IllegalArgumentException::new);
+
         if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
             throw new IllegalStateException("The initial gradient is very flat. The largest gradient is " + maxGradient);
         }
@@ -194,55 +152,38 @@ public class GradientOptimizer implements Optimizer {
 
     public static class GradientOptimizerBuilder {
 
-        private ProbabilisticModelWithGradient probabilisticModel;
-        private int maxEvaluations = Integer.MAX_VALUE;
-        private double relativeThreshold = 1e-8;
-        private double absoluteThreshold = 1e-8;
-        private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
+        private ProbabilisticModelWithGradient probabilisticModelWithGradient;
+        private GradientOptimizationAlgorithm gradientOptimizationAlgorithm = ConjugateGradient.builder().build();
+        private boolean checkInitialFitnessConditions = true;
 
-        GradientOptimizerBuilder() {
-        }
-
-        public GradientOptimizerBuilder probabilisticModel(ProbabilisticModelWithGradient probabilisticModel) {
-            this.probabilisticModel = probabilisticModel;
+        public GradientOptimizerBuilder probabilisticModel(ProbabilisticModelWithGradient probabilisticModelWithGradient) {
+            this.probabilisticModelWithGradient = probabilisticModelWithGradient;
             return this;
         }
 
-        public GradientOptimizerBuilder maxEvaluations(int maxEvaluations) {
-            this.maxEvaluations = maxEvaluations;
+        public GradientOptimizerBuilder algorithm(GradientOptimizationAlgorithm gradientOptimizationAlgorithm) {
+            this.gradientOptimizationAlgorithm = gradientOptimizationAlgorithm;
             return this;
         }
 
-        public GradientOptimizerBuilder relativeThreshold(double relativeThreshold) {
-            this.relativeThreshold = relativeThreshold;
-            return this;
-        }
-
-        public GradientOptimizerBuilder absoluteThreshold(double absoluteThreshold) {
-            this.absoluteThreshold = absoluteThreshold;
-            return this;
-        }
-
-        public GradientOptimizerBuilder updateFormula(UpdateFormula updateFormula) {
-            this.updateFormula = updateFormula;
+        public GradientOptimizerBuilder checkInitialFitnessConditions(boolean check) {
+            this.checkInitialFitnessConditions = check;
             return this;
         }
 
         public GradientOptimizer build() {
-            if (probabilisticModel == null) {
+            if (probabilisticModelWithGradient == null) {
                 throw new IllegalStateException("Cannot build optimizer without specifying network to optimize.");
             }
+            if (gradientOptimizationAlgorithm == null) {
+                throw new IllegalStateException("Cannot build optimizer without specifying algorithm for optimizing.");
+            }
             return new GradientOptimizer(
-                probabilisticModel,
-                maxEvaluations,
-                relativeThreshold,
-                absoluteThreshold,
-                updateFormula
+                probabilisticModelWithGradient,
+                gradientOptimizationAlgorithm,
+                checkInitialFitnessConditions
             );
         }
 
-        public String toString() {
-            return "GradientOptimizer.GradientOptimizerBuilder(probabilisticModel=" + this.probabilisticModel + ", maxEvaluations=" + this.maxEvaluations + ", relativeThreshold=" + this.relativeThreshold + ", absoluteThreshold=" + this.absoluteThreshold + ", updateFormula=" + this.updateFormula + ")";
-        }
     }
 }

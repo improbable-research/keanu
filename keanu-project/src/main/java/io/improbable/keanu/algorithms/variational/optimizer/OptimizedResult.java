@@ -10,12 +10,12 @@ import java.util.Map;
 @AllArgsConstructor
 public class OptimizedResult {
 
-    final Map<VariableReference, DoubleTensor> optimizedValues;
+    private final Map<VariableReference, DoubleTensor> optimizedValues;
 
     @Getter
-    final double optimizedFitness;
+    private final double fitness;
 
-    public DoubleTensor get(VariableReference variableReference) {
+    public DoubleTensor getValueFor(VariableReference variableReference) {
         return optimizedValues.get(variableReference);
     }
 }

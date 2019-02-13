@@ -48,10 +48,10 @@ public class TensorflowComputableGraphIntegerOpTest {
     }
 
     private void testIntegerBinaryOperation(long[] shape, BiFunction<IntegerVertex, IntegerVertex, IntegerVertex> op) {
-        IntegerVertex A = new UniformIntVertex(shape, 0, 1);
+        UniformIntVertex A = new UniformIntVertex(shape, 0, 1);
         A.setValue(A.sample());
 
-        IntegerVertex B = new UniformIntVertex(shape, 1, 1);
+        UniformIntVertex B = new UniformIntVertex(shape, 1, 1);
         B.setValue(B.sample());
 
         IntegerVertex C = op.apply(A, B);

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -26,11 +25,6 @@ public abstract class BooleanUnaryOpVertex<T extends Tensor> extends BooleanVert
 
     public Vertex<T> getInput() {
         return a;
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(a.sample(random));
     }
 
     @Override

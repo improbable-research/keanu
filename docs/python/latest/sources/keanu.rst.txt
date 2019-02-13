@@ -9,4 +9,4 @@ Submodules
     :caption: Contents:
 
     keanu.vertex
-    distributions
+    keanu.algorithm

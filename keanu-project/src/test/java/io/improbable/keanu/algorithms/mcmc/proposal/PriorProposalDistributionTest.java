@@ -4,13 +4,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Set;
@@ -18,26 +14,22 @@ import java.util.Set;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class PriorProposalDistributionTest {
 
-    @Mock
     public GaussianVertex vertex1;
-    @Mock
     public GaussianVertex vertex2;
     private PriorProposalDistribution proposalDistribution;
 
     @Before
-    public void setUpProposalDistribution() throws Exception {
-        when(vertex1.getReference()).thenReturn(new VertexId(1));
-        when(vertex2.getReference()).thenReturn(new VertexId(2));
-        proposalDistribution = new PriorProposalDistribution(ImmutableList.of(vertex1, vertex2));
+    public void setUpProposalDistribution() {
+        vertex1 = new GaussianVertex(0, 1);
+        vertex2 = new GaussianVertex(0, 1);
+        proposalDistribution = new PriorProposalDistribution();
     }
 
     @Before
-    public void setRandomSeed() throws Exception {
+    public void setRandomSeed() {
         KeanuRandom.setDefaultRandomSeed(0);
     }
 
@@ -46,7 +38,7 @@ public class PriorProposalDistributionTest {
         ProposalListener listener1 = mock(ProposalListener.class);
         ProposalListener listener2 = mock(ProposalListener.class);
         List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
-        proposalDistribution = new PriorProposalDistribution(ImmutableList.of(vertex1, vertex2), listeners);
+        proposalDistribution = new PriorProposalDistribution(listeners);
         Set<Variable> variables = ImmutableSet.of(vertex1, vertex2);
         Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
         verify(listener1).onProposalCreated(proposal);

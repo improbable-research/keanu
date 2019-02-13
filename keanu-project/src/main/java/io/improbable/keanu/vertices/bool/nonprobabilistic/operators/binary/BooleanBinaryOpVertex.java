@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -27,11 +26,6 @@ public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> 
         this.left = left;
         this.right = right;
         setParents(left, right);
-    }
-
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(left.sample(random), right.sample(random));
     }
 
     @Override
