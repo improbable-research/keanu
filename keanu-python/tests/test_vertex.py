@@ -8,7 +8,7 @@ from py4j.java_gateway import JVMView
 from keanu import set_deterministic_state
 from keanu.context import KeanuContext
 from keanu.vartypes import tensor_arg_types, primitive_types, numpy_types, pandas_types
-from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli, IntegerProxy
+from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli, IntegerProxy, Gamma
 from keanu.vertex.base import Vertex
 
 
@@ -367,3 +367,28 @@ def test_java_vertex_to_python_vertex_persists_label() -> None:
     java_vertex = Gaussian(0., 1., label=label).unwrap()
     python_vertex = Vertex._from_java_vertex(java_vertex)
     assert python_vertex.get_label() == label
+
+
+def test_get_parents() -> None:
+    p1 = Const(0.)
+    p2 = Const(1.)
+    v = Gaussian(p1, p2)
+    v_parents = [p.get_id() for p in v.get_parents()]
+    assert [p1.get_id(), p2.get_id()] == v_parents
+
+
+def test_get_probabilistic_parents() -> None:
+    p1 = Gamma(1., 1.)
+    p2 = Const(1.)
+    v = Gaussian(p1, p2)
+    v_parents = [p.get_id() for p in v.get_probabilistic_parents()]
+    assert [p1.get_id()] == v_parents
+
+
+def test_get_children() -> None:
+    p1 = Const(0.)
+    p2 = Const(1.)
+    v = Gaussian(p1, p2)
+    p1_children = [c.get_id() for c in p1.get_children()]
+    p2_children = [c.get_id() for c in p2.get_children()]
+    assert [v.get_id()] == p1_children == p2_children

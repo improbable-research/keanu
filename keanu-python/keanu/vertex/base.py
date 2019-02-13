@@ -69,6 +69,15 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def get_connected_graph(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
+    def get_parents(self) -> Iterator['Vertex']:
+        return Vertex._to_generator(self.unwrap().getParents())
+
+    def get_probabilistic_parents(self) -> Iterator['Vertex']:
+        return Vertex._to_generator(self.unwrap().getProbabilisticParents())
+
+    def get_children(self) -> Iterator['Vertex']:
+        return Vertex._to_generator(self.unwrap().getChildren())
+
     def get_id(self) -> Tuple[int, ...]:
         return Vertex._get_python_id(self.unwrap())
 
