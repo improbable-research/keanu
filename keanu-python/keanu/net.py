@@ -35,6 +35,9 @@ class BayesNet(JavaObjectWrapper):
     def get_discrete_latent_vertices(self) -> Iterator[Vertex]:
         return Vertex._to_generator(self.unwrap().getDiscreteLatentVertices())
 
+    def get_all_vertices(self) -> Iterator[Vertex]:
+        return Vertex._to_generator(self.unwrap().getAllVertices())
+
     def probe_for_non_zero_probability(self, attempts: int, random: KeanuRandom) -> None:
         self.unwrap().probeForNonZeroProbability(attempts, random.unwrap())
 
