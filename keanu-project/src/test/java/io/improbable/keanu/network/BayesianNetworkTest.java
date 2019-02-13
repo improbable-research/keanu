@@ -92,8 +92,6 @@ public class BayesianNetworkTest {
         assertThat(retrieved, is(b));
         retrieved = net.getVertexByLabel(labelOr);
         assertThat(retrieved, is(ored));
-        retrieved = net.getVertexByLabel(null);
-        assertThat(retrieved, nullValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
