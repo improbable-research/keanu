@@ -7,10 +7,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 /**
@@ -47,13 +44,13 @@ public class Geometric implements DiscreteDistribution {
     }
 
     public static DoubleVertex logProbOutput(IntegerPlaceholderVertex k, DoublePlaceholderVertex p) {
-        ConstantDoubleVertex zero = ConstantVertex.of(DoubleTensor.zeros(k.getShape()));
-        ConstantDoubleVertex one = ConstantVertex.of(DoubleTensor.ones(k.getShape()));
-
-        BooleanVertex parameterIsValid = p.greaterThan(zero).and(p.lessThan(one));
-        return If.isTrue(parameterIsValid)
-            .then(calculateLogProb(k, p))
-            .orElse(ConstantVertex.of(DoubleTensor.create(Double.NEGATIVE_INFINITY, k.getShape())));
+        DoubleVertex zeroes = ConstantVertex.of(DoubleTensor.zeros(k.getShape()));
+        DoubleVertex ones = ConstantVertex.of(DoubleTensor.ones(k.getShape()));
+        DoubleVertex parameterIsInvalidMask = p.toGreaterThanMask(zeroes)
+            .times(p.toLessThanMask(ones))
+            .unaryMinus()
+            .plus(ones);
+        return calculateLogProb(k, p).setWithMask(parameterIsInvalidMask, Double.NEGATIVE_INFINITY);
     }
 
     private DoubleTensor calculateLogProb(IntegerTensor k) {
