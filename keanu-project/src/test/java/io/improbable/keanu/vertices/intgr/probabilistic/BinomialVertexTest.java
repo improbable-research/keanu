@@ -74,7 +74,7 @@ public class BinomialVertexTest {
         int k1 = 20;
         int k2 = 80;
 
-        BinomialVertex testBinomialVertex = new BinomialVertex(new long[]{1, 2}, p, n);
+        BinomialVertex testBinomialVertex = new BinomialVertex(new long[]{2}, p, n);
         BinomialDistribution distribution = new BinomialDistribution(n, p);
 
         double actual = testBinomialVertex.logPmf(new int[]{k1, k2});
@@ -89,7 +89,7 @@ public class BinomialVertexTest {
         int k1 = 20;
         int k2 = 80;
 
-        BinomialVertex testBinomialVertex = new BinomialVertex(new long[]{1, 2}, p, n);
+        BinomialVertex testBinomialVertex = new BinomialVertex(new long[]{2}, p, n);
         LogProbGraph logProbGraph = testBinomialVertex.logProbGraph();
         LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, n, n.getValue());
