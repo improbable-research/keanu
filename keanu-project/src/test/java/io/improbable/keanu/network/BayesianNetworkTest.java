@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,7 +25,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import org.junit.rules.ExpectedException;
 import static org.mockito.Mockito.mock;
 
 public class BayesianNetworkTest {
