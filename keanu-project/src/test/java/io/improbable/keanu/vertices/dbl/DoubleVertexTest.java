@@ -2,14 +2,19 @@ package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Test;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 
 public class DoubleVertexTest {
 
@@ -97,5 +102,20 @@ public class DoubleVertexTest {
         DoubleVertex v1 = new ConstantDoubleVertex(3.6);
         IntegerVertex intV1 = v1.toInteger();
         assertEquals(3, intV1.getValue().scalar().longValue());
+    }
+
+    @Test
+    public void canGetProbabilisticParents() {
+        DoubleVertex deterministicParent = ConstantVertex.of(0.);
+        DoubleVertex probabilisticParent = new GaussianVertex(0., 1.);
+        DoubleVertex vertex = new GaussianVertex(deterministicParent, probabilisticParent);
+        assertThat(vertex.getProbabilisticParents(), contains(probabilisticParent));
+    }
+
+    @Test
+    public void getProbabilisticParentsReturnsEmptyIfNone() {
+        DoubleVertex deterministicParent = ConstantVertex.of(1.);
+        DoubleVertex vertex = new GaussianVertex(0., deterministicParent);
+        assertThat(vertex.getProbabilisticParents(), empty());
     }
 }

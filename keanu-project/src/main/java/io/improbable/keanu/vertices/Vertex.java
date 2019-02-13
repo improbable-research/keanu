@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexState<T>> {
 
@@ -261,6 +262,10 @@ public abstract class Vertex<T> implements Observable<T>, Variable<T, VertexStat
 
     public Set<Vertex> getParents() {
         return parents;
+    }
+
+    public Set<Vertex> getProbabilisticParents() {
+        return parents.stream().filter(vertex -> vertex instanceof Probabilistic).collect(Collectors.toSet());
     }
 
     public int getDegree() {
