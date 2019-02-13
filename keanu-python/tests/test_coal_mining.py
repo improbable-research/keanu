@@ -2,13 +2,12 @@ from typing import List
 
 import numpy as np
 from examples import CoalMining
-from keanu import BayesNet, KeanuRandom
+from keanu import BayesNet
 from keanu.algorithm import sample
-from keanu.vartypes import numpy_types, primitive_types
+from keanu.vartypes import primitive_types
 
 
 def test_coalmining() -> None:
-    KeanuRandom.set_default_random_seed(1)
     coal_mining = CoalMining()
     model = coal_mining.model()
 

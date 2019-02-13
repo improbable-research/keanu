@@ -2,13 +2,12 @@ import pytest
 from py4j.protocol import Py4JJavaError
 
 from examples import thermometers
-from keanu import KeanuRandom, BayesNet, Model
+from keanu import BayesNet, Model
 from keanu.algorithm import GradientOptimizer, ConjugateGradient, Adam
 
 
 @pytest.fixture
 def model() -> Model:
-    KeanuRandom.set_default_random_seed(1)
     model = thermometers.model()
 
     model.thermometer_one.observe(22.0)
