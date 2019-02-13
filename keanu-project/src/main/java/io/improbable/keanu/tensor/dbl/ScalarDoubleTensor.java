@@ -18,7 +18,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShape.calculateShapeForLengthOneBroadcast;
 
-public class ScalarDoubleTensor implements DoubleTensor {
+public class ScalarDoubleTensor extends DoubleTensor {
 
     private Double value;
     private long[] shape;

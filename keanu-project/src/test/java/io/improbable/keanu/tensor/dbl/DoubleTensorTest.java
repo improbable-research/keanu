@@ -14,6 +14,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +29,16 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+@RunWith(Parameterized.class)
 public class DoubleTensorTest {
+
+    @Parameterized.Parameters(name = "{index}: Test with {1}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
+            {new JVMDoubleTensorFactory(), "JVM DoubleTensor"},
+        });
+    }
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -41,8 +52,10 @@ public class DoubleTensorTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    @Before
-    public void setup() {
+    public DoubleTensorTest(DoubleTensorFactory factory, String name) {
+
+        DoubleTensor.setFactory(factory);
+
         matrixA = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
         matrixB = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
         scalarA = DoubleTensor.scalar(2.0);

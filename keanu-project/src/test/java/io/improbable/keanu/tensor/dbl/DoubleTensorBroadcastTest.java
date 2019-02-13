@@ -12,65 +12,7 @@ import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesIn
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesOperationEquals;
 import static org.junit.Assert.assertEquals;
 
-public class JVMBroadcastTensorTest {
-
-    @Test
-    public void canBroadcastMultiplyRank2ContainingVectorAndMatrix() {
-
-        /*
-          a = np.array([1, 2, 3, 4]).reshape(2,2)
-          b = np.array([1, 2]).reshape(1,2)
-          ab = a * b
-          print(ab)
-          print(np.shape(ab))
-         */
-
-        DoubleTensor rank4 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2}, new long[]{1, 2});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{1, 4, 3, 8}, new long[]{2, 2});
-
-        assertTimesOperationEquals(rank4, matrix, expected);
-        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
-    }
-
-    @Test
-    public void canBroadcastMultiplyRank2ContainingVectorAndMatrix2() {
-
-        /*
-          a = np.array([1, 2, 3, 4]).reshape(2,2)
-          b = np.array([1, 2]).reshape(2,1)
-          ab = a * b
-          print(ab)
-          print(np.shape(ab))
-         */
-
-        DoubleTensor rank4 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2}, new long[]{2, 1});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{1, 2, 6, 8}, new long[]{2, 2});
-
-        assertTimesOperationEquals(rank4, matrix, expected);
-        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
-    }
-
-
-    @Test
-    public void canBroadcastMultiplyRank3ContainingVectorAndMatrix() {
-
-        /*
-          a = np.array([1, 2, 3, 4, 5, 6, 7, 8]).reshape(2,2,2)
-          b = np.array([1, 2, 3, 4]).reshape(1,2,2)
-          ab = a * b
-          print(ab)
-          print(np.shape(ab))
-         */
-
-        DoubleTensor rank4 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{1, 2, 2});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{1, 4, 9, 16, 5, 12, 21, 32}, new long[]{2, 2, 2});
-
-        assertTimesOperationEquals(rank4, matrix, expected);
-        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
-    }
+public class DoubleTensorBroadcastTest {
 
     @Test
     public void canBroadcastMultiplyRank4ContainingVectorAndMatrix() {
@@ -83,9 +25,9 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank4 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2, 1});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2, 1, 1});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{1, 2, 6, 8, 15, 18, 28, 32}, new long[]{2, 2, 2, 1});
+        DoubleTensor rank4 = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2, 1});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2}).reshape(2, 2, 1, 1);
+        DoubleTensor expected = DoubleTensor.create(new double[]{1, 2, 6, 8, 15, 18, 28, 32}, new long[]{2, 2, 2, 1});
 
         assertTimesOperationEquals(rank4, matrix, expected);
         assertTimesInPlaceOperationEquals(rank4, matrix, expected);
@@ -102,9 +44,9 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank3 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2, 1});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{1, 2, 6, 8, 3, 6, 12, 16}, new long[]{2, 2, 2});
+        DoubleTensor rank3 = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2, 1});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor expected = DoubleTensor.create(new double[]{1, 2, 6, 8, 3, 6, 12, 16}, new long[]{2, 2, 2});
 
         assertTimesOperationEquals(rank3, matrix, expected);
         assertTimesInPlaceOperationEquals(rank3, matrix, expected);
@@ -121,9 +63,9 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank3 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{1, 2, 2});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{1, 4, 9, 16}, new long[]{1, 2, 2});
+        DoubleTensor rank3 = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{1, 2, 2});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor expected = DoubleTensor.create(new double[]{1, 4, 9, 16}, new long[]{1, 2, 2});
 
         assertTimesOperationEquals(rank3, matrix, expected);
         assertTimesInPlaceOperationEquals(rank3, matrix, expected);
@@ -140,13 +82,13 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank4 = JVMDoubleTensor.create(new double[]{
+        DoubleTensor rank4 = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 5, 6, 7, 8,
             4, 3, 2, 1, 7, 5, 8, 6
         }, new long[]{2, 2, 2, 2});
 
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2}).reshape(2, 2, 1, 1);
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2}).reshape(2, 2, 1, 1);
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 10, 12, 14, 16,
             12, 9, 6, 3, 28, 20, 32, 24
         }, new long[]{2, 2, 2, 2});
@@ -167,23 +109,23 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank1 = JVMDoubleTensor.create(new double[]{
+        DoubleTensor rank4 = DoubleTensor.create(new double[]{
             1, 2, 3
         }, new long[]{3});
 
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{
+        DoubleTensor matrix = DoubleTensor.create(new double[]{
             1, 2, 3,
             5, 6, 7
         }, new long[]{2, 3});
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             1, 4, 9,
             5, 12, 21
         }, new long[]{2, 3});
 
 
-        assertTimesOperationEquals(rank1, matrix, expected);
-        assertTimesInPlaceOperationEquals(rank1, matrix, expected);
+        assertTimesOperationEquals(rank4, matrix, expected);
+        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
     }
 
     @Test
@@ -200,13 +142,13 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank5 = JVMDoubleTensor.create(new double[]{
+        DoubleTensor rank5 = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
             6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3
         }, new long[]{2, 2, 2, 2, 2});
 
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2}).reshape(2, 2, 1, 1, 1);
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2}).reshape(2, 2, 1, 1, 1);
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 8, 6, 4, 2, 14, 10, 16, 12,
             18, 9, 6, 27, 9, 12, 21, 18, 24, 8, 20, 16, 0, 8, 4, 12
         }, new long[]{2, 2, 2, 2, 2});
@@ -226,12 +168,12 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor x = JVMDoubleTensor.zeros(new long[]{2, 2, 2, 2});
-        DoubleTensor y = JVMDoubleTensor.create(new double[]{1, 0, 1, 0}, new long[]{2, 2});
+        DoubleTensor x = DoubleTensor.zeros(new long[]{2, 2, 2, 2});
+        DoubleTensor y = DoubleTensor.create(new double[]{1, 0, 1, 0}, new long[]{2, 2});
 
         DoubleTensor diff = x.plus(y);
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             1, 0, 1, 0,
             1, 0, 1, 0,
             1, 0, 1, 0,
@@ -243,12 +185,12 @@ public class JVMBroadcastTensorTest {
 
     @Test
     public void canSuperBroadcastInPlace() {
-        DoubleTensor x = JVMDoubleTensor.zeros(new long[]{2, 2, 2, 2});
-        DoubleTensor y = JVMDoubleTensor.create(new double[]{1, 0, 1, 0}, new long[]{2, 2});
+        DoubleTensor x = DoubleTensor.zeros(new long[]{2, 2, 2, 2});
+        DoubleTensor y = DoubleTensor.create(new double[]{1, 0, 1, 0}, new long[]{2, 2});
 
         DoubleTensor diff = x.plusInPlace(y);
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             1, 0, 1, 0,
             1, 0, 1, 0,
             1, 0, 1, 0,
@@ -269,15 +211,15 @@ public class JVMBroadcastTensorTest {
           print(np.shape(sx))
          */
 
-        DoubleTensor x = JVMDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3, 1});
-        DoubleTensor s = JVMDoubleTensor.create(new double[]{
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3}, new long[]{3, 1});
+        DoubleTensor s = DoubleTensor.create(new double[]{
             -5, -2, -3, -7, -8,
             -5, -2, -3, -7, -8,
             -5, -2, -3, -7, -8
         }, new long[]{3, 5});
 
         DoubleTensor diff = s.plus(x);
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             -4, -1, -2, -6, -7,
             -3, 0, -1, -5, -6,
             -2, 1, 0, -4, -5
@@ -301,8 +243,8 @@ public class JVMBroadcastTensorTest {
           print(np.shape(sx))
          */
 
-        DoubleTensor x = JVMDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
-        DoubleTensor s = JVMDoubleTensor.create(new double[]{
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
+        DoubleTensor s = DoubleTensor.create(new double[]{
             -5, -5, -5,
             -2, -2, -2,
             -3, -3, -3,
@@ -311,7 +253,7 @@ public class JVMBroadcastTensorTest {
         }, new long[]{5, 3});
 
         DoubleTensor diff = s.plus(x);
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             -4, -3, -2,
             -1, 0, 1,
             -2, -1, 0,
@@ -333,9 +275,9 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank3 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2, 1});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{2, 3, 5, 6, 4, 5, 7, 8}, new long[]{2, 2, 2});
+        DoubleTensor rank3 = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2, 1});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor expected = DoubleTensor.create(new double[]{2, 3, 5, 6, 4, 5, 7, 8}, new long[]{2, 2, 2});
 
         assertPlusOperationEquals(rank3, matrix, expected);
         assertPlusInPlaceOperationEquals(rank3, matrix, expected);
@@ -352,9 +294,9 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank3 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{1, 2, 2});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{2, 4, 6, 8}, new long[]{1, 2, 2});
+        DoubleTensor rank3 = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{1, 2, 2});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor expected = DoubleTensor.create(new double[]{2, 4, 6, 8}, new long[]{1, 2, 2});
 
         assertPlusOperationEquals(rank3, matrix, expected);
         assertPlusInPlaceOperationEquals(rank3, matrix, expected);
@@ -371,8 +313,8 @@ public class JVMBroadcastTensorTest {
           print(np.shape(sx))
          */
 
-        DoubleTensor x = JVMDoubleTensor.create(new double[]{-1, -2, -3}, new long[]{3});
-        DoubleTensor s = JVMDoubleTensor.create(new double[]{
+        DoubleTensor x = DoubleTensor.create(new double[]{-1, -2, -3}, new long[]{3});
+        DoubleTensor s = DoubleTensor.create(new double[]{
             -5, -2, -3,
             -7, -8, -5,
             -2, -3, -7,
@@ -382,7 +324,7 @@ public class JVMBroadcastTensorTest {
 
         DoubleTensor diff = s.minus(x);
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             -4, 0, 0,
             -6, -6, -2,
             -1, -1, -4,
@@ -404,8 +346,8 @@ public class JVMBroadcastTensorTest {
           print(np.shape(sx))
          */
 
-        DoubleTensor x = JVMDoubleTensor.create(new double[]{-1, -2, -3}, new long[]{3, 1});
-        DoubleTensor s = JVMDoubleTensor.create(new double[]{
+        DoubleTensor x = DoubleTensor.create(new double[]{-1, -2, -3}, new long[]{3, 1});
+        DoubleTensor s = DoubleTensor.create(new double[]{
             -5, -2, -3, -7, -8,
             -5, -2, -3, -7, -8,
             -5, -2, -3, -7, -8
@@ -413,7 +355,7 @@ public class JVMBroadcastTensorTest {
 
         DoubleTensor diff = s.minus(x);
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             -4, -1, -2, -6, -7,
             -3, 0, -1, -5, -6,
             -2, 1, 0, -4, -5
@@ -433,9 +375,9 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank3 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2, 1});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{0, -1, -1, -2, 2, 1, 1, 0}, new long[]{2, 2, 2});
+        DoubleTensor rank3 = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2, 1});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor expected = DoubleTensor.create(new double[]{0, -1, -1, -2, 2, 1, 1, 0}, new long[]{2, 2, 2});
 
         assertMinusOperationEquals(rank3, matrix, expected);
         assertMinusInPlaceOperationEquals(rank3, matrix, expected);
@@ -452,9 +394,9 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank3 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{1, 2, 2});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{0, 0, 0, 0}, new long[]{1, 2, 2});
+        DoubleTensor rank3 = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{1, 2, 2});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor expected = DoubleTensor.create(new double[]{0, 0, 0, 0}, new long[]{1, 2, 2});
 
         assertMinusOperationEquals(rank3, matrix, expected);
         assertMinusInPlaceOperationEquals(rank3, matrix, expected);
@@ -471,8 +413,8 @@ public class JVMBroadcastTensorTest {
           print(np.shape(sx))
          */
 
-        DoubleTensor x = JVMDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3, 1});
-        DoubleTensor s = JVMDoubleTensor.create(new double[]{
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3}, new long[]{3, 1});
+        DoubleTensor s = DoubleTensor.create(new double[]{
             5, 2, 3, 7, 8,
             5, 2, 3, 7, 8,
             5, 2, 3, 7, 8
@@ -480,7 +422,7 @@ public class JVMBroadcastTensorTest {
 
         DoubleTensor diff = s.div(x);
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             5 / 1.0, 2 / 1.0, 3 / 1.0, 7 / 1.0, 8 / 1.0,
             5 / 2.0, 2 / 2.0, 3 / 2.0, 7 / 2.0, 8 / 2.0,
             5 / 3.0, 2 / 3.0, 3 / 3.0, 7 / 3.0, 8 / 3.0
@@ -504,8 +446,8 @@ public class JVMBroadcastTensorTest {
           print(np.shape(sx))
          */
 
-        DoubleTensor x = JVMDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
-        DoubleTensor s = JVMDoubleTensor.create(new double[]{
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3}, new long[]{3});
+        DoubleTensor s = DoubleTensor.create(new double[]{
             5, 5, 5,
             2, 2, 2,
             3, 3, 3,
@@ -515,7 +457,7 @@ public class JVMBroadcastTensorTest {
 
         DoubleTensor diff = s.div(x);
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             5 / 1.0, 5 / 2.0, 5 / 3.0,
             2 / 1.0, 2 / 2.0, 2 / 3.0,
             3 / 1.0, 3 / 2.0, 3 / 3.0,
@@ -537,9 +479,9 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank3 = JVMDoubleTensor.create(new double[]{10, 20, 30, 40}, new long[]{2, 2, 1});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 5, 10}, new long[]{2, 2});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{10., 5., 4., 2., 30., 15., 8., 4.}, new long[]{2, 2, 2});
+        DoubleTensor rank3 = DoubleTensor.create(new double[]{10, 20, 30, 40}, new long[]{2, 2, 1});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 5, 10}, new long[]{2, 2});
+        DoubleTensor expected = DoubleTensor.create(new double[]{10., 5., 4., 2., 30., 15., 8., 4.}, new long[]{2, 2, 2});
 
         assertDivideOperationEquals(rank3, matrix, expected);
         assertDivideInPlaceOperationEquals(rank3, matrix, expected);
@@ -556,9 +498,9 @@ public class JVMBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank3 = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{1, 2, 2});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{1., 1., 1., 1.}, new long[]{1, 2, 2});
+        DoubleTensor rank3 = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{1, 2, 2});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor expected = DoubleTensor.create(new double[]{1., 1., 1., 1.}, new long[]{1, 2, 2});
 
         assertDivideOperationEquals(rank3, matrix, expected);
         assertDivideInPlaceOperationEquals(rank3, matrix, expected);
@@ -566,10 +508,10 @@ public class JVMBroadcastTensorTest {
 
     @Test
     public void canBroadcastMultiplyDifferentRankedTensorsBigToSmall() {
-        DoubleTensor rank4 = JVMDoubleTensor.ones(4, 2, 2, 2);
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor rank4 = DoubleTensor.ones(4, 2, 2, 2);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 1, 2, 3, 4,
             1, 2, 3, 4, 1, 2, 3, 4,
             1, 2, 3, 4, 1, 2, 3, 4,
@@ -583,10 +525,10 @@ public class JVMBroadcastTensorTest {
 
     @Test
     public void canBroadcastMultiplyDifferentRankedTensorsSmallToBig() {
-        DoubleTensor rank4 = JVMDoubleTensor.ones(4, 2, 2, 2);
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor rank4 = DoubleTensor.ones(4, 2, 2, 2);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 1, 2, 3, 4,
             1, 2, 3, 4, 1, 2, 3, 4,
             1, 2, 3, 4, 1, 2, 3, 4,
@@ -600,10 +542,10 @@ public class JVMBroadcastTensorTest {
 
     @Test
     public void canBroadcastPlusDifferentRankedTensorsBigToSmall() {
-        DoubleTensor rank4 = JVMDoubleTensor.zeros(new long[]{4, 2, 2, 2});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor rank4 = DoubleTensor.zeros(new long[]{4, 2, 2, 2});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 1, 2, 3, 4,
             1, 2, 3, 4, 1, 2, 3, 4,
             1, 2, 3, 4, 1, 2, 3, 4,
@@ -616,10 +558,10 @@ public class JVMBroadcastTensorTest {
 
     @Test
     public void canBroadcastPlusDifferentRankedTensorsSmallToBig() {
-        DoubleTensor rank4 = JVMDoubleTensor.zeros(new long[]{4, 2, 2, 2});
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor rank4 = DoubleTensor.zeros(new long[]{4, 2, 2, 2});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 1, 2, 3, 4,
             1, 2, 3, 4, 1, 2, 3, 4,
             1, 2, 3, 4, 1, 2, 3, 4,
@@ -632,10 +574,10 @@ public class JVMBroadcastTensorTest {
 
     @Test
     public void canBroadcastDivideDifferentRankedTensorsBigToSmall() {
-        DoubleTensor rank4 = JVMDoubleTensor.ones(new long[]{4, 2, 2, 2}).times(10.);
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 5, 10}, new long[]{2, 2});
+        DoubleTensor rank4 = DoubleTensor.ones(new long[]{4, 2, 2, 2}).times(10.);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 5, 10}, new long[]{2, 2});
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             10, 5, 2, 1, 10, 5, 2, 1,
             10, 5, 2, 1, 10, 5, 2, 1,
             10, 5, 2, 1, 10, 5, 2, 1,
@@ -648,10 +590,10 @@ public class JVMBroadcastTensorTest {
 
     @Test
     public void canBroadcastDivideDifferentRankedTensorsSmallToBig() {
-        DoubleTensor rank4 = JVMDoubleTensor.ones(new long[]{4, 2, 2, 2}).times(10.);
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 5, 10}, new long[]{2, 2});
+        DoubleTensor rank4 = DoubleTensor.ones(new long[]{4, 2, 2, 2}).times(10.);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 5, 10}, new long[]{2, 2});
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             .1, .2, .5, 1, .1, .2, .5, 1,
             .1, .2, .5, 1, .1, .2, .5, 1,
             .1, .2, .5, 1, .1, .2, .5, 1,
@@ -664,10 +606,10 @@ public class JVMBroadcastTensorTest {
 
     @Test
     public void canBroadcastMinusDifferentRankedTensorsBigToSmall() {
-        DoubleTensor rank4 = JVMDoubleTensor.ones(new long[]{4, 2, 2, 2}).times(5.);
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor rank4 = DoubleTensor.ones(new long[]{4, 2, 2, 2}).times(5.);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             4, 3, 2, 1, 4, 3, 2, 1,
             4, 3, 2, 1, 4, 3, 2, 1,
             4, 3, 2, 1, 4, 3, 2, 1,
@@ -680,10 +622,10 @@ public class JVMBroadcastTensorTest {
 
     @Test
     public void canBroadcastMinusDifferentRankedTensorsSmallToBig() {
-        DoubleTensor rank4 = JVMDoubleTensor.ones(new long[]{4, 2, 2, 2}).times(5.);
-        DoubleTensor matrix = JVMDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor rank4 = DoubleTensor.ones(new long[]{4, 2, 2, 2}).times(5.);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
 
-        DoubleTensor expected = JVMDoubleTensor.create(new double[]{
+        DoubleTensor expected = DoubleTensor.create(new double[]{
             -4, -3, -2, -1, -4, -3, -2, -1,
             -4, -3, -2, -1, -4, -3, -2, -1,
             -4, -3, -2, -1, -4, -3, -2, -1,
@@ -693,4 +635,5 @@ public class JVMBroadcastTensorTest {
         assertMinusOperationEquals(matrix, rank4, expected);
         assertMinusInPlaceOperationEquals(matrix, rank4, expected);
     }
+
 }

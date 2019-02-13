@@ -26,7 +26,7 @@ import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.Broadcasta
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.opWithAutoBroadcast;
 import static java.util.Arrays.copyOf;
 
-public class JVMDoubleTensor implements DoubleTensor {
+public class JVMDoubleTensor extends DoubleTensor {
 
     private long[] shape;
     private long[] stride;
