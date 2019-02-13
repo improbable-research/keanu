@@ -10,7 +10,7 @@ from examples import thermometers
 from keanu import BayesNet, KeanuRandom, Model
 from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler, NUTSSampler,
                              ForwardSampler, PosteriorSamplingAlgorithm)
-from keanu.vertex import Gamma, Exponential, Gaussian
+from keanu.vertex import Gamma, Exponential, Gaussian, Cauchy
 
 
 @pytest.fixture
@@ -18,7 +18,7 @@ def net() -> BayesNet:
     with Model() as m:
         m.gamma = Gamma(1., 1.)
         m.exp = Exponential(1.)
-        m.add = m.gamma + m.exp
+        m.cauchy = Cauchy(m.gamma, m.exp)
 
     return m.to_bayes_net()
 
@@ -159,7 +159,6 @@ def test_down_sample_interval(net: BayesNet) -> None:
 
 
 def test_sample_with_plot(net: BayesNet) -> None:
-    KeanuRandom.set_default_random_seed(1)
     num_plots = 3
     _, ax = plt.subplots(num_plots, 1, squeeze=False)
     sample(net=net, sample_from=net.get_latent_vertices(), draws=5, plot=True, ax=ax)
