@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertEquals;
@@ -65,6 +66,26 @@ public class LambdaSectionTraversalTest {
     public void doesGetAllUpstreamVertices() {
 
         LambdaSection lambdaSection = LambdaSection.getUpstreamLambdaSection(C, true);
+        Set<Vertex> verticesDepthFirst = lambdaSection.getAllVertices();
+
+        assertEquals(5, verticesDepthFirst.size());
+        assertThat(verticesDepthFirst, containsInAnyOrder(A, B, aPlusB, cSigma, C));
+    }
+
+    @Test
+    public void doesGetUpstreamProbabilisticVerticesOfCollection() {
+
+        LambdaSection lambdaSection = LambdaSection.getUpstreamLambdaSectionForCollection(Arrays.asList(C, cSigma), false);
+        Set<Vertex> verticesDepthFirst = lambdaSection.getLatentAndObservedVertices();
+
+        assertEquals(3, verticesDepthFirst.size());
+        assertThat(verticesDepthFirst, containsInAnyOrder(A, B, C));
+    }
+
+    @Test
+    public void doesGetAllUpstreamVerticesOfCollection() {
+
+        LambdaSection lambdaSection = LambdaSection.getUpstreamLambdaSectionForCollection(Arrays.asList(C, cSigma), true);
         Set<Vertex> verticesDepthFirst = lambdaSection.getAllVertices();
 
         assertEquals(5, verticesDepthFirst.size());

@@ -92,7 +92,7 @@ public class LambdaSection {
      * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
      * includeNonProbabilistic is false.
      */
-    public static LambdaSection getUpstreamLambdaSectionCollection(List<Vertex> vertices, boolean includeNonProbabilistic) {
+    public static LambdaSection getUpstreamLambdaSectionForCollection(List<Vertex> vertices, boolean includeNonProbabilistic) {
 
         Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
