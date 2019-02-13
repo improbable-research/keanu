@@ -6,9 +6,7 @@ import com.opencsv.ICSVWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 public abstract class Writer {
@@ -27,9 +25,9 @@ public abstract class Writer {
     private String[] header = null;
     private boolean headerEnabled = false;
 
-    public abstract File toFile(File file);
+    public abstract File toFile(File file) throws IOException;
 
-    public File toFile(String file) {
+    public File toFile(String file) throws IOException {
         return toFile(new File(file));
     }
 
@@ -85,20 +83,16 @@ public abstract class Writer {
         return emptyValue;
     }
 
-    File writeToFile(File file, List<String[]> data) {
-        return writeToFile(file, data, separator, quoteChar, escapeChar, lineEnd);
+    CSVWriter prepareWriter(File file) throws IOException {
+        return prepareWriter(file, separator, quoteChar, escapeChar, lineEnd);
     }
 
-    File writeToFile(File file, List<String[]> data, char separator, char quoteChar, char escapeChar, String lineEnd) {
-        try (CSVWriter writer = new CSVWriter(new FileWriter(file), separator, quoteChar, escapeChar, lineEnd)) {
-            if (headerEnabled) {
-                writer.writeNext(header, false);
-            }
-            writer.writeAll(data, false);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
+    CSVWriter prepareWriter(File file, char separator, char quoteChar, char escapeChar, String lineEnd) throws IOException {
+        CSVWriter writer = new CSVWriter(new FileWriter(file), separator, quoteChar, escapeChar, lineEnd);
+        if (headerEnabled) {
+            writer.writeNext(header, false);
         }
-        return file;
+        return writer;
     }
 
     String[] createHeader(int size, String headerStyle, Function<Integer, String> func) {

@@ -249,5 +249,4 @@ public class WriteCsvTest {
         assertTrue(lines.get(0).equals(Arrays.asList("0.5", "1.5")));
         file.delete();
     }
-
 }
