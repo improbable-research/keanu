@@ -51,4 +51,9 @@ public class JVMDoubleTensorFactory implements DoubleTensorFactory {
     public DoubleTensor scalar(double scalarValue) {
         return JVMDoubleTensor.scalar(scalarValue);
     }
+
+    @Override
+    public DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
+        return null;
+    }
 }

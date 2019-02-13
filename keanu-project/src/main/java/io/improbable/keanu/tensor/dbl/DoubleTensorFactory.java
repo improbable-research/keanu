@@ -21,4 +21,6 @@ public interface DoubleTensorFactory {
     DoubleTensor arange(double start, double end, double stepSize);
 
     DoubleTensor scalar(double scalarValue);
+
+    DoubleTensor concat(int dimension, DoubleTensor... toConcat);
 }

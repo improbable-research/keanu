@@ -230,7 +230,7 @@ public class JVMDoubleTensor implements DoubleTensor {
         RealMatrix thisMatrix = asApacheRealMatrix(this);
         RealMatrix thatMatrix = asApacheRealMatrix(that);
 
-        return null;
+        return fromApacheRealMatrix(thisMatrix.multiply(thatMatrix));
     }
 
     private static RealMatrix asApacheRealMatrix(DoubleTensor matrix) {
@@ -247,6 +247,19 @@ public class JVMDoubleTensor implements DoubleTensor {
             }
         }
         return out;
+    }
+
+    private static JVMDoubleTensor fromApacheRealMatrix(RealMatrix realMatrix) {
+        double[][] data = realMatrix.getData();
+        double[] flatData = new double[realMatrix.getRowDimension() * realMatrix.getColumnDimension()];
+
+        int rows = realMatrix.getRowDimension();
+        int cols = realMatrix.getColumnDimension();
+        for (int r = 0; r < rows; r++) {
+            System.arraycopy(data[r], 0, flatData, r * cols, cols);
+        }
+
+        return new JVMDoubleTensor(flatData, new long[]{rows, cols});
     }
 
     @Override

@@ -5,8 +5,6 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -142,15 +140,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
      * DoubleTensor.concat(0, A, B, C) gives DoubleTensor.ones(12, 2)
      */
     static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
-        INDArray[] concatAsINDArray = new INDArray[toConcat.length];
-        for (int i = 0; i < toConcat.length; i++) {
-            concatAsINDArray[i] = Nd4jDoubleTensor.unsafeGetNd4J(toConcat[i]).dup();
-            if (concatAsINDArray[i].shape().length == 0) {
-                concatAsINDArray[i] = concatAsINDArray[i].reshape(1);
-            }
-        }
-        INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
-        return new Nd4jDoubleTensor(concat);
+        return factory.concat(dimension, toConcat);
     }
 
     static DoubleTensor min(DoubleTensor a, DoubleTensor b) {
