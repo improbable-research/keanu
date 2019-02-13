@@ -1,9 +1,12 @@
 ### Version 0.0.20 ###
 
 ## Common
+* Added `get_probabilistic_parents` to bayesian network
 * Saving a network as a DOT file includes labels on constant vertices.
 
 ## Python
+* Added `get_parents` and `get_children` to `BayesNet`
+* Added `get_all_vertices` to `BayesNet`
 * Improved performance of getting samples by using byte streams.
 * Added Python docstrings for sampling
 
