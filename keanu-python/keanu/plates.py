@@ -36,8 +36,9 @@ class Plates(JavaObjectWrapper):
     :param data_generator: An iterator used to generate the `Plate`s from data.
     Each item in the iterator is a dict, keyed on strings which can be interpreted as variable names.
     Each item is passed to your `factory` function so that you can construct each :class:`Plate`.
-    You must pass in either count or data_generator (but not both).
     :param initial_state: The starting values of any variables in your plates. Think of this as "time=0".
+    :raises ValueError if you pass in both a count and a data_generator
+    :raises ValueError if you pass in neither a count nor a data_generator
     """
 
     def __init__(self,
