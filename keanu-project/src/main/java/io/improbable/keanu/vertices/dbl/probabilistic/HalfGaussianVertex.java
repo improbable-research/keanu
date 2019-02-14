@@ -7,10 +7,10 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 
 import java.util.Map;
 import java.util.Set;
