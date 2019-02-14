@@ -30,13 +30,21 @@ class Plate(JavaObjectWrapper):
 
 
 class Plates(JavaObjectWrapper):
+    """
+    :param factory: a function that takes a :class:`Plate`. Used to add vertices to each Plate.
+    :param count: The number of :class:`Plate`s in this sequence.
+    :param data_generator: An iterator used to generate the `Plate`s from data.
+    Each item in the iterator is a dict, keyed on strings which can be interpreted as variable names.
+    Each item is passed to your `factory` function so that you can construct each :class:`Plate`.
+    You must pass in either count or data_generator (but not both).
+    :param initial_state: The starting values of any variables in your plates. Think of this as "time=0".
+    """
 
     def __init__(self,
                  factory: Callable[..., None],
                  count: int = None,
                  data_generator: Iterator[Dict[str, Any]] = None,
                  initial_state: Dict[str, vertex_constructor_param_types] = None):
-
         builder = k.jvm_view().PlateBuilder()
 
         if initial_state is not None:
