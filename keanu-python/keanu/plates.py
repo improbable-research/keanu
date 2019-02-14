@@ -59,7 +59,7 @@ class Plates(JavaObjectWrapper):
             builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactory(biconsumer)
 
         plates = builder.build()
-        super(Plates, self).__init__(plates)
+        super().__init__(plates)
 
     def __iter__(self) -> Generator[Plate, None, None]:
         iterator = self.unwrap().iterator()
