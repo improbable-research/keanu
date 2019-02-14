@@ -6,7 +6,6 @@ import com.google.common.io.Resources;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex;
@@ -22,7 +21,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -110,14 +108,14 @@ public class DotSaverTest {
 
     @Test
     public void outputtingVertexDegree1Surroundings() throws IOException {
-        complexNetDotSaver.save(outputWriter, Collections.singletonList(complexResultVertex), 1, false);
+        complexNetDotSaver.save(outputWriter, complexResultVertex, 1, false);
         String expectedVertexDegree1Output = readFileToString(VERTEX_DEGREE1__OUTPUT_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree1Output);
     }
 
     @Test
     public void outputtingVertexDegree2Surroundings() throws IOException {
-        complexNetDotSaver.save(outputWriter, Collections.singletonList(complexResultVertex), 2, false);
+        complexNetDotSaver.save(outputWriter, complexResultVertex, 2, false);
         String expectedVertexDegree2Output = readFileToString(VERTEX_DEGREE2__OUTPUT_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree2Output);
     }

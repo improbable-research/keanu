@@ -83,7 +83,7 @@ public void savePartialNetToDot(Vertex startingVertex,
                                 OutputStream outputStream,
                                 boolean saveValuesAndObservations) throws IOException {
     DotSaver saver = new DotSaver(net);
-    saver.save(outputStream, Collections.singletonList(startingVertex), degree, saveValuesAndObservations);
+    saver.save(outputStream, startingVertex, degree, saveValuesAndObservations);
 }
 ```
 

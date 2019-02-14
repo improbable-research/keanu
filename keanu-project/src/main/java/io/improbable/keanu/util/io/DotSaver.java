@@ -18,6 +18,7 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -132,6 +133,14 @@ public class DotSaver implements NetworkSaver {
         outputLabels(dotLabels, outputWriter);
         outputWriter.write(DOT_ENDING);
         outputWriter.close();
+    }
+
+    public void save(OutputStream output, Vertex vertex, int degree, boolean saveValues, Map<String, String> metadata) throws IOException {
+        save(output, Collections.singletonList(vertex), degree, saveValues, metadata);
+    }
+
+    public void save(OutputStream output, Vertex vertex, int degree, boolean saveValues) throws IOException {
+        save(output, Collections.singletonList(vertex), degree, saveValues);
     }
 
     private static void outputMetadata(Map<String, String> metadata, Writer outputWriter) throws IOException {
