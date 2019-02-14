@@ -41,11 +41,9 @@ def test_you_can_build_plates_from_data() -> None:
     plates = Plates(data_generator=data_generator, factory=create_vertices)
     assert plates.size() == num_plates
 
-    i = 0
-    for plate in plates:
+    for i, plate in enumerate(plates):
         assert plate.get("x").get_value() == i
         assert plate.get("y").get_value() == -i
-        i += 1
 
 
 def test_you_must_pass_count_or_data_generator() -> None:
