@@ -12,6 +12,8 @@ import io.improbable.keanu.vertices.Vertex;
 import java.util.List;
 import java.util.Map;
 
+import static io.improbable.keanu.algorithms.mcmc.SamplingUtil.takeSamples;
+
 public class ForwardSampler implements SamplingAlgorithm {
 
     private static final double LOG_PROB_OF_PRIOR = 0.;
@@ -30,11 +32,11 @@ public class ForwardSampler implements SamplingAlgorithm {
     public void step() {
         for (Vertex vertex : topologicallySortedVertices) {
             if (vertex instanceof Probabilistic) {
-                if (!(vertex.isObserved())) {
-                    vertex.setValue(((Probabilistic) vertex).sample(random));
-                }
+                vertex.setValue(((Probabilistic) vertex).sample(random));
             } else if (vertex instanceof NonProbabilistic) {
                 vertex.setValue(((NonProbabilistic) vertex).calculate());
+            } else {
+                throw new IllegalArgumentException("Forward sampler can only operate on Probabilistic or NonProbabilistic vertices. Invalid Vertex: [" + vertex + "]");
             }
         }
     }
@@ -42,13 +44,13 @@ public class ForwardSampler implements SamplingAlgorithm {
     @Override
     public void sample(Map<VariableReference, List<?>> samples, List<Double> logOfMasterPForEachSample) {
         step();
-        SamplingAlgorithm.takeSamples(samples, variablesToSampleFrom);
+        takeSamples(samples, variablesToSampleFrom);
         logOfMasterPForEachSample.add(LOG_PROB_OF_PRIOR);
     }
 
     @Override
     public NetworkSample sample() {
         step();
-        return new NetworkSample(SamplingAlgorithm.takeSample((List<? extends Variable<Object, ?>>) variablesToSampleFrom), LOG_PROB_OF_PRIOR);
+        return new NetworkSample(SamplingAlgorithm.takeSample(variablesToSampleFrom), LOG_PROB_OF_PRIOR);
     }
 }

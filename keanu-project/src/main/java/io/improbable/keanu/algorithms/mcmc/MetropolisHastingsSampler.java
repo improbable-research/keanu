@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.improbable.keanu.algorithms.mcmc.SamplingUtil.takeSamples;
+
 @Slf4j
 public class MetropolisHastingsSampler implements SamplingAlgorithm {
 
@@ -49,7 +51,7 @@ public class MetropolisHastingsSampler implements SamplingAlgorithm {
     @Override
     public void sample(Map<VariableReference, List<?>> samplesByVariable, List<Double> logOfMasterPForEachSample) {
         step();
-        SamplingAlgorithm.takeSamples(samplesByVariable, variablesToSampleFrom);
+        takeSamples(samplesByVariable, variablesToSampleFrom);
         logOfMasterPForEachSample.add(logProbabilityBeforeStep);
     }
 

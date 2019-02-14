@@ -1,7 +1,6 @@
 package io.improbable.keanu.network;
 
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -9,9 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Set;
 
-import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
@@ -34,61 +31,49 @@ public class LambdaSectionTraversalTest {
 
     @Test
     public void doesGetDownstreamProbabilisticVertices() {
-
         LambdaSection lambdaSection = LambdaSection.getDownstreamLambdaSection(A, false);
-        Set<Vertex> verticesDepthFirst = lambdaSection.getLatentAndObservedVertices();
-
-        assertEquals(2, verticesDepthFirst.size());
-        assertThat(verticesDepthFirst, containsInAnyOrder(A, C));
+        assertThat(lambdaSection.getAllVertices(), containsInAnyOrder(A, C));
     }
 
     @Test
     public void doesGetAllDownstreamVertices() {
-
         LambdaSection lambdaSection = LambdaSection.getDownstreamLambdaSection(A, true);
-        Set<Vertex> verticesDepthFirst = lambdaSection.getAllVertices();
-
-        assertEquals(3, verticesDepthFirst.size());
-        assertThat(verticesDepthFirst, containsInAnyOrder(A, aPlusB, C));
+        assertThat(lambdaSection.getAllVertices(), containsInAnyOrder(A, aPlusB, C));
     }
 
     @Test
     public void doesGetUpstreamProbabilisticVertices() {
-
         LambdaSection lambdaSection = LambdaSection.getUpstreamLambdaSection(C, false);
-        Set<Vertex> verticesDepthFirst = lambdaSection.getLatentAndObservedVertices();
-
-        assertEquals(3, verticesDepthFirst.size());
-        assertThat(verticesDepthFirst, containsInAnyOrder(A, B, C));
+        assertThat(lambdaSection.getAllVertices(), containsInAnyOrder(A, B, C));
     }
 
     @Test
     public void doesGetAllUpstreamVertices() {
-
         LambdaSection lambdaSection = LambdaSection.getUpstreamLambdaSection(C, true);
-        Set<Vertex> verticesDepthFirst = lambdaSection.getAllVertices();
-
-        assertEquals(5, verticesDepthFirst.size());
-        assertThat(verticesDepthFirst, containsInAnyOrder(A, B, aPlusB, cSigma, C));
+        assertThat(lambdaSection.getAllVertices(), containsInAnyOrder(A, B, aPlusB, cSigma, C));
     }
 
     @Test
     public void doesGetUpstreamProbabilisticVerticesOfCollection() {
-
         LambdaSection lambdaSection = LambdaSection.getUpstreamLambdaSectionForCollection(Arrays.asList(C, cSigma), false);
-        Set<Vertex> verticesDepthFirst = lambdaSection.getLatentAndObservedVertices();
+        assertThat(lambdaSection.getLatentAndObservedVertices(), containsInAnyOrder(A, B, C));
+    }
 
-        assertEquals(3, verticesDepthFirst.size());
-        assertThat(verticesDepthFirst, containsInAnyOrder(A, B, C));
+    @Test
+    public void doesGetDownstreamProbabilisticVerticesOfCollection() {
+        LambdaSection lambdaSection = LambdaSection.getDownstreamLambdaSectionForCollection(Arrays.asList(A, B), false);
+        assertThat(lambdaSection.getAllVertices(), containsInAnyOrder(A, C, B));
     }
 
     @Test
     public void doesGetAllUpstreamVerticesOfCollection() {
-
         LambdaSection lambdaSection = LambdaSection.getUpstreamLambdaSectionForCollection(Arrays.asList(C, cSigma), true);
-        Set<Vertex> verticesDepthFirst = lambdaSection.getAllVertices();
+        assertThat(lambdaSection.getAllVertices(), containsInAnyOrder(A, B, aPlusB, cSigma, C));
+    }
 
-        assertEquals(5, verticesDepthFirst.size());
-        assertThat(verticesDepthFirst, containsInAnyOrder(A, B, aPlusB, cSigma, C));
+    @Test
+    public void doesGetAllDownstreamVerticesOfCollection() {
+        LambdaSection lambdaSection = LambdaSection.getDownstreamLambdaSectionForCollection(Arrays.asList(A, B, cSigma), true);
+        assertThat(lambdaSection.getAllVertices(), containsInAnyOrder(A, B, aPlusB, cSigma, C));
     }
 }

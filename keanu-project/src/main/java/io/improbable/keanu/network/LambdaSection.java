@@ -6,6 +6,7 @@ import lombok.Value;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
@@ -53,16 +54,7 @@ public class LambdaSection {
      * includeNonProbabilistic is false.
      */
     public static LambdaSection getUpstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
-
-        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
-
-        Set<Vertex> upstreamVertices = getVertices(
-            aVertex,
-            Vertex::getParents,
-            shouldAdd
-        );
-
-        return new LambdaSection(upstreamVertices);
+        return getUpstreamLambdaSectionForCollection(Collections.singletonList(aVertex), includeNonProbabilistic);
     }
 
     /**
@@ -73,20 +65,11 @@ public class LambdaSection {
      * includeNonProbabilistic is false.
      */
     public static LambdaSection getDownstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
-
-        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
-
-        Set<Vertex> downstreamVertices = getVertices(
-            aVertex,
-            Vertex::getChildren,
-            shouldAdd
-        );
-
-        return new LambdaSection(downstreamVertices);
+        return getDownstreamLambdaSectionForCollection(Collections.singletonList(aVertex), includeNonProbabilistic);
     }
 
     /**
-     * @param vertices                 the starting vertices
+     * @param vertices                the starting vertices
      * @param includeNonProbabilistic false if only the probabilistic or observed vertices are wanted
      * @return All upstream vertices up to probabilistic or observed vertices if includeNonProbabilistic
      * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
@@ -96,7 +79,7 @@ public class LambdaSection {
 
         Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
-        Set<Vertex> upstreamVertices = getVerticesCollection(
+        Set<Vertex> upstreamVertices = getVertices(
             vertices,
             Vertex::getParents,
             shouldAdd
@@ -106,61 +89,47 @@ public class LambdaSection {
     }
 
     /**
-     * @param vertex       Vertex to start propagation from
-     * @param nextVertices The next vertices to move to given a current vertex. E.g getChildren for downstream or
-     *                     getParents for upstream.
-     * @param shouldAdd    true when a given vertex should be included in the result, false otherwise
-     * @return A Set of vertices that are in the direction implied by nextVertices and filtered by shouldAdd
+     * @param vertices                the starting vertices
+     * @param includeNonProbabilistic false if only the probabilistic or observed vertices are wanted
+     * @return All upstream vertices up to probabilistic or observed vertices if includeNonProbabilistic
+     * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
+     * includeNonProbabilistic is false.
      */
-    public static Set<Vertex> getVertices(Vertex vertex,
-                                          Function<Vertex, Collection<Vertex>> nextVertices,
+    public static LambdaSection getDownstreamLambdaSectionForCollection(List<Vertex> vertices, boolean includeNonProbabilistic) {
+
+        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
+
+        Set<Vertex> upstreamVertices = getVertices(
+            vertices,
+            Vertex::getChildren,
+            shouldAdd
+        );
+
+        return new LambdaSection(upstreamVertices);
+    }
+
+    public static Set<Vertex> getVertices(Vertex vertex, Function<Vertex, Collection<Vertex>> nextVertices,
                                           Predicate<Vertex> shouldAdd) {
-
-        Collection<Vertex> initialNext = nextVertices.apply(vertex);
-        Set<Vertex> queued = new HashSet<>(initialNext);
-        Deque<Vertex> stack = new ArrayDeque<>(initialNext);
-        Set<Vertex> result = new HashSet<>();
-        result.add(vertex);
-
-        while (!stack.isEmpty()) {
-            Vertex visiting = stack.pop();
-
-            if (shouldAdd.test(visiting)) {
-                result.add(visiting);
-            }
-
-            if (visiting.isObserved() || visiting.isProbabilistic()) {
-                continue;
-            }
-
-            for (Vertex next : nextVertices.apply(visiting)) {
-                if (!queued.contains(next)) {
-                    stack.add(next);
-                    queued.add(next);
-                }
-            }
-        }
-
-        return result;
+        return getVertices(Collections.singletonList(vertex), nextVertices, shouldAdd);
     }
 
     /**
-     * @param vertices       vertices to start propagation from
+     * @param vertices     vertices to start propagation from
      * @param nextVertices The next vertices to move to given a current vertex. E.g getChildren for downstream or
      *                     getParents for upstream.
      * @param shouldAdd    true when a given vertex should be included in the result, false otherwise
      * @return A Set of vertices that are in the direction implied by nextVertices and filtered by shouldAdd
      */
-    public static Set<Vertex> getVerticesCollection(List<Vertex> vertices,
-                                                    Function<Vertex, Collection<Vertex>> nextVertices,
-                                                    Predicate<Vertex> shouldAdd) {
+    public static Set<Vertex> getVertices(List<Vertex> vertices,
+                                        Function<Vertex, Collection<Vertex>> nextVertices,
+                                        Predicate<Vertex> shouldAdd) {
 
-        List<Vertex> copy = new ArrayList<>(vertices);
-        Vertex firstVertex = copy.remove(0);
+        List<Vertex> verticesCopy = new ArrayList<>(vertices);
+        Vertex firstVertex = verticesCopy.remove(0);
 
-        Set<Vertex> queued = new HashSet<>(copy);
+        Set<Vertex> queued = new HashSet<>(verticesCopy);
         Set<Vertex> visited = new HashSet<>();
-        Deque<Vertex> stack = new ArrayDeque<>(copy);
+        Deque<Vertex> stack = new ArrayDeque<>(verticesCopy);
 
         Collection<Vertex> initialNext = nextVertices.apply(firstVertex);
         queued.addAll(initialNext);
@@ -168,7 +137,7 @@ public class LambdaSection {
 
         Set<Vertex> result = new HashSet<>();
         result.add(firstVertex);
-        result.addAll(copy);
+        result.addAll(verticesCopy);
 
         while (!stack.isEmpty()) {
             Vertex visiting = stack.pop();

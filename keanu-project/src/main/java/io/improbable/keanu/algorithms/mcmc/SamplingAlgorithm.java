@@ -4,7 +4,6 @@ import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,16 +13,6 @@ public interface SamplingAlgorithm {
     static Map<VariableReference, ?> takeSample(List<? extends Variable> sampleFromVariables) {
         return sampleFromVariables.stream()
             .collect(Collectors.toMap(Variable::getReference, Variable::getValue));
-    }
-
-    static void takeSamples(Map<VariableReference, List<?>> samples, List<? extends Variable> fromVariables) {
-        fromVariables.forEach(variable -> addSampleForVariable((Variable<?, ?>) variable, samples));
-    }
-
-    static <T> void addSampleForVariable(Variable<T, ?> variable, Map<VariableReference, List<?>> samples) {
-        List<T> samplesForVariable = (List<T>) samples.computeIfAbsent(variable.getReference(), v -> new ArrayList<T>());
-        T value = variable.getValue();
-        samplesForVariable.add(value);
     }
 
     /**

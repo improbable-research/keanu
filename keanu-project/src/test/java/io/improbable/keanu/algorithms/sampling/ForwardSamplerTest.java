@@ -4,23 +4,24 @@ import io.improbable.keanu.Keanu;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.ProbabilisticModel;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
-import io.improbable.keanu.vertices.TestGraphGenerator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,12 +29,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.endsWith;
+import static org.mockito.ArgumentMatchers.startsWith;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @Slf4j
 public class ForwardSamplerTest {
+
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
 
     private KeanuRandom random;
 
@@ -42,15 +51,18 @@ public class ForwardSamplerTest {
         random = new KeanuRandom(1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void throwIfSampleFromHasObservationsDownstreamOfLatents() {
         GaussianVertex A = new GaussianVertex(100.0, 1);
         DoubleVertex B = A.plus(ConstantVertex.of(5.));
         GaussianVertex C = new GaussianVertex(B, 1.);
         C.observe(100.);
 
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        ProbabilisticModel model = new KeanuProbabilisticModel(network);
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(startsWith("Vertex: ["));
+        thrown.expectMessage(endsWith("] has a random variable in its upstream lambda section"));
 
         Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 1000);
     }
@@ -60,8 +72,7 @@ public class ForwardSamplerTest {
         GaussianVertex A = new GaussianVertex(100.0, 1);
         DoubleVertex B = A.plus(ConstantVertex.of(5.));
 
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        ProbabilisticModel model = new KeanuProbabilisticModel(network);
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         final int sampleCount = 1000;
         NetworkSamples samples = Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), sampleCount);
@@ -76,17 +87,17 @@ public class ForwardSamplerTest {
 
     @Test
     public void nonProbabilisticVerticesAreRecomputedDuringForwardSample() {
-        AtomicInteger opCount = new AtomicInteger(0);
-
         GaussianVertex A = new GaussianVertex(0, 1);
-        TestGraphGenerator.PassThroughVertex B = new TestGraphGenerator.PassThroughVertex(A, opCount, null, id -> log.info("OP on id:" + id));
+        PowerVertex B = mock(PowerVertex.class);
+        when(B.getParents()).thenReturn(Collections.singleton(A));
+        when(B.getId()).thenReturn(new VertexId());
+        when(B.calculate()).thenReturn(DoubleTensor.scalar(0.));
 
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        ProbabilisticModel model = new KeanuProbabilisticModel(network);
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 100);
 
-        assertEquals(100, opCount.get());
+        verify(B, times(100)).setValue(DoubleTensor.scalar(0.));
     }
 
     @Test
@@ -105,8 +116,7 @@ public class ForwardSamplerTest {
 
         IDTrackerVertex trackerFive = new IDTrackerVertex(trackerTwo, trackerFour, ids);
 
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        ProbabilisticModel model = new KeanuProbabilisticModel(network);
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(trackerThree, trackerOne, trackerTwo, trackerFour, trackerFive), 1);
 
@@ -130,8 +140,7 @@ public class ForwardSamplerTest {
 
         IDTrackerVertex trackerThree = new IDTrackerVertex(trackerOne, trackerTwo, ids);
 
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        ProbabilisticModel model = new KeanuProbabilisticModel(network);
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Collections.singletonList(trackerThree), 1);
 
@@ -156,8 +165,7 @@ public class ForwardSamplerTest {
 
         NonProbabilisticIDTrackerVertex trackerFive = new NonProbabilisticIDTrackerVertex(trackerThree, trackerFour, ids);
 
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        ProbabilisticModel model = new KeanuProbabilisticModel(network);
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(trackerThree, trackerFour, trackerFive), 1);
 

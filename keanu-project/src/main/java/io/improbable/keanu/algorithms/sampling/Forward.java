@@ -34,7 +34,6 @@ public class Forward implements PosteriorSamplingAlgorithm {
 
     /**
      * Samples from the prior of a Probabilistic Model.
-     * Bayesian Network is the only supported implementation.
      *
      * Samples are taken by sampling from the prior of the desired variables in topological order.
      *
