@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import com.google.common.base.Preconditions;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -10,11 +9,11 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShape.getSummationResultShape;
 import static java.util.Collections.singletonMap;
 
 public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
@@ -42,15 +41,6 @@ public class SumVertex extends DoubleUnaryOpVertex implements Differentiable {
     @ExportVertexToPythonBindings
     public SumVertex(DoubleVertex inputVertex) {
         this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getRank()));
-    }
-
-    private static long[] getSummationResultShape(long[] inputShape, int[] sumOverDimensions) {
-        if (inputShape.length > 0) {
-            return ArrayUtils.removeAll(inputShape, sumOverDimensions);
-        } else {
-            Preconditions.checkArgument(sumOverDimensions.length == 0);
-            return inputShape;
-        }
     }
 
     @Override

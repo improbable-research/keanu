@@ -4,6 +4,7 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
@@ -212,7 +213,21 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor sum(int... overDimensions) {
-        return null;
+
+        long[] resultShape = TensorShape.getSummationResultShape(shape, overDimensions);
+        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        double[] newBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
+
+        for (int i = 0; i < buffer.length; i++) {
+
+            long[] shapeIndices = ArrayUtils.removeAll(TensorShape.getShapeIndices(shape, stride, i), overDimensions);
+
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, shapeIndices));
+
+            newBuffer[j] += buffer[i];
+        }
+
+        return new JVMDoubleTensor(newBuffer, resultShape);
     }
 
     @Override

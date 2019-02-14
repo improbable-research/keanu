@@ -48,7 +48,7 @@ public class ScalarDoubleTensor extends DoubleTensor {
 
     @Override
     public long[] getStride() {
-        return new long[0];
+        return Arrays.copyOf(shape, shape.length);
     }
 
     @Override
