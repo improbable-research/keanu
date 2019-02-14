@@ -34,21 +34,15 @@ public class DotSaverTest {
     private static Vertex complexResultVertex;
     private static DotSaver complexNetDotSaver;
     private static ByteArrayOutputStream outputWriter;
-    private BayesianNetwork disconnectedBayesNet;
-    private GaussianVertex gaussian1;
-    private GaussianVertex gaussian2;
     private static final String resourcesFolder = "dotFiles";
     private static final String GAUSSIAN_OUTPUT_FILENAME = resourcesFolder + "/GaussianNodeOutput.dot";
     private static final String TENSOR_OUTPUT_FILENAME = resourcesFolder + "/ConstantTensorIntNodeOutput.dot";
     private static final String SCALAR_OUTPUT_FILENAME = resourcesFolder + "/ConstantScalarIntNodeOutput.dot";
     private static final String LABELLED_OUTPUT_FILENAME = resourcesFolder + "/ConstantLabelledIntNodeOutput.dot";
     private static final String COMPLEX_OUTPUT_FILENAME = resourcesFolder + "/ComplexNetDotOutput.dot";
-    private static final String VERTEX_DEGREE1__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree1Output.dot";
-    private static final String VERTEX_DEGREE2__OUTPUT_FILENAME = resourcesFolder + "/VertexDegree2Output.dot";
     private static final String OUTPUT_WITH_VALUES_FILENAME = resourcesFolder + "/OutputValuesSetToTrueOutput.dot";
     private static final String OUTPUT_WITH_METADATA_FILENAME = resourcesFolder + "/OutputWithMetadata.dot";
     private static final String OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME = resourcesFolder + "/OutputWithDisconnectedVertices.dot";
-    private static final String VERTEX_DEGREE1__OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME = resourcesFolder + "/VertexDegree1OutputWithDisconnectedVertices.dot";
 
     @BeforeClass
     public static void setUpComplexNet() {
@@ -68,25 +62,6 @@ public class DotSaverTest {
         outputWriter = new ByteArrayOutputStream();
     }
 
-    @Before
-    public void setupDisconnectedBayesNet() {
-        DoubleVertex v1 = new ConstantDoubleVertex(0.);
-        DoubleVertex v2 = new ConstantDoubleVertex(1.);
-        DoubleVertex gamma1 = new GammaVertex(1., v2);
-        gamma1.setLabel("gamma1");
-        gaussian1 = new GaussianVertex(v1, gamma1);
-        gaussian1.setLabel("gaussian1");
-
-        DoubleVertex v3 = new ConstantDoubleVertex(0.);
-        DoubleVertex v4 = new ConstantDoubleVertex(1.);
-        DoubleVertex gamma2 = new GammaVertex(1., v4);
-        gamma2.setLabel("gamma2");
-        gaussian2 = new GaussianVertex(v3, gamma2);
-        gaussian2.setLabel("gaussian2");
-
-        disconnectedBayesNet = new BayesianNetwork(Arrays.asList(v1, v2, gamma1, gaussian1, v3, v4, gamma2, gaussian2));
-    }
-
     @Test
     public void outputContainsHyperparameters() throws IOException {
         GaussianVertex gaussianV = new GaussianVertex(0, 1);
@@ -104,20 +79,6 @@ public class DotSaverTest {
         complexNetDotSaver.save(outputWriter, false);
         String expectedComplexOutput = readFileToString(COMPLEX_OUTPUT_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedComplexOutput);
-    }
-
-    @Test
-    public void outputtingVertexDegree1Surroundings() throws IOException {
-        complexNetDotSaver.save(outputWriter, complexResultVertex, 1, false);
-        String expectedVertexDegree1Output = readFileToString(VERTEX_DEGREE1__OUTPUT_FILENAME);
-        checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree1Output);
-    }
-
-    @Test
-    public void outputtingVertexDegree2Surroundings() throws IOException {
-        complexNetDotSaver.save(outputWriter, complexResultVertex, 2, false);
-        String expectedVertexDegree2Output = readFileToString(VERTEX_DEGREE2__OUTPUT_FILENAME);
-        checkDotFilesMatch(outputWriter.toString(), expectedVertexDegree2Output);
     }
 
     @Test
@@ -174,17 +135,24 @@ public class DotSaverTest {
     }
 
     @Test
-    public void dotSaveShowsDisconnectedVerticesWithDegree1() throws IOException {
-        DotSaver dotSaver = new DotSaver(disconnectedBayesNet);
-        dotSaver.save(outputWriter, Arrays.asList(gaussian1, gaussian2), 1, true);
-        String expectedOutputWithValues = readFileToString(VERTEX_DEGREE1__OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME);
-        checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
-    }
-
-    @Test
     public void dotSaveShowsAllDisconnectedVertices() throws IOException {
+        DoubleVertex v1 = new ConstantDoubleVertex(0.);
+        DoubleVertex v2 = new ConstantDoubleVertex(1.);
+        DoubleVertex gamma1 = new GammaVertex(1., v2);
+        gamma1.setLabel("gamma1");
+        GaussianVertex gaussian1 = new GaussianVertex(v1, gamma1);
+        gaussian1.setLabel("gaussian1");
+
+        DoubleVertex v3 = new ConstantDoubleVertex(0.);
+        DoubleVertex v4 = new ConstantDoubleVertex(1.);
+        DoubleVertex gamma2 = new GammaVertex(1., v4);
+        gamma2.setLabel("gamma2");
+        GaussianVertex gaussian2 = new GaussianVertex(v3, gamma2);
+        gaussian2.setLabel("gaussian2");
+
+        BayesianNetwork disconnectedBayesNet = new BayesianNetwork(Arrays.asList(v1, v2, gamma1, gaussian1, v3, v4, gamma2, gaussian2));
         DotSaver dotSaver = new DotSaver(disconnectedBayesNet);
-        dotSaver.save(outputWriter, Arrays.asList(gaussian1, gaussian2), 2, true);
+        dotSaver.save(outputWriter,true);
         String expectedOutputWithValues = readFileToString(OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
     }
