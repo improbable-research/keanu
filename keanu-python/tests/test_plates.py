@@ -8,12 +8,8 @@ from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, Ke
 
 def test_you_can_iterate_over_the_plates() -> None:
     num_plates = 100
-
     plates = Plates(count=num_plates, factory=lambda p: None)
-    plate_count = 0
-    for plate in plates:
-        plate_count += 1
-
+    plate_count = sum(1 for _ in plates)
     assert plate_count == num_plates
 
 
