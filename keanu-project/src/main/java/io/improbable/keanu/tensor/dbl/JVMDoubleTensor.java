@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
@@ -119,12 +120,12 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public long[] getShape() {
-        return shape;
+        return shapeCopy();
     }
 
     @Override
     public long[] getStride() {
-        return stride;
+        return copyOf(stride, stride.length);
     }
 
     @Override
@@ -153,11 +154,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor reshape(long... newShape) {
         return new JVMDoubleTensor(copyOf(buffer, buffer.length), copyOf(newShape, newShape.length));
-    }
-
-    @Override
-    public FlattenedView<Double> getFlattenedView() {
-        return null;
     }
 
     @Override
@@ -203,15 +199,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public Double sum() {
-        double result = 0;
-        for (int i = 0; i < buffer.length; i++) {
-            result += buffer[i];
-        }
-        return result;
-    }
-
-    @Override
     public DoubleTensor toDouble() {
         return duplicate();
     }
@@ -229,6 +216,15 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor transpose() {
         return permute(1, 0);
+    }
+
+    @Override
+    public Double sum() {
+        double result = 0;
+        for (int i = 0; i < buffer.length; i++) {
+            result += buffer[i];
+        }
+        return result;
     }
 
     @Override
@@ -257,6 +253,12 @@ public class JVMDoubleTensor extends DoubleTensor {
             result[i] = 1.0 / buffer[i];
         }
         return new JVMDoubleTensor(result, shapeCopy());
+    }
+
+    @Override
+    public DoubleTensor matrixInverse() {
+//        return fromApacheRealMatrix(MatrixUtils.inverse(asApacheRealMatrix(this)));
+        return null;
     }
 
     @Override
@@ -313,7 +315,17 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public int argMax() {
-        return 0;
+
+        double max = -Double.MAX_VALUE;
+        int argMax = 0;
+        for (int i = 0; i < buffer.length; i++) {
+            if (buffer[i] > max) {
+                max = buffer[i];
+                argMax = i;
+            }
+        }
+
+        return argMax;
     }
 
     @Override
@@ -683,11 +695,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor matrixInverse() {
-        return null;
-    }
-
-    @Override
     public double max() {
         double result = -Double.MAX_VALUE;
         for (int i = 0; i < buffer.length; i++) {
@@ -707,7 +714,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public double average() {
-        return 0;
+        return sum() / buffer.length;
     }
 
     @Override
@@ -717,7 +724,19 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public boolean equalsWithinEpsilon(DoubleTensor other, double epsilon) {
-        return false;
+        if (!Arrays.equals(shape, other.getShape())) {
+            return false;
+        }
+
+        double[] otherBuffer = other.asFlatDoubleArray();
+
+        for (int i = 0; i < buffer.length; i++) {
+            if (Math.abs(buffer[i] - otherBuffer[i]) > epsilon) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -784,11 +803,30 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor sigmoid() {
-        return null;
+        double[] newBuffer = newBuffer();
+
+        Sigmoid sigmoid = new Sigmoid();
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = sigmoid.value(buffer[i]);
+        }
+
+        return new JVMDoubleTensor(newBuffer, shapeCopy());
+    }
+
+    @Override
+    public DoubleTensor sigmoidInPlace() {
+
+        Sigmoid sigmoid = new Sigmoid();
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = sigmoid.value(buffer[i]);
+        }
+
+        return this;
     }
 
     @Override
     public DoubleTensor choleskyDecomposition() {
+//        return fromApacheRealMatrix(new CholeskyDecomposition(asApacheRealMatrix(this)).getL());
         return null;
     }
 
@@ -1029,11 +1067,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor sigmoidInPlace() {
-        return null;
-    }
-
-    @Override
     public DoubleTensor standardizeInPlace() {
         return null;
     }
@@ -1235,6 +1268,38 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         return new JVMDoubleTensor(newBuffer, shapeCopy());
+    }
+
+    @Override
+    public FlattenedView<Double> getFlattenedView() {
+        return new JVMDoubleFlattenedView();
+    }
+
+    private class JVMDoubleFlattenedView implements FlattenedView<Double> {
+
+        @Override
+        public long size() {
+            return buffer.length;
+        }
+
+        @Override
+        public Double get(long index) {
+            return buffer[Ints.checkedCast(index)];
+        }
+
+        @Override
+        public Double getOrScalar(long index) {
+            if (buffer.length == 1) {
+                return get(0);
+            } else {
+                return get(index);
+            }
+        }
+
+        @Override
+        public void set(long index, Double value) {
+            buffer[Ints.checkedCast(index)] = value;
+        }
     }
 
     @Override

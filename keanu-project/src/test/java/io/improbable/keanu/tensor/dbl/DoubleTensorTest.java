@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
@@ -9,6 +10,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -20,6 +22,7 @@ import org.junit.runners.Parameterized;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
@@ -87,6 +90,11 @@ public class DoubleTensorTest {
     public void youCanCreateARankOneTensor() {
         DoubleTensor vector = DoubleTensor.create(new double[]{1, 2, 3, 4, 5}, new long[]{5});
         assertArrayEquals(new long[]{5}, vector.getShape());
+    }
+
+    @Test
+    public void canAverage() {
+        assertEquals(2.5, matrixA.average(), 1e-6);
     }
 
     @Test
@@ -1045,6 +1053,39 @@ public class DoubleTensorTest {
 
         DoubleTensor concat = DoubleTensor.concat(0, x, y);
         assertEquals(DoubleTensor.create(2, 3, 4, 5, 6), concat);
+    }
+
+    @Test
+    public void canBasicTrig() {
+        assertUnaryOperation(Math::sin, DoubleTensor::sin, matrixA);
+        assertUnaryOperation(Math::cos, DoubleTensor::cos, matrixA);
+        assertUnaryOperation(Math::tan, DoubleTensor::tan, matrixA);
+        assertUnaryOperation(Math::asin, DoubleTensor::asin, matrixA);
+        assertUnaryOperation(Math::acos, DoubleTensor::acos, matrixA);
+        assertUnaryOperation(Math::atan, DoubleTensor::atan, matrixA);
+    }
+
+    @Test
+    public void canSigmoid() {
+        final Sigmoid sigmoid = new Sigmoid();
+        assertUnaryOperation(sigmoid::value, DoubleTensor::sigmoid, matrixA);
+    }
+
+    private void assertUnaryOperation(Function<Double, Double> unaryOp, Function<DoubleTensor, DoubleTensor> tensorOp, DoubleTensor input) {
+
+        DoubleTensor output = tensorOp.apply(input);
+
+        double[] expectedBuffer = new double[Ints.checkedCast(input.getLength())];
+        double[] inputBuffer = input.asFlatDoubleArray();
+
+        for (int i = 0; i < expectedBuffer.length; i++) {
+            expectedBuffer[i] = unaryOp.apply(inputBuffer[i]);
+        }
+
+        DoubleTensor expected = DoubleTensor.create(expectedBuffer, input.getShape());
+
+        assertArrayEquals(new double[2], new double[2], 1e-6);
+        assertTrue(expected.equalsWithinEpsilon(output, 1e-6));
     }
 
 }
