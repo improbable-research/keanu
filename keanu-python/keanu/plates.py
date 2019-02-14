@@ -53,7 +53,7 @@ class Plates(JavaObjectWrapper):
             builder = builder.count(count).withFactory(consumer)
 
         if data_generator is not None:
-            bifunction = lambda p, b: factory(Plate(p), b)
+            bifunction = lambda p, data: factory(Plate(p), data)
             biconsumer = BiConsumer(bifunction)
             data_generator_java = (k.to_java_map(m) for m in data_generator)
             builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactory(biconsumer)
