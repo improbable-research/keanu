@@ -1,7 +1,7 @@
 ### Version 0.0.20 ###
 
 ## Common
-* Added `get_probabilistic_parents` to bayesian network
+* Added `getProbabilisticParents` to bayesian network
 * Saving a network as a DOT file includes labels on constant vertices.
 
 ## Python
