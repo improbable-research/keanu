@@ -381,7 +381,7 @@ def test_can_get_parents_and_children() -> None:
         return [l.get_label() for l in lhs] == [r.get_label() for r in rhs]
 
     parents = (Gaussian(0, 1, label="parent1"), Gaussian(0, 1, label="parent2"))
-    children = tuple(Gaussian(parents[0], parents[1], label="child%d" % i) for i in range(5))
+    children = tuple(Gaussian(parents[0], parents[1], label=f"child{i}") for i in range(5))
 
     for parent in parents:
         assert labels_match(parent.get_children(), children)
