@@ -4,6 +4,8 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
@@ -837,7 +839,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public double product() {
-        double result = 0;
+        double result = 1.0;
         for (int i = 0; i < buffer.length; i++) {
             result *= buffer[i];
         }
@@ -846,7 +848,31 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor slice(int dimension, long index) {
-        return null;
+
+        long[] resultShape = ArrayUtils.remove(shape, dimension);
+        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        double[] newBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
+
+        for (int i = 0; i < newBuffer.length; i++) {
+
+            long[] shapeIndices = ArrayUtils.insert(dimension, TensorShape.getShapeIndices(resultShape, resultStride, i), index);
+
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(shape, stride, shapeIndices));
+
+            newBuffer[i] += buffer[j];
+        }
+
+        return new JVMDoubleTensor(newBuffer, resultShape);
+    }
+
+    @AllArgsConstructor
+    private static class SliceShapeIncrement{
+        long[] shape;
+        long[] position;
+
+        public void increment(){
+
+        }
     }
 
     @Override
