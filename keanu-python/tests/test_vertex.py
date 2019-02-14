@@ -148,7 +148,7 @@ def test_vertex_sample_is_a_numpy_array() -> None:
 
 def test_get_connected_graph() -> None:
     gaussian = Gaussian(0., 1.)
-    connected_graph = set(gaussian.get_connected_graph())
+    connected_graph = set(gaussian.iter_connected_graph())
 
     assert len(connected_graph) == 3
 
