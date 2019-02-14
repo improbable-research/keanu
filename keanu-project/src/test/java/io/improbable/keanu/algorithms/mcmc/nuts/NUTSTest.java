@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
 import io.improbable.keanu.algorithms.Statistics;
