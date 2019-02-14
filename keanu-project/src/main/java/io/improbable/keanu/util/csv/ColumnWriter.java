@@ -28,19 +28,19 @@ public class ColumnWriter extends Writer {
 
     @Override
     public File toFile(File file) throws IOException {
-        CSVWriter writer = prepareWriter(file);
-        int maxSize = findLongestTensor(vertices);
+        try (CSVWriter writer = prepareWriter(file)) {
+            int maxSize = findLongestTensor(vertices);
 
-        for (int i = 0; i < maxSize; i++) {
-            List<String> row = new ArrayList<>();
-            for (Vertex<? extends Tensor> vertex : vertices) {
-                List<Object> flatList = vertex.getValue().asFlatList();
-                row.add(i < flatList.size() ? flatList.get(i).toString() : getEmptyValue());
+            for (int i = 0; i < maxSize; i++) {
+                List<String> row = new ArrayList<>();
+                for (Vertex<? extends Tensor> vertex : vertices) {
+                    List<Object> flatList = vertex.getValue().asFlatList();
+                    row.add(i < flatList.size() ? flatList.get(i).toString() : getEmptyValue());
+                }
+                String[] rowArray = new String[row.size()];
+                writer.writeNext(row.toArray(rowArray), false);
             }
-            String[] rowArray = new String[row.size()];
-            writer.writeNext(row.toArray(rowArray), false);
         }
-        writer.close();
         return file;
     }
 

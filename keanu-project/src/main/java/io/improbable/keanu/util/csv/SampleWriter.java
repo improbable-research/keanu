@@ -24,21 +24,21 @@ public class SampleWriter extends Writer {
 
     @Override
     public File toFile(File file) throws IOException {
-        CSVWriter writer = prepareWriter(file);
+        try (CSVWriter writer = prepareWriter(file)) {
 
-        for (int i = 0; i < samples.size(); i++) {
-            List<String> row = new ArrayList<>();
-            for (Vertex<? extends Tensor> vertex : vertices) {
-                Tensor sample = samples.get(vertex).asList().get(i);
-                List<Object> flatList = sample.asFlatList();
-                for (int j = 0; j < flatList.size(); j++) {
-                    row.add(flatList.get(j).toString());
+            for (int i = 0; i < samples.size(); i++) {
+                List<String> row = new ArrayList<>();
+                for (Vertex<? extends Tensor> vertex : vertices) {
+                    Tensor sample = samples.get(vertex).asList().get(i);
+                    List<Object> flatList = sample.asFlatList();
+                    for (int j = 0; j < flatList.size(); j++) {
+                        row.add(flatList.get(j).toString());
+                    }
                 }
+                String[] rowArray = new String[row.size()];
+                writer.writeNext(row.toArray(rowArray), false);
             }
-            String[] rowArray = new String[row.size()];
-            writer.writeNext(row.toArray(rowArray), false);
         }
-        writer.close();
         return file;
     }
 
