@@ -149,7 +149,6 @@ public class NUTSTest {
 
         GaussianVertex A = new GaussianVertex(0.0, 1.0);
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
-        net.probeForNonZeroProbability(100, KeanuRandom.getDefaultRandom());
         ProbabilisticModelWithGradient model = new KeanuProbabilisticModelWithGradient(net);
 
         NUTS nuts = NUTS.builder()

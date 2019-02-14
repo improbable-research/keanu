@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.ProbabilisticModelWithGradient;
-import io.improbable.keanu.algorithms.SaveStatistics;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
@@ -24,7 +23,7 @@ import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.add;
  * <p>
  * The tree is reset for each sample.
  */
-class Tree implements SaveStatistics {
+class Tree {
 
     private final ProbabilisticModelWithGradient logProbGradientCalculator;
 
@@ -34,42 +33,70 @@ class Tree implements SaveStatistics {
 
     private final KeanuRandom random;
 
+    /**
+     * The forward most state in the tree
+     */
     @Getter
     private LeapfrogState forward;
 
+    /**
+     * The backward most state in the tree
+     */
     @Getter
     private LeapfrogState backward;
 
+    /**
+     * The accepted position in the tree
+     */
     @Getter
     private Proposal proposal;
 
+    /**
+     * Sum of momentum over all steps in tree
+     */
     @Getter
     private Map<VariableReference, DoubleTensor> sumMomentum;
 
-    /*
+    /**
      * The energy at the start state
      */
     @Getter
     private final double startEnergy;
 
+    /**
+     * Maximum energy change on a step before the step is considered divergent
+     */
     @Getter
     private final double maxEnergyChange;
 
+    /**
+     * log sum of negative energy change
+     */
     @Getter
     private double logSumWeight;
 
-    /*
+    /**
      * A summation of the metropolis acceptance probability over each step in tree.
      */
     @Getter
     private double sumMetropolisAcceptanceProbability;
 
+    /**
+     * Total number of steps in tree
+     */
     @Getter
     private int treeSize;
 
+    /**
+     * Height of binary tree as of last growth
+     */
     @Getter
     private int treeHeight;
 
+    /**
+     * True if the tree should continue to grow false otherwise. This will be false if the tree diverges or starts
+     * U-Turn
+     */
     private boolean shouldContinueFlag;
 
     /**
@@ -250,10 +277,6 @@ class Tree implements SaveStatistics {
 
             final Map<VariableReference, ?> sample = takeSample(sampleFromVariables);
 
-            if (isNotUsableNumber(logSumWeight) || isNotUsableNumber(metropolisAcceptanceProbability)) {
-                throw new IllegalStateException("acceptProbability is " + metropolisAcceptanceProbability + " logSumWeight is " + logSumWeight);
-            }
-
             Proposal proposal = new Proposal(
                 leapfrogStateAfterStep.getPosition(),
                 leapfrogStateAfterStep.getGradient(),
@@ -287,16 +310,8 @@ class Tree implements SaveStatistics {
         }
     }
 
-    private static boolean isNotUsableNumber(double value) {
-        return Double.isInfinite(value) || Double.isNaN(value);
-    }
-
     private static boolean acceptOtherProposalWithProbability(double probability,
                                                               KeanuRandom random) {
-
-        if (isNotUsableNumber(probability)) {
-            throw new IllegalStateException("Accept probability is " + probability);
-        }
 
         return Math.log(random.nextDouble()) < probability;
     }
@@ -315,10 +330,6 @@ class Tree implements SaveStatistics {
 
             forward += vForward.times(rhoForLatent).sum();
             backward += vBackward.times(rhoForLatent).sum();
-        }
-
-        if (isNotUsableNumber(forward) || isNotUsableNumber(backward)) {
-            throw new IllegalStateException("Forward : " + forward + " Backward : " + backward);
         }
 
         return (forward >= 0.0) && (backward >= 0.0);
@@ -358,7 +369,7 @@ class Tree implements SaveStatistics {
         private Proposal proposal;
 
         /**
-         * ????
+         * log sum of negative energy change
          */
         private double logSumWeight;
 

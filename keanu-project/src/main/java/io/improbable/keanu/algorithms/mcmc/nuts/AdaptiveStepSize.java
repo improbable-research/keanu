@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
-import io.improbable.keanu.algorithms.SaveStatistics;
 import io.improbable.keanu.algorithms.Statistics;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -13,7 +12,7 @@ import java.util.List;
  * <p>
  * The step size is used by NUTS as an epsilon for the leap frog integration.
  */
-class AdaptiveStepSize implements SaveStatistics {
+class AdaptiveStepSize {
 
     private static final double t0 = 10;
     private static final double gamma = 0.05;
@@ -101,7 +100,6 @@ class AdaptiveStepSize implements SaveStatistics {
         return stepSize;
     }
 
-    @Override
     public void save(Statistics statistics) {
         statistics.store(NUTS.Metrics.STEPSIZE, stepSize);
         statistics.store(NUTS.Metrics.MEAN_TREE_ACCEPT, acceptRate);

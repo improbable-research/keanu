@@ -40,13 +40,11 @@ class NUTSSampler implements SamplingAlgorithm {
 
     private Proposal proposal;
 
-    private int sampleNum;
-
     /**
      * @param sampleFromVariables       variables to sample from
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
      * @param adapPotentialEnabled      enabled the potential adaption
-     * @param potential                 ????
+     * @param potential                 provides mass in velocity and energy calculations
      * @param adaptStepSizeEnabled      enable the NUTS step size adaptation
      * @param stepSize                  configuration for tuning the stepSize, if adaptStepSizeEnabled
      * @param initialProposal           the starting proposal for the tree
@@ -81,8 +79,6 @@ class NUTSSampler implements SamplingAlgorithm {
         this.random = random;
         this.statistics = statistics;
         this.saveStatistics = saveStatistics;
-
-        this.sampleNum = 1;
 
         this.adapPotentialEnabled = adapPotentialEnabled;
         this.potential = potential;
@@ -153,7 +149,6 @@ class NUTSSampler implements SamplingAlgorithm {
             potential.update(proposal.getPosition());
         }
 
-        sampleNum++;
     }
 
     /**
