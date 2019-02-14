@@ -53,7 +53,10 @@ class Plates(JavaObjectWrapper):
             vertex_dictionary = k.jvm_view().SimpleVertexDictionary.backedBy(initial_state_java)
             builder = builder.withInitialState(vertex_dictionary)
 
-        assert (count is None) ^ (data_generator is None), "You must specify either a count or a data_generator"
+        if not ((count is None) ^ (data_generator is None)):
+            raise ValueError(
+                "Cannot create a plate sequence of an unknown size: you must specify either a count of a data_generator"
+            )
 
         if count is not None:
             function = lambda p: factory(Plate(p))
