@@ -391,4 +391,6 @@ def test_get_children() -> None:
     v = Gaussian(p1, p2)
     p1_children = [c.get_id() for c in p1.get_children()]
     p2_children = [c.get_id() for c in p2.get_children()]
-    assert [v.get_id()] == p1_children == p2_children
+    expected_children = [v.get_id()]
+    assert p1_children == expected_children
+    assert p2_children == expected_children
