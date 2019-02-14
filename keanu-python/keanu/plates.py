@@ -12,8 +12,7 @@ from keanu.vertex.label import _VertexLabel
 
 k = KeanuContext()
 
-java_import(k.jvm_view(), "io.improbable.keanu.plating.Plates")
-java_import(k.jvm_view(), "io.improbable.keanu.plating.PlateBuilder")
+java_import(k.jvm_view(), "io.improbable.keanu.templating.SequenceBuilder")
 java_import(k.jvm_view(), "io.improbable.keanu.vertices.SimpleVertexDictionary")
 
 
@@ -47,7 +46,7 @@ class Plates(JavaObjectWrapper):
                  data_generator: Iterator[Dict[str, Any]] = None,
                  initial_state: Dict[str, vertex_constructor_param_types] = None):
 
-        builder = k.jvm_view().PlateBuilder()
+        builder = k.jvm_view().SequenceBuilder()
 
         if initial_state is not None:
             initial_state_java = k.to_java_map(
@@ -91,5 +90,5 @@ class Plates(JavaObjectWrapper):
         'proxy_for.foo'
         """
         label_java = _VertexLabel(label).unwrap()
-        proxy_label_java = k.jvm_view().PlateBuilder.proxyFor(label_java)
+        proxy_label_java = k.jvm_view().SequenceBuilder.proxyFor(label_java)
         return proxy_label_java.getQualifiedName()
