@@ -45,6 +45,7 @@ class Plates(JavaObjectWrapper):
                  count: int = None,
                  data_generator: Iterator[Dict[str, Any]] = None,
                  initial_state: Dict[str, vertex_constructor_param_types] = None):
+
         builder = k.jvm_view().PlateBuilder()
 
         if initial_state is not None:
@@ -53,10 +54,12 @@ class Plates(JavaObjectWrapper):
             vertex_dictionary = k.jvm_view().SimpleVertexDictionary.backedBy(initial_state_java)
             builder = builder.withInitialState(vertex_dictionary)
 
-        if not ((count is None) ^ (data_generator is None)):
+        if count is None and data_generator is None:
             raise ValueError(
                 "Cannot create a plate sequence of an unknown size: you must specify either a count of a data_generator"
             )
+        elif count is not None and data_generator is not None:
+            raise ValueError("If you pass in a data_generator you cannot also pass in a count")
 
         if count is not None:
             function = lambda p: factory(Plate(p))

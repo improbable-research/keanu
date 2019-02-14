@@ -55,10 +55,7 @@ def test_you_must_pass_count_or_data_generator() -> None:
 
 
 def test_you_cannot_pass_both_count_and_data_generator() -> None:
-    with pytest.raises(
-            ValueError,
-            match=
-            "Cannot create a plate sequence of an unknown size: you must specify either a count of a data_generator"):
+    with pytest.raises(ValueError, match="If you pass in a data_generator you cannot also pass in a count"):
         Plates(factory=lambda _: None, count=1, data_generator=({} for _ in []))
 
 
