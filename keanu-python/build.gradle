@@ -14,7 +14,7 @@ task installPipenv {
 task pythonVersionInfo {
     doLast {
         exec {
-            commandLine 'python', '--version'
+            commandLine 'python3', '--version'
         }
         exec {
             commandLine 'pip3', '--version'
@@ -24,7 +24,7 @@ task pythonVersionInfo {
         }
         exec {
             // NB: the python version inside pipenv is not necessarily the same as the version outside pipenv
-            commandLine 'pipenv', 'run', 'python', '--version'
+            commandLine 'pipenv', 'run', 'python3', '--version'
         }
         exec {
             // NB: the pip version inside pipenv is not necessarily the same as the version outside pipenv
@@ -88,7 +88,7 @@ task generateDocumentation {
             // This ensures that there are no directories prefixed with an underscore
             // because Jekyll will ignore these directories which causes the generated docs not to be served properly
             workingDir("docs/")
-            commandLine "pipenv", "run", 'python', 'remove_underscores.py'
+            commandLine "pipenv", "run", 'python3', 'remove_underscores.py'
         }
         exec {
             commandLine 'mv', 'docs/_build/html/', '../docs/python/latest/'
@@ -128,7 +128,7 @@ task buildWheelDistribution {
 
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'python', project.file("setup.py"), 'sdist', 'bdist_wheel'
+            commandLine 'pipenv', 'run', 'python3', project.file("setup.py"), 'sdist', 'bdist_wheel'
         }
     }
 }
