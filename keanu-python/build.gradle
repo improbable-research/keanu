@@ -6,7 +6,7 @@ import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
 task installPipenv {
     doLast {
         exec {
-            commandLine 'pip', 'install', 'pipenv==2018.11.26'
+            commandLine 'pip3', 'install', 'pipenv==2018.11.26'
         }
     }
 }
@@ -17,7 +17,7 @@ task pythonVersionInfo {
             commandLine 'python', '--version'
         }
         exec {
-            commandLine 'pip', '--version'
+            commandLine 'pip3', '--version'
         }
         exec {
             commandLine 'pipenv', '--version'
