@@ -10,7 +10,6 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.util.FastMath;
 import org.nd4j.linalg.api.shape.Shape;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -174,7 +173,28 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor permute(int... rearrange) {
-        throw new NotImplementedException();
+
+        long[] resultShape = TensorShape.getPermutedResultShapeShape(shape, rearrange);
+        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        double[] newBuffer = newBuffer();
+
+        for (int i = 0; i < buffer.length; i++) {
+
+            long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
+
+            long[] permutedIndex = new long[shapeIndices.length];
+
+            for (int p = 0; p < permutedIndex.length; p++) {
+                permutedIndex[p] = shapeIndices[rearrange[p]];
+            }
+
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, permutedIndex));
+
+            newBuffer[j] = buffer[i];
+        }
+
+        return new JVMDoubleTensor(newBuffer, resultShape);
+
     }
 
     @Override
@@ -208,7 +228,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor transpose() {
-        return null;
+        return permute(1, 0);
     }
 
     @Override

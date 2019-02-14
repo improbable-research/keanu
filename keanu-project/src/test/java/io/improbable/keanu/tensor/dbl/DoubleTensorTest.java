@@ -351,6 +351,34 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canTranspose() {
+        DoubleTensor a = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        DoubleTensor actual = a.transpose();
+        DoubleTensor expected = DoubleTensor.create(new double[]{1, 3, 2, 4}, 2, 2);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canPermuteUpperDimensions() {
+        DoubleTensor a = DoubleTensor.create(new double[]{
+            1, 2,
+            3, 4,
+            5, 6,
+            7, 8
+        }, new long[]{1, 2, 2, 2});
+        DoubleTensor permuted = a.permute(0, 1, 3, 2);
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            1, 3,
+            2, 4,
+            5, 7,
+            6, 8
+        }, new long[]{1, 2, 2, 2});
+
+        assertEquals(expected, permuted);
+    }
+
+    @Test
     public void canPermute() {
         DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3}, new long[]{1, 3});
         DoubleTensor y = DoubleTensor.create(new double[]{4, 5, 6}, new long[]{1, 3});
@@ -454,34 +482,6 @@ public class DoubleTensorTest {
         }, new long[]{5, 2});
 
         assertEquals(expected, c);
-    }
-
-    @Test
-    public void canPermuteForTranspose() {
-        DoubleTensor a = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
-        DoubleTensor permuted = a.permute(1, 0);
-        DoubleTensor transposed = a.transpose();
-
-        assertEquals(transposed, permuted);
-    }
-
-    @Test
-    public void canPermuteUpperDimensions() {
-        DoubleTensor a = DoubleTensor.create(new double[]{
-            1, 2,
-            3, 4,
-            5, 6,
-            7, 8
-        }, new long[]{1, 2, 2, 2});
-        DoubleTensor permuted = a.permute(0, 1, 3, 2);
-        DoubleTensor expected = DoubleTensor.create(new double[]{
-            1, 3,
-            2, 4,
-            5, 7,
-            6, 8
-        }, new long[]{1, 2, 2, 2});
-
-        assertEquals(expected, permuted);
     }
 
     @Test

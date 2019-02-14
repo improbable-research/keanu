@@ -12,6 +12,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShape.getPermutedResultShapeShape;
+
 public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable {
 
     private final static String REARRANGE_NAME = "rearrange";
@@ -22,7 +24,7 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
     @ExportVertexToPythonBindings
     public PermuteVertex(@LoadVertexParam(INPUT_VERTEX_NAME) DoubleVertex inputVertex,
                          @LoadVertexParam(REARRANGE_NAME) int... rearrange) {
-        super(calculatePermutedShape(inputVertex, rearrange), inputVertex);
+        super(getPermutedResultShapeShape(inputVertex.getShape(), rearrange), inputVertex);
         this.rearrange = rearrange;
         this.invertedRearrange = invertedPermute(rearrange);
     }
@@ -88,15 +90,6 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
         }
 
         return inverted;
-    }
-
-    private static long[] calculatePermutedShape(DoubleVertex inputVertex, int... rearrange) {
-        long[] shape = inputVertex.getShape();
-        long[] permutedShape = new long[shape.length];
-        for (int i = 0; i < shape.length; i++) {
-            permutedShape[i] = shape[rearrange[i]];
-        }
-        return permutedShape;
     }
 
     @SaveVertexParam(REARRANGE_NAME)
