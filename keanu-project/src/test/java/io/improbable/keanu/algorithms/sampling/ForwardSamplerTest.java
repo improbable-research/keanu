@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.endsWith;
-import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -61,9 +59,7 @@ public class ForwardSamplerTest {
         ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(startsWith("Vertex: ["));
-        thrown.expectMessage(endsWith("] has a random variable in its upstream lambda section"));
-
+        thrown.expectMessage("Vertex: [" + C.toString() + "] has a random variable in its upstream lambda section");
         Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 1000);
     }
 
