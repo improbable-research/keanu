@@ -106,15 +106,15 @@ public class CauchyVertex extends DoubleVertex implements Differentiable, Probab
 
     @Override
     public LogProbGraph logProbGraph() {
-        DoublePlaceholderVertex xPlaceHolder = new DoublePlaceholderVertex(this.getShape());
-        DoublePlaceholderVertex locationPlaceHolder = new DoublePlaceholderVertex(location.getShape());
-        DoublePlaceholderVertex scalePlaceHolder = new DoublePlaceholderVertex(scale.getShape());
+        final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex locationPlaceholder = new DoublePlaceholderVertex(location.getShape());
+        final DoublePlaceholderVertex scalePlaceholder = new DoublePlaceholderVertex(scale.getShape());
 
         return LogProbGraph.builder()
-            .input(this, xPlaceHolder)
-            .input(location, locationPlaceHolder)
-            .input(scale, scalePlaceHolder)
-            .logProbOutput(Cauchy.logProbOutput(xPlaceHolder, locationPlaceHolder, scalePlaceHolder))
+            .input(this, xPlaceholder)
+            .input(location, locationPlaceholder)
+            .input(scale, scalePlaceholder)
+            .logProbOutput(Cauchy.logProbOutput(xPlaceholder, locationPlaceholder, scalePlaceholder))
             .build();
     }
 
