@@ -28,7 +28,7 @@ task pythonVersionInfo {
         }
         exec {
             // NB: the pip version inside pipenv is not necessarily the same as the version outside pipenv
-            commandLine 'pipenv', 'run', 'pip', '--version'
+            commandLine 'pipenv', 'run', 'pip3', '--version'
         }
     }
 }
