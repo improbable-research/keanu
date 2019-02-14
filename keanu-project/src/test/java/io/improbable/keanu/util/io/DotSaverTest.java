@@ -6,6 +6,7 @@ import com.google.common.io.Resources;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex;
@@ -35,6 +36,9 @@ public class DotSaverTest {
     private static Vertex complexResultVertex;
     private static DotSaver complexNetDotSaver;
     private static ByteArrayOutputStream outputWriter;
+    private BayesianNetwork disconnectedBayesNet;
+    private GaussianVertex gaussian1;
+    private GaussianVertex gaussian2;
     private static final String resourcesFolder = "dotFiles";
     private static final String GAUSSIAN_OUTPUT_FILENAME = resourcesFolder + "/GaussianNodeOutput.dot";
     private static final String TENSOR_OUTPUT_FILENAME = resourcesFolder + "/ConstantTensorIntNodeOutput.dot";
@@ -64,6 +68,25 @@ public class DotSaverTest {
     public void resetVertexIdsAndOutputStream() {
         VertexId.ID_GENERATOR.set(0);
         outputWriter = new ByteArrayOutputStream();
+    }
+
+    @Before
+    public void setupDisconnectedBayesNet() {
+        DoubleVertex v1 = new ConstantDoubleVertex(0.);
+        DoubleVertex v2 = new ConstantDoubleVertex(1.);
+        DoubleVertex gamma1 = new GammaVertex(1., v2);
+        gamma1.setLabel("gamma1");
+        gaussian1 = new GaussianVertex(v1, gamma1);
+        gaussian1.setLabel("gaussian1");
+
+        DoubleVertex v3 = new ConstantDoubleVertex(0.);
+        DoubleVertex v4 = new ConstantDoubleVertex(1.);
+        DoubleVertex gamma2 = new GammaVertex(1., v4);
+        gamma2.setLabel("gamma2");
+        gaussian2 = new GaussianVertex(v3, gamma2);
+        gaussian2.setLabel("gaussian2");
+
+        disconnectedBayesNet = new BayesianNetwork(Arrays.asList(v1, v2, gamma1, gaussian1, v3, v4, gamma2, gaussian2));
     }
 
     @Test
@@ -154,22 +177,7 @@ public class DotSaverTest {
 
     @Test
     public void dotSaveShowsDisconnectedVerticesWithDegree1() throws IOException {
-        DoubleVertex v1 = new ConstantDoubleVertex(0.);
-        DoubleVertex v2 = new ConstantDoubleVertex(1.);
-        DoubleVertex gamma1 = new GammaVertex(1., v2);
-        gamma1.setLabel("gamma1");
-        DoubleVertex gaussian1 = new GaussianVertex(v1, gamma1);
-        gaussian1.setLabel("gaussian1");
-
-        DoubleVertex v3 = new ConstantDoubleVertex(0.);
-        DoubleVertex v4 = new ConstantDoubleVertex(1.);
-        DoubleVertex gamma2 = new GammaVertex(1., v4);
-        gamma2.setLabel("gamma2");
-        DoubleVertex gaussian2 = new GaussianVertex(v3, gamma2);
-        gaussian2.setLabel("gaussian2");
-
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(Arrays.asList(v1, v2, gamma1, gaussian1, v3, v4, gamma2, gaussian2));
-        DotSaver dotSaver = new DotSaver(bayesianNetwork);
+        DotSaver dotSaver = new DotSaver(disconnectedBayesNet);
         dotSaver.save(outputWriter, Arrays.asList(gaussian1, gaussian2), 1, true);
         String expectedOutputWithValues = readFileToString(VERTEX_DEGREE1__OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
@@ -177,22 +185,7 @@ public class DotSaverTest {
 
     @Test
     public void dotSaveShowsAllDisconnectedVertices() throws IOException {
-        DoubleVertex v1 = new ConstantDoubleVertex(0.);
-        DoubleVertex v2 = new ConstantDoubleVertex(1.);
-        DoubleVertex gamma1 = new GammaVertex(1., v2);
-        gamma1.setLabel("gamma1");
-        DoubleVertex gaussian1 = new GaussianVertex(v1, gamma1);
-        gaussian1.setLabel("gaussian1");
-
-        DoubleVertex v3 = new ConstantDoubleVertex(0.);
-        DoubleVertex v4 = new ConstantDoubleVertex(1.);
-        DoubleVertex gamma2 = new GammaVertex(1., v4);
-        gamma2.setLabel("gamma2");
-        DoubleVertex gaussian2 = new GaussianVertex(v3, gamma2);
-        gaussian2.setLabel("gaussian2");
-
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(Arrays.asList(v1, v2, gamma1, gaussian1, v3, v4, gamma2, gaussian2));
-        DotSaver dotSaver = new DotSaver(bayesianNetwork);
+        DotSaver dotSaver = new DotSaver(disconnectedBayesNet);
         dotSaver.save(outputWriter, Arrays.asList(gaussian1, gaussian2), 2, true);
         String expectedOutputWithValues = readFileToString(OUTPUT_WITH_DISCONNECTED_VERTICES_FILENAME);
         checkDotFilesMatch(outputWriter.toString(), expectedOutputWithValues);
