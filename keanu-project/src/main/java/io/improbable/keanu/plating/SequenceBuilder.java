@@ -13,33 +13,33 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * PlateBuilder allows plates to be constructed in steps
+ * SequenceBuilder allows sequences to be constructed in steps
  *
- * @param <T> The data type provided to user-provided plate
+ * @param <T> The data type provided to user-provided sequence
  *            factory function, if building from data
  */
-public class PlateBuilder<T> {
+public class SequenceBuilder<T> {
 
     private static final String PROXY_LABEL_MARKER = "proxy_for";
     private VertexDictionary initialState;
     private Map<VertexLabel, VertexLabel> transitionMapping = Collections.emptyMap();
 
-    private interface PlateCount {
+    private interface ItemCount {
         int getCount();
     }
 
-    private interface PlateData<T> {
+    private interface SequenceData<T> {
         Iterator<T> getIterator();
     }
 
-    private interface PlateFactory {
+    private interface SequenceFactory {
         /**
-         * Build plates from current factory settings
+         * Build sequence from current factory settings
          *
-         * @return Collection of all created plates
-         * @throws PlateConstructionException which can occur e.g. if the labels don't marry up in the transition mapping
+         * @return Sequence
+         * @throws SequenceConstructionException which can occur e.g. if the labels don't marry up in the transition mapping
          */
-        Plates build();
+        Sequence build();
     }
 
     public static VertexLabel proxyFor(VertexLabel label) {
@@ -47,26 +47,26 @@ public class PlateBuilder<T> {
     }
 
 
-    public PlateBuilder<T> withInitialState(Vertex<?> vertex) {
+    public SequenceBuilder<T> withInitialState(Vertex<?> vertex) {
         return withInitialState(VertexDictionary.of(vertex));
     }
 
-    public PlateBuilder<T> withInitialState(VertexLabel label, Vertex<?> vertex) {
+    public SequenceBuilder<T> withInitialState(VertexLabel label, Vertex<?> vertex) {
         return withInitialState(VertexDictionary.backedBy(ImmutableMap.of(label, vertex)));
     }
 
-    public PlateBuilder<T> withInitialState(VertexDictionary initialState) {
+    public SequenceBuilder<T> withInitialState(VertexDictionary initialState) {
         this.initialState = initialState;
         return this;
     }
 
-    public PlateBuilder<T> withTransitionMapping(Map<VertexLabel, VertexLabel> transitionMapping) {
+    public SequenceBuilder<T> withTransitionMapping(Map<VertexLabel, VertexLabel> transitionMapping) {
         this.transitionMapping = transitionMapping;
         return this;
     }
 
     /**
-     * Build a fixed number of plates without additional data
+     * Build a fixed number of sequence items without additional data
      *
      * @param count count
      * @return A builder with count set
@@ -76,7 +76,7 @@ public class PlateBuilder<T> {
     }
 
     /**
-     * Build an unspecified number of plates with data from an iterator
+     * Build an unspecified number of sequence items with data from an iterator
      *
      * @param iterator iterator
      * @return A builder with data set
@@ -86,7 +86,7 @@ public class PlateBuilder<T> {
     }
 
     /**
-     * Build a number of plates with data from an iterator
+     * Build a number of sequence items with data from an iterator
      *
      * @param iterator iterator
      * @param sizeHint A hint of the iterator cardinality. Does not need to be exact
@@ -99,7 +99,7 @@ public class PlateBuilder<T> {
     /**
      * An intermediate builder, with a set count
      */
-    public class FromCount implements PlateCount {
+    public class FromCount implements ItemCount {
         private final int count;
         private final VertexDictionary initialState;
 
@@ -113,12 +113,12 @@ public class PlateBuilder<T> {
         }
 
         /**
-         * Set the Plate factory method, taking no additional data
+         * Set the SequenceItem factory method, taking no additional data
          *
-         * @param factory a plate factory
-         * @return A builder with count and plate factory set
+         * @param factory a sequence factory
+         * @return A builder with count and sequence factory set
          */
-        public FromCountFactory withFactory(Consumer<Plate> factory) {
+        public FromCountFactory withFactory(Consumer<SequenceItem> factory) {
             return new FromCountFactory(factory, this, initialState, transitionMapping);
         }
     }
@@ -126,7 +126,7 @@ public class PlateBuilder<T> {
     /**
      * An intermediate builder, with a set data iterator
      */
-    public class FromIterator implements PlateData<T> {
+    public class FromIterator implements SequenceData<T> {
         private Iterator<T> iterator;
         private int size;
         private final VertexDictionary initialState;
@@ -142,49 +142,49 @@ public class PlateBuilder<T> {
         }
 
         /**
-         * Set the Plate factory method, taking additional data
+         * Set the SequenceItem factory method, taking additional data
          *
-         * @param factory a plate factory
-         * @return A builder with data and plate factory set
+         * @param factory a sequence factory
+         * @return A builder with data and sequence factory set
          */
-        public FromDataFactory withFactory(BiConsumer<Plate, T> factory) {
+        public FromDataFactory withFactory(BiConsumer<SequenceItem, T> factory) {
             return new FromDataFactory(factory, this, size, initialState);
         }
     }
 
     /**
-     * Build Plates from some provided Data
+     * Build Sequence from some provided Data
      */
-    public class FromDataFactory implements PlateFactory {
-        private BiConsumer<Plate, T> factory;
-        private PlateData<T> data;
+    public class FromDataFactory implements SequenceFactory {
+        private BiConsumer<SequenceItem, T> factory;
+        private SequenceData<T> data;
         private int size;
         private final VertexDictionary initialState;
 
-        private FromDataFactory(BiConsumer<Plate, T> factory, PlateData<T> data, int size, VertexDictionary initialState) {
+        private FromDataFactory(BiConsumer<SequenceItem, T> factory, SequenceData<T> data, int size, VertexDictionary initialState) {
             this.factory = factory;
             this.data = data;
             this.size = size;
             this.initialState = initialState;
         }
 
-        public Plates build() throws PlateConstructionException {
-            Plates plates = new Plates(this.size);
+        public Sequence build() throws SequenceConstructionException {
+            Sequence sequence = new Sequence(this.size);
             Iterator<T> iter = data.getIterator();
             VertexDictionary previousVertices = initialState;
             while (iter.hasNext()) {
-                Plate plate = new Plate();
-                factory.accept(plate, iter.next());
-                connectTransitionVariables(previousVertices, plate, transitionMapping);
-                plates.add(plate);
-                previousVertices = plate;
+                SequenceItem item = new SequenceItem();
+                factory.accept(item, iter.next());
+                connectTransitionVariables(previousVertices, item, transitionMapping);
+                sequence.add(item);
+                previousVertices = item;
             }
-            return plates;
+            return sequence;
         }
     }
 
-    private void connectTransitionVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> transitionMapping) throws PlateConstructionException {
-        Collection<Vertex<?>> proxyVertices = plate.getProxyVertices();
+    private void connectTransitionVariables(VertexDictionary candidateVertices, SequenceItem item, Map<VertexLabel, VertexLabel> transitionMapping) throws SequenceConstructionException {
+        Collection<Vertex<?>> proxyVertices = item.getProxyVertices();
 
         for (Vertex<?> proxy : proxyVertices) {
             VertexLabel proxyLabel = proxy.getLabel().withoutOuterNamespace();
@@ -192,7 +192,7 @@ public class PlateBuilder<T> {
             VertexLabel parentLabel = transitionMapping.getOrDefault(proxyLabel, defaultParentLabel);
 
             if (parentLabel == null) {
-                throw new PlateConstructionException("Cannot find transition mapping for " + proxy.getLabel());
+                throw new SequenceConstructionException("Cannot find transition mapping for " + proxy.getLabel());
             }
 
             if (candidateVertices == null) {
@@ -201,7 +201,7 @@ public class PlateBuilder<T> {
 
             Vertex<?> parent = candidateVertices.get(parentLabel);
             if (parent == null) {
-                throw new PlateConstructionException("Cannot find VertexLabel " + parentLabel);
+                throw new SequenceConstructionException("Cannot find VertexLabel " + parentLabel);
             }
             proxy.setParents(parent);
         }
@@ -217,29 +217,29 @@ public class PlateBuilder<T> {
     }
 
     /**
-     * Build some number of plates
+     * Build some number of sequence items
      */
-    public class FromCountFactory implements PlateFactory {
-        private Consumer<Plate> factory;
-        private PlateCount count;
+    public class FromCountFactory implements SequenceFactory {
+        private Consumer<SequenceItem> factory;
+        private ItemCount count;
 
-        private FromCountFactory(Consumer<Plate> factory, PlateCount count, VertexDictionary initialState, Map<VertexLabel, VertexLabel> transitionMapping) {
+        private FromCountFactory(Consumer<SequenceItem> factory, ItemCount count, VertexDictionary initialState, Map<VertexLabel, VertexLabel> transitionMapping) {
             this.factory = factory;
             this.count = count;
         }
 
 
-        public Plates build() throws PlateConstructionException {
-            Plates plates = new Plates(count.getCount());
-            VertexDictionary previousPlate = initialState;
+        public Sequence build() throws SequenceConstructionException {
+            Sequence sequence = new Sequence(count.getCount());
+            VertexDictionary previousItem = initialState;
             for (int i = 0; i < count.getCount(); i++) {
-                Plate plate = new Plate();
-                factory.accept(plate);
-                connectTransitionVariables(previousPlate, plate, transitionMapping);
-                plates.add(plate);
-                previousPlate = plate;
+                SequenceItem item = new SequenceItem();
+                factory.accept(item);
+                connectTransitionVariables(previousItem, item, transitionMapping);
+                sequence.add(item);
+                previousItem = item;
             }
-            return plates;
+            return sequence;
         }
     }
 }

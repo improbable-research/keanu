@@ -36,11 +36,11 @@ started.
 
 Let's say you have a class `MyData` that looks like this:
 ```java
-{% snippet PlatesData %}
+{% snippet SequenceData %}
 ```
 This is an example of how you could pull in data from a csv file and run linear regression, using
 plates to build identical sections of the graph for each line of the csv.
 
 ```java
-{% snippet Plates %}
+{% snippet Sequence %}
 ```

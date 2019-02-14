@@ -44,7 +44,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class PlateBuilderTest {
+public class SequenceBuilderTest {
 
     private static class Bean {
         public int x;
@@ -64,67 +64,67 @@ public class PlateBuilderTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void buildPlatesFromCount_Size() {
+    public void buildSequenceFromCount_Size() {
         int n = 100;
-        Plates plates = new PlateBuilder()
+        Sequence sequence = new SequenceBuilder()
             .count(n)
-            .withFactory(plate -> {
+            .withFactory(item -> {
             })
             .build();
-        assertEquals(n, plates.size());
+        assertEquals(n, sequence.size());
     }
 
     @Test
-    public void buildPlatesFromCount_PlateContents() {
+    public void buildSequenceFromCount_Contents() {
         int n = 100;
         VertexLabel vertexName = new VertexLabel("vertexName");
-        Plates plates = new PlateBuilder<>()
+        Sequence sequence = new SequenceBuilder<>()
             .count(n)
-            .withFactory((plate) -> plate.add(vertexName, new BernoulliVertex(0.5)))
+            .withFactory((item) -> item.add(vertexName, new BernoulliVertex(0.5)))
             .build();
-        plates.asList().forEach(plate -> {
-            assertNotNull(plate.get(vertexName));
+        sequence.asList().forEach(item -> {
+            assertNotNull(item.get(vertexName));
         });
     }
 
     @Test
-    public void buildPlatesFromData_Size() {
-        Plates plates = new PlateBuilder<Bean>()
+    public void buildSequenceFromData_Size() {
+        Sequence sequence = new SequenceBuilder<Bean>()
             .fromIterator(ROWS.iterator())
-            .withFactory((plate, bean) -> {
+            .withFactory((item, bean) -> {
             })
             .build();
-        assertEquals(ROWS.size(), plates.size());
+        assertEquals(ROWS.size(), sequence.size());
     }
 
     @Test
-    public void buildPlatesFromData_Contents() {
-        Plates plates = new PlateBuilder<Bean>()
+    public void buildSequenceFromData_Contents() {
+        Sequence sequence = new SequenceBuilder<Bean>()
             .fromIterator(ROWS.iterator())
-            .withFactory((plate, bean) -> {
+            .withFactory((item, bean) -> {
                 assertEquals(0, bean.x);
             })
             .build();
     }
 
     @Test
-    public void ifAVertexIsLabeledThatIsWhatsUsedToReferToItInThePlate() {
+    public void ifAVertexIsLabeledThatIsWhatsUsedToReferToItInTheSequenceItem() {
         VertexLabel label = new VertexLabel("label");
 
         Vertex<?> startVertex = ConstantVertex.of(1.).setLabel(label);
 
-        Plates plates = new PlateBuilder<Integer>()
+        Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(startVertex)
             .withTransitionMapping(ImmutableMap.of(label, label))
             .count(10)
-            .withFactory((plate) -> {
+            .withFactory((item) -> {
                 DoubleVertex intermediateVertex = new DoubleProxyVertex(label);
-                plate.add(intermediateVertex);
+                item.add(intermediateVertex);
             })
             .build();
 
-        for (Plate plate : plates) {
-            Vertex<?> vertex = plate.get(label);
+        for (SequenceItem item : sequence) {
+            Vertex<?> vertex = item.get(label);
             assertThat(vertex, hasLabel(hasUnqualifiedName(label.getUnqualifiedName())));
             Vertex<?> parent = Iterables.getOnlyElement(vertex.getParents());
             assertThat(parent, hasLabel(hasUnqualifiedName(label.getUnqualifiedName())));
@@ -132,53 +132,53 @@ public class PlateBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void youCannotAddTheSameLabelTwiceIntoOnePlate() {
-        new PlateBuilder<Integer>()
+    public void youCannotAddTheSameLabelTwiceIntoOneSequenceItem() {
+        new SequenceBuilder<Integer>()
             .count(10)
-            .withFactory((plate) -> {
+            .withFactory((item) -> {
                 VertexLabel label = new VertexLabel("x");
                 DoubleVertex vertex1 = ConstantVertex.of(1.);
                 DoubleVertex vertex2 = ConstantVertex.of(1.);
-                plate.add(label, vertex1);
-                plate.add(label, vertex2);
+                item.add(label, vertex1);
+                item.add(label, vertex2);
             })
             .build();
     }
 
     @Test
-    public void youCanCreateASetOfPlatesWithACommonParameterFromACount() {
+    public void youCanCreateASequenceWithACommonParameterFromACount() {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         VertexLabel label = new VertexLabel("flip");
 
-        Plates plates = new PlateBuilder<Bean>()
+        Sequence sequence = new SequenceBuilder<Bean>()
             .count(10)
-            .withFactory((plate) -> {
+            .withFactory((item) -> {
                 BooleanVertex flip = new BernoulliVertex(commonTheta);
                 flip.observe(false);
-                plate.add(label, flip);
+                item.add(label, flip);
             })
             .build();
 
 
-        for (Plate plate : plates) {
-            Vertex<DoubleTensor> flip = plate.get(label);
+        for (SequenceItem item : sequence) {
+            Vertex<DoubleTensor> flip = item.get(label);
             assertThat(flip.getParents(), contains(commonTheta));
         }
     }
 
     @Test
-    public void youCanPutThePlatesIntoABayesNet() {
+    public void youCanPutTheSequenceIntoABayesNet() {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         VertexLabel label = new VertexLabel("flip");
 
-        Plates plates = new PlateBuilder<Bean>()
+        Sequence sequence = new SequenceBuilder<Bean>()
             .count(10)
-            .withFactory((plate) -> {
+            .withFactory((item) -> {
                 BooleanVertex flip = new BernoulliVertex(commonTheta);
                 flip.observe(false);
-                plate.add(label, flip);
+                item.add(label, flip);
             })
             .build();
 
@@ -186,18 +186,18 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void youCanPutTheSameVertexIntoMultiplePlates() {
+    public void youCanPutTheSameVertexIntoMultipleSequenceItems() {
         VertexLabel thetaLabel = new VertexLabel("theta");
         VertexLabel flipLabel = new VertexLabel("flip");
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
-        new PlateBuilder<Bean>()
+        new SequenceBuilder<Bean>()
             .count(10)
-            .withFactory((plate) -> {
+            .withFactory((item) -> {
                 BooleanVertex flip = new BernoulliVertex(commonTheta);
                 flip.observe(false);
-                plate.add(thetaLabel, commonTheta);
-                plate.add(flipLabel, flip);
+                item.add(thetaLabel, commonTheta);
+                item.add(flipLabel, flip);
             })
             .build();
 
@@ -206,23 +206,23 @@ public class PlateBuilderTest {
 
 
     @Test
-    public void youCanCreateASetOfPlatesWithACommonParameterFromAnIterator() {
+    public void youCanCreateASequenceWithACommonParameterFromAnIterator() {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         VertexLabel label = new VertexLabel("flip");
 
-        Plates plates = new PlateBuilder<Bean>()
+        Sequence sequence = new SequenceBuilder<Bean>()
             .fromIterator(ROWS.iterator())
-            .withFactory((plate, bean) -> {
+            .withFactory((item, bean) -> {
                 BooleanVertex flip = new BernoulliVertex(commonTheta);
                 flip.observe(false);
-                plate.add(label, flip);
+                item.add(label, flip);
             })
             .build();
 
 
-        for (Plate plate : plates) {
-            Vertex<DoubleTensor> flip = plate.get(label);
+        for (SequenceItem item : sequence) {
+            Vertex<DoubleTensor> flip = item.get(label);
             assertThat(flip.getParents(), contains(commonTheta));
         }
     }
@@ -236,35 +236,35 @@ public class PlateBuilderTest {
      *           Y[t-1]       Y[t]
      */
     @Test
-    public void youCanCreateATimeSeriesFromPlatesFromACount() {
+    public void youCanCreateATimeSeriesFromSequenceFromACount() {
 
         VertexLabel xLabel = new VertexLabel("x");
-        VertexLabel xPreviousLabel = PlateBuilder.proxyFor(xLabel);
+        VertexLabel xPreviousLabel = SequenceBuilder.proxyFor(xLabel);
         VertexLabel yLabel = new VertexLabel("y");
 
         Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
-        Plates plates = new PlateBuilder<Integer>()
+        Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(xLabel, initialX)
             .count(10)
-            .withFactory((plate) -> {
+            .withFactory((item) -> {
                 DoubleVertex xPrevious = new DoubleProxyVertex(xPreviousLabel);
                 DoubleVertex x = new ExponentialVertex(xPrevious);
                 IntegerVertex y = new PoissonVertex(x);
-                plate.add(xPrevious);
-                plate.add(xLabel, x);
-                plate.add(yLabel, y);
+                item.add(xPrevious);
+                item.add(xLabel, x);
+                item.add(yLabel, y);
             })
             .build();
 
 
         Vertex<DoubleTensor> previousX = initialX;
 
-        for (Plate plate : plates) {
-            Vertex<DoubleTensor> xPreviousProxy = plate.get(xPreviousLabel);
-            Vertex<DoubleTensor> x = plate.get(xLabel);
-            Vertex<DoubleTensor> y = plate.get(yLabel);
+        for (SequenceItem item : sequence) {
+            Vertex<DoubleTensor> xPreviousProxy = item.get(xPreviousLabel);
+            Vertex<DoubleTensor> x = item.get(xLabel);
+            Vertex<DoubleTensor> y = item.get(yLabel);
             assertThat(xPreviousProxy.getParents(), contains(previousX));
             assertThat(x.getParents(), contains(xPreviousProxy));
             assertThat(y.getParents(), contains(x));
@@ -281,36 +281,36 @@ public class PlateBuilderTest {
      *           Y[t-1]       Y[t]
      */
     @Test
-    public void youCanCreateATimeSeriesFromPlatesFromAnIterator() {
+    public void youCanCreateATimeSeriesFromSequenceFromAnIterator() {
 
         VertexLabel xLabel = new VertexLabel("x");
-        VertexLabel xPreviousLabel = PlateBuilder.proxyFor(xLabel);
+        VertexLabel xPreviousLabel = SequenceBuilder.proxyFor(xLabel);
         VertexLabel yLabel = new VertexLabel("y");
 
         Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
-        Plates plates = new PlateBuilder<Integer>()
+        Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(xLabel, initialX)
             .fromIterator(ys.iterator())
-            .withFactory((plate, observedY) -> {
+            .withFactory((item, observedY) -> {
                 DoubleVertex xPreviousProxy = new DoubleProxyVertex(xPreviousLabel);
                 DoubleVertex x = new ExponentialVertex(xPreviousProxy);
                 IntegerVertex y = new PoissonVertex(x);
                 y.observe(observedY);
-                plate.add(xPreviousProxy);
-                plate.add(xLabel, x);
-                plate.add(yLabel, y);
+                item.add(xPreviousProxy);
+                item.add(xLabel, x);
+                item.add(yLabel, y);
             })
             .build();
 
 
         Vertex<DoubleTensor> previousX = initialX;
 
-        for (Plate plate : plates) {
-            Vertex<DoubleTensor> xPreviousProxy = plate.get(xPreviousLabel);
-            Vertex<DoubleTensor> x = plate.get(xLabel);
-            Vertex<DoubleTensor> y = plate.get(yLabel);
+        for (SequenceItem item : sequence) {
+            Vertex<DoubleTensor> xPreviousProxy = item.get(xPreviousLabel);
+            Vertex<DoubleTensor> x = item.get(xLabel);
+            Vertex<DoubleTensor> y = item.get(yLabel);
             assertThat(xPreviousProxy.getParents(), contains(previousX));
             assertThat(x.getParents(), contains(xPreviousProxy));
             assertThat(y.getParents(), contains(x));
@@ -323,7 +323,7 @@ public class PlateBuilderTest {
      * See LoopTest.java for example usage
      */
     @Test
-    public void youCanCreateALoopFromPlatesFromACount() {
+    public void youCanCreateALoopFromSequenceFromACount() {
         // inputs
         VertexLabel runningTotalLabel = new VertexLabel("runningTotal");
         VertexLabel stillLoopingLabel = new VertexLabel("stillLooping");
@@ -345,7 +345,7 @@ public class PlateBuilderTest {
 
         int maximumLoopLength = 100;
 
-        Plates plates = new PlateBuilder<Integer>()
+        Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(SimpleVertexDictionary.backedBy(ImmutableMap.of(
                 plusLabel, initialSum,
                 loopLabel, tru,
@@ -356,26 +356,26 @@ public class PlateBuilderTest {
                 valueInLabel, valueOutLabel
             ))
             .count(maximumLoopLength)
-            .withFactory((plate) -> {
+            .withFactory((item) -> {
                 // inputs
                 DoubleVertex runningTotal = new DoubleProxyVertex(runningTotalLabel);
                 BooleanVertex stillLooping = new BooleanProxyVertex(stillLoopingLabel);
                 DoubleVertex valueIn = new DoubleProxyVertex(valueInLabel);
-                plate.addAll(ImmutableSet.of(runningTotal, stillLooping, valueIn));
+                item.addAll(ImmutableSet.of(runningTotal, stillLooping, valueIn));
 
                 // intermediate
                 DoubleVertex one = ConstantVertex.of(1.);
                 BooleanVertex condition = new BernoulliVertex(0.5);
-                plate.add(oneLabel, one);
-                plate.add(conditionLabel, condition);
+                item.add(oneLabel, one);
+                item.add(conditionLabel, condition);
 
                 // outputs
                 DoubleVertex plus = runningTotal.plus(one);
                 BooleanVertex loopAgain = stillLooping.and(condition);
                 DoubleVertex result = If.isTrue(loopAgain).then(plus).orElse(valueIn);
-                plate.add(plusLabel, plus);
-                plate.add(loopLabel, loopAgain);
-                plate.add(valueOutLabel, result);
+                item.add(plusLabel, plus);
+                item.add(loopLabel, loopAgain);
+                item.add(valueOutLabel, result);
             })
             .build();
 
@@ -384,17 +384,17 @@ public class PlateBuilderTest {
         BooleanVertex previousLoop = tru;
         DoubleVertex previousValueOut = initialValue;
 
-        for (Plate plate : plates) {
-            DoubleVertex runningTotal = plate.get(runningTotalLabel);
-            BooleanVertex stillLooping = plate.get(stillLoopingLabel);
-            DoubleVertex valueIn = plate.get(valueInLabel);
+        for (SequenceItem item : sequence) {
+            DoubleVertex runningTotal = item.get(runningTotalLabel);
+            BooleanVertex stillLooping = item.get(stillLoopingLabel);
+            DoubleVertex valueIn = item.get(valueInLabel);
 
-            DoubleVertex one = plate.get(oneLabel);
-            BooleanVertex condition = plate.get(conditionLabel);
+            DoubleVertex one = item.get(oneLabel);
+            BooleanVertex condition = item.get(conditionLabel);
 
-            DoubleVertex plus = plate.get(plusLabel);
-            BooleanVertex loop = plate.get(loopLabel);
-            DoubleVertex valueOut = plate.get(valueOutLabel);
+            DoubleVertex plus = item.get(plusLabel);
+            BooleanVertex loop = item.get(loopLabel);
+            DoubleVertex valueOut = item.get(valueOutLabel);
 
             assertThat(runningTotal.getParents(), contains(previousPlus));
             assertThat(stillLooping.getParents(), contains(previousLoop));
@@ -416,14 +416,14 @@ public class PlateBuilderTest {
         }
 
 
-        DoubleVertex output = plates.asList().get(maximumLoopLength - 1).get(valueOutLabel);
+        DoubleVertex output = sequence.asList().get(maximumLoopLength - 1).get(valueOutLabel);
 
         for (int firstFailure : new int[]{0, 1, 2, 10, 99}) {
-            for (Plate plate : plates) {
-                BooleanVertex condition = plate.get(conditionLabel);
+            for (SequenceItem item : sequence) {
+                BooleanVertex condition = item.get(conditionLabel);
                 condition.setAndCascade(true);
             }
-            BooleanVertex condition = plates.asList().get(firstFailure).get(conditionLabel);
+            BooleanVertex condition = sequence.asList().get(firstFailure).get(conditionLabel);
             condition.setAndCascade(false);
             Double expectedOutput = new Double(firstFailure);
             assertThat(output, VertexMatchers.hasValue(expectedOutput));
@@ -432,16 +432,16 @@ public class PlateBuilderTest {
 
     @Test
     public void itThrowsIfTheresAProxyVertexThatItDoesntKnowHowToMap() {
-        expectedException.expect(PlateConstructionException.class);
+        expectedException.expect(SequenceConstructionException.class);
         expectedException.expectMessage(startsWith("Cannot find transition mapping for "));
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
-        Plates plates = new PlateBuilder<Integer>()
+        Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(SimpleVertexDictionary.of())
             .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
             .count(10)
-            .withFactory((plate) -> {
-                plate.add(new DoubleProxyVertex(fakeLabel));
+            .withFactory((item) -> {
+                item.add(new DoubleProxyVertex(fakeLabel));
             })
             .build();
     }
@@ -451,28 +451,28 @@ public class PlateBuilderTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("You must provide a base case for the Transition Vertices - use withInitialState()");
         VertexLabel realLabel = new VertexLabel("real");
-        Plates plates = new PlateBuilder<Integer>()
+        Sequence sequence = new SequenceBuilder<Integer>()
             .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
             .count(10)
-            .withFactory((plate) -> {
-                plate.add(new DoubleProxyVertex(realLabel));
+            .withFactory((item) -> {
+                item.add(new DoubleProxyVertex(realLabel));
             })
             .build();
     }
 
     @Test
     public void itThrowsIfTheresAnUnknownLabelInTheProxyMapping() {
-        expectedException.expect(PlateConstructionException.class);
+        expectedException.expect(SequenceConstructionException.class);
         expectedException.expectMessage("Cannot find VertexLabel fake");
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
         DoubleVertex initialState = ConstantVertex.of(1.);
-        Plates plates = new PlateBuilder<Integer>()
+        Sequence sequence = new SequenceBuilder<Integer>()
             .withInitialState(realLabel, initialState)
             .withTransitionMapping(ImmutableMap.of(realLabel, fakeLabel))
             .count(10)
-            .withFactory((plate) -> {
-                plate.add(new DoubleProxyVertex(realLabel));
+            .withFactory((item) -> {
+                item.add(new DoubleProxyVertex(realLabel));
             })
             .build();
     }

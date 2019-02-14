@@ -12,14 +12,14 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Plate implements VertexDictionary {
+public class SequenceItem implements VertexDictionary {
 
-    private static final String NAME_PREFIX = "Plate_";
+    private static final String NAME_PREFIX = "Sequence_Item_";
     private static Pattern NAME_REGEX = Pattern.compile(NAME_PREFIX + "-?[\\d]+$");
 
     private Map<VertexLabel, Vertex<?>> contents;
 
-    public Plate() {
+    public SequenceItem() {
         this.contents = new HashMap<>();
     }
 
@@ -41,11 +41,11 @@ public class Plate implements VertexDictionary {
 
     public <T extends Vertex<?>> T add(VertexLabel label, T v) {
         if (label == null) {
-            throw new PlateConstructionException("Vertex " + v + " must contain a label in order to be added to a plate");
+            throw new SequenceConstructionException("Vertex " + v + " must contain a label in order to be added to a sequence item");
         }
         String outerNamespace = label.getOuterNamespace().orElse("");
         if (NAME_REGEX.matcher(outerNamespace).matches()) {
-            throw new PlateConstructionException("Vertex " + v + " has already been added to " + outerNamespace);
+            throw new SequenceConstructionException("Vertex " + v + " has already been added to " + outerNamespace);
         }
         label = scoped(label);
         if (contents.containsKey(label)) {
@@ -75,11 +75,11 @@ public class Plate implements VertexDictionary {
     }
 
     @Override
-    public Plate withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
-        Plate plate = new Plate();
-        plate.addAll(contents);
-        plate.addAll(extraEntries);
-        return plate;
+    public SequenceItem withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
+        SequenceItem item = new SequenceItem();
+        item.addAll(contents);
+        item.addAll(extraEntries);
+        return item;
     }
 
     public Collection<Vertex<?>> getProxyVertices() {

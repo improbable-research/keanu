@@ -1,9 +1,9 @@
 package io.improbable.keanu.plating.loop;
 
 import com.google.common.collect.ImmutableMap;
-import io.improbable.keanu.plating.Plate;
-import io.improbable.keanu.plating.PlateBuilder;
-import io.improbable.keanu.plating.Plates;
+import io.improbable.keanu.plating.Sequence;
+import io.improbable.keanu.plating.SequenceBuilder;
+import io.improbable.keanu.plating.SequenceItem;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
@@ -71,31 +71,31 @@ public class LoopBuilder {
      * @return the next stage builder
      */
     public LoopBuilder2 iterateWhile(Supplier<BooleanVertex> conditionSupplier) {
-        return iterateWhile(plate -> conditionSupplier.get());
+        return iterateWhile(item -> conditionSupplier.get());
     }
 
     /**
      * A mandatory method to specify the condition
      *
-     * @param conditionFunction a lambda that takes the current Plate and creates and returns a new BooleanVertex
+     * @param conditionFunction a lambda that takes the current SequenceItem and creates and returns a new BooleanVertex
      * @return the next stage builder
      */
-    public LoopBuilder2 iterateWhile(Function<Plate, BooleanVertex> conditionFunction) {
+    public LoopBuilder2 iterateWhile(Function<SequenceItem, BooleanVertex> conditionFunction) {
         return new LoopBuilder2(initialState, conditionFunction, customMappings.build(), maxLoopCount, throwWhenMaxCountIsReached);
     }
 
     public class LoopBuilder2 {
         private final VertexDictionary initialState;
-        private final Function<Plate, BooleanVertex> conditionFunction;
+        private final Function<SequenceItem, BooleanVertex> conditionFunction;
         private final Map<VertexLabel, VertexLabel> customMappings;
         private final int maxLoopCount;
         private final boolean throwWhenMaxCountIsReached;
         private final VertexLabel VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL = new VertexLabel("loop_value_out_when_always_true");
-        private final VertexLabel VALUE_IN_WHEN_ALWAYS_TRUE_LABEL = PlateBuilder.proxyFor(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
+        private final VertexLabel VALUE_IN_WHEN_ALWAYS_TRUE_LABEL = SequenceBuilder.proxyFor(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
-        LoopBuilder2(VertexDictionary initialState, Function<Plate, BooleanVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached) {
+        LoopBuilder2(VertexDictionary initialState, Function<SequenceItem, BooleanVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached) {
             this.initialState = setInitialState(initialState);
             this.conditionFunction = conditionFunction;
             this.customMappings = customMappings;
@@ -129,43 +129,43 @@ public class LoopBuilder {
          * @return the fully constructed Loop object
          */
         public Loop apply(Function<DoubleVertex, DoubleVertex> iterationFunction) {
-            return apply((plate, valueIn) -> iterationFunction.apply(valueIn));
+            return apply((item, valueIn) -> iterationFunction.apply(valueIn));
         }
 
         /**
          * A mandatory method to specify the iteration step
          *
-         * @param iterationFunction a lambda that takes the current Plate and the Proxy input vertex
+         * @param iterationFunction a lambda that takes the current SequenceItem and the Proxy input vertex
          *                          and creates and returns a new output vertex
          * @return the fully constructed Loop object
          */
-        public Loop apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction) {
-            Plates plates = new PlateBuilder<Integer>()
+        public Loop apply(BiFunction<SequenceItem, DoubleVertex, DoubleVertex> iterationFunction) {
+            Sequence sequence = new SequenceBuilder<Integer>()
                 .withInitialState(initialState)
                 .withTransitionMapping(customMappings)
                 .count(maxLoopCount)
-                .withFactory((plate) -> {
+                .withFactory((item) -> {
                     // inputs
                     DoubleVertex valueInWhenAlwaysTrue = new DoubleProxyVertex(VALUE_IN_WHEN_ALWAYS_TRUE_LABEL);
                     BooleanVertex stillLooping = new BooleanProxyVertex(Loop.STILL_LOOPING_LABEL);
                     DoubleVertex valueIn = new DoubleProxyVertex(Loop.VALUE_IN_LABEL);
-                    plate.addAll(valueInWhenAlwaysTrue, stillLooping, valueIn);
+                    item.addAll(valueInWhenAlwaysTrue, stillLooping, valueIn);
 
                     // intermediate
-                    BooleanVertex condition = conditionFunction.apply(plate);
-                    plate.add(Loop.CONDITION_LABEL, condition);
+                    BooleanVertex condition = conditionFunction.apply(item);
+                    item.add(Loop.CONDITION_LABEL, condition);
 
                     // outputs
-                    DoubleVertex iterationResult = iterationFunction.apply(plate, valueInWhenAlwaysTrue);
+                    DoubleVertex iterationResult = iterationFunction.apply(item, valueInWhenAlwaysTrue);
                     BooleanVertex loopAgain = stillLooping.and(condition);
                     DoubleVertex result = If.isTrue(loopAgain).then(iterationResult).orElse(valueIn);
-                    plate.add(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL, iterationResult);
-                    plate.add(LOOP_LABEL, loopAgain);
-                    plate.add(Loop.VALUE_OUT_LABEL, result);
+                    item.add(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL, iterationResult);
+                    item.add(LOOP_LABEL, loopAgain);
+                    item.add(Loop.VALUE_OUT_LABEL, result);
                 })
                 .build();
 
-            return new Loop(plates, throwWhenMaxCountIsReached);
+            return new Loop(sequence, throwWhenMaxCountIsReached);
         }
     }
 }
