@@ -1,10 +1,8 @@
-package io.improbable.keanu.plating;
+package io.improbable.keanu.templating.loop;
 
 
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.plating.loop.Loop;
-import io.improbable.keanu.plating.loop.LoopConstructionException;
-import io.improbable.keanu.plating.loop.LoopDidNotTerminateException;
+import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;

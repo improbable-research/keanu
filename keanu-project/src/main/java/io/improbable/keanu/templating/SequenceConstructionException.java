@@ -1,4 +1,4 @@
-package io.improbable.keanu.plating;
+package io.improbable.keanu.templating;
 
 
 /**

@@ -1,4 +1,4 @@
-package io.improbable.keanu.plating;
+package io.improbable.keanu.templating;
 
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;

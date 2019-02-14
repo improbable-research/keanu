@@ -1,9 +1,9 @@
-package io.improbable.keanu.plating.loop;
+package io.improbable.keanu.templating.loop;
 
 import com.google.common.collect.ImmutableMap;
-import io.improbable.keanu.plating.Sequence;
-import io.improbable.keanu.plating.SequenceBuilder;
-import io.improbable.keanu.plating.SequenceItem;
+import io.improbable.keanu.templating.Sequence;
+import io.improbable.keanu.templating.SequenceBuilder;
+import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;

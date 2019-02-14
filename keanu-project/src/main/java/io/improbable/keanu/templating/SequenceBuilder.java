@@ -1,4 +1,4 @@
-package io.improbable.keanu.plating;
+package io.improbable.keanu.templating;
 
 import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.vertices.Vertex;

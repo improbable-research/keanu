@@ -1,7 +1,7 @@
 package io.improbable.snippet;
 
-import io.improbable.keanu.plating.Sequence;
-import io.improbable.keanu.plating.SequenceBuilder;
+import io.improbable.keanu.templating.Sequence;
+import io.improbable.keanu.templating.SequenceBuilder;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.VertexLabel;
