@@ -176,7 +176,8 @@ def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
 
 
 @pytest.mark.parametrize(
-    "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution='prior', latents=net.iter_latent_vertices()))])
+    "algo",
+    [(lambda net: MetropolisHastingsSampler(proposal_distribution='prior', latents=net.iter_latent_vertices()))])
 def test_can_iter_through_samples(algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
     draws = 10
     samples = generate_samples(

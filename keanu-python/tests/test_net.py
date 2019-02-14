@@ -22,12 +22,12 @@ def test_construct_bayes_net() -> None:
 
 
 @pytest.mark.parametrize("get_method, latent, observed, continuous, discrete, deterministic",
-                         [("get_latent_or_observed_vertices", True, True, True, True, False),
-                          ("get_latent_vertices", True, False, True, True, False),
-                          ("get_observed_vertices", False, True, True, True, False),
-                          ("get_continuous_latent_vertices", True, False, True, False, False),
-                          ("get_discrete_latent_vertices", True, False, False, True, False),
-                          ("get_all_vertices", True, True, True, True, True)])
+                         [("iter_latent_or_observed_vertices", True, True, True, True, False),
+                          ("iter_latent_vertices", True, False, True, True, False),
+                          ("iter_observed_vertices", False, True, True, True, False),
+                          ("iter_continuous_latent_vertices", True, False, True, False, False),
+                          ("iter_discrete_latent_vertices", True, False, False, True, False),
+                          ("iter_all_vertices", True, True, True, True, True)])
 def test_can_get_vertices_from_bayes_net(get_method: str, latent: bool, observed: bool, continuous: bool,
                                          discrete: bool, deterministic: bool) -> None:
     gamma = Gamma(1., 1.)

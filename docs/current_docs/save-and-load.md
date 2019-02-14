@@ -114,7 +114,7 @@ qualified file name and the network to save (along with an optional metadata map
 is given below:
 
 ```python
-net = BayesNet(gamma.get_connected_graph())
+net = BayesNet(gamma.iter_connected_graph())
 metadata = {"Author": "Documentation Team"}
 
 protobuf_saver = ProtobufSaver(net)
