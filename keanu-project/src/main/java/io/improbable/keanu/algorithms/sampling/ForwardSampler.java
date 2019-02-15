@@ -16,6 +16,7 @@ import static io.improbable.keanu.algorithms.mcmc.SamplingUtil.takeSamples;
 
 public class ForwardSampler implements SamplingAlgorithm {
 
+    //Set to zero as the Forward Sampler is not interested in the log prob of samples
     private static final double LOG_PROB_OF_PRIOR = 0.;
 
     private final List<? extends Variable> variablesToSampleFrom;

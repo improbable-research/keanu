@@ -26,6 +26,7 @@ import org.junit.rules.ExpectedException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,7 +60,7 @@ public class ForwardSamplerTest {
         ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Vertex: [" + C.toString() + "] has a random variable in its upstream lambda section");
+        thrown.expectMessage("Forward sampler cannot be ran if observed variables have a random variable in their upstream lambda section");
         Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 1000);
     }
 
@@ -83,13 +84,18 @@ public class ForwardSamplerTest {
 
     @Test
     public void nonProbabilisticVerticesAreRecomputedDuringForwardSample() {
-        GaussianVertex A = new GaussianVertex(0, 1);
+        GaussianVertex A = mock(GaussianVertex.class);
         PowerVertex B = mock(PowerVertex.class);
-        when(B.getParents()).thenReturn(Collections.singleton(A));
+
+        when(A.getChildren()).thenReturn(Collections.singleton(B));
+        when(A.getId()).thenReturn(new VertexId());
+        when(A.sample()).thenReturn(DoubleTensor.scalar(1.));
+        when(A.getConnectedGraph()).thenReturn(new HashSet<>(Arrays.asList(A, B)));
+
         when(B.getId()).thenReturn(new VertexId());
         when(B.calculate()).thenReturn(DoubleTensor.scalar(0.));
 
-        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+        ProbabilisticModel model = new KeanuProbabilisticModel(Arrays.asList(A, B));
 
         Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 100);
 

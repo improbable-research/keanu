@@ -4,7 +4,6 @@ import io.improbable.keanu.vertices.Vertex;
 import lombok.Value;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
@@ -99,13 +98,13 @@ public class LambdaSection {
 
         Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
-        Set<Vertex> upstreamVertices = getVertices(
+        Set<Vertex> downstreamVertices = getVertices(
             vertices,
             Vertex::getChildren,
             shouldAdd
         );
 
-        return new LambdaSection(upstreamVertices);
+        return new LambdaSection(downstreamVertices);
     }
 
     public static Set<Vertex> getVertices(Vertex vertex, Function<Vertex, Collection<Vertex>> nextVertices,
@@ -121,30 +120,21 @@ public class LambdaSection {
      * @return A Set of vertices that are in the direction implied by nextVertices and filtered by shouldAdd
      */
     public static Set<Vertex> getVertices(List<Vertex> vertices,
-                                        Function<Vertex, Collection<Vertex>> nextVertices,
-                                        Predicate<Vertex> shouldAdd) {
+                                          Function<Vertex, Collection<Vertex>> nextVertices,
+                                          Predicate<Vertex> shouldAdd) {
 
-        List<Vertex> verticesCopy = new ArrayList<>(vertices);
-        Vertex firstVertex = verticesCopy.remove(0);
+        Set<Vertex> nextAll = vertices.stream()
+            .flatMap(v -> nextVertices.apply(v).stream())
+            .collect(Collectors.toSet());
 
-        Set<Vertex> queued = new HashSet<>(verticesCopy);
-        Set<Vertex> visited = new HashSet<>();
-        Deque<Vertex> stack = new ArrayDeque<>(verticesCopy);
+        Deque<Vertex> stack = new ArrayDeque<>(nextAll);
+        Set<Vertex> queued = new HashSet<>(vertices);
+        queued.addAll(nextAll);
 
-        Collection<Vertex> initialNext = nextVertices.apply(firstVertex);
-        queued.addAll(initialNext);
-        stack.addAll(initialNext);
-
-        Set<Vertex> result = new HashSet<>();
-        result.add(firstVertex);
-        result.addAll(verticesCopy);
+        Set<Vertex> result = new HashSet<>(vertices);
 
         while (!stack.isEmpty()) {
             Vertex visiting = stack.pop();
-
-            if (visited.contains(visiting)) {
-                continue;
-            }
 
             if (shouldAdd.test(visiting)) {
                 result.add(visiting);
@@ -160,7 +150,6 @@ public class LambdaSection {
                     queued.add(next);
                 }
             }
-            visited.add(visiting);
         }
 
         return result;

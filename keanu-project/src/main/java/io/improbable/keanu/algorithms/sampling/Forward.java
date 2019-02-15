@@ -11,11 +11,9 @@ import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.util.status.StatusBar;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import org.nd4j.base.Preconditions;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -68,36 +66,20 @@ public class Forward implements PosteriorSamplingAlgorithm {
         checkUpstreamOfObservedDoesNotContainProbabilistic(observedVertices);
 
         List<Vertex> verticesToSampleFrom = variablesToSampleFrom.stream().map(v -> (Vertex) v).collect(Collectors.toList());
-        Set<Vertex> allUpstreamVertices = allUpstreamVertices(verticesToSampleFrom);
+        Set<Vertex> allDownstreamVertices = allDownstreamVertices(network.getLatentVertices());
 
-        List<Vertex> sortedVertices = TopologicalSort.sort(allUpstreamVertices);
-        sortedVertices = removeNonProbabilisticVerticesBeforeTheFirstProbabilistic(sortedVertices);
+        List<Vertex> sortedVertices = TopologicalSort.sort(allDownstreamVertices);
 
         return new ForwardSampler(verticesToSampleFrom, sortedVertices, random);
     }
 
-    private List<Vertex> removeNonProbabilisticVerticesBeforeTheFirstProbabilistic(List<Vertex> topologicalVertices) {
-        List<Vertex> copy = new LinkedList<>(topologicalVertices);
-
-        for (Vertex vertex : topologicalVertices) {
-            if (vertex instanceof Probabilistic) {
-                break;
-            } else {
-                copy.remove(0);
-            }
-        }
-        return copy;
+    private Set<Vertex> allDownstreamVertices(List<Vertex> randomVertices) {
+        return LambdaSection.getDownstreamLambdaSectionForCollection(randomVertices, true).getAllVertices();
     }
 
-    private Set<Vertex> allUpstreamVertices(List<Vertex> fromVertices) {
-        return LambdaSection.getUpstreamLambdaSectionForCollection(fromVertices, true).getAllVertices();
-    }
-
-    private void checkUpstreamOfObservedDoesNotContainProbabilistic(List<Vertex> vertices) {
-        for (Vertex vertex : vertices) {
-            LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(vertex, false);
-            Set<Vertex> upstreamRandomVariables = upstreamLambdaSection.getAllVertices();
-            Preconditions.checkArgument(upstreamRandomVariables.size() == 1, "Vertex: [" + vertex + "] has a random variable in its upstream lambda section");
-        }
+    private void checkUpstreamOfObservedDoesNotContainProbabilistic(List<Vertex> observedVertices) {
+        LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSectionForCollection(observedVertices, false);
+        Set<Vertex> upstreamRandomVariables = upstreamLambdaSection.getAllVertices();
+        Preconditions.checkArgument(upstreamRandomVariables.size() == 1 || upstreamRandomVariables.size() == 0, "Forward sampler cannot be ran if observed variables have a random variable in their upstream lambda section");
     }
 }
