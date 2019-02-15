@@ -77,10 +77,10 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         label = self.unwrap().getLabel()
         return None if label is None else label.getQualifiedName()
 
-    def get_parents(self) -> Iterator['Vertex']:
+    def iter_parents(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getParents())
 
-    def get_children(self) -> Iterator['Vertex']:
+    def iter_children(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getChildren())
 
     def is_observed(self) -> bool:

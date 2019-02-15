@@ -91,9 +91,9 @@ def test_you_can_build_a_time_series() -> None:
         x = item.get(x_label)
         y = item.get(y_label)
         if x_from_previous_step is None:
-            assert [p.get_value() for p in x_previous_proxy.get_parents()] == [initial_x]
+            assert [p.get_value() for p in x_previous_proxy.iter_parents()] == [initial_x]
         else:
-            assert [p.get_id() for p in x_previous_proxy.get_parents()] == [x_from_previous_step.get_id()]
-        assert [p.get_id() for p in x.get_parents()] == [x_previous_proxy.get_id()]
-        assert [p.get_id() for p in y.get_parents()] == [x.get_id()]
+            assert [p.get_id() for p in x_previous_proxy.iter_parents()] == [x_from_previous_step.get_id()]
+        assert [p.get_id() for p in x.iter_parents()] == [x_previous_proxy.get_id()]
+        assert [p.get_id() for p in y.iter_parents()] == [x.get_id()]
         x_from_previous_step = x

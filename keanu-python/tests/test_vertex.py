@@ -384,7 +384,7 @@ def test_can_get_parents_and_children() -> None:
     children = tuple(Gaussian(parents[0], parents[1], label=f"child{i}") for i in range(5))
 
     for parent in parents:
-        assert labels_match(parent.get_children(), children)
+        assert labels_match(parent.iter_children(), children)
 
     for child in children:
-        assert labels_match(child.get_parents(), parents)
+        assert labels_match(child.iter_parents(), parents)
