@@ -21,25 +21,28 @@ def test_construct_bayes_net() -> None:
     assert uniform.get_id() in latent_vertex_ids
 
 
-@pytest.mark.parametrize("get_method, latent, observed, continuous, discrete",
-                         [("get_latent_or_observed_vertices", True, True, True, True),
-                          ("get_latent_vertices", True, False, True, True),
-                          ("get_observed_vertices", False, True, True, True),
-                          ("get_continuous_latent_vertices", True, False, True, False),
-                          ("get_discrete_latent_vertices", True, False, False, True)])
+@pytest.mark.parametrize("get_method, latent, observed, continuous, discrete, deterministic",
+                         [("get_latent_or_observed_vertices", True, True, True, True, False),
+                          ("get_latent_vertices", True, False, True, True, False),
+                          ("get_observed_vertices", False, True, True, True, False),
+                          ("get_continuous_latent_vertices", True, False, True, False, False),
+                          ("get_discrete_latent_vertices", True, False, False, True, False),
+                          ("get_all_vertices", True, True, True, True, True)])
 def test_can_get_vertices_from_bayes_net(get_method: str, latent: bool, observed: bool, continuous: bool,
-                                         discrete: bool) -> None:
+                                         discrete: bool, deterministic: bool) -> None:
     gamma = Gamma(1., 1.)
     gamma.observe(0.5)
 
     poisson = Poisson(gamma)
-    cauchy = Cauchy(gamma, 1.)
+
+    cauchy = Cauchy(1., 1.)
+    add = cauchy + gamma
 
     assert gamma.is_observed()
     assert not poisson.is_observed()
     assert not cauchy.is_observed()
 
-    net = BayesNet([gamma, poisson, cauchy])
+    net = BayesNet([gamma, poisson, cauchy, add])
     vertex_ids = [vertex.get_id() for vertex in getattr(net, get_method)()]
 
     if observed and continuous:
@@ -48,8 +51,11 @@ def test_can_get_vertices_from_bayes_net(get_method: str, latent: bool, observed
         assert poisson.get_id() in vertex_ids
     if latent and continuous:
         assert cauchy.get_id() in vertex_ids
+    if deterministic:
+        assert add.get_id() in vertex_ids
 
-    assert len(vertex_ids) == (observed and continuous) + (latent and discrete) + (latent and continuous)
+    assert len(vertex_ids) == (observed and continuous) + (latent and discrete) + (latent and
+                                                                                   continuous) + deterministic
 
 
 def test_probe_for_non_zero_probability_from_bayes_net() -> None:
@@ -110,9 +116,3 @@ def test_get_vertex_by_label() -> None:
     retrieved_vertex = net.get_vertex_by_label("gamma")
     assert retrieved_vertex is not None
     assert retrieved_vertex.get_id() == vertex.get_id()
-
-
-def test_get_vertex_by_label_returns_none_if_not_found() -> None:
-    vertex = Gamma(1., 1., label="gamma")
-    net = BayesNet([vertex])
-    assert net.get_vertex_by_label("gaussian") is None

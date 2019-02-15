@@ -6,6 +6,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.FitnessFunction;
 import io.improbable.keanu.algorithms.variational.optimizer.OptimizedResult;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.ApacheFitnessFunctionAdapter;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
@@ -15,6 +16,7 @@ import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
+import org.nd4j.base.Preconditions;
 
 import java.util.List;
 import java.util.Map;
@@ -58,10 +60,11 @@ public class BOBYQA implements NonGradientOptimizationAlgorithm {
 
     @Override
     public OptimizedResult optimize(List<? extends Variable> latentVariables, FitnessFunction fitnessFunction) {
-
         List<long[]> shapes = latentVariables.stream()
             .map(Variable::getShape)
             .collect(toList());
+
+        checkThereIsMoreThanOneDimension(shapes);
 
         BOBYQAOptimizer optimizer = new BOBYQAOptimizer(
             getNumInterpolationPoints(shapes),
@@ -90,6 +93,14 @@ public class BOBYQA implements NonGradientOptimizationAlgorithm {
             .convertFromPoint(pointValuePair.getPoint(), latentVariables);
 
         return new OptimizedResult(optimizedValues, pointValuePair.getValue());
+    }
+
+    private void checkThereIsMoreThanOneDimension(List<long[]> latentVariablesShapes) {
+        int totalDimensions = 0;
+        for (long[] shape : latentVariablesShapes) {
+            totalDimensions += TensorShape.getLength(shape);
+        }
+        Preconditions.checkArgument(totalDimensions > 1, "BOBYQA requires at least two dimensions to perform optimisation. You provided: " + totalDimensions + " dimension.");
     }
 
     private int getNumInterpolationPoints(List<long[]> latentVariableShapes) {
