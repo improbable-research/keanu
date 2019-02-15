@@ -67,7 +67,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def get_value(self) -> numpy_types:
         return Tensor._to_scalar_or_ndarray(self.unwrap().getValue())
 
-    def get_connected_graph(self) -> Iterator['Vertex']:
+    def iter_connected_graph(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getConnectedGraph())
 
     def get_id(self) -> Tuple[int, ...]:
@@ -77,10 +77,10 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         label = self.unwrap().getLabel()
         return None if label is None else label.getQualifiedName()
 
-    def get_parents(self) -> Iterator['Vertex']:
+    def iter_parents(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getParents())
 
-    def get_children(self) -> Iterator['Vertex']:
+    def iter_children(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getChildren())
 
     def is_observed(self) -> bool:

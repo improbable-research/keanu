@@ -20,22 +20,22 @@ class BayesNet(JavaObjectWrapper):
 
         super(BayesNet, self).__init__(k.jvm_view().BayesianNetwork(java_vertices))
 
-    def get_latent_or_observed_vertices(self) -> Iterator[Vertex]:
+    def iter_latent_or_observed_vertices(self) -> Iterator[Vertex]:
         return Vertex._to_generator(self.unwrap().getLatentOrObservedVertices())
 
-    def get_latent_vertices(self) -> Iterator[Vertex]:
+    def iter_latent_vertices(self) -> Iterator[Vertex]:
         return Vertex._to_generator(self.unwrap().getLatentVertices())
 
-    def get_observed_vertices(self) -> Iterator[Vertex]:
+    def iter_observed_vertices(self) -> Iterator[Vertex]:
         return Vertex._to_generator(self.unwrap().getObservedVertices())
 
-    def get_continuous_latent_vertices(self) -> Iterator[Vertex]:
+    def iter_continuous_latent_vertices(self) -> Iterator[Vertex]:
         return Vertex._to_generator(self.unwrap().getContinuousLatentVertices())
 
-    def get_discrete_latent_vertices(self) -> Iterator[Vertex]:
+    def iter_discrete_latent_vertices(self) -> Iterator[Vertex]:
         return Vertex._to_generator(self.unwrap().getDiscreteLatentVertices())
 
-    def get_all_vertices(self) -> Iterator[Vertex]:
+    def iter_all_vertices(self) -> Iterator[Vertex]:
         return Vertex._to_generator(self.unwrap().getAllVertices())
 
     def probe_for_non_zero_probability(self, attempts: int, random: KeanuRandom) -> None:
