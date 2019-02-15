@@ -17,7 +17,6 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,10 +38,14 @@ public class DotSaver implements NetworkSaver {
 
     private Set<VertexDotLabel> dotLabels = new HashSet<>();
     private Set<GraphEdge> graphEdges = new HashSet<>();
-    private BayesianNetwork bayesianNetwork;
+    private Set<Vertex> vertices;
 
     public DotSaver(BayesianNetwork network) {
-        bayesianNetwork = network;
+        this.vertices = new HashSet<>(network.getAllVertices());
+    }
+
+    public DotSaver(Set<Vertex> vertices) {
+        this.vertices = vertices;
     }
 
     /**
@@ -72,9 +75,7 @@ public class DotSaver implements NetworkSaver {
         graphEdges = new HashSet<>();
         Writer outputWriter = new OutputStreamWriter(output);
 
-        List<Vertex> allVertices = bayesianNetwork.getAllVertices();
-
-        for (Vertex v : allVertices) {
+        for (Vertex v : vertices) {
             if (saveValues) {
                 v.saveValue(this);
             } else {
@@ -84,7 +85,7 @@ public class DotSaver implements NetworkSaver {
 
         outputWriter.write(DOT_HEADER);
         outputMetadata(metadata, outputWriter);
-        outputEdges(graphEdges, outputWriter, allVertices);
+        outputEdges(graphEdges, outputWriter, vertices);
         outputLabels(dotLabels, outputWriter);
         outputWriter.write(DOT_ENDING);
         outputWriter.close();
@@ -105,7 +106,7 @@ public class DotSaver implements NetworkSaver {
         }
     }
 
-    private static void outputEdges(Collection<GraphEdge> edges, Writer outputWriter, List<Vertex> verticesToOutput) throws IOException {
+    private static void outputEdges(Collection<GraphEdge> edges, Writer outputWriter, Set<Vertex> verticesToOutput) throws IOException {
         for (GraphEdge edge : edges) {
             if (verticesToOutput.contains(edge.getParentVertex()) && verticesToOutput.contains(edge.getChildVertex())) {
                 outputWriter.write(EdgeDotLabel.inDotFormat(edge) + "\n");
