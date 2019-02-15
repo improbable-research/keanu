@@ -15,7 +15,7 @@ def net() -> BayesNet:
 
 
 def test_you_can_create_a_prior_proposal_distribution(net) -> None:
-    ProposalDistribution("prior", latents=net.get_latent_vertices())
+    ProposalDistribution("prior", latents=net.iter_latent_vertices())
 
 
 def test_you_can_create_a_gaussian_proposal_distribution() -> None:

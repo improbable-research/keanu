@@ -16,14 +16,14 @@ def model() -> Model:
 
 
 def test_gradient_op_bayes_net(model: Model) -> None:
-    net = BayesNet(model.temperature.get_connected_graph())
+    net = BayesNet(model.temperature.iter_connected_graph())
     gradient_optimizer = GradientOptimizer(net)
     assert gradient_optimizer.net is net
 
 
 def test_gradient_op_vertex(model: Model) -> None:
     gradient_optimizer = GradientOptimizer(model.temperature)
-    assert len(list(gradient_optimizer.net.get_latent_vertices())) == 1
+    assert len(list(gradient_optimizer.net.iter_latent_vertices())) == 1
 
 
 def test_gradient_op_throws_with_invalid_net_param() -> None:
@@ -48,7 +48,7 @@ def test_thermometers_map_gradient_with_adam(model: Model) -> None:
 
 
 def thermometers_map_gradient(model: Model, algorithm) -> None:
-    net = BayesNet(model.temperature.get_connected_graph())
+    net = BayesNet(model.temperature.iter_connected_graph())
     gradient_optimizer = GradientOptimizer(net, algorithm)
     result = gradient_optimizer.max_a_posteriori()
     assert result.fitness() < 0.
@@ -66,7 +66,7 @@ def test_thermometers_likelihood_gradient_for_adam(model: Model) -> None:
 
 
 def thermometers_max_likelihood_gradient(model: Model, algorithm) -> None:
-    net = BayesNet(model.temperature.get_connected_graph())
+    net = BayesNet(model.temperature.iter_connected_graph())
     gradient_optimizer = GradientOptimizer(net, algorithm)
     result = gradient_optimizer.max_likelihood()
     assert result.fitness() < 0.

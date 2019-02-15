@@ -1,9 +1,9 @@
-package io.improbable.keanu.plating.loop;
+package io.improbable.keanu.templating.loop;
 
 import com.google.common.collect.ImmutableMap;
-import io.improbable.keanu.plating.Plate;
-import io.improbable.keanu.plating.PlateBuilder;
-import io.improbable.keanu.plating.Plates;
+import io.improbable.keanu.templating.Sequence;
+import io.improbable.keanu.templating.SequenceBuilder;
+import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 
 /**
- * A Loop object is a convenient wrapper around some Plates.
+ * A Loop object is a convenient wrapper around some Sequence.
  * See LoopTest.java for examples of how it's used.
  * The way it works is to unroll the loop to a given maximum size and evaluate it in full
  * (so it's not very performant)
@@ -48,27 +48,27 @@ import java.util.Map;
 @Slf4j
 public class Loop {
     public static final VertexLabel VALUE_OUT_LABEL = new VertexLabel("loop_value_out");
-    public static final VertexLabel VALUE_IN_LABEL = PlateBuilder.proxyFor(VALUE_OUT_LABEL);
+    public static final VertexLabel VALUE_IN_LABEL = SequenceBuilder.proxyFor(VALUE_OUT_LABEL);
     public static final VertexLabel CONDITION_LABEL = new VertexLabel("loop_condition");
     public static final VertexLabel LOOP_LABEL = new VertexLabel("loop");
-    static final VertexLabel STILL_LOOPING_LABEL = PlateBuilder.proxyFor(LOOP_LABEL);
+    static final VertexLabel STILL_LOOPING_LABEL = SequenceBuilder.proxyFor(LOOP_LABEL);
     public static final int DEFAULT_MAX_COUNT = 100;
-    private final Plates plates;
+    private final Sequence sequence;
     private final boolean throwWhenMaxCountIsReached;
 
     /**
      * package-private because it is intended to be created by the LoopBuilder
      *
-     * @param plates                     the set of plates, one for each iteration in the loop
+     * @param sequence                     the set of sequence, one for each iteration in the loop
      * @param throwWhenMaxCountIsReached optionally disable throwing and log a warning instead
      */
-    Loop(Plates plates, boolean throwWhenMaxCountIsReached) {
-        this.plates = plates;
+    Loop(Sequence sequence, boolean throwWhenMaxCountIsReached) {
+        this.sequence = sequence;
         this.throwWhenMaxCountIsReached = throwWhenMaxCountIsReached;
     }
 
-    public Plates getPlates() {
-        return plates;
+    public Sequence getSequence() {
+        return sequence;
     }
 
     /**
@@ -113,19 +113,19 @@ public class Loop {
 
     /**
      * @param <V> the output type
-     * @return the output of the Loop (i.e. the output Vertex from the final Plate)
+     * @return the output of the Loop (i.e. the output Vertex from the final SequenceItem)
      * @throws LoopDidNotTerminateException if the loop was too short and hit its maximum unrolled size
      */
     public <V extends Vertex<?>> V getOutput() throws LoopDidNotTerminateException {
-        Plate finalPlate = plates.getLastPlate();
-        checkIfMaxCountHasBeenReached(finalPlate);
-        return finalPlate.get(VALUE_OUT_LABEL);
+        SequenceItem finalItem = sequence.getLastItem();
+        checkIfMaxCountHasBeenReached(finalItem);
+        return finalItem.get(VALUE_OUT_LABEL);
     }
 
-    private void checkIfMaxCountHasBeenReached(Plate plate) throws LoopDidNotTerminateException {
-        BooleanVertex stillLooping = plate.get(STILL_LOOPING_LABEL);
+    private void checkIfMaxCountHasBeenReached(SequenceItem item) throws LoopDidNotTerminateException {
+        BooleanVertex stillLooping = item.get(STILL_LOOPING_LABEL);
         if (!stillLooping.getValue().allFalse()) {
-            String errorMessage = "Loop has exceeded its max count " + plates.size();
+            String errorMessage = "Loop has exceeded its max count " + sequence.size();
             if (throwWhenMaxCountIsReached) {
                 throw new LoopDidNotTerminateException(errorMessage);
             } else {

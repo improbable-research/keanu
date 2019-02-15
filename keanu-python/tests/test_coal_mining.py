@@ -13,8 +13,8 @@ def test_coalmining() -> None:
 
     model.disasters.observe(coal_mining.training_data())
 
-    net = BayesNet(model.switchpoint.get_connected_graph())
-    samples = sample(net=net, sample_from=net.get_latent_vertices(), draws=2000, drop=100, down_sample_interval=5)
+    net = BayesNet(model.switchpoint.iter_connected_graph())
+    samples = sample(net=net, sample_from=net.iter_latent_vertices(), draws=2000, drop=100, down_sample_interval=5)
 
     vertex_samples: List[primitive_types] = samples["switchpoint"]
     vertex_samples_concatentated: np.ndarray = np.array(vertex_samples)

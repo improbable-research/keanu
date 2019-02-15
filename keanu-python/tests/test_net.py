@@ -8,26 +8,26 @@ import pytest
 
 def test_construct_bayes_net() -> None:
     uniform = UniformInt(0, 1)
-    graph = set(uniform.get_connected_graph())
+    graph = set(uniform.iter_connected_graph())
     vertex_ids = [vertex.get_id() for vertex in graph]
 
     assert len(vertex_ids) == 3
     assert uniform.get_id() in vertex_ids
 
     net = BayesNet(graph)
-    latent_vertex_ids = [vertex.get_id() for vertex in net.get_latent_vertices()]
+    latent_vertex_ids = [vertex.get_id() for vertex in net.iter_latent_vertices()]
 
     assert len(latent_vertex_ids) == 1
     assert uniform.get_id() in latent_vertex_ids
 
 
 @pytest.mark.parametrize("get_method, latent, observed, continuous, discrete, deterministic",
-                         [("get_latent_or_observed_vertices", True, True, True, True, False),
-                          ("get_latent_vertices", True, False, True, True, False),
-                          ("get_observed_vertices", False, True, True, True, False),
-                          ("get_continuous_latent_vertices", True, False, True, False, False),
-                          ("get_discrete_latent_vertices", True, False, False, True, False),
-                          ("get_all_vertices", True, True, True, True, True)])
+                         [("iter_latent_or_observed_vertices", True, True, True, True, False),
+                          ("iter_latent_vertices", True, False, True, True, False),
+                          ("iter_observed_vertices", False, True, True, True, False),
+                          ("iter_continuous_latent_vertices", True, False, True, False, False),
+                          ("iter_discrete_latent_vertices", True, False, False, True, False),
+                          ("iter_all_vertices", True, True, True, True, True)])
 def test_can_get_vertices_from_bayes_net(get_method: str, latent: bool, observed: bool, continuous: bool,
                                          discrete: bool, deterministic: bool) -> None:
     gamma = Gamma(1., 1.)
@@ -74,7 +74,7 @@ def test_probe_for_non_zero_probability_from_bayes_net() -> None:
 
 
 def check_loaded_net(net) -> None:
-    latents = list(net.get_latent_vertices())
+    latents = list(net.iter_latent_vertices())
     assert len(latents) == 1
     gamma = latents[0]
     assert gamma.get_value() == 2.5
@@ -92,7 +92,7 @@ def test_can_save_and_load(tmpdir) -> None:
 
     gamma = Gamma(1.0, 1.0)
     gamma.set_value(2.5)
-    net = BayesNet(gamma.get_connected_graph())
+    net = BayesNet(gamma.iter_connected_graph())
     metadata = {"Team": "GraphOS"}
     protobuf_saver = ProtobufSaver(net)
     protobuf_saver.save(PROTO_FILE, True, metadata)
