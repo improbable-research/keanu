@@ -5,7 +5,6 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
@@ -16,6 +15,7 @@ import org.nd4j.linalg.api.shape.Shape;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.ADD;
@@ -163,7 +163,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         boolean[] newBuffer = new boolean[buffer.length];
 
         for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = value.equals(buffer[i]);
+            newBuffer[i] = value == buffer[i];
         }
 
         return BooleanTensor.create(newBuffer, shapeCopy());
@@ -355,6 +355,18 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         return this;
+    }
+
+    @Override
+    public DoubleTensor unaryMinus() {
+
+        double[] newBuffer = newBuffer();
+
+        for (int i = 0; i < buffer.length; i++) {
+            newBuffer[i] = -buffer[i];
+        }
+
+        return new JVMDoubleTensor(newBuffer, shapeCopy());
     }
 
     @Override
@@ -697,24 +709,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public double max() {
-        double result = -Double.MAX_VALUE;
-        for (int i = 0; i < buffer.length; i++) {
-            result = Math.max(result, buffer[i]);
-        }
-        return result;
-    }
-
-    @Override
-    public double min() {
-        double result = Double.MAX_VALUE;
-        for (int i = 0; i < buffer.length; i++) {
-            result = Math.min(result, buffer[i]);
-        }
-        return result;
-    }
-
-    @Override
     public double average() {
         return sum() / buffer.length;
     }
@@ -863,16 +857,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         return new JVMDoubleTensor(newBuffer, resultShape);
-    }
-
-    @AllArgsConstructor
-    private static class SliceShapeIncrement{
-        long[] shape;
-        long[] position;
-
-        public void increment(){
-
-        }
     }
 
     @Override
@@ -1030,41 +1014,37 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor minInPlace(DoubleTensor that) {
-        checkElementwiseShapeMatch(that.getShape());
-
-        double[] thatBuffer = that.asFlatDoubleArray();
-
+    public double min() {
+        double result = Double.MAX_VALUE;
         for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = Math.min(buffer[i], thatBuffer[i]);
+            result = Math.min(result, buffer[i]);
         }
+        return result;
+    }
 
-        return this;
+    @Override
+    public DoubleTensor minInPlace(DoubleTensor that) {
+        return broadcastableOpInPlace(Math::min, that);
+    }
+
+    @Override
+    public double max() {
+        double result = -Double.MAX_VALUE;
+        for (int i = 0; i < buffer.length; i++) {
+            result = Math.max(result, buffer[i]);
+        }
+        return result;
     }
 
     @Override
     public DoubleTensor maxInPlace(DoubleTensor that) {
-        checkElementwiseShapeMatch(that.getShape());
-
-        double[] thatBuffer = that.asFlatDoubleArray();
-
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = Math.max(buffer[i], thatBuffer[i]);
-        }
-
-        return this;
+        return broadcastableOpInPlace(Math::max, that);
     }
 
     @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
-
-        double[] minBuffer = min.asFlatDoubleArray();
-        double[] maxBuffer = max.asFlatDoubleArray();
-
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = Math.max(minBuffer[i], Math.min(maxBuffer[i], buffer[i]));
-        }
-
+        maxInPlace(min);
+        minInPlace(max);
         return this;
     }
 
@@ -1232,7 +1212,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         return broadcastableOp(DIV, that);
     }
 
-    private DoubleTensor broadcastableOp(JVMDoubleTensorBroadcast.BroadcastableDoubleOperation op, DoubleTensor that) {
+    private DoubleTensor broadcastableOp(BiFunction<Double, Double, Double> op, DoubleTensor that) {
 
         long[] resultShape = Shape.broadcastOutputShape(shape, that.getShape());
 
@@ -1257,7 +1237,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         return new JVMDoubleTensor(result, resultShape);
     }
 
-    private DoubleTensor broadcastableOpInPlace(JVMDoubleTensorBroadcast.BroadcastableDoubleOperation op, DoubleTensor that) {
+    private DoubleTensor broadcastableOpInPlace(BiFunction<Double, Double, Double> op, DoubleTensor that) {
 
         long[] resultShape = Shape.broadcastOutputShape(shape, that.getShape());
 
@@ -1278,22 +1258,10 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         this.buffer = opWithAutoBroadcast(buffer, shape, stride, that, outputBuffer, op);
-        ;
+
         this.shape = resultShape;
 
         return this;
-    }
-
-    @Override
-    public DoubleTensor unaryMinus() {
-
-        double[] newBuffer = newBuffer();
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = -buffer[i];
-        }
-
-        return new JVMDoubleTensor(newBuffer, shapeCopy());
     }
 
     @Override
