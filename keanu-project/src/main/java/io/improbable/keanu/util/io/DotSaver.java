@@ -41,7 +41,7 @@ public class DotSaver implements NetworkSaver {
     private Set<Vertex> vertices;
 
     public DotSaver(BayesianNetwork network) {
-        this.vertices = new HashSet<>(network.getAllVertices());
+        this(new HashSet<>(network.getAllVertices()));
     }
 
     public DotSaver(Set<Vertex> vertices) {
