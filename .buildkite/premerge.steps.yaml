@@ -9,10 +9,10 @@
 #
 common: &common
   agents:
-    - "capable_of_building=platform"
+    - "capable_of_building=graphos-eng"
     - "environment=production"
     - "permission_set=builder"
-    - "queue=${CI_BUILDER_QUEUE:-v2-1548027760-94bc999c4cf1e408-------z}"
+    - "queue=${CI_BUILDER_QUEUE:bk-linux-v2-1550153124-bde4eb4d31664b90-------z-canary-gb4p}"
   timeout_in_minutes: 60 # TODO(ENG-548): reduce timeout once agent-cold-start is optimised.
   retry:
     automatic:
@@ -24,6 +24,6 @@ common: &common
 # These are then relied on to have stable names by other things, so once named, please beware renaming has consequences.
 
 steps:
-  - label: "build :bash:"
-    command: "ci/build.sh"
+  - label: "Build Keanu"
+    command: "bash ci/build.sh"
     <<: *common # This folds the YAML named anchor into this step. Overrides, if any, should follow, not precede.
