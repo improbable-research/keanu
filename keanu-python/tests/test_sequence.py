@@ -2,13 +2,13 @@ from typing import Any, Dict
 
 import pytest
 
-from keanu.plates import Plates, Plate
+from keanu.sequence import Sequence, SequenceItem
 from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, KeanuContext
 
 
 def test_you_can_iterate_over_the_plates() -> None:
     num_plates = 100
-    plates = Plates(count=num_plates, factory=lambda p: None)
+    plates = Sequence(count=num_plates, factory=lambda p: None)
     plate_count = sum(1 for _ in plates)
     assert plate_count == num_plates
 
@@ -17,12 +17,12 @@ def test_you_can_build_plates_with_fixed_count() -> None:
     num_plates = 100
     vertexLabel = "foo"
 
-    def create_vertex(plate: Plate) -> None:
+    def create_vertex(plate: SequenceItem) -> None:
         v = Bernoulli(0.5)
         v.set_label(vertexLabel)
         plate.add(v)
 
-    plates = Plates(count=num_plates, factory=create_vertex)
+    plates = Sequence(count=num_plates, factory=create_vertex)
     assert plates.size() == num_plates
 
     for plate in plates:
@@ -34,11 +34,11 @@ def test_you_can_build_plates_from_data() -> None:
 
     data_generator = ({"x": i, "y": -i} for i in range(num_plates))
 
-    def create_vertices(plate: Plate, point: Dict[str, Any]) -> None:
+    def create_vertices(plate: SequenceItem, point: Dict[str, Any]) -> None:
         plate.add(Const(point["x"], label="x"))
         plate.add(Const(point["y"], label="y"))
 
-    plates = Plates(data_generator=data_generator, factory=create_vertices)
+    plates = Sequence(data_generator=data_generator, factory=create_vertices)
     assert plates.size() == num_plates
 
     for i, plate in enumerate(plates):
@@ -50,13 +50,13 @@ def test_you_must_pass_count_or_data_generator() -> None:
     with pytest.raises(
             ValueError,
             match=
-            "Cannot create a plate sequence of an unknown size: you must specify either a count of a data_generator"):
-        Plates(factory=lambda _: None)
+            "Cannot create a sequence of an unknown size: you must specify either a count of a data_generator"):
+        Sequence(factory=lambda _: None)
 
 
 def test_you_cannot_pass_both_count_and_data_generator() -> None:
     with pytest.raises(ValueError, match="If you pass in a data_generator you cannot also pass in a count"):
-        Plates(factory=lambda _: None, count=1, data_generator=({} for _ in []))
+        Sequence(factory=lambda _: None, count=1, data_generator=({} for _ in []))
 
 
 def test_you_can_build_a_time_series() -> None:
@@ -70,7 +70,7 @@ def test_you_can_build_a_time_series() -> None:
     """
     x_label = "x"
     y_label = "y"
-    x_previous_label = Plates.proxy_for(x_label)
+    x_previous_label = Sequence.proxy_for(x_label)
 
     num_plates = 10
     initial_x = 1.
@@ -83,7 +83,7 @@ def test_you_can_build_a_time_series() -> None:
         plate.add(x, label=x_label)
         plate.add(y, label=y_label)
 
-    plates = Plates(initial_state={x_label: initial_x}, count=num_plates, factory=create_time_step)
+    plates = Sequence(initial_state={x_label: initial_x}, count=num_plates, factory=create_time_step)
     assert plates.size() == num_plates
 
     x_from_previous_plate = None
