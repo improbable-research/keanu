@@ -16,7 +16,7 @@ import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 
 public class AdaptiveQuadraticPotential implements Potential {
 
-    private final int adaptCount;
+    private final long adaptCount;
     private final int adaptionWindowSize;
     private final KeanuRandom random;
 
@@ -34,7 +34,7 @@ public class AdaptiveQuadraticPotential implements Potential {
     public AdaptiveQuadraticPotential(Map<VariableReference, DoubleTensor> initialMean,
                                       Map<VariableReference, DoubleTensor> initialVarianceDiagonal,
                                       double initialWeight,
-                                      int adaptCount,
+                                      long adaptCount,
                                       int adaptionWindowSize,
                                       KeanuRandom random) {
 

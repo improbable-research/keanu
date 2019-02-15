@@ -8,6 +8,7 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,50 +19,60 @@ import java.util.Map;
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
+@Slf4j
 class NUTSSampler implements SamplingAlgorithm {
 
-    private final KeanuRandom random;
     private final List<? extends Variable> sampleFromVariables;
+    private final ProbabilisticModelWithGradient logProbGradientCalculator;
+    private final LeapfrogIntegrator leapfrogIntegrator;
 
-    private final int maxTreeHeight;
+    private final boolean adaptPotentialEnabled;
+    private final Potential potential;
 
     private final boolean adaptStepSizeEnabled;
     private final AdaptiveStepSize stepSize;
 
+    private final long adaptCount;
+
+    private long stepCount;
+
+    private final int maxTreeHeight;
+
+    private Proposal proposal;
+
+    private final KeanuRandom random;
+
     private final double maxEnergyChange;
-    private final ProbabilisticModelWithGradient logProbGradientCalculator;
-    private final LeapfrogIntegrator leapfrogIntegrator;
 
     private final Statistics statistics;
     private final boolean saveStatistics;
 
-    private final boolean adapPotentialEnabled;
-    private final Potential potential;
-
-    private Proposal proposal;
 
     /**
      * @param sampleFromVariables       variables to sample from
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
-     * @param adapPotentialEnabled      enabled the potential adaption
+     * @param adaptPotentialEnabled     enable the potential adaption
      * @param potential                 provides mass in velocity and energy calculations
      * @param adaptStepSizeEnabled      enable the NUTS step size adaptation
      * @param stepSize                  configuration for tuning the stepSize, if adaptStepSizeEnabled
+     * @param adaptCount                number of steps to adapt potential and step size
+     * @param maxEnergyChange           the maximum change in energy before a step is considered divergent
+     * @param maxTreeHeight             The largest tree height before stopping the Hamiltonian process
      * @param initialProposal           the starting proposal for the tree
-     * @param maxTreeHeight             The largest tree height before stopping the hamilitonian process
      * @param random                    the source of randomness
      * @param statistics                the sampler statistics
      * @param saveStatistics            whether to record statistics
      */
     public NUTSSampler(List<? extends Variable> sampleFromVariables,
                        ProbabilisticModelWithGradient logProbGradientCalculator,
-                       boolean adapPotentialEnabled,
+                       boolean adaptPotentialEnabled,
                        Potential potential,
                        boolean adaptStepSizeEnabled,
                        AdaptiveStepSize stepSize,
+                       long adaptCount,
                        double maxEnergyChange,
-                       Proposal initialProposal,
                        int maxTreeHeight,
+                       Proposal initialProposal,
                        KeanuRandom random,
                        Statistics statistics,
                        boolean saveStatistics) {
@@ -70,18 +81,24 @@ class NUTSSampler implements SamplingAlgorithm {
         this.logProbGradientCalculator = logProbGradientCalculator;
         this.leapfrogIntegrator = new LeapfrogIntegrator(potential);
 
-        this.proposal = initialProposal;
+        this.adaptPotentialEnabled = adaptPotentialEnabled;
+        this.potential = potential;
+
+        this.adaptStepSizeEnabled = adaptStepSizeEnabled;
         this.stepSize = stepSize;
+
+        this.adaptCount = adaptCount;
+        this.stepCount = 0;
+
         this.maxEnergyChange = maxEnergyChange;
         this.maxTreeHeight = maxTreeHeight;
-        this.adaptStepSizeEnabled = adaptStepSizeEnabled;
+
+        this.proposal = initialProposal;
 
         this.random = random;
         this.statistics = statistics;
         this.saveStatistics = saveStatistics;
 
-        this.adapPotentialEnabled = adapPotentialEnabled;
-        this.potential = potential;
     }
 
     @Override
@@ -126,6 +143,7 @@ class NUTSSampler implements SamplingAlgorithm {
             random
         );
 
+
         while (tree.shouldContinue() && tree.getTreeHeight() < maxTreeHeight) {
 
             //build tree direction -1 = backwards OR 1 = forwards
@@ -145,10 +163,18 @@ class NUTSSampler implements SamplingAlgorithm {
             stepSize.adaptStepSize(tree);
         }
 
-        if (this.adapPotentialEnabled) {
+        if (this.adaptPotentialEnabled) {
             potential.update(proposal.getPosition());
         }
 
+        if (stepCount > adaptCount) {
+            if (tree.isDiverged()) {
+                statistics.store(NUTS.Metrics.DIVERGENT_SAMPLE, (double) stepCount);
+                log.warn("Divergent NUTS sample after adaption ended. Increase the number or samples to adapt for or the max energy change.");
+            }
+        }
+
+        stepCount++;
     }
 
     /**

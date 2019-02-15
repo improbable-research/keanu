@@ -48,7 +48,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     }
 
     public enum Metrics {
-        STEPSIZE, LOG_PROB, MEAN_TREE_ACCEPT, TREE_SIZE
+        STEPSIZE, LOG_PROB, MEAN_TREE_ACCEPT, TREE_SIZE, DIVERGENT_SAMPLE
     }
 
     @Getter
@@ -58,7 +58,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     private final double targetAcceptanceProb;
 
     @Getter
-    private final int adaptCount;
+    private final long adaptCount;
 
     private final boolean adaptStepSizeEnabled;
 
@@ -139,9 +139,10 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             potential,
             adaptStepSizeEnabled,
             stepSize,
+            adaptCount,
             maxEnergyChange,
-            initialProposal,
             maxTreeHeight,
+            initialProposal,
             random,
             statistics,
             saveStatistics
@@ -155,7 +156,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     public static class NUTSBuilder {
         private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
-        private int adaptCount = 1000;
+        private long adaptCount = 1000;
         private boolean adaptStepSizeEnabled = true;
         private Double initialStepSize = null;
 
@@ -200,7 +201,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
          *                   calculated value.
          * @return the builder for NUTS
          */
-        public NUTSBuilder adaptCount(int adaptCount) {
+        public NUTSBuilder adaptCount(long adaptCount) {
             if (adaptCount < 0) {
                 throw new IllegalArgumentException("Adapt count must be greater than or equal to 0");
             }

@@ -94,10 +94,16 @@ class Tree {
     private int treeHeight;
 
     /**
-     * True if the tree should continue to grow false otherwise. This will be false if the tree diverges or starts
-     * U-Turn
+     * True if the tree stopped growth if the max energy change was exceeded on one of the steps
      */
-    private boolean shouldContinueFlag;
+    @Getter
+    private boolean diverged;
+
+    /**
+     * True if the tree stopped growth due to u-turn
+     */
+    @Getter
+    private boolean uTurned;
 
     /**
      * @param startState                The leap frog for is initial step in the tree.
@@ -128,7 +134,8 @@ class Tree {
         this.sumMetropolisAcceptanceProbability = 0.0;
         this.treeSize = 0;
         this.treeHeight = 0;
-        this.shouldContinueFlag = true;
+        this.diverged = false;
+        this.uTurned = false;
     }
 
     public void grow(int buildDirection,
@@ -150,7 +157,7 @@ class Tree {
         sumMetropolisAcceptanceProbability += otherHalfTree.sumMetropolisAcceptanceProbability;
         treeSize += otherHalfTree.treeSize;
 
-        if (otherHalfTree.shouldContinueFlag) {
+        if (otherHalfTree.shouldContinue()) {
 
 
             if (Tree.acceptOtherProposalWithProbability(otherHalfTree.getLogSumWeight() - logSumWeight, random)) {
@@ -162,11 +169,16 @@ class Tree {
             sumMomentum = add(sumMomentum, otherHalfTree.sumMomentum);
         }
 
-        shouldContinueFlag = otherHalfTree.shouldContinueFlag && Tree.isNotUTurning(
-            forward.getVelocity(),
-            backward.getVelocity(),
-            sumMomentum
-        );
+        diverged = otherHalfTree.diverged;
+
+        if (!diverged) {
+
+            uTurned = otherHalfTree.uTurned || Tree.isUTurning(
+                forward.getVelocity(),
+                backward.getVelocity(),
+                sumMomentum
+            );
+        }
 
         treeHeight++;
     }
@@ -202,8 +214,8 @@ class Tree {
                 epsilon
             );
 
-            //Should continue building other half if first half's shouldContinueFlag is true
-            if (subTree.shouldContinueFlag) {
+            //Should continue building other half if first half's shouldContinue is true
+            if (subTree.shouldContinue()) {
 
                 SubTree extendedSubTree = buildTree(
                     buildDirection == -1 ? subTree.backward : subTree.forward,
@@ -218,13 +230,14 @@ class Tree {
                     subTree.forward = extendedSubTree.forward;
                 }
 
-                subTree.shouldContinueFlag = extendedSubTree.shouldContinueFlag;
+                subTree.diverged = extendedSubTree.diverged;
+//                subTree.uTurned = extendedSubTree.uTurned;
 
-                if (extendedSubTree.shouldContinueFlag) {
+                if (extendedSubTree.shouldContinue()) {
 
                     subTree.sumMomentum = add(subTree.sumMomentum, extendedSubTree.sumMomentum);
 
-                    subTree.shouldContinueFlag = isNotUTurning(
+                    subTree.uTurned = isUTurning(
                         subTree.forward.getVelocity(),
                         subTree.backward.getVelocity(),
                         subTree.sumMomentum
@@ -290,7 +303,8 @@ class Tree {
                 leapfrogStateAfterStep.getMomentum(),
                 proposal,
                 logSumWeight,
-                true,
+                false,
+                false,
                 metropolisAcceptanceProbability,
                 1
             );
@@ -303,6 +317,7 @@ class Tree {
                 leapfrogStateAfterStep.getMomentum(),
                 null,
                 Double.NEGATIVE_INFINITY,
+                true,
                 false,
                 0,
                 1
@@ -316,9 +331,9 @@ class Tree {
         return Math.log(random.nextDouble()) < probability;
     }
 
-    private static boolean isNotUTurning(Map<VariableReference, DoubleTensor> velocityForward,
-                                         Map<VariableReference, DoubleTensor> velocityBackward,
-                                         Map<VariableReference, DoubleTensor> rho) {
+    private static boolean isUTurning(Map<VariableReference, DoubleTensor> velocityForward,
+                                      Map<VariableReference, DoubleTensor> velocityBackward,
+                                      Map<VariableReference, DoubleTensor> rho) {
         double forward = 0.0;
         double backward = 0.0;
 
@@ -332,11 +347,14 @@ class Tree {
             backward += vBackward.times(rhoForLatent).sum();
         }
 
-        return (forward >= 0.0) && (backward >= 0.0);
+        return !((forward >= 0.0) && (backward >= 0.0));
     }
 
     public boolean shouldContinue() {
-        return shouldContinueFlag;
+        if (diverged && uTurned) {
+            throw new IllegalStateException("?");
+        }
+        return !diverged && !uTurned;
     }
 
     public void save(Statistics statistics) {
@@ -374,9 +392,14 @@ class Tree {
         private double logSumWeight;
 
         /**
-         * A flag indicating either the steps are turning or have diverged due to significant energy change.
+         * A flag indicating the a step diverged due to significant energy change.
          */
-        private boolean shouldContinueFlag;
+        private boolean diverged;
+
+        /**
+         * A flag indicating the steps are turning
+         */
+        private boolean uTurned;
 
         /**
          * A summation of the metropolis acceptance probability from each step
@@ -387,5 +410,12 @@ class Tree {
          * The size of the sub tree, which is the number of steps taken to build the tree.
          */
         private int treeSize;
+
+        public boolean shouldContinue() {
+            if (diverged && uTurned) {
+                throw new IllegalStateException("?");
+            }
+            return !diverged && !uTurned;
+        }
     }
 }

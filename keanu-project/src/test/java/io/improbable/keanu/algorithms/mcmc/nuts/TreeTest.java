@@ -113,6 +113,7 @@ public class TreeTest {
         tree.grow(-1, 1e-6);
 
         assertFalse(tree.shouldContinue());
+        assertTrue(tree.isDiverged());
         assertThat(tree.getProposal().getLogProb(), greaterThan(Double.NEGATIVE_INFINITY));
         assertThat(tree.getTreeSize(), equalTo(4));
     }

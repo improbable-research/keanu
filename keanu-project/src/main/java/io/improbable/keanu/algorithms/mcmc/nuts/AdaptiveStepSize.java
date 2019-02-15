@@ -19,7 +19,7 @@ class AdaptiveStepSize {
     private static final double kappa = 0.75;
 
     private final double mu;
-    private final double adaptCount;
+    private final long adaptCount;
     private final double sigma;
 
     private double stepSize;
@@ -29,14 +29,14 @@ class AdaptiveStepSize {
     private double logStepSizeBar;
     private double logStepSize;
 
-    private int stepNum;
+    private long stepNum;
 
     /**
      * @param stepSize   the step size
      * @param sigma      the target acceptance probability (lower target equates to a higher step size when tuning)
      * @param adaptCount the number of samples to adapt for
      */
-    AdaptiveStepSize(double stepSize, double sigma, int adaptCount) {
+    AdaptiveStepSize(double stepSize, double sigma, long adaptCount) {
         this.sigma = sigma;
         this.stepSize = stepSize;
         this.hBar = 0;
