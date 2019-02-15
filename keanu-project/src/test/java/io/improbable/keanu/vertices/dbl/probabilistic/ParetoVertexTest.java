@@ -12,13 +12,10 @@ import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.apache.commons.math3.distribution.ParetoDistribution;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +30,6 @@ public class ParetoVertexTest {
     private final double VERTEX_INCREMENT = 0.1;
 
     private KeanuRandom random;
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -76,9 +70,9 @@ public class ParetoVertexTest {
 
     @Test
     public void logProbGraphMatchesKnownLogDensityOfVector() {
-        DoubleVertex location = ConstantVertex.of(1., 1.);
+        DoubleVertex location = ConstantVertex.of(1.);
         DoubleVertex scale = ConstantVertex.of(1.5, 1.5);
-        ParetoVertex paretoVertex = new ParetoVertex(location, scale);
+        ParetoVertex paretoVertex = new ParetoVertex(new long[]{2}, location, scale);
         LogProbGraph logProbGraph = paretoVertex.logProbGraph();
 
         LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
@@ -99,11 +93,9 @@ public class ParetoVertexTest {
 
         LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
 
-        thrown.expect(GraphAssertionException.class);
-        thrown.expectMessage("Location and scale must be strictly positive");
-
-        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
     }
 
     @Test
@@ -115,11 +107,9 @@ public class ParetoVertexTest {
 
         LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
 
-        thrown.expect(GraphAssertionException.class);
-        thrown.expectMessage("Location and scale must be strictly positive");
-
-        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
     }
 
     @Test
@@ -131,11 +121,9 @@ public class ParetoVertexTest {
 
         LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
         LogProbGraphValueFeeder.feedValue(logProbGraph, paretoVertex, DoubleTensor.create(2., 2.));
+        LogProbGraphValueFeeder.feedValue(logProbGraph, location, location.getValue());
 
-        thrown.expect(GraphAssertionException.class);
-        thrown.expectMessage("Location and scale must be strictly positive");
-
-        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, location, location.getValue());
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
     }
 
     @Test

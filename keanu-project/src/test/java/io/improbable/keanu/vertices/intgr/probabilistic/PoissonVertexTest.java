@@ -1,8 +1,12 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.KeanuRandom;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.distribution.PoissonDistribution;
@@ -75,6 +79,26 @@ public class PoissonVertexTest {
         assertThat(logProb100, closeTo(distribution.logProbability(100), 1e-6));
     }
 
+     @Test
+    public void logProbGraphForValuesGreaterThanTwenty() {
+        DoubleVertex mu = ConstantVertex.of(25.0);
+
+        PoissonVertex poissonVertex = new PoissonVertex(mu);
+        LogProbGraph logProbGraph = poissonVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, mu.getValue());
+
+        PoissonDistribution distribution = new PoissonDistribution(25);
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, poissonVertex, IntegerTensor.scalar(19));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, distribution.logProbability(19));
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, poissonVertex, IntegerTensor.scalar(20));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, distribution.logProbability(20));
+
+        LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, poissonVertex, IntegerTensor.scalar(100));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, distribution.logProbability(100));
+    }
+
     @Test
     public void logProbMatchesKnownLogProb() {
         DoubleVertex mu = ConstantVertex.of(new double[]{5, 7});
@@ -86,5 +110,20 @@ public class PoissonVertexTest {
         double expectedLogProb = distribution1.logProbability(39) + distribution2.logProbability(49);
 
         assertEquals(expectedLogProb, actualLogProb, 1e-5);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogProb() {
+        DoubleVertex mu = ConstantVertex.of(new double[]{5, 7});
+        PoissonVertex poissonVertex = new PoissonVertex(mu);
+        LogProbGraph logProbGraph = poissonVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, mu, mu.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, poissonVertex, IntegerTensor.create(39, 49));
+
+        PoissonDistribution distribution1 = new PoissonDistribution(5);
+        PoissonDistribution distribution2 = new PoissonDistribution(7);
+        double expectedLogProb = distribution1.logProbability(39) + distribution2.logProbability(49);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedLogProb);
     }
 }

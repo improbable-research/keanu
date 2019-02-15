@@ -3,6 +3,12 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import org.apache.commons.math3.distribution.UniformIntegerDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
@@ -82,8 +88,37 @@ public class UniformIntVertexTest {
     }
 
     @Test
+    public void logProbGraphUpperBoundIsNegativeInfinity() {
+        IntegerVertex min = ConstantVertex.of(IntegerTensor.create(lowerBound, new long[]{1, N}));
+        IntegerVertex max = ConstantVertex.of(IntegerTensor.create(upperBound, new long[]{1, N}));
+        UniformIntVertex testUniformVertex = new UniformIntVertex(min, max);
+        LogProbGraph logProbGraph = testUniformVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, min, min.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, max, max.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, testUniformVertex, IntegerTensor.scalar(upperBound));
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
+    }
+
+    @Test
     public void logProbLowerBoundIsNotNegativeInfinity() {
         UniformIntVertex testUniformVertex = new UniformIntVertex(new long[]{1, N}, lowerBound, upperBound);
         assertNotEquals(testUniformVertex.logProb(Nd4jIntegerTensor.scalar(lowerBound)), Double.NEGATIVE_INFINITY, 1e-6);
+    }
+
+    @Test
+    public void logProbGraphLowerBoundIsNotNegativeInfinity() {
+        IntegerVertex min = ConstantVertex.of(IntegerTensor.create(lowerBound, new long[]{1, N}));
+        IntegerVertex max = ConstantVertex.of(IntegerTensor.create(upperBound, new long[]{1, N}));
+        UniformIntVertex testUniformVertex = new UniformIntVertex(min, max);
+        LogProbGraph logProbGraph = testUniformVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, min, min.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, max, max.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, testUniformVertex, IntegerTensor.scalar(lowerBound));
+
+        // Subtract 1 from upper bound for apache uniform distribution because it's bound inclusive.
+        UniformIntegerDistribution uniformIntegerDistribution = new UniformIntegerDistribution(lowerBound, upperBound - 1);
+        double expectedDensity = Math.log(uniformIntegerDistribution.probability(lowerBound)) * N;
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
     }
 }
