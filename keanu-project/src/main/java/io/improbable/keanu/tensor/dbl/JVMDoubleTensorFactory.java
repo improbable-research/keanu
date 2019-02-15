@@ -34,17 +34,17 @@ public class JVMDoubleTensorFactory implements DoubleTensorFactory {
 
     @Override
     public DoubleTensor linspace(double start, double end, int numberOfPoints) {
-        return null;
+        return JVMDoubleTensor.linspace(start, end, numberOfPoints);
     }
 
     @Override
     public DoubleTensor arange(double start, double end) {
-        return null;
+        return JVMDoubleTensor.arange(start, end);
     }
 
     @Override
     public DoubleTensor arange(double start, double end, double stepSize) {
-        return null;
+        return JVMDoubleTensor.arange(start, end, stepSize);
     }
 
     @Override

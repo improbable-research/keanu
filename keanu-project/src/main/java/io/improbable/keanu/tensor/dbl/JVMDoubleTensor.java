@@ -4,7 +4,6 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
@@ -82,6 +81,38 @@ public class JVMDoubleTensor extends DoubleTensor {
             }
         }
         return new JVMDoubleTensor(buffer, new long[]{n, n});
+    }
+
+    public static JVMDoubleTensor arange(double start, double end) {
+        return arange(start, end, 1.0);
+    }
+
+    public static JVMDoubleTensor arange(double start, double end, double stepSize) {
+        int steps = (int) Math.ceil((end - start) / stepSize);
+        double[] buffer = new double[steps];
+
+        double position = start;
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = position;
+            position += stepSize;
+        }
+
+        return new JVMDoubleTensor(buffer, new long[]{buffer.length});
+    }
+
+    public static JVMDoubleTensor linspace(double start, double end, int numberOfPoints) {
+
+        double stepSize = (end - start) / numberOfPoints;
+
+        double[] buffer = new double[numberOfPoints];
+
+        double position = start;
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = position;
+            position += stepSize;
+        }
+
+        return new JVMDoubleTensor(buffer, new long[]{buffer.length});
     }
 
     private double[] newBuffer() {
@@ -753,15 +784,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor clamp(DoubleTensor min, DoubleTensor max) {
-        double[] newBuffer = newBuffer();
-        double[] minBuffer = min.asFlatDoubleArray();
-        double[] maxBuffer = max.asFlatDoubleArray();
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = Math.max(minBuffer[i], Math.min(maxBuffer[i], buffer[i]));
-        }
-
-        return new JVMDoubleTensor(newBuffer, shapeCopy());
+        return duplicate().clampInPlace(min, max);
     }
 
     @Override
