@@ -56,8 +56,7 @@ class Sequence(JavaObjectWrapper):
 
         if count is None and data_generator is None:
             raise ValueError(
-                "Cannot create a sequence of an unknown size: you must specify either a count of a data_generator"
-            )
+                "Cannot create a sequence of an unknown size: you must specify either a count of a data_generator")
         elif count is not None and data_generator is not None:
             raise ValueError("If you pass in a data_generator you cannot also pass in a count")
 

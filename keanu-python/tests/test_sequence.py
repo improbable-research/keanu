@@ -49,8 +49,7 @@ def test_you_can_build_a_sequence_from_data() -> None:
 def test_you_must_pass_count_or_data_generator() -> None:
     with pytest.raises(
             ValueError,
-            match=
-            "Cannot create a sequence of an unknown size: you must specify either a count of a data_generator"):
+            match="Cannot create a sequence of an unknown size: you must specify either a count of a data_generator"):
         Sequence(factory=lambda _: None)
 
 
