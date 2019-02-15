@@ -2,6 +2,11 @@
 
 ## Common
 * Can save dot files with disconnected vertices in BayesianNetwork.
+* Plates have been renamed
+  * This was done primarily because we were using the term incorrectly, since Dynamic Bayes Nets (e.g. Hidden Markov) are not Plates.
+  * `Plates` --> `Sequence`
+  * `Plate` --> `SequenceItem`
+  * `plate` package --> `template`
 * Saving a network as a DOT file includes labels on constant vertices.
 
 ## Python

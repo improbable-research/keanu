@@ -51,7 +51,7 @@ public class JsonTest {
 
     @BeforeClass
     public static void setup() throws IOException {
-        VertexId.ID_GENERATOR.set(0);
+        VertexId.resetIdGenerator();
 
         DoubleVertex mu = new ConstantDoubleVertex(0);
         DoubleVertex sigma = new ConstantDoubleVertex(new double[]{3.0, 4.0});

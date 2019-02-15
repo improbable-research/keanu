@@ -13,7 +13,6 @@ public class BOBYQATest {
 
     @Test
     public void canFindMAPGivenBounds() {
-
         DoubleVertex A = new GaussianVertex(new long[]{2}, ConstantVertex.of(new double[]{1, -3}), 1);
         A.setValue(new double[]{0, 0});
 
@@ -31,5 +30,16 @@ public class BOBYQATest {
         optimizer.maxAPosteriori();
 
         assertArrayEquals(new double[]{0.9, -2}, A.getValue().asFlatDoubleArray(), 1e-2);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void throwsIfLessThanTwoDimensions() {
+        DoubleVertex A = new GaussianVertex(0, 1);
+
+        OptimizerBounds bounds = new OptimizerBounds();
+        bounds.addBound(A.getId(), -1.0, 1.);
+
+        NonGradientOptimizer optimizer = Keanu.Optimizer.NonGradient.builderFor(A.getConnectedGraph()).algorithm(BOBYQA.builder().boundsRange(10).optimizerBounds(bounds).build()).build();
+        optimizer.maxAPosteriori();
     }
 }
