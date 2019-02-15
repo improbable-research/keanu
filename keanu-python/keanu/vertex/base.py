@@ -13,6 +13,7 @@ from keanu.tensor import Tensor
 from keanu.vartypes import (tensor_arg_types, wrapped_java_types, shape_types, numpy_types, runtime_wrapped_java_types,
                             runtime_primitive_types, runtime_numpy_types, runtime_pandas_types, runtime_float_types,
                             runtime_str_types)
+from keanu.vertex.label import _VertexLabel
 
 k = KeanuContext()
 
@@ -58,7 +59,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def set_label(self, label: Optional[str]) -> None:
         if label is None:
             raise ValueError("label cannot be None.")
-        self.unwrap().setLabel(label)
+        self.unwrap().setLabel(_VertexLabel(label).unwrap())
 
     def sample(self) -> numpy_types:
         return Tensor._to_scalar_or_ndarray(self.unwrap().sample())
@@ -75,6 +76,12 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def get_label(self) -> Optional[str]:
         label = self.unwrap().getLabel()
         return None if label is None else label.getQualifiedName()
+
+    def get_parents(self) -> Iterator['Vertex']:
+        return Vertex._to_generator(self.unwrap().getParents())
+
+    def get_children(self) -> Iterator['Vertex']:
+        return Vertex._to_generator(self.unwrap().getChildren())
 
     def is_observed(self) -> bool:
         return self.unwrap().isObserved()
