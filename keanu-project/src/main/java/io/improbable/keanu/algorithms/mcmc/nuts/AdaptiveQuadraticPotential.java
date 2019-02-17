@@ -12,12 +12,15 @@ import java.util.Map;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.dotProduct;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.pow;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.times;
+import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.withShape;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 
 
 public class AdaptiveQuadraticPotential implements Potential {
 
     private final double initialWeight;
+    private final double initialMean;
+    private final double initialVariance;
     private final int adaptionWindowSize;
     private VarianceCalculator forwardVariance;
     private VarianceCalculator backgroundVariance;
@@ -29,22 +32,27 @@ public class AdaptiveQuadraticPotential implements Potential {
     @Getter
     private Map<VariableReference, DoubleTensor> standardDeviation;
 
-    public AdaptiveQuadraticPotential(double initialWeight,
+    public AdaptiveQuadraticPotential(double initialMean, double initialVariance, double initialWeight,
                                       int adaptionWindowSize) {
         Preconditions.checkArgument(adaptionWindowSize > 1);
 
         this.initialWeight = initialWeight;
+        this.initialMean = initialMean;
+        this.initialVariance = initialVariance;
 
         this.adaptionWindowSize = adaptionWindowSize;
         this.nSamples = 0;
     }
 
-    public void initialize(Map<VariableReference, DoubleTensor> initialMean,
-                           Map<VariableReference, DoubleTensor> initialVarianceDiagonal) {
-        this.setVariance(initialVarianceDiagonal);
+    public void initialize(Map<VariableReference, DoubleTensor> shapeLike) {
 
-        this.forwardVariance = new VarianceCalculator(initialMean, initialVarianceDiagonal, initialWeight);
-        this.backgroundVariance = new VarianceCalculator(zeros(initialMean), zeros(initialMean), 0);
+        Map<VariableReference, DoubleTensor> varianceShapedLike = withShape(initialVariance, shapeLike);
+        Map<VariableReference, DoubleTensor> meanShapedLike = withShape(initialMean, shapeLike);
+
+        this.setVariance(varianceShapedLike);
+
+        this.forwardVariance = new VarianceCalculator(meanShapedLike, varianceShapedLike, initialWeight);
+        this.backgroundVariance = new VarianceCalculator(zeros(meanShapedLike), zeros(meanShapedLike), 0);
     }
 
     private void setVariance(Map<VariableReference, DoubleTensor> variance) {

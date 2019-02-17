@@ -14,8 +14,6 @@ import org.junit.Test;
 import java.util.Map;
 
 import static io.improbable.keanu.algorithms.mcmc.nuts.LeapfrogIntegratorTest.leapfrogAt;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.ones;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 import static io.improbable.keanu.tensor.dbl.DoubleTensor.scalar;
 import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.assertEquals;
@@ -51,9 +49,9 @@ public class TreeTest {
 
         Map<VariableReference, DoubleTensor> p = ImmutableMap.of(vertex.getId(), scalar(0));
 
-        Potential potential = new AdaptiveQuadraticPotential(1, 101);
+        Potential potential = new AdaptiveQuadraticPotential(0, 1, 1, 101);
 
-        potential.initialize(zeros(p), ones(p));
+        potential.initialize(p);
         start = leapfrogAt(vertex, 0.0, 0.5, potential);
 
         leapfrogIntegrator = new LeapfrogIntegrator(potential);

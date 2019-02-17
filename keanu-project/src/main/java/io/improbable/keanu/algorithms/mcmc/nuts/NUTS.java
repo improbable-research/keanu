@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import static io.improbable.keanu.algorithms.mcmc.nuts.AdaptiveStepSize.findStartingStepSize;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.ones;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 import static java.util.stream.Collectors.toMap;
 
 
@@ -128,7 +126,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        potential.initialize(zeros(position), ones(position));
+        potential.initialize(position);
         Proposal initialProposal = new Proposal(position, gradient, startingSample, initialLogOfMasterP);
 
         return new NUTSSampler(
@@ -159,7 +157,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         private boolean adaptStepSizeEnabled = true;
         private Double initialStepSize = null;
 
-        private Potential potential = new AdaptiveQuadraticPotential(10.0, 100);
+        private Potential potential = new AdaptiveQuadraticPotential(0, 1, 10.0, 100);
         private boolean adaptPotentialEnabled = true;
 
         private double targetAcceptanceProb = 0.8;

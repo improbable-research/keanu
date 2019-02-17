@@ -11,8 +11,6 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.ones;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 import static org.junit.Assert.assertEquals;
 
 public class AdaptiveQuadraticPotentialTest {
@@ -26,11 +24,12 @@ public class AdaptiveQuadraticPotentialTest {
         Map<VariableReference, DoubleTensor> position = ImmutableMap.of(v.getReference(), v.getValue());
 
         AdaptiveQuadraticPotential potential = new AdaptiveQuadraticPotential(
+            0, 1,
             10,
             100
         );
 
-        potential.initialize(zeros(position), ones(position));
+        potential.initialize(position);
 
         Map<VariableReference, DoubleTensor> momentum = ImmutableMap.of(v.getReference(), DoubleTensor.scalar(0.5));
         Map<VariableReference, DoubleTensor> velocity = potential.getVelocity(momentum);
@@ -54,11 +53,12 @@ public class AdaptiveQuadraticPotentialTest {
         KeanuRandom random = new KeanuRandom(0);
 
         AdaptiveQuadraticPotential potential = new AdaptiveQuadraticPotential(
+            0, 1,
             0,
             1500
         );
 
-        potential.initialize(zeros(position), ones(position));
+        potential.initialize(position);
 
         double targetStandardDeviation = 2;
         for (int i = 0; i < 1000; i++) {
@@ -89,11 +89,12 @@ public class AdaptiveQuadraticPotentialTest {
 
         int windowSize = 1000;
         AdaptiveQuadraticPotential potential = new AdaptiveQuadraticPotential(
+            0, 1,
             0,
             windowSize
         );
 
-        potential.initialize(zeros(position), ones(position));
+        potential.initialize(position);
 
         SummaryStatistics statisticsWindow1And2 = new SummaryStatistics();
 

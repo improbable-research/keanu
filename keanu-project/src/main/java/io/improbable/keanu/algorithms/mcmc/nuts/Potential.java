@@ -8,8 +8,7 @@ import java.util.Map;
 
 public interface Potential {
 
-    void initialize(Map<VariableReference, DoubleTensor> initialMean,
-                    Map<VariableReference, DoubleTensor> initialVarianceDiagonal);
+    void initialize(Map<VariableReference, DoubleTensor> shapeLike);
 
     void update(Map<VariableReference, DoubleTensor> position);
 
