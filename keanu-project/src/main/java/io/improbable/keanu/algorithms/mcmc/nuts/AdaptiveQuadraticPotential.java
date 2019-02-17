@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
+import com.google.common.base.Preconditions;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -19,6 +20,9 @@ public class AdaptiveQuadraticPotential implements Potential {
     private final long adaptCount;
     private final int adaptionWindowSize;
     private final KeanuRandom random;
+    private VarianceCalculator forwardVariance;
+    private VarianceCalculator backgroundVariance;
+    private long nSamples;
 
     @Getter
     private Map<VariableReference, DoubleTensor> variance;
@@ -26,17 +30,13 @@ public class AdaptiveQuadraticPotential implements Potential {
     @Getter
     private Map<VariableReference, DoubleTensor> standardDeviation;
 
-    private VarianceCalculator forwardVariance;
-    private VarianceCalculator backgroundVariance;
-
-    private long nSamples;
-
     public AdaptiveQuadraticPotential(Map<VariableReference, DoubleTensor> initialMean,
                                       Map<VariableReference, DoubleTensor> initialVarianceDiagonal,
                                       double initialWeight,
                                       long adaptCount,
                                       int adaptionWindowSize,
                                       KeanuRandom random) {
+        Preconditions.checkArgument(adaptionWindowSize > 1);
 
         this.adaptCount = adaptCount;
         this.setVariance(initialVarianceDiagonal);
