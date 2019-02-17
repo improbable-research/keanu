@@ -47,7 +47,7 @@ class AdaptiveStepSize {
         this.stepNum = 1;
     }
 
-    public static double findStartingStepSizeSimple(double stepScale, List<? extends Variable<DoubleTensor, ?>> variables) {
+    public static double findStartingStepSize(double stepScale, List<? extends Variable<DoubleTensor, ?>> variables) {
         long N = variables.stream()
             .mapToLong(v -> v.getValue().getLength())
             .sum();

@@ -21,7 +21,7 @@ import lombok.Getter;
 import java.util.List;
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.nuts.AdaptiveStepSize.findStartingStepSizeSimple;
+import static io.improbable.keanu.algorithms.mcmc.nuts.AdaptiveStepSize.findStartingStepSize;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.ones;
 import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 import static java.util.stream.Collectors.toMap;
@@ -64,7 +64,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
     private final Double initialStepSize;
 
-    private final int potentialAdaptWindowSize;
+    private final Potential potential;
 
     private final boolean adaptPotentialEnabled;
 
@@ -119,7 +119,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         Map<VariableReference, ?> startingSample = SamplingAlgorithm.takeSample(sampleFromVariables);
 
         double startingStepSize = (initialStepSize == null) ?
-            findStartingStepSizeSimple(0.25, latentVariables) :
+            findStartingStepSize(0.25, latentVariables) :
             initialStepSize;
 
         AdaptiveStepSize stepSize = new AdaptiveStepSize(
@@ -128,8 +128,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             adaptCount
         );
 
-        Potential potential = new AdaptiveQuadraticPotential(zeros(position), ones(position), 10.0, adaptCount, potentialAdaptWindowSize, random);
-
+        potential.initialize(zeros(position), ones(position));
         Proposal initialProposal = new Proposal(position, gradient, startingSample, initialLogOfMasterP);
 
         return new NUTSSampler(
@@ -160,7 +159,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         private boolean adaptStepSizeEnabled = true;
         private Double initialStepSize = null;
 
-        private int potentialAdaptWindowSize = 100;
+        private Potential potential = new AdaptiveQuadraticPotential(10.0, 100);
         private boolean adaptPotentialEnabled = true;
 
         private double targetAcceptanceProb = 0.8;
@@ -232,14 +231,11 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         }
 
         /**
-         * @param potentialAdaptWindowSize The window size for adapting the mass matrix.
+         * @param potential provides mass in velocity and energy calculations
          * @return the builder for NUTS
          */
-        public NUTSBuilder potentialAdaptWindowSize(int potentialAdaptWindowSize) {
-            if (potentialAdaptWindowSize <= 0) {
-                throw new IllegalArgumentException("Potential Adapt Window Size must be greater than to 0");
-            }
-            this.potentialAdaptWindowSize = potentialAdaptWindowSize;
+        public NUTSBuilder potential(Potential potential) {
+            this.potential = potential;
             return this;
         }
 
@@ -283,7 +279,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
 
         public NUTS build() {
             return new NUTS(random, targetAcceptanceProb, adaptCount, adaptStepSizeEnabled, initialStepSize,
-                potentialAdaptWindowSize, adaptPotentialEnabled, maxEnergyChange, maxTreeHeight, saveStatistics);
+                potential, adaptPotentialEnabled, maxEnergyChange, maxTreeHeight, saveStatistics);
         }
 
         public String toString() {

@@ -17,9 +17,8 @@ import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 
 public class AdaptiveQuadraticPotential implements Potential {
 
-    private final long adaptCount;
+    private final double initialWeight;
     private final int adaptionWindowSize;
-    private final KeanuRandom random;
     private VarianceCalculator forwardVariance;
     private VarianceCalculator backgroundVariance;
     private long nSamples;
@@ -30,22 +29,22 @@ public class AdaptiveQuadraticPotential implements Potential {
     @Getter
     private Map<VariableReference, DoubleTensor> standardDeviation;
 
-    public AdaptiveQuadraticPotential(Map<VariableReference, DoubleTensor> initialMean,
-                                      Map<VariableReference, DoubleTensor> initialVarianceDiagonal,
-                                      double initialWeight,
-                                      long adaptCount,
-                                      int adaptionWindowSize,
-                                      KeanuRandom random) {
+    public AdaptiveQuadraticPotential(double initialWeight,
+                                      int adaptionWindowSize) {
         Preconditions.checkArgument(adaptionWindowSize > 1);
 
-        this.adaptCount = adaptCount;
+        this.initialWeight = initialWeight;
+
+        this.adaptionWindowSize = adaptionWindowSize;
+        this.nSamples = 0;
+    }
+
+    public void initialize(Map<VariableReference, DoubleTensor> initialMean,
+                           Map<VariableReference, DoubleTensor> initialVarianceDiagonal) {
         this.setVariance(initialVarianceDiagonal);
 
         this.forwardVariance = new VarianceCalculator(initialMean, initialVarianceDiagonal, initialWeight);
         this.backgroundVariance = new VarianceCalculator(zeros(initialMean), zeros(initialMean), 0);
-        this.adaptionWindowSize = adaptionWindowSize;
-        this.random = random;
-        this.nSamples = 0;
     }
 
     private void setVariance(Map<VariableReference, DoubleTensor> variance) {
@@ -55,10 +54,6 @@ public class AdaptiveQuadraticPotential implements Potential {
 
     @Override
     public void update(Map<VariableReference, DoubleTensor> position) {
-
-        if (nSamples >= adaptCount) {
-            return;
-        }
 
         if (nSamples > 0 && nSamples % adaptionWindowSize == 0) {
             forwardVariance = backgroundVariance;
@@ -74,7 +69,7 @@ public class AdaptiveQuadraticPotential implements Potential {
     }
 
     @Override
-    public Map<VariableReference, DoubleTensor> randomMomentum() {
+    public Map<VariableReference, DoubleTensor> randomMomentum(KeanuRandom random) {
 
         Map<VariableReference, DoubleTensor> result = new HashMap<>();
         for (VariableReference variable : standardDeviation.keySet()) {

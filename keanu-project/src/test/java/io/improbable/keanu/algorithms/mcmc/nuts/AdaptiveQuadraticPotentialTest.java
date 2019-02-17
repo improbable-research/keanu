@@ -26,13 +26,11 @@ public class AdaptiveQuadraticPotentialTest {
         Map<VariableReference, DoubleTensor> position = ImmutableMap.of(v.getReference(), v.getValue());
 
         AdaptiveQuadraticPotential potential = new AdaptiveQuadraticPotential(
-            zeros(position),
-            ones(position),
             10,
-            10,
-            100,
-            KeanuRandom.getDefaultRandom()
+            100
         );
+
+        potential.initialize(zeros(position), ones(position));
 
         Map<VariableReference, DoubleTensor> momentum = ImmutableMap.of(v.getReference(), DoubleTensor.scalar(0.5));
         Map<VariableReference, DoubleTensor> velocity = potential.getVelocity(momentum);
@@ -56,13 +54,11 @@ public class AdaptiveQuadraticPotentialTest {
         KeanuRandom random = new KeanuRandom(0);
 
         AdaptiveQuadraticPotential potential = new AdaptiveQuadraticPotential(
-            zeros(position),
-            ones(position),
             0,
-            1500,
-            1500,
-            random
+            1500
         );
+
+        potential.initialize(zeros(position), ones(position));
 
         double targetStandardDeviation = 2;
         for (int i = 0; i < 1000; i++) {
@@ -72,7 +68,7 @@ public class AdaptiveQuadraticPotentialTest {
 
         SummaryStatistics statistics = new SummaryStatistics();
         for (int i = 0; i < 1000; i++) {
-            double sample = potential.randomMomentum().get(v.getReference()).scalar();
+            double sample = potential.randomMomentum(random).get(v.getReference()).scalar();
             statistics.addValue(sample);
         }
 
@@ -93,13 +89,11 @@ public class AdaptiveQuadraticPotentialTest {
 
         int windowSize = 1000;
         AdaptiveQuadraticPotential potential = new AdaptiveQuadraticPotential(
-            zeros(position),
-            ones(position),
             0,
-            5 * windowSize,
-            windowSize,
-            random
+            windowSize
         );
+
+        potential.initialize(zeros(position), ones(position));
 
         SummaryStatistics statisticsWindow1And2 = new SummaryStatistics();
 

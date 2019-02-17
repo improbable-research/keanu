@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.nuts;
 
 import com.google.common.collect.ImmutableMap;
-import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModelWithGradient;
@@ -40,7 +39,9 @@ public class LeapfrogIntegratorTest {
 
         Map<VariableReference, DoubleTensor> p = ImmutableMap.of(vertex.getId(), scalar(0));
 
-        Potential potential = new AdaptiveQuadraticPotential(zeros(p), ones(p), 1, 100, 101, KeanuRandom.getDefaultRandom());
+        Potential potential = new AdaptiveQuadraticPotential(1, 101);
+
+        potential.initialize(zeros(p), ones(p));
 
         start = leapfrogAt(vertex, initialPosition, initialMomentum, potential);
 

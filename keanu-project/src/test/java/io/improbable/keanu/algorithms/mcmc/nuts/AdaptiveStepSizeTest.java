@@ -19,7 +19,7 @@ public class AdaptiveStepSizeTest {
     public void canUseSimpleHeuristicForInitialStepSize() {
 
         double stepScale = 0.25;
-        double startingStepSizeSimple = AdaptiveStepSize.findStartingStepSizeSimple(stepScale, ImmutableList.of(
+        double startingStepSizeSimple = AdaptiveStepSize.findStartingStepSize(stepScale, ImmutableList.of(
             ConstantVertex.of(DoubleTensor.arange(0, 5)),
             ConstantVertex.of(DoubleTensor.arange(0, 5))
         ));

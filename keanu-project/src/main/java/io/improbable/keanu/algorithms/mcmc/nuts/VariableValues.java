@@ -56,20 +56,20 @@ public class VariableValues {
         return result;
     }
 
-    public static Map<VariableReference, DoubleTensor> zeros(Map<VariableReference, DoubleTensor> shapeLike) {
+    public static Map<VariableReference, DoubleTensor> withShape(double value, Map<VariableReference, DoubleTensor> shapeLike) {
         Map<VariableReference, DoubleTensor> result = new HashMap<>();
         for (VariableReference v : shapeLike.keySet()) {
-            result.put(v, DoubleTensor.zeros(shapeLike.get(v).getShape()));
+            result.put(v, DoubleTensor.create(value, shapeLike.get(v).getShape()));
         }
         return result;
     }
 
+    public static Map<VariableReference, DoubleTensor> zeros(Map<VariableReference, DoubleTensor> shapeLike) {
+        return withShape(0.0, shapeLike);
+    }
+
     public static Map<VariableReference, DoubleTensor> ones(Map<VariableReference, DoubleTensor> shapeLike) {
-        Map<VariableReference, DoubleTensor> result = new HashMap<>();
-        for (VariableReference v : shapeLike.keySet()) {
-            result.put(v, DoubleTensor.ones(shapeLike.get(v).getShape()));
-        }
-        return result;
+        return withShape(1.0, shapeLike);
     }
 
 }

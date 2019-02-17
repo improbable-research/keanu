@@ -117,7 +117,7 @@ class NUTSSampler implements SamplingAlgorithm {
     @Override
     public void step() {
 
-        Map<VariableReference, DoubleTensor> initialMomentum = potential.randomMomentum();
+        Map<VariableReference, DoubleTensor> initialMomentum = potential.randomMomentum(random);
 
         LeapfrogState startState = new LeapfrogState(
             proposal.getPosition(),
@@ -163,7 +163,7 @@ class NUTSSampler implements SamplingAlgorithm {
             stepSize.adaptStepSize(tree);
         }
 
-        if (this.adaptPotentialEnabled) {
+        if (stepCount < adaptCount && this.adaptPotentialEnabled) {
             potential.update(proposal.getPosition());
         }
 

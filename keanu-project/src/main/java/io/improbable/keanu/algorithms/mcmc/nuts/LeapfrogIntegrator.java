@@ -18,18 +18,18 @@ public class LeapfrogIntegrator {
      *
      * @param fromState                 the state to leap from
      * @param logProbGradientCalculator the calculator for the log prob gradient
-     * @param epsilon                   the time delta
+     * @param timeStep                  the time delta
      * @return a new leapfrog having taken one step through space
      */
-    public LeapfrogState step(LeapfrogState fromState, final ProbabilisticModelWithGradient logProbGradientCalculator, final double epsilon) {
+    public LeapfrogState step(LeapfrogState fromState, final ProbabilisticModelWithGradient logProbGradientCalculator, final double timeStep) {
 
-        final double halfTimeStep = epsilon / 2.0;
+        final double halfTimeStep = timeStep / 2.0;
 
         Map<VariableReference, DoubleTensor> nextMomentum = stepMomentum(halfTimeStep, fromState.getMomentum(), fromState.getGradient());
 
         Map<VariableReference, DoubleTensor> nextVelocity = potential.getVelocity(nextMomentum);
 
-        Map<VariableReference, DoubleTensor> nextPosition = stepPosition(epsilon, nextVelocity, fromState.getPosition());
+        Map<VariableReference, DoubleTensor> nextPosition = stepPosition(timeStep, nextVelocity, fromState.getPosition());
 
         Map<? extends VariableReference, DoubleTensor> nextPositionGradient = logProbGradientCalculator.logProbGradients(nextPosition);
         final double nextPositionLogProb = logProbGradientCalculator.logProb();
