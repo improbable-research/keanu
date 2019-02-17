@@ -159,7 +159,6 @@ class Tree {
 
         if (otherHalfTree.shouldContinue()) {
 
-
             if (Tree.acceptOtherProposalWithProbability(otherHalfTree.getLogSumWeight() - logSumWeight, random)) {
                 proposal = otherHalfTree.proposal;
             }
@@ -231,7 +230,7 @@ class Tree {
                 }
 
                 subTree.diverged = extendedSubTree.diverged;
-//                subTree.uTurned = extendedSubTree.uTurned;
+                subTree.uTurned = extendedSubTree.uTurned;
 
                 if (extendedSubTree.shouldContinue()) {
 
@@ -351,9 +350,6 @@ class Tree {
     }
 
     public boolean shouldContinue() {
-        if (diverged && uTurned) {
-            throw new IllegalStateException("?");
-        }
         return !diverged && !uTurned;
     }
 
@@ -412,9 +408,6 @@ class Tree {
         private int treeSize;
 
         public boolean shouldContinue() {
-            if (diverged && uTurned) {
-                throw new IllegalStateException("?");
-            }
             return !diverged && !uTurned;
         }
     }

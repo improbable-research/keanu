@@ -8,6 +8,9 @@ import java.util.Map;
 
 public class VariableValues {
 
+    private VariableValues() {
+    }
+
     public static double dotProduct(Map<? extends VariableReference, DoubleTensor> left, Map<? extends VariableReference, DoubleTensor> right) {
         double dotProduct = 0.0;
         for (VariableReference v : left.keySet()) {

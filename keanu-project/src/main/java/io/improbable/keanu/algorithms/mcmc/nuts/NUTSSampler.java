@@ -127,12 +127,6 @@ class NUTSSampler implements SamplingAlgorithm {
             potential
         );
 
-        final double startEnergy = startState.getEnergy();
-
-        if (Double.isInfinite(startEnergy) || Double.isNaN(startEnergy)) {
-            throw new IllegalStateException("Start energy is invalid");
-        }
-
         Tree tree = new Tree(
             startState,
             proposal,
