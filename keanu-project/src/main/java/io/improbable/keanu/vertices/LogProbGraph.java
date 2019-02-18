@@ -50,9 +50,9 @@ public class LogProbGraph {
 
     }
 
-    static public class IntegerPlaceHolderVertex extends IntegerVertex implements PlaceholderVertex, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
+    static public class IntegerPlaceholderVertex extends IntegerVertex implements PlaceholderVertex, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
 
-        public IntegerPlaceHolderVertex(long... initialShape) {
+        public IntegerPlaceholderVertex(long... initialShape) {
             super(initialShape);
         }
 
