@@ -1,6 +1,7 @@
 ### Version 0.0.20 ###
 
 ## Common
+* Can save dot files with disconnected vertices in BayesianNetwork. You can also just pass a list of vertices to DotSaver.
 * Plates have been renamed
   * This was done primarily because we were using the term incorrectly, since Dynamic Bayes Nets (e.g. Hidden Markov) are not Plates.
   * `Plates` --> `Sequence`

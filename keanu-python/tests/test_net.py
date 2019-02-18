@@ -1,4 +1,4 @@
-from keanu.vertex import UniformInt, Gamma, Poisson, Cauchy
+from keanu.vertex import UniformInt, Gamma, Poisson, Cauchy, Const
 from keanu.vertex.base import Vertex
 from keanu import BayesNet, KeanuRandom
 from keanu.network_io import ProtobufLoader, JsonLoader, ProtobufSaver, DotSaver, JsonSaver
@@ -108,6 +108,24 @@ def test_can_save_and_load(tmpdir) -> None:
     check_loaded_net(new_net_from_proto)
     new_net_from_json = json_loader.load(JSON_FILE)
     check_loaded_net(new_net_from_json)
+
+
+def test_can_dot_save_list_of_vertices(tmpdir) -> None:
+    DOT_FILE = str(tmpdir.join("test.dot"))
+    metadata = {"Team": "GraphOS"}
+    theta = Const(1.)
+    k = Const(1.)
+    gamma = Gamma(theta, k)
+    gamma.set_value(2.5)
+    dot_saver = DotSaver([theta, k, gamma])
+    dot_saver.save(DOT_FILE, True, metadata)
+    check_dot_file(DOT_FILE)
+
+
+def test_dot_save_only_takes_bayes_net_or_list(tmpdir) -> None:
+    gamma = Gamma(1., 1.)
+    with pytest.raises(TypeError, match=r"DotSaver only takes BayesNet or a list of vertices."):
+        DotSaver(gamma)  # type: ignore # this is expected to fail mypy
 
 
 def test_get_vertex_by_label() -> None:
