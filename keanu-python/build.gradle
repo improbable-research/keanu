@@ -1,12 +1,7 @@
-import java.nio.file.Paths
-
-import static org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
-import static org.apache.tools.ant.taskdefs.condition.Os.isFamily
-
 task installPipenv {
     doLast {
         exec {
-            commandLine 'pip', 'install', 'pipenv==2018.11.26'
+            commandLine 'pip3', 'install', 'pipenv==2018.11.26'
         }
     }
 }
@@ -14,10 +9,10 @@ task installPipenv {
 task pythonVersionInfo {
     doLast {
         exec {
-            commandLine 'python', '--version'
+            commandLine 'python3', '--version'
         }
         exec {
-            commandLine 'pip', '--version'
+            commandLine 'pip3', '--version'
         }
         exec {
             commandLine 'pipenv', '--version'
@@ -28,7 +23,7 @@ task pythonVersionInfo {
         }
         exec {
             // NB: the pip version inside pipenv is not necessarily the same as the version outside pipenv
-            commandLine 'pipenv', 'run', 'pip', '--version'
+            commandLine 'pipenv', 'run', 'pip3', '--version'
         }
     }
 }
@@ -41,10 +36,30 @@ task installDependencies {
     }
 }
 
+task populatePythonClasspaths {
+    dependsOn(":keanu-python:nd4j:copyJarsIntoPythonClasspath")
+    dependsOn(":keanu-project:copyJarsIntoPythonClasspath")
+}
+
+task deleteDuplicatedJars() {
+    mustRunAfter(populatePythonClasspaths)
+
+    doLast {
+        delete fileTree("keanu/classpath/") {
+            include fileTree("nd4j/nd4j/classpath").files.name
+        }
+    }
+}
+
+task preparePythonClasspath {
+    dependsOn(populatePythonClasspaths)
+    dependsOn(deleteDuplicatedJars)
+}
+
 task preparePythonEnvironment {
     dependsOn(installPipenv)
     dependsOn(installDependencies)
-    dependsOn(":keanu-project:preparePythonClasspath")
+    dependsOn(preparePythonClasspath)
     dependsOn(":codegen:runCodeGeneration")
 }
 
@@ -124,7 +139,6 @@ task formatCheck {
 
 task buildWheelDistribution {
     mustRunAfter preparePythonEnvironment
-    mustRunAfter preparePythonEnvironment
 
     doLast {
         exec {
@@ -132,6 +146,7 @@ task buildWheelDistribution {
         }
     }
 }
+
 
 pythonVersionInfo.mustRunAfter(installPipenv)
 installDependencies.dependsOn(installPipenv)

@@ -1,0 +1,23 @@
+apply plugin: "java"
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.nd4j', name: 'nd4j-native-platform', version: project.property('nd4jVersion')
+}
+
+task copyJarsIntoPythonClasspath(type: Copy) {
+    into "nd4j/classpath/"
+    from configurations.compile
+}
+
+task buildWheelDistribution {
+    mustRunAfter(":keanu-python:preparePythonEnvironment")
+
+    doLast {
+        exec {
+            commandLine 'pipenv', 'run', 'python', project.file("setup.py"), 'sdist', 'bdist_wheel'
+        }
+    }
+}

@@ -6,9 +6,9 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
-import io.improbable.keanu.plating.Plate;
-import io.improbable.keanu.plating.PlateBuilder;
-import io.improbable.keanu.plating.Plates;
+import io.improbable.keanu.templating.Sequence;
+import io.improbable.keanu.templating.SequenceBuilder;
+import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -99,10 +99,10 @@ public class FoodPoisoningTest {
         VertexLabel isIllLabel = new VertexLabel("isIll");
         VertexLabel pIllLabel = new VertexLabel("pIll");
 
-        Consumer<Plate> personMaker = (plate) -> {
-            BernoulliVertex didEatOysters = plate.add(didEatOystersLabel, new BernoulliVertex(0.4));
-            BernoulliVertex didEatLamb = plate.add(didEatLambLabel, new BernoulliVertex(0.4));
-            BernoulliVertex didEatPoo = plate.add(didEatPooLabel, new BernoulliVertex(0.4));
+        Consumer<SequenceItem> personMaker = (item) -> {
+            BernoulliVertex didEatOysters = item.add(didEatOystersLabel, new BernoulliVertex(0.4));
+            BernoulliVertex didEatLamb = item.add(didEatLambLabel, new BernoulliVertex(0.4));
+            BernoulliVertex didEatPoo = item.add(didEatPooLabel, new BernoulliVertex(0.4));
 
             BooleanVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
@@ -115,11 +115,11 @@ public class FoodPoisoningTest {
                 .then(0.9)
                 .orElse(0.1);
 
-            plate.add(pIllLabel, pIll);
-            plate.add(isIllLabel, new BernoulliVertex(pIll));
+            item.add(pIllLabel, pIll);
+            item.add(isIllLabel, new BernoulliVertex(pIll));
         };
 
-        Plates personPlates = new PlateBuilder()
+        Sequence personSequence = new SequenceBuilder()
             .count(peopleCount)
             .withFactory(personMaker)
             .build();
@@ -128,11 +128,11 @@ public class FoodPoisoningTest {
         infectedLamb.observe(lambIsInfected);
         infectedToilet.observe(toiletIsInfected);
 
-        personPlates.forEach(plate -> {
-            plate.get(didEatOystersLabel).observeOwnValue();
-            plate.get(didEatLambLabel).observeOwnValue();
-            plate.get(didEatPooLabel).observeOwnValue();
-            plate.get(isIllLabel).observeOwnValue();
+        personSequence.forEach(item -> {
+            item.get(didEatOystersLabel).observeOwnValue();
+            item.get(didEatLambLabel).observeOwnValue();
+            item.get(didEatPooLabel).observeOwnValue();
+            item.get(isIllLabel).observeOwnValue();
         });
 
         infectedOysters.unobserve();

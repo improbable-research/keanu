@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 from py4j.java_gateway import JVMView
 
+from keanu import set_deterministic_state
 from keanu.context import KeanuContext
 from keanu.vartypes import tensor_arg_types, primitive_types, numpy_types, pandas_types
 from keanu.vertex import Gaussian, Const, UniformInt, Bernoulli, IntegerProxy
@@ -147,7 +148,7 @@ def test_vertex_sample_is_a_numpy_array() -> None:
 
 def test_get_connected_graph() -> None:
     gaussian = Gaussian(0., 1.)
-    connected_graph = set(gaussian.get_connected_graph())
+    connected_graph = set(gaussian.iter_connected_graph())
 
     assert len(connected_graph) == 3
 
@@ -191,6 +192,14 @@ def test_get_vertex_id() -> None:
     python_id = gaussian.get_id()
 
     assert all(value in python_id for value in java_id)
+
+
+def test_ids_are_reset() -> None:
+    gaussian = Gaussian(0., 1.)
+    set_deterministic_state()
+    gaussian2 = Gaussian(0., 1.)
+
+    assert gaussian.get_id() == gaussian2.get_id()
 
 
 @pytest.mark.parametrize("vertex, expected_type", [(Gaussian(0., 1.), np.floating), (UniformInt(0, 10), np.integer),
@@ -329,6 +338,12 @@ def test_can_pass_none_label() -> None:
     assert vertex.get_label() == None
 
 
+def test_can_pass_namespaced_label() -> None:
+    vertex = Gaussian(0., 1., label="outer.inner.foo")
+    assert vertex.get_label() == "outer.inner.foo"
+    assert vertex.unwrap().getLabel().getUnqualifiedName() == "foo"
+
+
 def test_set_label() -> None:
     label = "gaussian_vertex"
     vertex = Gaussian(0., 1.)
@@ -358,3 +373,18 @@ def test_java_vertex_to_python_vertex_persists_label() -> None:
     java_vertex = Gaussian(0., 1., label=label).unwrap()
     python_vertex = Vertex._from_java_vertex(java_vertex)
     assert python_vertex.get_label() == label
+
+
+def test_can_get_parents_and_children() -> None:
+
+    def labels_match(lhs, rhs) -> bool:
+        return [l.get_label() for l in lhs] == [r.get_label() for r in rhs]
+
+    parents = (Gaussian(0, 1, label="parent1"), Gaussian(0, 1, label="parent2"))
+    children = tuple(Gaussian(parents[0], parents[1], label=f"child{i}") for i in range(5))
+
+    for parent in parents:
+        assert labels_match(parent.iter_children(), children)
+
+    for child in children:
+        assert labels_match(child.iter_parents(), parents)
