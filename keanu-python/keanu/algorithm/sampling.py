@@ -72,9 +72,11 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
 class NUTSSampler(PosteriorSamplingAlgorithm):
     """
     :param adapt_count: The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value. Defaults to 1000.
-    :param target_acceptance_prob: The target acceptance probability. Defaults to 0.65 (Beskos et al., 2010; Neal, 2011).
-    :param adapt_enabled: Determines whether the step size will adapt during the first adaptCount samples. Defaults to True.
+    :param adapt_step_size_enabled: enable the step size adaption. Defaults to true.
+    :param adapt_potential_enabled: enable the potential adaption. Defaults to true.
+    :param target_acceptance_prob: The target acceptance probability. Defaults to 0.8.
     :param initial_step_size: Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.
+    :param max_energy_change: the maximum energy change before a step is considered divergent.
     :param max_tree_height: The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample. Defaults to 10.
     """
 
