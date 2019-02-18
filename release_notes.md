@@ -10,6 +10,7 @@
 * Saving a network as a DOT file includes labels on constant vertices.
 
 ## Python
+* Expose `unobserve`
 * Added `iter_all_vertices`
 * Rename methods returning generators to `iter_*` from `get_*`
 * Improved performance of getting samples by using byte streams.
