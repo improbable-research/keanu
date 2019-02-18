@@ -125,7 +125,7 @@ def test_can_dot_save_list_of_vertices(tmpdir) -> None:
 def test_dot_save_only_takes_bayes_net_or_list(tmpdir) -> None:
     gamma = Gamma(1., 1.)
     with pytest.raises(TypeError, match=r"DotSaver only takes BayesNet or a list of vertices."):
-        DotSaver(gamma)
+        DotSaver(gamma)  # type: ignore # this is expected to fail mypy
 
 
 def test_get_vertex_by_label() -> None:
