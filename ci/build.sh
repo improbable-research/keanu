@@ -7,4 +7,4 @@ fi
 
 cd "$(dirname "$0")/../"
 
-./gradlew build -x generateDocumentation -x deleteUnneededJarsFromPythonClasspath
+bash ./gradlew clean build --info --stacktrace
