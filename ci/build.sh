@@ -7,4 +7,4 @@ fi
 
 cd "$(dirname "$0")/../"
 
-./gradlew clean build --info --stacktrace --debug
+./gradlew clean build --info --stacktrace
