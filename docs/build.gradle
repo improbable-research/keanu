@@ -36,7 +36,6 @@ task installDependencies {
     dependsOn(":keanu-python:installPipenv")
     doLast {
         exec {
-            workingDir("src/test/python")
             commandLine 'pipenv', 'install'
         }
     }
@@ -47,7 +46,6 @@ task runPythonSnippets {
     dependsOn(installDependencies)
     doLast {
         exec {
-            workingDir("src/test/python")
             commandLine 'pipenv', 'run', 'pytest', '.'
         }
     }
