@@ -42,6 +42,7 @@ public class BayesianNetwork {
     }
 
     public Vertex getVertexByLabel(VertexLabel label) {
+        Preconditions.checkArgument(vertexLabels.containsKey(label), String.format("Vertex with label %s was not found in BayesianNetwork.", label));
         return vertexLabels.get(label);
     }
 

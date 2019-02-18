@@ -1,9 +1,16 @@
 ### Version 0.0.20 ###
 
 ## Common
+* Plates have been renamed
+  * This was done primarily because we were using the term incorrectly, since Dynamic Bayes Nets (e.g. Hidden Markov) are not Plates.
+  * `Plates` --> `Sequence`
+  * `Plate` --> `SequenceItem`
+  * `plate` package --> `template`
 * Saving a network as a DOT file includes labels on constant vertices.
 
 ## Python
+* Added `iter_all_vertices`
+* Rename methods returning generators to `iter_*` from `get_*`
 * Improved performance of getting samples by using byte streams.
 * Added Python docstrings for sampling
 

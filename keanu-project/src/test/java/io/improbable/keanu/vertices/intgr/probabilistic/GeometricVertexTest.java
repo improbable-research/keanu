@@ -2,6 +2,11 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -23,6 +28,20 @@ public class GeometricVertexTest {
     }
 
     @Test
+    public void logProbGraphIsCorrectScalar() {
+        DoubleVertex p = ConstantVertex.of(0.25);
+        GeometricVertex myVertex = new GeometricVertex(p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+
+        for (int i = 1; i < 20; i++) {
+            LogProbGraphValueFeeder.feedValueAndCascade(logProbGraph, myVertex, IntegerTensor.scalar(i));
+            LogProbGraphContract.matchesKnownLogDensity(logProbGraph, getExpectedPmf(0.25, i));
+        }
+    }
+
+    @Test
     public void logProbIsCorrectVector() {
         double p = 0.8;
         int[] values = new int[] {3, 5, 15};
@@ -38,15 +57,81 @@ public class GeometricVertexTest {
         assertEquals(expectedP, calculatedP, 1e-6);
     }
 
+    @Test
+    public void logProbGraphIsCorrectVector() {
+        DoubleVertex p = ConstantVertex.of(0.8);
+        int[] values = new int[] {3, 5, 15};
+        GeometricVertex myVertex = new GeometricVertex(new long[] {values.length}, p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.create(values));
+
+        double expectedP = 0.0;
+
+        for (int value : values) {
+            expectedP += getExpectedPmf(0.8, value);
+        }
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedP);
+    }
+
     private double getExpectedPmf(double p, int n) {
         return Math.log(Math.pow(1 - p, n - 1) * p);
     }
 
     @Test
-    public void lobProbIsNegativeInfinityOutsideSupport() {
+    public void logProbIsNegativeInfinityOutsideKSupport() {
         GeometricVertex myVertex = new GeometricVertex(0.5);
         double logProb = myVertex.logPmf(0);
         assertEquals(Double.NEGATIVE_INFINITY, logProb, 1e-10);
+    }
+
+    @Test
+    public void logProbGraphIsNegativeInfinityOutsideKSupport() {
+        DoubleVertex p = ConstantVertex.of(0.5);
+        GeometricVertex myVertex = new GeometricVertex(p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.scalar(0));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
+    }
+
+    @Test
+    public void logProbIsNegativeInfinityIfPGreaterThanOrEqualToOne() {
+        GeometricVertex myVertex = new GeometricVertex(1.);
+        double logProb = myVertex.logPmf(10);
+        assertEquals(Double.NEGATIVE_INFINITY, logProb, 1e-10);
+    }
+
+    @Test
+    public void logProbGraphIsNegativeInfinityIfPGreaterThanOrEqualToOne() {
+        DoubleVertex p = ConstantVertex.of(1.);
+        GeometricVertex myVertex = new GeometricVertex(p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.scalar(10));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
+    }
+
+    @Test
+    public void logProbIsNegativeInfinityIfPLessThanOrEqualToZero() {
+        GeometricVertex myVertex = new GeometricVertex(0.);
+        double logProb = myVertex.logPmf(10);
+        assertEquals(Double.NEGATIVE_INFINITY, logProb, 1e-10);
+    }
+
+    @Test
+    public void logProbGraphIsNegativeInfinityIfPLessThanOrEqualToZero() {
+        DoubleVertex p = ConstantVertex.of(0.);
+        GeometricVertex myVertex = new GeometricVertex(p);
+        LogProbGraph logProbGraph = myVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, p, p.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, myVertex, IntegerTensor.scalar(10));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
     }
 
     @Test

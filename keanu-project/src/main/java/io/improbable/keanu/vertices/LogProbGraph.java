@@ -63,15 +63,15 @@ public class LogProbGraph {
 
     }
 
-    public static class PlaceHolderBoolVertex extends BooleanVertex implements PlaceholderVertex, NonProbabilistic<BooleanTensor> {
+    static public class BooleanPlaceholderVertex extends BooleanVertex implements PlaceholderVertex, NonProbabilistic<BooleanTensor>, Differentiable, NonSaveableVertex {
 
-        public PlaceHolderBoolVertex(@LoadShape long[] initialShape) {
+        public BooleanPlaceholderVertex(long... initialShape) {
             super(initialShape);
         }
 
         @Override
         public BooleanTensor calculate() {
-            return this.getValue();
+            return getPlaceholderVertexValue(this);
         }
 
     }

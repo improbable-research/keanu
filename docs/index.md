@@ -61,9 +61,9 @@ grid_navigation:
       cta: Read more
       url: /docs/particle-filter
     - title: How do I repeat logic in my model?
-      excerpt: Learn how to use plates to describe repeating subgraphs in Keanu or to do time series modelling.
+      excerpt: Learn how to use sequence templates to describe repeating subgraphs in Keanu or to do time series modelling.
       cta: Read more
-      url: /docs/plates/
+      url: /docs/sequences/
     - title: Autocorrelation
       excerpt: Learn how to calculate autocorrelation on your samples.
       cta: Read more

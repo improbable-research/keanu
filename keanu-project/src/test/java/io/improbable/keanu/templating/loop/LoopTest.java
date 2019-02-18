@@ -1,10 +1,8 @@
-package io.improbable.keanu.plating;
+package io.improbable.keanu.templating.loop;
 
 
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.plating.loop.Loop;
-import io.improbable.keanu.plating.loop.LoopConstructionException;
-import io.improbable.keanu.plating.loop.LoopDidNotTerminateException;
+import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -53,7 +51,7 @@ public class LoopTest {
             .withInitialConditions(startValue)
             .iterateWhile(alwaysTrue)
             .apply(increment);
-        assertThat(loop.getPlates().size(), equalTo(Loop.DEFAULT_MAX_COUNT));
+        assertThat(loop.getSequence().size(), equalTo(Loop.DEFAULT_MAX_COUNT));
     }
 
     @Test
@@ -86,7 +84,7 @@ public class LoopTest {
             .withMaxIterations(customMaxCount)
             .iterateWhile(alwaysTrue)
             .apply(increment);
-        assertThat(loop.getPlates().size(), equalTo(customMaxCount));
+        assertThat(loop.getSequence().size(), equalTo(customMaxCount));
     }
 
     @Test
@@ -109,11 +107,11 @@ public class LoopTest {
         DoubleVertex output = loop.getOutput();
 
         for (int firstFailure : new int[]{0, 1, 2, 10, Loop.DEFAULT_MAX_COUNT - 1}) {
-            for (Plate plate : loop.getPlates()) {
-                BooleanVertex condition = plate.get(Loop.CONDITION_LABEL);
+            for (SequenceItem item : loop.getSequence()) {
+                BooleanVertex condition = item.get(Loop.CONDITION_LABEL);
                 condition.setAndCascade(true);
             }
-            BooleanVertex condition = loop.getPlates().asList().get(firstFailure).get(Loop.CONDITION_LABEL);
+            BooleanVertex condition = loop.getSequence().asList().get(firstFailure).get(Loop.CONDITION_LABEL);
             condition.setAndCascade(false);
             Double expectedOutput = new Double(firstFailure);
             assertThat(output, VertexMatchers.hasValue(expectedOutput));
@@ -142,9 +140,9 @@ public class LoopTest {
     }
 
     @Test
-    public void theConditionCanBeAFunctionOfThePlateVariables() {
-        Function<Plate, BooleanVertex> lessThanTen = plate -> {
-            DoubleVertex valueIn = plate.get(Loop.VALUE_IN_LABEL);
+    public void theConditionCanBeAFunctionOfTheSequenceVariables() {
+        Function<SequenceItem, BooleanVertex> lessThanTen = item -> {
+            DoubleVertex valueIn = item.get(Loop.VALUE_IN_LABEL);
             return valueIn.lessThan(ConstantVertex.of(10.));
         };
 
@@ -165,11 +163,11 @@ public class LoopTest {
         DoubleVertex startFactorial = ConstantVertex.of(1.);
         DoubleVertex startFactor = ConstantVertex.of(1.).setLabel(factorOutLabel);
 
-        BiFunction<Plate, DoubleVertex, DoubleVertex> factorial = (plate, valueIn) -> {
+        BiFunction<SequenceItem, DoubleVertex, DoubleVertex> factorial = (item, valueIn) -> {
             DoubleVertex factorIn = new DoubleProxyVertex(factorInLabel);
             DoubleVertex factorOut = factorIn.plus(ConstantVertex.of(1.));
-            plate.add(factorIn);
-            plate.add(factorOutLabel, factorOut);
+            item.add(factorIn);
+            item.add(factorOutLabel, factorOut);
             return valueIn.times(factorOut);
         };
 

@@ -4,4 +4,5 @@ Pipfile.lock
 __pycache__/
 dist/
 keanu/classpath
+nd4j/nd4j/classpath
 .mypy_cache/

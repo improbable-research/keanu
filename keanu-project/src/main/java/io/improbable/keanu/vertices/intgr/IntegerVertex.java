@@ -124,12 +124,12 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerAbsVertex(this);
     }
 
-    public IntegerVertex sum() {
-        return new IntegerSumVertex(this);
+    public IntegerVertex sum(int... sumOverDimensions) {
+        return new IntegerSumVertex(this, sumOverDimensions);
     }
 
-    public IntegerVertex sum(int... overDimensions) {
-        return new IntegerSumVertex(this, overDimensions);
+    public IntegerVertex sum() {
+        return new IntegerSumVertex(this);
     }
 
     public IntegerVertex lambda(long[] shape, Function<IntegerTensor, IntegerTensor> op) {

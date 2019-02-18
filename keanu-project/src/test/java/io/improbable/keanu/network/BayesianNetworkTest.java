@@ -7,7 +7,9 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -22,10 +24,12 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 
 public class BayesianNetworkTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     BayesianNetwork network;
     Set<Vertex> connectedGraph;
@@ -87,8 +91,6 @@ public class BayesianNetworkTest {
         assertThat(retrieved, is(b));
         retrieved = net.getVertexByLabel(labelOr);
         assertThat(retrieved, is(ored));
-        retrieved = net.getVertexByLabel(null);
-        assertThat(retrieved, nullValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -150,4 +152,18 @@ public class BayesianNetworkTest {
         assertTrue(verticesInNamespace.containsAll(Arrays.asList(a0, a1, b0)));
     }
 
+    @Test
+    public void throwsIfVertexWithLabelIsNotInBayesianNetwork() {
+        BernoulliVertex vertexInNetwork = new BernoulliVertex(0.5);
+        vertexInNetwork.setLabel(LABEL_A);
+        BayesianNetwork network = new BayesianNetwork(vertexInNetwork.getConnectedGraph());
+
+        BernoulliVertex vertexNotInNetwork = new BernoulliVertex(0.5);
+        vertexNotInNetwork.setLabel(LABEL_B);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(String.format("Vertex with label %s was not found in BayesianNetwork", LABEL_B));
+
+        network.getVertexByLabel(new VertexLabel(LABEL_B));
+    }
 }

@@ -8,6 +8,10 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -20,7 +24,7 @@ import java.util.Set;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class GeometricVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
+public class GeometricVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex p;
     private final static String P_NAME = "p";
@@ -66,6 +70,18 @@ public class GeometricVertex extends IntegerVertex implements ProbabilisticInteg
     @Override
     public double logProb(IntegerTensor value) {
         return Geometric.withParameters(p.getValue()).logProb(value).sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        IntegerPlaceholderVertex valuePlaceholder = new IntegerPlaceholderVertex(this.getShape());
+        DoublePlaceholderVertex pPlaceholder = new DoublePlaceholderVertex(p.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, valuePlaceholder)
+            .input(p, pPlaceholder)
+            .logProbOutput(Geometric.logProbOutput(valuePlaceholder, pPlaceholder))
+            .build();
     }
 
     @Override
