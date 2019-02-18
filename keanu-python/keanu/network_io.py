@@ -3,7 +3,8 @@ from py4j.java_gateway import JavaObject
 from .context import KeanuContext
 from .base import JavaObjectWrapper
 from .net import BayesNet
-from typing import Dict, Optional
+from typing import Dict, Optional, Union, List
+from .vertex.base import Vertex
 
 k = KeanuContext()
 
@@ -39,8 +40,15 @@ class ProtobufSaver(NetworkSaver):
 
 class DotSaver(NetworkSaver):
 
-    def __init__(self, net: BayesNet):
-        super().__init__(k.jvm_view().DotSaver(net.unwrap()))
+    def __init__(self, net_or_vertices: Union[BayesNet, List[Vertex]]):
+        if isinstance(net_or_vertices, BayesNet):
+            val = net_or_vertices.unwrap()
+        elif isinstance(net_or_vertices, list):
+            val = k.to_java_object_set(net_or_vertices)
+        else:
+            raise TypeError("DotSaver only takes BayesNet or a list of vertices.")
+
+        super().__init__(k.jvm_view().DotSaver(val))
 
 
 class JsonSaver(NetworkSaver):
