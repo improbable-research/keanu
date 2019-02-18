@@ -276,9 +276,23 @@ class Tree {
 
         final double energyChange = energyAfterStep - startEnergy;
 
-        final boolean shouldContinueFlag = Math.abs(energyChange) < maxEnergyChange;
+        final boolean isDivergent = Math.abs(energyChange) >= maxEnergyChange;
 
-        if (shouldContinueFlag) {
+        if (isDivergent) {
+
+            return new SubTree(
+                leapfrogStateAfterStep,
+                leapfrogStateAfterStep,
+                leapfrogStateAfterStep.getMomentum(),
+                null,
+                Double.NEGATIVE_INFINITY,
+                true,
+                false,
+                0,
+                1
+            );
+
+        } else {
 
             final double logSumWeight = -energyChange;
 
@@ -307,20 +321,6 @@ class Tree {
                 metropolisAcceptanceProbability,
                 1
             );
-
-        } else {
-
-            return new SubTree(
-                leapfrogStateAfterStep,
-                leapfrogStateAfterStep,
-                leapfrogStateAfterStep.getMomentum(),
-                null,
-                Double.NEGATIVE_INFINITY,
-                true,
-                false,
-                0,
-                1
-            );
         }
     }
 
@@ -346,7 +346,7 @@ class Tree {
             backward += vBackward.times(rhoForLatent).sum();
         }
 
-        return !((forward >= 0.0) && (backward >= 0.0));
+        return (forward < 0.0) || (backward < 0.0);
     }
 
     public boolean shouldContinue() {

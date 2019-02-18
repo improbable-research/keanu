@@ -12,8 +12,6 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.ones;
-import static io.improbable.keanu.algorithms.mcmc.nuts.VariableValues.zeros;
 import static io.improbable.keanu.tensor.dbl.DoubleTensor.scalar;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
