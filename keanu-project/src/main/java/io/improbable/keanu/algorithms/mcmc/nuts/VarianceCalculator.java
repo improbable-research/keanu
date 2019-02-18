@@ -18,7 +18,9 @@ public class VarianceCalculator {
     private Map<VariableReference, DoubleTensor> mean;
     private Map<VariableReference, DoubleTensor> M2;
 
-    public VarianceCalculator(Map<VariableReference, DoubleTensor> initialMean, Map<VariableReference, DoubleTensor> initialVariance, double initialWeight) {
+    public VarianceCalculator(Map<VariableReference, DoubleTensor> initialMean,
+                              Map<VariableReference, DoubleTensor> initialVariance,
+                              double initialWeight) {
         Preconditions.checkArgument(initialWeight >= 0.0);
         this.count = initialWeight;
         this.mean = initialMean;

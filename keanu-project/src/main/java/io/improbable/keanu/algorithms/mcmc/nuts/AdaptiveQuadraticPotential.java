@@ -32,7 +32,9 @@ public class AdaptiveQuadraticPotential implements Potential {
     @Getter
     private Map<VariableReference, DoubleTensor> standardDeviation;
 
-    public AdaptiveQuadraticPotential(double initialMean, double initialVariance, double initialWeight,
+    public AdaptiveQuadraticPotential(double initialMean,
+                                      double initialVariance,
+                                      double initialWeight,
                                       int adaptionWindowSize) {
         Preconditions.checkArgument(adaptionWindowSize > 1);
 

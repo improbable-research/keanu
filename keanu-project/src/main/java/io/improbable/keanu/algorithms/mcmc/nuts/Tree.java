@@ -139,13 +139,13 @@ class Tree {
     }
 
     public void grow(int buildDirection,
-                     double epsilon) {
+                     double timeStep) {
 
         SubTree otherHalfTree = buildTree(
             buildDirection == -1 ? backward : forward,
             buildDirection,
             treeHeight,
-            epsilon
+            timeStep
         );
 
         if (buildDirection == -1) {
@@ -184,15 +184,15 @@ class Tree {
 
     /**
      * @param buildFrom      The leap frog to start building the tree from
-     * @param buildDirection either 1 for forward or -1 for backwards in epsilon
+     * @param buildDirection either 1 for forward or -1 for backwards in time
      * @param treeHeight     The height to build the tree to
-     * @param epsilon        The time step delta for each new step
+     * @param timeStep       The time step delta for each new step
      * @return A subtree with treeHeight height
      */
     private SubTree buildTree(LeapfrogState buildFrom,
                               int buildDirection,
                               int treeHeight,
-                              double epsilon) {
+                              double timeStep) {
         if (treeHeight == 0) {
 
             //Base case-take one leapfrog step in the build direction
@@ -200,7 +200,7 @@ class Tree {
             return treeBuilderBaseCase(
                 buildFrom,
                 buildDirection,
-                epsilon
+                timeStep
             );
 
         } else {
@@ -210,7 +210,7 @@ class Tree {
                 buildFrom,
                 buildDirection,
                 treeHeight - 1,
-                epsilon
+                timeStep
             );
 
             //Should continue building other half if first half's shouldContinue is true
@@ -220,7 +220,7 @@ class Tree {
                     buildDirection == -1 ? subTree.backward : subTree.forward,
                     buildDirection,
                     treeHeight - 1,
-                    epsilon
+                    timeStep
                 );
 
                 if (buildDirection == -1) {
@@ -268,9 +268,9 @@ class Tree {
 
     private SubTree treeBuilderBaseCase(final LeapfrogState leapfrogState,
                                         final int buildDirection,
-                                        final double epsilon) {
+                                        final double timeStep) {
 
-        LeapfrogState leapfrogStateAfterStep = leapfrogIntegrator.step(leapfrogState, logProbGradientCalculator, epsilon * buildDirection);
+        LeapfrogState leapfrogStateAfterStep = leapfrogIntegrator.step(leapfrogState, logProbGradientCalculator, timeStep * buildDirection);
 
         final double energyAfterStep = leapfrogStateAfterStep.getEnergy();
 

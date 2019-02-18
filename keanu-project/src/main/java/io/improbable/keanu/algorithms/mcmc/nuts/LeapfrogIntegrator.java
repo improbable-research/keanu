@@ -14,7 +14,7 @@ public class LeapfrogIntegrator {
     private final Potential potential;
 
     /**
-     * Performs one leapfrog of the variables with a time delta as defined by epsilon
+     * Performs one leapfrog of the variables with a time delta as defined by timeStep
      *
      * @param fromState                 the state to leap from
      * @param logProbGradientCalculator the calculator for the log prob gradient

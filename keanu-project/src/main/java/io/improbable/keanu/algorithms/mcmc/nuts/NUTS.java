@@ -151,19 +151,17 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     }
 
     public static class NUTSBuilder {
-        private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
+        //NUTS defaults
+        private KeanuRandom random = KeanuRandom.getDefaultRandom();
         private long adaptCount = 1000;
         private boolean adaptStepSizeEnabled = true;
         private Double initialStepSize = null;
-
         private Potential potential = new AdaptiveQuadraticPotential(0, 1, 10.0, 100);
         private boolean adaptPotentialEnabled = true;
-
         private double targetAcceptanceProb = 0.8;
         private double maxEnergyChange = 1000.0;
         private int maxTreeHeight = 10;
-
         private boolean saveStatistics = false;
 
         public NUTSBuilder random(KeanuRandom random) {
