@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+
 set -e -u -o pipefail
 NEXT_VERSION=0.0.22
 DEV_NAME='dev1'
@@ -8,11 +10,11 @@ if [[ -n "${DEBUG-}" ]]; then
 fi
 
 cd "$(dirname "$0")/../"
-CURRENT_VERSION=`sed -n 's/current_version:\s*//p' _config.yml`
-python3 bin/freezeAtVersion.py --version ${CURRENT_VERSION}
+CURRENT_VERSION=$(sed -n 's/current_version:\s*//p' _config.yml)
+python3 bin/freezeAtVersion.py --version "${CURRENT_VERSION}"
 sed -i 's/\(current_version:\).*/\1 '"${NEXT_VERSION}"'/' _config.yml
 sed -i '1i- title: '"${CURRENT_VERSION}" _data/previous_versions.yml
-UNDER=`echo $CURRENT_VERSION | tr . _`
+UNDER=$(echo $CURRENT_VERSION | tr . _)
 sed -i '2i\ \ url: /docs/'"${UNDER}" _data/previous_versions.yml
 
 sed -i 's/'"\(version = u\).*/\1'${NEXT_VERSION}'/" ../keanu-python/docs/conf.py
