@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -83,7 +83,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Differentiable, Pr
     @Override
     public LogProbGraph logProbGraph() {
         final DoublePlaceholderVertex xPlaceHolder = new DoublePlaceholderVertex(this.getShape());
-        final IntegerPlaceHolderVertex kPlaceHolder = new IntegerPlaceHolderVertex(k.getShape());
+        final IntegerPlaceholderVertex kPlaceHolder = new IntegerPlaceholderVertex(k.getShape());
 
         return LogProbGraph.builder()
             .input(this, xPlaceHolder)

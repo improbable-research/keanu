@@ -1,4 +1,4 @@
-package io.improbable.keanu.plating.loop;
+package io.improbable.keanu.templating.loop;
 
 public class LoopDidNotTerminateException extends RuntimeException {
     public LoopDidNotTerminateException(String message) {

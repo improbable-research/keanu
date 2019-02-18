@@ -6,6 +6,10 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class Binomial implements DiscreteDistribution {
 
@@ -58,6 +62,18 @@ public class Binomial implements DiscreteDistribution {
         return logBinomialCoefficient.plusInPlace(kLogP).plusInPlace(nMinusKLogOneMinusP);
     }
 
+    public static DoubleVertex logProbOutput(IntegerPlaceHolderVertex k, DoublePlaceholderVertex p, IntegerPlaceHolderVertex n) {
+        DoubleVertex logBinomialCoefficient = getLogBinomialCoefficient(k, n);
+
+        DoubleVertex kDouble = k.toDouble();
+        DoubleVertex nDouble = n.toDouble();
+        DoubleVertex kLogP = kDouble.times(p.log());
+        DoubleVertex logOneMinusP = p.unaryMinus().plus(1.0).log();
+        DoubleVertex nMinusKLogOneMinusP = nDouble.minus(kDouble).times(logOneMinusP);
+
+        return logBinomialCoefficient.plus(kLogP).plus(nMinusKLogOneMinusP);
+    }
+
     private static DoubleTensor getLogBinomialCoefficient(IntegerTensor k, IntegerTensor n) {
 
         DoubleTensor nDouble = n.toDouble();
@@ -67,5 +83,16 @@ public class Binomial implements DiscreteDistribution {
         DoubleTensor logNMinusKFactorial = nDouble.minusInPlace(kDouble).plusInPlace(1.0).logGammaInPlace();
 
         return logNFactorial.minusInPlace(logKFactorial).minusInPlace(logNMinusKFactorial);
+    }
+
+    private static DoubleVertex getLogBinomialCoefficient(IntegerVertex k, IntegerVertex n) {
+
+        DoubleVertex nDouble = n.toDouble();
+        DoubleVertex kDouble = k.toDouble();
+        DoubleVertex logNFactorial = nDouble.plus(1.0).logGamma();
+        DoubleVertex logKFactorial = kDouble.plus(1.0).logGamma();
+        DoubleVertex logNMinusKFactorial = nDouble.minus(kDouble).plus(1.0).logGamma();
+
+        return logNFactorial.minus(logKFactorial).minus(logNMinusKFactorial);
     }
 }
