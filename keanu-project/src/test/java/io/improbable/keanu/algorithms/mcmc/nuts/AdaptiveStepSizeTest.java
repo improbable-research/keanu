@@ -32,9 +32,10 @@ public class AdaptiveStepSizeTest {
     public void canReduceAndIncreaseStep() {
         double startingStepSize = 0.1;
 
+        double targetAcceptRate = 0.65;
         AdaptiveStepSize tune = new AdaptiveStepSize(
             startingStepSize,
-            0.65,
+            targetAcceptRate,
             6
         );
 
