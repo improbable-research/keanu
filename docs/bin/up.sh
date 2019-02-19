@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
+# Use ./up.sh VERSION
 ## Script upgrades the version numbers in the places necessary across the repo.
 ## It will add the current and next version to appropiate locations.
 ## Used for after a release to start work on next version.
 
 set -e -u -o pipefail
-NEXT_VERSION=0.0.22
-DEV_NAME='dev1'
+
+if [  $# -eq 0  ]
+  then
+    echo "Version not specified"
+    exit 1
+fi
+
+NEXT_VERSION= $1
+DEV_NAME=${DEV_NAME:-'dev1'}
 
 if [[ -n "${DEBUG-}" ]]; then
   set -x
