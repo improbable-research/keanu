@@ -20,4 +20,4 @@ sed -i '2i\ \ url: /docs/'"${UNDER}" _data/previous_versions.yml
 sed -i 's/'"\(version = u\).*/\1'${NEXT_VERSION}'/" ../keanu-python/docs/conf.py
 sed -i 's/'"\(release = u\).*/\1'${NEXT_VERSION}'/" ../keanu-python/docs/conf.py
 sed -i "s/\(__version__ = '\).*/\1${NEXT_VERSION}.${DEV_NAME}'/" ../keanu-python/keanu/__version__.py
-sed -i "1i # Version '${NEXT_VERSION}'\n" ../release_notes.md
+sed -i "1i # Version ${NEXT_VERSION}\n" ../release_notes.md
