@@ -10,6 +10,7 @@ import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.LambdaSection;
+import io.improbable.keanu.network.TransitiveClosure;
 import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.Vertex;
 import org.nd4j.base.Preconditions;
@@ -17,6 +18,8 @@ import org.nd4j.base.Preconditions;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.Sets;
 
 public class Forward implements PosteriorSamplingAlgorithm {
 
@@ -66,9 +69,12 @@ public class Forward implements PosteriorSamplingAlgorithm {
         checkUpstreamOfObservedDoesNotContainProbabilistic(observedVertices);
 
         List<Vertex> verticesToSampleFrom = variablesToSampleFrom.stream().map(v -> (Vertex) v).collect(Collectors.toList());
-        Set<Vertex> allDownstreamVertices = allDownstreamVertices(network.getLatentVertices());
 
-        List<Vertex> sortedVertices = TopologicalSort.sort(allDownstreamVertices);
+        Set<Vertex> allDownstreamVertices = allDownstreamVertices(network.getLatentVertices());
+        Set<Vertex> transitiveClosureSampleFrom = TransitiveClosure.getUpstreamVerticesForCollection(verticesToSampleFrom, true).getAllVertices();
+        Set<Vertex> intersection = Sets.intersection(allDownstreamVertices, transitiveClosureSampleFrom);
+
+        List<Vertex> sortedVertices = TopologicalSort.sort(intersection);
 
         return new ForwardSampler(verticesToSampleFrom, sortedVertices, random);
     }

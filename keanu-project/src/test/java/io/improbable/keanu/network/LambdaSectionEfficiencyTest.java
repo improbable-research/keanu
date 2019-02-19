@@ -31,7 +31,8 @@ public class LambdaSectionEfficiencyTest {
         Set<Vertex> verticesDepthFirst = LambdaSection.getVertices(A, (v) -> {
             callsToNext.increment();
             return v.getChildren();
-        }, (v) -> {
+        },  (v) -> v.isProbabilistic() || v.isObserved(),
+            (v) -> {
             callsToPredicate.increment();
             return true;
         });
@@ -58,7 +59,9 @@ public class LambdaSectionEfficiencyTest {
         Set<Vertex> verticesDepthFirst = LambdaSection.getVertices(Arrays.asList(A, B, C), (v) -> {
             callsToNext.increment();
             return v.getChildren();
-        }, (v) -> {
+            },
+            (v) -> v.isProbabilistic() || v.isObserved(),
+            (v) -> {
             callsToPredicate.increment();
             return true;
         });
