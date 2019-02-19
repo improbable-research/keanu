@@ -54,6 +54,6 @@ public class JVMDoubleTensorFactory implements DoubleTensorFactory {
 
     @Override
     public DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
-        return null;
+        return JVMDoubleTensor.concat(dimension, toConcat);
     }
 }

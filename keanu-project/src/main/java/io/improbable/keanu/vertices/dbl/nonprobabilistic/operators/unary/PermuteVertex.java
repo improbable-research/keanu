@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShape.getPermutedResultShapeShape;
+import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 
 public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable {
 
@@ -80,16 +81,6 @@ public class PermuteVertex extends DoubleUnaryOpVertex implements Differentiable
         }
 
         return permuteToApply;
-    }
-
-    private static int[] invertedPermute(int[] rearrange) {
-        int[] inverted = new int[rearrange.length];
-
-        for (int i = 0; i < rearrange.length; i++) {
-            inverted[rearrange[i]] = i;
-        }
-
-        return inverted;
     }
 
     @SaveVertexParam(REARRANGE_NAME)

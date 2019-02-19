@@ -266,4 +266,14 @@ public class TensorShape {
         return permutedShape;
     }
 
+    public static int[] invertedPermute(int[] rearrange) {
+        int[] inverted = new int[rearrange.length];
+
+        for (int i = 0; i < rearrange.length; i++) {
+            inverted[rearrange[i]] = i;
+        }
+
+        return inverted;
+    }
+
 }

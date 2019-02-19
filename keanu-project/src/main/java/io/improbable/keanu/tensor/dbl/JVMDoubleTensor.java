@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.ADD;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.DIV;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.GTE_MASK;
@@ -880,6 +882,92 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         return new JVMDoubleTensor(newBuffer, resultShape);
+    }
+
+    public static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
+
+        long[] concatShape = getConcatResultShape(dimension, toConcat);
+
+        boolean shouldRearrange = dimension != 0;
+
+        if (shouldRearrange) {
+
+            int[] rearrange = shiftDimensionToDimensionZero(dimension, concatShape);
+
+            DoubleTensor[] toConcatOnDimensionZero = new DoubleTensor[toConcat.length];
+
+            for (int i = 0; i < toConcatOnDimensionZero.length; i++) {
+                toConcatOnDimensionZero[i] = toConcat[i].permute(rearrange);
+            }
+
+            long[] permutedConcatShape = TensorShape.getPermutedResultShapeShape(concatShape, rearrange);
+            JVMDoubleTensor concatOnDimZero = concatOnDimensionZero(permutedConcatShape, toConcatOnDimensionZero);
+
+            return concatOnDimZero.permute(invertedPermute(rearrange));
+        } else {
+
+            return concatOnDimensionZero(concatShape, toConcat);
+        }
+    }
+
+    private static JVMDoubleTensor concatOnDimensionZero(long[] concatShape, DoubleTensor... toConcat) {
+
+        double[] concatBuffer = new double[TensorShape.getLengthAsInt(concatShape)];
+        int bufferPosition = 0;
+
+        for (int i = 0; i < toConcat.length; i++) {
+
+            double[] cBuffer = toConcat[i].asFlatDoubleArray();
+            System.arraycopy(cBuffer, 0, concatBuffer, bufferPosition, cBuffer.length);
+            bufferPosition += cBuffer.length;
+        }
+
+        return new JVMDoubleTensor(concatBuffer, concatShape);
+    }
+
+    private static int[] shiftDimensionToDimensionZero(int dimension, long[] shape) {
+
+        int[] rearrange = new int[shape.length];
+        rearrange[0] = dimension;
+        for (int i = 1; i < rearrange.length; i++) {
+            if (i > dimension) {
+                rearrange[i] = i;
+            } else {
+                rearrange[i] = i - 1;
+            }
+        }
+        return rearrange;
+    }
+
+    private static long[] getConcatResultShape(int dimension, DoubleTensor... toConcat) {
+        Preconditions.checkArgument(toConcat.length > 0);
+
+        DoubleTensor first = toConcat[0];
+        long[] firstShape = first.getShape();
+
+        if (firstShape.length == 0 && dimension != 0) {
+            throw new IllegalArgumentException("Cannot concat scalars on dimension " + dimension);
+        }
+
+        long[] concatShape = firstShape.length == 0 ? new long[]{1} : Arrays.copyOf(firstShape, firstShape.length);
+
+        for (int i = 1; i < toConcat.length; i++) {
+            DoubleTensor c = toConcat[i];
+
+            long[] cShape = c.getShape();
+            for (int dim = 0; dim < concatShape.length; dim++) {
+
+                if (dim == dimension) {
+                    concatShape[dimension] += cShape.length == 0 ? 1 : cShape[dimension];
+                } else {
+                    if (cShape[dim] != concatShape[dim]) {
+                        throw new IllegalArgumentException("Cannot concat shape " + Arrays.toString(cShape));
+                    }
+                }
+            }
+        }
+
+        return concatShape;
     }
 
     @Override
