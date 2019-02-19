@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Pareto;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -193,7 +192,7 @@ public class ParetoVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex xm = new UniformVertex(0.0, 1.0);
-        xm.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
+        xm.setAndCascade(DoubleTensor.scalar(1.0));
         ParetoVertex vertexUnderTest = new ParetoVertex(xm, 3.0);
         vertexUnderTest.setAndCascade(1.0);
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -205,12 +204,12 @@ public class ParetoVertexTest {
         UniformVertex location = new UniformVertex(0.1, 1.0);
         ParetoVertex pareto = new ParetoVertex(location, 3.0);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.5);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(1.5);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(5.0);
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(0.1),
-            Nd4jDoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(0.1),
+            DoubleTensor.scalar(1.0),
             0.1,
             location,
             pareto,
@@ -226,12 +225,12 @@ public class ParetoVertexTest {
         UniformVertex scale = new UniformVertex(0.1, 5.0);
         ParetoVertex pareto = new ParetoVertex(1.0, scale);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.5);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(1.5);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(5.0);
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(0.1),
-            Nd4jDoubleTensor.scalar(5.0),
+            DoubleTensor.scalar(0.1),
+            DoubleTensor.scalar(5.0),
             0.1,
             scale,
             pareto,

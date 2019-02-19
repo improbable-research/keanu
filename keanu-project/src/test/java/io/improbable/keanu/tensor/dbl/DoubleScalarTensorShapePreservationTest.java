@@ -12,15 +12,15 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class DoubleScalarTensorShapePreservationTest {
 
-    private static Nd4jDoubleTensor doubleTensor;
-    private static Nd4jDoubleTensor lengthOneTensor;
+    private static DoubleTensor doubleTensor;
+    private static DoubleTensor lengthOneTensor;
     private static ScalarDoubleTensor scalarDoubleTensor;
     private static DoubleTensor[] tensors;
 
     @Before
     public void setup() {
-        doubleTensor = new Nd4jDoubleTensor(new double[]{1, 2, 3, 4, 5, 6}, new long[]{2, 3});
-        lengthOneTensor = new Nd4jDoubleTensor(new double[]{1.0}, new long[]{1, 1, 1, 1});
+        doubleTensor = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, new long[]{2, 3});
+        lengthOneTensor = DoubleTensor.create(new double[]{1.0}, new long[]{1, 1, 1, 1});
         scalarDoubleTensor = new ScalarDoubleTensor(1.);
         tensors = new DoubleTensor[]{doubleTensor, lengthOneTensor, scalarDoubleTensor};
     }
@@ -137,7 +137,7 @@ public class DoubleScalarTensorShapePreservationTest {
 
     @Test
     public void tensorElementwiseEqualsPreservesShape() {
-        checkOperationPreservesShape((l,r) -> l.elementwiseEquals(r));
+        checkOperationPreservesShape((l, r) -> l.elementwiseEquals(r));
     }
 
 

@@ -585,7 +585,7 @@ public class ScalarDoubleTensor extends DoubleTensor {
             value = Math.atan2(y.scalar(), value);
             shape = calculateShapeForLengthOneBroadcast(shape, y.getShape());
         } else {
-            return Nd4jDoubleTensor.create(value, y.getShape()).atan2InPlace(y);
+            return DoubleTensor.create(value, y.getShape()).atan2InPlace(y);
         }
         return this;
     }

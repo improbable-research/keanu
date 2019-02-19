@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -38,7 +37,7 @@ public class ExponentialVertexTest {
 
     @Test
     public void logProbIsNegInfWhereXLessThanOne() {
-        DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{1, -2}, new long[]{2, 1});
+        DoubleTensor matrixX = DoubleTensor.create(new double[]{1, -2}, new long[]{2, 1});
 
         DoubleTensor maskResult = Exponential.withParameters(DoubleTensor.ONE_SCALAR).logProb(matrixX);
         assertArrayEquals(new double[]{-1, Double.NEGATIVE_INFINITY}, maskResult.asFlatDoubleArray(), 0.0);
@@ -132,11 +131,11 @@ public class ExponentialVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex mu = new UniformVertex(0.0, 1.0);
-        mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
+        mu.setAndCascade(DoubleTensor.scalar(0.5));
         ExponentialVertex vertexUnderTest = new ExponentialVertex(
             3.
         );
-        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
+        vertexUnderTest.setAndCascade(DoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
@@ -146,13 +145,13 @@ public class ExponentialVertexTest {
         UniformVertex uniformA = new UniformVertex(1., 3.);
         ExponentialVertex exponential = new ExponentialVertex(uniformA);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.0);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(1.0);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(5.0);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(2.5),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(2.5),
             0.1,
             uniformA,
             exponential,

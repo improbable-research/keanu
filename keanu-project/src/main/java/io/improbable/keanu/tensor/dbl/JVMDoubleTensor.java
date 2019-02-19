@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
+import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.util.FastMath;
@@ -72,15 +73,11 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     public static JVMDoubleTensor eye(long n) {
+
         double[] buffer = new double[Ints.checkedCast(n * n)];
+        int nInt = Ints.checkedCast(n);
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (i == j) {
-                    buffer[i * j] = 1;
-                } else {
-                    buffer[i * j] = 0;
-                }
-            }
+            buffer[i * nInt + i] = 1;
         }
         return new JVMDoubleTensor(buffer, new long[]{n, n});
     }
@@ -292,8 +289,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor matrixInverse() {
-//        return fromApacheRealMatrix(MatrixUtils.inverse(asApacheRealMatrix(this)));
-        return null;
+        return fromApacheRealMatrix(MatrixUtils.inverse(asApacheRealMatrix(this)));
     }
 
     @Override

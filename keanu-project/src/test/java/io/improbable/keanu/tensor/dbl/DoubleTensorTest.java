@@ -98,6 +98,25 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canEye() {
+        DoubleTensor expected = DoubleTensor.create(new double[]{1, 0, 0, 0, 1, 0, 0, 0, 1}, 3, 3);
+        DoubleTensor actual = DoubleTensor.eye(3);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canInverseEyeMatrix() {
+        DoubleTensor eye = DoubleTensor.eye(2);
+
+        DoubleTensor expected = DoubleTensor.eye(2);
+        DoubleTensor actual = eye.matrixInverse();
+
+        assertArrayEquals(expected.asFlatDoubleArray(), actual.asFlatDoubleArray(), 1e-9);
+        assertArrayEquals(expected.getShape(), actual.getShape());
+    }
+
+    @Test
     public void canMatrixMultiply() {
 
         DoubleTensor left = DoubleTensor.create(new double[]{

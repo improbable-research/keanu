@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
@@ -123,12 +122,12 @@ public class LaplaceVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex mu = new UniformVertex(0.0, 1.0);
-        mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
+        mu.setAndCascade(DoubleTensor.scalar(0.5));
         LaplaceVertex vertexUnderTest = new LaplaceVertex(
             mu,
             3.0
         );
-        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
+        vertexUnderTest.setAndCascade(DoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
@@ -138,13 +137,13 @@ public class LaplaceVertexTest {
         UniformVertex uniformA = new UniformVertex(1.5, 3.0);
         LaplaceVertex laplace = new LaplaceVertex(uniformA, 3.0);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.0);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(5.0);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(1.5),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(1.5),
             0.1,
             uniformA,
             laplace,
@@ -159,13 +158,13 @@ public class LaplaceVertexTest {
         UniformVertex uniformA = new UniformVertex(1.5, 3.0);
         LaplaceVertex laplace = new LaplaceVertex(3.0, uniformA);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.0);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(0.5);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(3.0),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(3.0),
             0.1,
             uniformA,
             laplace,
@@ -205,9 +204,9 @@ public class LaplaceVertexTest {
 
         List<DoubleVertex> latentMuBeta = new ArrayList<>();
         UniformVertex latentMu = new UniformVertex(0.01, 10.0);
-        latentMu.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
+        latentMu.setAndCascade(DoubleTensor.scalar(9.9));
         UniformVertex latentBeta = new UniformVertex(0.01, 10.0);
-        latentBeta.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
+        latentBeta.setAndCascade(DoubleTensor.scalar(0.1));
         latentMuBeta.add(latentMu);
         latentMuBeta.add(latentBeta);
 

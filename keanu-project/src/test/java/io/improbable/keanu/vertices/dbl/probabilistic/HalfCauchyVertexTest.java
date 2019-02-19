@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -96,7 +95,7 @@ public class HalfCauchyVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         HalfCauchyVertex vertexUnderTest = new HalfCauchyVertex(3.0);
-        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
+        vertexUnderTest.setAndCascade(DoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
@@ -106,13 +105,13 @@ public class HalfCauchyVertexTest {
         UniformVertex uniformA = new UniformVertex(1.5, 3.0);
         HalfCauchyVertex cauchy = new HalfCauchyVertex(uniformA);
 
-        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
-        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
+        DoubleTensor vertexStartValue = DoubleTensor.scalar(0.0);
+        DoubleTensor vertexEndValue = DoubleTensor.scalar(0.5);
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(3.0),
+            DoubleTensor.scalar(1.0),
+            DoubleTensor.scalar(3.0),
             0.1,
             uniformA,
             cauchy,
