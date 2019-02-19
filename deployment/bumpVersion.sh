@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Use ./bump_version.sh VERSION
+# Use ./bumpVersion.sh VERSION
 ## Script upgrades the version numbers in the places necessary across the repo.
 ## It will add the current and next version to appropiate locations.
 ## Used for after a release to start work on next version.
@@ -8,7 +8,7 @@ set -e -u -o pipefail
 
 if [  $# -eq 0  ]
   then
-    echo "Version not specified. Usage ./bump_version.sh VERSION"
+    echo "Version not specified. Usage ./bumpVersion.sh VERSION"
     exit 1
 fi
 
@@ -44,6 +44,6 @@ sed -i 's/'"\\(release = u\\).*/\\1'${NEXT_VERSION}'/" ../keanu-python/docs/conf
 sed -i "s/\\(__version__ = '\\).*/\\1${NEXT_VERSION}.${DEV_NAME}'/" ../keanu-python/keanu/__version__.py
 
 # Add new version number to release notes
-sed -i "1i # Version ${NEXT_VERSION}\\n" ../release_notes.md
+sed -i "1i ## Version ${NEXT_VERSION}\\n" ../release_notes.md
 
 ../gradlew :keanu-python:generateDocumentation
