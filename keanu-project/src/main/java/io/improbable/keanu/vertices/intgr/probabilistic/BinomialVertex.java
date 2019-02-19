@@ -8,6 +8,10 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -21,7 +25,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class BinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
+public class BinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
@@ -69,8 +73,22 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     }
 
     @Override
-    public double logProb(IntegerTensor kTensor) {
-        return Binomial.withParameters(p.getValue(), n.getValue()).logProb(kTensor).sum();
+    public double logProb(IntegerTensor k) {
+        return Binomial.withParameters(p.getValue(), n.getValue()).logProb(k).sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        IntegerPlaceholderVertex kPlaceholder = new IntegerPlaceholderVertex(this.getShape());
+        DoublePlaceholderVertex pPlaceholder = new DoublePlaceholderVertex(p.getShape());
+        IntegerPlaceholderVertex nPlaceholder = new IntegerPlaceholderVertex(n.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, kPlaceholder)
+            .input(p, pPlaceholder)
+            .input(n, nPlaceholder)
+            .logProbOutput(Binomial.logProbOutput(kPlaceholder, pPlaceholder, nPlaceholder))
+            .build();
     }
 
     @Override

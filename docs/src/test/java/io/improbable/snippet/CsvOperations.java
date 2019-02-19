@@ -11,6 +11,7 @@ import io.improbable.keanu.util.csv.pojo.CsvProperty;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -69,7 +70,7 @@ public class CsvOperations {
         return (null);
     }
 
-    private static void writeCsvs() {
+    private static void writeCsvs() throws IOException {
         //%%SNIPPET_START%% WriteVars
         List<DoubleVertex> inferredVariables = runMyModel();
 

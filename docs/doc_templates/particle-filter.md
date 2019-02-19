@@ -19,7 +19,7 @@ page_nav:
         url: '/docs/regression/'
     next: 
         content: Next page
-        url: '/docs/plates'
+        url: '/docs/sequences/'
 ---
 
 ## Overview

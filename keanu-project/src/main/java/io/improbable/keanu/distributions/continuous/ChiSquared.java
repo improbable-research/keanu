@@ -6,7 +6,7 @@ import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
-import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceHolderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class ChiSquared implements ContinuousDistribution {
@@ -35,7 +35,7 @@ public class ChiSquared implements ContinuousDistribution {
         return numerator.minusInPlace(denominator);
     }
 
-    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, IntegerPlaceHolderVertex k) {
+    public static DoubleVertex logProbOutput(DoublePlaceholderVertex x, IntegerPlaceholderVertex k) {
         final DoubleVertex halfK = k.toDouble().div(2.);
         final DoubleVertex numerator = halfK.minus(1.).times(x.log()).minus(x.div(2.));
         final DoubleVertex denominator = halfK.times(LOG_TWO).plus(halfK.logGamma());
