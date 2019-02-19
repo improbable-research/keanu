@@ -83,7 +83,7 @@ public void savePartialNetToDot(Vertex startingVertex,
                                 OutputStream outputStream,
                                 boolean saveValuesAndObservations) throws IOException {
     DotSaver saver = new DotSaver(net);
-    saver.save(outputStream, startingVertex, degree, saveValuesAndObservations);
+    saver.save(outputStream, saveValuesAndObservations);
 }
 ```
 
@@ -114,7 +114,7 @@ qualified file name and the network to save (along with an optional metadata map
 is given below:
 
 ```python
-net = BayesNet(gamma.get_connected_graph())
+net = BayesNet(gamma.iter_connected_graph())
 metadata = {"Author": "Documentation Team"}
 
 protobuf_saver = ProtobufSaver(net)

@@ -1,13 +1,32 @@
-### Version 0.0.20 ###
+## Version 0.0.21 
 
-## Common
+### Common
+
+* Can save dot files with disconnected vertices in BayesianNetwork. You can also just pass a list of vertices to DotSaver.
+* Plates have been renamed
+  * This was done primarily because we were using the term incorrectly, since Dynamic Bayes Nets (e.g. Hidden Markov) are not Plates.
+  * `Plates` --> `Sequence`
+  * `Plate` --> `SequenceItem`
+  * `plate` package --> `template`
+  
+### Python
+
+* Added `iter_all_vertices`
+* Rename methods returning generators to `iter_*` from `get_*`
+* Split the ND4J dependencies into their own pip package.
+
+## Version 0.0.20
+
+### Common
+
 * Saving a network as a DOT file includes labels on constant vertices.
 
-## Python
+### Python
+
 * Improved performance of getting samples by using byte streams.
 * Added Python docstrings for sampling
 
-### Version 0.0.19 ###
+## Version 0.0.19
 
 * Added `get_vertex_by_label` to `BayesNet`
 * Added optional param `label` for all vertices in Python (e.g. `Gaussian(0., 1., label="gaussian")`). Now you must label vertices you are sampling from, otherwise Keanu will throw an exception.
