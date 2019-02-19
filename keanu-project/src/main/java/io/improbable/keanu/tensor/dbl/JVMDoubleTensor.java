@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -242,7 +243,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor diag() {
-        return null;
+        throw new NotImplementedException("");
     }
 
     @Override
@@ -261,6 +262,8 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor sum(int... overDimensions) {
+
+        overDimensions = TensorShape.getAbsoluteDimensions(this.shape.length, overDimensions);
 
         long[] resultShape = TensorShape.getSummationResultShape(shape, overDimensions);
         long[] resultStride = TensorShape.getRowFirstStride(resultShape);
@@ -332,7 +335,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
-        return null;
+        throw new NotImplementedException("");
     }
 
     @Override
@@ -361,7 +364,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public IntegerTensor argMax(int axis) {
-        return null;
+        throw new NotImplementedException("");
     }
 
     @Override
@@ -609,7 +612,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor safeLogTimes(DoubleTensor y) {
-        return null;
+        throw new NotImplementedException("");
     }
 
     @Override
@@ -692,7 +695,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor atan2(DoubleTensor y) {
-        return null;
+        throw new NotImplementedException("");
     }
 
     @Override
@@ -757,7 +760,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor standardize() {
-        return null;
+        throw new NotImplementedException("");
     }
 
     @Override
@@ -835,7 +838,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor choleskyDecomposition() {
 //        return fromApacheRealMatrix(new CholeskyDecomposition(asApacheRealMatrix(this)).getL());
-        return null;
+        throw new NotImplementedException("");
     }
 
     @Override
@@ -978,7 +981,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public List<DoubleTensor> split(int dimension, long... splitAtIndices) {
-        return null;
+        throw new NotImplementedException("");
     }
 
     @Override
@@ -1008,7 +1011,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
-        return null;
+        throw new NotImplementedException("");
     }
 
     @Override
@@ -1165,7 +1168,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor standardizeInPlace() {
-        return null;
+        throw new NotImplementedException("");
     }
 
     @Override
