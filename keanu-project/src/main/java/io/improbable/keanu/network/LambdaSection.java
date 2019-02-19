@@ -81,6 +81,7 @@ public class LambdaSection {
         Set<Vertex> upstreamVertices = getVertices(
             vertices,
             Vertex::getParents,
+            v -> v.isObserved() || v.isProbabilistic(),
             shouldAdd
         );
 
@@ -101,15 +102,16 @@ public class LambdaSection {
         Set<Vertex> downstreamVertices = getVertices(
             vertices,
             Vertex::getChildren,
+            v -> v.isObserved() || v.isProbabilistic(),
             shouldAdd
         );
 
         return new LambdaSection(downstreamVertices);
     }
 
-    public static Set<Vertex> getVertices(Vertex vertex, Function<Vertex, Collection<Vertex>> nextVertices,
+    public static Set<Vertex> getVertices(Vertex vertex, Function<Vertex, Collection<Vertex>> nextVertices, Function<Vertex, Boolean> stoppingCondition,
                                           Predicate<Vertex> shouldAdd) {
-        return getVertices(Collections.singletonList(vertex), nextVertices, shouldAdd);
+        return getVertices(Collections.singletonList(vertex), nextVertices, stoppingCondition, shouldAdd);
     }
 
     /**
@@ -121,6 +123,7 @@ public class LambdaSection {
      */
     public static Set<Vertex> getVertices(List<Vertex> vertices,
                                           Function<Vertex, Collection<Vertex>> nextVertices,
+                                          Function<Vertex, Boolean> stoppingCondition,
                                           Predicate<Vertex> shouldAdd) {
 
         Set<Vertex> nextAll = vertices.stream()
@@ -140,7 +143,7 @@ public class LambdaSection {
                 result.add(visiting);
             }
 
-            if (visiting.isObserved() || visiting.isProbabilistic()) {
+            if (stoppingCondition.apply(visiting)) {
                 continue;
             }
 
