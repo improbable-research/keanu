@@ -34,7 +34,7 @@ def tensor_net() -> BayesNet:
 
 
 @pytest.mark.parametrize(
-    "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.get_latent_vertices())),
+    "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.iter_latent_vertices())),
              (lambda net: NUTSSampler()), (lambda net: ForwardSampler())])
 def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(
         algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
@@ -47,7 +47,7 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(
 
 
 @pytest.mark.parametrize(
-    "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.get_latent_vertices())),
+    "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.iter_latent_vertices())),
              (lambda net: NUTSSampler()), (lambda net: ForwardSampler())])
 def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sample_from(
         algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], tensor_net: BayesNet) -> None:
@@ -161,7 +161,7 @@ def test_down_sample_interval(net: BayesNet) -> None:
 def test_sample_with_plot(net: BayesNet) -> None:
     num_plots = 3
     _, ax = plt.subplots(num_plots, 1, squeeze=False)
-    sample(net=net, sample_from=net.get_latent_vertices(), draws=5, plot=True, ax=ax)
+    sample(net=net, sample_from=net.iter_latent_vertices(), draws=5, plot=True, ax=ax)
 
     reorder_subplots(ax)
 
@@ -233,7 +233,7 @@ def test_iter_returns_same_result_as_sample() -> None:
 def test_iter_with_live_plot(net: BayesNet) -> None:
     num_plots = 3
     _, ax = plt.subplots(num_plots, 1, squeeze=False)
-    samples = generate_samples(net=net, sample_from=net.get_latent_vertices(), live_plot=True, refresh_every=5, ax=ax)
+    samples = generate_samples(net=net, sample_from=net.iter_latent_vertices(), live_plot=True, refresh_every=5, ax=ax)
 
     for sample in islice(samples, 5):
         pass
