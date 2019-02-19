@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
-import static io.improbable.keanu.network.LambdaSection.getVertices;
+import io.improbable.keanu.vertices.Vertex;
+import lombok.Value;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,8 +9,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import io.improbable.keanu.vertices.Vertex;
-import lombok.Value;
+import static io.improbable.keanu.network.LambdaSection.getVertices;
 
 /**
  * A Transitive Closure is defined as a given vertex and all the vertices that it affects (downstream) OR

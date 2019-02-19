@@ -1,6 +1,5 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;

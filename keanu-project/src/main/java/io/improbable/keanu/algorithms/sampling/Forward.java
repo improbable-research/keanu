@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.sampling;
 
+import com.google.common.collect.Sets;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
@@ -18,8 +19,6 @@ import org.nd4j.base.Preconditions;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.Sets;
 
 public class Forward implements PosteriorSamplingAlgorithm {
 
