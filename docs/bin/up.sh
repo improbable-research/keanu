@@ -8,11 +8,11 @@ set -e -u -o pipefail
 
 if [  $# -eq 0  ]
   then
-    echo "Version not specified"
+    echo "Version not specified. Usage ./up.sh VERSION"
     exit 1
 fi
 
-NEXT_VERSION= $1
+NEXT_VERSION=${1}
 DEV_NAME=${DEV_NAME:-'dev1'}
 
 if [[ -n "${DEBUG-}" ]]; then
