@@ -19,6 +19,7 @@ if [[ -n "${DEBUG-}" ]]; then
   set -x
 fi
 
+# Use docs dir as freezeAtVersion.py currently only works from that dir
 cd "$(dirname "$0")/../docs/"
 
 # Get the current version from _config.yml
@@ -44,3 +45,5 @@ sed -i "s/\\(__version__ = '\\).*/\\1${NEXT_VERSION}.${DEV_NAME}'/" ../keanu-pyt
 
 # Add new version number to release notes
 sed -i "1i # Version ${NEXT_VERSION}\\n" ../release_notes.md
+
+../gradlew :keanu-python:generateDocumentation
