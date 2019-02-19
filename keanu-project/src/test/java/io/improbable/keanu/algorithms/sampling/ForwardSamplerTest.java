@@ -18,8 +18,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerV
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 import lombok.extern.slf4j.Slf4j;
-
-import org.bytedeco.javacpp.annotation.Const;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
