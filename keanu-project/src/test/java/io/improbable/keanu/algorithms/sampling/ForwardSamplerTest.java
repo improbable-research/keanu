@@ -18,6 +18,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerV
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 import lombok.extern.slf4j.Slf4j;
+
+import org.bytedeco.javacpp.annotation.Const;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -174,6 +176,31 @@ public class ForwardSamplerTest {
         assertEquals(trackerThree.getId(), ids.get(0));
         assertEquals(trackerFour.getId(), ids.get(1));
         assertEquals(trackerFive.getId(), ids.get(2));
+    }
+
+    @Test
+    public void doesNotSampleFromLatentsThatAreNotInIntersectionOfTransitiveClosureOfSampleFromAndDownstreamOfLatents() {
+        ArrayList<VertexId> ids = new ArrayList<>();
+
+        IDTrackerVertex A = new IDTrackerVertex(ConstantVertex.of(5.0), ConstantVertex.of(5.0), ids);
+        IDTrackerVertex B = new IDTrackerVertex(ConstantVertex.of(5.0), ConstantVertex.of(5.0), ids);
+        IDTrackerVertex C = new IDTrackerVertex(ConstantVertex.of(5.0), ConstantVertex.of(5.0), ids);
+
+        IDTrackerVertex D = new IDTrackerVertex(A, B, ids);
+        IDTrackerVertex E = new IDTrackerVertex(B, C, ids);
+
+        NonProbabilisticIDTrackerVertex F = new NonProbabilisticIDTrackerVertex(D, ConstantVertex.of(5.), ids);
+
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+
+        Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(F), 1);
+
+        assertEquals(A.getId(), ids.get(0));
+        assertEquals(B.getId(), ids.get(1));
+        assertEquals(D.getId(), ids.get(2));
+        assertEquals(F.getId(), ids.get(3));
+
+        assertEquals(4, ids.size());
     }
 
     @Test
