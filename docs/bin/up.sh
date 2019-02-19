@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+## Script upgrades the version numbers in the places necessary across the repo.
+## It will add the current and next version to appropiate locations.
+## Used for after a release to start work on next version.
 
 set -e -u -o pipefail
 NEXT_VERSION=0.0.22
