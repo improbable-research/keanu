@@ -374,19 +374,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor powInPlace(DoubleTensor exponent) {
-        checkElementwiseShapeMatch(exponent.getShape());
-
-        double[] exponentBuffer = exponent.asFlatDoubleArray();
-
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.pow(buffer[i], exponentBuffer[i]);
-        }
-
-        return this;
-    }
-
-    @Override
     public DoubleTensor unaryMinus() {
 
         double[] newBuffer = newBuffer();
@@ -569,17 +556,21 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
+    public DoubleTensor powInPlace(DoubleTensor exponent) {
+        return broadcastableOpInPlace(FastMath::pow, exponent);
+    }
+
+    @Override
     public DoubleTensor pow(DoubleTensor exponent) {
-        checkElementwiseShapeMatch(exponent.getShape());
+        return broadcastableOp(FastMath::pow, exponent);
+    }
 
-        double[] exponentBuffer = exponent.asFlatDoubleArray();
-        double[] newBuffer = newBuffer();
-
+    @Override
+    public DoubleTensor powInPlace(double exponent) {
         for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = FastMath.pow(buffer[i], exponentBuffer[i]);
+            buffer[i] = FastMath.pow(buffer[i], exponent);
         }
-
-        return new JVMDoubleTensor(newBuffer, shapeCopy());
+        return this;
     }
 
     @Override
@@ -998,13 +989,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         return this;
     }
 
-    @Override
-    public DoubleTensor powInPlace(double exponent) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.pow(buffer[i], exponent);
-        }
-        return this;
-    }
 
     @Override
     public DoubleTensor sqrtInPlace() {

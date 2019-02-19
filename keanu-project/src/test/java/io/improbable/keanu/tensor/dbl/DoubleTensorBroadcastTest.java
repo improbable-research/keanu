@@ -8,6 +8,8 @@ import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertMinusIn
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertMinusOperationEquals;
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertPlusInPlaceOperationEquals;
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertPlusOperationEquals;
+import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertPowInPlaceOperationEquals;
+import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertPowOperationEquals;
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesInPlaceOperationEquals;
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesOperationEquals;
 import static org.junit.Assert.assertEquals;
@@ -634,6 +636,17 @@ public class DoubleTensorBroadcastTest {
 
         assertMinusOperationEquals(matrix, rank4, expected);
         assertMinusInPlaceOperationEquals(matrix, rank4, expected);
+    }
+
+    @Test
+    public void canBroadcastPow() {
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        DoubleTensor exponent = DoubleTensor.create(2, 3);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{1, 8, 9, 64}, 2, 2);
+
+        assertPowOperationEquals(matrix, exponent, expected);
+        assertPowInPlaceOperationEquals(matrix, exponent, expected);
     }
 
 }
