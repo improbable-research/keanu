@@ -3,7 +3,7 @@ from typing import Any, Iterable, Dict, List, Tuple
 
 from numpy import ndenumerate, ndarray, array_split
 from py4j.java_collections import JavaList
-from py4j.java_gateway import java_import, JavaObject
+from py4j.java_gateway import java_import, JavaObject, is_instance_of
 
 from keanu.algorithm._proposal_distribution import ProposalDistribution
 from keanu.context import KeanuContext
@@ -281,9 +281,17 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
     for vertex in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        samples_for_vertex = network_samples.get(vertex).asTensor()
+        import datetime
+        print(datetime.datetime.now())
+        if is_instance_of(k._gateway, vertex, "io.improbable.keanu.vertices.dbl.DoubleVertex"):
+            samples_for_vertex = network_samples.getDoubleTensorSamples(vertex).asTensor()
+        elif is_instance_of(k._gateway, vertex, "io.improbable.keanu.vertices.dbl.IntegerVertex"):
+            samples_for_vertex = network_samples.getIntegerTensorSamples(vertex).asTensor()
+        else:
+            samples_for_vertex = network_samples.get(vertex).asTensor()
         samples_as_ndarray = Tensor._to_scalar_or_ndarray(samples_for_vertex)
         samples = [sample[0] for sample in array_split(samples_as_ndarray, draws)]
+        print(datetime.datetime.now())
         for sample in samples:
             __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
