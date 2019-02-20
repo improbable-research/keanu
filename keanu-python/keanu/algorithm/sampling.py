@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import Any, Iterable, Dict, List, Tuple
 
-from numpy import ndenumerate, ndarray
+from numpy import ndenumerate, ndarray, array_split
 from py4j.java_collections import JavaList
 from py4j.java_gateway import java_import, JavaObject
 
@@ -155,7 +155,7 @@ def sample(net: BayesNet,
     if __all_scalar(sample_from):
         vertex_samples = __create_single_indexed_samples(network_samples, vertices_unwrapped, id_to_label)
     else:
-        vertex_samples = __create_multi_indexed_samples(vertices_unwrapped, network_samples, id_to_label)
+        vertex_samples = __create_multi_indexed_samples(vertices_unwrapped, network_samples, id_to_label, draws)
 
     if plot:
         traceplot(vertex_samples, ax=ax)
@@ -234,8 +234,7 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
         if all_scalar:
             sample: sample_generator_dict_type = {
                 id_to_label[Vertex._get_python_id(vertex_unwrapped)]: Tensor._to_scalar_or_ndarray(
-                    network_sample.get(vertex_unwrapped), return_as_primitive=True)
-                for vertex_unwrapped in vertices_unwrapped
+                    network_sample.get(vertex_unwrapped)) for vertex_unwrapped in vertices_unwrapped
             }
         else:
             sample = __create_multi_indexed_samples_generated(vertices_unwrapped, network_sample, id_to_label)
@@ -270,23 +269,21 @@ def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrap
     vertex_samples: sample_types = {}
     for vertex_unwrapped in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex_unwrapped)]
-        samples_for_vertex = network_samples.get(vertex_unwrapped).asList()
-        is_primitive = [True] * len(samples_for_vertex)
-        samples_as_ndarray = map(Tensor._to_scalar_or_ndarray, samples_for_vertex, is_primitive)
-        vertex_samples[vertex_label] = list(samples_as_ndarray)
+        samples_for_vertex = network_samples.get(vertex_unwrapped).asTensor()
+        samples_as_ndarray = Tensor._to_scalar_or_ndarray(samples_for_vertex)
+        vertex_samples[vertex_label] = list(samples_as_ndarray.flatten())
     return vertex_samples
 
 
 def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples: JavaObject,
-                                   id_to_label: Dict[Tuple[int, ...], str]) -> sample_types:
+                                   id_to_label: Dict[Tuple[int, ...], str], draws: int) -> sample_types:
     vertex_samples_multi: Dict = {}
     for vertex in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        samples_for_vertex = network_samples.get(vertex).asList()
-        is_primitive = [True] * len(samples_for_vertex)
-        samples_as_ndarray = map(Tensor._to_scalar_or_ndarray, samples_for_vertex, is_primitive)
-        samples = list(samples_as_ndarray)
+        samples_for_vertex = network_samples.get(vertex).asTensor()
+        samples_as_ndarray = Tensor._to_scalar_or_ndarray(samples_for_vertex)
+        samples = [sample[0] for sample in array_split(samples_as_ndarray, draws)]
         for sample in samples:
             __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
@@ -303,7 +300,7 @@ def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, netwo
     for vertex in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        sample = Tensor._to_scalar_or_ndarray(network_samples.get(vertex), return_as_primitive=True)
+        sample = Tensor._to_scalar_or_ndarray(network_samples.get(vertex))
         __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
     tuple_hierarchy: Dict = {(vertex_label, tensor_index): values

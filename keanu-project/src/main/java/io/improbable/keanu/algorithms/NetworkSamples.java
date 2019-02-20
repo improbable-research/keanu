@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
@@ -61,12 +62,12 @@ public class NetworkSamples {
         return this.size;
     }
 
-    public <T> Samples<T> get(Variable<T, ?> variable) {
+    public <DATA, TENSOR extends Tensor<DATA>> Samples<DATA, TENSOR> get(Variable<TENSOR, ?> variable) {
         return get(variable.getReference());
     }
 
-    public <T> Samples<T> get(VariableReference variableReference) {
-        return new Samples<>((List<T>) samplesByVariable.get(variableReference));
+    public <DATA, TENSOR extends Tensor<DATA>> Samples<DATA, TENSOR> get(VariableReference variableReference) {
+        return new Samples<>((List<TENSOR>) samplesByVariable.get(variableReference));
     }
 
     public DoubleVertexSamples getDoubleTensorSamples(Variable<DoubleTensor, ?> variable) {

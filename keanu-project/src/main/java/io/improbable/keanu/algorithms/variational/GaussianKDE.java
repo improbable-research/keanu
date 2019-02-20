@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class GaussianKDE {
 
-    public static KDEVertex approximate(Samples<DoubleTensor> vertexSamples) {
+    public static KDEVertex approximate(Samples<Double, DoubleTensor> vertexSamples) {
 
         List<Double> samples = vertexSamples.asList().stream()
             .map(GaussianKDE::checkIfScalar)

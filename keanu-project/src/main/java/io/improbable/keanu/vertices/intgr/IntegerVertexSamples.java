@@ -11,7 +11,7 @@ import java.util.Optional;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 
-public class IntegerVertexSamples extends Samples<IntegerTensor> {
+public class IntegerVertexSamples extends Samples<Integer, IntegerTensor> {
 
     public IntegerVertexSamples(List<IntegerTensor> samples) {
         super(samples);
@@ -56,6 +56,7 @@ public class IntegerVertexSamples extends Samples<IntegerTensor> {
         }
     }
 
+    @Override
     public IntegerTensor asTensor() {
         return IntegerTensor.stack(0, samples.toArray(new IntegerTensor[0]));
     }
