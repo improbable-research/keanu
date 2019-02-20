@@ -243,7 +243,15 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor diag() {
-        throw new NotImplementedException("");
+
+        int n = buffer.length;
+        double[] newBuffer = new double[Ints.checkedCast(n * n)];
+        int nInt = Ints.checkedCast(n);
+        for (int i = 0; i < n; i++) {
+            newBuffer[i * nInt + i] = buffer[i];
+        }
+
+        return new JVMDoubleTensor(newBuffer, new long[]{n, n});
     }
 
     @Override
