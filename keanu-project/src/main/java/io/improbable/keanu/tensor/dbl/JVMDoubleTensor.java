@@ -702,8 +702,21 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
+    public DoubleTensor atan2InPlace(double y) {
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = FastMath.atan2(y, buffer[i]);
+        }
+        return this;
+    }
+
+    @Override
+    public DoubleTensor atan2InPlace(DoubleTensor y) {
+        return broadcastableOpInPlace((left, right) -> FastMath.atan2(right, left), y);
+    }
+
+    @Override
     public DoubleTensor atan2(DoubleTensor y) {
-        throw new NotImplementedException("");
+        return broadcastableOp((left, right) -> FastMath.atan2(right, left), y);
     }
 
     @Override
@@ -1067,27 +1080,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] = FastMath.atan(buffer[i]);
         }
-        return this;
-    }
-
-    @Override
-    public DoubleTensor atan2InPlace(double y) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.atan2(y, buffer[i]);
-        }
-        return this;
-    }
-
-    @Override
-    public DoubleTensor atan2InPlace(DoubleTensor y) {
-        checkElementwiseShapeMatch(y.getShape());
-
-        double[] thatBuffer = y.asFlatDoubleArray();
-
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = FastMath.atan2(thatBuffer[i], buffer[i]);
-        }
-
         return this;
     }
 
