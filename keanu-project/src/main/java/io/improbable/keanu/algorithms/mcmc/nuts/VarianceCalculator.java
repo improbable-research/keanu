@@ -21,7 +21,7 @@ public class VarianceCalculator {
     public VarianceCalculator(Map<VariableReference, DoubleTensor> initialMean,
                               Map<VariableReference, DoubleTensor> initialVariance,
                               double initialWeight) {
-        Preconditions.checkArgument(initialWeight >= 0.0);
+        Preconditions.checkArgument(initialWeight >= 0.0, "Initial weight must be greater than or equal to 0");
         this.count = initialWeight;
         this.mean = initialMean;
         this.M2 = times(initialVariance, count);

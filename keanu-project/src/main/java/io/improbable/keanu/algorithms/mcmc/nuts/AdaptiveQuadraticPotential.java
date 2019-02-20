@@ -36,7 +36,7 @@ public class AdaptiveQuadraticPotential implements Potential {
                                       double initialVariance,
                                       double initialWeight,
                                       int adaptionWindowSize) {
-        Preconditions.checkArgument(adaptionWindowSize > 1);
+        Preconditions.checkArgument(adaptionWindowSize > 1, "Adapt window size must be greater than 1");
 
         this.initialWeight = initialWeight;
         this.initialMean = initialMean;

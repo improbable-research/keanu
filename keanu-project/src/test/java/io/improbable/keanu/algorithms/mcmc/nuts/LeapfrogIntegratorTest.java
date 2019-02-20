@@ -75,7 +75,7 @@ public class LeapfrogIntegratorTest {
     }
 
     @Test
-    public void doesIncreaseKineticEnergyWhenLogProbIncreases() {
+    public void doesDecreaseKineticEnergyWhenLogProbDecreases() {
 
         double startEnergy = start.getKineticEnergy();
 

@@ -8,7 +8,8 @@ import java.util.List;
 
 
 /**
- * This is based on Algorithm 5 from https://arxiv.org/pdf/1111.4246.pdf.
+ * This is based on Algorithm 5: HMC with dual averaging, from https://arxiv.org/pdf/1111.4246.pdf.
+ *
  * <p>
  * The step size is used by NUTS as a time step for the leap frog integration.
  */
