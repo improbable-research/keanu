@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -109,7 +110,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     public static JVMDoubleTensor linspace(double start, double end, int numberOfPoints) {
 
-        double stepSize = (end - start) / numberOfPoints;
+        double stepSize = (end - start) / (numberOfPoints - 1);
 
         double[] buffer = new double[numberOfPoints];
 
@@ -220,6 +221,30 @@ public class JVMDoubleTensor extends DoubleTensor {
 
 
         return new JVMDoubleTensor(copyOf(buffer, buffer.length), copyOf(newShape, newShape.length));
+    }
+
+    @Override
+    public BooleanTensor elementwiseEquals(Tensor that) {
+        if (that instanceof DoubleTensor) {
+            if (isScalar()) {
+                return (that).elementwiseEquals(this.scalar());
+            } else if (that.isScalar()) {
+                return elementwiseEquals(((DoubleTensor) that).scalar());
+            } else {
+
+                double[] thatBuffer = that.asFlatDoubleArray();
+                boolean[] newBuffer = new boolean[buffer.length];
+
+                for (int i = 0; i < buffer.length; i++) {
+                    newBuffer[i] = thatBuffer[i] == buffer[i];
+                }
+
+                return BooleanTensor.create(newBuffer, shapeCopy());
+
+            }
+        } else {
+            return Tensor.elementwiseEquals(this, that);
+        }
     }
 
     @Override
@@ -508,6 +533,11 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public BooleanTensor lessThan(DoubleTensor that) {
+
+        if (that.isScalar()) {
+            return lessThan(that.scalar());
+        }
+
         boolean[] newBuffer = new boolean[buffer.length];
         double[] thatBuffer = that.asFlatDoubleArray();
 
@@ -520,6 +550,11 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public BooleanTensor lessThanOrEqual(DoubleTensor that) {
+
+        if (that.isScalar()) {
+            return lessThanOrEqual(that.scalar());
+        }
+
         boolean[] newBuffer = new boolean[buffer.length];
         double[] thatBuffer = that.asFlatDoubleArray();
 
@@ -533,6 +568,10 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public BooleanTensor greaterThan(DoubleTensor that) {
 
+        if (that.isScalar()) {
+            return greaterThan(that.scalar());
+        }
+
         boolean[] newBuffer = new boolean[buffer.length];
         double[] thatBuffer = that.asFlatDoubleArray();
 
@@ -545,6 +584,11 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public BooleanTensor greaterThanOrEqual(DoubleTensor that) {
+
+        if (that.isScalar()) {
+            return greaterThanOrEqual(that.scalar());
+        }
+
         boolean[] newBuffer = new boolean[buffer.length];
         double[] thatBuffer = that.asFlatDoubleArray();
 
