@@ -2,6 +2,7 @@
 
 ### Common
 
+* Using Buildkite for CI
 * Can save dot files with disconnected vertices in BayesianNetwork. You can also just pass a list of vertices to DotSaver.
 * Plates have been renamed
   * This was done primarily because we were using the term incorrectly, since Dynamic Bayes Nets (e.g. Hidden Markov) are not Plates.
@@ -29,7 +30,6 @@
 
 ## Version 0.0.19
 
-* Buildkite
 * Added `get_vertex_by_label` to `BayesNet`
 * Added optional param `label` for all vertices in Python (e.g. `Gaussian(0., 1., label="gaussian")`). Now you must label vertices you are sampling from, otherwise Keanu will throw an exception.
 * Improved the structure of the Python sample dictionary
