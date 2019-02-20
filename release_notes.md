@@ -11,6 +11,7 @@
   
 ### Python
 
+* Expose `unobserve`
 * Added `iter_all_vertices`
 * Rename methods returning generators to `iter_*` from `get_*`
 * Split the ND4J dependencies into their own pip package.
