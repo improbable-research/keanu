@@ -38,8 +38,8 @@ public class DoubleTensorTest {
     @Parameterized.Parameters(name = "{index}: Test with {1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
-//            {new JVMDoubleTensorFactory(), "JVM DoubleTensor"},
+//            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
+            {new JVMDoubleTensorFactory(), "JVM DoubleTensor"},
         });
     }
 

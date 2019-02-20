@@ -15,11 +15,13 @@ import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.util.FastMath;
 import org.nd4j.linalg.api.shape.Shape;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 import static io.improbable.keanu.tensor.TensorShape.invertedPermute;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.ADD;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.DIV;
@@ -1031,9 +1033,73 @@ public class JVMDoubleTensor extends DoubleTensor {
         return boxedBuffer;
     }
 
+    /**
+     * @param dimension      the dimension to split on
+     * @param splitAtIndices the indices that the dimension to split on should be split on
+     * @return pieces of the tensor split in the order specified by splitAtIndices. To get
+     * pieces that encompasses the entire tensor, the last index in the splitAtIndices must
+     * be the length of the dimension being split on.
+     * <p>
+     * e.g A =
+     * [
+     * 1, 2, 3, 4, 5, 6
+     * 7, 8, 9, 1, 2, 3
+     * ]
+     * <p>
+     * A.split(0, [1]) gives List([1, 2, 3, 4, 5, 6])
+     * A.split(0, [1, 2]) gives List([1, 2, 3, 4, 5, 6], [7, 8, 9, 1, 2, 3]
+     * <p>
+     * A.split(1, [1, 3, 6]) gives
+     * List(
+     * [1, [2, 3  , [4, 5, 6,
+     * 7]  8, 9]    1, 2, 3]
+     * )
+     */
     @Override
     public List<DoubleTensor> split(int dimension, long... splitAtIndices) {
-        throw new NotImplementedException("");
+
+        long[] shape = getShape();
+        dimension = getAbsoluteDimension(dimension, getRank());
+
+        if (dimension < 0 || dimension >= shape.length) {
+            throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
+        }
+
+        int[] moveDimToZero = TensorShape.slideDimension(dimension, 0, shape.length);
+        int[] moveZeroToDim = TensorShape.slideDimension(0, dimension, shape.length);
+
+        DoubleTensor permutedTensor = this.permute(moveDimToZero).reshape(buffer.length);
+
+        double[] rawBuffer = permutedTensor.asFlatDoubleArray();
+
+        List<DoubleTensor> splitTensor = new ArrayList<>();
+
+        long previousSplitAtIndex = 0;
+        int rawBufferPosition = 0;
+        for (long splitAtIndex : splitAtIndices) {
+
+            long[] subTensorShape = Arrays.copyOf(shape, shape.length);
+            long subTensorLengthInDimension = splitAtIndex - previousSplitAtIndex;
+
+            if (subTensorLengthInDimension > shape[dimension] || subTensorLengthInDimension <= 0) {
+                throw new IllegalArgumentException("Invalid index to split on " + splitAtIndex + " at " + dimension + " for tensor of shape " + Arrays.toString(shape));
+            }
+
+            subTensorShape[dimension] = subTensorLengthInDimension;
+            int subTensorLength = Ints.checkedCast(TensorShape.getLength(subTensorShape));
+
+            double[] buffer = new double[subTensorLength];
+            System.arraycopy(rawBuffer, rawBufferPosition, buffer, 0, buffer.length);
+
+            long[] subTensorPermutedShape = TensorShape.getPermutedResultShapeShape(subTensorShape, moveDimToZero);
+            DoubleTensor subTensor = DoubleTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
+            splitTensor.add(subTensor);
+
+            previousSplitAtIndex = splitAtIndex;
+            rawBufferPosition += buffer.length;
+        }
+
+        return splitTensor;
     }
 
     @Override
