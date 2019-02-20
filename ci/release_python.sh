@@ -6,8 +6,8 @@ if [[ -n "${DEBUG-}" ]]; then
   set -x
 fi
 
-PYPI_TEST_SECRET="ci/improbable/keanu-eng-test-pypi"
-PYPI_REAL_SECRET="ci/improbable/keanu-eng-test-pypi"
+PYPI_TEST_SECRET="keanu-eng-test-pypi"
+PYPI_REAL_SECRET="keanu-eng-test-pypi"
 
 display_usage() {
 	echo
@@ -18,8 +18,8 @@ display_usage() {
 }
 
 get_secrets_for_manual_release() {
-	PYPI_USERNAME=$(imp-vault read --product_group="dev-workflow" --environment="production" --role="buildkite" --in_use_by="buildkite-agents" --type_name="generic-credentials" --name=${secret_name} --field="username")
-    PYPI_PASSWORD=$(imp-vault read --product_group="dev-workflow" --environment="production" --role="buildkite" --in_use_by="buildkite-agents" --type_name="generic-credentials" --name=${secret_name} --field="password")
+	PYPI_USERNAME=$(imp-vault read --product_group="dev-workflow" --environment="production" --role="buildkite" --in_use_by="buildkite-agents" --type_name="generic-credentials" --name="ci/improbable/${secret_name}" --field="username")
+  PYPI_PASSWORD=$(imp-vault read --product_group="dev-workflow" --environment="production" --role="buildkite" --in_use_by="buildkite-agents" --type_name="generic-credentials" --name="ci/improbable/${secret_name}" --field="password")
 }
 
 get_secrets_for_ci_release() {
