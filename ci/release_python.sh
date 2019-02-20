@@ -17,14 +17,24 @@ display_usage() {
 	echo
 }
 
-get_secrets_for_manual_release() {
-	PYPI_USERNAME=$(imp-vault read --product_group="dev-workflow" --environment="production" --role="buildkite" --in_use_by="buildkite-agents" --type_name="generic-credentials" --name="ci/improbable/${secret_name}" --field="username")
-  PYPI_PASSWORD=$(imp-vault read --product_group="dev-workflow" --environment="production" --role="buildkite" --in_use_by="buildkite-agents" --type_name="generic-credentials" --name="ci/improbable/${secret_name}" --field="password")
-}
-
-get_secrets_for_ci_release() {
-	PYPI_USERNAME=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name=${secret_name} --field="username")
-	PYPI_PASSWORD=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name=${secret_name} --field="password")
+get_secrets() {
+  release_type=$1
+  secret_name=$2
+  case ${release_type} in
+  manual)
+      pypi_username=$(imp-vault read --product_group="dev-workflow" --environment="production" --role="buildkite" --in_use_by="buildkite-agents" --type_name="generic-credentials" --name="ci/improbable/${secret_name}" --field="username")
+      pypi_password=$(imp-vault read --product_group="dev-workflow" --environment="production" --role="buildkite" --in_use_by="buildkite-agents" --type_name="generic-credentials" --name="ci/improbable/${secret_name}" --field="password")
+      ;;
+    ci)
+      pypi_username=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name="${secret_name}" --field="username")
+      pypi_password=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name="${secret_name}" --field="password")
+      ;;
+    *)
+      echo "Unknown release type"
+      display_usage
+      exit 1
+      ;;
+esac
 }
 
 if [ "$#" -ne 2 ]; then
@@ -34,13 +44,18 @@ if [ "$#" -ne 2 ]; then
 fi
 
 target_pypi_arg=${1}
+release_type=${2}
+
+pipenv install
 
 case $target_pypi_arg in
 	test)
-      secret_name=$PYPI_TEST_SECRET
+      get_secrets "${release_type}" ${PYPI_TEST_SECRET}
+      pipenv run python3 -m twine upload --username "${pypi_username}" --password "${pypi_password}" --repository-url https://test.pypi.org/legacy/ ../keanu-python/dist/*
       ;;
     real)
-      secret_name=$PYPI_REAL_SECRET
+      get_secrets "${release_type}" ${PYPI_REAL_SECRET}
+      pipenv run python3 -m twine upload --username "${pypi_username}" --password "${pypi_password}" ../keanu-python/dist/*
       ;;
     *)
       echo "Unknown target repo"
@@ -48,24 +63,3 @@ case $target_pypi_arg in
       exit 1
       ;;
 esac
-
-release_type=${2}
-
-case $release_type in
-	manual)
-      get_secrets_for_manual_release
-      ;;
-    ci)
-      get_secrets_for_ci_release
-      ;;
-    *)
-      echo "Unknown release type"
-      display_usage
-      exit 1
-      ;;
-esac
-
-
-cd "$(dirname "$0")/../"
-
-python3 -m twine upload --username "${PYPI_USERNAME}" --password "${PYPI_PASSWORD}" --repository-url https://test.pypi.org/legacy/ keanu-python/dist/*
