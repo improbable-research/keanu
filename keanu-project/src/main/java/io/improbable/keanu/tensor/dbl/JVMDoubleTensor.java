@@ -48,6 +48,11 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     private JVMDoubleTensor(double[] data, long[] shape) {
+
+        if (data.length != TensorShape.getLength(shape)) {
+            throw new IllegalArgumentException("Shape " + Arrays.toString(shape) + " does not match buffer size " + data.length);
+        }
+
         this.shape = shape;
         this.stride = TensorShape.getRowFirstStride(shape);
         this.buffer = data;
@@ -58,11 +63,6 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     public static JVMDoubleTensor create(double[] values, long... shape) {
-
-        if (values.length != TensorShape.getLength(shape)) {
-            throw new IllegalArgumentException("Shape " + Arrays.toString(shape) + " does not match buffer size " + values.length);
-        }
-
         return new JVMDoubleTensor(values, shape);
     }
 
@@ -211,14 +211,13 @@ public class JVMDoubleTensor extends DoubleTensor {
             }
         }
 
-        if (newLength != buffer.length) {
+        if (newLength != buffer.length || negativeDimension >= 0) {
             if (negativeDimension < 0) {
                 throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(shape) + " to " + Arrays.toString(newShape));
             } else {
                 newShape[negativeDimension] = buffer.length / newLength;
             }
         }
-
 
         return new JVMDoubleTensor(copyOf(buffer, buffer.length), copyOf(newShape, newShape.length));
     }
@@ -400,8 +399,8 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
-    public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
-        throw new NotImplementedException("");
+    public DoubleTensor tensorMultiply(DoubleTensor that, int[] dimsLeft, int[] dimsRight) {
+        return JVMTensorMul.tensorMmul(this, that, new int[][]{dimsLeft, dimsRight});
     }
 
     @Override

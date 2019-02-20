@@ -412,12 +412,18 @@ public class DoubleTensorTest {
     @Test
     public void canReshapeWithWildCardDim() {
         DoubleTensor a = DoubleTensor.create(new double[]{0, 1, 2, 3, 4, 5}, 2, 3);
-        DoubleTensor actualDim0 = a.reshape(-1, 2);
-        DoubleTensor actualDim1 = a.reshape(3, -1);
         DoubleTensor expected = DoubleTensor.create(new double[]{0, 1, 2, 3, 4, 5}, 3, 2);
 
-        assertEquals(actualDim1, expected);
-        assertEquals(actualDim0, expected);
+        assertEquals(a.reshape(3, -1), expected);
+        assertEquals(a.reshape(-1, 2), expected);
+    }
+
+    @Test
+    public void canReshapeWithWildCardDimEvenWithLengthOneDim() {
+        DoubleTensor a = DoubleTensor.create(new double[]{0, 1, 2, 3, 4, 5}, 1, 6);
+        DoubleTensor expected = DoubleTensor.create(new double[]{0, 1, 2, 3, 4, 5}, 1, 6);
+
+        assertEquals(a.reshape(-1, 6), expected);
     }
 
     @Test
