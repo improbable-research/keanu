@@ -38,8 +38,8 @@ public class DoubleTensorTest {
     @Parameterized.Parameters(name = "{index}: Test with {1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
-//            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
-            {new JVMDoubleTensorFactory(), "JVM DoubleTensor"},
+            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
+//            {new JVMDoubleTensorFactory(), "JVM DoubleTensor"},
         });
     }
 
@@ -1110,12 +1110,13 @@ public class DoubleTensorTest {
 
     @Test
     public void canBasicTrig() {
-        assertUnaryOperation(Math::sin, DoubleTensor::sin, matrixA);
-        assertUnaryOperation(Math::cos, DoubleTensor::cos, matrixA);
-        assertUnaryOperation(Math::tan, DoubleTensor::tan, matrixA);
-        assertUnaryOperation(Math::asin, DoubleTensor::asin, matrixA);
-        assertUnaryOperation(Math::acos, DoubleTensor::acos, matrixA);
-        assertUnaryOperation(Math::atan, DoubleTensor::atan, matrixA);
+        DoubleTensor trigFriendlyTensor = DoubleTensor.linspace(0.1, 0.9, 4).reshape(2, 2);
+        assertUnaryOperation(Math::sin, DoubleTensor::sin, trigFriendlyTensor);
+        assertUnaryOperation(Math::cos, DoubleTensor::cos, trigFriendlyTensor);
+        assertUnaryOperation(Math::tan, DoubleTensor::tan, trigFriendlyTensor);
+        assertUnaryOperation(Math::asin, DoubleTensor::asin, trigFriendlyTensor);
+        assertUnaryOperation(Math::acos, DoubleTensor::acos, trigFriendlyTensor);
+        assertUnaryOperation(Math::atan, DoubleTensor::atan, trigFriendlyTensor);
     }
 
     @Test
