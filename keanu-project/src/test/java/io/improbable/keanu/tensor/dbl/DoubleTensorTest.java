@@ -395,6 +395,31 @@ public class DoubleTensorTest {
         assertEquals(expected, actual);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnIncorrectShape() {
+        DoubleTensor.create(new double[]{0, 1, 2, 3, 4, 5, 6}, 2, 3);
+    }
+
+    @Test
+    public void canReshape() {
+        DoubleTensor a = DoubleTensor.create(new double[]{0, 1, 2, 3, 4, 5}, 2, 3);
+        DoubleTensor actual = a.reshape(3, 2);
+        DoubleTensor expected = DoubleTensor.create(new double[]{0, 1, 2, 3, 4, 5}, 3, 2);
+
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    public void canReshapeWithWildCardDim() {
+        DoubleTensor a = DoubleTensor.create(new double[]{0, 1, 2, 3, 4, 5}, 2, 3);
+        DoubleTensor actualDim0 = a.reshape(-1, 2);
+        DoubleTensor actualDim1 = a.reshape(3, -1);
+        DoubleTensor expected = DoubleTensor.create(new double[]{0, 1, 2, 3, 4, 5}, 3, 2);
+
+        assertEquals(actualDim1, expected);
+        assertEquals(actualDim0, expected);
+    }
+
     @Test
     public void canPermuteUpperDimensions() {
         DoubleTensor a = DoubleTensor.create(new double[]{

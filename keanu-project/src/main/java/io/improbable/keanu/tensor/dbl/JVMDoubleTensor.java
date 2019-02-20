@@ -55,6 +55,11 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     public static JVMDoubleTensor create(double[] values, long... shape) {
+
+        if (values.length != TensorShape.getLength(shape)) {
+            throw new IllegalArgumentException("Shape " + Arrays.toString(shape) + " does not match buffer size " + values.length);
+        }
+
         return new JVMDoubleTensor(values, shape);
     }
 
@@ -186,6 +191,32 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor reshape(long... newShape) {
+
+        long newLength = 1;
+        int negativeDimension = -1;
+
+        for (int i = 0; i < newShape.length; i++) {
+
+            long dimILength = newShape[i];
+            if (dimILength > 0) {
+                newLength *= dimILength;
+            } else if (dimILength < 0) {
+                if (negativeDimension >= 0) {
+                    throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(shape) + " to " + Arrays.toString(newShape));
+                }
+                negativeDimension = i;
+            }
+        }
+
+        if (newLength != buffer.length) {
+            if (negativeDimension < 0) {
+                throw new IllegalArgumentException("Cannot reshape " + Arrays.toString(shape) + " to " + Arrays.toString(newShape));
+            } else {
+                newShape[negativeDimension] = buffer.length / newLength;
+            }
+        }
+
+
         return new JVMDoubleTensor(copyOf(buffer, buffer.length), copyOf(newShape, newShape.length));
     }
 
