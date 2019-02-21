@@ -148,7 +148,7 @@ def test_vertex_sample_is_a_numpy_array() -> None:
 
 def test_get_connected_graph() -> None:
     gaussian = Gaussian(0., 1.)
-    connected_graph = set(gaussian.get_connected_graph())
+    connected_graph = set(gaussian.iter_connected_graph())
 
     assert len(connected_graph) == 3
 
@@ -320,6 +320,15 @@ def test_you_can_observe(ctor: Callable, args: Union[Tuple[float, ...], Tuple[in
     assert_vertex_value_equals(vertex, expected_type, value)
 
 
+def test_unobserve() -> None:
+    vertex = Gaussian(0., 1.)
+    vertex.observe(4)
+    assert vertex.is_observed()
+    assert vertex.get_value() == 4
+    vertex.unobserve()
+    assert not vertex.is_observed()
+
+
 @pytest.mark.parametrize("ctor, args, expected_type, value", [(Gaussian, (0., 1.), float, 4.),
                                                               (UniformInt, (0, 10), int, 5),
                                                               (Bernoulli, (0.5,), bool, True)])
@@ -336,6 +345,12 @@ def test_pass_label_as_an_optional_param() -> None:
 def test_can_pass_none_label() -> None:
     vertex = Gaussian(0., 1., label=None)
     assert vertex.get_label() == None
+
+
+def test_can_pass_namespaced_label() -> None:
+    vertex = Gaussian(0., 1., label="outer.inner.foo")
+    assert vertex.get_label() == "outer.inner.foo"
+    assert vertex.unwrap().getLabel().getUnqualifiedName() == "foo"
 
 
 def test_set_label() -> None:
@@ -367,3 +382,18 @@ def test_java_vertex_to_python_vertex_persists_label() -> None:
     java_vertex = Gaussian(0., 1., label=label).unwrap()
     python_vertex = Vertex._from_java_vertex(java_vertex)
     assert python_vertex.get_label() == label
+
+
+def test_can_get_parents_and_children() -> None:
+
+    def labels_match(lhs, rhs) -> bool:
+        return [l.get_label() for l in lhs] == [r.get_label() for r in rhs]
+
+    parents = (Gaussian(0, 1, label="parent1"), Gaussian(0, 1, label="parent2"))
+    children = tuple(Gaussian(parents[0], parents[1], label=f"child{i}") for i in range(5))
+
+    for parent in parents:
+        assert labels_match(parent.iter_children(), children)
+
+    for child in children:
+        assert labels_match(child.iter_parents(), parents)
