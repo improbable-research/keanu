@@ -1525,6 +1525,8 @@ public class JVMDoubleTensor extends DoubleTensor {
             //e.g. [2] / [2, 2]
             broadcastFromLeft(leftBuffer, leftShape, leftStride, rightBuffer, rightShape, rightStride, outputBuffer, op);
         }
+
+        return new JVMDoubleTensor(outputBuffer, resultShape);
     }
 
     private JVMDoubleTensor elementwiseBinaryOp(double[] leftBuffer, double[] rightBuffer, long[] shape,
