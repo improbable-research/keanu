@@ -14,14 +14,19 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Multip
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Arrays;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
+import org.junit.rules.ExpectedException;
 
 public class ConcatenationVertexTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void canConcatVectorsOfSameSize() {
@@ -82,6 +87,17 @@ public class ConcatenationVertexTest {
 
         Assert.assertArrayEquals(new long[]{4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
+    }
+
+    @Test
+    public void concatVectorThrowsAppropriateMessageIfScalarWithRankZero() {
+        DoubleVertex a = new ConstantDoubleVertex(1.);
+        DoubleVertex b = new ConstantDoubleVertex(2.);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Cannot concat shapes at a dimension greater than or equal to their ranks");
+
+        new ConcatenationVertex(0, a, b);
     }
 
     @Test(expected = IllegalArgumentException.class)
