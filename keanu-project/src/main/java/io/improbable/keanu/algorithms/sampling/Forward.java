@@ -63,8 +63,7 @@ public class Forward implements PosteriorSamplingAlgorithm {
             Preconditions.checkArgument(variable instanceof Vertex, "The Forward Sampler only works for Variables of type Vertex. Received : " + variable);
         }
 
-        Variable latent = latentVariables.get(0);
-        BayesianNetwork network = new BayesianNetwork(((Vertex) latent).getConnectedGraph());
+        BayesianNetwork network = checkSampleFromVariablesComeFromConnectedGraph(variablesToSampleFrom);
 
         List<Vertex> observedVertices = network.getObservedVertices();
         checkUpstreamOfObservedDoesNotContainProbabilistic(observedVertices);
@@ -78,6 +77,18 @@ public class Forward implements PosteriorSamplingAlgorithm {
         List<Vertex> sortedVertices = TopologicalSort.sort(intersection);
 
         return new ForwardSampler(network, verticesToSampleFrom, sortedVertices, random, calculateSampleProbability);
+    }
+
+    private BayesianNetwork checkSampleFromVariablesComeFromConnectedGraph(List<? extends Variable> variablesToSampleFrom) {
+        Variable variable = variablesToSampleFrom.get(0);
+        Set connectedGraph = ((Vertex) variable).getConnectedGraph();
+
+        for (Variable var : variablesToSampleFrom) {
+            if (!connectedGraph.contains(var)) {
+                throw new IllegalArgumentException("Sample from vertices must be part of the same connected graph.");
+            }
+        }
+        return new BayesianNetwork(connectedGraph);
     }
 
     private Set<Vertex> allDownstreamVertices(List<Vertex> randomVertices) {

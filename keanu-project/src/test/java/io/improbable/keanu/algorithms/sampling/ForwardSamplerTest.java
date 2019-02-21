@@ -84,6 +84,19 @@ public class ForwardSamplerTest {
     }
 
     @Test
+    public void throwsWhenSamplingFromDisconnectedGraph() {
+        GaussianVertex A = new GaussianVertex(0, 1.);
+        GaussianVertex B = new GaussianVertex(0, 1.);
+
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Sample from vertices must be part of the same connected graph.");
+
+        Keanu.Sampling.Forward.withDefaultConfig().getPosteriorSamples(model, Arrays.asList(A, B), 50);
+    }
+
+    @Test
     public void canCalculateProbabilityOfSamples() {
         GaussianVertex A = new GaussianVertex(100.0, 1);
         DoubleVertex B = A.plus(ConstantVertex.of(5.));
