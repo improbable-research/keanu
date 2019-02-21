@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.List;
 
-public class DoubleVertexSamples extends Samples<Double, DoubleTensor> {
+public class DoubleVertexSamples extends Samples<DoubleTensor> {
     private final long sampleShape[];
 
     public DoubleVertexSamples(List<DoubleTensor> samples) {
@@ -52,7 +52,6 @@ public class DoubleVertexSamples extends Samples<Double, DoubleTensor> {
     }
 
 
-    @Override
     public DoubleTensor asTensor() {
         return DoubleTensor.stack(0, samples.stream().toArray(DoubleTensor[]::new));
     }

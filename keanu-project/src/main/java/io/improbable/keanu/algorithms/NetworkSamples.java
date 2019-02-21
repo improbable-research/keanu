@@ -2,10 +2,14 @@ package io.improbable.keanu.algorithms;
 
 import com.google.common.base.Preconditions;
 import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertexSamples;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertexSamples;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,12 +66,20 @@ public class NetworkSamples {
         return this.size;
     }
 
-    public <DATA, TENSOR extends Tensor<DATA>> Samples<DATA, TENSOR> get(Variable<TENSOR, ?> variable) {
-        return get(variable.getReference());
+    public <T> Samples<T> get(Variable<T, ?> variable) {
+        if (variable instanceof DoubleVertex) {
+            return (Samples<T>) getDoubleTensorSamples(variable.getReference());
+        } else if (variable instanceof IntegerVertex) {
+            return (Samples<T>) getIntegerTensorSamples(variable.getReference());
+        } else if (variable instanceof BooleanVertex) {
+            return (Samples<T>) getBooleanTensorSamples(variable.getReference());
+        } else {
+            return get(variable.getReference());
+        }
     }
 
-    public <DATA, TENSOR extends Tensor<DATA>> Samples<DATA, TENSOR> get(VariableReference variableReference) {
-        return new Samples<>((List<TENSOR>) samplesByVariable.get(variableReference));
+    public <T> Samples<T> get(VariableReference variableReference) {
+        return new Samples<>((List<T>) samplesByVariable.get(variableReference));
     }
 
     public DoubleVertexSamples getDoubleTensorSamples(Variable<DoubleTensor, ?> variable) {
@@ -84,6 +96,14 @@ public class NetworkSamples {
 
     public IntegerVertexSamples getIntegerTensorSamples(VariableReference variableReference) {
         return new IntegerVertexSamples(samplesByVariable.get(variableReference));
+    }
+
+    public BooleanVertexSamples getBooleanTensorSamples(Variable<BooleanTensor, ?> variable) {
+        return getBooleanTensorSamples(variable.getReference());
+    }
+
+    public BooleanVertexSamples getBooleanTensorSamples(VariableReference variableReference) {
+        return new BooleanVertexSamples(samplesByVariable.get(variableReference));
     }
 
     public NetworkSamples drop(int dropCount) {

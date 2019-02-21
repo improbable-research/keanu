@@ -85,7 +85,7 @@
 
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">ndenumerate</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">array_split</span>
 <span class="kn">from</span> <span class="nn">py4j.java_collections</span> <span class="k">import</span> <span class="n">JavaList</span>
-<span class="kn">from</span> <span class="nn">py4j.java_gateway</span> <span class="k">import</span> <span class="n">java_import</span><span class="p">,</span> <span class="n">JavaObject</span>
+<span class="kn">from</span> <span class="nn">py4j.java_gateway</span> <span class="k">import</span> <span class="n">java_import</span><span class="p">,</span> <span class="n">JavaObject</span><span class="p">,</span> <span class="n">is_instance_of</span>
 
 <span class="kn">from</span> <span class="nn">keanu.algorithm._proposal_distribution</span> <span class="k">import</span> <span class="n">ProposalDistribution</span>
 <span class="kn">from</span> <span class="nn">keanu.context</span> <span class="k">import</span> <span class="n">KeanuContext</span>
@@ -363,9 +363,17 @@
     <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">vertices_unwrapped</span><span class="p">:</span>
         <span class="n">vertex_label</span> <span class="o">=</span> <span class="n">id_to_label</span><span class="p">[</span><span class="n">Vertex</span><span class="o">.</span><span class="n">_get_python_id</span><span class="p">(</span><span class="n">vertex</span><span class="p">)]</span>
         <span class="n">vertex_samples_multi</span><span class="p">[</span><span class="n">vertex_label</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-        <span class="n">samples_for_vertex</span> <span class="o">=</span> <span class="n">network_samples</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span><span class="o">.</span><span class="n">asTensor</span><span class="p">()</span>
+        <span class="kn">import</span> <span class="nn">datetime</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">samples_for_vertex</span> <span class="o">=</span> <span class="n">network_samples</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span><span class="o">.</span><span class="n">asTensor</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;cannot sample generic types.&quot;</span><span class="p">)</span>
+
         <span class="n">samples_as_ndarray</span> <span class="o">=</span> <span class="n">Tensor</span><span class="o">.</span><span class="n">_to_scalar_or_ndarray</span><span class="p">(</span><span class="n">samples_for_vertex</span><span class="p">)</span>
         <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">array_split</span><span class="p">(</span><span class="n">samples_as_ndarray</span><span class="p">,</span> <span class="n">draws</span><span class="p">)]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
             <span class="n">__add_sample_to_dict</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">vertex_samples_multi</span><span class="p">[</span><span class="n">vertex_label</span><span class="p">])</span>
 

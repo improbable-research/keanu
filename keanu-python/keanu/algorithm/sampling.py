@@ -269,9 +269,8 @@ def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrap
     vertex_samples: sample_types = {}
     for vertex_unwrapped in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex_unwrapped)]
-        samples_for_vertex = network_samples.get(vertex_unwrapped).asTensor()
-        samples_as_ndarray = Tensor._to_scalar_or_ndarray(samples_for_vertex)
-        vertex_samples[vertex_label] = list(samples_as_ndarray.flatten())
+        samples_for_vertex = __get_vertex_samples(network_samples, vertex)
+        vertex_samples[vertex_label] = list(samples_for_vertex.flatten())
     return vertex_samples
 
 
@@ -283,14 +282,8 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
         vertex_samples_multi[vertex_label] = defaultdict(list)
         import datetime
         print(datetime.datetime.now())
-        if is_instance_of(k._gateway, vertex, "io.improbable.keanu.vertices.dbl.DoubleVertex"):
-            samples_for_vertex = network_samples.getDoubleTensorSamples(vertex).asTensor()
-        elif is_instance_of(k._gateway, vertex, "io.improbable.keanu.vertices.dbl.IntegerVertex"):
-            samples_for_vertex = network_samples.getIntegerTensorSamples(vertex).asTensor()
-        else:
-            samples_for_vertex = network_samples.get(vertex).asTensor()
-        samples_as_ndarray = Tensor._to_scalar_or_ndarray(samples_for_vertex)
-        samples = [sample[0] for sample in array_split(samples_as_ndarray, draws)]
+        samples_for_vertex = __get_vertex_samples(network_samples, vertex)
+        samples = [sample[0] for sample in array_split(samples_for_vertex, draws)]
         print(datetime.datetime.now())
         for sample in samples:
             __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
@@ -326,3 +319,12 @@ def __add_sample_to_dict(sample_value: Any, vertex_sample: Dict):
     else:
         for index, value in ndenumerate(sample_value):
             vertex_sample[index].append(value.item())
+
+
+def __get_vertex_samples(network_samples, vertex) -> ndarray:
+    samples_for_vertex = network_samples.get(vertex)
+    try:
+        samples_for_vertex = samples_for_vertex.asTensor()
+    except AttributeError:
+        raise NotImplementedError("sampling from generics not supported.")
+    return Tensor._to_scalar_or_ndarray(samples_for_vertex)
