@@ -6,10 +6,11 @@ import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.*;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.BooleanPlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -17,7 +18,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Collections;
 import java.util.Map;
@@ -74,19 +74,15 @@ public class BernoulliVertex extends BooleanVertex implements ProbabilisticBoole
         return Bernoulli.withParameters(probTrue.getValue()).logProb(value).sum();
     }
 
+    @Override
     public LogProbGraph logProbGraph() {
-        final LogProbGraph.BooleanPlaceholderVertex xInput = new LogProbGraph.BooleanPlaceholderVertex(this.getShape());
-        final LogProbGraph.DoublePlaceholderVertex probTrueInput = new LogProbGraph.DoublePlaceholderVertex(probTrue.getShape());
-
-        final DoubleVertex logProb = If.isTrue(xInput)
-            .then(probTrueInput)
-            .orElse(ConstantVertex.of(1.0).minus(probTrueInput))
-            .sum();
+        BooleanPlaceholderVertex valuePlaceholder = new BooleanPlaceholderVertex(this.getShape());
+        DoublePlaceholderVertex probTruePlaceholder = new DoublePlaceholderVertex(probTrue.getShape());
 
         return LogProbGraph.builder()
-            .input(this, xInput)
-            .input(probTrue, probTrueInput)
-            .logProbOutput(logProb)
+            .input(this, valuePlaceholder)
+            .input(probTrue, probTruePlaceholder)
+            .logProbOutput(Bernoulli.logProbGraph(valuePlaceholder, probTruePlaceholder))
             .build();
     }
 
