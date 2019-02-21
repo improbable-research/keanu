@@ -32,7 +32,6 @@ public class JVMTensorMul {
 
         int[] newAxesA = Ints.concat(Ints.toArray(listA), axes[0]);
 
-
         List<Integer> listB = new ArrayList<>();
         for (int i = 0; i < bShape.length; i++) {
             if (!Ints.contains(axes[1], i))
@@ -48,15 +47,16 @@ public class JVMTensorMul {
         }
 
         //if listA and listB are empty these do not initialize.
-        //so initializing with {1} which will then get overriden if not empty
+        //so initializing with {1} which will then get overridden if not empty
         long[] newShapeA = {-1, n2};
         long[] oldShapeA;
         if (listA.size() == 0) {
             oldShapeA = new long[]{1};
         } else {
             oldShapeA = Longs.toArray(listA);
-            for (int i = 0; i < oldShapeA.length; i++)
+            for (int i = 0; i < oldShapeA.length; i++) {
                 oldShapeA[i] = aShape[Ints.checkedCast(oldShapeA[i])];
+            }
         }
 
         int n3 = 1;
@@ -65,15 +65,15 @@ public class JVMTensorMul {
             n3 *= bShape[axes[1][i]];
         }
 
-
         long[] newShapeB = {n3, -1};
         long[] oldShapeB;
         if (listB.size() == 0) {
             oldShapeB = new long[]{1};
         } else {
             oldShapeB = Longs.toArray(listB);
-            for (int i = 0; i < oldShapeB.length; i++)
+            for (int i = 0; i < oldShapeB.length; i++) {
                 oldShapeB[i] = bShape[Ints.checkedCast(oldShapeB[i])];
+            }
         }
 
         DoubleTensor at = a.permute(newAxesA).reshape(newShapeA);

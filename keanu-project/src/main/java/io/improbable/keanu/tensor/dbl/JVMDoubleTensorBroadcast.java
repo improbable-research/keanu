@@ -69,88 +69,28 @@ public class JVMDoubleTensorBroadcast {
 
     }
 
-
-    static double[] opWithAutoBroadcast(double[] leftBuffer, long[] leftShape, long[] leftStride,
-                                        DoubleTensor right, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
-
-        final double[] rightBuffer = right.asFlatDoubleArray();
-        final long[] rightShape = right.getShape();
-
-        if (Arrays.equals(leftShape, rightShape)) {
-
-            return elementwise(leftBuffer, rightBuffer, outputBuffer, op);
-        } else {
-
-            //Short circuit for broadcast with scalars
-            if (leftShape.length == 0) {
-                return scalarLeft(leftBuffer[0], rightBuffer, outputBuffer, op);
-            } else if (rightShape.length == 0) {
-                return scalarRight(leftBuffer, rightBuffer[0], outputBuffer, op);
-            }
-
-            final long[] rightStride = right.getStride();
-            //Allow broadcasting from left and right
-            if (leftShape.length > rightShape.length || leftBuffer.length > rightBuffer.length) {
-
-                //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
-                final long[] paddedRightShape;
-                final long[] paddedRightStride;
-
-                if (leftShape.length != rightShape.length) {
-                    paddedRightShape = TensorShape.shapeToDesiredRankByPrependingOnes(rightShape, leftShape.length);
-                    paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
-                } else {
-                    paddedRightShape = rightShape;
-                    paddedRightStride = rightStride;
-                }
-
-                //e.g. [2, 2] * [1, 2]
-                return broadcastFromRight(leftBuffer, leftShape, leftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
-            } else {
-
-                //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
-                final long[] paddedLeftShape;
-                final long[] paddedLeftStride;
-
-                if (leftShape.length != rightShape.length) {
-                    paddedLeftShape = TensorShape.shapeToDesiredRankByPrependingOnes(leftShape, rightShape.length);
-                    paddedLeftStride = TensorShape.getRowFirstStride(paddedLeftShape);
-                } else {
-                    paddedLeftShape = leftShape;
-                    paddedLeftStride = leftStride;
-                }
-
-                //e.g. [2] / [2, 2]
-                return broadcastFromLeft(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, rightShape, rightStride, outputBuffer, op);
-            }
-        }
-    }
-
-    private static double[] elementwise(double[] leftBuffer, double[] rightBuffer, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+    static void elementwise(double[] leftBuffer, double[] rightBuffer, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
 
         for (int i = 0; i < outputBuffer.length; i++) {
             outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[i]);
         }
 
-        return outputBuffer;
     }
 
-    private static double[] scalarLeft(double left, double[] rightBuffer, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+    static void scalarLeft(double left, double[] rightBuffer, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
 
         for (int i = 0; i < outputBuffer.length; i++) {
             outputBuffer[i] = op.apply(left, rightBuffer[i]);
         }
 
-        return outputBuffer;
     }
 
-    private static double[] scalarRight(double[] leftBuffer, double right, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+    static void scalarRight(double[] leftBuffer, double right, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
 
         for (int i = 0; i < leftBuffer.length; i++) {
             outputBuffer[i] = op.apply(leftBuffer[i], right);
         }
 
-        return outputBuffer;
     }
 
     /**
@@ -166,9 +106,21 @@ public class JVMDoubleTensorBroadcast {
      * @param op
      * @return
      */
-    private static double[] broadcastFromRight(double[] leftBuffer, long[] leftShape, long[] leftStride,
-                                               double[] rightBuffer, long[] rightShape, long[] rightStride,
-                                               double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+    static void broadcastFromRight(double[] leftBuffer, long[] leftShape, long[] leftStride,
+                                   double[] rightBuffer, long[] rightShape, long[] rightStride,
+                                   double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+
+        //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
+        final long[] paddedRightShape;
+        final long[] paddedRightStride;
+
+        if (leftShape.length != rightShape.length) {
+            paddedRightShape = TensorShape.shapeToDesiredRankByPrependingOnes(rightShape, leftShape.length);
+            paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
+        } else {
+            paddedRightShape = rightShape;
+            paddedRightStride = rightStride;
+        }
 
         for (int i = 0; i < outputBuffer.length; i++) {
 
@@ -177,15 +129,14 @@ public class JVMDoubleTensorBroadcast {
             long[] mappedShapeIndices = new long[shapeIndices.length];
 
             for (int s = 0; s < shapeIndices.length; s++) {
-                mappedShapeIndices[s] = shapeIndices[s] % rightShape[s];
+                mappedShapeIndices[s] = shapeIndices[s] % paddedRightShape[s];
             }
 
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(rightShape, rightStride, mappedShapeIndices));
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(paddedRightShape, paddedRightStride, mappedShapeIndices));
 
             outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[j]);
         }
 
-        return outputBuffer;
     }
 
     /**
@@ -201,9 +152,21 @@ public class JVMDoubleTensorBroadcast {
      * @param op
      * @return
      */
-    private static double[] broadcastFromLeft(double[] leftBuffer, long[] leftShape, long[] leftStride,
-                                              double[] rightBuffer, long[] rightShape, long[] rightStride,
-                                              double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+    static void broadcastFromLeft(double[] leftBuffer, long[] leftShape, long[] leftStride,
+                                  double[] rightBuffer, long[] rightShape, long[] rightStride,
+                                  double[] outputBuffer, BiFunction<Double, Double, Double> op) {
+
+        //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
+        final long[] paddedLeftShape;
+        final long[] paddedLeftStride;
+
+        if (leftShape.length != rightShape.length) {
+            paddedLeftShape = TensorShape.shapeToDesiredRankByPrependingOnes(leftShape, rightShape.length);
+            paddedLeftStride = TensorShape.getRowFirstStride(paddedLeftShape);
+        } else {
+            paddedLeftShape = leftShape;
+            paddedLeftStride = leftStride;
+        }
 
         for (int i = 0; i < outputBuffer.length; i++) {
 
@@ -212,15 +175,14 @@ public class JVMDoubleTensorBroadcast {
             long[] mappedShapeIndices = new long[shapeIndices.length];
 
             for (int s = 0; s < shapeIndices.length; s++) {
-                mappedShapeIndices[s] = shapeIndices[s] % leftShape[s];
+                mappedShapeIndices[s] = shapeIndices[s] % paddedLeftShape[s];
             }
 
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(leftShape, leftStride, mappedShapeIndices));
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(paddedLeftShape, paddedLeftStride, mappedShapeIndices));
 
             outputBuffer[i] = op.apply(leftBuffer[j], rightBuffer[i]);
         }
 
-        return outputBuffer;
     }
 
 

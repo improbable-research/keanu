@@ -32,7 +32,11 @@ import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.Broadcasta
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.LT_MASK;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.MUL;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.SUB;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.opWithAutoBroadcast;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastFromLeft;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastFromRight;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.elementwise;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarLeft;
+import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarRight;
 import static java.util.Arrays.copyOf;
 
 public class JVMDoubleTensor extends DoubleTensor {
@@ -1447,55 +1451,68 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     private DoubleTensor broadcastableOp(BiFunction<Double, Double, Double> op, DoubleTensor that) {
-
-        long[] resultShape = Shape.broadcastOutputShape(shape, that.getShape());
-
-        boolean resultShapeIsThisShape = Arrays.equals(resultShape, shape);
-        boolean resultShapeIsThatShape = Arrays.equals(resultShape, that.getShape());
-
-        if (!resultShapeIsThisShape && !resultShapeIsThatShape) {
-            throw new IllegalArgumentException(
-                "Broadcasting of shape " + Arrays.toString(shape) + " and " + Arrays.toString(that.getShape()) + " not supported."
-            );
-        }
-
-        double[] outputBuffer;
-        if (resultShapeIsThisShape) {
-            outputBuffer = newBuffer();
-        } else {
-            outputBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
-        }
-
-        double[] result = opWithAutoBroadcast(buffer, shape, stride, that, outputBuffer, op);
-
-        return new JVMDoubleTensor(result, resultShape);
+        return opWithAutoBroadcast(this, that, op, false);
     }
 
     private DoubleTensor broadcastableOpInPlace(BiFunction<Double, Double, Double> op, DoubleTensor that) {
+        return opWithAutoBroadcast(this, that, op, true);
+    }
 
-        long[] resultShape = Shape.broadcastOutputShape(shape, that.getShape());
+    private DoubleTensor opWithAutoBroadcast(DoubleTensor left, DoubleTensor right, BiFunction<Double, Double, Double> op, boolean inPlace) {
 
-        boolean resultShapeIsThisShape = Arrays.equals(resultShape, shape);
-        boolean resultShapeIsThatShape = Arrays.equals(resultShape, that.getShape());
+        double[] leftBuffer = left.asFlatDoubleArray();
+        long[] leftShape = left.getShape();
+        long[] leftStride = left.getStride();
+
+        double[] rightBuffer = right.asFlatDoubleArray();
+        long[] rightShape = right.getShape();
+        long[] rightStride = right.getStride();
+
+        long[] resultShape = Shape.broadcastOutputShape(leftShape, rightShape);
+
+        boolean resultShapeIsThisShape = Arrays.equals(resultShape, leftShape);
+        boolean resultShapeIsThatShape = Arrays.equals(resultShape, rightShape);
 
         if (!resultShapeIsThisShape && !resultShapeIsThatShape) {
             throw new IllegalArgumentException(
-                "Broadcasting of shape " + Arrays.toString(shape) + " and " + Arrays.toString(that.getShape()) + " not supported."
+                "Broadcasting of shape " + Arrays.toString(leftShape) + " and " + Arrays.toString(rightShape) + " not supported."
             );
         }
 
         double[] outputBuffer;
         if (resultShapeIsThisShape) {
-            outputBuffer = buffer;
+            if (inPlace) {
+                outputBuffer = leftBuffer;
+            } else {
+                outputBuffer = new double[leftBuffer.length];
+            }
         } else {
             outputBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
         }
 
-        this.buffer = opWithAutoBroadcast(buffer, shape, stride, that, outputBuffer, op);
+        if (Arrays.equals(leftShape, rightShape)) {
 
-        this.shape = resultShape;
+            elementwise(leftBuffer, rightBuffer, outputBuffer, op);
+        } else {
 
-        return this;
+            //Short circuit for broadcast with scalars
+            if (leftShape.length == 0) {
+                scalarLeft(leftBuffer[0], rightBuffer, outputBuffer, op);
+            } else if (rightShape.length == 0) {
+                scalarRight(leftBuffer, rightBuffer[0], outputBuffer, op);
+            }
+
+            //Allow broadcasting from left and right
+            if (leftShape.length > rightShape.length || leftBuffer.length > rightBuffer.length) {
+                //e.g. [2, 2] * [1, 2]
+                broadcastFromRight(leftBuffer, leftShape, leftStride, rightBuffer, rightShape, rightStride, outputBuffer, op);
+            } else {
+                //e.g. [2] / [2, 2]
+                broadcastFromLeft(leftBuffer, leftShape, leftStride, rightBuffer, rightShape, rightStride, outputBuffer, op);
+            }
+        }
+
+        return new JVMDoubleTensor(outputBuffer, resultShape);
     }
 
     @Override
