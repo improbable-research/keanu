@@ -1663,15 +1663,20 @@ a matching shaped Uniform Vertex</p>
 
 <dl class="function">
 <dt id="keanu.vertex.IntegerSum">
-<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerSum</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerSum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs a sum across all dimensions</p>
+<code class="descclassname">keanu.vertex.</code><code class="descname">IntegerSum</code><span class="sig-paren">(</span><em>input_vertex</em>, <em>over_dimensions</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/vertex/generated.html#IntegerSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.vertex.IntegerSum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a sum across each value stored in a vertex</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_vertex</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">floating</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool_</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">JavaObjectWrapper</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the vertex to have its values summed</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_vertex</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">floating</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool_</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Series</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">JavaObjectWrapper</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – the vertex to have its values summed</li>
+<li><strong>over_dimensions</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Collection</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – the dimensions to sum over</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code></p>
+</td>
 </tr>
 </tbody>
 </table>
