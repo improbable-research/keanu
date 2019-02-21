@@ -3,7 +3,6 @@ package io.improbable.keanu.tensor.dbl;
 import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 
-import java.util.Arrays;
 import java.util.function.BiFunction;
 
 public class JVMDoubleTensorBroadcast {
@@ -102,18 +101,6 @@ public class JVMDoubleTensorBroadcast {
                                    double[] rightBuffer, long[] rightShape, long[] rightStride,
                                    double[] outputBuffer, BiFunction<Double, Double, Double> op) {
 
-        //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
-        final long[] paddedRightShape;
-        final long[] paddedRightStride;
-
-        if (leftShape.length != rightShape.length) {
-            paddedRightShape = TensorShape.shapeToDesiredRankByPrependingOnes(rightShape, leftShape.length);
-            paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
-        } else {
-            paddedRightShape = rightShape;
-            paddedRightStride = rightStride;
-        }
-
         for (int i = 0; i < outputBuffer.length; i++) {
 
             long[] shapeIndices = TensorShape.getShapeIndices(leftShape, leftStride, i);
@@ -121,10 +108,10 @@ public class JVMDoubleTensorBroadcast {
             long[] mappedShapeIndices = new long[shapeIndices.length];
 
             for (int s = 0; s < shapeIndices.length; s++) {
-                mappedShapeIndices[s] = shapeIndices[s] % paddedRightShape[s];
+                mappedShapeIndices[s] = shapeIndices[s] % rightShape[s];
             }
 
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(paddedRightShape, paddedRightStride, mappedShapeIndices));
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(rightShape, rightStride, mappedShapeIndices));
 
             outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[j]);
         }
@@ -148,18 +135,6 @@ public class JVMDoubleTensorBroadcast {
                                   double[] rightBuffer, long[] rightShape, long[] rightStride,
                                   double[] outputBuffer, BiFunction<Double, Double, Double> op) {
 
-        //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
-        final long[] paddedLeftShape;
-        final long[] paddedLeftStride;
-
-        if (leftShape.length != rightShape.length) {
-            paddedLeftShape = TensorShape.shapeToDesiredRankByPrependingOnes(leftShape, rightShape.length);
-            paddedLeftStride = TensorShape.getRowFirstStride(paddedLeftShape);
-        } else {
-            paddedLeftShape = leftShape;
-            paddedLeftStride = leftStride;
-        }
-
         for (int i = 0; i < outputBuffer.length; i++) {
 
             long[] shapeIndices = TensorShape.getShapeIndices(rightShape, rightStride, i);
@@ -167,10 +142,10 @@ public class JVMDoubleTensorBroadcast {
             long[] mappedShapeIndices = new long[shapeIndices.length];
 
             for (int s = 0; s < shapeIndices.length; s++) {
-                mappedShapeIndices[s] = shapeIndices[s] % paddedLeftShape[s];
+                mappedShapeIndices[s] = shapeIndices[s] % leftShape[s];
             }
 
-            int j = Ints.checkedCast(TensorShape.getFlatIndex(paddedLeftShape, paddedLeftStride, mappedShapeIndices));
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(leftShape, leftStride, mappedShapeIndices));
 
             outputBuffer[i] = op.apply(leftBuffer[j], rightBuffer[i]);
         }

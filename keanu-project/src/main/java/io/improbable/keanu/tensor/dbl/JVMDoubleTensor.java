@@ -229,20 +229,14 @@ public class JVMDoubleTensor extends DoubleTensor {
     public BooleanTensor elementwiseEquals(Tensor that) {
         if (that instanceof DoubleTensor) {
             if (isScalar()) {
-                return (that).elementwiseEquals(this.scalar());
+                return that.elementwiseEquals(this.scalar());
             } else if (that.isScalar()) {
                 return elementwiseEquals(((DoubleTensor) that).scalar());
             } else {
 
-                double[] thatBuffer = that.asFlatDoubleArray();
-                boolean[] newBuffer = new boolean[buffer.length];
+                DoubleTensor equalsMask = broadcastableBinaryDoubleOp((l, r) -> l.equals(r) ? 1.0 : 0.0, (DoubleTensor) that);
 
-                for (int i = 0; i < buffer.length; i++) {
-                    newBuffer[i] = thatBuffer[i] == buffer[i];
-                }
-
-                return BooleanTensor.create(newBuffer, shapeCopy());
-
+                return maskToBooleanTensor(equalsMask);
             }
         } else {
             return Tensor.elementwiseEquals(this, that);
@@ -535,70 +529,33 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public BooleanTensor lessThan(DoubleTensor that) {
-
-        if (that.isScalar()) {
-            return lessThan(that.scalar());
-        }
-
-        boolean[] newBuffer = new boolean[buffer.length];
-        double[] thatBuffer = that.asFlatDoubleArray();
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] < thatBuffer[i];
-        }
-
-        return BooleanTensor.create(newBuffer, shapeCopy());
+        return maskToBooleanTensor(getLessThanMask(that));
     }
 
     @Override
     public BooleanTensor lessThanOrEqual(DoubleTensor that) {
-
-        if (that.isScalar()) {
-            return lessThanOrEqual(that.scalar());
-        }
-
-        boolean[] newBuffer = new boolean[buffer.length];
-        double[] thatBuffer = that.asFlatDoubleArray();
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] <= thatBuffer[i];
-        }
-
-        return BooleanTensor.create(newBuffer, shapeCopy());
+        return maskToBooleanTensor(getLessThanOrEqualToMask(that));
     }
 
     @Override
     public BooleanTensor greaterThan(DoubleTensor that) {
-
-        if (that.isScalar()) {
-            return greaterThan(that.scalar());
-        }
-
-        boolean[] newBuffer = new boolean[buffer.length];
-        double[] thatBuffer = that.asFlatDoubleArray();
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] > thatBuffer[i];
-        }
-
-        return BooleanTensor.create(newBuffer, shapeCopy());
+        return maskToBooleanTensor(getGreaterThanMask(that));
     }
 
     @Override
     public BooleanTensor greaterThanOrEqual(DoubleTensor that) {
+        return maskToBooleanTensor(getGreaterThanOrEqualToMask(that));
+    }
 
-        if (that.isScalar()) {
-            return greaterThanOrEqual(that.scalar());
+    private BooleanTensor maskToBooleanTensor(DoubleTensor mask) {
+        double[] maskBuffer = mask.asFlatDoubleArray();
+        boolean[] boolBuffer = new boolean[maskBuffer.length];
+
+        for (int i = 0; i < maskBuffer.length; i++) {
+            boolBuffer[i] = maskBuffer[i] == 1.0;
         }
 
-        boolean[] newBuffer = new boolean[buffer.length];
-        double[] thatBuffer = that.asFlatDoubleArray();
-
-        for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = buffer[i] >= thatBuffer[i];
-        }
-
-        return BooleanTensor.create(newBuffer, shapeCopy());
+        return BooleanTensor.create(boolBuffer, mask.getShape());
     }
 
     @Override
@@ -1450,14 +1407,14 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     private DoubleTensor broadcastableBinaryDoubleOp(BiFunction<Double, Double, Double> op, DoubleTensor that) {
-        return opWithAutoBroadcast(this, that, op, false);
+        return binaryDoubleOpWithAutoBroadcast(this, that, op, false);
     }
 
     private DoubleTensor broadcastableBinaryDoubleOpInPlace(BiFunction<Double, Double, Double> op, DoubleTensor that) {
-        return opWithAutoBroadcast(this, that, op, true);
+        return binaryDoubleOpWithAutoBroadcast(this, that, op, true);
     }
 
-    private JVMDoubleTensor opWithAutoBroadcast(DoubleTensor left, DoubleTensor right, BiFunction<Double, Double, Double> op, boolean inPlace) {
+    private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(DoubleTensor left, DoubleTensor right, BiFunction<Double, Double, Double> op, boolean inPlace) {
 
         final double[] leftBuffer = left.asFlatDoubleArray();
         final long[] leftShape = left.getShape();
@@ -1469,9 +1426,17 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         if (needsBroadcast) {
 
-            return broadcastBinaryOp(
-                leftBuffer, leftShape, left.getStride(),
-                rightBuffer, rightShape, right.getStride(),
+            //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
+            int resultRank = Math.max(leftShape.length, rightShape.length);
+            long[] paddedLeftShape = getOrPad(leftShape, resultRank);
+            long[] paddedLeftStride = TensorShape.getRowFirstStride(paddedLeftShape);
+
+            long[] paddedRightShape = getOrPad(rightShape, resultRank);
+            long[] paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
+
+            return broadcastBinaryDoubleOp(
+                leftBuffer, paddedLeftShape, paddedLeftStride,
+                rightBuffer, paddedRightShape, paddedRightStride,
                 op, inPlace
             );
 
@@ -1482,10 +1447,18 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     }
 
-    private JVMDoubleTensor broadcastBinaryOp(double[] leftBuffer, long[] leftShape, long[] leftStride,
-                                              double[] rightBuffer, long[] rightShape, long[] rightStride,
-                                              BiFunction<Double, Double, Double> op,
-                                              boolean inPlace) {
+    private long[] getOrPad(long[] shape, int rank) {
+        if (shape.length == rank) {
+            return shape;
+        } else {
+            return TensorShape.shapeToDesiredRankByPrependingOnes(shape, rank);
+        }
+    }
+
+    private JVMDoubleTensor broadcastBinaryDoubleOp(double[] leftBuffer, long[] leftShape, long[] leftStride,
+                                                    double[] rightBuffer, long[] rightShape, long[] rightStride,
+                                                    BiFunction<Double, Double, Double> op,
+                                                    boolean inPlace) {
 
         long[] resultShape = Shape.broadcastOutputShape(leftShape, rightShape);
         boolean resultShapeIsThisShape = Arrays.equals(resultShape, leftShape);
