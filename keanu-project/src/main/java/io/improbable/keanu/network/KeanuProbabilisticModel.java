@@ -49,7 +49,9 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
-        cascadeValues(inputs);
+        if (!inputs.isEmpty()) {
+            cascadeValues(inputs);
+        }
         return ProbabilityCalculator.calculateLogProbFor(this.latentOrObservedVertices);
     }
 
@@ -71,13 +73,15 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
 
     @Override
     public double logLikelihood(Map<VariableReference, ?> inputs) {
-        cascadeValues(inputs);
+        if (!inputs.isEmpty()) {
+            cascadeValues(inputs);
+        }
         return ProbabilityCalculator.calculateLogProbFor(this.observedVertices);
     }
 
     @Override
-    public List<? extends Variable> getLatentVariables() {
-        return this.latentVertices;
+    public List<Variable> getLatentVariables() {
+        return (List) this.latentVertices;
     }
 
     public List<Vertex> getLatentVertices() {
@@ -89,7 +93,7 @@ public class KeanuProbabilisticModel implements ProbabilisticModel {
     }
 
     @Override
-    public List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
+    public List<Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
         return getLatentVariables().stream()
             .filter(v -> v.getValue() instanceof DoubleTensor)
             .map(v -> (Variable<DoubleTensor, ?>) v)

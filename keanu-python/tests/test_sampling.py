@@ -273,7 +273,13 @@ def test_can_track_acceptance_rate_when_iterating(net: BayesNet) -> None:
 
 
 def test_can_specify_nuts_params(net: BayesNet) -> None:
-    algo = NUTSSampler(1000, 0.65, True, 0.1, 10)
+    algo = NUTSSampler(
+        adapt_count=1000,
+        target_acceptance_prob=0.65,
+        adapt_step_size_enabled=True,
+        adapt_potential_enabled=True,
+        initial_step_size=0.1,
+        max_tree_height=10)
 
     samples = sample(net, list(net.iter_latent_vertices()), algo, draws=500, drop=100)
 
