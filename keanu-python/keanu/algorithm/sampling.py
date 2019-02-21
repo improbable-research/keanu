@@ -1,5 +1,6 @@
 from collections import defaultdict
 from typing import Any, Iterable, Dict, List, Tuple
+import logging
 
 from numpy import ndenumerate, ndarray
 from py4j.java_collections import JavaList
@@ -316,9 +317,10 @@ def __add_sample_to_dict(sample_value: Any, vertex_sample: Dict):
 
 
 def __get_vertex_samples(network_samples, vertex) -> ndarray:
+    logging.getLogger("keanu").warning("Copying samples to an ndarray...")
     samples_for_vertex = network_samples.get(vertex)
     try:
         samples_for_vertex = samples_for_vertex.asTensor()
     except AttributeError:
-        raise NotImplementedError("sampling from generics not supported.")
+        raise NotImplementedError("Sampling from generics not supported.")
     return Tensor._to_scalar_or_ndarray(samples_for_vertex)
