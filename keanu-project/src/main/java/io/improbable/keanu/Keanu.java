@@ -100,11 +100,15 @@ public class Keanu {
         public static class Forward {
 
             public static io.improbable.keanu.algorithms.sampling.Forward withDefaultConfig() {
-                return new io.improbable.keanu.algorithms.sampling.Forward(KeanuRandom.getDefaultRandom());
+                return new io.improbable.keanu.algorithms.sampling.Forward(KeanuRandom.getDefaultRandom(), false);
             }
 
             public static io.improbable.keanu.algorithms.sampling.Forward withDefaultConfig(KeanuRandom random) {
-                return new io.improbable.keanu.algorithms.sampling.Forward(random);
+                return new io.improbable.keanu.algorithms.sampling.Forward(random, false);
+            }
+
+            public static io.improbable.keanu.algorithms.sampling.Forward.ForwardBuilder builder() {
+                return io.improbable.keanu.algorithms.sampling.Forward.builder();
             }
         }
 

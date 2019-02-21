@@ -23,13 +23,15 @@ import java.util.stream.Collectors;
 public class Forward implements PosteriorSamplingAlgorithm {
 
     private final KeanuRandom random;
+    private final boolean calculateSampleProbability;
 
-    public Forward() {
-        this(KeanuRandom.getDefaultRandom());
+    public static ForwardBuilder builder() {
+        return new ForwardBuilder();
     }
 
-    public Forward(KeanuRandom random) {
+    public Forward(KeanuRandom random, boolean calculateSampleProbability) {
         this.random = random;
+        this.calculateSampleProbability = calculateSampleProbability;
     }
 
     /**
@@ -75,7 +77,7 @@ public class Forward implements PosteriorSamplingAlgorithm {
 
         List<Vertex> sortedVertices = TopologicalSort.sort(intersection);
 
-        return new ForwardSampler(verticesToSampleFrom, sortedVertices, random);
+        return new ForwardSampler(network, verticesToSampleFrom, sortedVertices, random, calculateSampleProbability);
     }
 
     private Set<Vertex> allDownstreamVertices(List<Vertex> randomVertices) {
@@ -87,6 +89,32 @@ public class Forward implements PosteriorSamplingAlgorithm {
         Set<Vertex> upstreamRandomVariables = upstreamLambdaSection.getAllVertices();
         if (upstreamRandomVariables.size() > 1) {
             throw new IllegalArgumentException("Forward sampler cannot be ran if observed variables have a random variable in their upstream lambda section");
+        }
+    }
+
+    public static class ForwardBuilder {
+        private KeanuRandom random = KeanuRandom.getDefaultRandom();
+        private boolean calculateSampleProbability = false;
+
+        ForwardBuilder() {
+        }
+
+        public ForwardBuilder random(KeanuRandom random) {
+            this.random = random;
+            return this;
+        }
+
+        public ForwardBuilder calculateSampleProbability(boolean calculateSampleProbability) {
+            this.calculateSampleProbability = calculateSampleProbability;
+            return this;
+        }
+
+        public Forward build() {
+            return new Forward(random, calculateSampleProbability);
+        }
+
+        public String toString() {
+            return "ForwardBuilder(random=" + this.random + ", calculateSampleProbability=" + this.calculateSampleProbability + ")";
         }
     }
 }

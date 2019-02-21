@@ -5,6 +5,7 @@ import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -19,14 +20,18 @@ public class ForwardSampler implements SamplingAlgorithm {
     //Set to zero as the Forward Sampler is not interested in the log prob of samples
     private static final double LOG_PROB_OF_PRIOR = 0.;
 
+    private final BayesianNetwork network;
     private final List<? extends Variable> variablesToSampleFrom;
     private final List<Vertex> topologicallySortedVertices;
     private final KeanuRandom random;
+    private final boolean calculateSampleProbability;
 
-    public ForwardSampler(List<? extends Variable> variablesToSampleFrom, List<Vertex> topologicallySortedVertices, KeanuRandom random) {
+    public ForwardSampler(BayesianNetwork network, List<? extends Variable> variablesToSampleFrom, List<Vertex> topologicallySortedVertices, KeanuRandom random, boolean calculateSampleProbability) {
+        this.network = network;
         this.variablesToSampleFrom = variablesToSampleFrom;
         this.topologicallySortedVertices = topologicallySortedVertices;
         this.random = random;
+        this.calculateSampleProbability = calculateSampleProbability;
     }
 
     @Override
@@ -46,7 +51,8 @@ public class ForwardSampler implements SamplingAlgorithm {
     public void sample(Map<VariableReference, List<?>> samples, List<Double> logOfMasterPForEachSample) {
         step();
         takeSamples(samples, variablesToSampleFrom);
-        logOfMasterPForEachSample.add(LOG_PROB_OF_PRIOR);
+        double logProb = calculateSampleProbability ? network.getLogOfMasterP() : LOG_PROB_OF_PRIOR;
+        logOfMasterPForEachSample.add(logProb);
     }
 
     @Override
