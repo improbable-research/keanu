@@ -269,7 +269,7 @@ def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrap
     vertex_samples: sample_types = {}
     for vertex_unwrapped in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex_unwrapped)]
-        samples_for_vertex = __get_vertex_samples(network_samples, vertex)
+        samples_for_vertex = __get_vertex_samples(network_samples, vertex_unwrapped)
         vertex_samples[vertex_label] = list(samples_for_vertex.flatten())
     return vertex_samples
 
