@@ -1,9 +1,9 @@
 from collections import defaultdict
 from typing import Any, Iterable, Dict, List, Tuple
 
-from numpy import ndenumerate, ndarray, array_split
+from numpy import ndenumerate, ndarray
 from py4j.java_collections import JavaList
-from py4j.java_gateway import java_import, JavaObject, is_instance_of
+from py4j.java_gateway import java_import, JavaObject
 
 from keanu.algorithm._proposal_distribution import ProposalDistribution
 from keanu.context import KeanuContext
