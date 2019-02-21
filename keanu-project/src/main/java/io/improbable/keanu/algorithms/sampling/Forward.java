@@ -16,9 +16,9 @@ import io.improbable.keanu.util.status.StatusBar;
 import io.improbable.keanu.vertices.Vertex;
 import org.nd4j.base.Preconditions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Forward implements PosteriorSamplingAlgorithm {
 
@@ -59,16 +59,16 @@ public class Forward implements PosteriorSamplingAlgorithm {
         List<? extends Variable> latentVariables = model.getLatentVariables();
         Preconditions.checkArgument(latentVariables.size() > 0, "Your model must contain latent variables in order to forward sample.");
 
+        List<Vertex> verticesToSampleFrom = new ArrayList<>();
         for (Variable variable : variablesToSampleFrom) {
             Preconditions.checkArgument(variable instanceof Vertex, "The Forward Sampler only works for Variables of type Vertex. Received : " + variable);
+            verticesToSampleFrom.add((Vertex) variable);
         }
 
         BayesianNetwork network = checkSampleFromVariablesComeFromConnectedGraph(variablesToSampleFrom);
 
         List<Vertex> observedVertices = network.getObservedVertices();
         checkUpstreamOfObservedDoesNotContainProbabilistic(observedVertices);
-
-        List<Vertex> verticesToSampleFrom = variablesToSampleFrom.stream().map(v -> (Vertex) v).collect(Collectors.toList());
 
         Set<Vertex> allDownstreamVertices = allDownstreamVertices(network.getLatentVertices());
         Set<Vertex> transitiveClosureSampleFrom = TransitiveClosure.getUpstreamVerticesForCollection(verticesToSampleFrom, true).getAllVertices();
@@ -81,7 +81,7 @@ public class Forward implements PosteriorSamplingAlgorithm {
 
     private BayesianNetwork checkSampleFromVariablesComeFromConnectedGraph(List<? extends Variable> variablesToSampleFrom) {
         Variable variable = variablesToSampleFrom.get(0);
-        Set connectedGraph = ((Vertex) variable).getConnectedGraph();
+        Set<Vertex> connectedGraph = ((Vertex) variable).getConnectedGraph();
 
         for (Variable var : variablesToSampleFrom) {
             if (!connectedGraph.contains(var)) {

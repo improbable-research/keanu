@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
 import io.improbable.keanu.vertices.Vertex;
+import lombok.experimental.UtilityClass;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@UtilityClass
 public class Propagation {
 
     public static Set<Vertex> getVertices(Vertex vertex, Function<Vertex, Collection<Vertex>> nextVertices, Function<Vertex, Boolean> stoppingCondition,

@@ -2,11 +2,13 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
+import lombok.experimental.UtilityClass;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@UtilityClass
 public class SamplingUtil {
 
     public static void takeSamples(Map<VariableReference, List<?>> samples, List<? extends Variable> fromVariables) {

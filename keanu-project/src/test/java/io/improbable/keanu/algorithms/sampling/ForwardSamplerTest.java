@@ -7,7 +7,6 @@ import io.improbable.keanu.algorithms.ProbabilisticModel;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
@@ -269,7 +268,7 @@ public class ForwardSamplerTest {
 
         private final List<VertexId> ids;
 
-        public IDTrackerVertex(@LoadVertexParam("left")DoubleVertex left, @LoadVertexParam("right")DoubleVertex right, List<VertexId> ids) {
+        public IDTrackerVertex(DoubleVertex left, DoubleVertex right, List<VertexId> ids) {
             super(left.getShape());
             this.ids = ids;
             setParents(left, right);
@@ -296,7 +295,7 @@ public class ForwardSamplerTest {
 
         private final List<VertexId> ids;
 
-        public NonProbabilisticIDTrackerVertex(@LoadVertexParam("left")DoubleVertex left, @LoadVertexParam("right")DoubleVertex right, List<VertexId> ids) {
+        public NonProbabilisticIDTrackerVertex(DoubleVertex left, DoubleVertex right, List<VertexId> ids) {
             super(left, right);
             this.ids = ids;
         }
