@@ -14,12 +14,12 @@ import static org.junit.Assert.assertTrue;
 public class MCMCTestDistributions {
 
     public static BayesianNetwork createSimpleGaussian(double mu, double sigma, double initialValue) {
-        GaussianVertex A = new GaussianVertex(new long[]{2, 1}, mu, sigma);
+        GaussianVertex A = new GaussianVertex(mu, sigma);
         A.setAndCascade(initialValue);
         return new BayesianNetwork(A.getConnectedGraph());
     }
 
-    public static void samplesMatchSimpleGaussian(double mu, double sigma, List<DoubleTensor> samples, double delta) {
+    public static void samplesMatchSimpleGaussian(double mu, double sigma, List<DoubleTensor> samples) {
 
         long[] shape = samples.get(0).getShape();
 
@@ -38,8 +38,8 @@ public class MCMCTestDistributions {
         double[] means = averages.asFlatDoubleArray();
 
         for (int i = 0; i < means.length; i++) {
-            assertEquals(mu, means[i], 0.05);
-            assertEquals(sigma, standardDeviations[i], delta);
+            assertEquals(mu, means[i], 0.1);
+            assertEquals(sigma, standardDeviations[i], 0.1);
         }
     }
 
