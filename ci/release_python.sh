@@ -8,8 +8,8 @@ fi
 
 cd "$(dirname "$0")/"
 
-PYPI_TEST_SECRET="keanu-eng-test-pypi"
-PYPI_REAL_SECRET="keanu-eng-pypi"
+PYPI_TEST_SECRET_NAME="keanu-eng-test-pypi"
+PYPI_REAL_SECRET_NAME="keanu-eng-pypi"
 
 display_usage() {
   echo
@@ -64,11 +64,11 @@ pipenv install
 
 case $target_pypi_arg in
 test)
-  get_secrets "${release_type}" ${PYPI_TEST_SECRET}
+  get_secrets "${release_type}" ${PYPI_TEST_SECRET_NAME}
   pipenv run python3 -m twine upload --username "${pypi_username}" --password "${pypi_password}" --repository-url https://test.pypi.org/legacy/ ../keanu-python/dist/*
   ;;
 real)
-  get_secrets "${release_type}" ${PYPI_REAL_SECRET}
+  get_secrets "${release_type}" ${PYPI_REAL_SECRET_NAME}
   pipenv run python3 -m twine upload --username "${pypi_username}" --password "${pypi_password}" ../keanu-python/dist/*
   ;;
 *)
