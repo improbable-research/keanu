@@ -35,7 +35,7 @@ class PosteriorSamplingAlgorithm:
 class ForwardSampler(PosteriorSamplingAlgorithm):
 
     def __init__(self) -> None:
-        super().__init__(k.jvm_view().Forward())
+        super().__init__(k.jvm_view().Forward.builder().build())
 
 
 class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
