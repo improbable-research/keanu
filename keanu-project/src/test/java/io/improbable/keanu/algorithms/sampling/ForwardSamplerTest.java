@@ -97,6 +97,20 @@ public class ForwardSamplerTest {
     }
 
     @Test
+    public void canSampleFromHeirarchicalModel() {
+        GaussianVertex A = new GaussianVertex(10, 1.);
+        GaussianVertex B = new GaussianVertex(A, 1.);
+
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+
+        NetworkSamples samples = Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 5000);
+
+        double averageA = samples.getDoubleTensorSamples(A).getAverages().scalar();
+
+        assertEquals(10.0, averageA, 1e-2);
+    }
+
+    @Test
     public void canCalculateProbabilityOfSamples() {
         GaussianVertex A = new GaussianVertex(100.0, 1);
         DoubleVertex B = A.plus(ConstantVertex.of(5.));
