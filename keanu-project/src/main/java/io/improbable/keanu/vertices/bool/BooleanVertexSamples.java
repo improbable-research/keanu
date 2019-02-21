@@ -11,6 +11,7 @@ public class BooleanVertexSamples extends Samples<BooleanTensor> {
         super(samples);
     }
 
+    @Override
     public BooleanTensor asTensor() {
         return BooleanTensor.stack(0, samples.stream().toArray(BooleanTensor[]::new));
     }
