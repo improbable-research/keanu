@@ -8,11 +8,6 @@
 #  note that the setup is already done, so you should not manually adjust anything through the BuildKite interface.
 #
 common: &common
-  agents:
-    - "capable_of_building=graphos-eng"
-    - "environment=production"
-    - "permission_set=builder"
-    - "queue=${CI_BUILDER_QUEUE:-v2-1550517784-da1bacc245413d32-------z}"
   timeout_in_minutes: 60 # TODO(ENG-548): reduce timeout once agent-cold-start is optimised.
   retry:
     automatic:
@@ -20,10 +15,30 @@ common: &common
       - exit_status: -1
         limit: 3
 
+linux: &linux
+  agents:
+    - "capable_of_building=graphos-eng"
+    - "environment=production"
+    - "permission_set=builder"
+    - "queue=${CI_LINUX_BUILDER_QUEUE:-v2-1550668667-a9410887d4b815dd-------z}"
+
+windows: &windows
+  agents:
+    - "capable_of_building=graphos-eng"
+    - "environment=production"
+    - "permission_set=builder"
+    - "queue=${CI_WINDOWS_BUILDER_QUEUE:-v2-1550668662-a9410887d4b815dd-------z}"
+
 # NOTE: step labels turn into commit-status names like {org}/{repo}/{pipeline}/{step-label}, lower-case and hyphenated.
 # These are then relied on to have stable names by other things, so once named, please beware renaming has consequences.
 
 steps:
-  - label: "Build Keanu"
+  - label: "Build Keanu on Linux"
     command: "bash ci/build.sh"
-    <<: *common # This folds the YAML named anchor into this step. Overrides, if any, should follow, not precede.
+    <<: *common
+    <<: *linux
+
+  - label: "Build Keanu on Windows"
+    command: "bash ci/build.sh"
+    <<: *common
+    <<: *windows
