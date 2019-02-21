@@ -28,8 +28,12 @@ get_secrets() {
     ci)
       pypi_username=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name="${secret_name}" --field="username")
       pypi_password=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name="${secret_name}" --field="password")
+      
+      # Delete dist directory if it already exists.
       rm -rf keanu-python/dist/
-      buildkite-agent artifact download "keanu-python/dist/*" . 
+      mkdir keanu-python/dist/
+      # Download artifacts from Buildkite
+      buildkite-agent artifact download --step "Build Python distribution" "keanu-python/dist/*" "keanu-python/dist/"
       ;;
     *)
       echo "Unknown release type"
