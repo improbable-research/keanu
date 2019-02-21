@@ -26,7 +26,11 @@ common: &common
 steps:
   - label: "Build Python distribution"
     command: "bash ./ci/build_python.sh"
+    artifact_paths:
+      - "keanu-python/dist/*"
     <<: *common
+
+  - wait
 
   - block: "PyPi test release :rocket:"
 

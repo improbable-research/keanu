@@ -28,6 +28,8 @@ get_secrets() {
     ci)
       pypi_username=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name="${secret_name}" --field="username")
       pypi_password=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name="${secret_name}" --field="password")
+      rm -rf keanu-python/dist/
+      buildkite-agent artifact download --step "Release to PyPi test" "keanu-python/dist/*" "keanu-python/dist/"
       ;;
     *)
       echo "Unknown release type"
