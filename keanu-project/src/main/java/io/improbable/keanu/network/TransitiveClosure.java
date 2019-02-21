@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static io.improbable.keanu.network.LambdaSection.getVertices;
+import static io.improbable.keanu.network.Propagation.getVertices;
 
 /**
  * A Transitive Closure is defined as a given vertex and all the vertices that it affects (downstream) OR

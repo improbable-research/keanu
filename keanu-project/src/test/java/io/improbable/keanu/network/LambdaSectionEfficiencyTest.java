@@ -27,7 +27,7 @@ public class LambdaSectionEfficiencyTest {
         MutableInt callsToNext = new MutableInt(0);
         MutableInt callsToPredicate = new MutableInt(0);
 
-        Set<Vertex> verticesDepthFirst = LambdaSection.getVertices(A, (v) -> {
+        Set<Vertex> verticesDepthFirst = Propagation.getVertices(A, (v) -> {
             callsToNext.increment();
             return v.getChildren();
         },  (v) -> v.isProbabilistic() || v.isObserved(),
@@ -55,7 +55,7 @@ public class LambdaSectionEfficiencyTest {
         MutableInt callsToNext = new MutableInt(0);
         MutableInt callsToPredicate = new MutableInt(0);
 
-        Set<Vertex> verticesDepthFirst = LambdaSection.getVertices(Arrays.asList(A, B, C), (v) -> {
+        Set<Vertex> verticesDepthFirst = Propagation.getVertices(Arrays.asList(A, B, C), (v) -> {
             callsToNext.increment();
             return v.getChildren();
             },
