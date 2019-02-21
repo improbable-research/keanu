@@ -320,6 +320,15 @@ def test_you_can_observe(ctor: Callable, args: Union[Tuple[float, ...], Tuple[in
     assert_vertex_value_equals(vertex, expected_type, value)
 
 
+def test_unobserve() -> None:
+    vertex = Gaussian(0., 1.)
+    vertex.observe(4)
+    assert vertex.is_observed()
+    assert vertex.get_value() == 4
+    vertex.unobserve()
+    assert not vertex.is_observed()
+
+
 @pytest.mark.parametrize("ctor, args, expected_type, value", [(Gaussian, (0., 1.), float, 4.),
                                                               (UniformInt, (0, 10), int, 5),
                                                               (Bernoulli, (0.5,), bool, True)])

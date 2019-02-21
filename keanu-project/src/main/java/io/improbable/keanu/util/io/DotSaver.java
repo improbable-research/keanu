@@ -1,6 +1,5 @@
 package io.improbable.keanu.util.io;
 
-import com.google.common.base.Preconditions;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkSaver;
 import io.improbable.keanu.tensor.Tensor;
@@ -29,7 +28,6 @@ import java.util.Set;
  * Usage:
  * Create dotSaver: DotSaver writer = new DotSaver(yourBayesianNetwork);
  * To output network to a DOT file: writer.save(outputStream, saveValues);
- * To output vertex and its connections up to degree n: writer.save(outputStream, vertex, degree, saveValues);
  * where saveValues specifies whether you want to output values for vertices for which they've been set.
  */
 public class DotSaver implements NetworkSaver {
@@ -37,18 +35,33 @@ public class DotSaver implements NetworkSaver {
     private static final String DOT_HEADER = "digraph BayesianNetwork {\n";
     private static final String DOT_ENDING = "}";
     private static final String DOT_COMMENT_APPENDIX = "// ";
-    private static final int INFINITE_NETWORK_DEGREE = Integer.MAX_VALUE;
 
     private Set<VertexDotLabel> dotLabels = new HashSet<>();
     private Set<GraphEdge> graphEdges = new HashSet<>();
-    private BayesianNetwork bayesianNetwork;
+    private Set<Vertex> vertices;
 
     public DotSaver(BayesianNetwork network) {
-        bayesianNetwork = network;
+        this(new HashSet<>(network.getAllVertices()));
+    }
+
+    public DotSaver(Set<Vertex> vertices) {
+        this.vertices = vertices;
     }
 
     /**
-     * Outputs the network to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
+     * Outputs a graph to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
+     * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
+     *
+     * @param output     output stream to use for writing
+     * @param saveValues specify whether you want to output values of non-constant scalar vertices
+     * @throws IOException Any errors that occur during saving to the output stream
+     */
+    public void save(OutputStream output, boolean saveValues) throws IOException {
+        save(output, saveValues, null);
+    }
+
+    /**
+     * Outputs a graph to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
      * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
      *
      * @param output     output stream to use for writing
@@ -56,48 +69,13 @@ public class DotSaver implements NetworkSaver {
      * @param metadata   metadata to be added to the output as comments
      * @throws IOException Any errors that occur during saving to the output stream
      */
-    @Override
     public void save(OutputStream output, boolean saveValues, Map<String, String> metadata) throws IOException {
-        Preconditions.checkArgument(bayesianNetwork.getAllVertices().size() > 0, "Network must contain at least one vertex.");
-        Vertex anyVertex = bayesianNetwork.getAllVertices().get(0);
-        save(output, anyVertex, INFINITE_NETWORK_DEGREE, saveValues, metadata);
-    }
-
-    /**
-     * Outputs a subgraph around the specified vertex to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
-     * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
-     *
-     * @param output     output stream to use for writing
-     * @param vertex     vertex around which the subgraph will be centered
-     * @param degree     degree of connections to be visualized; for instance, if the degree is 1,
-     *                   only connections between the vertex and its parents and children will be written out to the DOT file.
-     * @param saveValues specify whether you want to output values of non-constant scalar vertices
-     * @throws IOException Any errors that occur during saving to the output stream
-     */
-    public void save(OutputStream output, Vertex vertex, int degree, boolean saveValues) throws IOException {
-        save(output, vertex, degree, saveValues, null);
-    }
-
-    /**
-     * Outputs a subgraph around the specified vertex to a DOT file which can be used by various graph visualizers to generate a visual representation of the graph.
-     * Read more about DOT format here: https://en.wikipedia.org/wiki/DOT_(graph_description_language)
-     *
-     * @param output     output stream to use for writing
-     * @param vertex     vertex around which the subgraph will be centered
-     * @param degree     degree of connections to be visualized; for instance, if the degree is 1,
-     *                   only connections between the vertex and its parents and children will be written out to the DOT file.
-     * @param saveValues specify whether you want to output values of non-constant scalar vertices
-     * @param metadata   metadata to be added to the output as comments
-     * @throws IOException Any errors that occur during saving to the output stream
-     */
-    public void save(OutputStream output, Vertex vertex, int degree, boolean saveValues, Map<String, String> metadata) throws IOException {
 
         dotLabels = new HashSet<>();
         graphEdges = new HashSet<>();
         Writer outputWriter = new OutputStreamWriter(output);
 
-        Set<Vertex> subGraph = bayesianNetwork.getSubgraph(vertex, degree);
-        for (Vertex v : subGraph) {
+        for (Vertex v : vertices) {
             if (saveValues) {
                 v.saveValue(this);
             } else {
@@ -107,7 +85,7 @@ public class DotSaver implements NetworkSaver {
 
         outputWriter.write(DOT_HEADER);
         outputMetadata(metadata, outputWriter);
-        outputEdges(graphEdges, outputWriter, subGraph);
+        outputEdges(graphEdges, outputWriter, vertices);
         outputLabels(dotLabels, outputWriter);
         outputWriter.write(DOT_ENDING);
         outputWriter.close();
