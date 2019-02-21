@@ -199,7 +199,7 @@ public class TensorShapeValidation {
 
         for (int i = 1; i < shapes.length; i++) {
             if (shapes[i].length <= dimension) {
-                throw new IllegalArgumentException(String.format("Cannot concat operand %d at a dimension greater than or equal to its rank", i));
+                throw new IllegalArgumentException(String.format("Cannot concat operand %d because dimension is greater than or equal to its rank", i));
             }
 
             if (shapes[i].length != concatShape.length) {

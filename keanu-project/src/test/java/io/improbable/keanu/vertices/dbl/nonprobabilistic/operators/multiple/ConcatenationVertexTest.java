@@ -95,7 +95,7 @@ public class ConcatenationVertexTest {
         DoubleVertex b = new ConstantDoubleVertex(2.);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Cannot concat operand 1 at a dimension greater than or equal to its rank");
+        thrown.expectMessage("Cannot concat operand 1 because dimension is greater than or equal to its rank");
 
         new ConcatenationVertex(0, a, b);
     }
