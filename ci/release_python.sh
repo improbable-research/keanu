@@ -29,7 +29,7 @@ get_secrets() {
       pypi_username=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name="${secret_name}" --field="username")
       pypi_password=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name="${secret_name}" --field="password")
       rm -rf keanu-python/dist/
-      buildkite-agent artifact download "keanu-python/dist/*" "keanu-python/dist/"
+      buildkite-agent artifact download "keanu-python/dist/keanu-0.0.4.dev1-py3-none-any.whl" . 
       ;;
     *)
       echo "Unknown release type"
