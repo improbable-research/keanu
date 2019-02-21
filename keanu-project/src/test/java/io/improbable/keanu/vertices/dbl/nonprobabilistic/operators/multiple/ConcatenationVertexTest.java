@@ -90,7 +90,7 @@ public class ConcatenationVertexTest {
     }
 
     @Test
-    public void concatVectorThrowsAppropriateMessageIfScalarWithRankZero() {
+    public void concatVectorThrowsIfDimensionIsGreaterThanOrEqualToOperandRank() {
         DoubleVertex a = new ConstantDoubleVertex(1.);
         DoubleVertex b = new ConstantDoubleVertex(2.);
 
