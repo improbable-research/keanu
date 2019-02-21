@@ -147,6 +147,9 @@ task buildWheelDistribution {
     }
 }
 
+clean.doFirst {
+    delete 'keanu/classpath'
+}
 
 pythonVersionInfo.mustRunAfter(installPipenv)
 installDependencies.dependsOn(installPipenv)

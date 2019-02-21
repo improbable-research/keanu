@@ -2,9 +2,12 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.distributions.continuous.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
@@ -47,6 +50,29 @@ public class HalfCauchyVertex extends CauchyVertex {
             return super.logProb(value) + LOG_TWO * value.getLength();
         }
         return Double.NEGATIVE_INFINITY;
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex locationPlaceholder = new DoublePlaceholderVertex(getLocation().getShape());
+        final DoublePlaceholderVertex scalePlaceholder = new DoublePlaceholderVertex(getScale().getShape());
+
+        final DoubleVertex cauchyLogProbOutput = Cauchy.logProbOutput(xPlaceholder, locationPlaceholder, scalePlaceholder);
+
+        final DoubleVertex result = cauchyLogProbOutput.plus(LOG_TWO);
+        final DoubleVertex invalidMask = xPlaceholder.toLessThanMask(LOC_ZERO);
+        final DoubleVertex halfCauchyLogProbOutput = result.setWithMask(invalidMask, Double.NEGATIVE_INFINITY);
+
+        // Set the value of locationPlaceholder since we know it's 0.
+        locationPlaceholder.setValue(LOC_ZERO);
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(getLocation(), locationPlaceholder)
+            .input(getScale(), scalePlaceholder)
+            .logProbOutput(halfCauchyLogProbOutput)
+            .build();
     }
 
     @Override
