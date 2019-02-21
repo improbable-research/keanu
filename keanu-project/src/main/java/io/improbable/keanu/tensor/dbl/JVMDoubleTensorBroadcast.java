@@ -69,14 +69,6 @@ public class JVMDoubleTensorBroadcast {
 
     }
 
-    static void elementwise(double[] leftBuffer, double[] rightBuffer, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
-
-        for (int i = 0; i < outputBuffer.length; i++) {
-            outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[i]);
-        }
-
-    }
-
     static void scalarLeft(double left, double[] rightBuffer, double[] outputBuffer, BiFunction<Double, Double, Double> op) {
 
         for (int i = 0; i < outputBuffer.length; i++) {

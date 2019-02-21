@@ -34,7 +34,6 @@ import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.Broadcasta
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.BroadcastableDoubleOperation.SUB;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastFromLeft;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastFromRight;
-import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.elementwise;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarLeft;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarRight;
 import static java.util.Arrays.copyOf;
@@ -489,22 +488,22 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
-        return broadcastableOp(GT_MASK, greaterThanThis);
+        return broadcastableBinaryDoubleOp(GT_MASK, greaterThanThis);
     }
 
     @Override
     public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanThis) {
-        return broadcastableOp(GTE_MASK, greaterThanThis);
+        return broadcastableBinaryDoubleOp(GTE_MASK, greaterThanThis);
     }
 
     @Override
     public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
-        return broadcastableOp(LT_MASK, lessThanThis);
+        return broadcastableBinaryDoubleOp(LT_MASK, lessThanThis);
     }
 
     @Override
     public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis) {
-        return broadcastableOp(LTE_MASK, lessThanThis);
+        return broadcastableBinaryDoubleOp(LTE_MASK, lessThanThis);
     }
 
     @Override
@@ -648,12 +647,12 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor powInPlace(DoubleTensor exponent) {
-        return broadcastableOpInPlace(FastMath::pow, exponent);
+        return broadcastableBinaryDoubleOpInPlace(FastMath::pow, exponent);
     }
 
     @Override
     public DoubleTensor pow(DoubleTensor exponent) {
-        return broadcastableOp(FastMath::pow, exponent);
+        return broadcastableBinaryDoubleOp(FastMath::pow, exponent);
     }
 
     @Override
@@ -791,12 +790,12 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor atan2InPlace(DoubleTensor y) {
-        return broadcastableOpInPlace((left, right) -> FastMath.atan2(right, left), y);
+        return broadcastableBinaryDoubleOpInPlace((left, right) -> FastMath.atan2(right, left), y);
     }
 
     @Override
     public DoubleTensor atan2(DoubleTensor y) {
-        return broadcastableOp((left, right) -> FastMath.atan2(right, left), y);
+        return broadcastableBinaryDoubleOp((left, right) -> FastMath.atan2(right, left), y);
     }
 
     @Override
@@ -1262,7 +1261,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor minInPlace(DoubleTensor that) {
-        return broadcastableOpInPlace(Math::min, that);
+        return broadcastableBinaryDoubleOpInPlace(Math::min, that);
     }
 
     @Override
@@ -1276,7 +1275,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor maxInPlace(DoubleTensor that) {
-        return broadcastableOpInPlace(Math::max, that);
+        return broadcastableBinaryDoubleOpInPlace(Math::max, that);
     }
 
     @Override
@@ -1361,12 +1360,12 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor minusInPlace(DoubleTensor that) {
-        return broadcastableOpInPlace(SUB, that);
+        return broadcastableBinaryDoubleOpInPlace(SUB, that);
     }
 
     @Override
     public DoubleTensor minus(DoubleTensor that) {
-        return broadcastableOp(SUB, that);
+        return broadcastableBinaryDoubleOp(SUB, that);
     }
 
     @Override
@@ -1388,12 +1387,12 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor plusInPlace(DoubleTensor that) {
-        return broadcastableOpInPlace(ADD, that);
+        return broadcastableBinaryDoubleOpInPlace(ADD, that);
     }
 
     @Override
     public DoubleTensor plus(DoubleTensor that) {
-        return broadcastableOp(ADD, that);
+        return broadcastableBinaryDoubleOp(ADD, that);
     }
 
     @Override
@@ -1415,12 +1414,12 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor timesInPlace(DoubleTensor that) {
-        return broadcastableOpInPlace(MUL, that);
+        return broadcastableBinaryDoubleOpInPlace(MUL, that);
     }
 
     @Override
     public DoubleTensor times(DoubleTensor that) {
-        return broadcastableOp(MUL, that);
+        return broadcastableBinaryDoubleOp(MUL, that);
     }
 
     @Override
@@ -1442,19 +1441,19 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor divInPlace(DoubleTensor that) {
-        return broadcastableOpInPlace(DIV, that);
+        return broadcastableBinaryDoubleOpInPlace(DIV, that);
     }
 
     @Override
     public DoubleTensor div(DoubleTensor that) {
-        return broadcastableOp(DIV, that);
+        return broadcastableBinaryDoubleOp(DIV, that);
     }
 
-    private DoubleTensor broadcastableOp(BiFunction<Double, Double, Double> op, DoubleTensor that) {
+    private DoubleTensor broadcastableBinaryDoubleOp(BiFunction<Double, Double, Double> op, DoubleTensor that) {
         return opWithAutoBroadcast(this, that, op, false);
     }
 
-    private DoubleTensor broadcastableOpInPlace(BiFunction<Double, Double, Double> op, DoubleTensor that) {
+    private DoubleTensor broadcastableBinaryDoubleOpInPlace(BiFunction<Double, Double, Double> op, DoubleTensor that) {
         return opWithAutoBroadcast(this, that, op, true);
     }
 
@@ -1462,19 +1461,17 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         final double[] leftBuffer = left.asFlatDoubleArray();
         final long[] leftShape = left.getShape();
-        final long[] leftStride = left.getStride();
 
         final double[] rightBuffer = right.asFlatDoubleArray();
         final long[] rightShape = right.getShape();
-        final long[] rightStride = right.getStride();
 
         final boolean needsBroadcast = !Arrays.equals(leftShape, rightShape);
 
         if (needsBroadcast) {
 
             return broadcastBinaryOp(
-                leftBuffer, leftShape, leftStride,
-                rightBuffer, rightShape, rightStride,
+                leftBuffer, leftShape, left.getStride(),
+                rightBuffer, rightShape, right.getStride(),
                 op, inPlace
             );
 
@@ -1535,7 +1532,9 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         final double[] outputBuffer = inPlace ? leftBuffer : new double[leftBuffer.length];
 
-        elementwise(leftBuffer, rightBuffer, outputBuffer, op);
+        for (int i = 0; i < outputBuffer.length; i++) {
+            outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[i]);
+        }
 
         return new JVMDoubleTensor(outputBuffer, shape);
     }
