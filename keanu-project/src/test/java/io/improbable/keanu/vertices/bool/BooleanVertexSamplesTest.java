@@ -1,12 +1,13 @@
 package io.improbable.keanu.vertices.bool;
 
 import com.google.common.collect.ImmutableList;
-import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.Test;
 
 import java.util.List;
+
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class BooleanVertexSamplesTest {
     List<BooleanTensor> values = ImmutableList.of(

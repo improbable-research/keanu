@@ -1,8 +1,6 @@
 package io.improbable.keanu.tensor.bool;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorMatchers;
-import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -14,6 +12,7 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
