@@ -155,7 +155,7 @@ def sample(net: BayesNet,
     if __all_scalar(sample_from):
         vertex_samples = __create_single_indexed_samples(network_samples, vertices_unwrapped, id_to_label)
     else:
-        vertex_samples = __create_multi_indexed_samples(vertices_unwrapped, network_samples, id_to_label, draws)
+        vertex_samples = __create_multi_indexed_samples(vertices_unwrapped, network_samples, id_to_label)
 
     if plot:
         traceplot(vertex_samples, ax=ax)
@@ -270,12 +270,12 @@ def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrap
     for vertex_unwrapped in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex_unwrapped)]
         samples_for_vertex = __get_vertex_samples(network_samples, vertex_unwrapped)
-        vertex_samples[vertex_label] = list(samples_for_vertex.flatten())
+        vertex_samples[vertex_label] = samples_for_vertex.tolist()
     return vertex_samples
 
 
 def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples: JavaObject,
-                                   id_to_label: Dict[Tuple[int, ...], str], draws: int) -> sample_types:
+                                   id_to_label: Dict[Tuple[int, ...], str]) -> sample_types:
     vertex_samples_multi: Dict = {}
     for vertex in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex)]
@@ -283,14 +283,13 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
         import datetime
         print(datetime.datetime.now())
         samples_for_vertex = __get_vertex_samples(network_samples, vertex)
-        samples = [sample[0] for sample in array_split(samples_for_vertex, draws)]
         print(datetime.datetime.now())
-        for sample in samples:
+        for sample in samples_for_vertex:
             __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
     tuple_hierarchy: Dict = {(vertex_label, shape_index): values
-                             for vertex_label, tensor_index in vertex_samples_multi.items()
-                             for shape_index, values in tensor_index.items()}
+                             for vertex_label, samples in vertex_samples_multi.items()
+                             for shape_index, values in samples.items()}
 
     return tuple_hierarchy
 
@@ -312,9 +311,7 @@ def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, netwo
 
 
 def __add_sample_to_dict(sample_value: Any, vertex_sample: Dict):
-    if type(sample_value) is not ndarray:
-        vertex_sample[COLUMN_HEADER_FOR_SCALAR].append(sample_value)
-    elif sample_value.shape == ():
+    if sample_value.shape == ():
         vertex_sample[COLUMN_HEADER_FOR_SCALAR].append(sample_value.item())
     else:
         for index, value in ndenumerate(sample_value):

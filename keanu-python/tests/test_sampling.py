@@ -320,4 +320,4 @@ def __assert_valid_samples(draws: int, samples: Dict) -> None:
     for label, vertex_samples in samples.items():
         assert len(vertex_samples) == draws
         assert type(vertex_samples) == list
-        assert all(isinstance(sample, float) for sample in vertex_samples)
+        assert all(type(sample) == float for sample in vertex_samples)

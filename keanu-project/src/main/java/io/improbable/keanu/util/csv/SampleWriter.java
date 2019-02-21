@@ -29,7 +29,7 @@ public class SampleWriter extends Writer {
             for (int i = 0; i < samples.size(); i++) {
                 List<String> row = new ArrayList<>();
                 for (Vertex<? extends Tensor> vertex : vertices) {
-                    Tensor sample = (Tensor) samples.get(vertex).asList().get(i);
+                    Tensor sample = samples.get(vertex).asList().get(i);
                     List<Object> flatList = sample.asFlatList();
                     for (int j = 0; j < flatList.size(); j++) {
                         row.add(flatList.get(j).toString());

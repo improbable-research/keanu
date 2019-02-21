@@ -52,5 +52,4 @@ public class Samples<T> {
     public List<T> asList() {
         return new ArrayList<>(samples);
     }
-
 }
