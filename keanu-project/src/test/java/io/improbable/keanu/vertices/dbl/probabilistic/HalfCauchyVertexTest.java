@@ -6,6 +6,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.CauchyDistribution;
@@ -34,7 +37,7 @@ public class HalfCauchyVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfScalar() {
+    public void logProbMatchesKnownLogDensityOfScalar() {
 
         CauchyDistribution distribution = new CauchyDistribution(0.0, 1.0);
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
@@ -43,14 +46,41 @@ public class HalfCauchyVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfNegativeScalar() {
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+
+        DoubleVertex scale = ConstantVertex.of(1.);
+        HalfCauchyVertex halfCauchyVertex = new HalfCauchyVertex(scale);
+        LogProbGraph logProbGraph = halfCauchyVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, halfCauchyVertex, DoubleTensor.scalar(0.5));
+
+        CauchyDistribution distribution = new CauchyDistribution(0.0, 1.0);
+        double expectedDensity = distribution.logDensity(0.5) + Math.log(2.);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfNegativeScalar() {
 
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorHalfCauchyVertex, -0.5, Double.NEGATIVE_INFINITY);
     }
 
     @Test
-    public void matchesKnownLogDensityOfVector() {
+    public void logProbGraphMatchesKnownLogDensityOfNegativeScalar() {
+
+        DoubleVertex scale = ConstantVertex.of(1.);
+        HalfCauchyVertex halfCauchyVertex = new HalfCauchyVertex(scale);
+        LogProbGraph logProbGraph = halfCauchyVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, halfCauchyVertex, DoubleTensor.scalar(-0.5));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfVector() {
 
         CauchyDistribution distribution = new CauchyDistribution(0.0, 1.0);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75) + 2.0 * Math.log(2.0);
@@ -59,10 +89,37 @@ public class HalfCauchyVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfNegativeVector() {
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+
+        DoubleVertex scale = ConstantVertex.of(1., 1.);
+        HalfCauchyVertex halfCauchyVertex = new HalfCauchyVertex(scale);
+        LogProbGraph logProbGraph = halfCauchyVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, halfCauchyVertex, DoubleTensor.create(0.25, 0.75));
+
+        CauchyDistribution distribution = new CauchyDistribution(0.0, 1.0);
+        double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75) + 2.0 * Math.log(2.0);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedLogDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfNegativeVector() {
 
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorHalfCauchyVertex, new double[]{-0.25, 0.75}, Double.NEGATIVE_INFINITY);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfNegativeVector() {
+
+        DoubleVertex scale = ConstantVertex.of(1.);
+        HalfCauchyVertex halfCauchyVertex = new HalfCauchyVertex(scale);
+        LogProbGraph logProbGraph = halfCauchyVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, scale, scale.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, halfCauchyVertex, DoubleTensor.create(-0.25, 0.75));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
     }
 
     @Test
