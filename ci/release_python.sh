@@ -36,6 +36,8 @@ get_secrets() {
       mkdir ../keanu-python/dist/
       # Download artifacts from Buildkite
       buildkite-agent artifact download --step "Build Python distribution" "keanu-python/dist/*" "../keanu-python/dist/"
+      echo `ls ../keanu-python/dist`
+      echo `ls ../keanu-python/dist/keanu-python`
       ;;
     *)
       echo "Unknown release type"
