@@ -50,6 +50,9 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def observe(self, v: tensor_arg_types) -> None:
         self.unwrap().observe(Tensor(self.cast(v)).unwrap())
 
+    def unobserve(self) -> None:
+        self.unwrap().unobserve()
+
     def set_value(self, v: tensor_arg_types) -> None:
         self.unwrap().setValue(Tensor(self.cast(v)).unwrap())
 

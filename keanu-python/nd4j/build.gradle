@@ -21,3 +21,7 @@ task buildWheelDistribution {
         }
     }
 }
+
+clean.doFirst {
+    delete 'nd4j/classpath'
+}

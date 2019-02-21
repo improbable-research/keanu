@@ -6,6 +6,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraphContract;
+import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -34,7 +37,7 @@ public class HalfGaussianVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfScalar() {
+    public void logProbMatchesKnownLogDensityOfScalar() {
 
         NormalDistribution distribution = new NormalDistribution(0.0, 1.0);
         HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
@@ -43,14 +46,39 @@ public class HalfGaussianVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfNegativeScalar() {
+    public void logProbGraphMatchesKnownLogDensityOfScalar() {
+        DoubleVertex sigma = ConstantVertex.of(1.);
+        HalfGaussianVertex halfGaussianVertex = new HalfGaussianVertex(sigma);
+        LogProbGraph logProbGraph = halfGaussianVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, sigma, sigma.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, halfGaussianVertex, DoubleTensor.scalar(0.5));
+
+        NormalDistribution distribution = new NormalDistribution(0.0, 1.0);
+        double expectedDensity = distribution.logDensity(0.5) + Math.log(2);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfNegativeScalar() {
 
         HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGaussianVertex, -0.5, Double.NEGATIVE_INFINITY);
     }
 
     @Test
-    public void matchesKnownLogDensityOfVector() {
+    public void logProbGraphMatchesKnownLogDensityOfNegativeScalar() {
+        DoubleVertex sigma = ConstantVertex.of(1.);
+        HalfGaussianVertex halfGaussianVertex = new HalfGaussianVertex(sigma);
+        LogProbGraph logProbGraph = halfGaussianVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, sigma, sigma.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, halfGaussianVertex, DoubleTensor.scalar(-0.5));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfVector() {
 
         NormalDistribution distribution = new NormalDistribution(0.0, 1.0);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75) + 2 * Math.log(2);
@@ -59,10 +87,35 @@ public class HalfGaussianVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityOfNegativeVector() {
+    public void logProbGraphMatchesKnownLogDensityOfVector() {
+        DoubleVertex sigma = ConstantVertex.of(1., 1.);
+        HalfGaussianVertex halfGaussianVertex = new HalfGaussianVertex(sigma);
+        LogProbGraph logProbGraph = halfGaussianVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, sigma, sigma.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, halfGaussianVertex, DoubleTensor.create(0.25, 0.75));
+
+        NormalDistribution distribution = new NormalDistribution(0.0, 1.0);
+        double expectedDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75) + 2. * Math.log(2);
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, expectedDensity);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogDensityOfNegativeVector() {
 
         HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorGaussianVertex, new double[]{-0.25, 0.75}, Double.NEGATIVE_INFINITY);
+    }
+
+    @Test
+    public void logProbGraphMatchesKnownLogDensityOfNegativeVector() {
+        DoubleVertex sigma = ConstantVertex.of(1., 1.);
+        HalfGaussianVertex halfGaussianVertex = new HalfGaussianVertex(sigma);
+        LogProbGraph logProbGraph = halfGaussianVertex.logProbGraph();
+        LogProbGraphValueFeeder.feedValue(logProbGraph, sigma, sigma.getValue());
+        LogProbGraphValueFeeder.feedValue(logProbGraph, halfGaussianVertex, DoubleTensor.create(-0.25, 0.75));
+
+        LogProbGraphContract.matchesKnownLogDensity(logProbGraph, Double.NEGATIVE_INFINITY);
     }
 
     @Test
