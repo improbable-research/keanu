@@ -2,9 +2,12 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -48,6 +51,29 @@ public class HalfGaussianVertex extends GaussianVertex {
             return super.logProb(value) + LOG_TWO * value.getLength();
         }
         return Double.NEGATIVE_INFINITY;
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        final DoublePlaceholderVertex xPlaceholder = new DoublePlaceholderVertex(this.getShape());
+        final DoublePlaceholderVertex muPlaceholder = new DoublePlaceholderVertex(getMu().getShape());
+        final DoublePlaceholderVertex sigmaPlaceholder = new DoublePlaceholderVertex(getSigma().getShape());
+
+        final DoubleVertex gaussianLogProbOutput = Gaussian.logProbOutput(xPlaceholder, muPlaceholder, sigmaPlaceholder);
+
+        final DoubleVertex result = gaussianLogProbOutput.plus(LOG_TWO);
+        final DoubleVertex invalidMask = xPlaceholder.toLessThanMask(MU_ZERO);
+        final DoubleVertex halfGaussianLogProbOutput = result.setWithMask(invalidMask, Double.NEGATIVE_INFINITY).sum();
+
+        // Set the value of muPlaceholder since we know it's 0.
+        muPlaceholder.setValue(MU_ZERO);
+
+        return LogProbGraph.builder()
+            .input(this, xPlaceholder)
+            .input(getMu(), muPlaceholder)
+            .input(getSigma(), sigmaPlaceholder)
+            .logProbOutput(halfGaussianLogProbOutput)
+            .build();
     }
 
     @Override

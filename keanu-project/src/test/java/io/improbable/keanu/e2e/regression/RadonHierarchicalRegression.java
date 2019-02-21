@@ -15,6 +15,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.HalfCauchyVertex;
 import lombok.Value;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -51,6 +52,7 @@ public class RadonHierarchicalRegression {
 
     @Test
     @Category(Slow.class)
+    @Ignore("Ignoring this until we can run a large enough version of this quickly enough to be useful")
     public void canPerformRegressionWithEightHierarchies() {
         buildAndRunHierarchicalNetwork(radonData, 8);
     }

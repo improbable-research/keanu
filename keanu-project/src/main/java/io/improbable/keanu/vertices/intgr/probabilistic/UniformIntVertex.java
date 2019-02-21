@@ -8,6 +8,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.LoadShape;
 import io.improbable.keanu.vertices.LoadVertexParam;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.LogProbGraph.IntegerPlaceholderVertex;
+import io.improbable.keanu.vertices.LogProbGraphSupplier;
 import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -20,7 +23,7 @@ import java.util.Set;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasOneNonLengthOneShapeOrAllLengthOne;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne;
 
-public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
+public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor>, LogProbGraphSupplier {
 
     private IntegerVertex min;
     private IntegerVertex max;
@@ -89,6 +92,20 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
     @Override
     public double logProb(IntegerTensor value) {
         return UniformInt.withParameters(min.getValue(), max.getValue()).logProb(value).sum();
+    }
+
+    @Override
+    public LogProbGraph logProbGraph() {
+        IntegerPlaceholderVertex valuePlaceholder = new IntegerPlaceholderVertex(this.getShape());
+        IntegerPlaceholderVertex minPlaceholder = new IntegerPlaceholderVertex(min.getShape());
+        IntegerPlaceholderVertex maxPlaceholder = new IntegerPlaceholderVertex(max.getShape());
+
+        return LogProbGraph.builder()
+            .input(this, valuePlaceholder)
+            .input(min, minPlaceholder)
+            .input(max, maxPlaceholder)
+            .logProbOutput(UniformInt.logProbOutput(valuePlaceholder, minPlaceholder, maxPlaceholder))
+            .build();
     }
 
     @Override
