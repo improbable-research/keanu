@@ -1468,32 +1468,31 @@ public class JVMDoubleTensor extends DoubleTensor {
         long[] rightShape = right.getShape();
         long[] rightStride = right.getStride();
 
-        long[] resultShape = Shape.broadcastOutputShape(leftShape, rightShape);
+        boolean needsBroadcast = !Arrays.equals(leftShape, rightShape);
 
-        boolean resultShapeIsThisShape = Arrays.equals(resultShape, leftShape);
-        boolean resultShapeIsThatShape = Arrays.equals(resultShape, rightShape);
-
-        if (!resultShapeIsThisShape && !resultShapeIsThatShape) {
-            throw new IllegalArgumentException(
-                "Broadcasting of shape " + Arrays.toString(leftShape) + " and " + Arrays.toString(rightShape) + " not supported."
-            );
-        }
-
+        long[] resultShape;
         double[] outputBuffer;
-        if (resultShapeIsThisShape) {
-            if (inPlace) {
-                outputBuffer = leftBuffer;
+
+        if (needsBroadcast) {
+
+            resultShape = Shape.broadcastOutputShape(leftShape, rightShape);
+            boolean resultShapeIsThisShape = Arrays.equals(resultShape, leftShape);
+
+            if (!resultShapeIsThisShape) {
+
+                boolean resultShapeIsThatShape = Arrays.equals(resultShape, rightShape);
+
+                if (!resultShapeIsThatShape) {
+                    throw new IllegalArgumentException(
+                        "Broadcasting of shape " + Arrays.toString(leftShape) + " and " + Arrays.toString(rightShape) + " not supported."
+                    );
+                }
+
+                outputBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
+
             } else {
-                outputBuffer = new double[leftBuffer.length];
+                outputBuffer = inPlace ? leftBuffer : new double[leftBuffer.length];
             }
-        } else {
-            outputBuffer = new double[Ints.checkedCast(TensorShape.getLength(resultShape))];
-        }
-
-        if (Arrays.equals(leftShape, rightShape)) {
-
-            elementwise(leftBuffer, rightBuffer, outputBuffer, op);
-        } else {
 
             //Short circuit for broadcast with scalars
             if (leftShape.length == 0) {
@@ -1510,6 +1509,13 @@ public class JVMDoubleTensor extends DoubleTensor {
                 //e.g. [2] / [2, 2]
                 broadcastFromLeft(leftBuffer, leftShape, leftStride, rightBuffer, rightShape, rightStride, outputBuffer, op);
             }
+
+        } else {
+            resultShape = leftShape;
+
+            outputBuffer = inPlace ? leftBuffer : new double[leftBuffer.length];
+
+            elementwise(leftBuffer, rightBuffer, outputBuffer, op);
         }
 
         return new JVMDoubleTensor(outputBuffer, resultShape);
