@@ -37,3 +37,9 @@ steps:
   - label: "Release to PyPi test"
     command: "bash ./ci/release_python.sh test ci"
     <<: *common
+
+  - block: "PyPi real release :rocket:"
+
+  - label: "Release to PyPi real"
+    command: "bash ./ci/release_python.sh real ci"
+    <<: *common
