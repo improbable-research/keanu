@@ -39,26 +39,26 @@ public class KeanuProbabilisticModelWithGradient extends KeanuProbabilisticModel
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
+    public Map<VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
         return gradients(inputs, logProbGradientCalculator);
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logProbGradients() {
+    public Map<VariableReference, DoubleTensor> logProbGradients() {
         return logProbGradients(null);
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
+    public Map<VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
         return gradients(inputs, logLikelihoodGradientCalculator);
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients() {
+    public Map<VariableReference, DoubleTensor> logLikelihoodGradients() {
         return logLikelihoodGradients(null);
     }
 
-    private Map<? extends VariableReference, DoubleTensor> gradients(Map<VariableReference, ?> inputs, LogProbGradientCalculator gradientCalculator) {
+    private Map gradients(Map<VariableReference, ?> inputs, LogProbGradientCalculator gradientCalculator) {
         if (inputs != null && !inputs.isEmpty()) {
             cascadeValues(inputs);
         }

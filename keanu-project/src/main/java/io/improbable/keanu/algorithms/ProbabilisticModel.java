@@ -25,7 +25,7 @@ public interface ProbabilisticModel {
 
     double logLikelihood(Map<VariableReference, ?> inputs);
 
-    List<? extends Variable> getLatentVariables();
+    List<Variable> getLatentVariables();
 
-    List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables();
+    List<Variable<DoubleTensor, ?>> getContinuousLatentVariables();
 }
