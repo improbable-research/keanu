@@ -6,6 +6,8 @@ if [[ -n "${DEBUG-}" ]]; then
   set -x
 fi
 
+cd "$(dirname "$0")/"
+
 PYPI_TEST_SECRET="keanu-eng-test-pypi"
 PYPI_REAL_SECRET="keanu-eng-test-pypi"
 
@@ -30,10 +32,10 @@ get_secrets() {
       pypi_password=$(imp-ci secrets read --environment="production" --buildkite-org="improbable" --secret-type="generic-credentials" --secret-name="${secret_name}" --field="password")
       
       # Delete dist directory if it already exists.
-      rm -rf keanu-python/dist/
-      mkdir keanu-python/dist/
+      rm -rf ../keanu-python/dist/
+      mkdir ../keanu-python/dist/
       # Download artifacts from Buildkite
-      buildkite-agent artifact download --step "Build Python distribution" "keanu-python/dist/*" "keanu-python/dist/"
+      buildkite-agent artifact download --step "Build Python distribution" "keanu-python/dist/*" "../keanu-python/dist/"
       ;;
     *)
       echo "Unknown release type"
