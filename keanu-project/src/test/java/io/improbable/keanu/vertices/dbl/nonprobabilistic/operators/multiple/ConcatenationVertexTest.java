@@ -16,12 +16,12 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
-import org.junit.rules.ExpectedException;
 
 public class ConcatenationVertexTest {
 
