@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -80,6 +81,21 @@ public class ForwardSamplerTest {
         assertEquals(sampleCount, samples.size());
         assertEquals(100.0, averageA, 0.1);
         assertEquals(105.0, averageB, 0.1);
+    }
+
+    @Test
+    public void canCalculateProbabilityOfSamples() {
+        GaussianVertex A = new GaussianVertex(100.0, 1);
+        DoubleVertex B = A.plus(ConstantVertex.of(5.));
+
+        ProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+
+        final int sampleCount = 1000;
+        NetworkSamples samples = Keanu.Sampling.Forward.builder().random(random).calculateSampleProbability(true).build().getPosteriorSamples(model, Arrays.asList(A, B), sampleCount);
+
+        assertTrue(samples.getLogOfMasterP(0) != 0.);
+        assertTrue(samples.getLogOfMasterP(1) != 0.);
+        assertTrue(samples.getLogOfMasterP(0) != samples.getLogOfMasterP(1));
     }
 
     @Test
