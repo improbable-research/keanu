@@ -5,3 +5,6 @@ name = "pypi"
 
 [packages]
 twine = "==1.12.1"
+
+[requires]
+python_version = "3.6"
