@@ -35,7 +35,7 @@ get_secrets() {
       rm -rf ../keanu-python/dist/
       mkdir ../keanu-python/dist/
       # Download artifacts from Buildkite
-      buildkite-agent artifact download --step "Build Python distribution" "keanu-python/dist/*" .
+      buildkite-agent artifact download --step "Build Python distribution" "keanu-python/dist/*" "../"
       echo `ls ../keanu-python/dist/`
       ;;
     *)
