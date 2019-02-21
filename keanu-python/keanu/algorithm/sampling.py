@@ -280,10 +280,7 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
     for vertex in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        import datetime
-        print(datetime.datetime.now())
         samples_for_vertex = __get_vertex_samples(network_samples, vertex)
-        print(datetime.datetime.now())
         for sample in samples_for_vertex:
             __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
