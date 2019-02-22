@@ -45,10 +45,10 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
 
     @ExportVertexToPythonBindings
     public MultinomialVertex(IntegerVertex n, DoubleVertex p) {
-        this(checkRankIsStrictlyPositive(n), n, p);
+        this(checkRankOfNIsStrictlyPositive(n), n, p);
     }
 
-    private static long[] checkRankIsStrictlyPositive(IntegerVertex n) {
+    private static long[] checkRankOfNIsStrictlyPositive(IntegerVertex n) {
         Preconditions.checkArgument(n.getRank() > 0, "Rank of n must be greater than 0.");
         return n.getShape();
     }
