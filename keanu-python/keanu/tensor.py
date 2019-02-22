@@ -80,7 +80,7 @@ class Tensor(JavaObjectWrapper):
             raise NotImplementedError("Generic types in a ndarray are not supported. Was given {}".format(type(scalar)))
 
     @staticmethod
-    def _to_ndarray(java_tensor: JavaObject) -> ndarray:
+    def _to_ndarray(java_tensor: JavaObject) -> Any:
         if (java_tensor.getRank() == 0):
             return np.array(java_tensor.scalar())
         else:
