@@ -102,6 +102,7 @@
 <span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.mcmc.MetropolisHastings&quot;</span><span class="p">)</span>
 <span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.mcmc.nuts.NUTS&quot;</span><span class="p">)</span>
 <span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.sampling.Forward&quot;</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">PosteriorSamplingAlgorithm</span><span class="p">:</span>
@@ -111,6 +112,12 @@
 
     <span class="k">def</span> <span class="nf">get_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JavaObject</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampler</span>
+
+
+<span class="k">class</span> <span class="nc">ForwardSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">Forward</span><span class="p">())</span>
 
 
 <div class="viewcode-block" id="MetropolisHastingsSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.MetropolisHastingsSampler">[docs]</a><span class="k">class</span> <span class="nc">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
@@ -213,7 +220,7 @@
 <span class="sd">    :param net: Bayesian Network containing latent variables.</span>
 <span class="sd">    :param sample_from: Vertices to include in the returned samples.</span>
 <span class="sd">    :param sampling_algorithm: The posterior sampling algorithm to use.</span>
-<span class="sd">        Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.</span>
+<span class="sd">        Options are :class:`keanu.algorithm.MetropolisHastingsSampler`, :class:`keanu.algorithm.NUTSSampler` and :class:`keanu.algorithm.ForwardSampler`</span>
 <span class="sd">        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with &#39;prior&#39; as its proposal distribution.</span>
 <span class="sd">    :param draws: The number of samples to take.</span>
 <span class="sd">    :param drop: The number of samples to drop before collecting anything.</span>
@@ -240,8 +247,9 @@
 
     <span class="n">vertices_unwrapped</span><span class="p">:</span> <span class="n">JavaList</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">to_java_object_list</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
 
-    <span class="n">probabilistic_model</span> <span class="o">=</span> <span class="n">ProbabilisticModel</span><span class="p">(</span><span class="n">net</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
-        <span class="n">sampling_algorithm</span><span class="p">,</span> <span class="n">MetropolisHastingsSampler</span><span class="p">)</span> <span class="k">else</span> <span class="n">ProbabilisticModelWithGradient</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+    <span class="n">probabilistic_model</span> <span class="o">=</span> <span class="n">ProbabilisticModel</span><span class="p">(</span><span class="n">net</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">sampling_algorithm</span><span class="p">,</span> <span class="n">MetropolisHastingsSampler</span><span class="p">)</span> <span class="ow">or</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">sampling_algorithm</span><span class="p">,</span> <span class="n">ForwardSampler</span><span class="p">))</span> <span class="k">else</span> <span class="n">ProbabilisticModelWithGradient</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 
     <span class="n">network_samples</span><span class="p">:</span> <span class="n">JavaObject</span> <span class="o">=</span> <span class="n">sampling_algorithm</span><span class="o">.</span><span class="n">get_sampler</span><span class="p">()</span><span class="o">.</span><span class="n">getPosteriorSamples</span><span class="p">(</span>
         <span class="n">probabilistic_model</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(),</span> <span class="n">vertices_unwrapped</span><span class="p">,</span> <span class="n">draws</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span><span class="o">.</span><span class="n">downSample</span><span class="p">(</span><span class="n">down_sample_interval</span><span class="p">)</span>
