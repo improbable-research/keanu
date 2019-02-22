@@ -27,7 +27,7 @@ windows: &windows
     - "capable_of_building=graphos-eng"
     - "environment=production"
     - "permission_set=builder"
-    - "queue=${CI_WINDOWS_BUILDER_QUEUE:-v2-1550668662-a9410887d4b815dd-------z}"
+    - "queue=${CI_WINDOWS_BUILDER_QUEUE:-v2-1550748015-b6a7d7f9ae5dbf04-------z}"
 
 # NOTE: step labels turn into commit-status names like {org}/{repo}/{pipeline}/{step-label}, lower-case and hyphenated.
 # These are then relied on to have stable names by other things, so once named, please beware renaming has consequences.
