@@ -35,7 +35,6 @@ import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertTrue;
 
 public class NetworkSamplesTest {
@@ -194,9 +193,6 @@ public class NetworkSamplesTest {
             new NetworkSample(vertexValsFirstSample, 9.4)
         ));
         assertThat(vertex, instanceOf(GenericVertex.class));
-        assertThat(networkSamples.get(vertex), not(instanceOf(DoubleVertexSamples.class)));
-        assertThat(networkSamples.get(vertex), not(instanceOf(IntegerVertexSamples.class)));
-        assertThat(networkSamples.get(vertex), not(instanceOf(BooleanVertexSamples.class)));
-        assertThat(networkSamples.get(vertex), instanceOf(Samples.class));
+        assertThat(networkSamples.get(vertex).getClass(), equalTo(Samples.class));
     }
 }
