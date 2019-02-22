@@ -7,4 +7,4 @@ fi
 
 cd "$(dirname "$0")/../"
 
-./gradlew clean build preparePythonClasspath buildWheelDistribution --info --stacktrace
+./gradlew clean preparePythonClasspath buildWheelDistribution --info --stacktrace
