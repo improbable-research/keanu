@@ -12,6 +12,7 @@
 * `ForwardSampler`
   * Samples from the prior of a bayesian network. The network cannot have observations that are dependent on random variables.
   * It's accessible from the `Keanu` factory like so: `Keanu.Sampling.Forward.withDefaultConfig()`
+  * There is a togglabe option to record the log prob of each sample. This is disabled by default for performance reasons.
   
 ### Python
 
