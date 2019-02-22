@@ -25,6 +25,7 @@ public class SimpleBooleanTensorTest {
     BooleanTensor matrixA;
     BooleanTensor matrixB;
     BooleanTensor matrixC;
+    private static final BooleanTensor matrixD = BooleanTensor.create(new boolean[]{true, false}, 1, 2);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -225,36 +226,26 @@ public class SimpleBooleanTensorTest {
 
     @Test
     public void canStackMatrices() {
-        BooleanTensor x = BooleanTensor.create(true, false).reshape(1, 2);
-        BooleanTensor y = BooleanTensor.create(true, false).reshape(1, 2);
-
-        assertThat(BooleanTensor.create(true, false, true, false).reshape(2, 1, 2), valuesAndShapesMatch(BooleanTensor.stack(0, x, y)));
-        assertThat(BooleanTensor.create(true, false, true, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(1, x, y)));
-        assertThat(BooleanTensor.create(true, true, false, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(2, x, y)));
+        assertThat(BooleanTensor.create(true, false, true, false).reshape(2, 1, 2), valuesAndShapesMatch(BooleanTensor.stack(0, matrixD, matrixD)));
+        assertThat(BooleanTensor.create(true, false, true, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(1, matrixD, matrixD)));
+        assertThat(BooleanTensor.create(true, true, false, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(2, matrixD, matrixD)));
     }
 
     @Test
     public void canStackIfDimensionIsNegative() {
-        BooleanTensor x = BooleanTensor.create(true, false).reshape(1, 2);
-        BooleanTensor y = BooleanTensor.create(true, false).reshape(1, 2);
-
-        assertThat(BooleanTensor.create(true, false, true, false).reshape(2, 1, 2), valuesAndShapesMatch(BooleanTensor.stack(-3, x, y)));
-        assertThat(BooleanTensor.create(true, false, true, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(-2, x, y)));
-        assertThat(BooleanTensor.create(true, true, false, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(-1, x, y)));
+        assertThat(BooleanTensor.create(true, false, true, false).reshape(2, 1, 2), valuesAndShapesMatch(BooleanTensor.stack(-3, matrixD, matrixD)));
+        assertThat(BooleanTensor.create(true, false, true, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(-2, matrixD, matrixD)));
+        assertThat(BooleanTensor.create(true, true, false, false).reshape(1, 2, 2), valuesAndShapesMatch(BooleanTensor.stack(-1, matrixD, matrixD)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotStackIfPositiveDimensionIsOutOfBounds() {
-        BooleanTensor x = BooleanTensor.create(true, false).reshape(1, 2);
-        BooleanTensor y = BooleanTensor.create(true, false).reshape(1, 2);
-        BooleanTensor.stack(3, x, y);
+        BooleanTensor.stack(3, matrixD, matrixD);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotStackIfNegativeDimensionIsOutOfBounds() {
-        BooleanTensor x = BooleanTensor.create(true, false).reshape(1, 2);
-        BooleanTensor y = BooleanTensor.create(true, false).reshape(1, 2);
-        BooleanTensor.stack(-4, x, y);
+        BooleanTensor.stack(-4, matrixD, matrixD);
     }
 
 }
