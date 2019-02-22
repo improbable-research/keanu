@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +54,6 @@ public class Samples<T> {
     }
 
     public T asTensor() {
-        throw new NotImplementedException("Generic samples cannot be coerced into a tensor.");
+        throw new UnsupportedOperationException("Generic samples cannot be coerced into a tensor.");
     }
 }
