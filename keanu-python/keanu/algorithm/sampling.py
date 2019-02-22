@@ -247,7 +247,7 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
         if all_scalar:
             sample: sample_generator_dict_type = {
                 id_to_label[Vertex._get_python_id(vertex_unwrapped)]: Tensor._to_ndarray(
-                    network_sample.get(vertex_unwrapped)) for vertex_unwrapped in vertices_unwrapped
+                    network_sample.get(vertex_unwrapped)).item() for vertex_unwrapped in vertices_unwrapped
             }
         else:
             sample = __create_multi_indexed_samples_generated(vertices_unwrapped, network_sample, id_to_label)

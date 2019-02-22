@@ -57,7 +57,7 @@ def test_autocorrelation_same_for_streaming_as_batch() -> None:
         samples_dataframe = samples_dataframe.append(next_sample, ignore_index=True)
 
     for vertex_id in samples_dataframe:
-        autocorr_streaming = stats.autocorrelation(np.stack(samples_dataframe[vertex_id].values).tolist())
+        autocorr_streaming = stats.autocorrelation(list(samples_dataframe[vertex_id].values))
         autocorr_batch = stats.autocorrelation(samples[vertex_id])
         np.testing.assert_array_equal(autocorr_batch, autocorr_streaming)
 
