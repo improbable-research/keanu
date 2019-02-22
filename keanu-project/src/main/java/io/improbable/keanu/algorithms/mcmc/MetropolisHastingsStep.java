@@ -68,12 +68,7 @@ public class MetropolisHastingsStep {
             final double pqxNew = proposalDistribution.logProbAtToGivenFrom(proposal);
 
             final double annealFactor = (1.0 / temperature);
-            final double hastingsCorrection = pqxOld - pqxNew;
-            final double logR = annealFactor * logProbabilityDelta + hastingsCorrection;
-            final double r = Math.exp(logR);
-
-            final boolean shouldAccept = r >= random.nextDouble();
-
+	    la la la la la 
             if (shouldAccept) {
                 return new StepResult(true, logProbabilityAfterStep);
             }
