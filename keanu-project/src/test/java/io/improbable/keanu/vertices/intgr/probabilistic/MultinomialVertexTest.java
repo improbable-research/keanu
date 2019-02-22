@@ -35,6 +35,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
+import org.junit.rules.ExpectedException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +43,9 @@ public class MultinomialVertexTest {
 
     @Rule
     public DeterministicRule rule = new DeterministicRule();
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheProbabilitiesDontSumToOne() {
@@ -313,5 +317,16 @@ public class MultinomialVertexTest {
             assertEquals(n.scalar() * probability, mean, epsilonForMean);
             assertEquals(n.scalar() * probability * (1 - probability), std * std, epsilonForVariance);
         }
+    }
+
+    @Test
+    public void throwsIfRankOfNIsZero() {
+        IntegerVertex nWithRankZero = ConstantVertex.of(10);
+        assertThat(nWithRankZero.getValue(), hasShape());
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Rank of n must be greater than 0.");
+
+        MultinomialVertex vertex = new MultinomialVertex(ConstantVertex.of(10), ConstantVertex.of(0.1, 0.2, 0.7));
     }
 }
