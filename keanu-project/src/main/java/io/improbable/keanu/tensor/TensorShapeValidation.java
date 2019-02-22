@@ -198,15 +198,17 @@ public class TensorShapeValidation {
         long[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
 
         for (int i = 1; i < shapes.length; i++) {
-            if (shapes[i].length <= dimension) {
-                throw new IllegalArgumentException(String.format("Cannot concat operand %d because dimension is greater than or equal to its rank", i));
+            int rank = shapes[i].length;
+
+            if (rank <= dimension) {
+                throw new IllegalArgumentException(String.format("Cannot concat operand %d because dimension %d is greater than or equal to its rank %d", i, dimension, rank));
             }
 
-            if (shapes[i].length != concatShape.length) {
+            if (rank != concatShape.length) {
                 throw new IllegalArgumentException("Cannot concat shapes of different ranks");
             }
 
-            for (int dim = 0; dim < shapes[i].length; dim++) {
+            for (int dim = 0; dim < rank; dim++) {
                 if (dim == dimension) {
                     concatShape[dim] += shapes[i][dim];
                 } else {
