@@ -317,6 +317,6 @@ def __add_sample_to_dict(sample_value: Any, vertex_sample: Dict):
 
 
 def __get_vertex_samples(network_samples, vertex) -> ndarray:
-    logging.getLogger("keanu").warning("Copying samples to an ndarray...")
+    logging.getLogger("keanu").warning("Copying samples from jvm...")
     samples_for_vertex = network_samples.get(vertex).asTensor()
     return Tensor._to_scalar_or_ndarray(samples_for_vertex)
