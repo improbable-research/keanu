@@ -21,6 +21,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 import java.util.Map;
 
@@ -35,7 +36,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
-import org.junit.rules.ExpectedException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -322,7 +322,7 @@ public class MultinomialVertexTest {
     @Test
     public void throwsIfRankOfNIsZero() {
         IntegerVertex nWithRankZero = ConstantVertex.of(10);
-        assertThat(nWithRankZero.getValue(), hasShape());
+        assertThat(nWithRankZero.getRank(), equalTo(0));
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Rank of n must be greater than 0.");
