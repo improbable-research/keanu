@@ -246,7 +246,7 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
 
         if all_scalar:
             sample: sample_generator_dict_type = {
-                id_to_label[Vertex._get_python_id(vertex_unwrapped)]: Tensor._to_scalar_or_ndarray(
+                id_to_label[Vertex._get_python_id(vertex_unwrapped)]: Tensor._to_ndarray(
                     network_sample.get(vertex_unwrapped)) for vertex_unwrapped in vertices_unwrapped
             }
         else:
@@ -310,7 +310,7 @@ def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, netwo
     for vertex in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        sample = Tensor._to_scalar_or_ndarray(network_samples.get(vertex))
+        sample = Tensor._to_ndarray(network_samples.get(vertex))
         __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
     tuple_hierarchy: Dict = {(vertex_label, tensor_index): values
@@ -330,4 +330,4 @@ def __add_sample_to_dict(sample_value: Any, vertex_sample: Dict):
 
 def __get_vertex_samples(network_samples, vertex) -> ndarray:
     samples_for_vertex = network_samples.get(vertex).asTensor()
-    return Tensor._to_scalar_or_ndarray(samples_for_vertex)
+    return Tensor._to_ndarray(samples_for_vertex)
