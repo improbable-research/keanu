@@ -24,8 +24,9 @@ public class TopologicalSort {
      * @return a linear ordering of vertices by order of execution
      */
     public static List<Vertex> sort(Collection<? extends Vertex> vertices) {
-        return vertices.stream().
-            sorted(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()))
+        return vertices
+            .stream()
+            .sorted(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()))
             .collect(Collectors.toList());
     }
 

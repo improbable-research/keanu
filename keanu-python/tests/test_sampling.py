@@ -9,8 +9,8 @@ import pytest
 from examples import thermometers
 from keanu import BayesNet, KeanuRandom, Model
 from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler, NUTSSampler,
-                             PosteriorSamplingAlgorithm)
-from keanu.vertex import Gamma, Exponential, Cauchy, Gaussian
+                             ForwardSampler, PosteriorSamplingAlgorithm)
+from keanu.vertex import Gamma, Exponential, Gaussian, Cauchy
 
 
 @pytest.fixture
@@ -28,14 +28,14 @@ def tensor_net() -> BayesNet:
     with Model() as m:
         m.gamma = Gamma(np.array([1., 1., 1., 1.]).reshape((2, 2)), np.array([2., 2., 2., 2.]).reshape((2, 2)))
         m.exp = Exponential(np.array([1., 1., 1., 1.]).reshape((2, 2)))
-        m.cauchy = Cauchy(m.gamma, m.exp)
+        m.add = m.gamma + m.exp
 
     return m.to_bayes_net()
 
 
 @pytest.mark.parametrize(
     "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.iter_latent_vertices())),
-             (lambda net: NUTSSampler())])
+             (lambda net: NUTSSampler()), (lambda net: ForwardSampler())])
 def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(
         algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], net: BayesNet) -> None:
     draws = 5
@@ -48,7 +48,7 @@ def test_sampling_returns_dict_of_list_of_ndarrays_for_vertices_in_sample_from(
 
 @pytest.mark.parametrize(
     "algo", [(lambda net: MetropolisHastingsSampler(proposal_distribution="prior", latents=net.iter_latent_vertices())),
-             (lambda net: NUTSSampler())])
+             (lambda net: NUTSSampler()), (lambda net: ForwardSampler())])
 def test_sampling_returns_multi_indexed_dict_of_list_of_scalars_for_tensor_in_sample_from(
         algo: Callable[[BayesNet], PosteriorSamplingAlgorithm], tensor_net: BayesNet) -> None:
     draws = 5
@@ -159,14 +159,15 @@ def test_down_sample_interval(net: BayesNet) -> None:
 
 
 def test_sample_with_plot(net: BayesNet) -> None:
-    _, ax = plt.subplots(3, 1, squeeze=False)
+    num_plots = 3
+    _, ax = plt.subplots(num_plots, 1, squeeze=False)
     sample(net=net, sample_from=net.iter_latent_vertices(), draws=5, plot=True, ax=ax)
 
     reorder_subplots(ax)
 
-    assert len(ax) == 3
-    assert all(len(ax[i][0].get_lines()) == 1 for i in range(3))
-    assert all(len(ax[i][0].get_lines()[0].get_ydata()) == 5 for i in range(3))
+    assert len(ax) == num_plots
+    assert all(len(ax[i][0].get_lines()) == 1 for i in range(num_plots))
+    assert all(len(ax[i][0].get_lines()[0].get_ydata()) == 5 for i in range(num_plots))
 
 
 def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
@@ -203,7 +204,7 @@ def test_can_iter_through_tensor_samples(algo: Callable[[BayesNet], PosteriorSam
     count = 0
     for sample in islice(samples, draws):
         count += 1
-        for distribution in ('exp', 'cauchy'):
+        for distribution in ('exp', 'gamma'):
             for i in (0, 1):
                 for j in (0, 1):
                     assert ((distribution, (i, j)) in sample)
@@ -230,16 +231,17 @@ def test_iter_returns_same_result_as_sample() -> None:
 
 
 def test_iter_with_live_plot(net: BayesNet) -> None:
-    _, ax = plt.subplots(3, 1, squeeze=False)
+    num_plots = 3
+    _, ax = plt.subplots(num_plots, 1, squeeze=False)
     samples = generate_samples(net=net, sample_from=net.iter_latent_vertices(), live_plot=True, refresh_every=5, ax=ax)
 
     for sample in islice(samples, 5):
         pass
 
     reorder_subplots(ax)
-    assert len(ax) == 3
-    assert all(len(ax[i][0].get_lines()) == 1 for i in range(3))
-    assert all(len(ax[i][0].get_lines()[0].get_ydata() == 5) for i in range(3))
+    assert len(ax) == num_plots
+    assert all(len(ax[i][0].get_lines()) == 1 for i in range(num_plots))
+    assert all(len(ax[i][0].get_lines()[0].get_ydata() == 5) for i in range(num_plots))
 
 
 def test_can_get_acceptance_rates(net: BayesNet) -> None:
