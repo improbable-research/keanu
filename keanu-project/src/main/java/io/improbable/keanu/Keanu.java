@@ -280,7 +280,7 @@ public class Keanu {
 
             if (containsDiscreteLatents) {
                 throw new UnsupportedOperationException(
-                    "Gradient optimization unsupported on networks containing discrete latents. " +
+                    "Optimization unsupported on networks containing discrete latents. " +
                         "Found " + discreteLatentVertices.size() + " discrete latents.");
             }
 
