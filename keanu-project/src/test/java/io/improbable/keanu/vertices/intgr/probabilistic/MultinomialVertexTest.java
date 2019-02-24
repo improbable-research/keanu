@@ -21,6 +21,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 
 import java.util.Map;
 
@@ -42,6 +43,9 @@ public class MultinomialVertexTest {
 
     @Rule
     public DeterministicRule rule = new DeterministicRule();
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheProbabilitiesDontSumToOne() {
@@ -313,5 +317,16 @@ public class MultinomialVertexTest {
             assertEquals(n.scalar() * probability, mean, epsilonForMean);
             assertEquals(n.scalar() * probability * (1 - probability), std * std, epsilonForVariance);
         }
+    }
+
+    @Test
+    public void throwsIfRankOfNIsZero() {
+        IntegerVertex nWithRankZero = ConstantVertex.of(10);
+        assertThat(nWithRankZero.getRank(), equalTo(0));
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Rank of n must be greater than 0.");
+
+        MultinomialVertex vertex = new MultinomialVertex(ConstantVertex.of(10), ConstantVertex.of(0.1, 0.2, 0.7));
     }
 }
