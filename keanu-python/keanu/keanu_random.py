@@ -6,6 +6,7 @@ from typing import Optional
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.KeanuRandom")
+java_import(k.jvm_view(), "io.improbable.keanu.vertices.VertexId")
 
 
 class KeanuRandom(JavaObjectWrapper):
@@ -22,3 +23,8 @@ class KeanuRandom(JavaObjectWrapper):
     @staticmethod
     def set_default_random_seed(seed: int) -> None:
         k.jvm_view().KeanuRandom.setDefaultRandomSeed(seed)
+
+
+def set_deterministic_state() -> None:
+    KeanuRandom.set_default_random_seed(0)
+    k.jvm_view().VertexId.resetIdGenerator()

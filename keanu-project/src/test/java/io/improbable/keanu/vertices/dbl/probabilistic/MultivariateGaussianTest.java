@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
@@ -28,6 +29,9 @@ public class MultivariateGaussianTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
+
     KeanuRandom random;
 
     @Before
@@ -44,7 +48,7 @@ public class MultivariateGaussianTest {
         double to = 2.;
         double bucketSize = 0.1;
 
-        sampleUnivariateMethodMatchesLogProbMethod(mvg, from, to, bucketSize, 1e-2, random, 300000);
+        sampleUnivariateMethodMatchesLogProbMethod(mvg, from, to, bucketSize, 1e-2, random, 250000);
     }
 
     @Test
@@ -241,7 +245,7 @@ public class MultivariateGaussianTest {
         double to = 1.;
         double bucketSize = 0.05;
 
-        sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 0.01, 100000, random, bucketSize * bucketSize, false);
+        sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 0.01, 10000, random, bucketSize * bucketSize, false);
     }
 
     @Test(expected = IllegalArgumentException.class)

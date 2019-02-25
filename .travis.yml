@@ -5,11 +5,11 @@ matrix:
       addons:
         sonarcloud:
           organization: "improbable-keanu"
-      script: deployment/buildAndDeploy.sh
-      after_success: deployment/sonar.sh
+      script: ci/build_and_deploy.sh
+      after_success: ci/sonar.sh
       before_install:
       - openssl aes-256-cbc -K $encrypted_eec04b57ffc0_key -iv $encrypted_eec04b57ffc0_iv
-        -in deployment/secret-keys-keanu.gpg.enc -out deployment/secret-keys-keanu.gpg -d
+        -in ci/secret-keys-keanu.gpg.enc -out ci/secret-keys-keanu.gpg -d
     - language: python
       python: 3.6
       env:

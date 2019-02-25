@@ -1,9 +1,11 @@
 package io.improbable.keanu.util.csv;
 
+import com.opencsv.CSVWriter;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,20 +27,21 @@ public class RowWriter extends Writer {
     }
 
     @Override
-    public File toFile(File file) {
-        List<String[]> data = new ArrayList<>();
-        int maxSize = findLongestTensor(vertices);
+    public File toFile(File file) throws IOException {
+        try (CSVWriter writer = prepareWriter(file)) {
+            int maxSize = findLongestTensor(vertices);
 
-        for (Vertex<? extends Tensor> vertex : vertices) {
-            List<String> row = new ArrayList<>();
-            List<Object> flatList = vertex.getValue().asFlatList();
-            for (int i = 0; i < maxSize; i++) {
-                row.add(i < flatList.size() ? flatList.get(i).toString() : getEmptyValue());
+            for (Vertex<? extends Tensor> vertex : vertices) {
+                List<String> row = new ArrayList<>();
+                List<Object> flatList = vertex.getValue().asFlatList();
+                for (int i = 0; i < maxSize; i++) {
+                    row.add(i < flatList.size() ? flatList.get(i).toString() : getEmptyValue());
+                }
+                String[] rowArray = new String[row.size()];
+                writer.writeNext(row.toArray(rowArray), false);
             }
-            String[] rowToString = new String[row.size()];
-            data.add(row.toArray(rowToString));
         }
-        return writeToFile(file, data);
+        return file;
     }
 
     @Override

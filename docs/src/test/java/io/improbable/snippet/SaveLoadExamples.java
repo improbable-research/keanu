@@ -50,7 +50,7 @@ public class SaveLoadExamples {
                                     OutputStream outputStream,
                                     boolean saveValuesAndObservations) throws IOException {
         DotSaver saver = new DotSaver(net);
-        saver.save(outputStream, startingVertex, degree, saveValuesAndObservations);
+        saver.save(outputStream, saveValuesAndObservations);
     }
     //%%SNIPPET_END%% SavePartialToDot
 

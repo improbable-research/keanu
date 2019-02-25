@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>keanu.algorithm &#8212; keanu 0.0.20 documentation</title>
+    <title>keanu.algorithm &#8212; keanu 0.0.21 documentation</title>
     <link rel="stylesheet" href="static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
@@ -45,7 +45,7 @@
 <li class="toctree-l3"><a class="reference internal" href="keanu.vertex.html">keanu.vertex</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">keanu.algorithm</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#module-keanu.algorithm">Inference</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-keanu.algorithm">Samplers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#samplers">Samplers</a></li>
 </ul>
 </li>
 </ul>
@@ -107,7 +107,7 @@
 <li><strong>net</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">BayesNet</span></code>) – Bayesian Network containing latent variables.</li>
 <li><strong>sample_from</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Vertex</span></code>]) – Vertices to include in the returned samples.</li>
 <li><strong>sampling_algorithm</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PosteriorSamplingAlgorithm</span></code>]) – The posterior sampling algorithm to use.
-Options are <a class="reference internal" href="#keanu.algorithm.MetropolisHastingsSampler" title="keanu.algorithm.MetropolisHastingsSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code></a> and <a class="reference internal" href="#keanu.algorithm.NUTSSampler" title="keanu.algorithm.NUTSSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.NUTSSampler</span></code></a>.
+Options are <a class="reference internal" href="#keanu.algorithm.MetropolisHastingsSampler" title="keanu.algorithm.MetropolisHastingsSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code></a>, <a class="reference internal" href="#keanu.algorithm.NUTSSampler" title="keanu.algorithm.NUTSSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.NUTSSampler</span></code></a> and <code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.ForwardSampler</span></code>
 If not set, <a class="reference internal" href="#keanu.algorithm.MetropolisHastingsSampler" title="keanu.algorithm.MetropolisHastingsSampler"><code class="xref py py-class docutils literal notranslate"><span class="pre">keanu.algorithm.MetropolisHastingsSampler</span></code></a> is chosen with ‘prior’ as its proposal distribution.</li>
 <li><strong>draws</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of samples to take.</li>
 <li><strong>drop</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of samples to drop before collecting anything.
@@ -180,8 +180,8 @@ If not set, a new one is created.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-keanu.algorithm">
-<span id="samplers"></span><h2>Samplers<a class="headerlink" href="#module-keanu.algorithm" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="samplers">
+<h2>Samplers<a class="headerlink" href="#samplers" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="keanu.algorithm.MetropolisHastingsSampler">
 <em class="property">class </em><code class="descclassname">keanu.algorithm.</code><code class="descname">MetropolisHastingsSampler</code><span class="sig-paren">(</span><em>proposal_distribution</em>, <em>latents</em>, <em>proposal_listeners=[]</em>, <em>proposal_distribution_sigma=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#MetropolisHastingsSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.MetropolisHastingsSampler" title="Permalink to this definition">¶</a></dt>
@@ -210,16 +210,18 @@ If not set, a new one is created.</p>
 
 <dl class="class">
 <dt id="keanu.algorithm.NUTSSampler">
-<em class="property">class </em><code class="descclassname">keanu.algorithm.</code><code class="descname">NUTSSampler</code><span class="sig-paren">(</span><em>adapt_count=None</em>, <em>target_acceptance_prob=None</em>, <em>adapt_enabled=None</em>, <em>initial_step_size=None</em>, <em>max_tree_height=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#NUTSSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.NUTSSampler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">keanu.algorithm.</code><code class="descname">NUTSSampler</code><span class="sig-paren">(</span><em>adapt_count=None</em>, <em>adapt_step_size_enabled=None</em>, <em>adapt_potential_enabled=None</em>, <em>target_acceptance_prob=None</em>, <em>initial_step_size=None</em>, <em>potential_adapt_window_size=None</em>, <em>max_energy_change=None</em>, <em>max_tree_height=None</em><span class="sig-paren">)</span><a class="reference internal" href="modules/keanu/algorithm/sampling.html#NUTSSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#keanu.algorithm.NUTSSampler" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>adapt_count</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value. Defaults to 1000.</li>
-<li><strong>target_acceptance_prob</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The target acceptance probability. Defaults to 0.65 (Beskos et al., 2010; Neal, 2011).</li>
-<li><strong>adapt_enabled</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]) – Determines whether the step size will adapt during the first adaptCount samples. Defaults to True.</li>
+<li><strong>adapt_step_size_enabled</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]) – enable the step size adaption. Defaults to true.</li>
+<li><strong>adapt_potential_enabled</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]) – enable the potential adaption. Defaults to true.</li>
+<li><strong>target_acceptance_prob</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – The target acceptance probability. Defaults to 0.8.</li>
 <li><strong>initial_step_size</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.</li>
+<li><strong>max_energy_change</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]) – the maximum energy change before a step is considered divergent.</li>
 <li><strong>max_tree_height</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample. Defaults to 10.</li>
 </ul>
 </td>

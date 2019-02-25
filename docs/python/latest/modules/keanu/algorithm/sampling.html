@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>keanu.algorithm.sampling &#8212; keanu 0.0.20 documentation</title>
+    <title>keanu.algorithm.sampling &#8212; keanu 0.0.21 documentation</title>
     <link rel="stylesheet" href="../../../static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
@@ -102,6 +102,7 @@
 <span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.mcmc.MetropolisHastings&quot;</span><span class="p">)</span>
 <span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.mcmc.nuts.NUTS&quot;</span><span class="p">)</span>
 <span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection&quot;</span><span class="p">)</span>
+<span class="n">java_import</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">(),</span> <span class="s2">&quot;io.improbable.keanu.algorithms.sampling.Forward&quot;</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">PosteriorSamplingAlgorithm</span><span class="p">:</span>
@@ -111,6 +112,12 @@
 
     <span class="k">def</span> <span class="nf">get_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JavaObject</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sampler</span>
+
+
+<span class="k">class</span> <span class="nc">ForwardSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">Forward</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span><span class="o">.</span><span class="n">build</span><span class="p">())</span>
 
 
 <div class="viewcode-block" id="MetropolisHastingsSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.MetropolisHastingsSampler">[docs]</a><span class="k">class</span> <span class="nc">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
@@ -130,7 +137,6 @@
                  <span class="n">latents</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Vertex</span><span class="p">],</span>
                  <span class="n">proposal_listeners</span><span class="o">=</span><span class="p">[],</span>
                  <span class="n">proposal_distribution_sigma</span><span class="p">:</span> <span class="n">numpy_types</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="p">(</span><span class="n">proposal_distribution</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">proposal_listeners</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;If you pass in proposal_listeners you must also specify proposal_distribution&quot;</span><span class="p">)</span>
 
@@ -155,17 +161,22 @@
 <div class="viewcode-block" id="NUTSSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.NUTSSampler">[docs]</a><span class="k">class</span> <span class="nc">NUTSSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param adapt_count: The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value. Defaults to 1000.</span>
-<span class="sd">    :param target_acceptance_prob: The target acceptance probability. Defaults to 0.65 (Beskos et al., 2010; Neal, 2011).</span>
-<span class="sd">    :param adapt_enabled: Determines whether the step size will adapt during the first adaptCount samples. Defaults to True.</span>
+<span class="sd">    :param adapt_step_size_enabled: enable the step size adaption. Defaults to true.</span>
+<span class="sd">    :param adapt_potential_enabled: enable the potential adaption. Defaults to true.</span>
+<span class="sd">    :param target_acceptance_prob: The target acceptance probability. Defaults to 0.8.</span>
 <span class="sd">    :param initial_step_size: Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.</span>
+<span class="sd">    :param max_energy_change: the maximum energy change before a step is considered divergent.</span>
 <span class="sd">    :param max_tree_height: The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample. Defaults to 10.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">adapt_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">adapt_step_size_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">adapt_potential_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">target_acceptance_prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">adapt_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">initial_step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">potential_adapt_window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">max_energy_change</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">max_tree_height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
         <span class="n">builder</span><span class="p">:</span> <span class="n">JavaObject</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">jvm_view</span><span class="p">()</span><span class="o">.</span><span class="n">NUTS</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span>
@@ -176,11 +187,20 @@
         <span class="k">if</span> <span class="n">target_acceptance_prob</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">builder</span><span class="o">.</span><span class="n">targetAcceptanceProb</span><span class="p">(</span><span class="n">target_acceptance_prob</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">adapt_enabled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">builder</span><span class="o">.</span><span class="n">adaptEnabled</span><span class="p">(</span><span class="n">adapt_enabled</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">adapt_step_size_enabled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">adaptStepSizeEnabled</span><span class="p">(</span><span class="n">adapt_step_size_enabled</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">adapt_potential_enabled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">adaptPotentialEnabled</span><span class="p">(</span><span class="n">adapt_potential_enabled</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">potential_adapt_window_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">potentialAdaptWindowSize</span><span class="p">(</span><span class="n">potential_adapt_window_size</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">initial_step_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">builder</span><span class="o">.</span><span class="n">initialStepSize</span><span class="p">(</span><span class="n">initial_step_size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">max_energy_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">maxEnergyChange</span><span class="p">(</span><span class="n">max_energy_change</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">max_tree_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">builder</span><span class="o">.</span><span class="n">maxTreeHeight</span><span class="p">(</span><span class="n">max_tree_height</span><span class="p">)</span>
@@ -200,7 +220,7 @@
 <span class="sd">    :param net: Bayesian Network containing latent variables.</span>
 <span class="sd">    :param sample_from: Vertices to include in the returned samples.</span>
 <span class="sd">    :param sampling_algorithm: The posterior sampling algorithm to use.</span>
-<span class="sd">        Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.</span>
+<span class="sd">        Options are :class:`keanu.algorithm.MetropolisHastingsSampler`, :class:`keanu.algorithm.NUTSSampler` and :class:`keanu.algorithm.ForwardSampler`</span>
 <span class="sd">        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with &#39;prior&#39; as its proposal distribution.</span>
 <span class="sd">    :param draws: The number of samples to take.</span>
 <span class="sd">    :param drop: The number of samples to drop before collecting anything.</span>
@@ -227,8 +247,9 @@
 
     <span class="n">vertices_unwrapped</span><span class="p">:</span> <span class="n">JavaList</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">to_java_object_list</span><span class="p">(</span><span class="n">sample_from</span><span class="p">)</span>
 
-    <span class="n">probabilistic_model</span> <span class="o">=</span> <span class="n">ProbabilisticModel</span><span class="p">(</span><span class="n">net</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
-        <span class="n">sampling_algorithm</span><span class="p">,</span> <span class="n">MetropolisHastingsSampler</span><span class="p">)</span> <span class="k">else</span> <span class="n">ProbabilisticModelWithGradient</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+    <span class="n">probabilistic_model</span> <span class="o">=</span> <span class="n">ProbabilisticModel</span><span class="p">(</span><span class="n">net</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">sampling_algorithm</span><span class="p">,</span> <span class="n">MetropolisHastingsSampler</span><span class="p">)</span> <span class="ow">or</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">sampling_algorithm</span><span class="p">,</span> <span class="n">ForwardSampler</span><span class="p">))</span> <span class="k">else</span> <span class="n">ProbabilisticModelWithGradient</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 
     <span class="n">network_samples</span><span class="p">:</span> <span class="n">JavaObject</span> <span class="o">=</span> <span class="n">sampling_algorithm</span><span class="o">.</span><span class="n">get_sampler</span><span class="p">()</span><span class="o">.</span><span class="n">getPosteriorSamples</span><span class="p">(</span>
         <span class="n">probabilistic_model</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(),</span> <span class="n">vertices_unwrapped</span><span class="p">,</span> <span class="n">draws</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span><span class="o">.</span><span class="n">downSample</span><span class="p">(</span><span class="n">down_sample_interval</span><span class="p">)</span>

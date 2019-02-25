@@ -10,7 +10,7 @@ public class DeterministicRule implements TestRule {
     @Override
     public Statement apply(final Statement base, final Description description) {
         KeanuRandom.setDefaultRandomSeed(1);
-        VertexId.ID_GENERATOR.set(1);
+        VertexId.resetIdGenerator();
         return base;
     }
 }

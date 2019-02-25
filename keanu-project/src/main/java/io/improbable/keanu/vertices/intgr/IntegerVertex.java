@@ -124,6 +124,10 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerAbsVertex(this);
     }
 
+    public IntegerVertex sum(int... sumOverDimensions) {
+        return new IntegerSumVertex(this, sumOverDimensions);
+    }
+
     public IntegerVertex sum() {
         return new IntegerSumVertex(this);
     }

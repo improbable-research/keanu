@@ -1,15 +1,13 @@
 import pytest
 from py4j.protocol import Py4JJavaError
 
-from keanu import KeanuRandom, Model, BayesNet
+from keanu import Model, BayesNet
 from keanu.algorithm import NonGradientOptimizer, BOBYQA
 from keanu.vertex import Gaussian
 
 
 @pytest.fixture
 def model() -> Model:
-    KeanuRandom.set_default_random_seed(1)
-
     with Model() as m:
         m.a = Gaussian(0., 50.)
         m.b = Gaussian(0., 50.)
@@ -20,14 +18,14 @@ def model() -> Model:
 
 
 def test_non_gradient_op_bayes_net(model: Model) -> None:
-    net = BayesNet(model.a.get_connected_graph())
+    net = BayesNet(model.a.iter_connected_graph())
     gradient_optimizer = NonGradientOptimizer(net)
     assert gradient_optimizer.net is net
 
 
 def test_non_gradient_op_vertex(model: Model) -> None:
     non_gradient_optimizer = NonGradientOptimizer(model.a)
-    assert len(list(non_gradient_optimizer.net.get_latent_vertices())) == 2
+    assert len(list(non_gradient_optimizer.net.iter_latent_vertices())) == 2
 
 
 def test_non_gradient_op_throws_with_invalid_net_param() -> None:

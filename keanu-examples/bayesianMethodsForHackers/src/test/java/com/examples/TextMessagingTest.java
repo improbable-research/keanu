@@ -17,7 +17,7 @@ public class TextMessagingTest {
     @Before
     public void setup() {
         KeanuRandom.setDefaultRandomSeed(1);
-        VertexId.ID_GENERATOR.set(1);
+        VertexId.resetIdGenerator();
     }
 
     @Test

@@ -8,8 +8,9 @@ Inference
 .. automodule:: keanu.algorithm
     :members: sample, generate_samples
 
+
 Samplers
 ~~~~~~~~
 
-.. automodule:: keanu.algorithm
-    :members: MetropolisHastingsSampler, NUTSSampler
+.. autoclass:: keanu.algorithm.MetropolisHastingsSampler
+.. autoclass:: keanu.algorithm.NUTSSampler

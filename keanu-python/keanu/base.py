@@ -13,8 +13,13 @@ class JavaObjectWrapper:
         return "[{0} => {1}]".format(self._class, type(self))
 
     def __getattr__(self, k: str) -> Callable:
+        self.__check_if_constructed_without_error(k)
         self.__check_if_unwrapped(k)
         raise AttributeError("{} has no attribute {}".format(self.__class__, k))
+
+    def __check_if_constructed_without_error(self, k: str) -> None:
+        if k in ("_val", "_class"):
+            raise ValueError("Object did not get properly constructed - probably due to an earlier unhandled Error.")
 
     def __check_if_unwrapped(self, k: str) -> None:
         # better error message for when JavaObjectWrapper is passed to a method that expects JavaObject
