@@ -67,6 +67,10 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     public static Nd4jDoubleTensor create(double[] values, long... shape) {
+        long length = TensorShape.getLength(shape);
+        if (values.length != length) {
+            throw new IllegalArgumentException("Shape " + Arrays.toString(shape) + " does not match buffer size " + values.length);
+        }
         return new Nd4jDoubleTensor(values, shape);
     }
 

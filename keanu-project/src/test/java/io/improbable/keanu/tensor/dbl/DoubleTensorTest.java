@@ -38,7 +38,7 @@ public class DoubleTensorTest {
     @Parameterized.Parameters(name = "{index}: Test with {1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
-//            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
+            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
             {new JVMDoubleTensorFactory(), "JVM DoubleTensor"},
         });
     }
@@ -922,9 +922,9 @@ public class DoubleTensorTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
 
-        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatReplaces(0., 1e-8);
-        validator.validate(containsZero);
-        assertThat(containsZero, equalTo(expectedResult));
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatReplaces(0., 1e-8);
+        DoubleTensor actual = validator.validate(containsZero);
+        assertThat(actual, valuesAndShapesMatch(expectedResult));
     }
 
     @Test
@@ -933,8 +933,8 @@ public class DoubleTensorTest {
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, 1e-8);
 
         TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(x -> x > 0., TensorValidationPolicy.changeValueTo(1e-8));
-        containsZero = validator.validate(containsZero);
-        assertThat(containsZero, equalTo(expectedResult));
+        DoubleTensor actual = validator.validate(containsZero);
+        assertThat(actual, equalTo(expectedResult));
     }
 
     @Test

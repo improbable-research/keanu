@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.math3.analysis.function.Sigmoid;
@@ -722,7 +723,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor safeLogTimes(DoubleTensor y) {
-        throw new NotImplementedException("");
+        return duplicate().safeLogTimesInPlace(y);
     }
 
     @Override
@@ -1198,7 +1199,10 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
-        throw new NotImplementedException("");
+        TensorValidator.NAN_CATCHER.validate(this);
+        TensorValidator.NAN_CATCHER.validate(y);
+        DoubleTensor result = this.logInPlace().timesInPlace(y);
+        return TensorValidator.NAN_FIXER.validate(result);
     }
 
     @Override
