@@ -20,6 +20,7 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.MetropolisHastings")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.nuts.NUTS")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.sampling.Forward")
 
 
 class PosteriorSamplingAlgorithm:
@@ -29,6 +30,12 @@ class PosteriorSamplingAlgorithm:
 
     def get_sampler(self) -> JavaObject:
         return self._sampler
+
+
+class ForwardSampler(PosteriorSamplingAlgorithm):
+
+    def __init__(self) -> None:
+        super().__init__(k.jvm_view().Forward.builder().build())
 
 
 class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
@@ -131,7 +138,7 @@ def sample(net: BayesNet,
     :param net: Bayesian Network containing latent variables.
     :param sample_from: Vertices to include in the returned samples.
     :param sampling_algorithm: The posterior sampling algorithm to use.
-        Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.
+        Options are :class:`keanu.algorithm.MetropolisHastingsSampler`, :class:`keanu.algorithm.NUTSSampler` and :class:`keanu.algorithm.ForwardSampler`
         If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'prior' as its proposal distribution.
     :param draws: The number of samples to take.
     :param drop: The number of samples to drop before collecting anything.
@@ -158,8 +165,9 @@ def sample(net: BayesNet,
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
-    probabilistic_model = ProbabilisticModel(net) if isinstance(
-        sampling_algorithm, MetropolisHastingsSampler) else ProbabilisticModelWithGradient(net)
+    probabilistic_model = ProbabilisticModel(net) if (
+        isinstance(sampling_algorithm, MetropolisHastingsSampler) or
+        isinstance(sampling_algorithm, ForwardSampler)) else ProbabilisticModelWithGradient(net)
 
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
@@ -246,9 +254,8 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
 
         if all_scalar:
             sample: sample_generator_dict_type = {
-                id_to_label[Vertex._get_python_id(vertex_unwrapped)]: Tensor._to_scalar_or_ndarray(
-                    network_sample.get(vertex_unwrapped), return_as_primitive=True)
-                for vertex_unwrapped in vertices_unwrapped
+                id_to_label[Vertex._get_python_id(vertex_unwrapped)]: Tensor._to_ndarray(
+                    network_sample.get(vertex_unwrapped)).item() for vertex_unwrapped in vertices_unwrapped
             }
         else:
             sample = __create_multi_indexed_samples_generated(vertices_unwrapped, network_sample, id_to_label)
@@ -283,10 +290,8 @@ def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrap
     vertex_samples: sample_types = {}
     for vertex_unwrapped in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex_unwrapped)]
-        samples_for_vertex = network_samples.get(vertex_unwrapped).asList()
-        is_primitive = [True] * len(samples_for_vertex)
-        samples_as_ndarray = map(Tensor._to_scalar_or_ndarray, samples_for_vertex, is_primitive)
-        vertex_samples[vertex_label] = list(samples_as_ndarray)
+        samples_for_vertex = __get_vertex_samples(network_samples, vertex_unwrapped)
+        vertex_samples[vertex_label] = samples_for_vertex.tolist()
     return vertex_samples
 
 
@@ -296,16 +301,13 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
     for vertex in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        samples_for_vertex = network_samples.get(vertex).asList()
-        is_primitive = [True] * len(samples_for_vertex)
-        samples_as_ndarray = map(Tensor._to_scalar_or_ndarray, samples_for_vertex, is_primitive)
-        samples = list(samples_as_ndarray)
-        for sample in samples:
+        samples_for_vertex = __get_vertex_samples(network_samples, vertex)
+        for sample in samples_for_vertex:
             __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
     tuple_hierarchy: Dict = {(vertex_label, shape_index): values
-                             for vertex_label, tensor_index in vertex_samples_multi.items()
-                             for shape_index, values in tensor_index.items()}
+                             for vertex_label, samples in vertex_samples_multi.items()
+                             for shape_index, values in samples.items()}
 
     return tuple_hierarchy
 
@@ -316,7 +318,7 @@ def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, netwo
     for vertex in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        sample = Tensor._to_scalar_or_ndarray(network_samples.get(vertex), return_as_primitive=True)
+        sample = Tensor._to_ndarray(network_samples.get(vertex))
         __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
     tuple_hierarchy: Dict = {(vertex_label, tensor_index): values
@@ -327,10 +329,13 @@ def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, netwo
 
 
 def __add_sample_to_dict(sample_value: Any, vertex_sample: Dict):
-    if type(sample_value) is not ndarray:
-        vertex_sample[COLUMN_HEADER_FOR_SCALAR].append(sample_value)
-    elif sample_value.shape == ():
+    if sample_value.shape == ():
         vertex_sample[COLUMN_HEADER_FOR_SCALAR].append(sample_value.item())
     else:
         for index, value in ndenumerate(sample_value):
             vertex_sample[index].append(value.item())
+
+
+def __get_vertex_samples(network_samples, vertex) -> ndarray:
+    samples_for_vertex = network_samples.get(vertex).asTensor()
+    return Tensor._to_ndarray(samples_for_vertex)
