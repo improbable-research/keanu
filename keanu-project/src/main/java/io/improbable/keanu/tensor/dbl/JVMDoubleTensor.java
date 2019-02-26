@@ -11,6 +11,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
+import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
@@ -354,6 +355,17 @@ public class JVMDoubleTensor extends DoubleTensor {
             result[i] = 1.0 / buffer[i];
         }
         return new JVMDoubleTensor(result, shapeCopy());
+    }
+
+    @Override
+    public DoubleTensor choleskyDecomposition() {
+//        return fromApacheRealMatrix(new CholeskyDecomposition(asApacheRealMatrix(this)).getL());
+        throw new NotImplementedException("");
+    }
+
+    @Override
+    public double determinant() {
+        return new LUDecomposition(asApacheRealMatrix(this)).getDeterminant();
     }
 
     @Override
@@ -936,17 +948,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         return this;
-    }
-
-    @Override
-    public DoubleTensor choleskyDecomposition() {
-//        return fromApacheRealMatrix(new CholeskyDecomposition(asApacheRealMatrix(this)).getL());
-        throw new NotImplementedException("");
-    }
-
-    @Override
-    public double determinant() {
-        return 0;
     }
 
     @Override

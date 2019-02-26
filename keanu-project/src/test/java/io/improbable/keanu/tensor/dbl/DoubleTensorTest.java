@@ -1,7 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorTestHelper;
@@ -27,7 +26,6 @@ import java.util.function.Function;
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static junit.framework.TestCase.assertTrue;
-import static org.bytedeco.javacpp.presets.openblas_nolapack.blas_set_num_threads;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
@@ -148,6 +146,20 @@ public class DoubleTensorTest {
         }, 2, 3);
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void canFindDeterminantOf2By2Matrix() {
+        DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
+        double expected = 1 * 4 - 2 * 3;
+        assertEquals(expected, A.determinant(), 1e-10);
+    }
+
+    @Test
+    public void canFindDeterminantOf3By3Matrix() {
+        DoubleTensor A = DoubleTensor.arange(0, 9).reshape(3, 3);
+        double expected = 1 * 5 * 9 + 2 * 6 * 7 + 3 * 4 * 8 - 3 * 5 * 7 - 2 * 4 * 9 - 1 * 6 * 8;
+        assertEquals(expected, A.determinant(), 1e-10);
     }
 
     @Test
