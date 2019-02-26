@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.math3.analysis.function.Sigmoid;
@@ -310,6 +311,9 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor transpose() {
+        if (shape.length < 2) {
+            throw new IllegalArgumentException("Cannot transpose rank " + shape.length);
+        }
         return permute(1, 0);
     }
 
@@ -442,7 +446,33 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public IntegerTensor argMax(int axis) {
-        throw new NotImplementedException("");
+
+        if (axis >= shape.length) {
+            throw new IllegalArgumentException("Cannot take arg max of axis " + axis + " on a " + shape.length + " rank tensor.");
+        }
+
+        int[] rearrange = shiftDimensionToDimensionZero(axis, shape);
+
+        DoubleTensor permuted = permute(rearrange);
+        double[] permutedBuffer = permuted.asFlatDoubleArray();
+
+        int dimLength = Ints.checkedCast(buffer.length / shape[axis]);
+
+        double[] maxBuffer = new double[dimLength];
+        int[] maxIndex = new int[dimLength];
+
+        for (int i = 0; i < permutedBuffer.length; i++) {
+
+            final int bufferIndex = i % dimLength;
+
+            if (permutedBuffer[i] > maxBuffer[bufferIndex]) {
+                maxBuffer[bufferIndex] = permutedBuffer[i];
+                maxIndex[bufferIndex] = i / dimLength;
+            }
+
+        }
+
+        return IntegerTensor.create(maxIndex, ArrayUtils.remove(shape, axis));
     }
 
     @Override
@@ -672,7 +702,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor safeLogTimes(DoubleTensor y) {
-        throw new NotImplementedException("");
+        return duplicate().safeLogTimesInPlace(y);
     }
 
     @Override
@@ -1148,7 +1178,10 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
-        throw new NotImplementedException("");
+        TensorValidator.NAN_CATCHER.validate(this);
+        TensorValidator.NAN_CATCHER.validate(y);
+        DoubleTensor result = this.logInPlace().timesInPlace(y);
+        return TensorValidator.NAN_FIXER.validate(result);
     }
 
     @Override
