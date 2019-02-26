@@ -14,7 +14,10 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Test;
 
+import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
+import static io.improbable.keanu.tensor.TensorMatchers.hasShape;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class DifferentiatorTest {

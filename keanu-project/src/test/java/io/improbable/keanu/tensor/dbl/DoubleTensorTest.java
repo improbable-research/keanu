@@ -27,6 +27,7 @@ import java.util.function.Function;
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static junit.framework.TestCase.assertTrue;
+import static org.bytedeco.javacpp.presets.openblas_nolapack.blas_set_num_threads;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;

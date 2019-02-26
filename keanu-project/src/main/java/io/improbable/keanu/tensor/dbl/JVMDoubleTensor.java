@@ -360,6 +360,22 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor that) {
 
+//        double[] A = buffer;
+//        double[] B = that.asFlatDoubleArray();
+//        double[] C = new double[Ints.checkedCast(shape[0] * that.getShape()[1])];
+//
+//        int N = (int) that.getShape()[1];//(int) c.columns();
+//        int M = (int) shape[0];//(int) c.rows();
+//        int K = (int) shape[1];//(int) a.columns();
+//
+//        int lda = (int) shape[0];//(int) a.rows();
+//        int ldb = (int) that.getShape()[0];//(int) b.rows();
+//        int ldc = (int) lda;//(int) c.rows();
+//
+//        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, 1, A, lda, B, ldb, 0, C, ldc);
+
+//        return new JVMDoubleTensor(C, new long[]{shape[0], that.getShape()[1]});
+
         RealMatrix thisMatrix = asApacheRealMatrix(this);
         RealMatrix thatMatrix = asApacheRealMatrix(that);
 
