@@ -20,6 +20,7 @@ k = KeanuContext()
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.MetropolisHastings")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.nuts.NUTS")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.RollBackToCachedValuesOnRejection")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.sampling.Forward")
 
 
 class PosteriorSamplingAlgorithm:
@@ -29,6 +30,12 @@ class PosteriorSamplingAlgorithm:
 
     def get_sampler(self) -> JavaObject:
         return self._sampler
+
+
+class ForwardSampler(PosteriorSamplingAlgorithm):
+
+    def __init__(self) -> None:
+        super().__init__(k.jvm_view().Forward.builder().build())
 
 
 class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
@@ -48,7 +55,6 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
                  latents: Iterable[Vertex],
                  proposal_listeners=[],
                  proposal_distribution_sigma: numpy_types = None):
-
         if (proposal_distribution is None and len(proposal_listeners) > 0):
             raise TypeError("If you pass in proposal_listeners you must also specify proposal_distribution")
 
@@ -73,17 +79,22 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
 class NUTSSampler(PosteriorSamplingAlgorithm):
     """
     :param adapt_count: The number of samples for which the step size will be tuned. For the remaining samples in which it is not tuned, the step size will be frozen to its last calculated value. Defaults to 1000.
-    :param target_acceptance_prob: The target acceptance probability. Defaults to 0.65 (Beskos et al., 2010; Neal, 2011).
-    :param adapt_enabled: Determines whether the step size will adapt during the first adaptCount samples. Defaults to True.
+    :param adapt_step_size_enabled: enable the step size adaption. Defaults to true.
+    :param adapt_potential_enabled: enable the potential adaption. Defaults to true.
+    :param target_acceptance_prob: The target acceptance probability. Defaults to 0.8.
     :param initial_step_size: Sets the initial step size. If none is given then a heuristic will be used to determine a good step size.
+    :param max_energy_change: the maximum energy change before a step is considered divergent.
     :param max_tree_height: The maximum tree size for the sampler. This controls how long a sample walk can be before it terminates. This will set at a maximum approximately 2^treeSize number of logProb evaluations for a sample. Defaults to 10.
     """
 
     def __init__(self,
                  adapt_count: int = None,
+                 adapt_step_size_enabled: bool = None,
+                 adapt_potential_enabled: bool = None,
                  target_acceptance_prob: float = None,
-                 adapt_enabled: bool = None,
                  initial_step_size: float = None,
+                 potential_adapt_window_size: int = None,
+                 max_energy_change: float = None,
                  max_tree_height: int = None):
 
         builder: JavaObject = k.jvm_view().NUTS.builder()
@@ -94,11 +105,20 @@ class NUTSSampler(PosteriorSamplingAlgorithm):
         if target_acceptance_prob is not None:
             builder.targetAcceptanceProb(target_acceptance_prob)
 
-        if adapt_enabled is not None:
-            builder.adaptEnabled(adapt_enabled)
+        if adapt_step_size_enabled is not None:
+            builder.adaptStepSizeEnabled(adapt_step_size_enabled)
+
+        if adapt_potential_enabled is not None:
+            builder.adaptPotentialEnabled(adapt_potential_enabled)
+
+        if potential_adapt_window_size is not None:
+            builder.potentialAdaptWindowSize(potential_adapt_window_size)
 
         if initial_step_size is not None:
             builder.initialStepSize(initial_step_size)
+
+        if max_energy_change is not None:
+            builder.maxEnergyChange(max_energy_change)
 
         if max_tree_height is not None:
             builder.maxTreeHeight(max_tree_height)
@@ -118,7 +138,7 @@ def sample(net: BayesNet,
     :param net: Bayesian Network containing latent variables.
     :param sample_from: Vertices to include in the returned samples.
     :param sampling_algorithm: The posterior sampling algorithm to use.
-        Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.
+        Options are :class:`keanu.algorithm.MetropolisHastingsSampler`, :class:`keanu.algorithm.NUTSSampler` and :class:`keanu.algorithm.ForwardSampler`
         If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'prior' as its proposal distribution.
     :param draws: The number of samples to take.
     :param drop: The number of samples to drop before collecting anything.
@@ -145,8 +165,9 @@ def sample(net: BayesNet,
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
-    probabilistic_model = ProbabilisticModel(net) if isinstance(
-        sampling_algorithm, MetropolisHastingsSampler) else ProbabilisticModelWithGradient(net)
+    probabilistic_model = ProbabilisticModel(net) if (
+        isinstance(sampling_algorithm, MetropolisHastingsSampler) or
+        isinstance(sampling_algorithm, ForwardSampler)) else ProbabilisticModelWithGradient(net)
 
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
@@ -233,9 +254,8 @@ def _samples_generator(sample_iterator: JavaObject, vertices_unwrapped: JavaList
 
         if all_scalar:
             sample: sample_generator_dict_type = {
-                id_to_label[Vertex._get_python_id(vertex_unwrapped)]: Tensor._to_scalar_or_ndarray(
-                    network_sample.get(vertex_unwrapped), return_as_primitive=True)
-                for vertex_unwrapped in vertices_unwrapped
+                id_to_label[Vertex._get_python_id(vertex_unwrapped)]: Tensor._to_ndarray(
+                    network_sample.get(vertex_unwrapped)).item() for vertex_unwrapped in vertices_unwrapped
             }
         else:
             sample = __create_multi_indexed_samples_generated(vertices_unwrapped, network_sample, id_to_label)
@@ -270,10 +290,8 @@ def __create_single_indexed_samples(network_samples: JavaObject, vertices_unwrap
     vertex_samples: sample_types = {}
     for vertex_unwrapped in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex_unwrapped)]
-        samples_for_vertex = network_samples.get(vertex_unwrapped).asList()
-        is_primitive = [True] * len(samples_for_vertex)
-        samples_as_ndarray = map(Tensor._to_scalar_or_ndarray, samples_for_vertex, is_primitive)
-        vertex_samples[vertex_label] = list(samples_as_ndarray)
+        samples_for_vertex = __get_vertex_samples(network_samples, vertex_unwrapped)
+        vertex_samples[vertex_label] = samples_for_vertex.tolist()
     return vertex_samples
 
 
@@ -283,16 +301,13 @@ def __create_multi_indexed_samples(vertices_unwrapped: JavaList, network_samples
     for vertex in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        samples_for_vertex = network_samples.get(vertex).asList()
-        is_primitive = [True] * len(samples_for_vertex)
-        samples_as_ndarray = map(Tensor._to_scalar_or_ndarray, samples_for_vertex, is_primitive)
-        samples = list(samples_as_ndarray)
-        for sample in samples:
+        samples_for_vertex = __get_vertex_samples(network_samples, vertex)
+        for sample in samples_for_vertex:
             __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
     tuple_hierarchy: Dict = {(vertex_label, shape_index): values
-                             for vertex_label, tensor_index in vertex_samples_multi.items()
-                             for shape_index, values in tensor_index.items()}
+                             for vertex_label, samples in vertex_samples_multi.items()
+                             for shape_index, values in samples.items()}
 
     return tuple_hierarchy
 
@@ -303,7 +318,7 @@ def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, netwo
     for vertex in vertices_unwrapped:
         vertex_label = id_to_label[Vertex._get_python_id(vertex)]
         vertex_samples_multi[vertex_label] = defaultdict(list)
-        sample = Tensor._to_scalar_or_ndarray(network_samples.get(vertex), return_as_primitive=True)
+        sample = Tensor._to_ndarray(network_samples.get(vertex))
         __add_sample_to_dict(sample, vertex_samples_multi[vertex_label])
 
     tuple_hierarchy: Dict = {(vertex_label, tensor_index): values
@@ -314,10 +329,13 @@ def __create_multi_indexed_samples_generated(vertices_unwrapped: JavaList, netwo
 
 
 def __add_sample_to_dict(sample_value: Any, vertex_sample: Dict):
-    if type(sample_value) is not ndarray:
-        vertex_sample[COLUMN_HEADER_FOR_SCALAR].append(sample_value)
-    elif sample_value.shape == ():
+    if sample_value.shape == ():
         vertex_sample[COLUMN_HEADER_FOR_SCALAR].append(sample_value.item())
     else:
         for index, value in ndenumerate(sample_value):
             vertex_sample[index].append(value.item())
+
+
+def __get_vertex_samples(network_samples, vertex) -> ndarray:
+    samples_for_vertex = network_samples.get(vertex).asTensor()
+    return Tensor._to_ndarray(samples_for_vertex)

@@ -97,6 +97,22 @@ public class Keanu {
         }
 
         @UtilityClass
+        public static class Forward {
+
+            public static io.improbable.keanu.algorithms.sampling.Forward withDefaultConfig() {
+                return new io.improbable.keanu.algorithms.sampling.Forward(KeanuRandom.getDefaultRandom(), false);
+            }
+
+            public static io.improbable.keanu.algorithms.sampling.Forward withDefaultConfig(KeanuRandom random) {
+                return new io.improbable.keanu.algorithms.sampling.Forward(random, false);
+            }
+
+            public static io.improbable.keanu.algorithms.sampling.Forward.ForwardBuilder builder() {
+                return io.improbable.keanu.algorithms.sampling.Forward.builder();
+            }
+        }
+
+        @UtilityClass
         public static class SimulatedAnnealing {
 
             public static io.improbable.keanu.algorithms.mcmc.SimulatedAnnealing withDefaultConfig() {
@@ -264,7 +280,7 @@ public class Keanu {
 
             if (containsDiscreteLatents) {
                 throw new UnsupportedOperationException(
-                    "Gradient optimization unsupported on networks containing discrete latents. " +
+                    "Optimization unsupported on networks containing discrete latents. " +
                         "Found " + discreteLatentVertices.size() + " discrete latents.");
             }
 
