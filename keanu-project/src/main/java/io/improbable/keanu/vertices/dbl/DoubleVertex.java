@@ -56,7 +56,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVer
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastToIntegerVertex;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -105,7 +104,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
      * - If both left and right operands are rank 1, they are promoted to a matrix by prepending a 1 to its dimensions.
      *   After matrix multiplication, it is reshaped to be a scalar. This is essentially a dot product.
      *   This returns a ReshapeVertex.
-     * - If only one of the operands are rank 1, it is promoted to a matrix by prepending a 1 to its dimensions.
+     * - If only one of the operands is rank 1 (and the other operand is rank 2), it is promoted to a matrix by prepending a 1 to its dimensions.
      *   After matrix multiplication, the appended 1 is removed. This is essentially a matrix-vector product.
      *   This returns a ReshapeVertex.
      * - Otherwise, they are multiplied like conventional matrices.
@@ -122,10 +121,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
         if (leftRank == 1 && rightRank == 1) {
             return result.reshape();
-        } else if (leftRank == 1) {
-            return result.reshape(ArrayUtils.remove(result.getShape(), 0));
-        } else if (rightRank == 1) {
-            return result.reshape(ArrayUtils.remove(result.getShape(), 1));
+        } else if (leftRank == 1 && rightRank == 2) {
+            return result.reshape(result.getShape()[1]);
+        } else if (leftRank == 2 && rightRank == 1) {
+            return result.reshape(result.getShape()[0]);
         } else {
             return result;
         }
