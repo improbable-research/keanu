@@ -96,8 +96,24 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new MultiplicationVertex(this, that);
     }
 
-    public MatrixMultiplicationVertex matrixMultiply(DoubleVertex that) {
-        return new MatrixMultiplicationVertex(this, that);
+    public DoubleVertex matrixMultiply(DoubleVertex that) {
+        int leftRank = this.getRank();
+        int rightRank = that.getRank();
+
+        DoubleVertex leftMatrix = leftRank == 1 ? this.reshape(1, this.getShape()[0]) : this;
+        DoubleVertex rightMatrix = rightRank == 1 ? that.reshape(that.getShape()[0], 1) : that;
+
+        MatrixMultiplicationVertex result = new MatrixMultiplicationVertex(leftMatrix, rightMatrix);
+
+        if (leftRank == 1 && rightRank == 1) {
+            return result.reshape();
+        } else if (leftRank == 1) {
+            return result.reshape(result.getShape()[1]);
+        } else if (rightRank == 1) {
+            return result.reshape(result.getShape()[0]);
+        } else {
+            return result;
+        }
     }
 
     public MatrixInverseVertex matrixInverse() {

@@ -36,7 +36,7 @@ public class ReshapeVertexTest {
         DoubleVertex alpha = new UniformVertex(0, 10);
         alpha.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        MatrixMultiplicationVertex N = m.matrixMultiply(alpha);
+        MatrixMultiplicationVertex N = (MatrixMultiplicationVertex) m.matrixMultiply(alpha);
 
         ReshapeVertex reshapedN = new ReshapeVertex(N, 4, 1);
 
@@ -57,7 +57,7 @@ public class ReshapeVertexTest {
         UniformVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        MatrixMultiplicationVertex N = m.matrixMultiply(a);
+        MatrixMultiplicationVertex N = (MatrixMultiplicationVertex) m.matrixMultiply(a);
 
         DoubleTensor dNdm = Differentiator.reverseModeAutoDiff(N, m).withRespectTo(m);
         DoubleTensor dNda = Differentiator.reverseModeAutoDiff(N, a).withRespectTo(a);

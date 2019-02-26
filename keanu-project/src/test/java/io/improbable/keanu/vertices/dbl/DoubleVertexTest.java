@@ -2,16 +2,29 @@ package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import org.junit.Before;
 import org.junit.Test;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class DoubleVertexTest {
+
+    private DoubleTensor vectorA;
+    private DoubleTensor vectorB;
+
+    @Before
+    public void initVectors() {
+        vectorA = DoubleTensor.create(new double[]{1., 2.}, 2);
+        vectorB = DoubleTensor.create(new double[]{1., 2., 3., 4., 5., 6.}, 6);
+    }
 
     @Test
     public void canObserveArrayOfValues() {
@@ -97,5 +110,42 @@ public class DoubleVertexTest {
         DoubleVertex v1 = new ConstantDoubleVertex(3.6);
         IntegerVertex intV1 = v1.toInteger();
         assertEquals(3, intV1.getValue().scalar().longValue());
+    }
+
+    @Test
+    public void canMatrixMultiplyVectors() {
+        DoubleVertex vectorsMultiplied = ConstantVertex.of(vectorA).matrixMultiply(ConstantVertex.of(vectorA));
+        DoubleTensor result = vectorsMultiplied.lazyEval();
+        DoubleTensor expectedResult = DoubleTensor.scalar(5.);
+        assertThat(result, valuesAndShapesMatch(expectedResult));
+    }
+
+    @Test
+    public void canMatrixMultiplyVectorAndMatrix() {
+        DoubleVertex vectorsMultiplied = ConstantVertex.of(vectorA).matrixMultiply(ConstantVertex.of(vectorB.reshape(2, 3)));
+        DoubleTensor result = vectorsMultiplied.lazyEval();
+        DoubleTensor expectedResult = DoubleTensor.create(new double[]{9., 12., 15.}, 3);
+        assertThat(result, valuesAndShapesMatch(expectedResult));
+    }
+
+    @Test
+    public void canMatrixMultiplyMatrixAndVector() {
+        DoubleVertex vectorsMultiplied = ConstantVertex.of(vectorB.reshape(3, 2)).matrixMultiply(ConstantVertex.of(vectorA));
+        DoubleTensor result = vectorsMultiplied.lazyEval();
+        DoubleTensor expectedResult = DoubleTensor.create(new double[]{5., 11., 17.}, 3);
+        assertThat(result, valuesAndShapesMatch(expectedResult));
+    }
+
+    @Test
+    public void canMatrixMultiplyMatrices() {
+        DoubleVertex vectorsMultiplied = ConstantVertex.of(vectorB.reshape(3, 2)).matrixMultiply(ConstantVertex.of(vectorB.reshape(2, 3)));
+        DoubleTensor result = vectorsMultiplied.lazyEval();
+        DoubleTensor expectedResult = DoubleTensor.create(
+            new double[]{
+                 9., 12., 15.,
+                19., 26., 33.,
+                29., 40., 51.
+            }, 3, 3);
+        assertThat(result, valuesAndShapesMatch(expectedResult));
     }
 }
