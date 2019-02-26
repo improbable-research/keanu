@@ -100,7 +100,8 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
      * Matrix product of two vertices
      *
      * @param that  a double vertex to matrix multiply
-     * @return a vertex that represents the matrix multiplication of two vertices.
+     * @return a vertex that represents the matrix multiplication of two vertices. Note that this operation
+     * does that always return a MatrixMultiplicationVertex.
      * - If both left and right operands are rank 2, they are multiplied like conventional matrices.
      * - If both left and right operands are rank 1, they are promoted to a matrix by prepending a 1 to its dimensions.
      *   After matrix multiplication, it is reshaped to be a scalar. This is essentially a dot product.
