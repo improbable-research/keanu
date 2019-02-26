@@ -156,7 +156,7 @@ public class MetropolisHastingsStepTest {
         }
 
         @Override
-        public Proposal getProposal(Set<Variable> variables, KeanuRandom random) {
+        public Proposal getProposal(Set<? extends Variable> variables, KeanuRandom random) {
             Proposal proposal = new Proposal();
             variables.forEach(variable -> proposal.setProposal(variable, DoubleTensor.scalar(constant)));
             return proposal;

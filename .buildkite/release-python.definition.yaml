@@ -1,0 +1,12 @@
+agent_queue_id: trigger-pipelines
+description: Release Keanu Python to PyPi.
+github:
+  branch_configuration: 
+  - master
+  default_branch: master
+  pull_request_branch_filter_configuration: []
+teams:
+- name: Everyone
+  permission: BUILD_AND_READ
+- name: ebu/graphos-engineering
+  permission: MANAGE_BUILD_AND_READ
