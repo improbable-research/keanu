@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;

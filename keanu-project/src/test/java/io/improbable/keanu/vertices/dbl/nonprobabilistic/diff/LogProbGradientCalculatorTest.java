@@ -19,7 +19,6 @@ import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndSh
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 public class LogProbGradientCalculatorTest {
 
