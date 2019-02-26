@@ -1,5 +1,9 @@
 ## Version 0.0.22
 
+## Python
+
+* Improved performance of getting samples by coercing them into a `Tensor` in Java (instead of iterating through an `ArrayList`).
+
 ## Version 0.0.21 
 
 ### Common

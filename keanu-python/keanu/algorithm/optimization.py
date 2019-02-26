@@ -31,7 +31,7 @@ class _OptimizedResult(JavaObjectWrapper):
         return self.unwrap().getFitness()
 
     def value_for(self, v: Vertex) -> numpy_types:
-        return Tensor._to_scalar_or_ndarray(self.unwrap().getValueFor(v.unwrap().getReference()))
+        return Tensor._to_ndarray(self.unwrap().getValueFor(v.unwrap().getReference()))
 
 
 _norm = dict(max_abs='MAX_ABS', l2="L2")
