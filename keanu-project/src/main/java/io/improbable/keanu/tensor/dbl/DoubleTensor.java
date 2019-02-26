@@ -15,7 +15,7 @@ import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
-//    private static DoubleTensorFactory factory = new JVMDoubleTensorFactory();
+    //    private static DoubleTensorFactory factory = new JVMDoubleTensorFactory();
     private static DoubleTensorFactory factory = new Nd4jDoubleTensorFactory();
 
     public static void setFactory(DoubleTensorFactory factory) {
@@ -250,6 +250,11 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
 
     public abstract DoubleTensor floor();
 
+    /**
+     * @return The tensor with the elements rounded half up
+     * e.g. 1.5 -> 2
+     * e.g. -2.5 -> -3
+     */
     public abstract DoubleTensor round();
 
     public abstract DoubleTensor sigmoid();

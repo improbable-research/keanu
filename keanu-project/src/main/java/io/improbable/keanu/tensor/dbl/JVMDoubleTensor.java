@@ -925,11 +925,18 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     @Override
+    /**
+     * Round half up as used in ND4j
+     */
     public DoubleTensor round() {
         double[] newBuffer = newBuffer();
 
         for (int i = 0; i < buffer.length; i++) {
-            newBuffer[i] = FastMath.round(buffer[i]);
+            if (buffer[i] >= 0) {
+                newBuffer[i] = FastMath.floor(buffer[i] + 0.5);
+            } else {
+                newBuffer[i] = FastMath.ceil(buffer[i] - 0.5);
+            }
         }
 
         return new JVMDoubleTensor(newBuffer, shapeCopy());
