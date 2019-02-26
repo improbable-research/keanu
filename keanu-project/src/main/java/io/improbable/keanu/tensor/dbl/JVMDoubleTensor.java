@@ -182,7 +182,15 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public Double getValue(long... index) {
-        long flatIndex = TensorShape.getFlatIndex(shape, stride, index);
+        long flatIndex;
+        if (index.length == 1) {
+            flatIndex = index[0];
+        } else {
+            if (index.length != shape.length) {
+                throw new IllegalArgumentException("Cannot get index " + Arrays.toString(index) + " for shape " + Arrays.toString(shape));
+            }
+            flatIndex = TensorShape.getFlatIndex(shape, stride, index);
+        }
         return buffer[Ints.checkedCast(flatIndex)];
     }
 

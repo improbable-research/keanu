@@ -233,7 +233,7 @@ public class MetropolisHastingsTest {
     public void doesNotDoExtraWorkOnRejectionWhenRejectionCacheEnabled() {
         AtomicInteger n = new AtomicInteger(0);
 
-        DoubleVertex start = new GaussianVertex(new long[]{1, 3}, 0, 1);
+        DoubleVertex start = new GaussianVertex(new long[]{3}, 0, 1);
 
         DoubleVertex blackBox = start.lambda(
             (startValue) -> {

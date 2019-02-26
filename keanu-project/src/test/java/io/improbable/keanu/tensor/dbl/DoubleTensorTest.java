@@ -1186,4 +1186,24 @@ public class DoubleTensorTest {
         assertTrue(expected.equalsWithinEpsilon(output, 1e-6));
     }
 
+    @Test
+    public void canGetValueByIndex() {
+        DoubleTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2);
+        double value = A.getValue(1, 0, 1);
+        assertEquals(5, value, 1e-10);
+    }
+
+    @Test
+    public void canGetValueByFlatIndex() {
+        DoubleTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2);
+        double value = A.getValue(7);
+        assertEquals(7, value, 1e-10);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnInvalidIndex() {
+        DoubleTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2);
+        double value = A.getValue(1, 0);
+    }
+
 }
