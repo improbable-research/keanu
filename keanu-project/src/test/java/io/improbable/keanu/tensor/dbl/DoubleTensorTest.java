@@ -172,6 +172,29 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canMatrixMultiply2x2() {
+
+        DoubleTensor left = DoubleTensor.create(new double[]{
+            1, 2,
+            3, 4
+        }, 2, 2);
+
+        DoubleTensor right = DoubleTensor.create(new double[]{
+            5, 6,
+            7, 8
+        }, 2, 2);
+
+        DoubleTensor result = left.matrixMultiply(right);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            19, 22,
+            43, 50
+        }, 2, 2);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     public void canFindDeterminantOf2By2Matrix() {
         DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
         double expected = 1 * 4 - 2 * 3;
