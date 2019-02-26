@@ -21,7 +21,9 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.testGradientAcrossMultipleHyperParameterValues;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -222,8 +224,8 @@ public class BernoulliVertexTest {
             0.0
         );
 
-        assertEquals(expectedWrtA, dLogPmf.get(A.getId()));
-        assertEquals(expectedWrtB, dLogPmf.get(B.getId()));
+        assertThat(expectedWrtA, valuesWithinEpsilonAndShapesMatch(dLogPmf.get(A.getId()), 1e-8));
+        assertThat(expectedWrtB, valuesWithinEpsilonAndShapesMatch(dLogPmf.get(B.getId()), 1e-8));
     }
 
     @Test

@@ -7,8 +7,11 @@ import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class DoubleCPTVertexTest {
@@ -65,8 +68,8 @@ public class DoubleCPTVertexTest {
         DoubleTensor actualReverse = Differentiator.reverseModeAutoDiff(doubleCPTVertex, A).withRespectTo(A);
         DoubleTensor actualForward = Differentiator.forwardModeAutoDiff(A, doubleCPTVertex).of(doubleCPTVertex);
 
-        assertEquals(expected, actualReverse);
-        assertEquals(expected, actualForward);
+        assertThat(expected, valuesWithinEpsilonAndShapesMatch(actualReverse, 1e-8));
+        assertThat(expected, valuesWithinEpsilonAndShapesMatch(actualForward, 1e-8));
     }
 
 }

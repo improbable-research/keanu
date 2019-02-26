@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
@@ -158,8 +159,8 @@ public class LogProbGradientCalculatorTest {
         DoubleTensor expectedDJLogProbWrtAValue = dJLogProbWrtH.times(dHdA);
         DoubleTensor expectedDJLogProbWrtBValue = dJLogProbWrtH.times(dHdB);
 
-        assertEquals(expectedDJLogProbWrtAValue, dJLogProbWrtAValue);
-        assertEquals(expectedDJLogProbWrtBValue, dJLogProbWrtBValue);
+        assertThat(expectedDJLogProbWrtAValue, valuesWithinEpsilonAndShapesMatch(dJLogProbWrtAValue, 1e-8));
+        assertThat(expectedDJLogProbWrtBValue, valuesWithinEpsilonAndShapesMatch(dJLogProbWrtBValue, 1e-8));
     }
 
 }

@@ -112,7 +112,12 @@ public class Nd4jDoubleTensor extends DoubleTensor {
         if (that.isLengthOne()) {
             return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
         }
-        return ((Nd4jDoubleTensor) that).tensor;
+
+        if (that instanceof Nd4jDoubleTensor) {
+            return ((Nd4jDoubleTensor) that).tensor;
+        } else {
+            return TypedINDArrayFactory.create(that.asFlatDoubleArray(), that.getShape(), BUFFER_TYPE);
+        }
     }
 
     @Override
