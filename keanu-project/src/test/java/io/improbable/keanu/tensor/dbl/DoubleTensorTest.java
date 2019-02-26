@@ -38,7 +38,7 @@ public class DoubleTensorTest {
     @Parameterized.Parameters(name = "{index}: Test with {1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
+//            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
             {new JVMDoubleTensorFactory(), "JVM DoubleTensor"},
         });
     }
@@ -392,6 +392,11 @@ public class DoubleTensorTest {
         DoubleTensor expected = DoubleTensor.create(new double[]{1, 3, 2, 4}, 2, 2);
 
         assertEquals(expected, actual);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotTransposeVector() {
+        DoubleTensor.create(1, 2, 3).transpose();
     }
 
     @Test(expected = IllegalArgumentException.class)

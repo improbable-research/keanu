@@ -314,6 +314,9 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor transpose() {
+        if (shape.length < 2) {
+            throw new IllegalArgumentException("Cannot transpose rank " + shape.length);
+        }
         return permute(1, 0);
     }
 

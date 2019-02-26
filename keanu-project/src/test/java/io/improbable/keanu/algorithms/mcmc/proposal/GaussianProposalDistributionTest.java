@@ -30,8 +30,8 @@ import static org.mockito.Mockito.when;
 public class GaussianProposalDistributionTest {
 
     public Proposal proposal;
-    DoubleTensor currentState = DoubleTensor.create(4.2, 42.0).transpose();
-    DoubleTensor proposedState = DoubleTensor.create(4.3, 43.0).transpose();
+    DoubleTensor currentState = DoubleTensor.create(4.2, 42.0);
+    DoubleTensor proposedState = DoubleTensor.create(4.3, 43.0);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -44,23 +44,23 @@ public class GaussianProposalDistributionTest {
     private DoubleTensor sigma;
 
     @Before
-    public void setUpProposalDistribution() throws Exception {
+    public void setUpProposalDistribution() {
         sigma = DoubleTensor.scalar(1.);
         proposalDistribution = new GaussianProposalDistribution(sigma);
     }
 
     @Before
-    public void setRandomSeed() throws Exception {
+    public void setRandomSeed() {
         KeanuRandom.setDefaultRandomSeed(0);
     }
 
     @Before
-    public void setUpProposal() throws Exception {
+    public void setUpProposal() {
         when(vertex1.getValue()).thenReturn(DoubleTensor.scalar(currentState.getValue(0)));
         when(vertex2.getValue()).thenReturn(DoubleTensor.scalar(currentState.getValue(1)));
 
-        when(vertex1.getShape()).thenReturn(new long[] {});
-        when(vertex2.getShape()).thenReturn(new long[] {});
+        when(vertex1.getShape()).thenReturn(new long[]{});
+        when(vertex2.getShape()).thenReturn(new long[]{});
 
         proposal = new Proposal();
         proposal.setProposal(vertex1, DoubleTensor.scalar(proposedState.getValue(0)));
@@ -86,11 +86,14 @@ public class GaussianProposalDistributionTest {
         ProposalListener listener1 = mock(ProposalListener.class);
         ProposalListener listener2 = mock(ProposalListener.class);
         List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
+
         proposalDistribution = new GaussianProposalDistribution(sigma, listeners);
         Set<Variable> variables = ImmutableSet.of(vertex1, vertex2);
+
         Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
         verify(listener1).onProposalCreated(proposal);
         verify(listener2).onProposalCreated(proposal);
+
         proposalDistribution.onProposalRejected();
         verify(listener1).onProposalRejected(proposal);
         verify(listener2).onProposalRejected(proposal);
