@@ -11,6 +11,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
+import org.apache.commons.math3.linear.CholeskyDecomposition;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -359,8 +360,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor choleskyDecomposition() {
-//        return fromApacheRealMatrix(new CholeskyDecomposition(asApacheRealMatrix(this)).getL());
-        throw new NotImplementedException("");
+        return fromApacheRealMatrix(new CholeskyDecomposition(asApacheRealMatrix(this)).getL());
     }
 
     @Override

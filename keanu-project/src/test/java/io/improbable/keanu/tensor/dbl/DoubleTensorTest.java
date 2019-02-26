@@ -25,6 +25,7 @@ import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesWithinEpsilonAndShapesMatch;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -160,6 +161,26 @@ public class DoubleTensorTest {
         DoubleTensor A = DoubleTensor.arange(0, 9).reshape(3, 3);
         double expected = 1 * 5 * 9 + 2 * 6 * 7 + 3 * 4 * 8 - 3 * 5 * 7 - 2 * 4 * 9 - 1 * 6 * 8;
         assertEquals(expected, A.determinant(), 1e-10);
+    }
+
+    @Test
+    public void canFindCholeskeyDecomposition() {
+        //Example from: https://en.wikipedia.org/wiki/Cholesky_decomposition
+        DoubleTensor A = DoubleTensor.create(new double[]{
+            4, 12, -16,
+            12, 37, -43,
+            -16, -43, 98
+        }, 3, 3);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            2, 0, 0,
+            6, 1, 0,
+            -8, 5, 3
+        }, 3, 3);
+
+        DoubleTensor actual = A.choleskyDecomposition();
+
+        assertThat(actual, valuesWithinEpsilonAndShapesMatch(expected, 1e-10));
     }
 
     @Test
