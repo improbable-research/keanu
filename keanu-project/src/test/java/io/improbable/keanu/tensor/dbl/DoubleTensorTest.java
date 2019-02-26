@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
 import com.google.common.primitives.Ints;
+import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorTestHelper;
@@ -95,6 +96,34 @@ public class DoubleTensorTest {
     @Test
     public void canAverage() {
         assertEquals(2.5, matrixA.average(), 1e-6);
+    }
+
+    @Test
+    public void canStandardDeviation() {
+        DoubleTensor A = DoubleTensor.create(0, 0.1, -0.1, 0.3, 0.4);
+
+        double actual = A.standardDeviation();
+        double expected = 0.20736;
+
+        assertEquals(expected, actual, 1e-3);
+    }
+
+    @Test
+    public void canStandardDeviationByFormula() {
+        KeanuRandom random = new KeanuRandom();
+        DoubleTensor A = random.nextGaussian(new long[]{50});
+
+        double actual = A.standardDeviation();
+        double expected = Math.sqrt(A.minus(A.average()).pow(2).sum() / (A.getLength() - 1));
+
+        assertEquals(expected, actual, 1e-3);
+    }
+
+    @Test
+    public void canGetStandardDeviation() {
+        KeanuRandom random = new KeanuRandom();
+        DoubleTensor A = random.nextGaussian(new long[]{1000}).times(5);
+        assertEquals(5.0, A.standardDeviation(), 0.1);
     }
 
     @Test

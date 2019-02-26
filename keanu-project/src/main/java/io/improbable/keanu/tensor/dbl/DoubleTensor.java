@@ -15,7 +15,7 @@ import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
-    //    private static DoubleTensorFactory factory = new JVMDoubleTensorFactory();
+//        private static DoubleTensorFactory factory = new JVMDoubleTensorFactory();
     private static DoubleTensorFactory factory = new Nd4jDoubleTensorFactory();
 
     public static void setFactory(DoubleTensorFactory factory) {

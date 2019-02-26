@@ -16,6 +16,7 @@ import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.FastMath;
 import org.nd4j.linalg.api.shape.Shape;
 
@@ -861,7 +862,13 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public double standardDeviation() {
-        return 0;
+
+        SummaryStatistics stats = new SummaryStatistics();
+        for (int i = 0; i < buffer.length; i++) {
+            stats.addValue(buffer[i]);
+        }
+
+        return stats.getStandardDeviation();
     }
 
     @Override
