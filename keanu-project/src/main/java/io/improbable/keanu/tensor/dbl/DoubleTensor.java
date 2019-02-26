@@ -252,8 +252,8 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
 
     /**
      * @return The tensor with the elements rounded half up
-     * e.g. 1.5 -> 2
-     * e.g. -2.5 -> -3
+     * e.g. 1.5 is 2
+     * e.g. -2.5 is -3
      */
     public abstract DoubleTensor round();
 

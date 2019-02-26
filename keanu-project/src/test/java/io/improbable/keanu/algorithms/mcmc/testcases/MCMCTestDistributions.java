@@ -15,7 +15,7 @@ public class MCMCTestDistributions {
 
     public static BayesianNetwork createSimpleGaussian(double mu, double sigma, double initialValue) {
         GaussianVertex A = new GaussianVertex(mu, sigma);
-        A.setAndCascade(DoubleTensor.create(initialValue, 2, 2));
+        A.setAndCascade(initialValue);
         return new BayesianNetwork(A.getConnectedGraph());
     }
 
