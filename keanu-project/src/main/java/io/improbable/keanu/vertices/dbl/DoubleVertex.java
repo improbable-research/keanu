@@ -96,6 +96,26 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new MultiplicationVertex(this, that);
     }
 
+    /*
+        - If both arguments are rank 2 they are multiplied like conventional matrices.
+        - If the first argument has rank 1, it is promoted to a matrix by prepending a 1 to its dimensions.
+          After matrix multiplication the prepended 1 is removed.
+        - If the second argument has rank1 1, it is promoted to a matrix by appending a 1 to its dimensions.
+          After matrix multiplication the appended 1 is removed.
+        - If both arguments are rank 1, dot product is applied.
+     */
+
+    /**
+     * Matrix product of two vertices
+     *
+     * @param that  a double vertex to matrix multiply
+     * @return a vertex that represents the matrix multiplication of two vertices.
+     * - If both left and right operands are rank 2, they are multiplied like conventional matrices.
+     * - If both left and right operands are rank 1, they are promoted to a matrix by prepending a 1 to its dimensions.
+     *   After matrix multiplication, it is reshaped to be a scalar. This is essentially a dot product.
+     * - If only one of the operands are rank 1, it is promoted to a matrix by prepending a 1 to its dimensions.
+     *   After matrix multiplication, the appended 1 is removed. This is essentially a matrix-vector product.
+     */
     public DoubleVertex matrixMultiply(DoubleVertex that) {
         int leftRank = this.getRank();
         int rightRank = that.getRank();
