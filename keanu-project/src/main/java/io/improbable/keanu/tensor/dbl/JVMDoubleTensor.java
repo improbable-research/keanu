@@ -474,8 +474,8 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         int[] rearrange = shiftDimensionToDimensionZero(axis, shape);
 
-        DoubleTensor permuted = permute(rearrange);
-        double[] permutedBuffer = permuted.asFlatDoubleArray();
+        JVMDoubleTensor permuted = (JVMDoubleTensor) permute(rearrange);
+        double[] permutedBuffer = permuted.buffer;
 
         int dimLength = Ints.checkedCast(buffer.length / shape[axis]);
 
@@ -571,7 +571,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
         checkElementwiseShapeMatch(mask.getShape());
 
-        double[] maskBuffer = mask.asFlatDoubleArray();
+        double[] maskBuffer = getRawBufferIfJVMTensor(mask);
 
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] = maskBuffer[i] == 1.0 ? value : buffer[i];
@@ -585,7 +585,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         checkElementwiseShapeMatch(mask.getShape());
 
         double[] newBuffer = new double[buffer.length];
-        double[] maskBuffer = mask.asFlatDoubleArray();
+        double[] maskBuffer = getRawBufferIfJVMTensor(mask);
 
         for (int i = 0; i < buffer.length; i++) {
             newBuffer[i] = maskBuffer[i] == 1.0 ? value : buffer[i];
@@ -615,7 +615,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     private BooleanTensor maskToBooleanTensor(DoubleTensor mask) {
-        double[] maskBuffer = mask.asFlatDoubleArray();
+        double[] maskBuffer = getRawBufferIfJVMTensor(mask);
         boolean[] boolBuffer = new boolean[maskBuffer.length];
 
         for (int i = 0; i < maskBuffer.length; i++) {
@@ -877,7 +877,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             return false;
         }
 
-        double[] otherBuffer = other.asFlatDoubleArray();
+        double[] otherBuffer = getRawBufferIfJVMTensor(other);
 
         for (int i = 0; i < buffer.length; i++) {
             if (Math.abs(buffer[i] - otherBuffer[i]) > epsilon) {
@@ -1033,7 +1033,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         for (int i = 0; i < toConcat.length; i++) {
 
-            double[] cBuffer = toConcat[i].asFlatDoubleArray();
+            double[] cBuffer = getRawBufferIfJVMTensor(toConcat[i]);
             System.arraycopy(cBuffer, 0, concatBuffer, bufferPosition, cBuffer.length);
             bufferPosition += cBuffer.length;
         }
@@ -1091,6 +1091,14 @@ public class JVMDoubleTensor extends DoubleTensor {
         return bufferCopy();
     }
 
+    private static double[] getRawBufferIfJVMTensor(DoubleTensor tensor) {
+        if (tensor instanceof JVMDoubleTensor) {
+            return ((JVMDoubleTensor) tensor).buffer;
+        } else {
+            return tensor.asFlatDoubleArray();
+        }
+    }
+
     @Override
     public int[] asFlatIntegerArray() {
         return bufferAsInteger();
@@ -1140,9 +1148,9 @@ public class JVMDoubleTensor extends DoubleTensor {
         int[] moveDimToZero = TensorShape.slideDimension(dimension, 0, shape.length);
         int[] moveZeroToDim = TensorShape.slideDimension(0, dimension, shape.length);
 
-        DoubleTensor permutedTensor = this.permute(moveDimToZero).reshape(buffer.length);
+        JVMDoubleTensor permutedTensor = (JVMDoubleTensor) this.permute(moveDimToZero).reshape(buffer.length);
 
-        double[] rawBuffer = permutedTensor.asFlatDoubleArray();
+        double[] rawBuffer = permutedTensor.buffer;
 
         List<DoubleTensor> splitTensor = new ArrayList<>();
 
@@ -1486,12 +1494,12 @@ public class JVMDoubleTensor extends DoubleTensor {
         return binaryDoubleOpWithAutoBroadcast(this, that, op, true);
     }
 
-    private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(DoubleTensor left, DoubleTensor right, BiFunction<Double, Double, Double> op, boolean inPlace) {
+    private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(JVMDoubleTensor left, DoubleTensor right, BiFunction<Double, Double, Double> op, boolean inPlace) {
 
-        final double[] leftBuffer = left.asFlatDoubleArray();
-        final long[] leftShape = left.getShape();
+        final double[] leftBuffer = left.buffer;
+        final long[] leftShape = left.shape;
 
-        final double[] rightBuffer = right.asFlatDoubleArray();
+        final double[] rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
         final boolean needsBroadcast = !Arrays.equals(leftShape, rightShape);
@@ -1506,7 +1514,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             long[] paddedRightShape = getOrPad(rightShape, resultRank);
             long[] paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
 
-            return broadcastBinaryDoubleOp(
+            return broadcastBinaryDoubleOp(left,
                 leftBuffer, paddedLeftShape, paddedLeftStride,
                 rightBuffer, paddedRightShape, paddedRightStride,
                 op, inPlace
@@ -1514,7 +1522,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         } else {
 
-            return elementwiseBinaryOp(leftBuffer, rightBuffer, leftShape, op, inPlace);
+            return elementwiseBinaryOp(left, leftBuffer, rightBuffer, leftShape, op, inPlace);
         }
 
     }
@@ -1527,20 +1535,20 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
     }
 
-    private JVMDoubleTensor broadcastBinaryDoubleOp(double[] leftBuffer, long[] leftShape, long[] leftStride,
+    private JVMDoubleTensor broadcastBinaryDoubleOp(JVMDoubleTensor left, double[] leftBuffer, long[] leftShape, long[] leftStride,
                                                     double[] rightBuffer, long[] rightShape, long[] rightStride,
                                                     BiFunction<Double, Double, Double> op,
                                                     boolean inPlace) {
 
         long[] resultShape = Shape.broadcastOutputShape(leftShape, rightShape);
-        boolean resultShapeIsThisShape = Arrays.equals(resultShape, leftShape);
+        boolean resultShapeIsLeftSideShape = Arrays.equals(resultShape, leftShape);
 
         final double[] outputBuffer;
-        if (!resultShapeIsThisShape) {
+        if (!resultShapeIsLeftSideShape) {
 
-            boolean resultShapeIsThatShape = Arrays.equals(resultShape, rightShape);
+            boolean resultShapeIsRightSideShape = Arrays.equals(resultShape, rightShape);
 
-            if (!resultShapeIsThatShape) {
+            if (!resultShapeIsRightSideShape) {
                 throw new IllegalArgumentException(
                     "Broadcasting of shape " + Arrays.toString(leftShape) + " and " + Arrays.toString(rightShape) + " not supported."
                 );
@@ -1568,10 +1576,20 @@ public class JVMDoubleTensor extends DoubleTensor {
             broadcastFromLeft(leftBuffer, leftShape, leftStride, rightBuffer, rightShape, rightStride, outputBuffer, op);
         }
 
-        return new JVMDoubleTensor(outputBuffer, resultShape);
+        if (inPlace) {
+            left.buffer = outputBuffer;
+            left.shape = resultShape;
+
+            //TODO: get rid of the need to do this!
+            left.stride = TensorShape.getRowFirstStride(resultShape);
+
+            return left;
+        } else {
+            return new JVMDoubleTensor(outputBuffer, resultShape);
+        }
     }
 
-    private JVMDoubleTensor elementwiseBinaryOp(double[] leftBuffer, double[] rightBuffer, long[] shape,
+    private JVMDoubleTensor elementwiseBinaryOp(JVMDoubleTensor left, double[] leftBuffer, double[] rightBuffer, long[] shape,
                                                 BiFunction<Double, Double, Double> op,
                                                 boolean inPlace) {
 
@@ -1581,7 +1599,12 @@ public class JVMDoubleTensor extends DoubleTensor {
             outputBuffer[i] = op.apply(leftBuffer[i], rightBuffer[i]);
         }
 
-        return new JVMDoubleTensor(outputBuffer, shape);
+        if (inPlace) {
+            left.buffer = outputBuffer;
+            return left;
+        } else {
+            return new JVMDoubleTensor(outputBuffer, shape);
+        }
     }
 
     @Override

@@ -153,6 +153,6 @@ public class DoubleScalarTensorShapePreservationTest {
     private static void resultShapeMatchesBroadcastShape(Tensor result, Tensor input1, Tensor input2) {
         long[] broadcastShape = Shape.broadcastOutputShape(input1.getShape(), input2.getShape());
         long[] resultShape = result.getShape();
-        assertThat(broadcastShape, equalTo(resultShape));
+        assertThat(resultShape, equalTo(broadcastShape));
     }
 }

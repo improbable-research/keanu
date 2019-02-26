@@ -133,7 +133,7 @@ public class JsonTest {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Incorrect Parameter Type specified.  " +
             "Got: class io.improbable.keanu.tensor.intgr.ScalarIntegerTensor, " +
-            "Expected: interface io.improbable.keanu.tensor.dbl.DoubleTensor");
+            "Expected: class io.improbable.keanu.tensor.dbl.DoubleTensor");
         tryLoadingNetwork(JSON_WRONG_ARGUMENT_TYPE_FILE);
     }
 

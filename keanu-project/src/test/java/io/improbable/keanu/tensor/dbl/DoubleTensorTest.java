@@ -120,13 +120,6 @@ public class DoubleTensorTest {
     }
 
     @Test
-    public void canGetStandardDeviation() {
-        KeanuRandom random = new KeanuRandom();
-        DoubleTensor A = random.nextGaussian(new long[]{1000}).times(5);
-        assertEquals(5.0, A.standardDeviation(), 0.1);
-    }
-
-    @Test
     public void canEye() {
         DoubleTensor expected = DoubleTensor.create(new double[]{1, 0, 0, 0, 1, 0, 0, 0, 1}, 3, 3);
         DoubleTensor actual = DoubleTensor.eye(3);
