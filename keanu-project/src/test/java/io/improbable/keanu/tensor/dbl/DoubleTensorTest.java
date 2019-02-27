@@ -11,6 +11,8 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 import org.apache.commons.math3.analysis.function.Sigmoid;
+import org.apache.commons.math3.linear.BlockRealMatrix;
+import org.apache.commons.math3.linear.LUDecomposition;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -213,9 +215,26 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canFindDeterminantOfSingular3By3Matrix() {
+        DoubleTensor A = DoubleTensor.arange(1, 10).reshape(3, 3);
+        double expected = 0;
+        assertEquals(expected, A.determinant(), 1e-10);
+    }
+
+    @Test
     public void canFindDeterminantOf3By3Matrix() {
-        DoubleTensor A = DoubleTensor.arange(0, 9).reshape(3, 3);
-        double expected = 1 * 5 * 9 + 2 * 6 * 7 + 3 * 4 * 8 - 3 * 5 * 7 - 2 * 4 * 9 - 1 * 6 * 8;
+        DoubleTensor A = DoubleTensor.create(
+            -1, 7, 3,
+            -2, -9, 6,
+            10, -3, 5
+        ).reshape(3, 3);
+
+        double expected = new LUDecomposition(new BlockRealMatrix(new double[][]{
+            new double[]{-1, 7, 3},
+            new double[]{-2, -9, 6},
+            new double[]{10, -3, 5}
+        })).getDeterminant();
+
         assertEquals(expected, A.determinant(), 1e-10);
     }
 

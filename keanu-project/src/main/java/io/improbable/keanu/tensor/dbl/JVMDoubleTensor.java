@@ -10,9 +10,7 @@ import io.improbable.keanu.tensor.validate.TensorValidator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.math3.analysis.function.Sigmoid;
-import org.apache.commons.math3.linear.BlockRealMatrix;
-import org.apache.commons.math3.linear.LUDecomposition;
-import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.util.FastMath;
@@ -407,9 +405,35 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public double determinant() {
 
-        //lu = getrf
-        //product of diagonal
-        return new LUDecomposition(asApacheRealMatrix(this)).getDeterminant();
+        final int m = Ints.checkedCast(shape[0]);
+        final int n = Ints.checkedCast(shape[1]);
+        final int lda = m;
+        final double[] newBuffer = bufferCopy();
+        final int[] ipiv = new int[newBuffer.length];
+
+        int factorizationResult = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, m, n, newBuffer, lda, ipiv);
+
+        if (factorizationResult < 0) {
+            throw new IllegalStateException("Matrix factorization failed");
+        } else if (factorizationResult > 0) {
+            return 0;
+        }
+
+        //credit: https://stackoverflow.com/questions/47315471/compute-determinant-from-lu-decomposition-in-lapack
+        int j;
+        double detp = 1.;
+        for (j = 0; j < n; j++) {
+            if (j + 1 != ipiv[j]) {
+                detp = -detp;
+            }
+        }
+
+        double detU = 1.0;
+        for (int i = 0; i < m; i++) {
+            detU *= newBuffer[i * m + i];
+        }
+
+        return detU * detp;
     }
 
     @Override
@@ -421,10 +445,12 @@ public class JVMDoubleTensor extends DoubleTensor {
         final double[] newBuffer = bufferCopy();
         final int[] ipiv = new int[newBuffer.length];
 
-        int result = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, m, n, newBuffer, lda, ipiv);
+        int factorizationResult = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, m, n, newBuffer, lda, ipiv);
 
-        if (result != 0) {
+        if (factorizationResult < 0) {
             throw new IllegalStateException("Matrix factorization failed");
+        } else if (factorizationResult > 0) {
+            throw new SingularMatrixException();
         }
 
         int inverseResult = LAPACKE_dgetri(LAPACK_ROW_MAJOR, m, newBuffer, m, ipiv);
@@ -452,35 +478,6 @@ public class JVMDoubleTensor extends DoubleTensor {
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, 1, A, K, B, N, 0, C, N);
 
         return new JVMDoubleTensor(C, new long[]{shape[0], that.getShape()[1]});
-    }
-
-    private static RealMatrix asApacheRealMatrix(DoubleTensor matrix) {
-        long[] shape = matrix.getShape();
-        if (shape.length != 2) {
-            throw new IllegalArgumentException("Cannot convert tensor of shape " + Arrays.toString(shape) + " to a matrix.");
-        }
-
-        BlockRealMatrix out = new BlockRealMatrix((int) shape[0], (int) shape[1]);
-        for (int i = 0; i < shape[0]; i++) {
-            for (int j = 0; j < shape[1]; j++) {
-                double value = matrix.getValue(i, j);
-                out.setEntry(i, j, value);
-            }
-        }
-        return out;
-    }
-
-    private static JVMDoubleTensor fromApacheRealMatrix(RealMatrix realMatrix) {
-        double[][] data = realMatrix.getData();
-        double[] flatData = new double[realMatrix.getRowDimension() * realMatrix.getColumnDimension()];
-
-        int rows = realMatrix.getRowDimension();
-        int cols = realMatrix.getColumnDimension();
-        for (int r = 0; r < rows; r++) {
-            System.arraycopy(data[r], 0, flatData, r * cols, cols);
-        }
-
-        return new JVMDoubleTensor(flatData, new long[]{rows, cols});
     }
 
     @Override
