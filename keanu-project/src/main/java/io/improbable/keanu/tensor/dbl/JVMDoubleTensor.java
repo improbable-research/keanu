@@ -11,7 +11,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
-import org.apache.commons.math3.linear.CholeskyDecomposition;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -43,6 +42,8 @@ import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarRigh
 import static java.util.Arrays.copyOf;
 import static org.bytedeco.javacpp.openblas.CblasNoTrans;
 import static org.bytedeco.javacpp.openblas.CblasRowMajor;
+import static org.bytedeco.javacpp.openblas.LAPACKE_dpotrf;
+import static org.bytedeco.javacpp.openblas.LAPACK_ROW_MAJOR;
 import static org.bytedeco.javacpp.openblas.cblas_dgemm;
 
 public class JVMDoubleTensor extends DoubleTensor {
@@ -372,16 +373,48 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor choleskyDecomposition() {
-        return fromApacheRealMatrix(new CholeskyDecomposition(asApacheRealMatrix(this)).getL());
+
+        if (shape.length != 2 || shape[0] != shape[1]) {
+            throw new IllegalArgumentException("Cholesky decomposition must be performed on square matrix.");
+        }
+
+        int N = Ints.checkedCast(shape[0]);
+        byte upperLower = 'L';
+        double[] newBuffer = bufferCopy();
+
+        int result = LAPACKE_dpotrf(LAPACK_ROW_MAJOR, upperLower, N, newBuffer, N);
+
+        if (result != 0) {
+            throw new IllegalStateException("Cholesky decomposition failed");
+        }
+
+        getBottomTriangularInPlace(N, newBuffer);
+
+        return new JVMDoubleTensor(newBuffer, shapeCopy());
+    }
+
+    private void getBottomTriangularInPlace(int N, double[] buffer) {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (j > i) {
+                    buffer[i * N + j] = 0;
+                }
+            }
+        }
     }
 
     @Override
     public double determinant() {
+        //lu = getrf
+        //product of diagonal
         return new LUDecomposition(asApacheRealMatrix(this)).getDeterminant();
     }
 
     @Override
     public DoubleTensor matrixInverse() {
+
+        //lu = getrf
+        //inverse = getri
         return fromApacheRealMatrix(MatrixUtils.inverse(asApacheRealMatrix(this)));
     }
 
