@@ -14,7 +14,9 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Multip
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
 
@@ -22,6 +24,9 @@ import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.Tensor
 import static org.junit.Assert.assertEquals;
 
 public class ConcatenationVertexTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void canConcatVectorsOfSameSize() {
@@ -82,6 +87,17 @@ public class ConcatenationVertexTest {
 
         Assert.assertArrayEquals(new long[]{4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
+    }
+
+    @Test
+    public void concatVectorThrowsIfDimensionIsGreaterThanOrEqualToOperandRank() {
+        DoubleVertex a = new ConstantDoubleVertex(1.);
+        DoubleVertex b = new ConstantDoubleVertex(2.);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Cannot concat operand 1 because dimension 0 is greater than or equal to its rank 0");
+
+        new ConcatenationVertex(0, a, b);
     }
 
     @Test(expected = IllegalArgumentException.class)
