@@ -17,13 +17,15 @@ import static org.junit.Assert.assertEquals;
 
 public class DoubleVertexTest {
 
-    private DoubleTensor vectorA;
-    private DoubleTensor vectorB;
+    private DoubleVertex vectorA;
+    private DoubleVertex matrixA;
+    private DoubleVertex matrixB;
 
     @Before
     public void initVectors() {
-        vectorA = DoubleTensor.create(new double[]{1., 2.}, 2);
-        vectorB = DoubleTensor.create(new double[]{1., 2., 3., 4., 5., 6.}, 6);
+        vectorA = ConstantVertex.of(new double[]{1., 2.}, 2);
+        matrixA = ConstantVertex.of(new double[]{1., 2., 3., 4., 5., 6.}, 3, 2);
+        matrixB = ConstantVertex.of(new double[]{1., 2., 3., 4., 5., 6.}, 2, 3);
     }
 
     @Test
@@ -114,7 +116,7 @@ public class DoubleVertexTest {
 
     @Test
     public void canMatrixMultiplyVectors() {
-        DoubleVertex vectorsMultiplied = ConstantVertex.of(vectorA).matrixMultiply(ConstantVertex.of(vectorA));
+        DoubleVertex vectorsMultiplied = vectorA.matrixMultiply(vectorA);
         DoubleTensor result = vectorsMultiplied.lazyEval();
         DoubleTensor expectedResult = DoubleTensor.scalar(5.);
         assertThat(result, valuesAndShapesMatch(expectedResult));
@@ -122,7 +124,7 @@ public class DoubleVertexTest {
 
     @Test
     public void canMatrixMultiplyVectorAndMatrix() {
-        DoubleVertex vectorAndMatrixMultiplied = ConstantVertex.of(vectorA).matrixMultiply(ConstantVertex.of(vectorB.reshape(2, 3)));
+        DoubleVertex vectorAndMatrixMultiplied = vectorA.matrixMultiply(matrixB);
         DoubleTensor result = vectorAndMatrixMultiplied.lazyEval();
         DoubleTensor expectedResult = DoubleTensor.create(new double[]{9., 12., 15.}, 3);
         assertThat(result, valuesAndShapesMatch(expectedResult));
@@ -130,7 +132,7 @@ public class DoubleVertexTest {
 
     @Test
     public void canMatrixMultiplyMatrixAndVector() {
-        DoubleVertex matrixAndVectorMultiplied = ConstantVertex.of(vectorB.reshape(3, 2)).matrixMultiply(ConstantVertex.of(vectorA));
+        DoubleVertex matrixAndVectorMultiplied = matrixA.matrixMultiply(vectorA);
         DoubleTensor result = matrixAndVectorMultiplied.lazyEval();
         DoubleTensor expectedResult = DoubleTensor.create(new double[]{5., 11., 17.}, 3);
         assertThat(result, valuesAndShapesMatch(expectedResult));
@@ -138,7 +140,7 @@ public class DoubleVertexTest {
 
     @Test
     public void canMatrixMultiplyMatrices() {
-        DoubleVertex matricesMultiplied = ConstantVertex.of(vectorB.reshape(3, 2)).matrixMultiply(ConstantVertex.of(vectorB.reshape(2, 3)));
+        DoubleVertex matricesMultiplied = matrixA.matrixMultiply(matrixB);
         DoubleTensor result = matricesMultiplied.lazyEval();
         DoubleTensor expectedResult = DoubleTensor.create(
             new double[]{
