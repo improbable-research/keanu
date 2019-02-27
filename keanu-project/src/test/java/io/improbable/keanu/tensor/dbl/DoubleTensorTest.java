@@ -148,6 +148,17 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canInverseMatrix() {
+        DoubleTensor A = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
+
+        DoubleTensor expected = DoubleTensor.create(4, -2, -3, 1).reshape(2, 2).times(1.0 / A.determinant());
+
+        DoubleTensor actual = A.matrixInverse();
+
+        assertThat(expected, valuesWithinEpsilonAndShapesMatch(actual, 1e-8));
+    }
+
+    @Test
     public void canMatrixMultiply() {
 
         DoubleTensor left = DoubleTensor.create(new double[]{

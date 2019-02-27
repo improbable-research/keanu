@@ -12,7 +12,6 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
-import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -42,6 +41,8 @@ import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarRigh
 import static java.util.Arrays.copyOf;
 import static org.bytedeco.javacpp.openblas.CblasNoTrans;
 import static org.bytedeco.javacpp.openblas.CblasRowMajor;
+import static org.bytedeco.javacpp.openblas.LAPACKE_dgetrf;
+import static org.bytedeco.javacpp.openblas.LAPACKE_dgetri;
 import static org.bytedeco.javacpp.openblas.LAPACKE_dpotrf;
 import static org.bytedeco.javacpp.openblas.LAPACK_ROW_MAJOR;
 import static org.bytedeco.javacpp.openblas.cblas_dgemm;
@@ -405,6 +406,7 @@ public class JVMDoubleTensor extends DoubleTensor {
 
     @Override
     public double determinant() {
+
         //lu = getrf
         //product of diagonal
         return new LUDecomposition(asApacheRealMatrix(this)).getDeterminant();
@@ -413,9 +415,25 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor matrixInverse() {
 
-        //lu = getrf
-        //inverse = getri
-        return fromApacheRealMatrix(MatrixUtils.inverse(asApacheRealMatrix(this)));
+        final int m = Ints.checkedCast(shape[0]);
+        final int n = Ints.checkedCast(shape[1]);
+        final int lda = m;
+        final double[] newBuffer = bufferCopy();
+        final int[] ipiv = new int[newBuffer.length];
+
+        int result = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, m, n, newBuffer, lda, ipiv);
+
+        if (result != 0) {
+            throw new IllegalStateException("Matrix factorization failed");
+        }
+
+        int inverseResult = LAPACKE_dgetri(LAPACK_ROW_MAJOR, m, newBuffer, m, ipiv);
+
+        if (inverseResult != 0) {
+            throw new IllegalStateException("Matrix inverse failed");
+        }
+
+        return new JVMDoubleTensor(newBuffer, shapeCopy());
     }
 
     @Override
