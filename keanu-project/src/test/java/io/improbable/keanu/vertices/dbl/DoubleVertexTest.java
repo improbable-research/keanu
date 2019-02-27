@@ -122,24 +122,24 @@ public class DoubleVertexTest {
 
     @Test
     public void canMatrixMultiplyVectorAndMatrix() {
-        DoubleVertex vectorsMultiplied = ConstantVertex.of(vectorA).matrixMultiply(ConstantVertex.of(vectorB.reshape(2, 3)));
-        DoubleTensor result = vectorsMultiplied.lazyEval();
+        DoubleVertex vectorAndMatrixMultiplied = ConstantVertex.of(vectorA).matrixMultiply(ConstantVertex.of(vectorB.reshape(2, 3)));
+        DoubleTensor result = vectorAndMatrixMultiplied.lazyEval();
         DoubleTensor expectedResult = DoubleTensor.create(new double[]{9., 12., 15.}, 3);
         assertThat(result, valuesAndShapesMatch(expectedResult));
     }
 
     @Test
     public void canMatrixMultiplyMatrixAndVector() {
-        DoubleVertex vectorsMultiplied = ConstantVertex.of(vectorB.reshape(3, 2)).matrixMultiply(ConstantVertex.of(vectorA));
-        DoubleTensor result = vectorsMultiplied.lazyEval();
+        DoubleVertex matrixAndVectorMultiplied = ConstantVertex.of(vectorB.reshape(3, 2)).matrixMultiply(ConstantVertex.of(vectorA));
+        DoubleTensor result = matrixAndVectorMultiplied.lazyEval();
         DoubleTensor expectedResult = DoubleTensor.create(new double[]{5., 11., 17.}, 3);
         assertThat(result, valuesAndShapesMatch(expectedResult));
     }
 
     @Test
     public void canMatrixMultiplyMatrices() {
-        DoubleVertex vectorsMultiplied = ConstantVertex.of(vectorB.reshape(3, 2)).matrixMultiply(ConstantVertex.of(vectorB.reshape(2, 3)));
-        DoubleTensor result = vectorsMultiplied.lazyEval();
+        DoubleVertex matricesMultiplied = ConstantVertex.of(vectorB.reshape(3, 2)).matrixMultiply(ConstantVertex.of(vectorB.reshape(2, 3)));
+        DoubleTensor result = matricesMultiplied.lazyEval();
         DoubleTensor expectedResult = DoubleTensor.create(
             new double[]{
                  9., 12., 15.,
