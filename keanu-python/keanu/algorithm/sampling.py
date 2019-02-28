@@ -43,10 +43,11 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
     :param proposal_distribution: The proposal distribution for Metropolis Hastings. Options are 'gaussian' and 'prior'.
     :param latents: All latent vertices.
     :param proposal_listeners: Listeners for proposal creation and rejection. Options are :class:`keanu.algorithm.AcceptanceRateTracker`.
-    :param proposal_distribution_sigma: Parameter sigma for 'gaussian' proposal distribution.
+    :param proposal_distribution_sigma: Parameter sigma for 'gaussian' proposal distribution or multiple sigmas for 'multivariate_gaussian'
 
     :raises TypeError: If you pass `proposal_listener` without specifying `proposal_distribution`.
-    :raises TypeError: If you choose 'gaussian' as `proposal_distribution` but did not specify `proposal_distribution_sigma`.
+    :raises TypeError: If you choose 'gaussian' as `proposal_distribution` but did not specify a single `proposal_distribution_sigma`.
+    :raises TypeError: If you choose 'multivariate_gaussian' as `proposal_distribution` but not specify a list of sigmas for each latent.
     :raises TypeError: If you choose 'prior' as `proposal_distribution` but did not pass latent vertices.
     """
 
