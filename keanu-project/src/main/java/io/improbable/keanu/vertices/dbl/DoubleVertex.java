@@ -115,7 +115,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         int rightRank = that.getRank();
 
         if (leftRank < 1 || rightRank < 1) {
-            throw new IllegalArgumentException("Matrix multiply for rank 0 is not supported. Use multiply instead.");
+            throw new IllegalArgumentException("Matrix multiply for rank 0 is not supported. Use times instead.");
         }
 
         DoubleVertex leftMatrix = leftRank == 1 ? this.reshape(1, this.getShape()[0]) : this;

@@ -164,7 +164,7 @@ public class DoubleVertexTest {
         assertThat(scalarWithRank0.getRank(), equalTo(0));
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Matrix multiply for rank 0 is not supported. Use multiply instead.");
+        thrown.expectMessage("Matrix multiply for rank 0 is not supported. Use times instead.");
 
         scalarWithRank0.matrixMultiply(matrix);
     }
