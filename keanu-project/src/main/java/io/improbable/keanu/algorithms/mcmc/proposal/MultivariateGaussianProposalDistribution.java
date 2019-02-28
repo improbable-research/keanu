@@ -40,6 +40,7 @@ public class MultivariateGaussianProposalDistribution implements ProposalDistrib
             DoubleTensor sample = random.nextGaussian(variable.getShape(), (DoubleTensor) variable.getValue(), sigmas.get(variable));
             proposal.setProposal(variable, sample);
         }
+        proposalNotifier.notifyProposalCreated(proposal);
         return proposal;
     }
 
