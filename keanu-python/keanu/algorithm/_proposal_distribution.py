@@ -45,7 +45,8 @@ class ProposalDistribution(JavaObjectWrapper):
             if len(sigma) != len(latents):
                 raise TypeError("Multivaraite Gaussian Proposal Distribution requires sigma for each latents")
 
-            args.append(k.to_java_map(dict(zip(latents, sigma))))
+            sigma_as_tensors = [Tensor(s) for s in sigma]
+            args.append(k.to_java_map(dict(zip(latents, sigma_as_tensors))))
         elif sigma is not None:
             raise TypeError('Parameter sigma is not valid unless type is "gaussian" or "multivariate_gaussian"')
 

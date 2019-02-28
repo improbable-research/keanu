@@ -176,6 +176,12 @@ def test_can_specify_a_gaussian_proposal_distribution(net: BayesNet) -> None:
     generate_samples(net=net, sample_from=net.iter_latent_vertices(), sampling_algorithm=algo)
 
 
+def test_can_specify_a_multivariate_gaussian_proposal_distribution(net: BayesNet) -> None:
+    algo = MetropolisHastingsSampler(
+        proposal_distribution="multivariate_gaussian", latents=net.iter_latent_vertices(), proposal_distribution_sigma=[np.array(1.), np.array(2.), np.array(3.)])
+    generate_samples(net=net, sample_from=net.iter_latent_vertices(), sampling_algorithm=algo)
+
+
 @pytest.mark.parametrize(
     "algo",
     [(lambda net: MetropolisHastingsSampler(proposal_distribution='prior', latents=net.iter_latent_vertices()))])
