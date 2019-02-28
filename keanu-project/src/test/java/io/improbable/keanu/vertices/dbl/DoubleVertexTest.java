@@ -7,15 +7,21 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import static org.hamcrest.Matchers.equalTo;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import org.junit.rules.ExpectedException;
 
 public class DoubleVertexTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     private DoubleVertex vectorA;
     private DoubleVertex matrixA;
@@ -148,6 +154,27 @@ public class DoubleVertexTest {
                 19., 26., 33.,
                 29., 40., 51.
             }, 3, 3);
+        assertThat(result, valuesAndShapesMatch(expectedResult));
+    }
+
+    @Test
+    public void cannotMatrixMultiplyScalarsWithRank0() {
+        DoubleVertex scalarWithRank0 = ConstantVertex.of(2.);
+        DoubleVertex matrix = ConstantVertex.of(new double[]{2., 3.}, 1, 2);
+        assertThat(scalarWithRank0.getRank(), equalTo(0));
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Matrix multiply for rank 0 is not supported. Use multiply instead.");
+
+        scalarWithRank0.matrixMultiply(matrix);
+    }
+
+    @Test
+    public void canMatrixMultiplyScalarsWithRank1() {
+        DoubleVertex scalarWithRank0 = ConstantVertex.of(new double[]{2.}, 1);
+        DoubleVertex matrix = ConstantVertex.of(new double[]{2., 3.}, 1, 2);
+        DoubleTensor result = scalarWithRank0.matrixMultiply(matrix).lazyEval();
+        DoubleTensor expectedResult = DoubleTensor.create(new double[]{4., 6.}, 2);
         assertThat(result, valuesAndShapesMatch(expectedResult));
     }
 }
