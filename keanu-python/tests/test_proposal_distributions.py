@@ -23,8 +23,10 @@ def test_you_can_create_a_gaussian_proposal_distribution() -> None:
     ProposalDistribution("gaussian", sigma=np.array(1.))
 
 
-def test_you_can_create_a_gaussian_proposal_distribution(net) -> None:
-    ProposalDistribution("multivariate_gaussian", latents=list(net.iter_latent_vertices()), sigma=[np.array(1.), np.array(2.)])
+def test_you_can_create_a_multivariate_gaussian_proposal_distribution(net) -> None:
+    ProposalDistribution(
+        "multivariate_gaussian", latents=list(net.iter_latent_vertices()), sigma=[np.array(1.),
+                                                                                  np.array(2.)])
 
 
 def test_it_throws_if_you_specify_gaussian_without_a_value_for_sigma() -> None:

@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Iterable, Dict, List, Tuple
+from typing import Any, Iterable, Dict, List, Tuple, Union
 
 from numpy import ndenumerate, ndarray
 from py4j.java_collections import JavaList
@@ -54,7 +54,7 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
                  proposal_distribution: str,
                  latents: Iterable[Vertex],
                  proposal_listeners=[],
-                 proposal_distribution_sigma: numpy_types = None):
+                 proposal_distribution_sigma: Union[numpy_types, List[numpy_types]] = None):
         if (proposal_distribution is None and len(proposal_listeners) > 0):
             raise TypeError("If you pass in proposal_listeners you must also specify proposal_distribution")
 
