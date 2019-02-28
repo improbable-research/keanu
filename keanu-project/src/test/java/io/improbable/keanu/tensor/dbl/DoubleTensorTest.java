@@ -41,7 +41,7 @@ public class DoubleTensorTest {
     @Parameterized.Parameters(name = "{index}: Test with {1}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
-//            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
+            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
             {new JVMDoubleTensorFactory(), "JVM DoubleTensor"},
         });
     }
@@ -1276,9 +1276,30 @@ public class DoubleTensorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void doesThrowOnInvalidIndex() {
+    public void doesThrowOnGetInvalidIndex() {
         DoubleTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2);
         double value = A.getValue(1, 0);
     }
+
+    @Test
+    public void canSetValueByFlatIndex() {
+        DoubleTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2);
+        A.setValue(0.5, 6);
+        assertEquals(0.5, A.getValue(6), 1e-10);
+    }
+
+    @Test
+    public void canSetValueByIndex() {
+        DoubleTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2);
+        A.setValue(0.5, 1, 0, 1);
+        assertEquals(0.5, A.getValue(5), 1e-10);
+    }
+
+    @Test(expected = Exception.class)
+    public void doesThrowOnSetByInvalidIndex() {
+        DoubleTensor A = DoubleTensor.arange(0, 8).reshape(2, 2, 2);
+        A.setValue(0.5, 1, 0);
+    }
+
 
 }

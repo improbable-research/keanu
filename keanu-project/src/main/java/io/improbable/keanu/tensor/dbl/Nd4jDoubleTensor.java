@@ -141,10 +141,15 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     }
 
     public Double getValue(long... index) {
-        return tensor.getDouble(index);
+        if (index.length == 1) {
+            return tensor.getDouble(index[0]);
+        } else {
+            return tensor.getDouble(index);
+        }
     }
 
     public DoubleTensor setValue(Double value, long... index) {
+
         tensor.putScalar(index, value);
         return this;
     }
@@ -166,6 +171,9 @@ public class Nd4jDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor transpose() {
+        if (this.getRank() != 2) {
+            throw new IllegalArgumentException("Cannot transpose rank " + this.getRank() + " tensor. Try permute instead.");
+        }
         return new Nd4jDoubleTensor(tensor.transpose());
     }
 
@@ -286,7 +294,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor choleskyDecomposition() {
         INDArray dup = tensor.dup();
-        Nd4j.getBlasWrapper().lapack().potrf(dup, false);
+        Nd4j.getBlasWrapper().lapack().potrf(dup, true);
         return new Nd4jDoubleTensor(dup);
     }
 
