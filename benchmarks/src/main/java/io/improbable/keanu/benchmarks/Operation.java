@@ -34,6 +34,14 @@ public enum Operation {
         public double apply(double lhs, double rhs) {
             return lhs / rhs;
         }
+    },
+    MATRIX_MULTIPLY{
+        public DoubleTensor apply(DoubleTensor lhs, DoubleTensor rhs) {
+            return lhs.matrixMultiply(rhs);
+        }
+        public double apply(double lhs, double rhs) {
+            return lhs / rhs;
+        }
     };
 
     public abstract DoubleTensor apply(DoubleTensor lhs, DoubleTensor rhs);

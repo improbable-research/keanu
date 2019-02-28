@@ -381,6 +381,7 @@ public class JVMDoubleTensor extends DoubleTensor {
         byte upperLower = 'L';
         double[] newBuffer = bufferCopy();
 
+        //https://software.intel.com/en-us/mkl-developer-reference-c-matrix-factorization-lapack-computational-routines
         int result = LAPACKE_dpotrf(LAPACK_ROW_MAJOR, upperLower, N, newBuffer, N);
 
         if (result != 0) {
@@ -465,19 +466,24 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor that) {
 
+        long[] thatShape = that.getShape();
+        if (this.shape.length != 2 || thatShape.length != 2 || shape[1] != thatShape[0]) {
+            throw new IllegalArgumentException("Cannot matrix multiply shape " + Arrays.toString(shape) + " shape " + Arrays.toString(thatShape));
+        }
+
         //C = alpha*A*B + beta*C
         //(M,N) = (M,k)(k,N) + (M,N)
         double[] A = buffer;
         double[] B = that.asFlatDoubleArray();
-        double[] C = new double[Ints.checkedCast(shape[0] * that.getShape()[1])];
+        double[] C = new double[Ints.checkedCast(this.shape[0] * thatShape[1])];
 
         int N = (int) that.getShape()[1];
-        int M = (int) shape[0];
-        int K = (int) shape[1];
+        int M = (int) this.shape[0];
+        int K = (int) this.shape[1];
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, 1, A, K, B, N, 0, C, N);
 
-        return new JVMDoubleTensor(C, new long[]{shape[0], that.getShape()[1]});
+        return new JVMDoubleTensor(C, new long[]{this.shape[0], that.getShape()[1]});
     }
 
     @Override
