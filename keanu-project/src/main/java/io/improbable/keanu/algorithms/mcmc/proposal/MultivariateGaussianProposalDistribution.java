@@ -2,35 +2,31 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MultivariateGaussianProposalDistribution implements ProposalDistribution {
 
+    private final Map<VariableReference, Double> sigmas;
     private final DoubleTensor covariance;
-    private final DoubleTensor cholesky;
     private final ProposalNotifier proposalNotifier;
 
-    public MultivariateGaussianProposalDistribution(DoubleTensor covariance) {
-        this(covariance, Collections.emptyList());
+    public MultivariateGaussianProposalDistribution(Map<VariableReference, Double> sigmas) {
+        this(sigmas, Collections.emptyList());
     }
 
-    public MultivariateGaussianProposalDistribution(DoubleTensor covariance, List<ProposalListener> listeners) {
-        if (covariance.getRank() != 2) {
-            throw new IllegalArgumentException("covariance for Multivariate Gaussian proposal function has to me a matrix.");
-        }
-        if (covariance.getShape()[0] != covariance.getShape()[1]) {
-            throw new IllegalArgumentException("covariance matrix for Multivariate Gaussian proposal has to be symmetric.");
-        }
-
-        this.covariance = covariance;
-        this.cholesky = covariance.choleskyDecomposition();
+    public MultivariateGaussianProposalDistribution(Map<VariableReference, Double> sigmas, List<ProposalListener> listeners) {
+        this.sigmas = sigmas;
+        this.covariance = DoubleTensor.create(sigmas.values().stream().mapToDouble(Double::doubleValue).toArray());
         this.proposalNotifier = new ProposalNotifier(listeners);
     }
 
@@ -41,9 +37,7 @@ public class MultivariateGaussianProposalDistribution implements ProposalDistrib
             if (!(variable.getValue() instanceof DoubleTensor)) {
                 throw new IllegalStateException("Multivariate Gaussian proposal function cannot be used for discrete variable " + variable);
             }
-            DoubleTensor sample = cholesky
-                .matrixMultiply(random.nextGaussian(new long[]{covariance.getShape()[0]}))
-                .reshape(variable.getShape());
+            DoubleTensor sample = random.nextGaussian(variable.getShape(), (DoubleTensor) variable.getValue(), DoubleTensor.scalar(sigmas.get(variable.getReference())));
             proposal.setProposal(variable, sample);
         }
         return proposal;
