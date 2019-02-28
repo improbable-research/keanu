@@ -1,9 +1,6 @@
 package io.improbable.keanu.benchmarks;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensorFactory;
-import io.improbable.keanu.tensor.dbl.JVMDoubleTensorFactory;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensorFactory;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -11,32 +8,15 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 
 @State(Scope.Benchmark)
-public class ElementwiseDoubleOperations {
+public class ElementwiseBinaryDoubleOperations {
 
     private static final int NUM_OPERATIONS = 100;
 
     @Param({"TIMES", "MATRIX_MULTIPLY"})
-    public Operation operation;
+    public BinaryOperation operation;
 
     @Param({"1", "10", "100", "1000"})
     public int N;
-
-    public enum DoubleTensorImpl {
-        JVM {
-            @Override
-            DoubleTensorFactory getFactory() {
-                return new JVMDoubleTensorFactory();
-            }
-        },
-        ND4J {
-            @Override
-            DoubleTensorFactory getFactory() {
-                return new Nd4jDoubleTensorFactory();
-            }
-        };
-
-        abstract DoubleTensorFactory getFactory();
-    }
 
     @Param({"JVM", "ND4J"})
     public DoubleTensorImpl impl;

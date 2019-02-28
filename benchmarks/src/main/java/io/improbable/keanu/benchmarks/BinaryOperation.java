@@ -2,7 +2,7 @@ package io.improbable.keanu.benchmarks;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-public enum Operation {
+public enum BinaryOperation {
     PLUS {
         public DoubleTensor apply(DoubleTensor lhs, DoubleTensor rhs) {
             return lhs.plus(rhs);
