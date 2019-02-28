@@ -53,7 +53,7 @@ public class KeanuLapack {
 
     /**
      * https://software.intel.com/en-us/mkl-developer-reference-c-getri
-     *
+     * <p>
      * Computes the inverse of an LU-factored general matrix.
      *
      * @param N      length of one dimension in the square matrix to operate on

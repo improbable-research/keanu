@@ -16,7 +16,7 @@ public class UnaryDoubleOperations {
     @Param({"CHOLESKEY", "DETERMINANT", "COS", "INVERSE", "LOG", "TRANSPOSE"})
     public UnaryOperation operation;
 
-    @Param({"10", "100", "1000"})
+    @Param({"10"})
     public int N;
 
     @Param({"JVM", "ND4J"})
