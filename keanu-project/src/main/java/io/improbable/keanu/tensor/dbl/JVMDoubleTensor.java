@@ -36,13 +36,12 @@ import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastF
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.broadcastFromRight;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarLeft;
 import static io.improbable.keanu.tensor.dbl.JVMDoubleTensorBroadcast.scalarRight;
+import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetrf;
+import static io.improbable.keanu.tensor.dbl.KeanuLapack.dgetri;
+import static io.improbable.keanu.tensor.dbl.KeanuLapack.dpotrf;
 import static java.util.Arrays.copyOf;
 import static org.bytedeco.javacpp.openblas.CblasNoTrans;
 import static org.bytedeco.javacpp.openblas.CblasRowMajor;
-import static org.bytedeco.javacpp.openblas.LAPACKE_dgetrf;
-import static org.bytedeco.javacpp.openblas.LAPACKE_dgetri;
-import static org.bytedeco.javacpp.openblas.LAPACKE_dpotrf;
-import static org.bytedeco.javacpp.openblas.LAPACK_ROW_MAJOR;
 import static org.bytedeco.javacpp.openblas.cblas_dgemm;
 
 public class JVMDoubleTensor extends DoubleTensor {
@@ -378,25 +377,23 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
 
         int N = Ints.checkedCast(shape[0]);
-        byte upperLower = 'L';
         double[] newBuffer = bufferCopy();
 
-        //https://software.intel.com/en-us/mkl-developer-reference-c-matrix-factorization-lapack-computational-routines
-        int result = LAPACKE_dpotrf(LAPACK_ROW_MAJOR, upperLower, N, newBuffer, N);
+        int result = dpotrf(KeanuLapack.Triangular.LOWER, N, newBuffer);
 
         if (result != 0) {
             throw new IllegalStateException("Cholesky decomposition failed");
         }
 
-        getBottomTriangularInPlace(N, newBuffer);
+        zeroOutUpperTriangle(N, newBuffer);
 
         return new JVMDoubleTensor(newBuffer, shapeCopy());
     }
 
-    private void getBottomTriangularInPlace(int N, double[] buffer) {
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                if (j > i) {
+    private void zeroOutUpperTriangle(int N, double[] buffer) {
+        if (N > 1) {
+            for (int i = 0; i < N; i++) {
+                for (int j = i + 1; j < N; j++) {
                     buffer[i * N + j] = 0;
                 }
             }
@@ -408,11 +405,10 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         final int m = Ints.checkedCast(shape[0]);
         final int n = Ints.checkedCast(shape[1]);
-        final int lda = m;
         final double[] newBuffer = bufferCopy();
         final int[] ipiv = new int[newBuffer.length];
 
-        int factorizationResult = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, m, n, newBuffer, lda, ipiv);
+        final int factorizationResult = dgetrf(m, n, newBuffer, ipiv);
 
         if (factorizationResult < 0) {
             throw new IllegalStateException("Matrix factorization failed");
@@ -442,11 +438,10 @@ public class JVMDoubleTensor extends DoubleTensor {
 
         final int m = Ints.checkedCast(shape[0]);
         final int n = Ints.checkedCast(shape[1]);
-        final int lda = m;
         final double[] newBuffer = bufferCopy();
         final int[] ipiv = new int[newBuffer.length];
 
-        int factorizationResult = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, m, n, newBuffer, lda, ipiv);
+        final int factorizationResult = dgetrf(m, n, newBuffer, ipiv);
 
         if (factorizationResult < 0) {
             throw new IllegalStateException("Matrix factorization failed");
@@ -454,7 +449,7 @@ public class JVMDoubleTensor extends DoubleTensor {
             throw new SingularMatrixException();
         }
 
-        int inverseResult = LAPACKE_dgetri(LAPACK_ROW_MAJOR, m, newBuffer, m, ipiv);
+        int inverseResult = dgetri(m, newBuffer, ipiv);
 
         if (inverseResult != 0) {
             throw new IllegalStateException("Matrix inverse failed");
@@ -466,24 +461,24 @@ public class JVMDoubleTensor extends DoubleTensor {
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor that) {
 
-        long[] thatShape = that.getShape();
+        final long[] thatShape = that.getShape();
         if (this.shape.length != 2 || thatShape.length != 2 || shape[1] != thatShape[0]) {
             throw new IllegalArgumentException("Cannot matrix multiply shape " + Arrays.toString(shape) + " shape " + Arrays.toString(thatShape));
         }
 
         //C = alpha*A*B + beta*C
         //(M,N) = (M,k)(k,N) + (M,N)
-        double[] A = buffer;
-        double[] B = that.asFlatDoubleArray();
-        double[] C = new double[Ints.checkedCast(this.shape[0] * thatShape[1])];
+        final double[] A = buffer;
+        final double[] B = getRawBufferIfJVMTensor(that);
+        final double[] C = new double[Ints.checkedCast(this.shape[0] * thatShape[1])];
 
-        int N = (int) that.getShape()[1];
-        int M = (int) this.shape[0];
-        int K = (int) this.shape[1];
+        final int N = (int) thatShape[1];
+        final int M = (int) this.shape[0];
+        final int K = (int) this.shape[1];
 
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, M, N, K, 1, A, K, B, N, 0, C, N);
 
-        return new JVMDoubleTensor(C, new long[]{this.shape[0], that.getShape()[1]});
+        return new JVMDoubleTensor(C, new long[]{this.shape[0], thatShape[1]});
     }
 
     @Override
