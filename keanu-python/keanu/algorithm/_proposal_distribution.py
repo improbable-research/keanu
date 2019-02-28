@@ -1,4 +1,4 @@
-from typing import List, Any, Callable, Dict, Iterable
+from typing import List, Any, Callable, Dict, Union, cast
 
 from py4j.java_gateway import java_import
 
@@ -11,10 +11,12 @@ from keanu.vertex import Vertex
 k = KeanuContext()
 
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution")
+java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.proposal.MultivariateGaussianProposalDistribution")
 java_import(k.jvm_view(), "io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution")
 
 proposal_distribution_types: Dict[str, Callable] = {
     "gaussian": k.jvm_view().GaussianProposalDistribution,
+    "multivariate_gaussian": k.jvm_view().MultivariateGaussianProposalDistribution,
     "prior": k.jvm_view().PriorProposalDistribution,
 }
 
@@ -23,8 +25,8 @@ class ProposalDistribution(JavaObjectWrapper):
 
     def __init__(self,
                  type_: str,
-                 latents: Iterable[Vertex] = None,
-                 sigma: numpy_types = None,
+                 latents: List[Vertex] = None,
+                 sigma: Union[numpy_types, List[numpy_types]] = None,
                  listeners: List[Any] = []) -> None:
         ctor = proposal_distribution_types[type_]
         args = []
@@ -32,9 +34,20 @@ class ProposalDistribution(JavaObjectWrapper):
         if type_ == "gaussian":
             if sigma is None:
                 raise TypeError("Gaussian Proposal Distribution requires a value for sigma")
-            args.append(Tensor(sigma).unwrap())
+            if type(sigma) == list:
+                raise TypeError("Gaussian Proposal Distribution requires one sigma")
+            args.append(Tensor(cast(numpy_types, sigma)).unwrap())
+        elif type_ == "multivariate_gaussian":
+            if sigma is None:
+                raise TypeError("Multivariate Gaussian Proposal Distribution requires values for sigma")
+            if latents is None:
+                raise TypeError("Multivariate Gaussian Proposal Distribution requires latent variables")
+            if len(sigma) != len(latents):
+                raise TypeError("Multivaraite Gaussian Proposal Distribution requires sigma for each latents")
+
+            args.append(k.to_java_map(dict(zip(latents, sigma))))
         elif sigma is not None:
-            raise TypeError('Parameter sigma is not valid unless type is "gaussian"')
+            raise TypeError('Parameter sigma is not valid unless type is "gaussian" or "multivariate_gaussian"')
 
         if type_ == "prior":
             if latents is None:
