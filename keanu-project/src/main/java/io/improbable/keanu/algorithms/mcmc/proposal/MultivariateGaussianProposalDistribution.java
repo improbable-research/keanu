@@ -2,31 +2,31 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
-import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
+import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Assumes variables are independent. Instead of using a Multivariate Gaussian pdf,
+ * this proposal computes the product of multiple Univariate Gaussian pdfs.
+ */
 public class MultivariateGaussianProposalDistribution implements ProposalDistribution {
 
-    private final Map<VariableReference, Double> sigmas;
-    private final DoubleTensor covariance;
+    private final Map<? extends Variable, DoubleTensor> sigmas;
     private final ProposalNotifier proposalNotifier;
 
-    public MultivariateGaussianProposalDistribution(Map<VariableReference, Double> sigmas) {
+    public MultivariateGaussianProposalDistribution(Map<? extends Variable, DoubleTensor> sigmas) {
         this(sigmas, Collections.emptyList());
     }
 
-    public MultivariateGaussianProposalDistribution(Map<VariableReference, Double> sigmas, List<ProposalListener> listeners) {
+    public MultivariateGaussianProposalDistribution(Map<? extends Variable, DoubleTensor> sigmas, List<ProposalListener> listeners) {
         this.sigmas = sigmas;
-        this.covariance = DoubleTensor.create(sigmas.values().stream().mapToDouble(Double::doubleValue).toArray());
         this.proposalNotifier = new ProposalNotifier(listeners);
     }
 
@@ -37,7 +37,7 @@ public class MultivariateGaussianProposalDistribution implements ProposalDistrib
             if (!(variable.getValue() instanceof DoubleTensor)) {
                 throw new IllegalStateException("Multivariate Gaussian proposal function cannot be used for discrete variable " + variable);
             }
-            DoubleTensor sample = random.nextGaussian(variable.getShape(), (DoubleTensor) variable.getValue(), DoubleTensor.scalar(sigmas.get(variable.getReference())));
+            DoubleTensor sample = random.nextGaussian(variable.getShape(), (DoubleTensor) variable.getValue(), sigmas.get(variable));
             proposal.setProposal(variable, sample);
         }
         return proposal;
@@ -49,7 +49,7 @@ public class MultivariateGaussianProposalDistribution implements ProposalDistrib
             throw new ClassCastException("Only DoubleTensor values are supported - not " + ofValue.getClass().getSimpleName());
         }
 
-        ContinuousDistribution proposalDistribution = MultivariateGaussian.withParameters((DoubleTensor) ofValue, covariance);
+        ContinuousDistribution proposalDistribution = Gaussian.withParameters((DoubleTensor) ofValue, sigmas.get(variable));
         return proposalDistribution.logProb((DoubleTensor) givenValue).sum();
     }
 
