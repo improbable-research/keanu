@@ -6,10 +6,11 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static io.improbable.keanu.algorithms.mcmc.SamplingUtil.takeSamples;
 
 @Slf4j
 public class MetropolisHastingsSampler implements SamplingAlgorithm {
@@ -58,15 +59,6 @@ public class MetropolisHastingsSampler implements SamplingAlgorithm {
     public NetworkSample sample() {
         step();
         return new NetworkSample(SamplingAlgorithm.takeSample((List<? extends Variable<Object, ?>>) variablesToSampleFrom), logProbabilityBeforeStep);
-    }
-    private static void takeSamples(Map<VariableReference, List<?>> samples, List<? extends Variable> fromVariables) {
-        fromVariables.forEach(variable -> addSampleForVariable((Variable<?, ?>) variable, samples));
-    }
-
-    private static <T> void addSampleForVariable(Variable<T, ?> variable, Map<VariableReference, List<?>> samples) {
-        List<T> samplesForVariable = (List<T>) samples.computeIfAbsent(variable.getReference(), v -> new ArrayList<T>());
-        T value = variable.getValue();
-        samplesForVariable.add(value);
     }
 
 }

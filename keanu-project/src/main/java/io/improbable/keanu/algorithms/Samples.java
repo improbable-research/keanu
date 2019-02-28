@@ -52,4 +52,8 @@ public class Samples<T> {
     public List<T> asList() {
         return new ArrayList<>(samples);
     }
+
+    public T asTensor() {
+        throw new UnsupportedOperationException("Generic samples cannot be coerced into a tensor.");
+    }
 }

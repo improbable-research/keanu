@@ -1,3 +1,9 @@
+## Version 0.0.22
+
+## Python
+
+* Improved performance of getting samples by coercing them into a `Tensor` in Java (instead of iterating through an `ArrayList`).
+
 ## Version 0.0.21 
 
 ### Common
@@ -9,6 +15,10 @@
   * `Plates` --> `Sequence`
   * `Plate` --> `SequenceItem`
   * `plate` package --> `template`
+* `ForwardSampler`
+  * Samples from the prior of a bayesian network. The network cannot have observations that are dependent on random variables.
+  * It's accessible from the `Keanu` factory like so: `Keanu.Sampling.Forward.withDefaultConfig()`
+  * There is a togglabe option to record the log prob of each sample. This is disabled by default for performance reasons.
   
 ### Python
 

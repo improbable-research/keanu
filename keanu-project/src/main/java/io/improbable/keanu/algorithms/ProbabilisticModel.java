@@ -24,7 +24,7 @@ public interface ProbabilisticModel extends AutoCloseable {
 
     double logLikelihood(Map<VariableReference, ?> inputs);
 
-    List<? extends Variable> getLatentVariables();
+    List<Variable> getLatentVariables();
 
     default List<? extends Variable<DoubleTensor, ?>> getContinuousLatentVariables() {
         return getLatentVariables().stream()

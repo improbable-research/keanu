@@ -39,7 +39,7 @@ public class KeanuCompiledProbabilisticGraph implements ProbabilisticModel {
 
         ComputableGraph computableGraph = builder.build();
 
-        List<Variable<?, TensorflowVariableState>> latentVariables = builder.getLatentVariables().stream()
+        List latentVariables = builder.getLatentVariables().stream()
             .map(v -> new TensorflowVariable<>(computableGraph, v))
             .collect(Collectors.toList());
 
@@ -55,7 +55,7 @@ public class KeanuCompiledProbabilisticGraph implements ProbabilisticModel {
     private final ComputableGraph computableGraph;
 
     @Getter
-    private final List<? extends Variable> latentVariables;
+    private final List<Variable> latentVariables;
 
     @Getter
     private final VariableReference logProbOp;

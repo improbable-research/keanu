@@ -8,6 +8,7 @@ import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.mcmc.SamplingAlgorithm;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,159 +19,156 @@ import java.util.Map;
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
+@Slf4j
 class NUTSSampler implements SamplingAlgorithm {
 
-    private final KeanuRandom random;
-    private final List<? extends Variable<DoubleTensor, ?>> latentVariables;
     private final List<? extends Variable> sampleFromVariables;
-    private final int maxTreeHeight;
-    private final boolean adaptEnabled;
-    private final Stepsize stepsize;
-    private final Tree tree;
     private final ProbabilisticModelWithGradient logProbGradientCalculator;
+    private final LeapfrogIntegrator leapfrogIntegrator;
+
+    private final boolean adaptPotentialEnabled;
+    private final Potential potential;
+
+    private final boolean adaptStepSizeEnabled;
+    private final AdaptiveStepSize stepSize;
+
+    private final long adaptCount;
+
+    private long stepCount;
+
+    private final int maxTreeHeight;
+
+    private Proposal proposal;
+
+    private final KeanuRandom random;
+
+    private final double maxEnergyChange;
+
     private final Statistics statistics;
     private final boolean saveStatistics;
-    private int sampleNum;
+
 
     /**
-     * @param sampleFromVariables        variables to sample from
-     * @param latentVariables            variables that represent latent variables
+     * @param sampleFromVariables       variables to sample from
      * @param logProbGradientCalculator gradient calculator for diff of log prob with respect to latents
-     * @param adaptEnabled              enable the NUTS step size adaptation
-     * @param stepsize                  configuration for tuning the stepsize, if adaptEnabled
-     * @param tree                      initial tree that will contain the state of the tree build
-     * @param maxTreeHeight             The largest tree height before stopping the hamilitonian process
+     * @param adaptPotentialEnabled     enable the potential adaption
+     * @param potential                 provides mass in velocity and energy calculations
+     * @param adaptStepSizeEnabled      enable the NUTS step size adaptation
+     * @param stepSize                  configuration for tuning the stepSize, if adaptStepSizeEnabled
+     * @param adaptCount                number of steps to adapt potential and step size
+     * @param maxEnergyChange           the maximum change in energy before a step is considered divergent
+     * @param maxTreeHeight             The largest tree height before stopping the Hamiltonian process
+     * @param initialProposal           the starting proposal for the tree
      * @param random                    the source of randomness
      * @param statistics                the sampler statistics
      * @param saveStatistics            whether to record statistics
      */
     public NUTSSampler(List<? extends Variable> sampleFromVariables,
-                       List<? extends Variable<DoubleTensor, ?>> latentVariables,
                        ProbabilisticModelWithGradient logProbGradientCalculator,
-                       boolean adaptEnabled,
-                       Stepsize stepsize,
-                       Tree tree,
+                       boolean adaptPotentialEnabled,
+                       Potential potential,
+                       boolean adaptStepSizeEnabled,
+                       AdaptiveStepSize stepSize,
+                       long adaptCount,
+                       double maxEnergyChange,
                        int maxTreeHeight,
+                       Proposal initialProposal,
                        KeanuRandom random,
                        Statistics statistics,
                        boolean saveStatistics) {
 
         this.sampleFromVariables = sampleFromVariables;
-        this.latentVariables = latentVariables;
         this.logProbGradientCalculator = logProbGradientCalculator;
+        this.leapfrogIntegrator = new LeapfrogIntegrator(potential);
 
-        this.tree = tree;
-        this.stepsize = stepsize;
+        this.adaptPotentialEnabled = adaptPotentialEnabled;
+        this.potential = potential;
+
+        this.adaptStepSizeEnabled = adaptStepSizeEnabled;
+        this.stepSize = stepSize;
+
+        this.adaptCount = adaptCount;
+        this.stepCount = 0;
+
+        this.maxEnergyChange = maxEnergyChange;
         this.maxTreeHeight = maxTreeHeight;
-        this.adaptEnabled = adaptEnabled;
+
+        this.proposal = initialProposal;
 
         this.random = random;
         this.statistics = statistics;
         this.saveStatistics = saveStatistics;
 
-        this.sampleNum = 1;
     }
 
     @Override
     public void sample(Map<VariableReference, List<?>> samples, List<Double> logOfMasterPForEachSample) {
         step();
-        addSampleFromCache(samples, tree.getSampleAtAcceptedPosition());
-        logOfMasterPForEachSample.add(tree.getLogOfMasterPAtAcceptedPosition());
+        addSampleFromCache(samples, proposal.getSample());
+        logOfMasterPForEachSample.add(proposal.getLogProb());
     }
 
     @Override
     public NetworkSample sample() {
         step();
-        return new NetworkSample(tree.getSampleAtAcceptedPosition(), tree.getLogOfMasterPAtAcceptedPosition());
+        return new NetworkSample(proposal.getSample(), proposal.getLogProb());
     }
 
     @Override
     public void step() {
 
-        initializeMomentumForEachVariable(latentVariables, tree.getForwardMomentum(), random);
-        cache(tree.getForwardMomentum(), tree.getBackwardMomentum());
+        Map<VariableReference, DoubleTensor> initialMomentum = potential.randomMomentum(random);
 
-        double logOfMasterPMinusMomentumBeforeLeapfrog = tree.getLogOfMasterPAtAcceptedPosition() - 0.5 * dotProduct(tree.getForwardMomentum());
+        LeapfrogState startState = new LeapfrogState(
+            proposal.getPosition(),
+            initialMomentum,
+            proposal.getGradient(),
+            proposal.getLogProb(),
+            potential
+        );
 
-        double logU = Math.log(random.nextDouble()) + logOfMasterPMinusMomentumBeforeLeapfrog;
+        Tree tree = new Tree(
+            startState,
+            proposal,
+            maxEnergyChange,
+            logProbGradientCalculator,
+            leapfrogIntegrator,
+            sampleFromVariables,
+            random
+        );
 
-        int treeHeight = 0;
-        tree.resetTreeBeforeSample();
 
-        while (tree.shouldContinue() && treeHeight < maxTreeHeight) {
+        while (tree.shouldContinue() && tree.getTreeHeight() < maxTreeHeight) {
 
             //build tree direction -1 = backwards OR 1 = forwards
             int buildDirection = random.nextBoolean() ? 1 : -1;
 
-            Tree otherHalfTree = Tree.buildOtherHalfOfTree(
-                tree,
-                latentVariables,
-                logProbGradientCalculator,
-                sampleFromVariables,
-                logU,
-                buildDirection,
-                treeHeight,
-                stepsize.getStepsize(),
-                logOfMasterPMinusMomentumBeforeLeapfrog,
-                random
-            );
-
-            if (otherHalfTree.shouldContinue()) {
-                final double acceptanceProb = (double) otherHalfTree.getAcceptedLeapfrogCount() / tree.getAcceptedLeapfrogCount();
-
-                Tree.acceptOtherPositionWithProbability(
-                    acceptanceProb,
-                    tree,
-                    otherHalfTree,
-                    random
-                );
-            }
-
-            tree.incrementLeapfrogCount(otherHalfTree.getAcceptedLeapfrogCount());
-            tree.setDeltaLikelihoodOfLeapfrog(tree.getDeltaLikelihoodOfLeapfrog() + otherHalfTree.getDeltaLikelihoodOfLeapfrog());
-            tree.setTreeSize(tree.getTreeSize() + otherHalfTree.getTreeSize());
-            tree.continueIfNotUTurning(otherHalfTree);
-
-            treeHeight++;
+            tree.grow(buildDirection, stepSize.getStepSize());
         }
+
+        this.proposal = tree.getProposal();
 
         if (saveStatistics) {
-            recordSamplerStatistics();
+            stepSize.save(statistics);
+            tree.save(statistics);
         }
 
-        if (this.adaptEnabled) {
-            stepsize.adaptStepSize(tree, sampleNum);
+        if (this.adaptStepSizeEnabled) {
+            stepSize.adaptStepSize(tree);
         }
 
-        tree.acceptPositionAndGradient();
-        sampleNum++;
-    }
-
-    private void recordSamplerStatistics() {
-        stepsize.save(statistics);
-        tree.save(statistics);
-    }
-
-    private static void initializeMomentumForEachVariable(List<? extends Variable<DoubleTensor, ?>> variables,
-                                                          Map<VariableReference, DoubleTensor> momentums,
-                                                          KeanuRandom random) {
-        for (Variable<DoubleTensor, ?> variable : variables) {
-            momentums.put(variable.getReference(), random.nextGaussian(variable.getShape()));
+        if (stepCount < adaptCount && this.adaptPotentialEnabled) {
+            potential.update(proposal.getPosition());
         }
-    }
 
-    private static void cache(Map<? extends VariableReference, DoubleTensor> from, Map<VariableReference, DoubleTensor> to) {
-        for (Map.Entry<? extends VariableReference, DoubleTensor> entry : from.entrySet()) {
-            to.put(entry.getKey(), entry.getValue());
+        if (stepCount > adaptCount) {
+            if (tree.isDiverged()) {
+                statistics.store(NUTS.Metrics.DIVERGENT_SAMPLE, (double) stepCount);
+                log.warn("Divergent NUTS sample after adaption ended. Increase the number or samples to adapt for or the max energy change.");
+            }
         }
-    }
 
-    private static double dotProduct(Map<? extends VariableReference, DoubleTensor> momentums) {
-        double dotProduct = 0.0;
-        for (DoubleTensor momentum : momentums.values()) {
-            dotProduct += momentum.pow(2).sum();
-        }
-        return dotProduct;
+        stepCount++;
     }
 
     /**

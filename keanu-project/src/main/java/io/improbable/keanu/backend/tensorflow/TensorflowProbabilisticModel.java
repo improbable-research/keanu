@@ -33,7 +33,7 @@ public class TensorflowProbabilisticModel implements ProbabilisticModel {
 
         TensorflowComputableGraph computableGraph = builder.build();
 
-        List<Variable<?, TensorflowVariableState>> latentVariables = builder.getLatentVariables().stream()
+        List latentVariables = builder.getLatentVariables().stream()
             .map(v -> new TensorflowVariable<>(computableGraph, v))
             .collect(Collectors.toList());
 
@@ -49,7 +49,7 @@ public class TensorflowProbabilisticModel implements ProbabilisticModel {
     private final TensorflowComputableGraph computableGraph;
 
     @Getter
-    private final List<? extends Variable> latentVariables;
+    private final List<Variable> latentVariables;
 
     @Getter
     private final VariableReference logProbOp;

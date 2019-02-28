@@ -48,7 +48,7 @@ public class TensorflowProbabilisticModelWithGradient extends TensorflowProbabil
             latentVariablesReferences
         );
 
-        List<Variable<?, TensorflowVariableState>> latentVariables = builder.getLatentVariables().stream()
+        List latentVariables = builder.getLatentVariables().stream()
             .map(v -> new TensorflowVariable<>(computableGraph, v))
             .collect(Collectors.toList());
 
@@ -68,7 +68,7 @@ public class TensorflowProbabilisticModelWithGradient extends TensorflowProbabil
     private final Map<VariableReference, VariableReference> logLikelihoodGradients;
 
     public TensorflowProbabilisticModelWithGradient(TensorflowComputableGraph computableGraph,
-                                                    List<? extends Variable> latentVariables,
+                                                    List<Variable> latentVariables,
                                                     VariableReference logProbOp,
                                                     VariableReference logLikelihoodOp,
                                                     Map<VariableReference, VariableReference> logProbGradients,
@@ -80,27 +80,27 @@ public class TensorflowProbabilisticModelWithGradient extends TensorflowProbabil
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logProbGradients() {
+    public Map<VariableReference, DoubleTensor> logProbGradients() {
         return logProbGradients(null);
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
+    public Map<VariableReference, DoubleTensor> logProbGradients(Map<VariableReference, ?> inputs) {
         return calculateGradients(inputs, logProbGradients);
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients() {
+    public Map<VariableReference, DoubleTensor> logLikelihoodGradients() {
         return logLikelihoodGradients(null);
     }
 
     @Override
-    public Map<? extends VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
+    public Map<VariableReference, DoubleTensor> logLikelihoodGradients(Map<VariableReference, ?> inputs) {
         return calculateGradients(inputs, logLikelihoodGradients);
     }
 
-    private Map<? extends VariableReference, DoubleTensor> calculateGradients(Map<VariableReference, ?> inputs,
-                                                                              Map<VariableReference, VariableReference> gradientLookup) {
+    private Map<VariableReference, DoubleTensor> calculateGradients(Map<VariableReference, ?> inputs,
+                                                                    Map<VariableReference, VariableReference> gradientLookup) {
 
         Map<VariableReference, ?> results = computableGraph.compute(inputs, gradientLookup.keySet());
 
