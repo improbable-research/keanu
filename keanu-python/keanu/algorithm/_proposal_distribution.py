@@ -35,7 +35,7 @@ class ProposalDistribution(JavaObjectWrapper):
             if sigma is None:
                 raise TypeError("Gaussian Proposal Distribution requires a value for sigma")
             if type(sigma) == list:
-                raise TypeError("Gaussian Proposal Distribution requires one sigma")
+                raise TypeError("Gaussian Proposal Distribution requires single sigma")
             args.append(Tensor(cast(numpy_types, sigma)).unwrap())
         elif type_ == "multivariate_gaussian":
             if sigma is None:
