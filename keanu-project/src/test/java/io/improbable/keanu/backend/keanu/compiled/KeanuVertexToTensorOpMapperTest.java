@@ -1,55 +1,58 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
-import io.improbable.keanu.algorithms.VariableReference;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Before;
+import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.Vertex;
 import org.junit.Test;
+import org.reflections.Reflections;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import static junit.framework.TestCase.assertEquals;
+import static io.improbable.keanu.backend.keanu.compiled.KeanuVertexToTensorOpMapper.getOpMapperFor;
 
 public class KeanuVertexToTensorOpMapperTest {
 
-    private GaussianVertex A;
-    private GaussianVertex B;
-    private DoubleVertex C;
+    @Test
+    public void doesSupportIntegerOperations() {
 
-    @Before
-    public void setup() {
-        A = new GaussianVertex(0, 1);
-        B = new GaussianVertex(0, 1);
-        C = A.times(B);
+        Reflections reflections = new Reflections("io.improbable.keanu.vertices.intgr.nonprobabilistic");
+
+        Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
+        List<Class<? extends Vertex>> supportedVertices = vertices.stream()
+            .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
+            .filter(v -> !Modifier.isAbstract(v.getModifiers()))
+            .collect(Collectors.toList());
+
+        assertDoesSupport(supportedVertices);
     }
 
     @Test
-    public void doesInPlaceOnLastUseOperationsThatAreMutable() {
-        assertInPlace(true, false, true);
+    public void doesSupportDoubleOperations() {
+
+        Reflections reflections = new Reflections("io.improbable.keanu.vertices.dbl.nonprobabilistic");
+
+        Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
+        List<Class<? extends Vertex>> supportedVertices = vertices.stream()
+            .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
+            .filter(v -> !Modifier.isAbstract(v.getModifiers()))
+            .collect(Collectors.toList());
+
+        assertDoesSupport(supportedVertices);
     }
 
-    @Test
-    public void doesNotInPlaceThatAreImmutable() {
-        assertInPlace(false, false, false);
+    private void assertDoesSupport(List<Class<? extends Vertex>> supportedVertices) {
+        List<Class<? extends Vertex>> unsupportedVertices = supportedVertices.stream()
+            .filter(v -> getOpMapperFor(v) == null)
+            .collect(Collectors.toList());
+
+        if (!unsupportedVertices.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("\n");
+            unsupportedVertices.forEach(v -> sb.append("Does not support " + v.getCanonicalName() + "\n"));
+            throw new AssertionError(sb.toString());
+        }
     }
 
-    @Test
-    public void doesNotInPlaceNonLastUseOperations() {
-        DoubleVertex D = A.plus(B);
-        assertInPlace(true, false, false);
-    }
-
-    private void assertInPlace(boolean aMutable, boolean bMutable, boolean shouldInPlace) {
-        KeanuVertexToTensorOpMapper.OpMapper opMapper = KeanuVertexToTensorOpMapper.getOpMapperFor(MultiplicationVertex.class);
-
-        Map<VariableReference, KeanuCompiledVariable> lookup = new HashMap<>();
-        lookup.put(A.getReference(), new KeanuCompiledVariable("A", aMutable));
-        lookup.put(B.getReference(), new KeanuCompiledVariable("B", bMutable));
-
-        String result = opMapper.apply(C, lookup);
-
-        assertEquals(result.contains("InPlace"), shouldInPlace);
-    }
 }
