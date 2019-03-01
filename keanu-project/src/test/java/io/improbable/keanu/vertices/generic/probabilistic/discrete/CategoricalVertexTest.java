@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastToIntegerVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,16 +53,6 @@ public class CategoricalVertexTest {
         thrown.expectMessage("Shapes must match or be length one");
 
         new CategoricalVertex<>(selectableValues);
-    }
-
-    @Test
-    public void cannotCastACategoricalVertex() {
-        Map<Integer, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(3, ConstantVertex.of(t1));
-        selectableValues.put(3, ConstantVertex.of(t1));
-
-        CategoricalVertex<Integer, IntegerTensor> v = new CategoricalVertex<>(selectableValues);
-        new CastToIntegerVertex(v);
     }
 
     @Test
