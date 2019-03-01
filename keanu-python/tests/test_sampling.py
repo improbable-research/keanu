@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 
 from examples import thermometers
-from keanu import BayesNet, KeanuRandom, Model
+from keanu import BayesNet, KeanuRandom, Model, set_deterministic_state
 from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler, NUTSSampler,
                              ForwardSampler, PosteriorSamplingAlgorithm)
 from keanu.vertex import Gamma, Exponential, Gaussian, Cauchy
@@ -180,7 +180,7 @@ def test_can_specify_a_multivariate_gaussian_proposal_distribution(net: BayesNet
     algo = MetropolisHastingsSampler(
         proposal_distribution="multivariate_gaussian",
         latents=net.iter_latent_vertices(),
-        proposal_distribution_sigma=[np.array(1.), np.array(2.), np.array(3.)])
+        proposal_distribution_sigma=[1., 2., 3.])
     generate_samples(net=net, sample_from=net.iter_latent_vertices(), sampling_algorithm=algo)
 
 
@@ -312,6 +312,22 @@ def test_generate_samples_throws_if_vertices_in_sample_from_are_missing_labels()
     net = BayesNet([sigma, vertex])
     with pytest.raises(ValueError, match=r"Vertices in sample_from must be labelled."):
         samples = generate_samples(net=net, sample_from=net.iter_latent_vertices())
+
+
+def test_sample_default_is_gaussian_proposal(net) -> None:
+    set_deterministic_state()
+    net = BayesNet([Gamma(1., 1., label="gamma")])
+    actual_samples = sample(net=net, sample_from=net.iter_latent_vertices())
+
+    set_deterministic_state()
+    net = BayesNet([Gamma(1., 1., label="gamma")])
+    latents = list(net.iter_latent_vertices())
+    algo = MetropolisHastingsSampler(
+            proposal_distribution="gaussian",
+            latents=latents,
+            proposal_distribution_sigma=1.)
+    expected_samples = sample(net=net, sample_from=latents, sampling_algorithm=algo)
+    assert actual_samples == expected_samples
 
 
 def set_starting_state(model: Model) -> None:

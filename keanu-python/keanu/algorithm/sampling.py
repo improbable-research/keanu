@@ -140,7 +140,7 @@ def sample(net: BayesNet,
     :param sample_from: Vertices to include in the returned samples.
     :param sampling_algorithm: The posterior sampling algorithm to use.
         Options are :class:`keanu.algorithm.MetropolisHastingsSampler`, :class:`keanu.algorithm.NUTSSampler` and :class:`keanu.algorithm.ForwardSampler`
-        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'prior' as its proposal distribution.
+        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'multivariate_gaussian' as its proposal distribution.
     :param draws: The number of samples to take.
     :param drop: The number of samples to drop before collecting anything.
         If this is zero then no samples will be dropped before collecting.
@@ -154,15 +154,20 @@ def sample(net: BayesNet,
     :param Axes ax: `matplotlib.axes.Axes <https://matplotlib.org/api/axes_api.html>`_.
         If not set, a new one is created.
 
+    :raises ValueError: If `sample_from` is empty
     :raises ValueError: If `sample_from` contains vertices without labels.
 
     :return: Dictionary of samples at an index (tuple) for each vertex label (str). If all the vertices in `sample_from` are scalar, the dictionary is only keyed by label.
     """
 
     sample_from = list(sample_from)
+    id_to_label = __check_if_vertices_are_labelled(sample_from)
 
     if sampling_algorithm is None:
-        sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from)
+        sampling_algorithm = MetropolisHastingsSampler(
+                proposal_distribution="gaussian",
+                latents=sample_from,
+                proposal_distribution_sigma=1.)
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
@@ -173,7 +178,6 @@ def sample(net: BayesNet,
     network_samples: JavaObject = sampling_algorithm.get_sampler().getPosteriorSamples(
         probabilistic_model.unwrap(), vertices_unwrapped, draws).drop(drop).downSample(down_sample_interval)
 
-    id_to_label = __check_if_vertices_are_labelled(sample_from)
     if __all_scalar(sample_from):
         vertex_samples = __create_single_indexed_samples(network_samples, vertices_unwrapped, id_to_label)
     else:
@@ -219,7 +223,10 @@ def generate_samples(net: BayesNet,
     id_to_label = __check_if_vertices_are_labelled(sample_from)
 
     if sampling_algorithm is None:
-        sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from)
+        sampling_algorithm = MetropolisHastingsSampler(
+                proposal_distribution="gaussian",
+                latents=sample_from,
+                proposal_distribution_sigma=1.)
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
