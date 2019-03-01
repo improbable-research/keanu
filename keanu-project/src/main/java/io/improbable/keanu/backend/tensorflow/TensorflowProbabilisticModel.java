@@ -3,6 +3,7 @@ package io.improbable.keanu.backend.tensorflow;
 import io.improbable.keanu.algorithms.ProbabilisticModel;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.backend.VariableImpl;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,7 @@ public class TensorflowProbabilisticModel implements ProbabilisticModel {
         TensorflowComputableGraph computableGraph = builder.build();
 
         List latentVariables = builder.getLatentVariables().stream()
-            .map(v -> new TensorflowVariable<>(computableGraph, v))
+            .map(v -> new VariableImpl<>(computableGraph, v))
             .collect(Collectors.toList());
 
         return new TensorflowProbabilisticModel(
