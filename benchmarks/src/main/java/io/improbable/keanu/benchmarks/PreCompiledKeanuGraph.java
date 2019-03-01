@@ -11,12 +11,12 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 
-public class PreCompiledKeaunGraph implements ComputableGraph {
+public class PreCompiledKeanuGraph implements ComputableGraph {
 
     private final Map<String, VariableReference> outputsByString;
     private final Function<Map<String, ?>, Map<String, ?>> computeFunction;
 
-    public PreCompiledKeaunGraph(VariableReference c) {
+    public PreCompiledKeanuGraph(VariableReference c) {
 
         computeFunction = new TestGraph();
 
@@ -41,12 +41,11 @@ public class PreCompiledKeaunGraph implements ComputableGraph {
 
     @Override
     public <T> T getInput(VariableReference input) {
-        return null;
+        throw new UnsupportedOperationException("No need to implement this for performance tests");
     }
 
     private String toSourceVariableName(VariableReference variableReference) {
-        String s = variableReference.toStringReference();
-        return s;
+        return variableReference.toStringReference();
     }
 
     public static class TestGraph implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {

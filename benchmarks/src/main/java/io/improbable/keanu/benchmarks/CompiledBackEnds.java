@@ -20,7 +20,7 @@ import java.util.Map;
 public class CompiledBackEnds {
 
     public enum Backend {
-        KEANU_GRAPH, KEANU_COMPILED, TENSORFLOW, PRECOMPILED_KEANU
+        KEANU_GRAPH, KEANU_COMPILED, PRECOMPILED_KEANU
     }
 
     @Param({"KEANU_COMPILED", "KEANU_GRAPH"})
@@ -96,7 +96,7 @@ public class CompiledBackEnds {
     }
 
     public ComputableGraph precompiledKeaunuGraph(DoubleVertex output) {
-        return new PreCompiledKeaunGraph(output.getReference());
+        return new PreCompiledKeanuGraph(output.getReference());
     }
 
     @Benchmark

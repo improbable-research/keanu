@@ -4,15 +4,21 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.ComputableGraphBuilder;
 import io.improbable.keanu.backend.StringVariableReference;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.joor.Reflect;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +27,9 @@ import java.util.function.Function;
 import static java.util.stream.Collectors.toMap;
 
 public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<ComputableGraph> {
+
+    private static final String PACKAGE = "io.improbable.keanu.backend.keanu";
+    private static final String CLASS_NAME_PREFIX = "CompiledKeanuGraph";
 
     private StringBuilder computeSourceBuilder;
     private StringBuilder instanceVariableBuilder;
@@ -32,7 +41,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
     private int internalOpCount = 0;
 
-    private final String className = "CompiledKeanuGraph" + this.hashCode();
+    private final String className = CLASS_NAME_PREFIX + this.hashCode();
 
     public KeanuCompiledGraphBuilder() {
         computeSourceBuilder = new StringBuilder();
@@ -46,15 +55,15 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
     private void startSource(StringBuilder sb) {
 
-        sb.append("package io.improbable.keanu.backend.keanu;\n");
-        sb.append("import java.util.Collection;\n");
-        sb.append("import java.util.Collections;\n");
-        sb.append("import java.util.HashMap;\n");
-        sb.append("import java.util.Map;\n");
+        sb.append("package " + PACKAGE + ";\n");
+        sb.append(importString(Collection.class));
+        sb.append(importString(Collections.class));
+        sb.append(importString(HashMap.class));
+        sb.append(importString(Map.class));
         sb.append(importString(VariableReference.class));
         sb.append(importString(DoubleTensor.class));
 
-        sb.append("public final class " + className + " implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {\n");
+        append(sb, "public final class ", className, " implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {\n");
     }
 
     private String importString(Class<?> clazz) {
@@ -67,7 +76,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
         for (VariableReference out : outputs) {
             String name = lookup.get(out).getName();
-            sb.append("results.put(\"" + out.toStringReference() + "\", " + name + ");\n");
+            append(sb, "results.put(\"", out.toStringReference(), "\", ", name, ");\n");
         }
 
         sb.append("return results;\n");
@@ -78,34 +87,32 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     @Override
     public void createConstant(Vertex visiting) {
 
-        Object value = visiting.getValue();
-        String type = getType(value);
+        String type = getType(visiting);
         String lookupName = visiting.getReference().toStringReference();
         String name = toSourceVariableName(visiting.getReference());
 
-        instanceVariableBuilder.append("private final " + type + " " + name + ";\n");
-        constructorBuilder.append(name + " = " + "(" + type + ")" + "constants.get(\"" + lookupName + "\");\n");
+        append(instanceVariableBuilder, "private final ", type, " ", name, ";\n");
+        append(constructorBuilder, name, " = ", "(", type, ")", "constants.get(\"", lookupName, "\");\n");
 
         lookup.put(visiting.getReference(), new KeanuCompiledVariable(name, false));
-        constantValues.put(visiting.getReference(), value);
+        constantValues.put(visiting.getReference(), visiting.getValue());
 
     }
 
     @Override
     public void createVariable(Vertex visiting) {
 
-        Object value = visiting.getValue();
-        String variableType = getType(value);
+        String variableType = getType(visiting);
         String variableName = toSourceVariableName(visiting.getReference());
 
         declareInput(variableType, variableName, visiting.getReference().toStringReference());
 
         lookup.put(visiting.getReference(), new KeanuCompiledVariable(variableName, false));
-        variableValues.put(visiting.getReference(), value);
+        variableValues.put(visiting.getReference(), visiting.getValue());
     }
 
     private void declareInput(String type, String name, String inputName) {
-        computeSourceBuilder.append("final " + type + " " + name + " = " + "(" + type + ")" + "inputs.get(\"" + inputName + "\");\n");
+        append(computeSourceBuilder, "final ", type, " ", name, " = (", type, ") inputs.get(\"", inputName, "\");\n");
     }
 
     @Override
@@ -120,7 +127,8 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
         String variableType = getType(visiting);
         String name = toSourceVariableName(visiting.getReference());
-        computeSourceBuilder.append("final " + variableType + " " + name + " = " + opMapperFor.apply(visiting, lookup) + ";\n");
+
+        append(computeSourceBuilder, "final ", variableType, " ", name, " = ", opMapperFor.apply(visiting, lookup), ";\n");
 
         lookup.put(visiting.getReference(), new KeanuCompiledVariable(name, true));
     }
@@ -130,7 +138,15 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     }
 
     private String getType(Object v) {
-        return "DoubleTensor";
+        if (v instanceof DoubleVertex) {
+            return DoubleTensor.class.getCanonicalName();
+        } else if (v instanceof IntegerVertex) {
+            return IntegerTensor.class.getCanonicalName();
+        } else if (v instanceof BooleanVertex) {
+            return BooleanTensor.class.getCanonicalName();
+        } else {
+            throw new IllegalArgumentException("Compiling of " + v.getClass().getCanonicalName() + " not supported yet.");
+        }
     }
 
     private String toSourceVariableName(VariableReference variableReference) {
@@ -150,7 +166,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     @Override
     public VariableReference add(VariableReference left, VariableReference right) {
 
-        String variableType = "DoubleTensor";
+        String variableType = DoubleTensor.class.getCanonicalName();
 
         String leftName = lookup.get(left).getName();
         String rightName = lookup.get(right).getName();
@@ -158,7 +174,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         String name = "vv_" + internalOpCount;
         internalOpCount++;
 
-        computeSourceBuilder.append("final " + variableType + " " + name + " = " + leftName + ".plus(" + rightName + ");\n");
+        append(computeSourceBuilder, "final ", variableType, " ", name, " = ", leftName, ".plus(", rightName + ");\n");
 
         StringVariableReference reference = new StringVariableReference(name);
         lookup.put(reference, new KeanuCompiledVariable(name, true));
@@ -173,15 +189,15 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         );
     }
 
-    @Override
-    public ComputableGraph build() {
+    public String getSource() {
         StringBuilder stringBuilder = new StringBuilder();
 
         startSource(stringBuilder);
 
         stringBuilder.append(instanceVariableBuilder);
 
-        stringBuilder.append("public " + className + "(final Map<String, ?> constants) {\n");
+        append(stringBuilder, "public ", className, "(final Map<String, ?> constants) {\n");
+
         stringBuilder.append(constructorBuilder);
         stringBuilder.append("}\n");
 
@@ -190,7 +206,19 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
         endSource(stringBuilder);
 
-        String source = stringBuilder.toString();
+        return stringBuilder.toString();
+    }
+
+    private void append(StringBuilder sb, String... line) {
+        for (String token : line) {
+            sb.append(token);
+        }
+    }
+
+    @Override
+    public ComputableGraph build() {
+
+        String source = getSource();
 
 //        System.out.println(source);
 
@@ -203,7 +231,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
             .collect(toMap(e -> e.getKey().toStringReference(), Map.Entry::getValue));
 
         Function<Map<String, ?>, Map<String, ?>> computeFunction = Reflect.compile(
-            "io.improbable.keanu.backend.keanu." + className,
+            PACKAGE + "." + className,
             source
         ).create(constantsByString).get();
 

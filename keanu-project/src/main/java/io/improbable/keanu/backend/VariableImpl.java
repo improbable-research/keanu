@@ -34,6 +34,6 @@ public class VariableImpl<T> implements Variable<T, VariableStateImpl> {
 
     @Override
     public VariableStateImpl getState() {
-        return null;
+        return graph.getInput(variableReference);
     }
 }
