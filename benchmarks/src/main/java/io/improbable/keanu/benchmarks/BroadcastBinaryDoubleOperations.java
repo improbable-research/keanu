@@ -35,7 +35,7 @@ public class BroadcastBinaryDoubleOperations {
         String[] dimTokens = dims.split(",");
 
         String leftParam = dimTokens[0];
-        String rightParam = dimTokens[0];
+        String rightParam = dimTokens[1];
 
         long[] leftShape = Arrays.stream(leftParam.split("x"))
             .mapToLong(Long::parseLong)

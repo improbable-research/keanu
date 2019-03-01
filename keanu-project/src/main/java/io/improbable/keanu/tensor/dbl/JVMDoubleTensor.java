@@ -1544,7 +1544,10 @@ public class JVMDoubleTensor extends DoubleTensor {
         return binaryDoubleOpWithAutoBroadcast(this, that, op, true);
     }
 
-    private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(JVMDoubleTensor left, DoubleTensor right, BiFunction<Double, Double, Double> op, boolean inPlace) {
+    private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(JVMDoubleTensor left,
+                                                            DoubleTensor right,
+                                                            BiFunction<Double, Double, Double> op,
+                                                            boolean inPlace) {
 
         final double[] leftBuffer = left.buffer;
         final long[] leftShape = left.shape;

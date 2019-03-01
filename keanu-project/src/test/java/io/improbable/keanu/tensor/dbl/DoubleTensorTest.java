@@ -14,6 +14,7 @@ import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.special.Gamma;
+import org.apache.commons.math3.util.FastMath;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -1262,6 +1263,8 @@ public class DoubleTensorTest {
         assertUnaryOperation(Math::floor, DoubleTensor::floorInPlace, tensorRangeWithNegatives());
         assertUnaryOperation(Gamma::logGamma, DoubleTensor::logGamma, tensorBetween0And1());
         assertUnaryOperation(Gamma::logGamma, DoubleTensor::logGammaInPlace, tensorBetween0And1());
+        assertUnaryOperation(FastMath::sqrt, DoubleTensor::sqrt, tensorBetween0And1());
+        assertUnaryOperation(FastMath::sqrt, DoubleTensor::sqrtInPlace, tensorBetween0And1());
     }
 
     private DoubleTensor tensorRangeWithNegatives() {

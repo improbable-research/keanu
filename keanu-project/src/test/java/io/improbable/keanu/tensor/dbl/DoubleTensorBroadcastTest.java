@@ -1,6 +1,10 @@
 package io.improbable.keanu.tensor.dbl;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
 
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertDivideInPlaceOperationEquals;
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertDivideOperationEquals;
@@ -14,7 +18,20 @@ import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesIn
 import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesOperationEquals;
 import static org.junit.Assert.assertEquals;
 
+@RunWith(Parameterized.class)
 public class DoubleTensorBroadcastTest {
+
+    @Parameterized.Parameters(name = "{index}: Test with {1}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+            {new Nd4jDoubleTensorFactory(), "ND4J DoubleTensor"},
+            {new JVMDoubleTensorFactory(), "JVM DoubleTensor"},
+        });
+    }
+
+    public DoubleTensorBroadcastTest(DoubleTensorFactory factory, String name) {
+        DoubleTensor.setFactory(factory);
+    }
 
     @Test
     public void canBroadcastMultiplyRank4ContainingVectorAndMatrix() {
