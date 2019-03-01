@@ -5,7 +5,7 @@ from py4j.java_gateway import java_import
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 from keanu.tensor import Tensor
-from keanu.vartypes import numpy_types
+from keanu.vartypes import tensor_arg_types
 from keanu.vertex import Vertex
 
 k = KeanuContext()
@@ -26,7 +26,7 @@ class ProposalDistribution(JavaObjectWrapper):
     def __init__(self,
                  type_: str,
                  latents: List[Vertex] = None,
-                 sigma: Union[numpy_types, List[numpy_types]] = None,
+                 sigma: Union[tensor_arg_types, List[tensor_arg_types]] = None,
                  listeners: List[Any] = []) -> None:
         ctor = proposal_distribution_types[type_]
         args = []
@@ -36,16 +36,16 @@ class ProposalDistribution(JavaObjectWrapper):
                 raise TypeError("Gaussian Proposal Distribution requires a value for sigma")
             if type(sigma) == list:
                 raise TypeError("Gaussian Proposal Distribution requires single sigma")
-            args.append(Tensor(cast(numpy_types, sigma)).unwrap())
+            args.append(Tensor(cast(tensor_arg_types, sigma)).unwrap())
         elif type_ == "multivariate_gaussian":
             if sigma is None:
                 raise TypeError("Multivariate Gaussian Proposal Distribution requires values for sigma")
             if latents is None:
                 raise TypeError("Multivariate Gaussian Proposal Distribution requires latent variables")
-            if len(sigma) != len(latents):
+            if len(cast(list, sigma)) != len(latents):
                 raise TypeError("Multivaraite Gaussian Proposal Distribution requires sigma for each latents")
 
-            sigma_as_tensors = [Tensor(cast(numpy_types, s)) for s in sigma]
+            sigma_as_tensors = [Tensor(cast(tensor_arg_types, s)) for s in cast(list, sigma)]
             args.append(k.to_java_map(dict(zip(latents, sigma_as_tensors))))
         elif sigma is not None:
             raise TypeError('Parameter sigma is not valid unless type is "gaussian" or "multivariate_gaussian"')

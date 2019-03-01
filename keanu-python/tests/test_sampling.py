@@ -314,47 +314,6 @@ def test_generate_samples_throws_if_vertices_in_sample_from_are_missing_labels()
         samples = generate_samples(net=net, sample_from=net.iter_latent_vertices())
 
 
-def test_sample_default_is_gaussian_proposal(net) -> None:
-    draws = 10
-
-    set_deterministic_state()
-    net = BayesNet([Gamma(1., 1., label="gamma")])
-    actual_samples = sample(net=net, sample_from=net.iter_latent_vertices(), draws=draws)
-
-    set_deterministic_state()
-    net = BayesNet([Gamma(1., 1., label="gamma")])
-    latents = list(net.iter_latent_vertices())
-    algo = MetropolisHastingsSampler(
-            proposal_distribution="gaussian",
-            latents=latents,
-            proposal_distribution_sigma=1.)
-    expected_samples = sample(net=net, sample_from=latents, sampling_algorithm=algo, draws=draws)
-    assert actual_samples == expected_samples
-
-
-def test_generate_samples_default_is_gaussian_proposal(net) -> None:
-    draws = 10
-
-    set_deterministic_state()
-    net = BayesNet([Gamma(1., 1., label="gamma")])
-    actual_samples_generator = generate_samples(net=net, sample_from=net.iter_latent_vertices())
-    actual_samples = []
-    for sample in islice(actual_samples_generator, draws):
-        actual_samples.append(sample)
-
-    set_deterministic_state()
-    net = BayesNet([Gamma(1., 1., label="gamma")])
-    latents = list(net.iter_latent_vertices())
-    algo = MetropolisHastingsSampler(
-            proposal_distribution="gaussian",
-            latents=latents,
-            proposal_distribution_sigma=1.)
-    expected_samples_generator = generate_samples(net=net, sample_from=latents, sampling_algorithm=algo)
-    expected_samples = []
-    for sample in islice(expected_samples_generator, draws):
-        expected_samples.append(sample)
-    assert actual_samples == expected_samples
-
 def set_starting_state(model: Model) -> None:
     KeanuRandom.set_default_random_seed(1)
     model.temperature.set_value(model.temperature.sample())

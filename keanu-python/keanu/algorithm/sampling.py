@@ -10,7 +10,7 @@ from keanu.context import KeanuContext
 from keanu.net import BayesNet, ProbabilisticModel, ProbabilisticModelWithGradient
 from keanu.plots import traceplot
 from keanu.tensor import Tensor
-from keanu.vartypes import sample_types, sample_generator_types, numpy_types, sample_generator_dict_type
+from keanu.vartypes import sample_types, sample_generator_types, numpy_types, sample_generator_dict_type, tensor_arg_types
 from keanu.vertex.base import Vertex
 
 COLUMN_HEADER_FOR_SCALAR = (0,)
@@ -55,7 +55,7 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
                  proposal_distribution: str,
                  latents: Iterable[Vertex],
                  proposal_listeners=[],
-                 proposal_distribution_sigma: Union[numpy_types, List[numpy_types]] = None):
+                 proposal_distribution_sigma: Union[tensor_arg_types, List[tensor_arg_types]] = None):
         if (proposal_distribution is None and len(proposal_listeners) > 0):
             raise TypeError("If you pass in proposal_listeners you must also specify proposal_distribution")
 
@@ -140,7 +140,7 @@ def sample(net: BayesNet,
     :param sample_from: Vertices to include in the returned samples.
     :param sampling_algorithm: The posterior sampling algorithm to use.
         Options are :class:`keanu.algorithm.MetropolisHastingsSampler`, :class:`keanu.algorithm.NUTSSampler` and :class:`keanu.algorithm.ForwardSampler`
-        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'gaussian' as its proposal distribution.
+        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'prior' as its proposal distribution.
     :param draws: The number of samples to take.
     :param drop: The number of samples to drop before collecting anything.
         If this is zero then no samples will be dropped before collecting.
@@ -163,10 +163,7 @@ def sample(net: BayesNet,
     id_to_label = __check_if_vertices_are_labelled(sample_from)
 
     if sampling_algorithm is None:
-        sampling_algorithm = MetropolisHastingsSampler(
-                proposal_distribution="gaussian",
-                latents=sample_from,
-                proposal_distribution_sigma=1.)
+        sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from)
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
@@ -201,7 +198,7 @@ def generate_samples(net: BayesNet,
     :param sample_from: Vertices to include in the returned samples.
     :param sampling_algorithm: The posterior sampling algorithm to use.
         Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.
-        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'gaussian' as its proposal distribution.
+        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'prior' as its proposal distribution.
     :param drop: The number of samples to drop before collecting anything.
         If this is zero then no samples will be dropped before collecting.
     :param down_sample_interval: Collect 1 sample for every `down_sample_interval`.
@@ -222,10 +219,7 @@ def generate_samples(net: BayesNet,
     id_to_label = __check_if_vertices_are_labelled(sample_from)
 
     if sampling_algorithm is None:
-        sampling_algorithm = MetropolisHastingsSampler(
-                proposal_distribution="gaussian",
-                latents=sample_from,
-                proposal_distribution_sigma=1.)
+        sampling_algorithm = MetropolisHastingsSampler(proposal_distribution="prior", latents=sample_from)
 
     vertices_unwrapped: JavaList = k.to_java_object_list(sample_from)
 
