@@ -140,7 +140,7 @@ def sample(net: BayesNet,
     :param sample_from: Vertices to include in the returned samples.
     :param sampling_algorithm: The posterior sampling algorithm to use.
         Options are :class:`keanu.algorithm.MetropolisHastingsSampler`, :class:`keanu.algorithm.NUTSSampler` and :class:`keanu.algorithm.ForwardSampler`
-        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'multivariate_gaussian' as its proposal distribution.
+        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'gaussian' as its proposal distribution.
     :param draws: The number of samples to take.
     :param drop: The number of samples to drop before collecting anything.
         If this is zero then no samples will be dropped before collecting.
@@ -202,7 +202,7 @@ def generate_samples(net: BayesNet,
     :param sample_from: Vertices to include in the returned samples.
     :param sampling_algorithm: The posterior sampling algorithm to use.
         Options are :class:`keanu.algorithm.MetropolisHastingsSampler` and :class:`keanu.algorithm.NUTSSampler`.
-        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'prior' as its proposal distribution.
+        If not set, :class:`keanu.algorithm.MetropolisHastingsSampler` is chosen with 'gaussian' as its proposal distribution.
     :param drop: The number of samples to drop before collecting anything.
         If this is zero then no samples will be dropped before collecting.
     :param down_sample_interval: Collect 1 sample for every `down_sample_interval`.
