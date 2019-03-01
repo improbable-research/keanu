@@ -154,7 +154,6 @@ def sample(net: BayesNet,
     :param Axes ax: `matplotlib.axes.Axes <https://matplotlib.org/api/axes_api.html>`_.
         If not set, a new one is created.
 
-    :raises ValueError: If `sample_from` is empty
     :raises ValueError: If `sample_from` contains vertices without labels.
 
     :return: Dictionary of samples at an index (tuple) for each vertex label (str). If all the vertices in `sample_from` are scalar, the dictionary is only keyed by label.
