@@ -5,8 +5,6 @@ import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
-import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticModel;
-import io.improbable.keanu.backend.tensorflow.TensorflowProbabilisticModelWithGradient;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -35,18 +33,8 @@ public class OptimizerTest {
     }
 
     @Test
-    public void tensorflowGradientOptimizerCanMLE() {
-        assertCanCalculateMaxLikelihood(getTensorflowGradientOptimizer());
-    }
-
-    @Test
     public void keanuNonGradientOptimizerCanMLE() {
         assertCanCalculateMaxLikelihood(getKeanuNonGradientOptimizer());
-    }
-
-    @Test
-    public void tensorflowNonGradientOptimizerCanMLE() {
-        assertCanCalculateMaxLikelihood(getTensorflowNonGradientOptimizer());
     }
 
     @Test
@@ -55,18 +43,8 @@ public class OptimizerTest {
     }
 
     @Test
-    public void tensorflowGradientOptimizerCanMAP() {
-        assertCanCalculateMaxAPosteriori(getTensorflowGradientOptimizer());
-    }
-
-    @Test
     public void keanuNonGradientOptimizerCanMAP() {
         assertCanCalculateMaxAPosteriori(getKeanuNonGradientOptimizer());
-    }
-
-    @Test
-    public void tensorflowNonGradientOptimizerCanMAP() {
-        assertCanCalculateMaxAPosteriori(getTensorflowNonGradientOptimizer());
     }
 
     private Function<BayesianNetwork, Optimizer> getKeanuGradientOptimizer() {
@@ -75,18 +53,6 @@ public class OptimizerTest {
 
     private Function<BayesianNetwork, Optimizer> getKeanuNonGradientOptimizer() {
         return (bayesNet) -> Keanu.Optimizer.NonGradient.of(bayesNet);
-    }
-
-    private Function<BayesianNetwork, Optimizer> getTensorflowGradientOptimizer() {
-        return (bayesNet) -> GradientOptimizer.builder()
-            .probabilisticModel(TensorflowProbabilisticModelWithGradient.convert(bayesNet))
-            .build();
-    }
-
-    private Function<BayesianNetwork, Optimizer> getTensorflowNonGradientOptimizer() {
-        return (bayesNet) -> NonGradientOptimizer.builder()
-            .probabilisticModel(TensorflowProbabilisticModel.convert(bayesNet))
-            .build();
     }
 
     private void assertCanCalculateMaxLikelihood(Function<BayesianNetwork, Optimizer> optimizerMapper) {
