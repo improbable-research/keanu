@@ -177,6 +177,36 @@ public class DoubleTensorBroadcastTest {
     }
 
     @Test
+    public void canBroadcastScalarToMatrix() {
+
+        DoubleTensor left = DoubleTensor.scalar(5);
+        DoubleTensor right = DoubleTensor.arange(0, 10).reshape(2, 5);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            0, 5, 10, 15, 20,
+            25, 30, 35, 40, 45
+        }, new long[]{2, 5});
+
+        assertTimesOperationEquals(left, right, expected);
+        assertTimesInPlaceOperationEquals(left, right, expected);
+    }
+
+    @Test
+    public void canBroadcastMatrixToScalar() {
+
+        DoubleTensor left = DoubleTensor.arange(0, 10).reshape(2, 5);
+        DoubleTensor right = DoubleTensor.scalar(5);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            0, 5, 10, 15, 20,
+            25, 30, 35, 40, 45
+        }, new long[]{2, 5});
+
+        assertTimesOperationEquals(left, right, expected);
+        assertTimesInPlaceOperationEquals(left, right, expected);
+    }
+
+    @Test
     public void canSuperBroadcast() {
 
         /*
@@ -271,7 +301,7 @@ public class DoubleTensorBroadcastTest {
             -8, -8, -8
         }, new long[]{5, 3});
 
-        DoubleTensor diff = s.plus(x);
+        DoubleTensor result = s.plus(x);
         DoubleTensor expected = DoubleTensor.create(new double[]{
             -4, -3, -2,
             -1, 0, 1,
@@ -280,7 +310,7 @@ public class DoubleTensorBroadcastTest {
             -7, -6, -5
         }, new long[]{5, 3});
 
-        assertEquals(expected, diff);
+        assertEquals(expected, result);
     }
 
     @Test(expected = IllegalArgumentException.class)

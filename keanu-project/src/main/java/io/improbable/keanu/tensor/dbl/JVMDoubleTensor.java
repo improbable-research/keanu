@@ -1537,50 +1537,70 @@ public class JVMDoubleTensor extends DoubleTensor {
     }
 
     private DoubleTensor broadcastableBinaryDoubleOp(BiFunction<Double, Double, Double> op, DoubleTensor that) {
-        return binaryDoubleOpWithAutoBroadcast(this, that, op, false);
+        return binaryDoubleOpWithAutoBroadcast(that, op, false);
     }
 
     private DoubleTensor broadcastableBinaryDoubleOpInPlace(BiFunction<Double, Double, Double> op, DoubleTensor that) {
-        return binaryDoubleOpWithAutoBroadcast(this, that, op, true);
+        return binaryDoubleOpWithAutoBroadcast(that, op, true);
     }
 
-    private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(JVMDoubleTensor left,
-                                                            DoubleTensor right,
+    private JVMDoubleTensor binaryDoubleOpWithAutoBroadcast(DoubleTensor right,
                                                             BiFunction<Double, Double, Double> op,
                                                             boolean inPlace) {
 
-        final double[] leftBuffer = left.buffer;
-        final long[] leftShape = left.shape;
 
         final double[] rightBuffer = getRawBufferIfJVMTensor(right);
         final long[] rightShape = right.getShape();
 
-        final boolean needsBroadcast = !Arrays.equals(leftShape, rightShape);
+        final boolean needsBroadcast = !Arrays.equals(shape, rightShape);
 
         if (needsBroadcast) {
 
-            //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
-            int resultRank = Math.max(leftShape.length, rightShape.length);
-            long[] paddedLeftShape = getOrPad(leftShape, resultRank);
-            long[] paddedLeftStride = TensorShape.getRowFirstStride(paddedLeftShape);
+            //Short circuit for broadcast with scalars
+            if (shape.length == 0 || rightShape.length == 0) {
 
-            long[] paddedRightShape = getOrPad(rightShape, resultRank);
-            long[] paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
+                final double[] outputBuffer;
+                final long[] resultShape;
+                final long[] resultStride;
 
-            return broadcastBinaryDoubleOp(left,
-                leftBuffer, paddedLeftShape, paddedLeftStride,
-                rightBuffer, paddedRightShape, paddedRightStride,
+                if (shape.length == 0) {
+                    outputBuffer = new double[rightBuffer.length];
+                    resultShape = Arrays.copyOf(rightShape, rightShape.length);
+                    resultStride = Arrays.copyOf(right.getStride(), rightShape.length);
+                    scalarLeft(buffer[0], rightBuffer, outputBuffer, op);
+                } else {
+                    outputBuffer = inPlace ? buffer : new double[buffer.length];
+                    resultShape = Arrays.copyOf(shape, shape.length);
+                    resultStride = stride;
+                    scalarRight(buffer, rightBuffer[0], outputBuffer, op);
+                }
+
+                if (inPlace) {
+                    buffer = outputBuffer;
+                    shape = resultShape;
+                    stride = resultStride;
+
+                    return this;
+                } else {
+                    return new JVMDoubleTensor(outputBuffer, resultShape);
+                }
+
+            }
+
+            return broadcastBinaryDoubleOp(this,
+                buffer, shape,
+                rightBuffer, right.getShape(),
                 op, inPlace
             );
 
         } else {
 
-            return elementwiseBinaryOp(left, leftBuffer, rightBuffer, leftShape, op, inPlace);
+            return elementwiseBinaryOp(this, buffer, rightBuffer, shape, op, inPlace);
         }
 
     }
 
-    private long[] getOrPad(long[] shape, int rank) {
+    private long[] getShapeOrPadToRank(long[] shape, int rank) {
         if (shape.length == rank) {
             return shape;
         } else {
@@ -1588,22 +1608,30 @@ public class JVMDoubleTensor extends DoubleTensor {
         }
     }
 
-    private JVMDoubleTensor broadcastBinaryDoubleOp(JVMDoubleTensor left, double[] leftBuffer, long[] leftShape, long[] leftStride,
-                                                    double[] rightBuffer, long[] rightShape, long[] rightStride,
+    private JVMDoubleTensor broadcastBinaryDoubleOp(JVMDoubleTensor left, double[] leftBuffer, long[] leftShape,
+                                                    double[] rightBuffer, long[] rightShape,
                                                     BiFunction<Double, Double, Double> op,
                                                     boolean inPlace) {
 
-        long[] resultShape = Shape.broadcastOutputShape(leftShape, rightShape);
-        boolean resultShapeIsLeftSideShape = Arrays.equals(resultShape, leftShape);
+        //implicitly pad lower ranks with 1s. E.g. [3, 3] & [3] -> [3, 3] -> [1, 3]
+        int resultRank = Math.max(leftShape.length, rightShape.length);
+        long[] paddedLeftShape = getShapeOrPadToRank(leftShape, resultRank);
+        long[] paddedLeftStride = TensorShape.getRowFirstStride(paddedLeftShape);
+
+        long[] paddedRightShape = getShapeOrPadToRank(rightShape, resultRank);
+        long[] paddedRightStride = TensorShape.getRowFirstStride(paddedRightShape);
+
+        long[] resultShape = Shape.broadcastOutputShape(paddedLeftShape, paddedRightShape);
+        boolean resultShapeIsLeftSideShape = Arrays.equals(resultShape, paddedLeftShape);
 
         final double[] outputBuffer;
         if (!resultShapeIsLeftSideShape) {
 
-            boolean resultShapeIsRightSideShape = Arrays.equals(resultShape, rightShape);
+            boolean resultShapeIsRightSideShape = Arrays.equals(resultShape, paddedRightShape);
 
             if (!resultShapeIsRightSideShape) {
                 throw new IllegalArgumentException(
-                    "Broadcasting of shape " + Arrays.toString(leftShape) + " and " + Arrays.toString(rightShape) + " not supported."
+                    "Broadcasting of shape " + Arrays.toString(paddedLeftShape) + " and " + Arrays.toString(paddedRightShape) + " not supported."
                 );
             }
 
@@ -1613,20 +1641,13 @@ public class JVMDoubleTensor extends DoubleTensor {
             outputBuffer = inPlace ? leftBuffer : new double[leftBuffer.length];
         }
 
-        //Short circuit for broadcast with scalars
-        if (leftShape.length == 0) {
-            scalarLeft(leftBuffer[0], rightBuffer, outputBuffer, op);
-        } else if (rightShape.length == 0) {
-            scalarRight(leftBuffer, rightBuffer[0], outputBuffer, op);
-        }
-
         //Allow broadcasting from left and right
-        if (leftShape.length > rightShape.length || leftBuffer.length > rightBuffer.length) {
+        if (paddedLeftShape.length > paddedRightShape.length || leftBuffer.length > rightBuffer.length) {
             //e.g. [2, 2] * [1, 2]
-            broadcastFromRight(leftBuffer, leftShape, leftStride, rightBuffer, rightShape, rightStride, outputBuffer, op);
+            broadcastFromRight(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
         } else {
             //e.g. [2] / [2, 2]
-            broadcastFromLeft(leftBuffer, leftShape, leftStride, rightBuffer, rightShape, rightStride, outputBuffer, op);
+            broadcastFromLeft(leftBuffer, paddedLeftShape, paddedLeftStride, rightBuffer, paddedRightShape, paddedRightStride, outputBuffer, op);
         }
 
         if (inPlace) {
