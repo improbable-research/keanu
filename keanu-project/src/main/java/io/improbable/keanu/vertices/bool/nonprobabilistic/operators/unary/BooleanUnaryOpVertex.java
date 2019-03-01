@@ -23,6 +23,7 @@ public abstract class BooleanUnaryOpVertex<T extends Tensor> extends BooleanVert
         setParents(a);
     }
 
+    @SaveVertexParam(INPUT_NAME)
     public Vertex<T> getInput() {
         return a;
     }
@@ -34,8 +35,4 @@ public abstract class BooleanUnaryOpVertex<T extends Tensor> extends BooleanVert
 
     protected abstract BooleanTensor op(T value);
 
-    @SaveVertexParam(INPUT_NAME)
-    public Vertex<T> getA() {
-        return a;
-    }
 }

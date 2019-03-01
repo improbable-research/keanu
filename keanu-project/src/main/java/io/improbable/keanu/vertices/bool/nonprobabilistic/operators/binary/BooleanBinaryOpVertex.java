@@ -29,11 +29,13 @@ public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> 
     }
 
     @Override
+    @SaveVertexParam(A_NAME)
     public Vertex<A> getLeft() {
         return left;
     }
 
     @Override
+    @SaveVertexParam(B_NAME)
     public Vertex<B> getRight() {
         return right;
     }
@@ -50,13 +52,4 @@ public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> 
 
     protected abstract BooleanTensor op(A l, B r);
 
-    @SaveVertexParam(A_NAME)
-    public Vertex<A> getA() {
-        return left;
-    }
-
-    @SaveVertexParam(B_NAME)
-    public Vertex<B> getB() {
-        return right;
-    }
 }

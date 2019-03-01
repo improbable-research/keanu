@@ -16,15 +16,20 @@ class WrappedCompiledGraph implements ComputableGraph {
     private Map<String, VariableReference> outputsByString;
     private Function<Map<String, ?>, Map<String, ?>> computeFunction;
 
+    private Map<VariableReference, Object> cachedInputs;
+
     WrappedCompiledGraph(Function<Map<String, ?>, Map<String, ?>> computeFunction,
                          List<VariableReference> outputs) {
         this.computeFunction = computeFunction;
         this.outputsByString = outputs.stream()
             .collect(toMap(VariableReference::toStringReference, output -> output));
+        this.cachedInputs = new HashMap<>();
     }
 
     @Override
     public Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs, Collection<VariableReference> outputs) {
+
+        cachedInputs.putAll(inputs);
 
         final Map<String, Object> inputsByString = new HashMap<>();
 
@@ -45,6 +50,6 @@ class WrappedCompiledGraph implements ComputableGraph {
 
     @Override
     public <T> T getInput(VariableReference input) {
-        return null;
+        return (T) cachedInputs.get(input);
     }
 }
