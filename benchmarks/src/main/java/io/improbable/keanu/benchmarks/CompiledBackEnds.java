@@ -4,7 +4,6 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.keanu.KeanuComputableGraph;
 import io.improbable.keanu.backend.keanu.compiled.KeanuCompiledGraphBuilder;
-import io.improbable.keanu.backend.tensorflow.TensorflowComputableGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -24,7 +23,7 @@ public class CompiledBackEnds {
         KEANU_GRAPH, KEANU_COMPILED, TENSORFLOW, PRECOMPILED_KEANU
     }
 
-    @Param({"KEANU_COMPILED", "KEANU_GRAPH", "TENSORFLOW"})
+    @Param({"KEANU_COMPILED", "KEANU_GRAPH"})
     public Backend backend;
 
     @Param({"100", "0"})
@@ -65,9 +64,6 @@ public class CompiledBackEnds {
             case KEANU_COMPILED:
                 computableGraph = compiledKeaunuGraph(outputNode);
                 break;
-            case TENSORFLOW:
-                computableGraph = tensorflowGraph(outputNode);
-                break;
         }
     }
 
@@ -101,10 +97,6 @@ public class CompiledBackEnds {
 
     public ComputableGraph precompiledKeaunuGraph(DoubleVertex output) {
         return new PreCompiledKeaunGraph(output.getReference());
-    }
-
-    public ComputableGraph tensorflowGraph(DoubleVertex output) {
-        return TensorflowComputableGraph.convert(output.getConnectedGraph());
     }
 
     @Benchmark

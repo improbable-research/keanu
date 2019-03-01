@@ -1,7 +1,7 @@
 package io.improbable.keanu.benchmarks;
 
+import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
-import io.improbable.keanu.backend.VariableReference;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Collection;
