@@ -133,7 +133,7 @@ public class KeanuVertexToTensorOpMapper {
 
             KeanuCompiledVariable leftVariable = lookup.get(left.getReference());
             KeanuCompiledVariable rightVariable = lookup.get(right.getReference());
-            boolean doInPlace = leftVariable.isMutable() && isLastChildByToposort(vertex, left) && ENABLE_IN_PLACE;
+            boolean doInPlace = leftVariable.isMutable() && isLastChildByTopographicalSort(vertex, left) && ENABLE_IN_PLACE;
             String call = doInPlace ? methodName + "InPlace" : methodName;
 
             return leftVariable.getName() + "." + call + "(" + rightVariable.getName() + ")";
@@ -147,7 +147,7 @@ public class KeanuVertexToTensorOpMapper {
             Vertex<?> input = unaryOpVertex.getInput();
 
             KeanuCompiledVariable inputVariable = lookup.get(input.getReference());
-            boolean doInPlace = inputVariable.isMutable() && isLastChildByToposort(vertex, input) && ENABLE_IN_PLACE;
+            boolean doInPlace = inputVariable.isMutable() && isLastChildByTopographicalSort(vertex, input) && ENABLE_IN_PLACE;
 
             String call = doInPlace ? methodName + "InPlace" : methodName;
 
@@ -155,7 +155,7 @@ public class KeanuVertexToTensorOpMapper {
         };
     }
 
-    private static boolean isLastChildByToposort(Vertex<?> child, Vertex<?> parent) {
+    private static boolean isLastChildByTopographicalSort(Vertex<?> child, Vertex<?> parent) {
         Optional<Vertex> last = parent.getChildren().stream()
             .max(Comparator.comparing(Vertex::getId));
 
