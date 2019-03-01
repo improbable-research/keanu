@@ -13,6 +13,7 @@ import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
+import org.apache.commons.math3.special.Gamma;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -1229,24 +1230,52 @@ public class DoubleTensorTest {
 
     @Test
     public void canBasicTrig() {
-        DoubleTensor trigFriendlyTensor = DoubleTensor.linspace(0.1, 0.9, 4).reshape(2, 2);
-        assertUnaryOperation(Math::sin, DoubleTensor::sin, trigFriendlyTensor);
-        assertUnaryOperation(Math::cos, DoubleTensor::cos, trigFriendlyTensor);
-        assertUnaryOperation(Math::tan, DoubleTensor::tan, trigFriendlyTensor);
-        assertUnaryOperation(Math::asin, DoubleTensor::asin, trigFriendlyTensor);
-        assertUnaryOperation(Math::acos, DoubleTensor::acos, trigFriendlyTensor);
-        assertUnaryOperation(Math::atan, DoubleTensor::atan, trigFriendlyTensor);
+        assertUnaryOperation(Math::sin, DoubleTensor::sin, tensorBetween0And1());
+        assertUnaryOperation(Math::sin, DoubleTensor::sinInPlace, tensorBetween0And1());
+        assertUnaryOperation(Math::cos, DoubleTensor::cos, tensorBetween0And1());
+        assertUnaryOperation(Math::cos, DoubleTensor::cosInPlace, tensorBetween0And1());
+        assertUnaryOperation(Math::tan, DoubleTensor::tan, tensorBetween0And1());
+        assertUnaryOperation(Math::tan, DoubleTensor::tanInPlace, tensorBetween0And1());
+        assertUnaryOperation(Math::asin, DoubleTensor::asin, tensorBetween0And1());
+        assertUnaryOperation(Math::asin, DoubleTensor::asinInPlace, tensorBetween0And1());
+        assertUnaryOperation(Math::acos, DoubleTensor::acos, tensorBetween0And1());
+        assertUnaryOperation(Math::acos, DoubleTensor::acosInPlace, tensorBetween0And1());
+        assertUnaryOperation(Math::atan, DoubleTensor::atan, tensorBetween0And1());
+        assertUnaryOperation(Math::atan, DoubleTensor::atanInPlace, tensorBetween0And1());
+    }
+
+    private DoubleTensor tensorBetween0And1() {
+        return DoubleTensor.linspace(0.1, 0.9, 4).reshape(2, 2);
+    }
+
+    @Test
+    public void canBasicUnaryOps() {
+        assertUnaryOperation(Math::exp, DoubleTensor::exp, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::exp, DoubleTensor::expInPlace, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::abs, DoubleTensor::abs, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::abs, DoubleTensor::absInPlace, tensorRangeWithNegatives());
+        assertUnaryOperation(Gamma::digamma, DoubleTensor::digamma, tensorRangeWithNegatives());
+        assertUnaryOperation(Gamma::digamma, DoubleTensor::digammaInPlace, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::ceil, DoubleTensor::ceil, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::ceil, DoubleTensor::ceilInPlace, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::floor, DoubleTensor::floor, tensorRangeWithNegatives());
+        assertUnaryOperation(Math::floor, DoubleTensor::floorInPlace, tensorRangeWithNegatives());
+        assertUnaryOperation(Gamma::logGamma, DoubleTensor::logGamma, tensorBetween0And1());
+        assertUnaryOperation(Gamma::logGamma, DoubleTensor::logGammaInPlace, tensorBetween0And1());
+    }
+
+    private DoubleTensor tensorRangeWithNegatives() {
+        return DoubleTensor.linspace(-0.9, 0.9, 4).reshape(2, 2);
     }
 
     @Test
     public void canSigmoid() {
         final Sigmoid sigmoid = new Sigmoid();
-        assertUnaryOperation(sigmoid::value, DoubleTensor::sigmoid, matrixA);
+        assertUnaryOperation(sigmoid::value, DoubleTensor::sigmoid, DoubleTensor.arange(1, 5).reshape(2, 2));
+        assertUnaryOperation(sigmoid::value, DoubleTensor::sigmoidInPlace, DoubleTensor.arange(1, 5).reshape(2, 2));
     }
 
     private void assertUnaryOperation(Function<Double, Double> unaryOp, Function<DoubleTensor, DoubleTensor> tensorOp, DoubleTensor input) {
-
-        DoubleTensor output = tensorOp.apply(input);
 
         double[] expectedBuffer = new double[Ints.checkedCast(input.getLength())];
         double[] inputBuffer = input.asFlatDoubleArray();
@@ -1255,9 +1284,9 @@ public class DoubleTensorTest {
             expectedBuffer[i] = unaryOp.apply(inputBuffer[i]);
         }
 
+        DoubleTensor output = tensorOp.apply(input);
         DoubleTensor expected = DoubleTensor.create(expectedBuffer, input.getShape());
 
-        assertArrayEquals(new double[2], new double[2], 1e-6);
         assertTrue(expected.equalsWithinEpsilon(output, 1e-6));
     }
 
