@@ -103,6 +103,8 @@ public interface Tensor<T> {
 
     Tensor<T> reshape(long... newShape);
 
+    Tensor<T> permute(int... rearrange);
+
     FlattenedView<T> getFlattenedView();
 
     interface FlattenedView<T> {
@@ -120,7 +122,7 @@ public interface Tensor<T> {
         return Arrays.asList(asFlatArray());
     }
 
-    default boolean isLengthOne(){
+    default boolean isLengthOne() {
         return getLength() == 1;
     }
 

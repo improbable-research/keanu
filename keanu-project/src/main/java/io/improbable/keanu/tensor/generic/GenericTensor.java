@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.generic;
 
+import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -209,6 +210,31 @@ public class GenericTensor<T> implements Tensor<T> {
                 + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
         }
         return new GenericTensor<>(data, newShape);
+    }
+
+    @Override
+    public Tensor<T> permute(int... rearrange) {
+
+        long[] resultShape = TensorShape.getPermutedResultShape(shape, rearrange);
+        long[] resultStride = TensorShape.getRowFirstStride(resultShape);
+        T[] newBuffer = Arrays.copyOf(data, data.length);
+
+        for (int i = 0; i < data.length; i++) {
+
+            long[] shapeIndices = TensorShape.getShapeIndices(shape, stride, i);
+
+            long[] permutedIndex = new long[shapeIndices.length];
+
+            for (int p = 0; p < permutedIndex.length; p++) {
+                permutedIndex[p] = shapeIndices[rearrange[p]];
+            }
+
+            int j = Ints.checkedCast(TensorShape.getFlatIndex(resultShape, resultStride, permutedIndex));
+
+            newBuffer[j] = data[i];
+        }
+
+        return new GenericTensor<>(newBuffer, resultShape);
     }
 
     @Override

@@ -98,6 +98,14 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor permute(int... rearrange) {
+        if (rearrange.length > shape.length) {
+            throw new IllegalArgumentException("Cannot permute " + Arrays.toString(rearrange) + " on shape " + Arrays.toString(shape));
+        }
+        return new ScalarIntegerTensor(value, shape);
+    }
+
+    @Override
     public IntegerTensor diag() {
         return duplicate();
     }

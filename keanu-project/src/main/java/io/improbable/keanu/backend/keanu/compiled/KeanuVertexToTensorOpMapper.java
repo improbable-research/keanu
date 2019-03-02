@@ -50,6 +50,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPermuteVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerReshapeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
@@ -121,6 +122,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(IntegerSumVertex.class, KeanuVertexToTensorOpMapper::sumIntegerOp);
         opMappers.put(IntegerReshapeVertex.class, KeanuVertexToTensorOpMapper::reshapeIntegerOp);
         opMappers.put(IntegerSliceVertex.class, KeanuVertexToTensorOpMapper::sliceIntegerOp);
+        opMappers.put(IntegerPermuteVertex.class, KeanuVertexToTensorOpMapper::permuteIntegerOp);
 
         opMappers.put(IntegerMaxVertex.class, binaryOp("IntegerTensor.max(%s,%s)"));
         opMappers.put(IntegerMinVertex.class, binaryOp("IntegerTensor.min(%s,%s)"));
@@ -243,6 +245,11 @@ public class KeanuVertexToTensorOpMapper {
 
     private static String permuteDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         PermuteVertex permuteVertex = (PermuteVertex) vertex;
+        return permuteOp(permuteVertex.getRearrange(), permuteVertex.getInputVertex(), lookup);
+    }
+
+    private static String permuteIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        IntegerPermuteVertex permuteVertex = (IntegerPermuteVertex) vertex;
         return permuteOp(permuteVertex.getRearrange(), permuteVertex.getInputVertex(), lookup);
     }
 
