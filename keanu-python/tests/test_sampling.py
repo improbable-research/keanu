@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 
 from examples import thermometers
-from keanu import BayesNet, KeanuRandom, Model, set_deterministic_state
+from keanu import BayesNet, KeanuRandom, Model
 from keanu.algorithm import (sample, generate_samples, AcceptanceRateTracker, MetropolisHastingsSampler, NUTSSampler,
                              ForwardSampler, PosteriorSamplingAlgorithm)
 from keanu.vertex import Gamma, Exponential, Gaussian, Cauchy

@@ -43,22 +43,28 @@ def test_it_throws_if_you_specify_multivariate_gaussian_without_values_for_laten
 
 
 def test_it_throws_if_you_specify_multivariate_gaussian_without_a_value_for_sigma(net: BayesNet) -> None:
-    with pytest.raises(TypeError, match=r"Multivariate Gaussian Proposal Distribution requires a sigma value for each latent"):
+    with pytest.raises(
+            TypeError, match=r"Multivariate Gaussian Proposal Distribution requires a sigma value for each latent"):
         ProposalDistribution("multivariate_gaussian", latents=list(net.iter_latent_vertices()))
 
 
 def test_it_throws_if_you_specify_multivariate_gaussian_a_sigma_that_is_not_a_list(net: BayesNet) -> None:
-    with pytest.raises(TypeError, match=r"Multivariate Gaussian Proposal Distribution requires a sigma value for each latent"):
-        ProposalDistribution("multivariate_gaussian", latents=list(net.iter_latent_vertices()), sigma=np.array([1., 2.]))
+    with pytest.raises(
+            TypeError, match=r"Multivariate Gaussian Proposal Distribution requires a sigma value for each latent"):
+        ProposalDistribution(
+            "multivariate_gaussian", latents=list(net.iter_latent_vertices()), sigma=np.array([1., 2.]))
 
 
 def test_it_throws_if_you_specify_multivariate_gaussian_with_not_enough_sigmas_for_each_latent(net: BayesNet) -> None:
-    with pytest.raises(TypeError, match=r"Multivariate Gaussian Proposal Distribution requires a sigma value for each latent"):
+    with pytest.raises(
+            TypeError, match=r"Multivariate Gaussian Proposal Distribution requires a sigma value for each latent"):
         ProposalDistribution("multivariate_gaussian", latents=list(net.iter_latent_vertices()), sigma=[1.])
 
 
-def test_it_throws_if_you_specify_multivariate_gaussian_with_a_list_of_non_tensor_arg_types_as_sigma(net: BayesNet) -> None:
-    with pytest.raises(TypeError, match=r"Multivariate Gaussian Proposal Distribution requires a sigma value for each latent"):
+def test_it_throws_if_you_specify_multivariate_gaussian_with_a_list_of_non_tensor_arg_types_as_sigma(
+        net: BayesNet) -> None:
+    with pytest.raises(
+            TypeError, match=r"Multivariate Gaussian Proposal Distribution requires a sigma value for each latent"):
         ProposalDistribution("multivariate_gaussian", latents=list(net.iter_latent_vertices()), sigma=[[1.], [2.]])
 
 
