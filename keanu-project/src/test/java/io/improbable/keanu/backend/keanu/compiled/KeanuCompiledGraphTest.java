@@ -6,6 +6,8 @@ import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -33,34 +35,49 @@ public class KeanuCompiledGraphTest {
 
     @Test
     public void compilesAddition() {
-        assertBinaryMatches(DoubleVertex::plus);
+        assertBinaryDoubleMatches(DoubleVertex::plus);
     }
 
     @Test
     public void compilesSubtraction() {
-        assertBinaryMatches(DoubleVertex::minus);
+        assertBinaryDoubleMatches(DoubleVertex::minus);
     }
 
     @Test
     public void compilesMultiplication() {
-        assertBinaryMatches(DoubleVertex::times);
+        assertBinaryDoubleMatches(DoubleVertex::times);
     }
 
     @Test
     public void compilesDivision() {
-        assertBinaryMatches(DoubleVertex::div);
+        assertBinaryDoubleMatches(DoubleVertex::div);
+    }
+
+    @Test
+    public void compilesATan2() {
+        assertBinaryDoubleMatches(DoubleVertex::atan2);
+    }
+
+    @Test
+    public void compilesPow() {
+        assertBinaryDoubleMatches(DoubleVertex::pow);
+    }
+
+    @Test
+    public void compilesMatrixMultiply() {
+        assertBinaryDoubleMatches(new long[]{2, 3}, new long[]{3, 2}, DoubleVertex::matrixMultiply);
     }
 
     @Test
     public void compilesSeveralChainedOpsWithConstant() {
-        assertBinaryMatches((a, b) -> a.plus(b).times(b).div(2).minus(a));
+        assertBinaryDoubleMatches((a, b) -> a.plus(b).times(b).div(2).minus(a));
     }
 
-    private void assertBinaryMatches(BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
-        assertBinaryMatches(new long[0], new long[0], op);
+    private void assertBinaryDoubleMatches(BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+        assertBinaryDoubleMatches(new long[0], new long[0], op);
     }
 
-    private void assertBinaryMatches(long[] shapeA, long[] shapeB, BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+    private void assertBinaryDoubleMatches(long[] shapeA, long[] shapeB, BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
 
         GaussianVertex A = new GaussianVertex(shapeA, 0, 1);
@@ -108,35 +125,86 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
-    public void compilesSum() {
-        assertUnaryMatches(new long[]{2, 2}, DoubleVertex::sum);
-        assertUnaryMatches(new long[]{2, 2}, (a) -> a.sum(0));
-        assertUnaryMatches(new long[]{2, 2}, (a) -> a.sum(1));
+    public void canReshapeDouble() {
+        assertUnaryDoubleMatches(new long[]{3, 4}, (a) -> a.reshape(6, 2));
     }
 
     @Test
-    public void compilesLog() {
-        assertUnaryMatches(DoubleVertex::abs);
-        assertUnaryMatches(DoubleVertex::cos);
-        assertUnaryMatches(DoubleVertex::exp);
-        assertUnaryMatches(DoubleVertex::log);
-        assertUnaryMatches(DoubleVertex::logGamma);
-        assertUnaryMatches(DoubleVertex::sin);
-        assertUnaryMatches(DoubleVertex::tan);
+    public void compilesSum() {
+        assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::sum);
+        assertUnaryDoubleMatches(new long[]{2, 2}, (a) -> a.sum(0));
+        assertUnaryDoubleMatches(new long[]{2, 2}, (a) -> a.sum(1));
     }
 
-    private void assertUnaryMatches(Function<DoubleVertex, DoubleVertex> op) {
-        assertUnaryMatches(new long[0], op);
-        assertUnaryMatches(new long[]{2}, op);
-        assertUnaryMatches(new long[]{2, 2}, op);
+    @Test
+    public void compilesSimpleUnaryOps() {
+        assertUnaryDoubleMatches(DoubleVertex::abs);
+        assertUnaryDoubleMatches(DoubleVertex::cos);
+        assertUnaryDoubleMatches(DoubleVertex::acos);
+        assertUnaryDoubleMatches(DoubleVertex::exp);
+        assertUnaryDoubleMatches(DoubleVertex::log);
+        assertUnaryDoubleMatches(DoubleVertex::logGamma);
+        assertUnaryDoubleMatches(DoubleVertex::sin);
+        assertUnaryDoubleMatches(DoubleVertex::asin);
+        assertUnaryDoubleMatches(DoubleVertex::tan);
+        assertUnaryDoubleMatches(DoubleVertex::atan);
+        assertUnaryDoubleMatches(DoubleVertex::ceil);
+        assertUnaryDoubleMatches(DoubleVertex::floor);
+        assertUnaryDoubleMatches(DoubleVertex::round);
+        assertUnaryDoubleMatches(DoubleVertex::sigmoid);
     }
 
-    private void assertUnaryMatches(long[] shape, Function<DoubleVertex, DoubleVertex> op) {
+    @Test
+    public void compilesSquareMatrices() {
+        assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::matrixDeterminant);
+        assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::matrixInverse);
+    }
+
+    private void assertUnaryDoubleMatches(Function<DoubleVertex, DoubleVertex> op) {
+        assertUnaryDoubleMatches(new long[0], op);
+        assertUnaryDoubleMatches(new long[]{2}, op);
+        assertUnaryDoubleMatches(new long[]{2, 2}, op);
+    }
+
+    private void assertUnaryDoubleMatches(long[] shape, Function<DoubleVertex, DoubleVertex> op) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
 
         UniformVertex A = new UniformVertex(shape, 0, 1);
 
         DoubleVertex C = op.apply(A);
+
+        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
+
+        ComputableGraph computableGraph = compiler.build();
+
+        Map<VariableReference, Object> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+
+        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+
+        assertEquals(C.getValue(), result.get(C.getReference()));
+    }
+
+    @Test
+    public void canReshapeInteger() {
+        assertUnaryIntegerMatches(new long[]{3, 4}, (a) -> a.reshape(6, 2));
+    }
+
+    @Test
+    public void compilesSimpleUnaryIntegerOps() {
+        assertUnaryIntegerMatches(IntegerVertex::abs);
+    }
+
+    private void assertUnaryIntegerMatches(Function<IntegerVertex, IntegerVertex> op) {
+        assertUnaryIntegerMatches(new long[0], op);
+    }
+
+    private void assertUnaryIntegerMatches(long[] shape, Function<IntegerVertex, IntegerVertex> op) {
+        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
+
+        UniformIntVertex A = new UniformIntVertex(shape, 0, 1);
+
+        IntegerVertex C = op.apply(A);
 
         compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
 

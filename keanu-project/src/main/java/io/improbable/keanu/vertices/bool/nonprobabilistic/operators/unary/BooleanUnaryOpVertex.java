@@ -24,7 +24,7 @@ public abstract class BooleanUnaryOpVertex<T extends Tensor> extends BooleanVert
     }
 
     @SaveVertexParam(INPUT_NAME)
-    public Vertex<T> getInput() {
+    public Vertex<T> getInputVertex() {
         return a;
     }
 

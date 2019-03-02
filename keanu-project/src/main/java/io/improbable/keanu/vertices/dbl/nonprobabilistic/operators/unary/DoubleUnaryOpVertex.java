@@ -33,6 +33,7 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
     }
 
     @SaveVertexParam(INPUT_VERTEX_NAME)
+    @Override
     public DoubleVertex getInputVertex() {
         return inputVertex;
     }
@@ -40,10 +41,6 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
     @Override
     public DoubleTensor calculate() {
         return op(inputVertex.getValue());
-    }
-
-    public DoubleVertex getInput() {
-        return inputVertex;
     }
 
     protected abstract DoubleTensor op(DoubleTensor value);

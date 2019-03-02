@@ -33,12 +33,6 @@ public abstract class IntegerUnaryOpVertex extends IntegerVertex implements NonP
     }
 
     @Override
-    public IntegerVertex getInput() {
-        return inputVertex;
-    }
-
-
-    @Override
     public IntegerTensor calculate() {
         return op(inputVertex.getValue());
     }
