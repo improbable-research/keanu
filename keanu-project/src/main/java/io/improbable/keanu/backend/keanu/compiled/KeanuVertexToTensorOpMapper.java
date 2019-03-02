@@ -140,7 +140,11 @@ public class KeanuVertexToTensorOpMapper {
     }
 
     public static OpMapper getOpMapperFor(Class<?> clazz) {
-        return opMappers.get(clazz);
+        OpMapper opMapper = opMappers.get(clazz);
+        if (opMapper == null) {
+            throw new IllegalArgumentException("No mapper for " + clazz.getCanonicalName());
+        }
+        return opMapper;
     }
 
     private static OpMapper fluentBinaryOp(String methodName) {
