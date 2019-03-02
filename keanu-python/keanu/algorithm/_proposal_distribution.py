@@ -41,7 +41,7 @@ class ProposalDistribution(JavaObjectWrapper):
                 raise TypeError("Multivariate Gaussian Proposal Distribution requires values for latents")
             if not isinstance(sigma, list) or len(sigma) < 0 or len(sigma) != len(latents) or not isinstance(
                     sigma[0], runtime_tensor_arg_types):
-                raise TypeError("Multivariate Gaussian Proposal Distribution requires a sigma value for each latent")
+                raise TypeError("Multivariate Gaussian Proposal Distribution requires a list of sigmas for each latent")
 
             sigma_as_tensors = [Tensor(s) for s in sigma]
             args.append(k.to_java_map(dict(zip(latents, sigma_as_tensors))))
