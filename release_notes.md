@@ -1,6 +1,12 @@
 ## Version 0.0.22
 
-## Python
+### Common
+
+* Added `MultivariateGaussianProposalDistribution`. It assumes a diagonal covariance matrix.
+  * Example in Python:
+    * `MetropolisHastingsSampler(proposal_distribution='multivariate_gaussian', latents=[v1, v2], proposal_distribution_sigma=[1., np.array([[1., 2.], [3., 4.]]))`
+
+### Python
 
 * Improved performance of getting samples by coercing them into a `Tensor` in Java (instead of iterating through an `ArrayList`).
 
