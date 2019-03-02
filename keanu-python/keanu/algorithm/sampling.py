@@ -40,7 +40,7 @@ class ForwardSampler(PosteriorSamplingAlgorithm):
 
 class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
     """
-    :param proposal_distribution: The proposal distribution for Metropolis Hastings. Options are 'gaussian' and 'prior'.
+    :param proposal_distribution: The proposal distribution for Metropolis Hastings. Options are 'gaussian', 'multivariate_gaussian' and 'prior'.
     :param latents: All latent vertices.
     :param proposal_listeners: Listeners for proposal creation and rejection. Options are :class:`keanu.algorithm.AcceptanceRateTracker`.
     :param proposal_distribution_sigma: Parameter sigma for 'gaussian' proposal distribution or multiple sigmas for 'multivariate_gaussian'
