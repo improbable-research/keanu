@@ -46,7 +46,7 @@ public class KeanuCompiledProbabilisticGraphTest {
     }
 
     @Test
-    public void canSumUniformIntegers() {
+    public void canSumUniformIntAndPoissonAndMixWithDoubleObservation() {
         PoissonVertex A = new PoissonVertex(1);
         UniformIntVertex B = new UniformIntVertex(0, 10);
 

@@ -12,12 +12,17 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Additi
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanMaskVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleGreaterThanOrEqualToMaskVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanMaskVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleLessThanOrEqualToMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
@@ -72,28 +77,35 @@ public class KeanuVertexToTensorOpMapper {
         opMappers = new HashMap<>();
 
         //Double ops
-        opMappers.put(AdditionVertex.class, fluentBinaryOp("plus"));
-        opMappers.put(DifferenceVertex.class, fluentBinaryOp("minus"));
-        opMappers.put(DivisionVertex.class, fluentBinaryOp("div"));
-        opMappers.put(MultiplicationVertex.class, fluentBinaryOp("times"));
+        opMappers.put(AdditionVertex.class, fluentBinaryOp("plus", "plusInPlace"));
+        opMappers.put(DifferenceVertex.class, fluentBinaryOp("minus", "minusInPlace"));
+        opMappers.put(DivisionVertex.class, fluentBinaryOp("div", "divInPlace"));
+        opMappers.put(MultiplicationVertex.class, fluentBinaryOp("times", "timesInPlace"));
         opMappers.put(MatrixMultiplicationVertex.class, fluentBinaryOp("matrixMultiply"));
-        opMappers.put(PowerVertex.class, fluentBinaryOp("pow"));
-        opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2"));
+        opMappers.put(PowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
+        opMappers.put(ArcTan2Vertex.class, fluentBinaryOp("atan2", "atan2InPlace"));
 
-        opMappers.put(AbsVertex.class, fluentUnaryOp("abs"));
-        opMappers.put(CosVertex.class, fluentUnaryOp("cos"));
-        opMappers.put(ArcCosVertex.class, fluentUnaryOp("acos"));
-        opMappers.put(ExpVertex.class, fluentUnaryOp("exp"));
-        opMappers.put(LogVertex.class, fluentUnaryOp("log"));
-        opMappers.put(LogGammaVertex.class, fluentUnaryOp("logGamma"));
-        opMappers.put(SinVertex.class, fluentUnaryOp("sin"));
-        opMappers.put(ArcSinVertex.class, fluentUnaryOp("asin"));
-        opMappers.put(TanVertex.class, fluentUnaryOp("tan"));
-        opMappers.put(ArcTanVertex.class, fluentUnaryOp("atan"));
-        opMappers.put(CeilVertex.class, fluentUnaryOp("ceil"));
-        opMappers.put(FloorVertex.class, fluentUnaryOp("floor"));
-        opMappers.put(RoundVertex.class, fluentUnaryOp("round"));
-        opMappers.put(SigmoidVertex.class, fluentUnaryOp("sigmoid"));
+        opMappers.put(DoubleGreaterThanOrEqualToMaskVertex.class, fluentBinaryOp("getGreaterThanOrEqualToMask"));
+        opMappers.put(DoubleGreaterThanMaskVertex.class, fluentBinaryOp("getGreaterThanMask"));
+        opMappers.put(DoubleLessThanOrEqualToMaskVertex.class, fluentBinaryOp("getLessThanOrEqualToMask"));
+        opMappers.put(DoubleLessThanMaskVertex.class, fluentBinaryOp("getLessThanMask"));
+
+        opMappers.put(DoubleSetWithMaskVertex.class, KeanuVertexToTensorOpMapper::setWithMaskDoubleOp);
+
+        opMappers.put(AbsVertex.class, fluentUnaryOp("abs", "absInPlace"));
+        opMappers.put(CosVertex.class, fluentUnaryOp("cos", "cosInPlace"));
+        opMappers.put(ArcCosVertex.class, fluentUnaryOp("acos", "acosInPlace"));
+        opMappers.put(ExpVertex.class, fluentUnaryOp("exp", "expInPlace"));
+        opMappers.put(LogVertex.class, fluentUnaryOp("log", "logInPlace"));
+        opMappers.put(LogGammaVertex.class, fluentUnaryOp("logGamma", "logGammaInPlace"));
+        opMappers.put(SinVertex.class, fluentUnaryOp("sin", "sinInPlace"));
+        opMappers.put(ArcSinVertex.class, fluentUnaryOp("asin", "asinInPlace"));
+        opMappers.put(TanVertex.class, fluentUnaryOp("tan", "tanInPlace"));
+        opMappers.put(ArcTanVertex.class, fluentUnaryOp("atan", "atanInPlace"));
+        opMappers.put(CeilVertex.class, fluentUnaryOp("ceil", "ceilInPlace"));
+        opMappers.put(FloorVertex.class, fluentUnaryOp("floor", "floorInPlace"));
+        opMappers.put(RoundVertex.class, fluentUnaryOp("round", "roundInPlace"));
+        opMappers.put(SigmoidVertex.class, fluentUnaryOp("sigmoid", "sigmoidInPlace"));
 
         opMappers.put(MatrixDeterminantVertex.class, unaryOp("DoubleTensor.scalar(%s.determinant())"));
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));
@@ -112,11 +124,11 @@ public class KeanuVertexToTensorOpMapper {
         //Integer ops
         opMappers.put(IntegerAbsVertex.class, fluentUnaryOp("abs"));
 
-        opMappers.put(IntegerMultiplicationVertex.class, fluentBinaryOp("times"));
-        opMappers.put(IntegerAdditionVertex.class, fluentBinaryOp("plus"));
-        opMappers.put(IntegerDifferenceVertex.class, fluentBinaryOp("minus"));
-        opMappers.put(IntegerDivisionVertex.class, fluentBinaryOp("divideBy"));
-        opMappers.put(IntegerPowerVertex.class, fluentBinaryOp("pow"));
+        opMappers.put(IntegerMultiplicationVertex.class, fluentBinaryOp("times", "timesInPlace"));
+        opMappers.put(IntegerAdditionVertex.class, fluentBinaryOp("plus", "plusInPlace"));
+        opMappers.put(IntegerDifferenceVertex.class, fluentBinaryOp("minus", "minusInPlace"));
+        opMappers.put(IntegerDivisionVertex.class, fluentBinaryOp("divideBy", "divideByInPlace"));
+        opMappers.put(IntegerPowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
 
         opMappers.put(IntegerConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatOpInteger);
         opMappers.put(IntegerSumVertex.class, KeanuVertexToTensorOpMapper::sumIntegerOp);
@@ -141,13 +153,17 @@ public class KeanuVertexToTensorOpMapper {
 
     public static OpMapper getOpMapperFor(Class<?> clazz) {
         OpMapper opMapper = opMappers.get(clazz);
-        if (opMapper == null) {
-            throw new IllegalArgumentException("No mapper for " + clazz.getCanonicalName());
-        }
+//        if (opMapper == null) {
+//            throw new IllegalArgumentException("No mapper for " + clazz.getCanonicalName());
+//        }
         return opMapper;
     }
 
     private static OpMapper fluentBinaryOp(String methodName) {
+        return fluentBinaryOp(methodName, methodName);
+    }
+
+    private static OpMapper fluentBinaryOp(String methodName, String inPlaceMethodName) {
         return (vertex, lookup) -> {
             VertexBinaryOp<?, ?> binaryOpVertex = (VertexBinaryOp<?, ?>) vertex;
             Vertex<?> left = binaryOpVertex.getLeft();
@@ -156,7 +172,7 @@ public class KeanuVertexToTensorOpMapper {
             KeanuCompiledVariable leftVariable = lookup.get(left.getReference());
             KeanuCompiledVariable rightVariable = lookup.get(right.getReference());
             boolean doInPlace = leftVariable.isMutable() && isLastChildByTopographicalSort(vertex, left) && ENABLE_IN_PLACE;
-            String call = doInPlace ? methodName + "InPlace" : methodName;
+            String call = doInPlace ? inPlaceMethodName : methodName;
 
             return leftVariable.getName() + "." + call + "(" + rightVariable.getName() + ")";
 
@@ -174,6 +190,10 @@ public class KeanuVertexToTensorOpMapper {
     }
 
     private static OpMapper fluentUnaryOp(String methodName) {
+        return fluentUnaryOp(methodName, methodName);
+    }
+
+    private static OpMapper fluentUnaryOp(String methodName, String inPlaceMethodName) {
         return (vertex, lookup) -> {
             VertexUnaryOp unaryOpVertex = (VertexUnaryOp) vertex;
             Vertex<?> input = unaryOpVertex.getInputVertex();
@@ -181,7 +201,7 @@ public class KeanuVertexToTensorOpMapper {
             KeanuCompiledVariable inputVariable = lookup.get(input.getReference());
             boolean doInPlace = inputVariable.isMutable() && isLastChildByTopographicalSort(vertex, input) && ENABLE_IN_PLACE;
 
-            String call = doInPlace ? methodName + "InPlace" : methodName;
+            String call = doInPlace ? inPlaceMethodName : methodName;
 
             return inputVariable.getName() + "." + call + "()";
         };
@@ -211,6 +231,19 @@ public class KeanuVertexToTensorOpMapper {
 
             return String.format(format, leftVariable.getName(), rightVariable.getName());
         };
+    }
+
+    private static String setWithMaskDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        DoubleSetWithMaskVertex setWithMaskVertex = (DoubleSetWithMaskVertex) vertex;
+        Vertex mask = setWithMaskVertex.getMask();
+        Vertex operand = setWithMaskVertex.getOperand();
+        Vertex setValue = setWithMaskVertex.getSetValue();
+
+        String operandName = lookup.get(operand.getId()).getName();
+        String maskName = lookup.get(mask.getId()).getName();
+        String setValueName = lookup.get(setValue.getId()).getName();
+
+        return operandName + ".setWithMask(" + maskName + "," + setValueName + ".scalar())";
     }
 
     private static String reshapeDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
