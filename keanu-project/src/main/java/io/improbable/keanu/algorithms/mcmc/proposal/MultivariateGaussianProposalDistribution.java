@@ -13,8 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Assumes variables are independent. Instead of using a Multivariate Gaussian pdf,
- * this proposal computes the product of multiple Univariate Gaussian pdfs.
+ * Assumes the covariance of Multivariate Gaussian proposal distribution is diagonal.
+ * An n-dimensional Multivariate Gaussian with mean [mu_1, ..., mu_n] and diagonal covariance matrix diag(sigma_1^2, ..., sigma_n^2)
+ * has the same logpdf as a sum of logpdfs of n independent Univariate Gaussian random variables with mean mu_i and variance sigma_i.
  */
 public class MultivariateGaussianProposalDistribution implements ProposalDistribution {
 
