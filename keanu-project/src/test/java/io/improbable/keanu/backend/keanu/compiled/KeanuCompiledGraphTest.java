@@ -130,6 +130,11 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canSliceDouble() {
+        assertUnaryDoubleMatches(new long[]{3, 4}, (a) -> a.slice(1, 2));
+    }
+
+    @Test
     public void compilesSum() {
         assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::sum);
         assertUnaryDoubleMatches(new long[]{2, 2}, (a) -> a.sum(0));
@@ -188,6 +193,11 @@ public class KeanuCompiledGraphTest {
     @Test
     public void canReshapeInteger() {
         assertUnaryIntegerMatches(new long[]{3, 4}, (a) -> a.reshape(6, 2));
+    }
+
+    @Test
+    public void canSliceInteger() {
+        assertUnaryIntegerMatches(new long[]{3, 4}, (a) -> a.slice(1, 2));
     }
 
     @Test

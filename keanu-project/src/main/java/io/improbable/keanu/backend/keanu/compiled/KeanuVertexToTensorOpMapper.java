@@ -30,10 +30,12 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGamm
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.PermuteVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -49,6 +51,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerReshapeVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 
 import java.util.Arrays;
@@ -96,7 +99,9 @@ public class KeanuVertexToTensorOpMapper {
 
         opMappers.put(ConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatOpDouble);
         opMappers.put(SumVertex.class, KeanuVertexToTensorOpMapper::sumDoubleOp);
-        opMappers.put(ReshapeVertex.class, KeanuVertexToTensorOpMapper::reshapeDoubleOp)
+        opMappers.put(ReshapeVertex.class, KeanuVertexToTensorOpMapper::reshapeDoubleOp);
+        opMappers.put(PermuteVertex.class, KeanuVertexToTensorOpMapper::permuteDoubleOp);
+        opMappers.put(SliceVertex.class, KeanuVertexToTensorOpMapper::sliceDoubleOp);
         ;
         opMappers.put(MaxVertex.class, binaryOp("DoubleTensor.max(%s,%s)"));
         opMappers.put(MinVertex.class, binaryOp("DoubleTensor.min(%s,%s)"));
@@ -104,16 +109,18 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(CastToDoubleVertex.class, fluentUnaryOp("toDouble"));
 
         //Integer ops
+        opMappers.put(IntegerAbsVertex.class, fluentUnaryOp("abs"));
+
         opMappers.put(IntegerMultiplicationVertex.class, fluentBinaryOp("times"));
         opMappers.put(IntegerAdditionVertex.class, fluentBinaryOp("plus"));
         opMappers.put(IntegerDifferenceVertex.class, fluentBinaryOp("minus"));
         opMappers.put(IntegerDivisionVertex.class, fluentBinaryOp("divideBy"));
-        opMappers.put(IntegerAbsVertex.class, fluentBinaryOp("abs"));
         opMappers.put(IntegerPowerVertex.class, fluentBinaryOp("pow"));
 
         opMappers.put(IntegerConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatOpInteger);
         opMappers.put(IntegerSumVertex.class, KeanuVertexToTensorOpMapper::sumIntegerOp);
         opMappers.put(IntegerReshapeVertex.class, KeanuVertexToTensorOpMapper::reshapeIntegerOp);
+        opMappers.put(IntegerSliceVertex.class, KeanuVertexToTensorOpMapper::sliceIntegerOp);
 
         opMappers.put(IntegerMaxVertex.class, binaryOp("IntegerTensor.max(%s,%s)"));
         opMappers.put(IntegerMinVertex.class, binaryOp("IntegerTensor.min(%s,%s)"));
@@ -217,6 +224,35 @@ public class KeanuVertexToTensorOpMapper {
 
     private static String toJavaArrayCreation(long[] array) {
         return "new long[]{" + Arrays.stream(array).mapToObj(Long::toString).collect(Collectors.joining(",")) + "}";
+    }
+
+    private static String sliceDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        SliceVertex sliceVertex = (SliceVertex) vertex;
+        return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
+    }
+
+    private static String sliceIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        IntegerSliceVertex sliceVertex = (IntegerSliceVertex) vertex;
+        return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
+    }
+
+    private static String sliceOp(int dimension, long index, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        String variableName = lookup.get(inputVertex.getId()).getName();
+        return variableName + ".slice(" + dimension + "," + index + ")";
+    }
+
+    private static String permuteDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        PermuteVertex permuteVertex = (PermuteVertex) vertex;
+        return permuteOp(permuteVertex.getRearrange(), permuteVertex.getInputVertex(), lookup);
+    }
+
+    private static String permuteOp(int[] proposedShape, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        String variableName = lookup.get(inputVertex.getId()).getName();
+        return variableName + ".permute(" + toJavaArrayCreation(proposedShape) + ")";
+    }
+
+    private static String toJavaArrayCreation(int[] array) {
+        return "new int[]{" + Arrays.stream(array).mapToObj(Long::toString).collect(Collectors.joining(",")) + "}";
     }
 
     private static String concatOp(int dimension,
