@@ -122,10 +122,10 @@
 
 <div class="viewcode-block" id="MetropolisHastingsSampler"><a class="viewcode-back" href="../../../keanu.algorithm.html#keanu.algorithm.MetropolisHastingsSampler">[docs]</a><span class="k">class</span> <span class="nc">MetropolisHastingsSampler</span><span class="p">(</span><span class="n">PosteriorSamplingAlgorithm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param proposal_distribution: The proposal distribution for Metropolis Hastings. Options are &#39;gaussian&#39; and &#39;prior&#39;.</span>
+<span class="sd">    :param proposal_distribution: The proposal distribution for Metropolis Hastings. Options are &#39;gaussian&#39;, &#39;multivariate_gaussian&#39; and &#39;prior&#39;.</span>
 <span class="sd">    :param latents: All latent vertices.</span>
 <span class="sd">    :param proposal_listeners: Listeners for proposal creation and rejection. Options are :class:`keanu.algorithm.AcceptanceRateTracker`.</span>
-<span class="sd">    :param proposal_distribution_sigma: Parameter sigma for &#39;gaussian&#39; proposal distribution or multiple sigmas for &#39;multivariate_gaussian&#39;</span>
+<span class="sd">    :param proposal_distribution_sigma: Parameter sigma for &#39;gaussian&#39; proposal distribution or list sigmas for each latent for &#39;multivariate_gaussian&#39; proposal distribution</span>
 
 <span class="sd">    :raises TypeError: If you pass `proposal_listener` without specifying `proposal_distribution`.</span>
 <span class="sd">    :raises TypeError: If you choose &#39;gaussian&#39; as `proposal_distribution` but did not specify a single `proposal_distribution_sigma`.</span>
