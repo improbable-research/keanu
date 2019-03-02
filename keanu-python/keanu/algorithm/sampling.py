@@ -47,7 +47,7 @@ class MetropolisHastingsSampler(PosteriorSamplingAlgorithm):
 
     :raises TypeError: If you pass `proposal_listener` without specifying `proposal_distribution`.
     :raises TypeError: If you choose 'gaussian' as `proposal_distribution` but did not specify a single `proposal_distribution_sigma`.
-    :raises TypeError: If you choose 'multivariate_gaussian' as `proposal_distribution` but not specify a list of sigmas for each latent.
+    :raises TypeError: If you choose 'multivariate_gaussian' as `proposal_distribution` but did not pass latent vertices and a list of sigmas for each latent.
     :raises TypeError: If you choose 'prior' as `proposal_distribution` but did not pass latent vertices.
     """
 
