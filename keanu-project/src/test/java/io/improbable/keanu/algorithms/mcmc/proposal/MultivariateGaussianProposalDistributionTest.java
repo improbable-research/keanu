@@ -7,6 +7,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;
@@ -31,33 +32,55 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class MultivariateGaussianProposalDistributionTest {
 
-    public Proposal proposal;
-    private static final DoubleTensor currentStateForVertex1 = DoubleTensor.create(4.2);
-    private static final DoubleTensor currentStateForVertex2 = DoubleTensor.create(42.0);
+    public Proposal scalarProposal;
+    private static final DoubleTensor scalarCurrentStateForVertex1 = DoubleTensor.create(4.2);
+    private static final DoubleTensor scalarCurrentStateForVertex2 = DoubleTensor.create(42.0);
 
-    private static final DoubleTensor proposedStateForVertex1 = DoubleTensor.create(4.3);
-    private static final DoubleTensor proposedStateForVertex2 = DoubleTensor.create(43.0);
+    private static final DoubleTensor scalarProposedStateForVertex1 = DoubleTensor.create(4.3);
+    private static final DoubleTensor scalarProposedStateForVertex2 = DoubleTensor.create(43.0);
 
-    private static final DoubleTensor sigmaForVertex1 = DoubleTensor.create(1.);
-    private static final DoubleTensor sigmaForVertex2 = DoubleTensor.create(2.);
+    private static final DoubleTensor scalarSigmaForVertex1 = DoubleTensor.create(1.);
+    private static final DoubleTensor scalarSigmaForVertex2 = DoubleTensor.create(2.);
+
+    public Proposal nonScalarProposal;
+    private static final DoubleTensor nonScalarCurrentStateForVertex1 = DoubleTensor.create(4.2, 4.7);
+    private static final DoubleTensor nonScalarCurrentStateForVertex2 = DoubleTensor.create(42.0, 48.0);
+
+    private static final DoubleTensor nonScalarProposedStateForVertex1 = DoubleTensor.create(4.3, 5.8);
+    private static final DoubleTensor nonScalarProposedStateForVertex2 = DoubleTensor.create(43.0, 32.0);
+
+    private static final DoubleTensor nonScalarSigmaForVertex1 = DoubleTensor.create(1., 3.);
+    private static final DoubleTensor nonScalarSigmaForVertex2 = DoubleTensor.create(2., 2.);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Mock
-    private GaussianVertex vertex1;
+    private GaussianVertex scalarVertex1;
     @Mock
-    private GaussianVertex vertex2;
-    private MultivariateGaussianProposalDistribution proposalDistribution;
-    private Map<Variable, DoubleTensor> sigmas;
+    private GaussianVertex scalarVertex2;
+    @Mock
+    private GaussianVertex nonScalarVertex1;
+    @Mock
+    private GaussianVertex nonScalarVertex2;
+
+    private MultivariateGaussianProposalDistribution scalarProposalDistribution;
+    private MultivariateGaussianProposalDistribution nonScalarProposalDistribution;
+    private Map<Variable, DoubleTensor> scalarSigmas;
+    private Map<Variable, DoubleTensor> nonScalarSigmas;
 
     @Before
     public void setUpProposalDistribution() {
-        sigmas = ImmutableMap.of(
-            vertex1, sigmaForVertex1,
-            vertex2, sigmaForVertex2
+        scalarSigmas = ImmutableMap.of(
+            scalarVertex1, scalarSigmaForVertex1,
+            scalarVertex2, scalarSigmaForVertex2
         );
-        proposalDistribution = new MultivariateGaussianProposalDistribution(sigmas);
+        nonScalarSigmas = ImmutableMap.of(
+            nonScalarVertex1, nonScalarSigmaForVertex1,
+            nonScalarVertex2, nonScalarSigmaForVertex2
+        );
+        scalarProposalDistribution = new MultivariateGaussianProposalDistribution(scalarSigmas);
+        nonScalarProposalDistribution = new MultivariateGaussianProposalDistribution(nonScalarSigmas);
     }
 
     @Before
@@ -67,33 +90,55 @@ public class MultivariateGaussianProposalDistributionTest {
 
     @Before
     public void setUpProposal() {
-        when(vertex1.getValue()).thenReturn(currentStateForVertex1);
-        when(vertex2.getValue()).thenReturn(currentStateForVertex2);
+        when(scalarVertex1.getValue()).thenReturn(scalarCurrentStateForVertex1);
+        when(scalarVertex2.getValue()).thenReturn(scalarCurrentStateForVertex2);
 
-        when(vertex1.getShape()).thenReturn(new long[] {});
-        when(vertex2.getShape()).thenReturn(new long[] {});
+        when(scalarVertex1.getShape()).thenReturn(new long[] {});
+        when(scalarVertex2.getShape()).thenReturn(new long[] {});
 
-        proposal = new Proposal();
-        proposal.setProposal(vertex1, proposedStateForVertex1);
-        proposal.setProposal(vertex2, proposedStateForVertex2);
+        scalarProposal = new Proposal();
+        scalarProposal.setProposal(scalarVertex1, scalarProposedStateForVertex1);
+        scalarProposal.setProposal(scalarVertex2, scalarProposedStateForVertex2);
+
+        when(nonScalarVertex1.getValue()).thenReturn(nonScalarCurrentStateForVertex1);
+        when(nonScalarVertex2.getValue()).thenReturn(nonScalarCurrentStateForVertex2);
+
+        when(nonScalarVertex1.getShape()).thenReturn(new long[] {2});
+        when(nonScalarVertex2.getShape()).thenReturn(new long[] {2});
+
+        nonScalarProposal = new Proposal();
+        nonScalarProposal.setProposal(nonScalarVertex1, nonScalarProposedStateForVertex1);
+        nonScalarProposal.setProposal(nonScalarVertex2, nonScalarProposedStateForVertex2);
     }
 
     @Test
     public void theLogProbAtToIsMultivariateGaussian() {
-        double logProb = proposalDistribution.logProbAtToGivenFrom(proposal);
-        DoubleTensor mu = DoubleTensor.concat(currentStateForVertex1, currentStateForVertex2);
-        DoubleTensor cov = DoubleTensor.concat(sigmaForVertex1.pow(2.), sigmaForVertex2.pow(2.)).diag();
-        DoubleTensor x = DoubleTensor.concat(proposedStateForVertex1, proposedStateForVertex2);
+        double logProb = scalarProposalDistribution.logProbAtToGivenFrom(scalarProposal);
+        DoubleTensor mu = DoubleTensor.concat(scalarCurrentStateForVertex1, scalarCurrentStateForVertex2);
+        DoubleTensor cov = DoubleTensor.concat(scalarSigmaForVertex1, scalarSigmaForVertex2).diag().pow(2);
+        DoubleTensor x = DoubleTensor.concat(scalarProposedStateForVertex1, scalarProposedStateForVertex2);
         DoubleTensor expectedLogProb = MultivariateGaussian.withParameters(mu, cov).logProb(x);
         assertThat(logProb, equalTo(expectedLogProb.sum()));
     }
 
     @Test
     public void theLogProbAtFromIsMultivariateGaussian() {
-        double logProb = proposalDistribution.logProbAtFromGivenTo(proposal);
-        DoubleTensor mu = DoubleTensor.concat(proposedStateForVertex1, proposedStateForVertex2);
-        DoubleTensor cov = DoubleTensor.concat(sigmaForVertex1.pow(2.), sigmaForVertex2.pow(2.)).diag();
-        DoubleTensor x = DoubleTensor.concat(currentStateForVertex1, currentStateForVertex2);
+        double logProb = scalarProposalDistribution.logProbAtFromGivenTo(scalarProposal);
+        DoubleTensor mu = DoubleTensor.concat(scalarProposedStateForVertex1, scalarProposedStateForVertex2);
+        DoubleTensor cov = DoubleTensor.concat(scalarSigmaForVertex1.pow(2.), scalarSigmaForVertex2.pow(2.)).diag();
+        DoubleTensor x = DoubleTensor.concat(scalarCurrentStateForVertex1, scalarCurrentStateForVertex2);
+        DoubleTensor expectedLogProb = MultivariateGaussian.withParameters(mu, cov).logProb(x);
+        assertThat(logProb, equalTo(expectedLogProb.sum()));
+    }
+
+    @Test
+    public void theLogProbAtToIsMultivariateGaussian_nonScalar() {
+        double logProb = nonScalarProposalDistribution.logProbAtToGivenFrom(nonScalarProposal);
+
+        DoubleTensor mu = DoubleTensor.concat(nonScalarCurrentStateForVertex1, nonScalarCurrentStateForVertex2);
+        DoubleTensor cov = DoubleTensor.concat(nonScalarSigmaForVertex1, nonScalarSigmaForVertex2).pow(2.).diag();
+        DoubleTensor x = DoubleTensor.concat(nonScalarProposedStateForVertex1, nonScalarProposedStateForVertex2);
+
         DoubleTensor expectedLogProb = MultivariateGaussian.withParameters(mu, cov).logProb(x);
         assertThat(logProb, equalTo(expectedLogProb.sum()));
     }
@@ -103,12 +148,12 @@ public class MultivariateGaussianProposalDistributionTest {
         ProposalListener listener1 = mock(ProposalListener.class);
         ProposalListener listener2 = mock(ProposalListener.class);
         List<ProposalListener> listeners = ImmutableList.of(listener1, listener2);
-        proposalDistribution = new MultivariateGaussianProposalDistribution(sigmas, listeners);
-        Set<Variable> variables = ImmutableSet.of(vertex1, vertex2);
-        Proposal proposal = proposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
+        scalarProposalDistribution = new MultivariateGaussianProposalDistribution(scalarSigmas, listeners);
+        Set<Variable> variables = ImmutableSet.of(scalarVertex1, scalarVertex2);
+        Proposal proposal = scalarProposalDistribution.getProposal(variables, KeanuRandom.getDefaultRandom());
         verify(listener1).onProposalCreated(proposal);
         verify(listener2).onProposalCreated(proposal);
-        proposalDistribution.onProposalRejected();
+        scalarProposalDistribution.onProposalRejected();
         verify(listener1).onProposalRejected(proposal);
         verify(listener2).onProposalRejected(proposal);
         verifyNoMoreInteractions(listener1, listener2);
@@ -117,8 +162,8 @@ public class MultivariateGaussianProposalDistributionTest {
     @Test
     public void itThrowsIfYouUseItOnADiscreteVariable() {
         thrown.expect(IllegalStateException.class);
-        thrown.expectMessage("Multivariate Gaussian proposal function cannot be used for discrete variable");
+        thrown.expectMessage("Multivariate Gaussian scalarProposal function cannot be used for discrete variable");
         PoissonVertex poisson = new PoissonVertex(1.);
-        proposalDistribution.getProposal(ImmutableSet.of(poisson), KeanuRandom.getDefaultRandom());
+        scalarProposalDistribution.getProposal(ImmutableSet.of(poisson), KeanuRandom.getDefaultRandom());
     }
 }
