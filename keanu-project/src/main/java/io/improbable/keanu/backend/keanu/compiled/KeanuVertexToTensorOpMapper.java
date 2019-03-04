@@ -184,7 +184,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(GreaterThanVertex.class, fluentBinaryOp("greaterThan"));
         opMappers.put(LessThanOrEqualVertex.class, fluentBinaryOp("lessThanOrEqualTo"));
         opMappers.put(LessThanVertex.class, fluentBinaryOp("lessThan"));
-        opMappers.put(EqualsVertex.class, fluentBinaryOp("equalTo"));
+        opMappers.put(EqualsVertex.class, fluentBinaryOp("elementwiseEquals"));
         opMappers.put(NotEqualsVertex.class, fluentBinaryOp("notEqualTo"));
 
         opMappers.put(OrBinaryVertex.class, fluentBinaryOp("or"));

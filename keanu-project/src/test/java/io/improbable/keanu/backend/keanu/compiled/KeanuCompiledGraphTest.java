@@ -3,6 +3,8 @@ package io.improbable.keanu.backend.keanu.compiled;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -222,6 +224,70 @@ public class KeanuCompiledGraphTest {
 
         Map<VariableReference, Object> inputs = new HashMap<>();
         inputs.put(A.getReference(), A.getValue());
+
+        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+
+        assertEquals(C.getValue(), result.get(C.getReference()));
+    }
+
+    @Test
+    public void canReshapeBoolean() {
+        assertUnaryBooleanMatches(new long[]{3, 4}, (a) -> a.reshape(6, 2));
+    }
+
+    @Test
+    public void canSliceBoolean() {
+        assertUnaryBooleanMatches(new long[]{3, 4}, (a) -> a.slice(1, 2));
+    }
+
+    @Test
+    public void compilesEqualTo() {
+        assertBinaryBooleanMatches(BooleanVertex::equalTo);
+    }
+
+    @Test
+    public void compilesAnd() {
+        assertBinaryBooleanMatches(BooleanVertex::and);
+    }
+
+    private void assertUnaryBooleanMatches(long[] shape, Function<BooleanVertex, BooleanVertex> op) {
+        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
+
+        BernoulliVertex A = new BernoulliVertex(shape, 0.5);
+
+        BooleanVertex C = op.apply(A);
+
+        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
+
+        ComputableGraph computableGraph = compiler.build();
+
+        Map<VariableReference, Object> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+
+        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+
+        assertEquals(C.getValue(), result.get(C.getReference()));
+    }
+
+    private void assertBinaryBooleanMatches(BiFunction<BooleanVertex, BooleanVertex, BooleanVertex> op) {
+        assertBinaryBooleanMatches(new long[0], new long[0], op);
+    }
+
+    private void assertBinaryBooleanMatches(long[] shapeA, long[] shapeB, BiFunction<BooleanVertex, BooleanVertex, BooleanVertex> op) {
+        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
+
+        BernoulliVertex A = new BernoulliVertex(shapeA, 0.5);
+        BernoulliVertex B = new BernoulliVertex(shapeB, 0.5);
+
+        BooleanVertex C = op.apply(A, B);
+
+        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
+
+        ComputableGraph computableGraph = compiler.build();
+
+        Map<VariableReference, Object> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
 
         Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
 
