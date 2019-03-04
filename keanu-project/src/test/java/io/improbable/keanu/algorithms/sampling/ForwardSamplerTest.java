@@ -139,9 +139,9 @@ public class ForwardSamplerTest {
 
         ProbabilisticModel model = new KeanuProbabilisticModel(Arrays.asList(A, B));
 
-        Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 100);
+        Keanu.Sampling.Forward.withDefaultConfig(random).getPosteriorSamples(model, Arrays.asList(A, B), 20);
 
-        verify(B, times(100)).setValue(DoubleTensor.scalar(0.));
+        verify(B, times(20)).setValue(DoubleTensor.scalar(0.));
     }
 
     @Test
