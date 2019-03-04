@@ -42,6 +42,20 @@ public class KeanuVertexToTensorOpMapperTest {
         assertDoesSupport(supportedVertices);
     }
 
+    @Test
+    public void doesSupportBooleanOperations() {
+
+        Reflections reflections = new Reflections("io.improbable.keanu.vertices.bool.nonprobabilistic");
+
+        Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
+        List<Class<? extends Vertex>> supportedVertices = vertices.stream()
+            .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
+            .filter(v -> !Modifier.isAbstract(v.getModifiers()))
+            .collect(Collectors.toList());
+
+        assertDoesSupport(supportedVertices);
+    }
+
     private void assertDoesSupport(List<Class<? extends Vertex>> supportedVertices) {
         List<Class<? extends Vertex>> unsupportedVertices = supportedVertices.stream()
             .filter(v -> getOpMapperFor(v) == null)
