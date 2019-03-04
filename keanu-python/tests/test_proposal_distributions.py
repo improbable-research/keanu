@@ -59,6 +59,12 @@ def test_it_throws_if_you_specify_multivariate_gaussian_with_not_enough_sigmas_f
         ProposalDistribution("multivariate_gaussian", latents=list(net.iter_latent_vertices()), sigma=[1.])
 
 
+def test_it_throws_if_you_specify_multivariate_gaussian_with_empty_list_of_latents_and_sigma(net: BayesNet) -> None:
+    with pytest.raises(
+            TypeError, match=r"Multivariate Gaussian Proposal Distribution requires a list of sigmas for each latent"):
+        ProposalDistribution("multivariate_gaussian", latents=[], sigma=[])
+
+
 def test_it_throws_if_you_specify_sigma_but_the_type_isnt_gaussian() -> None:
     with pytest.raises(TypeError, match=r'Parameter sigma is not valid unless type is "gaussian"'):
         ProposalDistribution("prior", sigma=1.)
