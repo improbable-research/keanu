@@ -15,6 +15,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanReshapeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanSliceVertex;
@@ -183,6 +184,8 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(GreaterThanVertex.class, fluentBinaryOp("greaterThan"));
         opMappers.put(LessThanOrEqualVertex.class, fluentBinaryOp("lessThanOrEqualTo"));
         opMappers.put(LessThanVertex.class, fluentBinaryOp("lessThan"));
+        opMappers.put(EqualsVertex.class, fluentBinaryOp("equalTo"));
+        opMappers.put(NotEqualsVertex.class, fluentBinaryOp("notEqualTo"));
 
         opMappers.put(OrBinaryVertex.class, fluentBinaryOp("or"));
         opMappers.put(AndBinaryVertex.class, fluentBinaryOp("and"));
