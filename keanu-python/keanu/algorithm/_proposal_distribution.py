@@ -39,7 +39,7 @@ class ProposalDistribution(JavaObjectWrapper):
         elif type_ == "multivariate_gaussian":
             if latents is None:
                 raise TypeError("Multivariate Gaussian Proposal Distribution requires values for latents")
-            if not isinstance(sigma, list) or len(sigma) < 0 or len(sigma) != len(latents) or not isinstance(
+            if not isinstance(sigma, list) or len(sigma) <= 0 or len(sigma) != len(latents) or not isinstance(
                     sigma[0], runtime_tensor_arg_types):
                 raise TypeError("Multivariate Gaussian Proposal Distribution requires a list of sigmas for each latent")
 
