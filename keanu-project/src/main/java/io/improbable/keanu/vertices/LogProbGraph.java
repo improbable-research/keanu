@@ -25,7 +25,11 @@ public class LogProbGraph {
      */
     @Getter
     @Singular
-    private final Map<Vertex<?>, PlaceholderVertex<?>> inputs;
+    private final Map<Vertex<?>, Vertex<?>> inputs;
+
+    public <T> Vertex<T> getInput(Vertex<T> input) {
+        return (Vertex<T>) inputs.get(input);
+    }
 
     /**
      * A vertex representing the result of log probability computation
@@ -37,7 +41,7 @@ public class LogProbGraph {
         return (Vertex<T>) inputs.get(input);
     }
 
-    static public class DoublePlaceholderVertex extends DoubleVertex implements PlaceholderVertex<DoubleTensor>, NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
+    static public class DoublePlaceholderVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, Differentiable, NonSaveableVertex {
 
         public DoublePlaceholderVertex(long... initialShape) {
             super(initialShape);
@@ -50,7 +54,7 @@ public class LogProbGraph {
 
     }
 
-    static public class IntegerPlaceholderVertex extends IntegerVertex implements PlaceholderVertex<IntegerTensor>, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
+    static public class IntegerPlaceholderVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
 
         public IntegerPlaceholderVertex(long... initialShape) {
             super(initialShape);
@@ -63,7 +67,7 @@ public class LogProbGraph {
 
     }
 
-    static public class BooleanPlaceholderVertex extends BooleanVertex implements PlaceholderVertex<BooleanTensor>, NonProbabilistic<BooleanTensor>, Differentiable, NonSaveableVertex {
+    static public class BooleanPlaceholderVertex extends BooleanVertex implements NonProbabilistic<BooleanTensor>, Differentiable, NonSaveableVertex {
 
         public BooleanPlaceholderVertex(long... initialShape) {
             super(initialShape);
@@ -76,8 +80,6 @@ public class LogProbGraph {
 
     }
 
-    private interface PlaceholderVertex<T> {
-    }
 
     private static <T> T getPlaceholderVertexValue(Vertex<T> vertex) {
         if (!vertex.hasValue()) {

@@ -35,10 +35,10 @@ public class MultivariateGaussian implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final double dimensions = numberOfDimensions();
+        final long dimensions = numberOfDimensions();
         final double kLog2Pi = dimensions * LOG_2_PI;
         final double logCovDet = Math.log(covariance.determinant());
-        DoubleTensor xMinusMu = x.minus(mu);
+        DoubleTensor xMinusMu = x.minus(mu).reshape(dimensions, 1);
         DoubleTensor xMinusMuT = xMinusMu.transpose();
         DoubleTensor covInv = covariance.matrixInverse();
 
@@ -49,16 +49,21 @@ public class MultivariateGaussian implements ContinuousDistribution {
         return DoubleTensor.scalar(-0.5 * (scalar + kLog2Pi + logCovDet));
     }
 
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
+        throw new UnsupportedOperationException();
+    }
+
     public static DoubleVertex logProbGraph(DoublePlaceholderVertex x, DoublePlaceholderVertex mu, DoublePlaceholderVertex covariance) {
         final long dimensions = numberOfDimensions(mu.getShape());
         final double kLog2Pi = dimensions * LOG_2_PI;
         final DoubleVertex logCovDet = covariance.matrixDeterminant().log();
-        DoubleVertex xMinusMu = x.minus(mu);
-        DoubleVertex xMinusMuT = xMinusMu.permute(1, 0);
+        DoubleVertex xMinusMu = x.minus(mu).reshape(dimensions, 1);
+        DoubleVertex xMinusMuT = xMinusMu.transpose();
         DoubleVertex covInv = covariance.matrixInverse();
 
         DoubleVertex scalar = isUnivariate(dimensions) ?
-            covInv.times(xMinusMu).times(xMinusMuT).slice(0, 0):
+            covInv.times(xMinusMu).times(xMinusMuT).slice(0, 0) :
             xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu)).slice(0, 0);
 
         return scalar.plus(kLog2Pi).plus(logCovDet).times(-0.5).slice(0, 0);
@@ -78,10 +83,5 @@ public class MultivariateGaussian implements ContinuousDistribution {
 
     private static long numberOfDimensions(long[] muShape) {
         return muShape[0];
-    }
-
-    @Override
-    public Diffs dLogProb(DoubleTensor x) {
-        throw new UnsupportedOperationException();
     }
 }

@@ -72,7 +72,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
     }
 
     public MultivariateGaussianVertex(double mu, double covariance) {
-        this(oneByOneMatrix(mu), oneByOneMatrix(covariance));
+        this(new ConstantDoubleVertex(new double[]{mu}), oneByOneMatrix(covariance));
     }
 
     private static DoubleVertex oneByOneMatrix(double value) {
@@ -122,16 +122,23 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
     }
 
     private static long[] checkValidMultivariateShape(long[] muShape, long[] covarianceShape) {
-        if (covarianceShape.length != 2 || muShape.length != 2) {
-            throw new IllegalArgumentException(String.format("Ranks of mu and covariance must be 2. Given: %d, %d", muShape.length, covarianceShape.length));
-        } else if (covarianceShape[0] != covarianceShape[1]) {
-            throw new IllegalArgumentException(String.format("Dimensions 0 and 1 of covariance must equal. Given: %s", Arrays.toString(covarianceShape)));
-        } else if (muShape[1] != 1) {
-            throw new IllegalArgumentException(String.format("Dimension 1 of mu must equal 1. Given: %d", muShape[1]));
-        } else if (muShape[0] != covarianceShape[0]) {
-            throw new IllegalArgumentException(String.format("Dimension 0 of mu must equal dimension 0 of covariance. Given: %s, %s", muShape[0], covarianceShape[0]));
-        } else {
-            return muShape;
+
+        if (covarianceShape.length != 2) {
+            throw new IllegalArgumentException("Covariance must be matrix");
         }
+
+        if (muShape.length != 1) {
+            throw new IllegalArgumentException("Mu must be vector");
+        }
+
+        if (covarianceShape[0] != covarianceShape[1]) {
+            throw new IllegalArgumentException("Covariance matrix must be square. Given shape: " + Arrays.toString(covarianceShape));
+        }
+
+        if (muShape[0] != covarianceShape[0]) {
+            throw new IllegalArgumentException("Dimension 0 of mu must equal dimension 0 of covariance. Given: " + muShape[0] + "," + covarianceShape[0]);
+        }
+
+        return muShape;
     }
 }
