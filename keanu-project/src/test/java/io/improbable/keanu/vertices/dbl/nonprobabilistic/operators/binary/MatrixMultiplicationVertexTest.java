@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
@@ -272,8 +273,12 @@ public class MatrixMultiplicationVertexTest {
     @Test
     public void changesMatchGradient() {
         UniformVertex inputA = new UniformVertex(new long[]{2, 5}, -10.0, 10.0);
-        UniformVertex inputB = new UniformVertex(new long[]{5, 4}, -10.0, 10.0);
-        MatrixMultiplicationVertex outputVertex = inputA.matrixMultiply(inputB);
+        UniformVertex inputB = new UniformVertex(new long[]{5, 2}, -10.0, 10.0);
+        MatrixMultiplicationVertex mmultVertex = inputA.matrixMultiply(inputB);
+        MultiplicationVertex outputVertex = mmultVertex.times(
+            new ConstantDoubleVertex(new double[]{1., 2., 3., 4., 5., 6., 7., 8.}, new long[]{2, 2, 2})
+        );
+
         final double INCREMENT = 10;
         final double DELTA = 1e-10;
 
