@@ -1,12 +1,11 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.Keanu;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
-import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
-import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
-import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.algorithms.Variable;
+import io.improbable.keanu.algorithms.mcmc.proposal.*;
 import io.improbable.keanu.algorithms.mcmc.testcases.MCMCTestCase;
 import io.improbable.keanu.algorithms.mcmc.testcases.MultiVariateDiscreteTestCase;
 import io.improbable.keanu.algorithms.mcmc.testcases.SingleVariateDiscreteTestCase;
@@ -25,6 +24,7 @@ import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
@@ -211,6 +211,45 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroProbability(100);
 
         ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
+        MetropolisHastings metropolisHastings = MetropolisHastings.builder()
+            .proposalDistribution(proposalDistribution)
+            .rejectionStrategy(new RollbackAndCascadeOnRejection())
+            .build();
+
+        NetworkSamples posteriorSamples = metropolisHastings.getPosteriorSamples(
+            new KeanuProbabilisticModel(bayesNet),
+            Arrays.asList(A, B),
+            1000
+        );
+
+        double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages().scalar();
+        double averagePosteriorB = posteriorSamples.getDoubleTensorSamples(B).getAverages().scalar();
+
+        double actual = averagePosteriorA + averagePosteriorB;
+        assertEquals(44.0, actual, 0.1);
+    }
+
+     @Test
+    public void youCanUseAMultivariateGaussianProposal() {
+
+        DoubleVertex A = new GaussianVertex(20.0, 1.0);
+        DoubleVertex B = new GaussianVertex(20.0, 1.0);
+
+        A.setValue(20.0);
+        B.setValue(20.0);
+
+        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
+
+        Cobserved.observe(46.0);
+
+        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
+        bayesNet.probeForNonZeroProbability(100);
+
+        Map<Variable, DoubleTensor> sigmas = ImmutableMap.of(
+            A, DoubleTensor.scalar(1.),
+            B, DoubleTensor.scalar(1.)
+        );
+        ProposalDistribution proposalDistribution = new MultivariateGaussianProposalDistribution(sigmas);
         MetropolisHastings metropolisHastings = MetropolisHastings.builder()
             .proposalDistribution(proposalDistribution)
             .rejectionStrategy(new RollbackAndCascadeOnRejection())
