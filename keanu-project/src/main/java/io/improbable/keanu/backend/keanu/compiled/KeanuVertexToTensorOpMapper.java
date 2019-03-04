@@ -189,7 +189,7 @@ public class KeanuVertexToTensorOpMapper {
 
         opMappers.put(OrBinaryVertex.class, fluentBinaryOp("or"));
         opMappers.put(AndBinaryVertex.class, fluentBinaryOp("and"));
-        opMappers.put(NotBinaryVertex.class, fluentBinaryOp("not"));
+        opMappers.put(NotBinaryVertex.class, fluentUnaryOp("not"));
 
         opMappers.put(CastToBooleanVertex.class, fluentUnaryOp("toBoolean"));
 
@@ -374,7 +374,7 @@ public class KeanuVertexToTensorOpMapper {
 
     private static String takeOp(long[] index, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         String variableName = lookup.get(inputVertex.getId()).getName();
-        return variableName + ".take(" + toJavaArrayCreation(index) + ")";
+        return variableName + ".getValue(" + toJavaArrayCreation(index) + ")";
     }
 
     private static String toJavaArrayCreation(long[] array) {

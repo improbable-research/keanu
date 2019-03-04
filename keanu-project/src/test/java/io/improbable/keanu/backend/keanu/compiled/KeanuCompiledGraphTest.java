@@ -142,6 +142,11 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canTakeDouble() {
+        assertUnaryDoubleMatches(new long[]{3, 4}, (a) -> a.take(1, 2));
+    }
+
+    @Test
     public void compilesSum() {
         assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::sum);
         assertUnaryDoubleMatches(new long[]{2, 2}, (a) -> a.sum(0));
@@ -294,6 +299,11 @@ public class KeanuCompiledGraphTest {
     @Test
     public void compilesOr() {
         assertBinaryBooleanMatches(BooleanVertex::or);
+    }
+
+    @Test
+    public void compilesNot() {
+        assertUnaryBooleanMatches(new long[]{3, 4}, (a) -> BooleanVertex.not(a));
     }
 
     private void assertUnaryBooleanMatches(long[] shape, Function<BooleanVertex, BooleanVertex> op) {

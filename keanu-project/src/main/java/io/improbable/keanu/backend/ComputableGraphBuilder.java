@@ -83,7 +83,7 @@ public interface ComputableGraphBuilder<T extends ComputableGraph> {
             .collect(Collectors.toList());
 
         convert(requiredVertices);
-        outputs.stream().map(v -> ((Vertex) v).getReference()).forEach(this::registerOutput);
+        outputs.stream().map(Vertex::getReference).forEach(this::registerOutput);
     }
 
     /**
