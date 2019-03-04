@@ -153,6 +153,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         return "v_" + variableReference.toStringReference();
     }
 
+    @Override
     public void registerOutput(VariableReference output) {
         outputs.add(output);
         lookup.get(output).setMutable(false);
@@ -189,6 +190,10 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         );
     }
 
+    /**
+     * @return The java source to be used for compilation. This will be the entire .java file that represents a class
+     * that can be used for doing a calculation described by the graph that was passed to this builder.
+     */
     public String getSource() {
         StringBuilder stringBuilder = new StringBuilder();
 

@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * This class is a utility class for creating joint logProb graphs. It takes a BayesianNetwork and returns variable
+ * references to outputs of the log prior probability and log likelihood.
+ */
 @UtilityClass
 public class ProbabilisticGraphConverter {
 

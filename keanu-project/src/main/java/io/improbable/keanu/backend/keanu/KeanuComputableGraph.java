@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A computable graph that wraps the Keanu vertices
+ */
 public class KeanuComputableGraph implements ComputableGraph {
 
     private final Map<VariableReference, Vertex> vertexLookup;

@@ -11,6 +11,10 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A computable graph that wraps a compiled Keanu graph. This compiled graph is generated at runtime from Keanu
+ * vertices.
+ */
 class WrappedCompiledGraph implements ComputableGraph {
 
     private Map<String, VariableReference> outputsByString;

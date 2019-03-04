@@ -5,6 +5,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A demonstration of what a compiled graph actually looks like.
+ */
 public class TestGraph implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {
 
     private final DoubleTensor v_4;

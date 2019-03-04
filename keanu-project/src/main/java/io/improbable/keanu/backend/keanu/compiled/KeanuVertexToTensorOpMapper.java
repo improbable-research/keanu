@@ -67,6 +67,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * This class provides a static lookup per vertex to a string that represents the right hand side the assignment
+ * in compiled graph. This should include everything up to but not including the semicolon that ends the line of code
+ * that is the complete assignment.
+ * <p>
+ * e.g. AdditionVertex.class ->
+ * <p>
+ * leftArg <= left hand arg from additionVertex
+ * rightArg <= right hand arg from additionVertex
+ * <p>
+ * lookup leftArg and rightArg
+ * return leftArg + ".plus(" + rightArg + ")"
+ */
 public class KeanuVertexToTensorOpMapper {
 
     public static final boolean ENABLE_IN_PLACE = true;
@@ -148,21 +161,31 @@ public class KeanuVertexToTensorOpMapper {
     }
 
     interface OpMapper {
+        /**
+         * @param vertex the operation (e.g. times, plus)
+         * @param lookup lookup other variable names and any metadata about them (e.g. mutable)
+         * @return the right hand side of the assignment
+         */
         String apply(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup);
     }
 
     public static OpMapper getOpMapperFor(Class<?> clazz) {
-        OpMapper opMapper = opMappers.get(clazz);
-//        if (opMapper == null) {
-//            throw new IllegalArgumentException("No mapper for " + clazz.getCanonicalName());
-//        }
-        return opMapper;
+        return opMappers.get(clazz);
     }
 
     private static OpMapper fluentBinaryOp(String methodName) {
         return fluentBinaryOp(methodName, methodName);
     }
 
+    /**
+     * Assumes that the left hand arg has a method called methodName and a method called
+     * inPlaceMethodName. The inPlaceMethodName is used if the variable is considered mutable. It is considered
+     * mutable if it is not an input, constant, or output.
+     *
+     * @param methodName        the method to call when not mutating the left hand variable of the binary op
+     * @param inPlaceMethodName the method to call when mutating the left hand variable of the binary op
+     * @return a OpMapper that provides the right hand side of an assignment. e.g. v1.plus(v2)
+     */
     private static OpMapper fluentBinaryOp(String methodName, String inPlaceMethodName) {
         return (vertex, lookup) -> {
             VertexBinaryOp<?, ?> binaryOpVertex = (VertexBinaryOp<?, ?>) vertex;
@@ -179,6 +202,12 @@ public class KeanuVertexToTensorOpMapper {
         };
     }
 
+    /**
+     * Similar to fluent unary op except it allows defining the entire string template
+     *
+     * @param format the format for the right hand side of the assignment. e.g. DoubleTensor.scalar(%s.determinant())
+     * @return an OpMapper that will map an operation using the provided format
+     */
     private static OpMapper unaryOp(String format) {
         return (vertex, lookup) -> {
             VertexUnaryOp unaryOpVertex = (VertexUnaryOp) vertex;
@@ -193,6 +222,15 @@ public class KeanuVertexToTensorOpMapper {
         return fluentUnaryOp(methodName, methodName);
     }
 
+    /**
+     * Assumes that the left hand arg has a method called methodName and a method called
+     * inPlaceMethodName. The inPlaceMethodName is used if the variable is considered mutable. It is considered
+     * mutable if it is not an input, constant, or output.
+     *
+     * @param methodName        the method to call when not mutating the variable of the unary op
+     * @param inPlaceMethodName the method to call when mutating the variable of the unary op
+     * @return a OpMapper that provides the right hand side of an assignment. e.g. v1.cos()
+     */
     private static OpMapper fluentUnaryOp(String methodName, String inPlaceMethodName) {
         return (vertex, lookup) -> {
             VertexUnaryOp unaryOpVertex = (VertexUnaryOp) vertex;
@@ -207,6 +245,14 @@ public class KeanuVertexToTensorOpMapper {
         };
     }
 
+    /**
+     * If the child is the last child by topographic sort order of the parent then it can reuse the memory of its
+     * parent.
+     *
+     * @param child  the child vertex in question
+     * @param parent the parent vertex in question
+     * @return true if the child is the last child of the parent by topographic sort order
+     */
     private static boolean isLastChildByTopographicalSort(Vertex<?> child, Vertex<?> parent) {
         Optional<Vertex> last = parent.getChildren().stream()
             .max(Comparator.comparing(Vertex::getId));
@@ -220,6 +266,12 @@ public class KeanuVertexToTensorOpMapper {
         throw new IllegalArgumentException("Constant should not be operation mapped");
     }
 
+    /**
+     * Similar to fluent binary op except it allows defining the entire string template
+     *
+     * @param format the format for the right hand side of the assignment. e.g. DoubleTensor.max(%s,%s)
+     * @return an OpMapper that will map an operation using the provided format
+     */
     private static OpMapper binaryOp(String format) {
         return (vertex, lookup) -> {
             VertexBinaryOp<?, ?> binaryOpVertex = (VertexBinaryOp<?, ?>) vertex;

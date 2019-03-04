@@ -21,6 +21,13 @@ import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLog
 @AllArgsConstructor
 public class KeanuCompiledProbabilisticGraph implements ProbabilisticModel {
 
+    /**
+     * Takes a BayesianNetwork and converts it to a KeanuCompiledProbabilisticGraph. This compiles the graph in the
+     * bayesian network and then compiles the logProb graph.
+     *
+     * @param network The bayesian network for conversions
+     * @return A compiled ProbabilisticGraph that represents the BayesianNetwork
+     */
     public static KeanuCompiledProbabilisticGraph convert(BayesianNetwork network) {
         KeanuCompiledGraphBuilder builder = new KeanuCompiledGraphBuilder();
 
