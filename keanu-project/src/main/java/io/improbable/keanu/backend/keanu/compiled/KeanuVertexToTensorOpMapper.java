@@ -5,10 +5,21 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexUnaryOp;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BooleanConcatenationVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanReshapeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanTakeVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBinaryVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastToDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -129,7 +140,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(MatrixDeterminantVertex.class, unaryOp("DoubleTensor.scalar(%s.determinant())"));
         opMappers.put(MatrixInverseVertex.class, fluentUnaryOp("matrixInverse"));
 
-        opMappers.put(ConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatOpDouble);
+        opMappers.put(ConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatDoubleOp);
         opMappers.put(SumVertex.class, KeanuVertexToTensorOpMapper::sumDoubleOp);
         opMappers.put(ReshapeVertex.class, KeanuVertexToTensorOpMapper::reshapeDoubleOp);
         opMappers.put(PermuteVertex.class, KeanuVertexToTensorOpMapper::permuteDoubleOp);
@@ -150,7 +161,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(IntegerDivisionVertex.class, fluentBinaryOp("divideBy", "divideByInPlace"));
         opMappers.put(IntegerPowerVertex.class, fluentBinaryOp("pow", "powInPlace"));
 
-        opMappers.put(IntegerConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatOpInteger);
+        opMappers.put(IntegerConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatIntegerOp);
         opMappers.put(IntegerSumVertex.class, KeanuVertexToTensorOpMapper::sumIntegerOp);
         opMappers.put(IntegerReshapeVertex.class, KeanuVertexToTensorOpMapper::reshapeIntegerOp);
         opMappers.put(IntegerSliceVertex.class, KeanuVertexToTensorOpMapper::sliceIntegerOp);
@@ -163,9 +174,21 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(CastToIntegerVertex.class, fluentUnaryOp("toInteger"));
 
         //Booleans ops
+        opMappers.put(BooleanConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatBoolOp);
         opMappers.put(BooleanReshapeVertex.class, KeanuVertexToTensorOpMapper::reshapeBooleanOp);
         opMappers.put(BooleanSliceVertex.class, KeanuVertexToTensorOpMapper::sliceBooleanOp);
         opMappers.put(BooleanTakeVertex.class, KeanuVertexToTensorOpMapper::takeBooleanOp);
+
+        opMappers.put(GreaterThanOrEqualVertex.class, fluentBinaryOp("greaterThanOrEqualTo"));
+        opMappers.put(GreaterThanVertex.class, fluentBinaryOp("greaterThan"));
+        opMappers.put(LessThanOrEqualVertex.class, fluentBinaryOp("lessThanOrEqualTo"));
+        opMappers.put(LessThanVertex.class, fluentBinaryOp("lessThan"));
+
+        opMappers.put(OrBinaryVertex.class, fluentBinaryOp("or"));
+        opMappers.put(AndBinaryVertex.class, fluentBinaryOp("and"));
+        opMappers.put(NotBinaryVertex.class, fluentBinaryOp("not"));
+
+        opMappers.put(CastToBooleanVertex.class, fluentUnaryOp("toBoolean"));
 
         //Constants
         opMappers.put(ConstantIntegerVertex.class, KeanuVertexToTensorOpMapper::constant);
@@ -394,6 +417,30 @@ public class KeanuVertexToTensorOpMapper {
         return "new int[]{" + Arrays.stream(array).mapToObj(Long::toString).collect(Collectors.joining(",")) + "}";
     }
 
+    private static String concatDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        ConcatenationVertex concatenationVertex = (ConcatenationVertex) vertex;
+        DoubleVertex[] operands = concatenationVertex.getOperands();
+        int dimension = concatenationVertex.getDimension();
+
+        return concatOp(dimension, operands, "DoubleTensor.concat", lookup);
+    }
+
+    private static String concatIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        IntegerConcatenationVertex concatenationVertex = (IntegerConcatenationVertex) vertex;
+        IntegerVertex[] operands = concatenationVertex.getOperands();
+        int dimension = concatenationVertex.getDimension();
+
+        return concatOp(dimension, operands, "IntegerTensor.concat", lookup);
+    }
+
+    private static String concatBoolOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        BooleanConcatenationVertex concatenationVertex = (BooleanConcatenationVertex) vertex;
+        BooleanVertex[] operands = concatenationVertex.getOperands();
+        int dimension = concatenationVertex.getDimension();
+
+        return concatOp(dimension, operands, "BooleanTensor.concat", lookup);
+    }
+
     private static String concatOp(int dimension,
                                    Vertex[] operands,
                                    String concatOp,
@@ -405,22 +452,6 @@ public class KeanuVertexToTensorOpMapper {
 
         return concatOp + "(" + dimension + "," + operandArg + ")";
 
-    }
-
-    private static String concatOpDouble(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        ConcatenationVertex concatenationVertex = (ConcatenationVertex) vertex;
-        DoubleVertex[] operands = concatenationVertex.getOperands();
-        int dimension = concatenationVertex.getDimension();
-
-        return concatOp(dimension, operands, "DoubleTensor.concat", lookup);
-    }
-
-    private static String concatOpInteger(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
-        IntegerConcatenationVertex concatenationVertex = (IntegerConcatenationVertex) vertex;
-        IntegerVertex[] operands = concatenationVertex.getInputArray();
-        int dimension = concatenationVertex.getDimension();
-
-        return concatOp(dimension, operands, "IntegerTensor.concat", lookup);
     }
 
     private static String sumDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
