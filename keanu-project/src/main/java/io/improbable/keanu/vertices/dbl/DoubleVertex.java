@@ -124,7 +124,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         MatrixMultiplicationVertex result = new MatrixMultiplicationVertex(leftMatrix, rightMatrix);
 
         if (leftRank == 1 && rightRank == 1) {
-            return result.reshape();
+            return result.reshape(new long[0]);
         } else if (leftRank == 1 && rightRank == 2) {
             return result.reshape(result.getShape()[1]);
         } else if (leftRank == 2 && rightRank == 1) {
