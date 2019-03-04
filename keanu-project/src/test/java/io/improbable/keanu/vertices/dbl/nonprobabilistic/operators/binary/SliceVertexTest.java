@@ -174,7 +174,8 @@ public class SliceVertexTest {
     public void changesMatchGradient() {
         UniformVertex cube = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         SliceVertex slice = new SliceVertex(cube, 2, 0);
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(cube), slice, 10.0, 1e-10);
+        MultiplicationVertex result = slice.times(5.0);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(cube), result, 10.0, 1e-10);
     }
 
 }
