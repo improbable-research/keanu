@@ -40,7 +40,7 @@ public class MatrixMultiplicationVertexTest {
         UniformVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        MatrixMultiplicationVertex c = a.matrixMultiply(b);
+        MatrixMultiplicationVertex c = (MatrixMultiplicationVertex) a.matrixMultiply(b);
 
         //of c wrt a,b
         DoubleTensor dCda = Differentiator.forwardModeAutoDiff(a, c).of(c);
@@ -78,7 +78,7 @@ public class MatrixMultiplicationVertexTest {
         assertEquals(expecteddCda, dCdaReverse);
         assertEquals(expecteddCdb, dCdbReverse);
 
-        MatrixMultiplicationVertex d = b.matrixMultiply(a);
+        MatrixMultiplicationVertex d = (MatrixMultiplicationVertex) b.matrixMultiply(a);
 
         DoubleTensor dDda = Differentiator.forwardModeAutoDiff(a, d).of(d);
         DoubleTensor dDdb = Differentiator.forwardModeAutoDiff(b, d).of(d);
@@ -142,7 +142,7 @@ public class MatrixMultiplicationVertexTest {
         UniformVertex alpha = new UniformVertex(0, 10);
         alpha.setValue(DoubleTensor.create(new double[]{1, 3, 5, 2, 4, 6}, 2, 3));
 
-        MatrixMultiplicationVertex N = m.matrixMultiply(alpha);
+        MatrixMultiplicationVertex N = (MatrixMultiplicationVertex) m.matrixMultiply(alpha);
 
         PartialsOf reverseModePartialDiff = Differentiator.reverseModeAutoDiff(N, m, alpha);
 
@@ -189,7 +189,7 @@ public class MatrixMultiplicationVertexTest {
         }, 2, 2));
 
         DoubleVertex N = m.matrixMultiply(alpha);
-        MatrixMultiplicationVertex y = N.matrixMultiply(beta);
+        MatrixMultiplicationVertex y = (MatrixMultiplicationVertex) N.matrixMultiply(beta);
 
         PartialsOf dydx = Differentiator.reverseModeAutoDiff(y, m, alpha, beta);
 
@@ -252,7 +252,7 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex N = alpha.matrixMultiply(m);
         DoubleVertex L = beta.matrixMultiply(alpha);
         //y = L x N = (beta x alpha) x (alpha x m)
-        MatrixMultiplicationVertex y = L.matrixMultiply(N);
+        MatrixMultiplicationVertex y = (MatrixMultiplicationVertex) L.matrixMultiply(N);
         PartialsOf dydx = Differentiator.reverseModeAutoDiff(y, alpha);
 
         DoubleTensor dydalphaForward = Differentiator.forwardModeAutoDiff(alpha, y).of(y);
@@ -274,7 +274,7 @@ public class MatrixMultiplicationVertexTest {
     public void changesMatchGradient() {
         UniformVertex inputA = new UniformVertex(new long[]{2, 5}, -10.0, 10.0);
         UniformVertex inputB = new UniformVertex(new long[]{5, 2}, -10.0, 10.0);
-        MatrixMultiplicationVertex mmultVertex = inputA.matrixMultiply(inputB);
+        DoubleVertex mmultVertex = inputA.matrixMultiply(inputB);
         MultiplicationVertex outputVertex = mmultVertex.times(
             new ConstantDoubleVertex(new double[]{1., 2., 3., 4., 5., 6., 7., 8.}, new long[]{2, 2, 2})
         );

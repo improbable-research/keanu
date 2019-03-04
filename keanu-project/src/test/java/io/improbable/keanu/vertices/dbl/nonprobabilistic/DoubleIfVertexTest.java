@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -32,7 +31,7 @@ public class DoubleIfVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        MatrixMultiplicationVertex c = a.matrixMultiply(b);
+        DoubleVertex c = a.matrixMultiply(b);
         DoubleVertex d = b.matrixMultiply(a);
 
         PartialsOf dC = Differentiator.reverseModeAutoDiff(c, a, b);
@@ -100,7 +99,7 @@ public class DoubleIfVertexTest {
         b.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
         DoubleVertex c = a.matrixMultiply(b);
-        MatrixMultiplicationVertex d = b.matrixMultiply(a);
+        DoubleVertex d = b.matrixMultiply(a);
 
         PartialsOf dD = Differentiator.reverseModeAutoDiff(d, a, b);
         DoubleTensor dDda = dD.withRespectTo(a);
@@ -131,8 +130,8 @@ public class DoubleIfVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        MatrixMultiplicationVertex c = a.matrixMultiply(b);
-        MatrixMultiplicationVertex d = b.matrixMultiply(a);
+        DoubleVertex c = a.matrixMultiply(b);
+        DoubleVertex d = b.matrixMultiply(a);
 
         DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a);
         DoubleTensor dDda = Differentiator.reverseModeAutoDiff(d, a).withRespectTo(a);
@@ -168,7 +167,7 @@ public class DoubleIfVertexTest {
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        MatrixMultiplicationVertex c = a.matrixMultiply(b);
+        DoubleVertex c = a.matrixMultiply(b);
 
         DoubleVertex d = new UniformVertex(0, 10);
         d.setValue(DoubleTensor.create(new double[]{9, 10, 11, 12}, 2, 2));
@@ -176,7 +175,7 @@ public class DoubleIfVertexTest {
         DoubleVertex e = new UniformVertex(0, 10);
         e.setValue(DoubleTensor.create(new double[]{13, 14, 15, 16}, 2, 2));
 
-        MatrixMultiplicationVertex f = d.matrixMultiply(e);
+        DoubleVertex f = d.matrixMultiply(e);
 
         DoubleTensor dCda = Differentiator.reverseModeAutoDiff(c, a).withRespectTo(a);
         DoubleTensor dFdd = Differentiator.reverseModeAutoDiff(f, d).withRespectTo(d);

@@ -334,8 +334,8 @@ public class ConcatenationVertexTest {
         UniformVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        MatrixMultiplicationVertex c = sharedMatrix.matrixMultiply(a);
-        MatrixMultiplicationVertex d = sharedMatrix.matrixMultiply(b);
+        MatrixMultiplicationVertex c = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(a);
+        MatrixMultiplicationVertex d = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(b);
 
         DoubleTensor dCdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, c).of(c);
         DoubleTensor dDdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, d).of(d);
@@ -386,8 +386,8 @@ public class ConcatenationVertexTest {
         UniformVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        MatrixMultiplicationVertex c = sharedMatrix.matrixMultiply(a);
-        MatrixMultiplicationVertex d = sharedMatrix.matrixMultiply(b);
+        MatrixMultiplicationVertex c = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(a);
+        MatrixMultiplicationVertex d = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(b);
 
         DoubleTensor dCdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, c).of(c);
         DoubleTensor dDdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, d).of(d);
@@ -441,9 +441,9 @@ public class ConcatenationVertexTest {
         UniformVertex f = new UniformVertex(0, 10);
         f.setValue(DoubleTensor.create(new double[]{90, 91, 92, 93}, 2, 2));
 
-        MatrixMultiplicationVertex c = sharedMatrix.matrixMultiply(a);
-        MatrixMultiplicationVertex d = sharedMatrix.matrixMultiply(b);
-        MatrixMultiplicationVertex e = sharedMatrix.matrixMultiply(f);
+        MatrixMultiplicationVertex c = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(a);
+        MatrixMultiplicationVertex d = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(b);
+        MatrixMultiplicationVertex e = (MatrixMultiplicationVertex) sharedMatrix.matrixMultiply(f);
 
         DoubleTensor dCdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, c).of(c);
         DoubleTensor dDdshared = Differentiator.forwardModeAutoDiff(sharedMatrix, d).of(d);

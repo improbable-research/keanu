@@ -1,6 +1,10 @@
 ## Version 0.0.22
 
-## Python
+### Common
+
+* `DoubleVertex#matrixMultiply` now performs dot product when given two vectors, and matrix-vector product when given a matrix and a vector.
+
+### Python
 
 * Improved performance of getting samples by coercing them into a `Tensor` in Java (instead of iterating through an `ArrayList`).
 
