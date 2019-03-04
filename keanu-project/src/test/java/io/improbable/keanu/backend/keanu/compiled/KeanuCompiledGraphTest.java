@@ -137,6 +137,11 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canConcatDouble() {
+        assertBinaryDoubleMatches(new long[]{3, 4}, new long[]{3, 4}, (a, b) -> DoubleVertex.concat(1, a, b));
+    }
+
+    @Test
     public void compilesSum() {
         assertUnaryDoubleMatches(new long[]{2, 2}, DoubleVertex::sum);
         assertUnaryDoubleMatches(new long[]{2, 2}, (a) -> a.sum(0));
@@ -203,6 +208,11 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canConcatInteger() {
+        assertBinaryIntegerMatches(new long[]{3, 4}, new long[]{3, 4}, (a, b) -> IntegerVertex.concat(1, a, b));
+    }
+
+    @Test
     public void compilesSimpleUnaryIntegerOps() {
         assertUnaryIntegerMatches(IntegerVertex::abs);
     }
@@ -230,6 +240,27 @@ public class KeanuCompiledGraphTest {
         assertEquals(C.getValue(), result.get(C.getReference()));
     }
 
+    private void assertBinaryIntegerMatches(long[] shapeA, long[] shapeB, BiFunction<IntegerVertex, IntegerVertex, IntegerVertex> op) {
+        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
+
+        UniformIntVertex A = new UniformIntVertex(shapeA, 0, 1);
+        UniformIntVertex B = new UniformIntVertex(shapeB, 0, 1);
+
+        IntegerVertex C = op.apply(A, B);
+
+        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
+
+        ComputableGraph computableGraph = compiler.build();
+
+        Map<VariableReference, Object> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
+
+        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+
+        assertEquals(C.getValue(), result.get(C.getReference()));
+    }
+
     @Test
     public void canReshapeBoolean() {
         assertUnaryBooleanMatches(new long[]{3, 4}, (a) -> a.reshape(6, 2));
@@ -241,13 +272,28 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canConcatBoolean() {
+        assertBinaryBooleanMatches(new long[]{3, 4}, new long[]{3, 4}, (a, b) -> BooleanVertex.concat(1, a, b));
+    }
+
+    @Test
     public void compilesEqualTo() {
         assertBinaryBooleanMatches(BooleanVertex::equalTo);
     }
 
     @Test
+    public void compilesNotEqualTo() {
+        assertBinaryBooleanMatches(BooleanVertex::notEqualTo);
+    }
+
+    @Test
     public void compilesAnd() {
         assertBinaryBooleanMatches(BooleanVertex::and);
+    }
+
+    @Test
+    public void compilesOr() {
+        assertBinaryBooleanMatches(BooleanVertex::or);
     }
 
     private void assertUnaryBooleanMatches(long[] shape, Function<BooleanVertex, BooleanVertex> op) {

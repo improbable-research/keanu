@@ -62,6 +62,8 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         sb.append(importString(Map.class));
         sb.append(importString(VariableReference.class));
         sb.append(importString(DoubleTensor.class));
+        sb.append(importString(IntegerTensor.class));
+        sb.append(importString(BooleanTensor.class));
 
         append(sb, "public final class ", className, " implements java.util.function.Function<Map<String, ?>, Map<String, ?>> {\n");
     }

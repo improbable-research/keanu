@@ -63,7 +63,7 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
         return concat(absoluteDimension, reshaped);
     }
 
-    static BooleanTensor concat(int dimension, BooleanTensor[] toConcat) {
+    static BooleanTensor concat(int dimension, BooleanTensor... toConcat) {
         DoubleTensor[] toDoubles = new DoubleTensor[toConcat.length];
 
         for (int i = 0; i < toConcat.length; i++) {
