@@ -218,6 +218,11 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canTakeInteger() {
+        assertUnaryIntegerMatches(new long[]{3, 4}, (a) -> a.take(1, 2));
+    }
+
+    @Test
     public void compilesSimpleUnaryIntegerOps() {
         assertUnaryIntegerMatches(IntegerVertex::abs);
     }
@@ -279,6 +284,11 @@ public class KeanuCompiledGraphTest {
     @Test
     public void canConcatBoolean() {
         assertBinaryBooleanMatches(new long[]{3, 4}, new long[]{3, 4}, (a, b) -> BooleanVertex.concat(1, a, b));
+    }
+
+    @Test
+    public void canTakeBoolean() {
+        assertUnaryBooleanMatches(new long[]{3, 4}, (a) -> a.take(1, 2));
     }
 
     @Test

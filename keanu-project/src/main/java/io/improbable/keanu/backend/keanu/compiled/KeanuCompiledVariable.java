@@ -7,7 +7,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class KeanuCompiledVariable {
 
-
     @Getter
     /**
      * the name of the variable in the source

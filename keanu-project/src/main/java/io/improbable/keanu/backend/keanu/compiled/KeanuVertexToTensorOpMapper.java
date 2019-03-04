@@ -185,7 +185,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(LessThanOrEqualVertex.class, fluentBinaryOp("lessThanOrEqualTo"));
         opMappers.put(LessThanVertex.class, fluentBinaryOp("lessThan"));
         opMappers.put(EqualsVertex.class, fluentBinaryOp("elementwiseEquals"));
-        opMappers.put(NotEqualsVertex.class, fluentBinaryOp("notEqualTo"));
+        opMappers.put(NotEqualsVertex.class, KeanuVertexToTensorOpMapper::notOp);
 
         opMappers.put(OrBinaryVertex.class, fluentBinaryOp("or"));
         opMappers.put(AndBinaryVertex.class, fluentBinaryOp("and"));
@@ -359,22 +359,33 @@ public class KeanuVertexToTensorOpMapper {
 
     private static String takeDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         TakeVertex takeVertex = (TakeVertex) vertex;
-        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
+        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup, "DoubleTensor");
     }
 
     private static String takeIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IntegerTakeVertex takeVertex = (IntegerTakeVertex) vertex;
-        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
+        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup, "IntegerTensor");
     }
 
     private static String takeBooleanOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         BooleanTakeVertex takeVertex = (BooleanTakeVertex) vertex;
-        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
+        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup, "BooleanTensor");
     }
 
-    private static String takeOp(long[] index, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+    private static String takeOp(long[] index, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup, String tensorType) {
         String variableName = lookup.get(inputVertex.getId()).getName();
-        return variableName + ".getValue(" + toJavaArrayCreation(index) + ")";
+        return tensorType + ".scalar(" + variableName + ".getValue(" + toJavaArrayCreation(index) + "))";
+    }
+
+    private static String notOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        VertexBinaryOp<?, ?> binaryOpVertex = (VertexBinaryOp<?, ?>) vertex;
+        Vertex<?> left = binaryOpVertex.getLeft();
+        Vertex<?> right = binaryOpVertex.getRight();
+
+        KeanuCompiledVariable leftVariable = lookup.get(left.getReference());
+        KeanuCompiledVariable rightVariable = lookup.get(right.getReference());
+
+        return leftVariable.getName() + ".elementwiseEquals(" + rightVariable.getName() + ").not()";
     }
 
     private static String toJavaArrayCreation(long[] array) {
