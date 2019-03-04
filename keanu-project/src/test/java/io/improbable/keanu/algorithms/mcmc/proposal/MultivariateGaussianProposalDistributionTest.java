@@ -83,7 +83,7 @@ public class MultivariateGaussianProposalDistributionTest {
     public void theLogProbAtToIsMultivariateGaussian() {
         double logProb = proposalDistribution.logProbAtToGivenFrom(proposal);
         DoubleTensor mu = DoubleTensor.concat(currentStateForVertex1, currentStateForVertex2);
-        DoubleTensor cov = DoubleTensor.concat(sigmaForVertex1, sigmaForVertex2).diag().pow(2.);
+        DoubleTensor cov = DoubleTensor.concat(sigmaForVertex1, sigmaForVertex2).pow(2.).diag();
         DoubleTensor x = DoubleTensor.concat(proposedStateForVertex1, proposedStateForVertex2);
         DoubleTensor expectedLogProb = MultivariateGaussian.withParameters(mu, cov).logProb(x);
         assertThat(logProb, closeTo(expectedLogProb.sum(), 1e-14)); // sum of .log().sum() has rounding errors
@@ -93,7 +93,7 @@ public class MultivariateGaussianProposalDistributionTest {
     public void theLogProbAtFromIsMultivariateGaussian() {
         double logProb = proposalDistribution.logProbAtFromGivenTo(proposal);
         DoubleTensor mu = DoubleTensor.concat(proposedStateForVertex1, proposedStateForVertex2);
-        DoubleTensor cov = DoubleTensor.concat(sigmaForVertex1, sigmaForVertex2).diag().pow(2.);
+        DoubleTensor cov = DoubleTensor.concat(sigmaForVertex1, sigmaForVertex2).pow(2.).diag();
         DoubleTensor x = DoubleTensor.concat(currentStateForVertex1, currentStateForVertex2);
         DoubleTensor expectedLogProb = MultivariateGaussian.withParameters(mu, cov).logProb(x);
         assertThat(logProb, closeTo(expectedLogProb.sum(), 1e-14)); // sum of .log().sum() has rounding errors
