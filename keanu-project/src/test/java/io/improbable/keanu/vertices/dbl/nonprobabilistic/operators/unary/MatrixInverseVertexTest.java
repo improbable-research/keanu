@@ -87,7 +87,7 @@ public class MatrixInverseVertexTest {
     public void inverseMultipliedEqualsIdentity() {
         UniformVertex inputVertex = new UniformVertex(new long[]{4, 4}, -20.0, 20.0);
         DoubleVertex inverseVertex = inputVertex.matrixInverse();
-        MatrixMultiplicationVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
+        MatrixMultiplicationVertex multiplied = (MatrixMultiplicationVertex) inverseVertex.matrixMultiply(inputVertex);
 
         for (int i = 0; i < NUM_ITERATIONS; i++) {
             inputVertex.setValue(inputVertex.sample());
