@@ -5,6 +5,7 @@
 * Added `MultivariateGaussianProposalDistribution`. It assumes a diagonal covariance matrix.
   * Example in Python:
     * `MetropolisHastingsSampler(proposal_distribution='multivariate_gaussian', latents=[v1, v2], proposal_distribution_sigma=[1., np.array([[1., 2.], [3., 4.]]))`
+* `DoubleVertex#matrixMultiply` now performs dot product when given two vectors, and matrix-vector product when given a matrix and a vector.
 
 ### Python
 
