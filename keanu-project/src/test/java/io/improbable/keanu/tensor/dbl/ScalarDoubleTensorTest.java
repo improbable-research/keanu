@@ -233,14 +233,17 @@ public class ScalarDoubleTensorTest {
     @Test
     public void doesMatrixMultiplyWhenRank2() {
         DoubleTensor lengthOne = new ScalarDoubleTensor(2).reshape(1, 1);
-        DoubleTensor matrix = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
+        DoubleTensor matrix = DoubleTensor.create(3, 4).reshape(1, 2);
         DoubleTensor result = lengthOne.matrixMultiply(matrix);
-        DoubleTensor expected = DoubleTensor.create(2, 4, 6, 8).reshape(2, 2);
+        DoubleTensor expected = DoubleTensor.create(6, 8).reshape(1, 2);
         assertEquals(expected, result);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void doesThrowOnMatrixMultiplyWhenRank0() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Matrix multiply must be used on matrices");
+
         DoubleTensor lengthOne = new ScalarDoubleTensor(2);
         DoubleTensor matrix = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
         lengthOne.matrixMultiply(matrix);
@@ -253,5 +256,19 @@ public class ScalarDoubleTensorTest {
         DoubleTensor result = lengthOne.tensorMultiply(matrix, new int[]{0}, new int[]{1});
         DoubleTensor expected = DoubleTensor.create(0, 2, 4, 6).reshape(2, 2);
         assertEquals(expected, result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnInvalidLeftDimsTensorMultiply() {
+        DoubleTensor lengthOne = new ScalarDoubleTensor(2);
+        DoubleTensor matrix = DoubleTensor.arange(0, 4).reshape(2, 1, 2);
+        lengthOne.tensorMultiply(matrix, new int[]{0}, new int[]{1});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnInvalidRightDimsTensorMultiply() {
+        DoubleTensor lengthOne = new ScalarDoubleTensor(2).reshape(1);
+        DoubleTensor matrix = DoubleTensor.arange(0, 4).reshape(2, 1, 2);
+        lengthOne.tensorMultiply(matrix, new int[]{0}, new int[]{3});
     }
 }

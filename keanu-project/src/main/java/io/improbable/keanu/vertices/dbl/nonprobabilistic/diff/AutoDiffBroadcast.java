@@ -28,7 +28,9 @@ public class AutoDiffBroadcast {
 
             DoubleTensor correctedPartial = DoubleTensor
                 .zeros(resultShape)
-                .plusInPlace(partial.get().reshape(upRankedPartialShape));
+                .plusInPlace(
+                    partial.get().reshape(upRankedPartialShape)
+                );
 
             return new PartialDerivative(correctedPartial);
         } else {

@@ -72,7 +72,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
     }
 
     public MultivariateGaussianVertex(double mu, double covariance) {
-        this(new ConstantDoubleVertex(new double[]{mu}), oneByOneMatrix(covariance));
+        this(new ConstantDoubleVertex(DoubleTensor.vector(mu)), oneByOneMatrix(covariance));
     }
 
     private static DoubleVertex oneByOneMatrix(double value) {
@@ -124,11 +124,11 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
     private static long[] checkValidMultivariateShape(long[] muShape, long[] covarianceShape) {
 
         if (covarianceShape.length != 2) {
-            throw new IllegalArgumentException("Covariance must be matrix");
+            throw new IllegalArgumentException("Covariance must be matrix but was rank " + covarianceShape.length);
         }
 
         if (muShape.length != 1) {
-            throw new IllegalArgumentException("Mu must be vector");
+            throw new IllegalArgumentException("Mu must be vector but was rank " + muShape.length);
         }
 
         if (covarianceShape[0] != covarianceShape[1]) {
@@ -136,7 +136,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Differen
         }
 
         if (muShape[0] != covarianceShape[0]) {
-            throw new IllegalArgumentException("Dimension 0 of mu must equal dimension 0 of covariance. Given: " + muShape[0] + "," + covarianceShape[0]);
+            throw new IllegalArgumentException("Dimension 0 of mu must equal dimension 0 of covariance. Given: mu " + muShape[0] + ", covariance " + covarianceShape[0]);
         }
 
         return muShape;

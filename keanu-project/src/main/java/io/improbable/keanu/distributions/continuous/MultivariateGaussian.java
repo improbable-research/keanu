@@ -39,7 +39,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
         final double kLog2Pi = dimensions * LOG_2_PI;
         final double logCovDet = Math.log(covariance.determinant());
         DoubleTensor xMinusMu = x.minus(mu).reshape(dimensions, 1);
-        DoubleTensor xMinusMuT = xMinusMu.transpose();
+        DoubleTensor xMinusMuT = xMinusMu.reshape(1, dimensions);
         DoubleTensor covInv = covariance.matrixInverse();
 
         double scalar = isUnivariate() ?
@@ -59,7 +59,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
         final double kLog2Pi = dimensions * LOG_2_PI;
         final DoubleVertex logCovDet = covariance.matrixDeterminant().log();
         DoubleVertex xMinusMu = x.minus(mu).reshape(dimensions, 1);
-        DoubleVertex xMinusMuT = xMinusMu.transpose();
+        DoubleVertex xMinusMuT = xMinusMu.reshape(1, dimensions);
         DoubleVertex covInv = covariance.matrixInverse();
 
         DoubleVertex scalar = isUnivariate(dimensions) ?

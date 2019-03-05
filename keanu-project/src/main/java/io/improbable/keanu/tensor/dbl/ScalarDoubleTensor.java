@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShape.calculateShapeForLengthOneBroadcast;
-import static io.improbable.keanu.tensor.TensorShape.getTensorMultiplyResultShape;
+import static io.improbable.keanu.tensor.TensorShapeValidation.getTensorMultiplyResultShape;
 import static org.apache.commons.lang3.ArrayUtils.removeAll;
 
 public class ScalarDoubleTensor implements DoubleTensor {
@@ -159,17 +159,14 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor that) {
-        if (shape.length == 2) {
-            return that.times(value);
-        } else {
-            throw new IllegalArgumentException("Cannot matrix multiply shape: " + Arrays.toString(shape));
-        }
+        TensorShapeValidation.getMatrixMultiplicationResultingShape(shape, that.getShape());
+        return that.times(value);
     }
 
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor that, int[] dimsLeft, int[] dimsRight) {
         long[] resultShape = getTensorMultiplyResultShape(this.shape, that.getShape(), dimsLeft, dimsRight);
-        return Nd4jDoubleTensor.create(value, shape).tensorMultiply(that, dimsLeft, dimsRight).reshape(resultShape);
+        return that.times(value).reshape(resultShape);
     }
 
     @Override

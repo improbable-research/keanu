@@ -69,10 +69,14 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return new ScalarIntegerTensor(scalarValue);
     }
 
+    static IntegerTensor vector(int... values) {
+        return create(values, values.length);
+    }
+
     /**
-     * @param dimension  the dimension along which toStack are stacked
-     * @param toStack    an array of IntegerTensor
-     * @return  an IntegerTensor with toStack joined along a new dimension
+     * @param dimension the dimension along which toStack are stacked
+     * @param toStack   an array of IntegerTensor
+     * @return an IntegerTensor with toStack joined along a new dimension
      * <p>
      * e.g. A, B, C = IntegerTensor.ones(4, 2)
      * <p>
@@ -104,7 +108,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     /**
      * @param dimension the dimension along which the tensors will be joined
      * @param toConcat  an array of IntegerTensor
-     * @return  an IntegerTensor with toConcat joined along existing dimension
+     * @return an IntegerTensor with toConcat joined along existing dimension
      * <p>
      * e.g. A, B, C = IntegerTensor.ones(4, 2)
      * <p>

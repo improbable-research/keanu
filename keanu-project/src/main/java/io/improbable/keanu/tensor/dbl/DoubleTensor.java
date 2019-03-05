@@ -96,6 +96,10 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new ScalarDoubleTensor(scalarValue);
     }
 
+    static DoubleTensor vector(double... values) {
+        return DoubleTensor.create(values, values.length);
+    }
+
     /**
      * @param dimension the dimension along which toStack are stacked
      * @param toStack   an array of DoubleTensor's of the same shape

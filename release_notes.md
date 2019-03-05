@@ -3,6 +3,7 @@
 ### Common
 
 * `DoubleVertex#matrixMultiply` now performs dot product when given two vectors, and matrix-vector product when given a matrix and a vector.
+* `MultivariateGaussianVertex` now requires that mu is a vector instead of a matrix.
 
 ### Python
 
