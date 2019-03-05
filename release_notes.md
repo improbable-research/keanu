@@ -3,6 +3,7 @@
 ### Common
 
 * `DoubleVertex#matrixMultiply` now performs dot product when given two vectors, and matrix-vector product when given a matrix and a vector.
+* Autodiff for Slice Vertices has now been fixed (caused issues with NUTs when run on a graph containing Slices)
 
 ### Python
 
