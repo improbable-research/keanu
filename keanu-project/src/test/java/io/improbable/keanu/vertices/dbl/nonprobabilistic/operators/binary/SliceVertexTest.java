@@ -6,13 +6,16 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static org.junit.Assert.assertEquals;
 
 public class SliceVertexTest {
 
@@ -21,6 +24,24 @@ public class SliceVertexTest {
     @Before
     public void setup() {
         matrixA = new ConstantDoubleVertex(DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3));
+    }
+
+    @Test
+    public void canDoAutodiffAcrossSliceAndConcat() {
+        GaussianVertex latent = new GaussianVertex(new long[]{4, 1}, 0.0, 1.0);
+        SliceVertex slices[] = new SliceVertex[4];
+
+        for (int i = 0; i < slices.length; i++) {
+            slices[i] = new SliceVertex(latent, 0, i);
+        }
+
+        ConcatenationVertex concatenationVertex = new ConcatenationVertex(0, slices);
+        GaussianVertex observed = new GaussianVertex(concatenationVertex, 1);
+
+        DoubleTensor dForward = Differentiator.forwardModeAutoDiff(latent, concatenationVertex).of(concatenationVertex);
+        DoubleTensor dReverse = Differentiator.reverseModeAutoDiff(concatenationVertex, latent).withRespectTo(latent);
+
+        assertEquals(dForward, dReverse);
     }
 
     @Test
@@ -59,7 +80,7 @@ public class SliceVertexTest {
         SliceVertex columnZero = new SliceVertex(m, 0, 0);
         SliceVertex elementZero = new SliceVertex(columnZero, 0, 0);
 
-        Assert.assertEquals(elementZero.getValue().scalar(), 1, 1e-6);
+        assertEquals(elementZero.getValue().scalar(), 1, 1e-6);
     }
 
     @Test
@@ -153,7 +174,10 @@ public class SliceVertexTest {
     public void changesMatchGradient() {
         UniformVertex cube = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         SliceVertex slice = new SliceVertex(cube, 2, 0);
-        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(cube), slice, 10.0, 1e-10);
+        MultiplicationVertex result = slice.times(
+            new ConstantDoubleVertex(new double[]{1., 2., 3., 4., 5., 6., 7., 8.}, new long[]{2, 2, 2})
+        );
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(cube), result, 10.0, 1e-10);
     }
 
 }
