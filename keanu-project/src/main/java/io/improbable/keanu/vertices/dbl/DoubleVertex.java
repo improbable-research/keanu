@@ -96,8 +96,42 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new MultiplicationVertex(this, that);
     }
 
-    public MatrixMultiplicationVertex matrixMultiply(DoubleVertex that) {
-        return new MatrixMultiplicationVertex(this, that);
+    /**
+     * Matrix product of two vertices
+     *
+     * @param that a double vertex representing a matrix or a vector to matrix multiply
+     * @return a vertex that represents the matrix multiplication of two vertices.
+     * - If both left and right operands are rank 1, they are promoted to a matrix by prepending a 1 to its dimensions.
+     * After matrix multiplication, it is reshaped to be a scalar. This is essentially a dot product.
+     * This returns a ReshapeVertex.
+     * - If only one of the operands is rank 1 (and the other operand is rank 2), it is promoted to a matrix by prepending a 1 to its dimensions.
+     * After matrix multiplication, the appended 1 is removed. This is essentially a matrix-vector product.
+     * This returns a ReshapeVertex.
+     * - Otherwise, they are multiplied like conventional matrices.
+     * This returns a MatrixMultiplicationVertex.
+     */
+    public DoubleVertex matrixMultiply(DoubleVertex that) {
+        int leftRank = this.getRank();
+        int rightRank = that.getRank();
+
+        if (leftRank < 1 || rightRank < 1) {
+            throw new IllegalArgumentException("Matrix multiply for rank 0 is not supported. Use times instead.");
+        }
+
+        DoubleVertex leftMatrix = leftRank == 1 ? this.reshape(1, this.getShape()[0]) : this;
+        DoubleVertex rightMatrix = rightRank == 1 ? that.reshape(that.getShape()[0], 1) : that;
+
+        MatrixMultiplicationVertex result = new MatrixMultiplicationVertex(leftMatrix, rightMatrix);
+
+        if (leftRank == 1 && rightRank == 1) {
+            return result.reshape(new long[0]);
+        } else if (leftRank == 1 && rightRank == 2) {
+            return result.reshape(result.getShape()[1]);
+        } else if (leftRank == 2 && rightRank == 1) {
+            return result.reshape(result.getShape()[0]);
+        } else {
+            return result;
+        }
     }
 
     public MatrixInverseVertex matrixInverse() {
@@ -236,6 +270,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new PermuteVertex(this, rearrange);
     }
 
+    public PermuteVertex transpose() {
+        return new PermuteVertex(this, 1, 0);
+    }
+
     public DoubleUnaryOpLambda<DoubleTensor> lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
                                                     Function<Map<Vertex, PartialDerivative>, PartialDerivative> forwardModeAutoDiffLambda,
                                                     Function<PartialDerivative, Map<Vertex, PartialDerivative>> reverseModeAutoDiffLambda) {
@@ -283,7 +321,9 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new EqualsVertex<>(this, rhs);
     }
 
-    public IntegerVertex toInteger() { return new CastToIntegerVertex(this); }
+    public IntegerVertex toInteger() {
+        return new CastToIntegerVertex(this);
+    }
 
     public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
         return new NotEqualsVertex<>(this, rhs);

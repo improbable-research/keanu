@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.ArrayUtils.removeAll;
 
 public class TensorShapeValidation {
 
@@ -103,7 +104,7 @@ public class TensorShapeValidation {
         );
     }
 
-    public static long[] checkIsBroadcastable(long[] left, long[] right){
+    public static long[] checkIsBroadcastable(long[] left, long[] right) {
         return Shape.broadcastOutputShape(left, right);
     }
 
@@ -236,5 +237,55 @@ public class TensorShapeValidation {
             }
 
         }
+    }
+
+    public static long[] getTensorMultiplyResultShape(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
+
+        if (dimsLeft.length != dimsRight.length) {
+            throw new IllegalArgumentException("Tensor multiply must match dimension lengths " +
+                toStringArgs(leftShape, rightShape, dimsLeft, dimsRight)
+            );
+        }
+
+
+        for (int i = 0; i < dimsLeft.length; i++) {
+
+            if (dimsLeft[i] >= leftShape.length || dimsLeft[i] < 0) {
+                throw new IllegalArgumentException("Left dimensions " + Arrays.toString(dimsLeft) +
+                    " is invalid for left shape " + Arrays.toString(leftShape)
+                );
+            }
+
+            if (dimsRight[i] >= rightShape.length || dimsRight[i] < 0) {
+                throw new IllegalArgumentException("Right dimensions " + Arrays.toString(dimsRight) +
+                    " is invalid for right shape " + Arrays.toString(rightShape)
+                );
+            }
+
+            if (leftShape[dimsLeft[i]] != rightShape[dimsRight[i]]) {
+                throw new IllegalArgumentException("Cannot tensor multiply dimension " + i + " for " +
+                    toStringArgs(leftShape, rightShape, dimsLeft, dimsRight)
+                );
+            }
+        }
+
+        return TensorShape.concat(removeAll(leftShape, dimsLeft), removeAll(rightShape, dimsRight));
+    }
+
+    private static String toStringArgs(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
+        return "left shape: " + Arrays.toString(leftShape) + " right shape: " + Arrays.toString(rightShape) + " on left dimensions " +
+            Arrays.toString(dimsLeft) + " and right dimensions " + Arrays.toString(dimsRight);
+    }
+
+    public static long[] getMatrixMultiplicationResultingShape(long[] left, long[] right) {
+        if (left.length != 2 || right.length != 2) {
+            throw new IllegalArgumentException("Matrix multiply must be used on matrices");
+        }
+
+        if (left[1] != right[0]) {
+            throw new IllegalArgumentException("Can not multiply matrices of shapes " + Arrays.toString(left) + " X " + Arrays.toString(right));
+        }
+
+        return new long[]{left[0], right[1]};
     }
 }

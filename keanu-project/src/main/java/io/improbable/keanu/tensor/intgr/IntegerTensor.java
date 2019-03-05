@@ -69,6 +69,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return new ScalarIntegerTensor(scalarValue);
     }
 
+    static IntegerTensor vector(int... values) {
+        return create(values, values.length);
+    }
+
     /**
      * @param dimension the dimension along which toStack are stacked
      * @param toStack   an array of IntegerTensor

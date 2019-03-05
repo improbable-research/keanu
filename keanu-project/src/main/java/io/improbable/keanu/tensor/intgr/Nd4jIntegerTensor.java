@@ -591,6 +591,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public Integer scalar() {
+        if(this.getLength() > 1){
+            throw new IllegalArgumentException("Not a scalar");
+        }
         return (int) tensor.getDouble(0);
     }
 

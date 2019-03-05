@@ -307,6 +307,9 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public Boolean scalar() {
+        if (this.getLength() > 1) {
+            throw new IllegalArgumentException("Not a scalar");
+        }
         return data[0];
     }
 

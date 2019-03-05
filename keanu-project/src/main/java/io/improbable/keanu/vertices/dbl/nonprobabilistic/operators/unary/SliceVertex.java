@@ -48,7 +48,7 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
 
         DoubleTensor partial = derivativeOfOutputWithRespectToSelf.get();
-        DoubleTensor padded = padSliceWithZerosToMatchOriginalShape(partial);
+        DoubleTensor padded = padSliceWithZerosToMatchInputShape(partial);
         partials.put(inputVertex, new PartialDerivative(padded));
 
         return partials;
@@ -60,24 +60,30 @@ public class SliceVertex extends DoubleUnaryOpVertex implements Differentiable {
         return new PartialDerivative(dInputVertex.get().slice(dimension, index));
     }
 
-    private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {
-        long[] targetShape = TensorShape.concat(getShape(), inputVertex.getShape());
-        int dimensionInWrt = dimension + getRank();
+    private DoubleTensor padSliceWithZerosToMatchInputShape(DoubleTensor tensor) {
+        int dimensionsInWrt = getRank();
+        int dimensionsInOf = tensor.getRank() - dimensionsInWrt;
+        int sliceDimension = dimension + dimensionsInOf;
+        long[] targetShape = TensorShape.concat(
+          TensorShape.selectDimensions(0, dimensionsInOf, tensor.getShape()),
+          inputVertex.getShape()
+        );
         long indicesBefore = index;
-        long indicesAfter = targetShape[dimensionInWrt] - index - 1;
-        targetShape[dimensionInWrt] = 1;
+        long indicesAfter = targetShape[sliceDimension] - index - 1;
+        targetShape[sliceDimension] = 1;
+
         DoubleTensor outputTensor = tensor.reshape(targetShape);
 
         if (indicesBefore != 0) {
-            targetShape[dimensionInWrt] = indicesBefore;
-            DoubleTensor prefixTensor = DoubleTensor.zeros(targetShape).reshape(targetShape);
-            outputTensor = DoubleTensor.concat(dimensionInWrt, prefixTensor, outputTensor);
+            targetShape[sliceDimension] = indicesBefore;
+            DoubleTensor prefixTensor = DoubleTensor.zeros(targetShape);
+            outputTensor = DoubleTensor.concat(sliceDimension, prefixTensor, outputTensor);
         }
 
         if (indicesAfter != 0) {
-            targetShape[dimensionInWrt] = indicesAfter;
-            DoubleTensor postfixTensor = DoubleTensor.zeros(targetShape).reshape(targetShape);
-            outputTensor = DoubleTensor.concat(dimensionInWrt, outputTensor, postfixTensor);
+            targetShape[sliceDimension] = indicesAfter;
+            DoubleTensor postfixTensor = DoubleTensor.zeros(targetShape);
+            outputTensor = DoubleTensor.concat(sliceDimension, outputTensor, postfixTensor);
         }
 
         return outputTensor;
