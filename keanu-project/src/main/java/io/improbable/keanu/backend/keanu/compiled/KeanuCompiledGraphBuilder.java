@@ -223,14 +223,14 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     }
 
     @Override
-    public ComputableGraph build() {
+    public WrappedCompiledGraph build() {
 
         String source = getSource();
 
         return compile(source);
     }
 
-    private ComputableGraph compile(String source) {
+    private WrappedCompiledGraph compile(String source) {
 
         Map<String, ?> constantsByString = constantValues.entrySet().stream()
             .collect(toMap(e -> e.getKey().toStringReference(), Map.Entry::getValue));

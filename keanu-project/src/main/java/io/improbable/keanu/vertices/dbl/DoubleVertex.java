@@ -30,6 +30,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVer
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.TensorMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ternary.DoubleSetWithMaskVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
@@ -132,6 +133,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         } else {
             return result;
         }
+    }
+
+    public TensorMultiplicationVertex tensorMultiply(DoubleVertex that, int[] dimsLeft, int[] dimsRight) {
+        return new TensorMultiplicationVertex(this, that, dimsLeft, dimsRight);
     }
 
     public MatrixInverseVertex matrixInverse() {
