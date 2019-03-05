@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShape.calculateShapeForLengthOneBroadcast;
+import static io.improbable.keanu.tensor.TensorShape.getTensorMultiplyResultShape;
+import static org.apache.commons.lang3.ArrayUtils.removeAll;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 
@@ -131,7 +133,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor sum(int... overDimensions) {
         overDimensions = TensorShape.getAbsoluteDimensions(shape.length, overDimensions);
-        long[] summedShape = ArrayUtils.removeAll(shape, overDimensions);
+        long[] summedShape = removeAll(shape, overDimensions);
         return new ScalarDoubleTensor(value, summedShape);
     }
 
@@ -157,21 +159,17 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor that) {
-        if (that.isLengthOne()) {
+        if (shape.length == 2) {
             return that.times(value);
+        } else {
+            throw new IllegalArgumentException("Cannot matrix multiply shape: " + Arrays.toString(shape));
         }
-        throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
     }
 
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor that, int[] dimsLeft, int[] dimsRight) {
-        if (that.isLengthOne()) {
-            if (dimsLeft.length > 1 || dimsRight.length > 1 || dimsLeft[0] != 0 || dimsRight[0] != 0) {
-                throw new IllegalArgumentException("Tensor multiply sum dimensions out of bounds for scalar");
-            }
-            return that.times(value);
-        }
-        throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
+        long[] resultShape = getTensorMultiplyResultShape(this.shape, that.getShape(), dimsLeft, dimsRight);
+        return Nd4jDoubleTensor.create(value, shape).tensorMultiply(that, dimsLeft, dimsRight).reshape(resultShape);
     }
 
     @Override

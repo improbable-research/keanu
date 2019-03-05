@@ -229,4 +229,29 @@ public class ScalarDoubleTensorTest {
         DoubleTensor value = DoubleTensor.create(new double[]{1}, 1, 1, 1);
         assertEquals(3, value.lessThanOrEqual(2).getRank());
     }
+
+    @Test
+    public void doesMatrixMultiplyWhenRank2() {
+        DoubleTensor lengthOne = new ScalarDoubleTensor(2).reshape(1, 1);
+        DoubleTensor matrix = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
+        DoubleTensor result = lengthOne.matrixMultiply(matrix);
+        DoubleTensor expected = DoubleTensor.create(2, 4, 6, 8).reshape(2, 2);
+        assertEquals(expected, result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnMatrixMultiplyWhenRank0() {
+        DoubleTensor lengthOne = new ScalarDoubleTensor(2);
+        DoubleTensor matrix = DoubleTensor.create(1, 2, 3, 4).reshape(2, 2);
+        lengthOne.matrixMultiply(matrix);
+    }
+
+    @Test
+    public void doesTensorMultiply() {
+        DoubleTensor lengthOne = new ScalarDoubleTensor(2).reshape(1);
+        DoubleTensor matrix = DoubleTensor.arange(0, 4).reshape(2, 1, 2);
+        DoubleTensor result = lengthOne.tensorMultiply(matrix, new int[]{0}, new int[]{1});
+        DoubleTensor expected = DoubleTensor.create(0, 2, 4, 6).reshape(2, 2);
+        assertEquals(expected, result);
+    }
 }

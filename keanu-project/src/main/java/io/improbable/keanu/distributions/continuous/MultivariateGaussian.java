@@ -63,10 +63,10 @@ public class MultivariateGaussian implements ContinuousDistribution {
         DoubleVertex covInv = covariance.matrixInverse();
 
         DoubleVertex scalar = isUnivariate(dimensions) ?
-            covInv.times(xMinusMu).times(xMinusMuT).slice(0, 0) :
-            xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu)).slice(0, 0);
+            covInv.times(xMinusMu).times(xMinusMuT) :
+            xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu));
 
-        return scalar.plus(kLog2Pi).plus(logCovDet).times(-0.5).slice(0, 0);
+        return scalar.plus(kLog2Pi).plus(logCovDet).times(-0.5);
     }
 
     private boolean isUnivariate() {

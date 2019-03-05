@@ -5,6 +5,8 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 
+import static org.apache.commons.lang3.ArrayUtils.removeAll;
+
 public class TensorShape {
 
     private long[] shape;
@@ -246,6 +248,22 @@ public class TensorShape {
             dimension += rank;
         }
         return dimension;
+    }
+
+    public static long[] getTensorMultiplyResultShape(long[] leftShape, long[] rightShape, int[] dimsLeft, int[] dimsRight) {
+
+        if (dimsLeft.length != dimsRight.length) {
+            throw new IllegalArgumentException("Tensor multiply must match dimension lengths");
+        }
+
+
+        for (int i = 0; i < dimsLeft.length; i++) {
+            if (leftShape[dimsLeft[i]] != rightShape[dimsRight[i]]) {
+                throw new IllegalArgumentException("Cannot tensor multiply ");
+            }
+        }
+
+        return TensorShape.concat(removeAll(leftShape, dimsLeft), removeAll(rightShape, dimsRight));
     }
 
 }

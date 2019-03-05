@@ -4,19 +4,14 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.LogProbGraphContract;
 import io.improbable.keanu.vertices.LogProbGraphValueFeeder;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialsOf;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Before;
 import org.junit.Rule;
@@ -24,12 +19,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
-import java.util.HashSet;
-import java.util.Map;
-
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 
@@ -241,35 +232,4 @@ public class MultivariateGaussianTest {
         mvg.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
     }
 
-    @Test
-    public void autoDiffOfLogProbGraphEqualsDlogProb() {
-        DoubleVertex mu = ConstantVertex.of(DoubleTensor.create(1, 2));
-        ConstantDoubleVertex cov = ConstantVertex.of(DoubleTensor.create(1, 0, 0, 2).reshape(2, 2));
-        MultivariateGaussianVertex A = new MultivariateGaussianVertex(mu, cov);
-        A.setValue(DoubleTensor.create(1, 3));
-
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(A.getConnectedGraph());
-        LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(
-            bayesianNetwork.getContinuousLatentVertices(),
-            bayesianNetwork.getContinuousLatentVertices()
-        );
-
-        LogProbGraph logProbGraph = A.logProbGraph();
-
-        logProbGraph.getInput(A).setValue(A.getValue());
-        logProbGraph.getInput(mu).setValue(mu.getValue());
-        logProbGraph.getInput(cov).setValue(cov.getValue());
-
-        PartialsOf partialsOf = Differentiator.reverseModeAutoDiff(
-            logProbGraph.getLogProbOutput(),
-            new HashSet<>(logProbGraph.getInputs().values())
-        );
-
-        DoubleTensor expected = partialsOf.withRespectTo(A);
-
-        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
-        DoubleTensor actual = gradient.get(A.getId());
-
-        assertArrayEquals(expected.asFlatDoubleArray(), actual.asFlatDoubleArray(), 1e-8);
-    }
 }
