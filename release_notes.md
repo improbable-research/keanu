@@ -4,6 +4,8 @@
 
 * `DoubleVertex#matrixMultiply` now performs dot product when given two vectors, and matrix-vector product when given a matrix and a vector.
 * `MultivariateGaussianVertex` now requires that mu is a vector instead of a matrix.
+* `DoubleTensor.scalar` will throw an exception if the DoubleTensor is not actually a scalar. Please use .getValue(0) if you just
+want the first element in a DoubleTensor.
 
 ### Python
 
