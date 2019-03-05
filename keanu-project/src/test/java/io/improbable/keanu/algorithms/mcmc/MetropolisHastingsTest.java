@@ -1,8 +1,12 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.Keanu;
+import io.improbable.keanu.algorithms.NetworkSample;
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
@@ -15,6 +19,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.KeanuProbabilisticModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.testcategory.Slow;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -25,7 +30,9 @@ import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -301,6 +308,53 @@ public class MetropolisHastingsTest {
         MetropolisHastings algo = Keanu.Sampling.MetropolisHastings.withDefaultConfig();
 
         double averageA = algo.generatePosteriorSamples(model, model.getLatentVariables())
+            .dropCount(dropCount)
+            .downSampleInterval(downSampleInterval)
+            .stream()
+            .limit(sampleCount)
+            .mapToDouble(networkState -> networkState.get(A).scalar())
+            .average().getAsDouble();
+
+        assertEquals(0.0, averageA, 0.1);
+    }
+
+    @Test
+    public void duplicateKeysAreIgnored() {
+
+        MCMCTestCase testCase = new SumGaussianTestCase();
+
+        BayesianNetwork bayesNet = testCase.getModel();
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(bayesNet);
+
+        List<Variable> duplicateVariables = ImmutableList.<Variable>builder().addAll(model.getLatentVariables()).addAll(model.getLatentVariables()).build();
+
+        NetworkSamples posteriorSamples = MetropolisHastings.builder()
+            .proposalDistribution(new PriorProposalDistribution())
+            .rejectionStrategy(new RollBackToCachedValuesOnRejection())
+            .variableSelector(MHStepVariableSelector.FULL_VARIABLE_SELECTOR)
+            .build()
+            .getPosteriorSamples(
+                model,
+                duplicateVariables,
+                5000
+            );
+
+        testCase.assertExpected(posteriorSamples);
+    }
+
+    @Test
+    public void duplicateKeysAreIgnoredWhenYouStream() {
+
+        int sampleCount = 1000;
+        int dropCount = 100;
+        int downSampleInterval = 1;
+        GaussianVertex A = new GaussianVertex(0, 1);
+        KeanuProbabilisticModel model = new KeanuProbabilisticModel(A.getConnectedGraph());
+        MetropolisHastings algo = Keanu.Sampling.MetropolisHastings.withDefaultConfig();
+
+        List<Variable> duplicateVariables = ImmutableList.<Variable>builder().addAll(model.getLatentVariables()).addAll(model.getLatentVariables()).build();
+
+        double averageA = algo.generatePosteriorSamples(model, duplicateVariables)
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
             .stream()

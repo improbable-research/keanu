@@ -12,6 +12,7 @@ public interface SamplingAlgorithm {
 
     static Map<VariableReference, ?> takeSample(List<? extends Variable> sampleFromVariables) {
         return sampleFromVariables.stream()
+            .distinct()
             .collect(Collectors.toMap(Variable::getReference, Variable::getValue));
     }
 
