@@ -29,8 +29,8 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
         this(DoubleTensor.scalar(constant));
     }
 
-    public ConstantDoubleVertex(double[] vector) {
-        this(DoubleTensor.create(vector));
+    public ConstantDoubleVertex(double... vector) {
+        this(DoubleTensor.vector(vector));
     }
 
     public ConstantDoubleVertex(double[] data, long[] shape) {
