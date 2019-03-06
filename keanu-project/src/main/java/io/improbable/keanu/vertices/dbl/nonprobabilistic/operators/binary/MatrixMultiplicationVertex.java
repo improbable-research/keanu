@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivativeVertex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,30 +51,6 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements 
             );
 
         Map<Vertex, PartialDerivative> partials = new HashMap<>();
-        partials.put(left, dOutputsWrtLeft);
-        partials.put(right, dOutputsWrtRight);
-
-        return partials;
-    }
-
-    @Override
-    public Map<Vertex, PartialDerivativeVertex> reverseModeAutoDifferentiation(PartialDerivativeVertex derivativeOfOutputWithRespectToSelf) {
-
-        PartialDerivativeVertex dOutputsWrtLeft = PartialDerivativeVertex
-            .matrixMultiplyAlongWrtDimensions(
-                derivativeOfOutputWithRespectToSelf,
-                right.getValue(),
-                true
-            );
-
-        PartialDerivativeVertex dOutputsWrtRight = PartialDerivativeVertex
-            .matrixMultiplyAlongWrtDimensions(
-                derivativeOfOutputWithRespectToSelf,
-                left.getValue(),
-                false
-            );
-
-        Map<Vertex, PartialDerivativeVertex> partials = new HashMap<>();
         partials.put(left, dOutputsWrtLeft);
         partials.put(right, dOutputsWrtRight);
 

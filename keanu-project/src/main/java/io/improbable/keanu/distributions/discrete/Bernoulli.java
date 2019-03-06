@@ -5,8 +5,8 @@ import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.BooleanPlaceholderVertex;
-import io.improbable.keanu.vertices.DoublePlaceholderVertex;
+import io.improbable.keanu.vertices.bool.BooleanPlaceholderVertex;
+import io.improbable.keanu.vertices.dbl.DoublePlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 

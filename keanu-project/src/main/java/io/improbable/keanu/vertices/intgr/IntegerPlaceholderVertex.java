@@ -1,6 +1,9 @@
-package io.improbable.keanu.vertices;
+package io.improbable.keanu.vertices.intgr;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 

@@ -4,7 +4,7 @@ import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.IntegerPlaceholderVertex;
+import io.improbable.keanu.vertices.intgr.IntegerPlaceholderVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class UniformInt implements DiscreteDistribution {
