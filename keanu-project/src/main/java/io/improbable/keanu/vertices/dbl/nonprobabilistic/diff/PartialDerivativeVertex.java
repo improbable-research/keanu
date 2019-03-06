@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.Arrays;
@@ -152,17 +151,17 @@ public class PartialDerivativeVertex {
         return new PartialDerivativeVertex(result);
     }
 
-    public static PartialDerivative matrixMultiplyAlongWrtDimensions(PartialDerivative partial, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivativeVertex matrixMultiplyAlongWrtDimensions(PartialDerivativeVertex partial, DoubleVertex multiplier, boolean partialIsLeft) {
 
         if (!partial.isPresent()) {
             return partial;
         }
 
-        final DoubleTensor partialValue = partial.get();
+        final DoubleVertex partialValue = partial.get();
         final int partialRank = partialValue.getRank();
         final int wrtRightDimension = partialRank - 1;
 
-        DoubleTensor result;
+        DoubleVertex result;
         if (partialIsLeft) {
             result = partialValue
                 .tensorMultiply(multiplier, new int[]{wrtRightDimension}, new int[]{1});
@@ -177,7 +176,7 @@ public class PartialDerivativeVertex {
                 .permute(transposeWrt);
         }
 
-        return new PartialDerivative(result);
+        return new PartialDerivativeVertex(result);
     }
 
     /**

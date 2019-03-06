@@ -1,12 +1,6 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
-import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
@@ -37,52 +31,6 @@ public class LogProbGraph {
         return (Vertex<T>) inputs.get(input);
     }
 
-    public static class DoublePlaceholderVertex extends DoubleVertex implements PlaceholderVertex, NonProbabilistic<DoubleTensor>, Differentiable {
-
-        public DoublePlaceholderVertex(@LoadShape long... initialShape) {
-            super(initialShape);
-        }
-
-        @Override
-        public DoubleTensor calculate() {
-            return getPlaceholderVertexValue(this);
-        }
-
-    }
-
-    static public class IntegerPlaceholderVertex extends IntegerVertex implements PlaceholderVertex, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
-
-        public IntegerPlaceholderVertex(long... initialShape) {
-            super(initialShape);
-        }
-
-        @Override
-        public IntegerTensor calculate() {
-            return getPlaceholderVertexValue(this);
-        }
-
-    }
-
-    static public class BooleanPlaceholderVertex extends BooleanVertex implements PlaceholderVertex, NonProbabilistic<BooleanTensor>, Differentiable, NonSaveableVertex {
-
-        public BooleanPlaceholderVertex(long... initialShape) {
-            super(initialShape);
-        }
-
-        @Override
-        public BooleanTensor calculate() {
-            return getPlaceholderVertexValue(this);
-        }
-
-    }
-
     public interface PlaceholderVertex {
-    }
-
-    private static <T> T getPlaceholderVertexValue(Vertex<T> vertex) {
-        if (!vertex.hasValue()) {
-            throw new IllegalStateException("Cannot get value because PlaceholderVertex has not been initialized.");
-        }
-        return vertex.getValue();
     }
 }

@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivativeVertex;
 
 import java.util.Collections;
 import java.util.Map;
@@ -25,6 +26,10 @@ public interface Differentiable {
     }
 
     default Map<Vertex, PartialDerivative> reverseModeAutoDifferentiation(PartialDerivative derivativeOfOutputWithRespectToSelf) {
+        return Collections.emptyMap();
+    }
+
+    default Map<Vertex, PartialDerivativeVertex> reverseModeAutoDifferentiation(PartialDerivativeVertex derivativeOfOutputWithRespectToSelf) {
         return Collections.emptyMap();
     }
 }
