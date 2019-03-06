@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
+
 /**
  * This class is meant to help with auto diff in operations that support implicit broadcasting. E.g. In
  * addition/subtraction/multiplication/division scalar operands can be operated with non-scalar operands.
@@ -21,9 +23,14 @@ public class AutoDiffBroadcast {
         if (shouldCorrectPartialForBroadcast(partial, partialOfShape, targetOfShape)) {
 
             long[] wrtShape = partial.getWrtShape(partialOfShape);
+            long[] resultShape = TensorShape.concat(targetOfShape, wrtShape);
+            long[] upRankedPartialShape = shapeToDesiredRankByPrependingOnes(partial.get().getShape(), resultShape.length);
+
             DoubleTensor correctedPartial = DoubleTensor
-                .zeros(TensorShape.concat(targetOfShape, wrtShape))
-                .plus(partial.get());
+                .zeros(resultShape)
+                .plusInPlace(
+                    partial.get().reshape(upRankedPartialShape)
+                );
 
             return new PartialDerivative(correctedPartial);
         } else {

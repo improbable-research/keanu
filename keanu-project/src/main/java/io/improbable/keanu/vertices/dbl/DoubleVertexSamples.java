@@ -52,6 +52,7 @@ public class DoubleVertexSamples extends Samples<DoubleTensor> {
     }
 
 
+    @Override
     public DoubleTensor asTensor() {
         return DoubleTensor.stack(0, samples.stream().toArray(DoubleTensor[]::new));
     }

@@ -5,6 +5,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 
+
 public class TensorShape {
 
     private long[] shape;

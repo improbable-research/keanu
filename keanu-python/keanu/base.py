@@ -1,4 +1,3 @@
-import logging
 from typing import Callable
 from py4j.java_gateway import JavaObject
 

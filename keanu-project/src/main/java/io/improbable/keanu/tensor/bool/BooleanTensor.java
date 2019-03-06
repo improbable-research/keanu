@@ -4,6 +4,9 @@ import io.improbable.keanu.kotlin.BooleanOperators;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import org.apache.commons.lang3.ArrayUtils;
+
+import static io.improbable.keanu.tensor.TensorShape.getAbsoluteDimension;
 
 public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<BooleanTensor> {
 
@@ -23,12 +26,45 @@ public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<Boolean
         return new SimpleBooleanTensor(scalarValue);
     }
 
+    static BooleanTensor vector(boolean... values) {
+        return create(values, values.length);
+    }
+
     static BooleanTensor trues(long... shape) {
         return new SimpleBooleanTensor(true, shape);
     }
 
     static BooleanTensor falses(long... shape) {
         return new SimpleBooleanTensor(false, shape);
+    }
+
+    /**
+     * @param dimension the dimension along which toStack are stacked
+     * @param toStack   an array of BooleanTensor's of the same shape
+     * @return a BooleanTensor with toStack joined along a new dimension
+     * <p>
+     * e.g. A, B, C = BooleanTensor.trues(4, 2)
+     * <p>
+     * BooleanTensor.stack(0, A, B, C) gives BooleanTensor.trues(3, 4, 2)
+     * <p>
+     * BooleanTensor.stack(1, A, B, C) gives BooleanTensor.trues(4, 3, 2)
+     * <p>
+     * BooleanTensor.stack(2, A, B, C) gives BooleanTensor.trues(4, 2, 3)
+     * <p>
+     * BooleanTensor.stack(-1, A, B, C) gives BooleanTensor.trues(4, 2, 3)
+     */
+    static BooleanTensor stack(int dimension, BooleanTensor... toStack) {
+        long[] shape = toStack[0].getShape();
+        int stackedRank = toStack[0].getRank() + 1;
+        int absoluteDimension = getAbsoluteDimension(dimension, stackedRank);
+        long[] stackedShape = ArrayUtils.insert(absoluteDimension, shape, 1);
+
+        BooleanTensor[] reshaped = new BooleanTensor[toStack.length];
+        for (int i = 0; i < toStack.length; i++) {
+            reshaped[i] = toStack[i].reshape(stackedShape);
+        }
+
+        return concat(absoluteDimension, reshaped);
     }
 
     static BooleanTensor concat(int dimension, BooleanTensor[] toConcat) {
