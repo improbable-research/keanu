@@ -6,7 +6,7 @@ import com.google.common.primitives.Longs;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JVMTensorMul {
+public class TensorMulByMatrixMul {
 
     public static DoubleTensor tensorMmul(DoubleTensor a, DoubleTensor b, int[][] axes) {
 
@@ -51,7 +51,7 @@ public class JVMTensorMul {
         long[] newShapeA = {-1, n2};
         long[] oldShapeA;
         if (listA.size() == 0) {
-            oldShapeA = new long[]{1};
+            oldShapeA = new long[0];
         } else {
             oldShapeA = Longs.toArray(listA);
             for (int i = 0; i < oldShapeA.length; i++) {
@@ -68,7 +68,7 @@ public class JVMTensorMul {
         long[] newShapeB = {n3, -1};
         long[] oldShapeB;
         if (listB.size() == 0) {
-            oldShapeB = new long[]{1};
+            oldShapeB = new long[0];
         } else {
             oldShapeB = Longs.toArray(listB);
             for (int i = 0; i < oldShapeB.length; i++) {

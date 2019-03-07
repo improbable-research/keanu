@@ -667,6 +667,17 @@ public class DoubleTensorTest {
     }
 
     @Test
+    public void canTensorMultiplyAllDimensions() {
+        DoubleTensor a = DoubleTensor.create(new double[]{2}).reshape(1);
+        DoubleTensor b = DoubleTensor.create(new double[]{1, 2, 3, 4}).reshape(2, 1, 2);
+        DoubleTensor resultAB = a.tensorMultiply(b, new int[]{0}, new int[]{1});
+        DoubleTensor resultBA = b.tensorMultiply(a, new int[]{1}, new int[]{0});
+
+        assertArrayEquals(new long[]{2, 2}, resultAB.getShape());
+        assertArrayEquals(new long[]{2, 2}, resultBA.getShape());
+    }
+
+    @Test
     public void canCalculateProductOfVector() {
         double productVectorA = vectorA.product();
         double productRankThreeTensor = rankThreeTensor.product();

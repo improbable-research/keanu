@@ -331,8 +331,7 @@ public class Nd4jDoubleTensor extends DoubleTensor {
 
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
-        INDArray tensorMmulResult = Nd4j.tensorMmul(tensor, unsafeGetNd4J(value), new int[][]{dimsLeft, dimsRight});
-        return new Nd4jDoubleTensor(tensorMmulResult);
+        return TensorMulByMatrixMul.tensorMmul(this, value, new int[][]{dimsLeft, dimsRight});
     }
 
     @Override
