@@ -100,7 +100,7 @@ public abstract class DoubleTensor implements NumberTensor<Double, DoubleTensor>
         return new ScalarDoubleTensor(scalarValue);
     }
 
-    static DoubleTensor vector(double... values) {
+    public static DoubleTensor vector(double... values) {
         return DoubleTensor.create(values, values.length);
     }
 

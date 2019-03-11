@@ -3,6 +3,7 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.KeanuRandom;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LogProbGraph.DoublePlaceholderVertex;
@@ -27,10 +28,11 @@ public class MultivariateGaussian implements ContinuousDistribution {
     public DoubleTensor sample(long[] shape, KeanuRandom random) {
         TensorShapeValidation.checkTensorsMatchNonLengthOneShapeOrAreLengthOne(shape, mu.getShape());
         final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
-        final DoubleTensor variateSamples = random.nextGaussian(mu.getShape());
+        final DoubleTensor variateSamples = random.nextGaussian(mu.getShape())
+            .reshape(TensorShape.shapeDesiredToRankByAppendingOnes(mu.getShape(), 2));
         final DoubleTensor covTimesVariates = isUnivariate() ?
             choleskyCov.times(variateSamples) : choleskyCov.matrixMultiply(variateSamples);
-        return covTimesVariates.plus(mu);
+        return covTimesVariates.reshape(mu.getShape()).plus(mu);
     }
 
     @Override
