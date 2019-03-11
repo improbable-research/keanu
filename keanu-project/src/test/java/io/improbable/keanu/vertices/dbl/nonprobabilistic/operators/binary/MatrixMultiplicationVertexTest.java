@@ -285,4 +285,20 @@ public class MatrixMultiplicationVertexTest {
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
     }
 
+    @Test
+    public void changesMatchGradientWhenResultIsLengthOne() {
+        UniformVertex inputA = new UniformVertex(new long[]{1, 2}, -10.0, 10.0);
+        UniformVertex inputB = new UniformVertex(new long[]{2, 1}, -10.0, 10.0);
+        MatrixMultiplicationVertex mmultVertex = (MatrixMultiplicationVertex)inputA.matrixMultiply(inputB);
+
+        MultiplicationVertex outputVertex = mmultVertex.times(
+            new ConstantDoubleVertex(new double[]{1., 2., 3., 4., 5., 6., 7., 8.}, new long[]{2, 2, 2})
+        );
+
+        final double INCREMENT = 10;
+        final double DELTA = 1e-10;
+
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
+    }
+
 }

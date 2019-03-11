@@ -326,7 +326,7 @@ public class ProbabilisticDoubleTensorContract {
             }
         }
 
-        long[] shape = isVector ? new long[]{1, 2} : new long[]{2, 1};
+        long[] shape = new long[]{2};
 
         for (Map.Entry<Pair<Double, Double>, Long> entry : sampleBucket.entrySet()) {
             double percentage = (double) entry.getValue() / sampleCount;

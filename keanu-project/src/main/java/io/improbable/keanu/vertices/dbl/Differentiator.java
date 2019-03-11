@@ -58,7 +58,7 @@ public class Differentiator {
         return new PartialsWithRespectTo(wrt, ofWrt);
     }
 
-    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Set<DoubleVertex> wrt) {
+    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Set<? extends Vertex<?>> wrt) {
         if (ofVertex.isObserved()) {
             return new PartialsOf(ofVertex, Collections.emptyMap());
         } else {
@@ -66,7 +66,7 @@ public class Differentiator {
         }
     }
 
-    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, DoubleVertex... wrt) {
+    public static PartialsOf reverseModeAutoDiff(Vertex ofVertex, Vertex<?>... wrt) {
         return reverseModeAutoDiff(ofVertex, new HashSet<>(Arrays.asList(wrt)));
     }
 

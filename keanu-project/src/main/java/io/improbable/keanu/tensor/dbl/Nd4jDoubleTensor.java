@@ -300,6 +300,9 @@ public class Nd4jDoubleTensor extends DoubleTensor {
 
     @Override
     public Double scalar() {
+        if (this.getLength() > 1) {
+            throw new IllegalArgumentException("Not a scalar");
+        }
         return tensor.getDouble(0);
     }
 

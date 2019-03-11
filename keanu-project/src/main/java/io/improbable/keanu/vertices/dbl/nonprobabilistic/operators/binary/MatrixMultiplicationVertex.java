@@ -8,9 +8,10 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivative;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.getMatrixMultiplicationResultingShape;
 
 public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements Differentiable {
     /**
@@ -23,7 +24,7 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements 
     @ExportVertexToPythonBindings
     public MatrixMultiplicationVertex(@LoadVertexParam(LEFT_NAME) DoubleVertex left,
                                       @LoadVertexParam(RIGHT_NAME) DoubleVertex right) {
-        super(getResultingShape(left.getShape(), right.getShape()),
+        super(getMatrixMultiplicationResultingShape(left.getShape(), right.getShape()),
             left, right);
     }
 
@@ -75,17 +76,5 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements 
         );
 
         return partialsFromLeft.add(partialsFromRight);
-    }
-
-    private static long[] getResultingShape(long[] left, long[] right) {
-        if (left.length != 2 || right.length != 2) {
-            throw new IllegalArgumentException("Matrix multiply must be used on matrices");
-        }
-
-        if (left[1] != right[0]) {
-            throw new IllegalArgumentException("Can not multiply matrices of shapes " + Arrays.toString(left) + " X " + Arrays.toString(right));
-        }
-
-        return new long[]{left[0], right[1]};
     }
 }
