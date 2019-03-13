@@ -20,13 +20,15 @@ linux: &linux
     - "capable_of_building=graphos-eng"
     - "environment=production"
     - "permission_set=builder"
-    - "queue=${CI_LINUX_BUILDER_QUEUE:-v2-1550668667-a9410887d4b815dd-------z}"
+    - "platform=linux"
+    - "queue=${CI_LINUX_BUILDER_QUEUE:-v2-1552399688-f84f3666421d190b-------z}"
 
 windows: &windows
   agents:
     - "capable_of_building=graphos-eng"
     - "environment=production"
     - "permission_set=builder"
+    - "platform=windows"
     - "queue=${CI_WINDOWS_BUILDER_QUEUE:-v2-1550748015-b6a7d7f9ae5dbf04-------z}"
 
 # NOTE: step labels turn into commit-status names like {org}/{repo}/{pipeline}/{step-label}, lower-case and hyphenated.
