@@ -2,14 +2,19 @@ package io.improbable.snippet;
 
 import io.improbable.keanu.templating.Sequence;
 import io.improbable.keanu.templating.SequenceBuilder;
+import io.improbable.keanu.templating.SequenceItem;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
+import io.improbable.keanu.vertices.SimpleVertexDictionary;
+import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class SequenceExample {
     //%%SNIPPET_START%% SequenceData
@@ -72,4 +77,47 @@ public class SequenceExample {
         return sequence;
     }
     //%%SNIPPET_END%% Sequence
+
+    public Sequence buildSequenceTimeSeries() {
+        //%%SNIPPET_START%% SequenceTimeSeries
+        DoubleVertex two = new ConstantDoubleVertex(2);
+
+        // Define the labels of vertices we will use in our Sequence
+        VertexLabel x1Label = new VertexLabel("x1");
+        VertexLabel x2Label = new VertexLabel("x2");
+
+        // Define 'Proxy Vertices' which we use as placeholders when defining our sequence for the equivalent vertex
+        // in the previous sequence.
+        // I.e. these are the inputs to our sequence
+        VertexLabel x1InputLabel = SequenceBuilder.proxyFor(x1Label);
+        VertexLabel x2InputLabel = SequenceBuilder.proxyFor(x2Label);
+
+        // Define a factory method that creates proxy vertices using the proxy vertex labels and then uses these
+        // to define the computation graph of the Sequence.
+        // Note we have labeled the output vertices of this sequence
+        Consumer<SequenceItem> factory = sequenceItem -> {
+            DoubleProxyVertex x1Input = new DoubleProxyVertex(x1InputLabel);
+            DoubleProxyVertex x2Input = new DoubleProxyVertex(x2InputLabel);
+
+            DoubleVertex x1Output = x1Input.multiply(two).setLabel(x1Label);
+            DoubleVertex x2Output = x2Input.plus(x1Output).setLabel(x2Label);
+
+            sequenceItem.addAll(x1Input, x2Input, x1Output, x2Output);
+        };
+
+        // Create the starting values of our sequence
+        DoubleVertex x1Start = new ConstantDoubleVertex(4).setLabel(x1Label);
+        DoubleVertex x2Start = new ConstantDoubleVertex(4).setLabel(x2Label);
+        VertexDictionary dictionary = SimpleVertexDictionary.of(x1Start, x2Start);
+
+        Sequence sequence = new SequenceBuilder<Integer>()
+            .withInitialState(dictionary)
+            .count(5)
+            .withFactory(factory)
+            .build();
+
+        //%%SNIPPET_END%% SequenceTimeSeries
+
+        return sequence;
+    }
 }

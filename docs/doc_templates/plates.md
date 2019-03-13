@@ -29,7 +29,28 @@ A sequence is a group of vertices that is repeated multiple times in the network
 (optionally) depend on vertices in the previous group. They typically represent a concept larger than a vertex like 
 an agent in an ABM, a time series or some observations that are associated.
 
-## How do you build them?
+# Examples
+
+Here are some examples that will walk you through the process of developing with Sequences.
+
+## Writing time series
+
+This example shows you how you can write a simple time series model using Sequences
+
+```java
+{% snippet SequenceTimeSeries %}
+```
+
+Note: by using the `.withFactories` method on the builder, rather than the `.withFactory`, it is possible
+to have factories which use proxy input vertices which are defined in other factories.
+I.e. your vertices can cross factories.
+
+## Observing many associated data points
+
+This example shows you how you can repeat logic over many data observed data points which are associated by having a 
+dependence on a common global value. 
+Here they are the intercept and weights of a linear regression model. 
+
 
 Let's say you have a class `MyData` that looks like this:
 ```java

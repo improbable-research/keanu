@@ -492,7 +492,7 @@ public class SequenceBuilderTest {
         VertexLabel x4Label = new VertexLabel("x4");
 
         DoubleVertex two = new ConstantDoubleVertex(2);
-        DoubleVertex half = new ConstantDoubleVertex(0.2);
+        DoubleVertex half = new ConstantDoubleVertex(0.5);
 
         VertexLabel x1InputLabel = SequenceBuilder.proxyFor(x1Label);
         VertexLabel x2InputLabel = SequenceBuilder.proxyFor(x2Label);
