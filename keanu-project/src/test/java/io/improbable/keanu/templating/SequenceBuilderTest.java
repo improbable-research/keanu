@@ -9,6 +9,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexMatchers;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -26,8 +27,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
 import static io.improbable.keanu.vertices.VertexMatchers.hasLabel;
@@ -38,6 +44,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
@@ -475,5 +482,80 @@ public class SequenceBuilderTest {
                 item.add(new DoubleProxyVertex(realLabel));
             })
             .build();
+    }
+
+    @Test
+    public void youCanCreateSequenceFromMultipleFactories() throws IOException {
+        VertexLabel x1Label = new VertexLabel("x1");
+        VertexLabel x2Label = new VertexLabel("x2");
+        VertexLabel x3Label = new VertexLabel("x3");
+        VertexLabel x4Label = new VertexLabel("x4");
+
+        DoubleVertex two = new ConstantDoubleVertex(2);
+        DoubleVertex half = new ConstantDoubleVertex(0.2);
+
+        VertexLabel x1InputLabel = SequenceBuilder.proxyFor(x1Label);
+        VertexLabel x2InputLabel = SequenceBuilder.proxyFor(x2Label);
+        VertexLabel x3InputLabel = SequenceBuilder.proxyFor(x3Label);
+        VertexLabel x4InputLabel = SequenceBuilder.proxyFor(x4Label);
+
+        Consumer<SequenceItem> factory1 = sequenceItem -> {
+            DoubleProxyVertex x1Input = new DoubleProxyVertex(x1InputLabel);
+            DoubleProxyVertex x2Input = new DoubleProxyVertex(x2InputLabel);
+
+            DoubleVertex x1Output = x1Input.multiply(two).setLabel(x1Label);
+            DoubleVertex x3Output = x2Input.multiply(two).setLabel(x3Label);
+
+            sequenceItem.addAll(x1Input, x2Input, x1Output, x3Output);
+        };
+
+        Consumer<SequenceItem> factory2 = sequenceItem -> {
+            DoubleProxyVertex x3Input = new DoubleProxyVertex(x3InputLabel);
+            DoubleProxyVertex x4Input = new DoubleProxyVertex(x4InputLabel);
+
+            DoubleVertex x2Output = x3Input.multiply(half).setLabel(x2Label);
+            DoubleVertex x4Output = x4Input.multiply(half).setLabel(x4Label);
+
+            sequenceItem.addAll(x3Input, x4Input, x2Output, x4Output);
+        };
+
+        DoubleVertex x1Start = new ConstantDoubleVertex(4).setLabel(x1Label);
+        DoubleVertex x2Start = new ConstantDoubleVertex(4).setLabel(x2Label);
+        DoubleVertex x3Start = new ConstantDoubleVertex(4).setLabel(x3Label);
+        DoubleVertex x4Start = new ConstantDoubleVertex(4).setLabel(x4Label);
+
+        VertexDictionary dictionary = SimpleVertexDictionary.of(x1Start, x2Start, x3Start, x4Start);
+        List<Consumer<SequenceItem>> factories = new ArrayList<>();
+        factories.add(factory1);
+        factories.add(factory2);
+
+
+        Sequence sequence = new SequenceBuilder<Integer>()
+            .withInitialState(dictionary)
+            .count(5)
+            .withFactories(factories)
+            .build();
+
+        assertThat(sequence.size(), equalTo(5));
+        for (SequenceItem item : sequence.asList()) {
+            checkSequenceOutputLinksToInput(item, x1InputLabel, x1Label);
+            checkSequenceOutputLinksToInput(item, x2InputLabel, x3Label);
+            checkSequenceOutputLinksToInput(item, x3InputLabel, x2Label);
+            checkSequenceOutputLinksToInput(item, x4InputLabel, x4Label);
+        }
+    }
+
+    /**
+     * A helper method that finds the proxy vertex that is the output of the previous sequence item and checks it has been
+     * wired up correctly to the desired input vertex of the current sequence item
+     * desired
+     */
+    private void checkSequenceOutputLinksToInput(SequenceItem item, VertexLabel previousOutputLabel, VertexLabel currentInputLabel) {
+        Set<Vertex> inputChildren = item.get(previousOutputLabel).getChildren();
+        assertThat(inputChildren.size(), is(1));
+
+        Optional<Vertex> optionalOutputOfPreviousTimestep = inputChildren.stream().findFirst();
+        assertThat(optionalOutputOfPreviousTimestep.isPresent(), is(true));
+        assertThat(optionalOutputOfPreviousTimestep.get().getLabel().withoutOuterNamespace(), is(currentInputLabel));
     }
 }
