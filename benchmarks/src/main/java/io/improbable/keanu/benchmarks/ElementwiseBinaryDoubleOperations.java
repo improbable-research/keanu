@@ -16,7 +16,7 @@ public class ElementwiseBinaryDoubleOperations {
     public BinaryOperation operation;
 
     @Param({"1", "10", "100", "1000"})
-    public int N;
+    public int dimLength;
 
     @Param({"JVM", "ND4J"})
     public DoubleTensorImpl impl;
@@ -27,8 +27,8 @@ public class ElementwiseBinaryDoubleOperations {
     @Setup
     public void setup() {
         DoubleTensor.setFactory(impl.getFactory());
-        left = DoubleTensor.arange(0, N * N).reshape(N, N);
-        right = DoubleTensor.arange(N * N, 2 * N * N).reshape(N, N);
+        left = DoubleTensor.arange(0, dimLength * dimLength).reshape(dimLength, dimLength);
+        right = DoubleTensor.arange(dimLength * dimLength, 2 * dimLength * dimLength).reshape(dimLength, dimLength);
     }
 
     @Benchmark
