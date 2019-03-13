@@ -29,7 +29,7 @@ public class KeanuLapack {
      *
      * @param upperLower either upper triangular or lower triangular specifies format of result
      * @param N          length of one dimension in the square matrix to operate on
-     * @param buffer     matrix to take choleskey decoposition of and buffer to store result
+     * @param buffer     matrix to take cholesky decoposition of and buffer to store result
      * @return 0 if successful, -i if error at i index, or positive if matrix is not positive-definite
      */
     public static int dpotrf(Triangular upperLower, int N, double[] buffer) {

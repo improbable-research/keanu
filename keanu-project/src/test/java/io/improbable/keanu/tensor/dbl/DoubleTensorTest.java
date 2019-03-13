@@ -241,7 +241,7 @@ public class DoubleTensorTest {
     }
 
     @Test
-    public void canFindCholeskeyDecomposition() {
+    public void canFindCholeskyDecomposition() {
         //Example from: https://en.wikipedia.org/wiki/Cholesky_decomposition
         DoubleTensor A = DoubleTensor.create(new double[]{
             4, 12, -16,

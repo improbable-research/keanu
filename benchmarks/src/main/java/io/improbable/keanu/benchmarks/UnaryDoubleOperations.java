@@ -13,7 +13,7 @@ public class UnaryDoubleOperations {
 
     private static final int NUM_OPERATIONS = 100;
 
-    @Param({"CHOLESKEY", "DETERMINANT", "COS", "INVERSE", "LOG", "TRANSPOSE"})
+    @Param({"CHOLESKY", "DETERMINANT", "COS", "INVERSE", "LOG", "TRANSPOSE"})
     public UnaryOperation operation;
 
     @Param({"10"})

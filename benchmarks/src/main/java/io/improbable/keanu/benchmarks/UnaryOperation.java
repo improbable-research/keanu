@@ -18,7 +18,7 @@ public enum UnaryOperation {
         }
     },
 
-    CHOLESKEY {
+    CHOLESKY {
         @Override
         public DoubleTensor apply(DoubleTensor tensor) {
             return tensor.choleskyDecomposition();
