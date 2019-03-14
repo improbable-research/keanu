@@ -1,4 +1,4 @@
-from typing import Callable, Generator, Dict, Optional, Any, Iterator
+from typing import Callable, Generator, Dict, Optional, Any, Iterator, Iterable
 
 from py4j.java_gateway import java_import
 
@@ -30,7 +30,8 @@ class SequenceItem(JavaObjectWrapper):
 
 class Sequence(JavaObjectWrapper):
     """
-    :param factory: a function that takes a :class:`SequenceItem`. Used to add vertices to each SequenceItem.
+    :param factories: either a function or an iterable object of functions that takes a :class:`SequenceItem`.
+    Used to add vertices to each SequenceItem.
     :param count: The number of :class:`SequenceItem`s in this sequence.
     :param data_generator: An iterator used to generate the `SequenceItem`s from data.
     Each item in the iterator is a dict, keyed on strings which can be interpreted as variable names.
@@ -41,7 +42,8 @@ class Sequence(JavaObjectWrapper):
     """
 
     def __init__(self,
-                 factory: Callable[..., None],
+                 factory: Callable[..., None] = None,
+                 factories: Iterable[Callable[..., None]] = None,
                  count: int = None,
                  data_generator: Iterator[Dict[str, Any]] = None,
                  initial_state: Dict[str, vertex_constructor_param_types] = None):
@@ -59,17 +61,28 @@ class Sequence(JavaObjectWrapper):
                 "Cannot create a sequence of an unknown size: you must specify either a count of a data_generator")
         elif count is not None and data_generator is not None:
             raise ValueError("If you pass in a data_generator you cannot also pass in a count")
+        elif factory is None and factories is None:
+            raise ValueError("You must provide a value for either the 'factory' or 'factories' input")
 
         if count is not None:
-            function = lambda p: factory(SequenceItem(p))
-            consumer = Consumer(function)
-            builder = builder.count(count).withFactory(consumer)
+            if factories is not None:
+                functions = [Consumer(lambda p: factory(SequenceItem(p))) for factory in factories]
+                builder = builder.count(count).withFactories(functions)
+            elif factory is not None:
+                function = lambda p: factory(SequenceItem(p))
+                consumer = Consumer(function)
+                builder = builder.count(count).withFactory(consumer)
 
         if data_generator is not None:
-            bifunction = lambda p, data: factory(SequenceItem(p), data)
-            biconsumer = BiConsumer(bifunction)
-            data_generator_java = (k.to_java_map(m) for m in data_generator)
-            builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactory(biconsumer)
+            if factories is not None:
+                bifunctions = [Consumer(lambda p, data: factory(SequenceItem(p), data)) for factory in factories]
+                data_generator_java = (k.to_java_map(m) for m in data_generator)
+                builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactory(bifunctions)
+            elif factory is not None:
+                bifunction = lambda p, data: factory(SequenceItem(p), data)
+                biconsumer = BiConsumer(bifunction)
+                data_generator_java = (k.to_java_map(m) for m in data_generator)
+                builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactory(biconsumer)
 
         sequence = builder.build()
         super().__init__(sequence)
