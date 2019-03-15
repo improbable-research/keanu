@@ -1,6 +1,7 @@
 from typing import Callable, Generator, Dict, Optional, Any, Iterator, Iterable
 
 from py4j.java_gateway import java_import
+from py4j.java_collections import ListConverter
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
@@ -66,8 +67,9 @@ class Sequence(JavaObjectWrapper):
 
         if count is not None:
             if factories is not None:
-                functions = [Consumer(lambda p: factory(SequenceItem(p))) for factory in factories]
-                builder = builder.count(count).withFactories(functions)
+                functions = [Consumer(lambda p, f=f: f(SequenceItem(p))) for f in factories]
+                java_functions = ListConverter().convert(functions, k._gateway._gateway_client)
+                builder = builder.count(count).withFactories(java_functions)
             elif factory is not None:
                 function = lambda p: factory(SequenceItem(p))
                 consumer = Consumer(function)
@@ -76,8 +78,9 @@ class Sequence(JavaObjectWrapper):
         if data_generator is not None:
             if factories is not None:
                 bifunctions = [Consumer(lambda p, data: factory(SequenceItem(p), data)) for factory in factories]
+                java_bifunctions = ListConverter().convert(bifunctions, k._gateway._gateway_client)
                 data_generator_java = (k.to_java_map(m) for m in data_generator)
-                builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactory(bifunctions)
+                builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactory(java_bifunctions)
             elif factory is not None:
                 bifunction = lambda p, data: factory(SequenceItem(p), data)
                 biconsumer = BiConsumer(bifunction)

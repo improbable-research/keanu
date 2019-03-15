@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -485,7 +484,7 @@ public class SequenceBuilderTest {
     }
 
     @Test
-    public void youCanCreateSequenceFromMultipleFactories() throws IOException {
+    public void youCanCreateSequenceFromMultipleFactories() {
         VertexLabel x1Label = new VertexLabel("x1");
         VertexLabel x2Label = new VertexLabel("x2");
         VertexLabel x3Label = new VertexLabel("x3");

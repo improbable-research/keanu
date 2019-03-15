@@ -80,6 +80,12 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
         label = self.unwrap().getLabel()
         return None if label is None else label.getQualifiedName()
 
+    def get_label_without_outer_namespace(self) -> Optional[str]:
+        label = self.unwrap().getLabel()
+        if label is None:
+            return None
+        return label.withoutOuterNamespace().getQualifiedName()
+
     def iter_parents(self) -> Iterator['Vertex']:
         return Vertex._to_generator(self.unwrap().getParents())
 

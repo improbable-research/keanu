@@ -1,9 +1,10 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import pytest
 
 from keanu.sequence import Sequence, SequenceItem
-from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, KeanuContext
+from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, KeanuContext, ConstantDouble, Vertex, \
+    vertex_constructor_param_types
 
 
 def test_you_can_iterate_over_the_sequence() -> None:
@@ -97,3 +98,80 @@ def test_you_can_build_a_time_series() -> None:
         assert [p.get_id() for p in x.iter_parents()] == [x_previous_proxy.get_id()]
         assert [p.get_id() for p in y.iter_parents()] == [x.get_id()]
         x_from_previous_step = x
+
+
+def __check_sequence_output_links_to_input(item: SequenceItem, previous_output_label: str,
+                                           current_input_label: str) -> None:
+    input_children = item.get(previous_output_label).iter_children()
+    optional_output_of_previous_timestep = next(input_children, None)
+
+    assert optional_output_of_previous_timestep is not None
+    assert next(input_children, None) is None
+
+    assert optional_output_of_previous_timestep.get_label_without_outer_namespace() == current_input_label
+
+
+def test_you_can_use_multiple_factories_to_build_sequences() -> None:
+    x1_label = "x1"
+    x2_label = "x2"
+    x3_label = "x3"
+    x4_label = "x4"
+
+    two = ConstantDouble(2)
+    half = ConstantDouble(0.5)
+
+    x1_input_label = Sequence.proxy_for(x1_label)
+    x2_input_label = Sequence.proxy_for(x2_label)
+    x3_input_label = Sequence.proxy_for(x3_label)
+    x4_input_label = Sequence.proxy_for(x4_label)
+
+    def factory1(sequence_item):
+        x1_input = DoubleProxy((), x1_input_label)
+        x2_input = DoubleProxy((), x2_input_label)
+
+        x1_output = x1_input * two
+        x1_output.set_label(x1_label)
+        x3_output = x2_input * two
+        x3_output.set_label(x3_label)
+
+        sequence_item.add(x1_input)
+        sequence_item.add(x2_input)
+        sequence_item.add(x1_output)
+        sequence_item.add(x3_output)
+
+    def factory2(sequence_item):
+        x3_input = DoubleProxy((), x3_input_label)
+        x4_input = DoubleProxy((), x4_input_label)
+
+        x2_output = x3_input * half
+        x2_output.set_label(x2_label)
+        x4_output = x4_input * half
+        x4_output.set_label(x4_label)
+
+        sequence_item.add(x3_input)
+        sequence_item.add(x4_input)
+        sequence_item.add(x2_output)
+        sequence_item.add(x4_output)
+
+    x1_start = ConstantDouble(4)
+    x2_start = ConstantDouble(4)
+    x3_start = ConstantDouble(4)
+    x4_start = ConstantDouble(4)
+
+    initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {
+        x1_label: x1_start,
+        x2_label: x2_start,
+        x3_label: x3_start,
+        x4_label: x4_start
+    }
+    factories = [factory1, factory2]
+
+    sequence = Sequence(count=5, factories=factories, initial_state=initial_state)
+
+    assert sequence.size() == 5
+
+    for item in sequence:
+        __check_sequence_output_links_to_input(item, x1_input_label, x1_label)
+        __check_sequence_output_links_to_input(item, x2_input_label, x3_label)
+        __check_sequence_output_links_to_input(item, x3_input_label, x2_label)
+        __check_sequence_output_links_to_input(item, x4_input_label, x4_label)
