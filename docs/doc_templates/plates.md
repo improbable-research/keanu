@@ -47,7 +47,7 @@ I.e. your vertices can cross factories.
 
 ## Observing many associated data points
 
-This example shows you how you can repeat logic over many data observed data points which are associated by having a 
+This example shows you how you can repeat logic over many observed data points which are associated by having a 
 dependency on a common global value. 
 Here they are the intercept and weights of a linear regression model. 
 
