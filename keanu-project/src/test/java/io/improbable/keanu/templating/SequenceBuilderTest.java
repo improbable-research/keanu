@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
 import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
 import static io.improbable.keanu.vertices.VertexMatchers.hasLabel;
 import static io.improbable.keanu.vertices.VertexMatchers.hasNoLabel;
@@ -542,6 +543,16 @@ public class SequenceBuilderTest {
             checkSequenceOutputLinksToInput(item, x3InputLabel, x2Label);
             checkSequenceOutputLinksToInput(item, x4InputLabel, x4Label);
         }
+
+        checkOutputEquals(sequence, x1Label, 128.);
+        checkOutputEquals(sequence, x2Label, 2.);
+        checkOutputEquals(sequence, x3Label, 8.);
+        checkOutputEquals(sequence, x4Label, .125);
+    }
+
+    private void checkOutputEquals(Sequence sequence, VertexLabel label, Double desiredOutput) {
+        DoubleVertex x1Result = sequence.getLastItem().get(label);
+        assertThat(x1Result.getValue(), isScalarWithValue(desiredOutput));
     }
 
     /**

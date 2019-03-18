@@ -5,11 +5,12 @@ import pytest
 from keanu.sequence import Sequence, SequenceItem
 from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, KeanuContext, ConstantDouble, Vertex, \
     vertex_constructor_param_types
+from keanu.vertex.label import _VertexLabel
 
 
 def test_you_can_iterate_over_the_sequence() -> None:
     num_items = 100
-    sequence = Sequence(count=num_items, factory=lambda p: None)
+    sequence = Sequence(count=num_items, factories=lambda p: None)
     item_count = sum(1 for _ in sequence)
     assert item_count == num_items
 
@@ -23,7 +24,7 @@ def test_you_can_build_a_sequence_with_fixed_count() -> None:
         v.set_label(vertexLabel)
         item.add(v)
 
-    sequence = Sequence(count=num_items, factory=create_vertex)
+    sequence = Sequence(count=num_items, factories=create_vertex)
     assert sequence.size() == num_items
 
     for item in sequence:
@@ -39,7 +40,7 @@ def test_you_can_build_a_sequence_from_data() -> None:
         item.add(Const(point["x"], label="x"))
         item.add(Const(point["y"], label="y"))
 
-    sequence = Sequence(data_generator=data_generator, factory=create_vertices)
+    sequence = Sequence(data_generator=data_generator, factories=create_vertices)
     assert sequence.size() == num_items
 
     for index, item in enumerate(sequence):
@@ -51,12 +52,12 @@ def test_you_must_pass_count_or_data_generator() -> None:
     with pytest.raises(
             ValueError,
             match="Cannot create a sequence of an unknown size: you must specify either a count of a data_generator"):
-        Sequence(factory=lambda _: None)
+        Sequence(factories=lambda _: None)
 
 
 def test_you_cannot_pass_both_count_and_data_generator() -> None:
     with pytest.raises(ValueError, match="If you pass in a data_generator you cannot also pass in a count"):
-        Sequence(factory=lambda _: None, count=1, data_generator=({} for _ in []))
+        Sequence(factories=lambda _: None, count=1, data_generator=({} for _ in []))
 
 
 def test_you_can_build_a_time_series() -> None:
@@ -83,7 +84,7 @@ def test_you_can_build_a_time_series() -> None:
         sequence_item.add(x, label=x_label)
         sequence_item.add(y, label=y_label)
 
-    sequence = Sequence(initial_state={x_label: initial_x}, count=num_items, factory=create_time_step)
+    sequence = Sequence(initial_state={x_label: initial_x}, count=num_items, factories=create_time_step)
     assert sequence.size() == num_items
 
     x_from_previous_step = None
@@ -109,6 +110,16 @@ def __check_sequence_output_links_to_input(item: SequenceItem, previous_output_l
     assert next(input_children, None) is None
 
     assert optional_output_of_previous_timestep.get_label_without_outer_namespace() == current_input_label
+
+
+def __check_output_equals(sequence: Sequence, label: str, desired_output: float) -> None:
+    sequence_unwrapped = sequence.unwrap()
+    x1_result = sequence_unwrapped.getLastItem().get(_VertexLabel(label).unwrap())
+    assert len(x1_result.getShape()) == 0
+
+    print(x1_result.getValue())
+    print(x1_result.getValue().scalar())
+    assert x1_result.getValue().scalar() == desired_output
 
 
 def test_you_can_use_multiple_factories_to_build_sequences() -> None:
@@ -175,3 +186,8 @@ def test_you_can_use_multiple_factories_to_build_sequences() -> None:
         __check_sequence_output_links_to_input(item, x2_input_label, x3_label)
         __check_sequence_output_links_to_input(item, x3_input_label, x2_label)
         __check_sequence_output_links_to_input(item, x4_input_label, x4_label)
+
+    __check_output_equals(sequence, x1_label, 128)
+    __check_output_equals(sequence, x2_label, 2)
+    __check_output_equals(sequence, x3_label, 8)
+    __check_output_equals(sequence, x4_label, 0.125)

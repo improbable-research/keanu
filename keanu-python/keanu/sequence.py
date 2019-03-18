@@ -1,7 +1,10 @@
-from typing import Callable, Generator, Dict, Optional, Any, Iterator, Iterable
+from typing import Callable, Generator, Dict, Optional, Any, Iterator, Iterable, Union
 
 from py4j.java_gateway import java_import
 from py4j.java_collections import ListConverter
+
+from functools import partial
+from collections.abc import Iterable as CollectionsIterable
 
 from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
@@ -43,8 +46,7 @@ class Sequence(JavaObjectWrapper):
     """
 
     def __init__(self,
-                 factory: Callable[..., None] = None,
-                 factories: Iterable[Callable[..., None]] = None,
+                 factories: Union[Callable[..., None], Iterable[Callable[..., None]]] = None,
                  count: int = None,
                  data_generator: Iterator[Dict[str, Any]] = None,
                  initial_state: Dict[str, vertex_constructor_param_types] = None):
@@ -62,30 +64,30 @@ class Sequence(JavaObjectWrapper):
                 "Cannot create a sequence of an unknown size: you must specify either a count of a data_generator")
         elif count is not None and data_generator is not None:
             raise ValueError("If you pass in a data_generator you cannot also pass in a count")
-        elif factory is None and factories is None:
-            raise ValueError("You must provide a value for either the 'factory' or 'factories' input")
+        elif factories is None:
+            raise ValueError("You must provide a value for the 'factories' input")
+
+        if not isinstance(factories, CollectionsIterable):
+            factories = [factories]
 
         if count is not None:
-            if factories is not None:
-                functions = [Consumer(lambda p, f=f: f(SequenceItem(p))) for f in factories]
-                java_functions = ListConverter().convert(functions, k._gateway._gateway_client)
-                builder = builder.count(count).withFactories(java_functions)
-            elif factory is not None:
-                function = lambda p: factory(SequenceItem(p))
-                consumer = Consumer(function)
-                builder = builder.count(count).withFactory(consumer)
+
+            def wrap_function_argument_in_sequence_item(f, p):
+                return f(SequenceItem(p))
+
+            functions = [Consumer(partial(wrap_function_argument_in_sequence_item, f)) for f in factories]
+            java_functions = ListConverter().convert(functions, k._gateway._gateway_client)
+            builder = builder.count(count).withFactories(java_functions)
 
         if data_generator is not None:
-            if factories is not None:
-                bifunctions = [Consumer(lambda p, data: factory(SequenceItem(p), data)) for factory in factories]
-                java_bifunctions = ListConverter().convert(bifunctions, k._gateway._gateway_client)
-                data_generator_java = (k.to_java_map(m) for m in data_generator)
-                builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactory(java_bifunctions)
-            elif factory is not None:
-                bifunction = lambda p, data: factory(SequenceItem(p), data)
-                biconsumer = BiConsumer(bifunction)
-                data_generator_java = (k.to_java_map(m) for m in data_generator)
-                builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactory(biconsumer)
+
+            def wrap_function_arguments_in_sequence_item(f, p, data):
+                return f(SequenceItem(p), data)
+
+            bifunctions = [BiConsumer(partial(wrap_function_arguments_in_sequence_item, f)) for f in factories]
+            java_bifunctions = ListConverter().convert(bifunctions, k._gateway._gateway_client)
+            data_generator_java = (k.to_java_map(m) for m in data_generator)
+            builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactories(java_bifunctions)
 
         sequence = builder.build()
         super().__init__(sequence)

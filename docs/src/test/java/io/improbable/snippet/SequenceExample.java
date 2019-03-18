@@ -86,15 +86,15 @@ public class SequenceExample {
         VertexLabel x1Label = new VertexLabel("x1");
         VertexLabel x2Label = new VertexLabel("x2");
 
-        // Define 'Proxy Vertices' which we use as placeholders when defining our sequence for the equivalent vertex
-        // in the previous sequence.
-        // I.e. these are the inputs to our sequence
+        // Define labels for the Proxy Vertices which stand in for a Vertex from the previous SequenceItem.
+        // They will be automatically wired up when you construct the Sequence.
+        // I.e. these are the 'inputs' to our SequenceItem
         VertexLabel x1InputLabel = SequenceBuilder.proxyFor(x1Label);
         VertexLabel x2InputLabel = SequenceBuilder.proxyFor(x2Label);
 
         // Define a factory method that creates proxy vertices using the proxy vertex labels and then uses these
         // to define the computation graph of the Sequence.
-        // Note we have labeled the output vertices of this sequence
+        // Note we have labeled the output vertices of this SequenceItem
         Consumer<SequenceItem> factory = sequenceItem -> {
             DoubleProxyVertex x1Input = new DoubleProxyVertex(x1InputLabel);
             DoubleProxyVertex x2Input = new DoubleProxyVertex(x2InputLabel);

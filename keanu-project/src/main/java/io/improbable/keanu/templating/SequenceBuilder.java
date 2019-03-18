@@ -119,7 +119,7 @@ public class SequenceBuilder<T> {
          * @return A builder with count and sequence factory set
          */
         public FromCountFactories withFactory(Consumer<SequenceItem> factory) {
-            return new FromCountFactories(Collections.singleton(factory), this, initialState, transitionMapping);
+            return withFactories(Collections.singleton(factory));
         }
 
         /**
@@ -160,7 +160,7 @@ public class SequenceBuilder<T> {
          * @return A builder with data and sequence factory set
          */
         public FromDataFactories withFactory(BiConsumer<SequenceItem, T> factory) {
-            return new FromDataFactories(Collections.singleton(factory), this, size, initialState);
+            return withFactories(Collections.singleton(factory));
         }
 
         /**
