@@ -71,20 +71,12 @@ class Sequence(JavaObjectWrapper):
             factories = [factories]
 
         if count is not None:
-
-            def wrap_function_argument_in_sequence_item(f, p):
-                return f(SequenceItem(p))
-
-            functions = [Consumer(partial(wrap_function_argument_in_sequence_item, f)) for f in factories]
+            functions = [Consumer(partial(lambda f, p: f(SequenceItem(p)), f)) for f in factories]
             java_functions = ListConverter().convert(functions, k._gateway._gateway_client)
             builder = builder.count(count).withFactories(java_functions)
 
         if data_generator is not None:
-
-            def wrap_function_arguments_in_sequence_item(f, p, data):
-                return f(SequenceItem(p), data)
-
-            bifunctions = [BiConsumer(partial(wrap_function_arguments_in_sequence_item, f)) for f in factories]
+            bifunctions = [BiConsumer(partial(lambda f, p, data: f(SequenceItem(p), data), f)) for f in factories]
             java_bifunctions = ListConverter().convert(bifunctions, k._gateway._gateway_client)
             data_generator_java = (k.to_java_map(m) for m in data_generator)
             builder = builder.fromIterator(JavaIterator(data_generator_java)).withFactories(java_bifunctions)

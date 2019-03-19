@@ -551,8 +551,8 @@ public class SequenceBuilderTest {
     }
 
     private void checkOutputEquals(Sequence sequence, VertexLabel label, Double desiredOutput) {
-        DoubleVertex x1Result = sequence.getLastItem().get(label);
-        assertThat(x1Result.getValue(), isScalarWithValue(desiredOutput));
+        DoubleVertex result = sequence.getLastItem().get(label);
+        assertThat(result.getValue(), isScalarWithValue(desiredOutput));
     }
 
     /**

@@ -46,13 +46,13 @@ VertexLabel x2Label = new VertexLabel("x2");
 
 // Define labels for the Proxy Vertices which stand in for a Vertex from the previous SequenceItem.
 // They will be automatically wired up when you construct the Sequence.
-// I.e. these are the 'inputs' to our SequenceItem
+// i.e. these are the 'inputs' to our SequenceItem
 VertexLabel x1InputLabel = SequenceBuilder.proxyFor(x1Label);
 VertexLabel x2InputLabel = SequenceBuilder.proxyFor(x2Label);
 
 // Define a factory method that creates proxy vertices using the proxy vertex labels and then uses these
 // to define the computation graph of the Sequence.
-// Note we have labeled the output vertices of this sequence
+// Note we have labeled the output vertices of this SequenceItem
 Consumer<SequenceItem> factory = sequenceItem -> {
     DoubleProxyVertex x1Input = new DoubleProxyVertex(x1InputLabel);
     DoubleProxyVertex x2Input = new DoubleProxyVertex(x2InputLabel);
@@ -78,12 +78,12 @@ Sequence sequence = new SequenceBuilder<Integer>()
 
 Note: by using the `.withFactories` method on the builder, rather than the `.withFactory`, it is possible
 to have factories which use proxy input vertices which are defined in other factories.
-I.e. your vertices can cross factories.
+i.e. your vertices can cross factories.
 
 ## Observing many associated data points
 
-This example shows you how you can repeat logic over many data observed data points which are associated by having a 
-dependence on a common global value. 
+This example shows you how you can repeat logic over many observed data points which are associated by having a 
+dependency on a common global value. 
 Here they are the intercept and weights of a linear regression model. 
 
 
