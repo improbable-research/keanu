@@ -97,10 +97,10 @@ import java.util.stream.Collectors;
  * in compiled graph. This should include everything up to but not including the semicolon that ends the line of code
  * that is the complete assignment.
  * <p>
- * e.g. AdditionVertex.class ->
+ * e.g. AdditionVertex.class -&gt;
  * <p>
- * leftArg <= left hand arg from additionVertex
- * rightArg <= right hand arg from additionVertex
+ * leftArg &lt;= left hand arg from additionVertex
+ * rightArg &lt;= right hand arg from additionVertex
  * <p>
  * lookup leftArg and rightArg
  * return leftArg + ".plus(" + rightArg + ")"
