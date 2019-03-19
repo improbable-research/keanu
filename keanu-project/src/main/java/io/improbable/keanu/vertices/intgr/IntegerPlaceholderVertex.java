@@ -5,7 +5,6 @@ import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerPlaceholderVertex extends IntegerVertex implements LogProbGraph.PlaceholderVertex, NonProbabilistic<IntegerTensor>, Differentiable, NonSaveableVertex {
 

@@ -4,7 +4,6 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.NonSaveableVertex;
-import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 
 public class BooleanPlaceholderVertex extends BooleanVertex implements LogProbGraph.PlaceholderVertex, NonProbabilistic<BooleanTensor>, Differentiable, NonSaveableVertex {

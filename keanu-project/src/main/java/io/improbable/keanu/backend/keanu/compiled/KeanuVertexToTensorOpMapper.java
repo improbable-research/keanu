@@ -1,11 +1,12 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
-import io.improbable.keanu.algorithms.Variable;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
@@ -24,6 +25,8 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotBin
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastToDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
@@ -63,6 +66,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVert
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastToIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerIfVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
@@ -153,6 +158,9 @@ public class KeanuVertexToTensorOpMapper {
 
         opMappers.put(CastToDoubleVertex.class, fluentUnaryOp("toDouble"));
 
+        opMappers.put(DoubleIfVertex.class, KeanuVertexToTensorOpMapper::doubleIfOp);
+        opMappers.put(DoubleProxyVertex.class, KeanuVertexToTensorOpMapper::doubleProxyOp);
+
         //Integer ops
         opMappers.put(IntegerAbsVertex.class, fluentUnaryOp("abs"));
 
@@ -174,6 +182,9 @@ public class KeanuVertexToTensorOpMapper {
 
         opMappers.put(CastToIntegerVertex.class, fluentUnaryOp("toInteger"));
 
+        opMappers.put(IntegerIfVertex.class, KeanuVertexToTensorOpMapper::integerIfOp);
+        opMappers.put(IntegerProxyVertex.class, KeanuVertexToTensorOpMapper::integerProxyOp);
+
         //Booleans ops
         opMappers.put(BooleanConcatenationVertex.class, KeanuVertexToTensorOpMapper::concatBoolOp);
         opMappers.put(BooleanReshapeVertex.class, KeanuVertexToTensorOpMapper::reshapeBooleanOp);
@@ -192,6 +203,9 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(NotBinaryVertex.class, fluentUnaryOp("not"));
 
         opMappers.put(CastToBooleanVertex.class, fluentUnaryOp("toBoolean"));
+
+        opMappers.put(BooleanIfVertex.class, KeanuVertexToTensorOpMapper::booleanIfOp);
+        opMappers.put(BooleanProxyVertex.class, KeanuVertexToTensorOpMapper::booleanProxyOp);
 
         //Constants
         opMappers.put(ConstantIntegerVertex.class, KeanuVertexToTensorOpMapper::constant);
@@ -513,4 +527,61 @@ public class KeanuVertexToTensorOpMapper {
         }
     }
 
+    private static String doubleIfOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        DoubleIfVertex ifVertex = (DoubleIfVertex) vertex;
+
+        BooleanVertex predicate = ifVertex.getPredicate();
+        DoubleVertex thn = ifVertex.getThn();
+        DoubleVertex els = ifVertex.getEls();
+
+        return ifOp(predicate, thn, els, "doubleWhere", lookup);
+    }
+
+    private static String integerIfOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        IntegerIfVertex ifVertex = (IntegerIfVertex) vertex;
+
+        BooleanVertex predicate = ifVertex.getPredicate();
+        IntegerVertex thn = ifVertex.getThn();
+        IntegerVertex els = ifVertex.getEls();
+
+        return ifOp(predicate, thn, els, "integerWhere", lookup);
+    }
+
+    private static String booleanIfOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        BooleanIfVertex ifVertex = (BooleanIfVertex) vertex;
+
+        BooleanVertex predicate = ifVertex.getPredicate();
+        BooleanVertex thn = ifVertex.getThn();
+        BooleanVertex els = ifVertex.getEls();
+
+        return ifOp(predicate, thn, els, "booleanWhere", lookup);
+    }
+
+    private static String ifOp(Vertex predicate,
+                               Vertex thn,
+                               Vertex els,
+                               String methodName,
+                               Map<VariableReference, KeanuCompiledVariable> lookup) {
+
+        String predicateName = lookup.get(predicate.getId()).getName();
+        String thnName = lookup.get(thn.getId()).getName();
+        String elsName = lookup.get(els.getId()).getName();
+
+        return predicateName + "." + methodName + "(" + thnName + "," + elsName + ")";
+    }
+
+    private static String doubleProxyOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        DoubleProxyVertex proxyVertex = (DoubleProxyVertex) vertex;
+        return lookup.get(proxyVertex.getParent().getId()).getName();
+    }
+
+    private static String integerProxyOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        IntegerProxyVertex proxyVertex = (IntegerProxyVertex) vertex;
+        return lookup.get(proxyVertex.getParent().getId()).getName();
+    }
+
+    private static String booleanProxyOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        BooleanProxyVertex proxyVertex = (BooleanProxyVertex) vertex;
+        return lookup.get(proxyVertex.getParent().getId()).getName();
+    }
 }
