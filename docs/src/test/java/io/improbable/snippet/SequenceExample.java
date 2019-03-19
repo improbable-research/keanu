@@ -88,7 +88,7 @@ public class SequenceExample {
 
         // Define labels for the Proxy Vertices which stand in for a Vertex from the previous SequenceItem.
         // They will be automatically wired up when you construct the Sequence.
-        // I.e. these are the 'inputs' to our SequenceItem
+        // i.e. these are the 'inputs' to our SequenceItem
         VertexLabel x1InputLabel = SequenceBuilder.proxyFor(x1Label);
         VertexLabel x2InputLabel = SequenceBuilder.proxyFor(x2Label);
 
