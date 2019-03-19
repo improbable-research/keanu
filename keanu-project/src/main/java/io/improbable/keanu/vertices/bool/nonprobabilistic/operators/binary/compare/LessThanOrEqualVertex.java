@@ -19,4 +19,7 @@ public class LessThanOrEqualVertex<A extends NumberTensor, B extends NumberTenso
         return l.lessThanOrEqual(r);
     }
 
+    protected String getInfixSymbol() {
+        return "<=";
+    }
 }

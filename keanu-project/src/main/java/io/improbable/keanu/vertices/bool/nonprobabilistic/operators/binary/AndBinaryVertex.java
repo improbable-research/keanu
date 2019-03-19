@@ -20,4 +20,8 @@ public class AndBinaryVertex extends BooleanBinaryOpVertex<BooleanTensor, Boolea
     protected BooleanTensor op(BooleanTensor l, BooleanTensor r) {
         return l.and(r);
     }
+
+    protected String getInfixSymbol() {
+        return "&&";
+    }
 }

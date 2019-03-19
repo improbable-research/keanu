@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.util.DescriptionUtils;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
 import io.improbable.keanu.vertices.Vertex;
@@ -47,5 +48,12 @@ public abstract class BooleanBinaryOpVertex<A extends Tensor, B extends Tensor> 
     @SaveVertexParam(B_NAME)
     public Vertex<B> getB() {
         return b;
+    }
+
+    abstract protected String getInfixSymbol();
+
+    @Override
+    public String recursiveDescriptionStep(boolean includeBrackets) {
+        return DescriptionUtils.createBooleanUnaryOpDescription(a, b, this.getInfixSymbol(), includeBrackets);
     }
 }

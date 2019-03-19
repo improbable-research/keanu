@@ -58,4 +58,9 @@ public class DifferenceVertex extends DoubleBinaryOpVertex implements Differenti
         partials.put(right, toRight);
         return partials;
     }
+
+    @Override
+    protected CharSequence getDescriptionDelimiter() {
+        return " - ";
+    }
 }

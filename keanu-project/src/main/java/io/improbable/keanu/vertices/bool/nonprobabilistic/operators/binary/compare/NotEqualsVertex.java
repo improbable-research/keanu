@@ -19,4 +19,7 @@ public class NotEqualsVertex<A extends Tensor, B extends Tensor> extends Boolean
         return l.elementwiseEquals(r).not();
     }
 
+    protected String getInfixSymbol() {
+        return "!=";
+    }
 }

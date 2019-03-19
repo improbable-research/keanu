@@ -24,4 +24,9 @@ public class IntegerMultiplicationVertex extends IntegerBinaryOpVertex {
     protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
         return l.times(r);
     }
+
+    @Override
+    protected CharSequence getDescriptionDelimiter() {
+        return " * ";
+    }
 }

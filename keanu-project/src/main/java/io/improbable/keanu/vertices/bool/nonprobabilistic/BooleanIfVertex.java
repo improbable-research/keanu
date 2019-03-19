@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.util.DescriptionUtils;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -50,5 +51,10 @@ public class BooleanIfVertex extends BooleanVertex implements NonProbabilistic<B
     @SaveVertexParam(ELS_NAME)
     public BooleanVertex getEls() {
         return els;
+    }
+
+    @Override
+    public String recursiveDescriptionStep(boolean includeBrackets) {
+        return DescriptionUtils.createIfStringDescription(this.predicate, this.thn, this.els, includeBrackets);
     }
 }

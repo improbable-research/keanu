@@ -233,6 +233,9 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
     def _get_python_id(java_vertex: JavaObject) -> Tuple[int, ...]:
         return tuple(java_vertex.getId().getValue())
 
+    def create_description(self) -> str:
+        return self.unwrap().createDescription()
+
 
 class Double(Vertex):
 

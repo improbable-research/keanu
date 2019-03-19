@@ -19,4 +19,8 @@ public class OrBinaryVertex extends BooleanBinaryOpVertex<BooleanTensor, Boolean
     protected BooleanTensor op(BooleanTensor l, BooleanTensor r) {
         return l.or(r);
     }
+
+    protected String getInfixSymbol() {
+        return "||";
+    }
 }

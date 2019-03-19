@@ -18,4 +18,8 @@ public class EqualsVertex<TENSOR extends Tensor> extends BooleanBinaryOpVertex<T
     protected BooleanTensor op(TENSOR l, TENSOR r) {
         return l.elementwiseEquals(r);
     }
+
+    protected String getInfixSymbol() {
+        return "==";
+    }
 }

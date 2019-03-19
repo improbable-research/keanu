@@ -71,4 +71,9 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex implements Differ
         return partials;
     }
 
+    @Override
+    protected CharSequence getDescriptionDelimiter() {
+        return " * ";
+    }
+
 }

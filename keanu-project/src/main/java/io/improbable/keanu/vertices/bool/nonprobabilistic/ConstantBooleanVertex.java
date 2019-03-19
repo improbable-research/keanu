@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.network.NetworkSaver;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.LoadVertexParam;
@@ -46,5 +47,10 @@ public class ConstantBooleanVertex extends BooleanVertex implements ConstantVert
     @SaveVertexParam(CONSTANT_NAME)
     public BooleanTensor getConstantValue() {
         return getValue();
+    }
+
+    protected String getBaseDescription() {
+        Tensor value = this.getConstantValue();
+        return createBaseDescription(value);
     }
 }

@@ -4,6 +4,7 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.util.DescriptionUtils;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -52,6 +53,11 @@ public class IntegerIfVertex extends IntegerVertex implements NonProbabilistic<I
 
     private IntegerTensor op(BooleanTensor predicate, IntegerTensor thn, IntegerTensor els) {
         return predicate.integerWhere(thn, els);
+    }
+
+    @Override
+    public String recursiveDescriptionStep(boolean includeBrackets) {
+        return DescriptionUtils.createIfStringDescription(this.predicate, this.thn, this.els, includeBrackets);
     }
 
 }

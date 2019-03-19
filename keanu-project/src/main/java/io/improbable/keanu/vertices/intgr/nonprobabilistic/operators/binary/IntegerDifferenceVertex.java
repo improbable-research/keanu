@@ -24,4 +24,9 @@ public class IntegerDifferenceVertex extends IntegerBinaryOpVertex {
     protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
         return l.minus(r);
     }
+
+    @Override
+    protected CharSequence getDescriptionDelimiter() {
+        return " - ";
+    }
 }

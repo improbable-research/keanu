@@ -24,4 +24,9 @@ public class IntegerAdditionVertex extends IntegerBinaryOpVertex {
     protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
         return l.plus(r);
     }
+
+    @Override
+    protected CharSequence getDescriptionDelimiter() {
+        return " + ";
+    }
 }

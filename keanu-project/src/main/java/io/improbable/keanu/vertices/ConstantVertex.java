@@ -10,6 +10,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
+import java.util.Arrays;
+
 public interface ConstantVertex {
 
     static ConstantBooleanVertex of(Boolean value) {
@@ -82,5 +84,16 @@ public interface ConstantVertex {
 
     static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {
         return new ConstantGenericVertex<>(tensor);
+    }
+
+    default String createBaseDescription(Tensor value) {
+        String valueString = value.isScalar() ? value.scalar().toString() :
+            new StringBuilder("(Tensor with shape: ").append(Arrays.toString(value.getShape())).append(")").toString();
+
+        return new StringBuilder()
+            .append("Const(")
+            .append(valueString)
+            .append(")")
+            .toString();
     }
 }
