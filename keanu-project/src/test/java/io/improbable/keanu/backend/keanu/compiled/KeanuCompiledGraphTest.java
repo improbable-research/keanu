@@ -3,12 +3,18 @@ package io.improbable.keanu.backend.keanu.compiled;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 import org.junit.Test;
 
@@ -25,9 +31,7 @@ public class KeanuCompiledGraphTest {
 
     @Test
     public void compilesEmptyGraph() {
-
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
-
         ComputableGraph computableGraph = compiler.build();
 
         Map<VariableReference, ?> result = computableGraph.compute(Collections.emptyMap(), Collections.emptyList());
@@ -80,24 +84,11 @@ public class KeanuCompiledGraphTest {
     }
 
     private void assertBinaryDoubleMatches(long[] shapeA, long[] shapeB, BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
-        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
-
         GaussianVertex A = new GaussianVertex(shapeA, 0, 1);
         GaussianVertex B = new GaussianVertex(shapeB, 0, 1);
-
         DoubleVertex C = op.apply(A, B);
 
-        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
-
-        ComputableGraph computableGraph = compiler.build();
-
-        Map<VariableReference, Object> inputs = new HashMap<>();
-        inputs.put(A.getReference(), A.getValue());
-        inputs.put(B.getReference(), B.getValue());
-
-        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
-
-        assertEquals(C.getValue(), result.get(C.getReference()));
+        assertCompiledIsSameAsVertexEvaluation(A, B, C);
     }
 
     @Test
@@ -184,22 +175,10 @@ public class KeanuCompiledGraphTest {
     }
 
     private void assertUnaryDoubleMatches(long[] shape, Function<DoubleVertex, DoubleVertex> op) {
-        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
-
         UniformVertex A = new UniformVertex(shape, 0, 1);
-
         DoubleVertex C = op.apply(A);
 
-        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
-
-        ComputableGraph computableGraph = compiler.build();
-
-        Map<VariableReference, Object> inputs = new HashMap<>();
-        inputs.put(A.getReference(), A.getValue());
-
-        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
-
-        assertEquals(C.getValue(), result.get(C.getReference()));
+        assertCompiledIsSameAsVertexEvaluation(A, C);
     }
 
     @Test
@@ -232,43 +211,18 @@ public class KeanuCompiledGraphTest {
     }
 
     private void assertUnaryIntegerMatches(long[] shape, Function<IntegerVertex, IntegerVertex> op) {
-        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
-
         UniformIntVertex A = new UniformIntVertex(shape, 0, 1);
-
         IntegerVertex C = op.apply(A);
 
-        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
-
-        ComputableGraph computableGraph = compiler.build();
-
-        Map<VariableReference, Object> inputs = new HashMap<>();
-        inputs.put(A.getReference(), A.getValue());
-
-        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
-
-        assertEquals(C.getValue(), result.get(C.getReference()));
+        assertCompiledIsSameAsVertexEvaluation(A, C);
     }
 
     private void assertBinaryIntegerMatches(long[] shapeA, long[] shapeB, BiFunction<IntegerVertex, IntegerVertex, IntegerVertex> op) {
-        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
-
         UniformIntVertex A = new UniformIntVertex(shapeA, 0, 1);
         UniformIntVertex B = new UniformIntVertex(shapeB, 0, 1);
-
         IntegerVertex C = op.apply(A, B);
 
-        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
-
-        ComputableGraph computableGraph = compiler.build();
-
-        Map<VariableReference, Object> inputs = new HashMap<>();
-        inputs.put(A.getReference(), A.getValue());
-        inputs.put(B.getReference(), B.getValue());
-
-        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
-
-        assertEquals(C.getValue(), result.get(C.getReference()));
+        assertCompiledIsSameAsVertexEvaluation(A, B, C);
     }
 
     @Test
@@ -317,22 +271,10 @@ public class KeanuCompiledGraphTest {
     }
 
     private void assertUnaryBooleanMatches(long[] shape, Function<BooleanVertex, BooleanVertex> op) {
-        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
-
         BernoulliVertex A = new BernoulliVertex(shape, 0.5);
-
         BooleanVertex C = op.apply(A);
 
-        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
-
-        ComputableGraph computableGraph = compiler.build();
-
-        Map<VariableReference, Object> inputs = new HashMap<>();
-        inputs.put(A.getReference(), A.getValue());
-
-        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
-
-        assertEquals(C.getValue(), result.get(C.getReference()));
+        assertCompiledIsSameAsVertexEvaluation(A, C);
     }
 
     private void assertBinaryBooleanMatches(BiFunction<BooleanVertex, BooleanVertex, BooleanVertex> op) {
@@ -340,13 +282,52 @@ public class KeanuCompiledGraphTest {
     }
 
     private void assertBinaryBooleanMatches(long[] shapeA, long[] shapeB, BiFunction<BooleanVertex, BooleanVertex, BooleanVertex> op) {
-        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
-
         BernoulliVertex A = new BernoulliVertex(shapeA, 0.5);
         BernoulliVertex B = new BernoulliVertex(shapeB, 0.5);
 
         BooleanVertex C = op.apply(A, B);
 
+        assertCompiledIsSameAsVertexEvaluation(A, B, C);
+    }
+
+    @Test
+    public void canCompareDoublesWithEpsilon() {
+        long[] shape = new long[]{10, 10};
+        GaussianVertex A = new GaussianVertex(shape, 0, 1);
+        GaussianVertex B = new GaussianVertex(shape, 0, 1);
+
+        assertCompiledIsSameAsVertexEvaluation(A, B, new NumericalEqualsVertex(A, B, ConstantVertex.of(0.5)));
+    }
+
+    @Test
+    public void canCompareDoublesAndIntegerWithEpsilon() {
+        long[] shape = new long[]{10, 10};
+        GaussianVertex A = new GaussianVertex(shape, 0, 1);
+        PoissonVertex B = new PoissonVertex(shape, 1);
+
+        assertCompiledIsSameAsVertexEvaluation(A, B, new NumericalEqualsVertex(A, B, ConstantVertex.of(IntegerTensor.create(1, shape))));
+    }
+
+    @Test
+    public void canCompileDoubleCompare() {
+        long[] shape = new long[]{10, 10};
+        assertDoubleCompareMatches(shape, shape, DoubleVertex::greaterThan);
+        assertDoubleCompareMatches(shape, shape, DoubleVertex::greaterThanOrEqualTo);
+        assertDoubleCompareMatches(shape, shape, DoubleVertex::lessThan);
+        assertDoubleCompareMatches(shape, shape, DoubleVertex::lessThanOrEqualTo);
+    }
+
+    private void assertDoubleCompareMatches(long[] shapeA, long[] shapeB, BiFunction<DoubleVertex, DoubleVertex, BooleanVertex> op) {
+
+        GaussianVertex A = new GaussianVertex(shapeA, 0, 1);
+        GaussianVertex B = new GaussianVertex(shapeB, 0, 1);
+        BooleanVertex C = op.apply(A, B);
+
+        assertCompiledIsSameAsVertexEvaluation(A, B, C);
+    }
+
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C) {
+        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
 
         ComputableGraph computableGraph = compiler.build();
@@ -354,6 +335,20 @@ public class KeanuCompiledGraphTest {
         Map<VariableReference, Object> inputs = new HashMap<>();
         inputs.put(A.getReference(), A.getValue());
         inputs.put(B.getReference(), B.getValue());
+
+        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+
+        assertEquals(C.getValue(), result.get(C.getReference()));
+    }
+
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> C) {
+        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
+        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
+
+        ComputableGraph computableGraph = compiler.build();
+
+        Map<VariableReference, Object> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
 
         Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
 

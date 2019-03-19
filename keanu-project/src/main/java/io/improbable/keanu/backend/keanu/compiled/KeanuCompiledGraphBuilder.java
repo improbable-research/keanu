@@ -89,7 +89,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     @Override
     public void createConstant(Vertex visiting) {
 
-        String type = getType(visiting);
+        String type = getAssigmentType(visiting);
         String lookupName = visiting.getReference().toStringReference();
         String name = toSourceVariableName(visiting.getReference());
 
@@ -104,7 +104,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
     @Override
     public void createVariable(Vertex visiting) {
 
-        String variableType = getType(visiting);
+        String variableType = getAssigmentType(visiting);
         String variableName = toSourceVariableName(visiting.getReference());
 
         declareInput(variableType, variableName, visiting.getReference().toStringReference());
@@ -127,7 +127,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
         KeanuVertexToTensorOpMapper.OpMapper opMapperFor = KeanuVertexToTensorOpMapper.getOpMapperFor(visiting.getClass());
 
-        String variableType = getType(visiting);
+        String variableType = getAssigmentType(visiting);
         String name = toSourceVariableName(visiting.getReference());
 
         append(computeSourceBuilder, "final ", variableType, " ", name, " = ", opMapperFor.apply(visiting, lookup), ";\n");
@@ -139,7 +139,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         return v instanceof ConstantDoubleVertex || v instanceof ConstantIntegerVertex || v instanceof ConstantBooleanVertex;
     }
 
-    private String getType(Object v) {
+    private String getAssigmentType(Object v) {
         if (v instanceof DoubleVertex) {
             return DoubleTensor.class.getCanonicalName();
         } else if (v instanceof IntegerVertex) {

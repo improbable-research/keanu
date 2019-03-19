@@ -1,6 +1,7 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.algorithms.VariableReference;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexUnaryOp;
@@ -9,6 +10,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanProxyVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastToBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
@@ -191,12 +193,13 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(BooleanSliceVertex.class, KeanuVertexToTensorOpMapper::sliceBooleanOp);
         opMappers.put(BooleanTakeVertex.class, KeanuVertexToTensorOpMapper::takeBooleanOp);
 
-        opMappers.put(GreaterThanOrEqualVertex.class, fluentBinaryOp("greaterThanOrEqualTo"));
+        opMappers.put(GreaterThanOrEqualVertex.class, fluentBinaryOp("greaterThanOrEqual"));
         opMappers.put(GreaterThanVertex.class, fluentBinaryOp("greaterThan"));
-        opMappers.put(LessThanOrEqualVertex.class, fluentBinaryOp("lessThanOrEqualTo"));
+        opMappers.put(LessThanOrEqualVertex.class, fluentBinaryOp("lessThanOrEqual"));
         opMappers.put(LessThanVertex.class, fluentBinaryOp("lessThan"));
         opMappers.put(EqualsVertex.class, fluentBinaryOp("elementwiseEquals"));
         opMappers.put(NotEqualsVertex.class, KeanuVertexToTensorOpMapper::notOp);
+        opMappers.put(NumericalEqualsVertex.class, KeanuVertexToTensorOpMapper::numericalEqualsOp);
 
         opMappers.put(OrBinaryVertex.class, fluentBinaryOp("or"));
         opMappers.put(AndBinaryVertex.class, fluentBinaryOp("and"));
@@ -583,5 +586,18 @@ public class KeanuVertexToTensorOpMapper {
     private static String booleanProxyOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         BooleanProxyVertex proxyVertex = (BooleanProxyVertex) vertex;
         return lookup.get(proxyVertex.getParent().getId()).getName();
+    }
+
+    private static String numericalEqualsOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        NumericalEqualsVertex numericalEquals = (NumericalEqualsVertex) vertex;
+        Vertex<? extends NumberTensor> a = numericalEquals.getA();
+        Vertex<? extends NumberTensor> b = numericalEquals.getB();
+        Vertex<? extends NumberTensor> epsilon = numericalEquals.getEpsilon();
+
+        String aName = lookup.get(a.getId()).getName();
+        String bName = lookup.get(b.getId()).getName();
+        String epsilonName = lookup.get(epsilon.getId()).getName();
+
+        return aName + ".toDouble().minus(" + bName + ".toDouble()).absInPlace().lessThanOrEqual(" + epsilonName + ".toDouble())";
     }
 }

@@ -49,4 +49,32 @@ public class NumericalEqualsVertexTest {
 
         assertArrayEquals(new Boolean[]{false, true, true}, equality.asFlatArray());
     }
+
+    @Test
+    public void canCompareIntegersAlmostEqual() {
+
+        NumericalEqualsVertex equals = new NumericalEqualsVertex(
+            ConstantVertex.of(new int[]{1, 2, 3}),
+            ConstantVertex.of(new int[]{2, 2, 6}),
+            ConstantVertex.of(1.1)
+        );
+
+        BooleanTensor equality = equals.lazyEval();
+
+        assertArrayEquals(new Boolean[]{true, true, false}, equality.asFlatArray());
+    }
+
+    @Test
+    public void canCompareIntegersAndDoublesAlmostEqual() {
+
+        NumericalEqualsVertex equals = new NumericalEqualsVertex(
+            ConstantVertex.of(new int[]{1, 2, 3}),
+            ConstantVertex.of(new double[]{2.0, 2.0, 5.5}),
+            ConstantVertex.of(2.1)
+        );
+
+        BooleanTensor equality = equals.lazyEval();
+
+        assertArrayEquals(new Boolean[]{true, true, false}, equality.asFlatArray());
+    }
 }
