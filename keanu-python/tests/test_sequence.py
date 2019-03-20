@@ -207,9 +207,7 @@ def test_last_item_retrieved_correctly() -> None:
         sequence_item.add(x)
 
     x_start = ConstantDouble(1.0)
-    initial_state = {
-      x_label: x_start
-    }
+    initial_state = {x_label: x_start}
 
     sequence = Sequence(count=2, factories=factory, initial_state=initial_state)
 
