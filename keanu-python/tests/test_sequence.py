@@ -207,10 +207,11 @@ def test_last_item_retrieved_correctly() -> None:
         sequence_item.add(x)
 
     x_start = ConstantDouble(1.0)
-    initial_state = {x_label: x_start}
+    initial_state: Optional[Dict[str, vertex_constructor_param_types]] = {x_label: x_start}
 
     sequence = Sequence(count=2, factories=factory, initial_state=initial_state)
 
     sequence_item_contents = sequence.get_last_item().get_contents()
     x_output = sequence_item_contents.get(x_label)
+    assert x_output is not None
     assert x_output.get_value() == 4
