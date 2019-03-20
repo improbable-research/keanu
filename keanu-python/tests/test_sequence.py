@@ -196,7 +196,7 @@ def test_you_can_use_multiple_factories_to_build_sequences() -> None:
 
 
 def test_last_item_retrieved_correctly() -> None:
-    x_label = "xx"
+    x_label = "x"
     x_input_label = Sequence.proxy_for(x_label)
 
     def factory(sequence_item):
@@ -213,5 +213,6 @@ def test_last_item_retrieved_correctly() -> None:
 
     sequence_item_contents = sequence.get_last_item().get_contents()
     x_output = sequence_item_contents.get(x_label)
+
     assert x_output is not None
     assert x_output.get_value() == 4

@@ -1,6 +1,6 @@
 from typing import Callable, Generator, Dict, Optional, Any, Iterator, Iterable, Union
 
-from py4j.java_gateway import java_import
+from py4j.java_gateway import java_import, is_instance_of
 from py4j.java_collections import ListConverter
 
 from functools import partial
@@ -32,7 +32,13 @@ class SequenceItem(JavaObjectWrapper):
         return Vertex._from_java_vertex(self.unwrap().get(_VertexLabel(label).unwrap()))
 
     def get_contents(self) -> Dict[str, Vertex]:
-        return {k.getUnqualifiedName(): Vertex._from_java_vertex(v) for k, v in self.unwrap().getContents().items()}
+        def get_unqualified_name_or_proxy_name(key, vertex):
+            if is_instance_of(k._gateway, vertex, "io.improbable.keanu.vertices.ProxyVertex"):
+                print("found a proxy")
+                return "proxy_for." + key.getUnqualifiedName()
+            return key.getUnqualifiedName()
+
+        return {get_unqualified_name_or_proxy_name(k, v): Vertex._from_java_vertex(v) for k, v in self.unwrap().getContents().items()}
 
 
 class Sequence(JavaObjectWrapper):
