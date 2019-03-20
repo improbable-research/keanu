@@ -195,7 +195,7 @@ def test_you_can_use_multiple_factories_to_build_sequences() -> None:
     __check_output_equals(sequence, x4_label, 0.125)
 
 
-def test_last_item_retrieved_correctly():
+def test_last_item_retrieved_correctly() -> None:
     x_label = "xx"
     x_input_label = Sequence.proxy_for(x_label)
 
