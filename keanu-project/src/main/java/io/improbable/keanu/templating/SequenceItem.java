@@ -56,6 +56,14 @@ public class SequenceItem implements VertexDictionary {
         return v;
     }
 
+    /**
+     * @return Returns a map of vertex labels to vertices, which covers all of the vertices that have been explicitly
+     * added to this sequence item.
+     */
+    public Map<VertexLabel, Vertex<?>> getContents() {
+        return this.contents;
+    }
+
     private String getUniqueName() {
         return NAME_PREFIX + this.hashCode();
     }

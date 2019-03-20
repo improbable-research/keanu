@@ -31,6 +31,9 @@ class SequenceItem(JavaObjectWrapper):
     def get(self, label: str) -> Vertex:
         return Vertex._from_java_vertex(self.unwrap().get(_VertexLabel(label).unwrap()))
 
+    def get_contents(self) -> Dict[str, Vertex]:
+        return self.unwrap().getContents()
+
 
 class Sequence(JavaObjectWrapper):
     """
