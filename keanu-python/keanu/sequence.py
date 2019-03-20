@@ -32,7 +32,7 @@ class SequenceItem(JavaObjectWrapper):
         return Vertex._from_java_vertex(self.unwrap().get(_VertexLabel(label).unwrap()))
 
     def get_contents(self) -> Dict[str, Vertex]:
-        return self.unwrap().getContents()
+        return {k.getUnqualifiedName(): Vertex._from_java_vertex(v) for k, v in self.unwrap().getContents().items()}
 
 
 class Sequence(JavaObjectWrapper):
@@ -94,6 +94,9 @@ class Sequence(JavaObjectWrapper):
 
     def size(self) -> int:
         return self.unwrap().size()
+
+    def get_last_item(self) -> SequenceItem:
+        return SequenceItem(self.unwrap().getLastItem())
 
     @staticmethod
     def proxy_for(label: str) -> str:

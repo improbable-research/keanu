@@ -2,6 +2,8 @@ from typing import Any, Dict, Optional
 
 import pytest
 
+from keanu import BayesNet
+from keanu.network_io import DotSaver
 from keanu.sequence import Sequence, SequenceItem
 from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, KeanuContext, ConstantDouble, Vertex, \
     vertex_constructor_param_types
@@ -191,3 +193,26 @@ def test_you_can_use_multiple_factories_to_build_sequences() -> None:
     __check_output_equals(sequence, x2_label, 2)
     __check_output_equals(sequence, x3_label, 8)
     __check_output_equals(sequence, x4_label, 0.125)
+
+
+def test_last_item_retrieved_correctly():
+    x_label = "xx"
+    x_input_label = Sequence.proxy_for(x_label)
+
+    def factory(sequence_item):
+        x = DoubleProxy((), x_input_label)
+        x_out = x * Const(2.0)
+        x_out.set_label(x_label)
+        sequence_item.add(x_out)
+        sequence_item.add(x)
+
+    x_start = ConstantDouble(1.0)
+    initial_state = {
+      x_label: x_start
+    }
+
+    sequence = Sequence(count=2, factories=factory, initial_state=initial_state)
+
+    sequence_item_contents = sequence.get_last_item().get_contents()
+    x_output = sequence_item_contents.get(x_label)
+    assert x_output.get_value() == 4
