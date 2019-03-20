@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.google.common.collect.ImmutableMap.copyOf;
+
 public class SequenceItem implements VertexDictionary {
 
     private static final String NAME_PREFIX = "Sequence_Item_";
@@ -61,7 +63,7 @@ public class SequenceItem implements VertexDictionary {
      * added to this sequence item.
      */
     public Map<VertexLabel, Vertex<?>> getContents() {
-        return this.contents;
+        return copyOf(this.contents);
     }
 
     private String getUniqueName() {
