@@ -1,6 +1,7 @@
 package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.vertices.NonSaveableVertex;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import org.junit.Test;
 import org.reflections.Reflections;
@@ -15,40 +16,13 @@ import static io.improbable.keanu.backend.keanu.compiled.KeanuVertexToTensorOpMa
 public class KeanuVertexToTensorOpMapperTest {
 
     @Test
-    public void doesSupportIntegerOperations() {
+    public void doesSupportAllOperations() {
 
-        Reflections reflections = new Reflections("io.improbable.keanu.vertices.intgr.nonprobabilistic");
-
-        Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
-        List<Class<? extends Vertex>> supportedVertices = vertices.stream()
-            .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
-            .filter(v -> !Modifier.isAbstract(v.getModifiers()))
-            .collect(Collectors.toList());
-
-        assertDoesSupport(supportedVertices);
-    }
-
-    @Test
-    public void doesSupportDoubleOperations() {
-
-        Reflections reflections = new Reflections("io.improbable.keanu.vertices.dbl.nonprobabilistic");
+        Reflections reflections = new Reflections("io.improbable.keanu.vertices");
 
         Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
         List<Class<? extends Vertex>> supportedVertices = vertices.stream()
-            .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
-            .filter(v -> !Modifier.isAbstract(v.getModifiers()))
-            .collect(Collectors.toList());
-
-        assertDoesSupport(supportedVertices);
-    }
-
-    @Test
-    public void doesSupportBooleanOperations() {
-
-        Reflections reflections = new Reflections("io.improbable.keanu.vertices.bool.nonprobabilistic");
-
-        Set<Class<? extends Vertex>> vertices = reflections.getSubTypesOf(Vertex.class);
-        List<Class<? extends Vertex>> supportedVertices = vertices.stream()
+            .filter(v -> !Probabilistic.class.isAssignableFrom(v))
             .filter(v -> !NonSaveableVertex.class.isAssignableFrom(v))
             .filter(v -> !Modifier.isAbstract(v.getModifiers()))
             .collect(Collectors.toList());
