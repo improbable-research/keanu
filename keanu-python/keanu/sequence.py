@@ -32,9 +32,8 @@ class SequenceItem(JavaObjectWrapper):
         return Vertex._from_java_vertex(self.unwrap().get(_VertexLabel(label).unwrap()))
 
     def get_contents(self) -> Dict[str, Vertex]:
-        def get_unqualified_name_or_proxy_name(key, vertex):
+        def get_unqualified_name_or_proxy_name(key, vertex) -> str:
             if is_instance_of(k._gateway, vertex, "io.improbable.keanu.vertices.ProxyVertex"):
-                print("found a proxy")
                 return "proxy_for." + key.getUnqualifiedName()
             return key.getUnqualifiedName()
 
