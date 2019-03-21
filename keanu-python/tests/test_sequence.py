@@ -2,10 +2,8 @@ from typing import Any, Dict, Optional
 
 import pytest
 
-from keanu import BayesNet
-from keanu.network_io import DotSaver
 from keanu.sequence import Sequence, SequenceItem
-from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, KeanuContext, ConstantDouble, Vertex, \
+from keanu.vertex import Bernoulli, DoubleProxy, Exponential, Poisson, Const, ConstantDouble, \
     vertex_constructor_param_types
 from keanu.vertex.label import _VertexLabel
 
@@ -213,6 +211,9 @@ def test_last_item_retrieved_correctly() -> None:
 
     sequence_item_contents = sequence.get_last_item().get_contents()
     x_output = sequence_item_contents.get(x_label)
+    x_proxy = sequence_item_contents.get(Sequence.proxy_for(x_label))
 
     assert x_output is not None
+    assert x_proxy is not None
     assert x_output.get_value() == 4
+    assert x_proxy.get_value() == 2
