@@ -231,6 +231,8 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
 
         String source = getSource();
 
+        System.out.println(source);
+
         return compile(source);
     }
 

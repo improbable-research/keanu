@@ -10,8 +10,12 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.NumericalEqualsVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -184,6 +188,20 @@ public class KeanuCompiledGraphTest {
     }
 
     @Test
+    public void canCompileDoubleIf() {
+        long[] shape = new long[]{4};
+        BernoulliVertex predicate = new BernoulliVertex(shape, 0.5);
+        GaussianVertex A = new GaussianVertex(shape, 0, 1);
+        GaussianVertex B = new GaussianVertex(shape, 0, 1);
+
+        DoubleIfVertex D = If.isTrue(predicate)
+            .then(A)
+            .orElse(B);
+
+        assertCompiledIsSameAsVertexEvaluation(A, B, predicate, D);
+    }
+
+    @Test
     public void canReshapeInteger() {
         assertUnaryIntegerMatches(new long[]{3, 4}, (a) -> a.reshape(6, 2));
     }
@@ -225,6 +243,20 @@ public class KeanuCompiledGraphTest {
         IntegerVertex C = op.apply(A, B);
 
         assertCompiledIsSameAsVertexEvaluation(A, B, C);
+    }
+
+    @Test
+    public void canCompileIntegerIf() {
+        long[] shape = new long[]{4};
+        BernoulliVertex predicate = new BernoulliVertex(shape, 0.5);
+        UniformIntVertex A = new UniformIntVertex(shape, 0, 1);
+        UniformIntVertex B = new UniformIntVertex(shape, 0, 1);
+
+        IntegerVertex D = If.isTrue(predicate)
+            .then(A)
+            .orElse(B);
+
+        assertCompiledIsSameAsVertexEvaluation(A, B, predicate, D);
     }
 
     @Test
@@ -270,6 +302,20 @@ public class KeanuCompiledGraphTest {
     @Test
     public void compilesNot() {
         assertUnaryBooleanMatches(new long[]{3, 4}, (a) -> BooleanVertex.not(a));
+    }
+
+    @Test
+    public void canCompileBooleanIf() {
+        long[] shape = new long[]{4};
+        BernoulliVertex predicate = new BernoulliVertex(shape, 0.5);
+        BernoulliVertex A = new BernoulliVertex(shape, 0.5);
+        BernoulliVertex B = new BernoulliVertex(shape, 0.5);
+
+        BooleanVertex D = If.isTrue(predicate)
+            .then(A)
+            .orElse(B);
+
+        assertCompiledIsSameAsVertexEvaluation(A, B, predicate, D);
     }
 
     private void assertUnaryBooleanMatches(long[] shape, Function<BooleanVertex, BooleanVertex> op) {
@@ -345,6 +391,51 @@ public class KeanuCompiledGraphTest {
         assertCompiledIsSameAsVertexEvaluation(A, C);
     }
 
+    @Test
+    public void canCompileGenericSlice() {
+
+        Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, ConstantVertex.of(0.1, 0.5, 0.8, 0.2));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
+
+        CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
+        GenericSliceVertex<TestEnum> C = A.slice(0, 1);
+
+        assertCompiledIsSameAsVertexEvaluation(A, C);
+    }
+
+    @Test
+    public void canCompileGenericIf() {
+
+        Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, ConstantVertex.of(0.1, 0.5, 0.8, 0.2));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
+
+        BernoulliVertex predicate = new BernoulliVertex(new long[]{4}, 0.5);
+        CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
+        CategoricalVertex<TestEnum> B = new CategoricalVertex<>(selectableValues);
+
+        IfVertex<TestEnum> D = new IfVertex<>(predicate, A, B);
+
+        assertCompiledIsSameAsVertexEvaluation(A, B, predicate, D);
+    }
+
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C, Vertex<?> D) {
+        KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
+        compiler.convert(D.getConnectedGraph(), ImmutableList.of(D));
+
+        ComputableGraph computableGraph = compiler.build();
+
+        Map<VariableReference, Object> inputs = new HashMap<>();
+        inputs.put(A.getReference(), A.getValue());
+        inputs.put(B.getReference(), B.getValue());
+        inputs.put(C.getReference(), C.getValue());
+
+        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+
+        assertEquals(D.getValue(), result.get(D.getReference()));
+    }
+
     private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
@@ -360,9 +451,9 @@ public class KeanuCompiledGraphTest {
         assertEquals(C.getValue(), result.get(C.getReference()));
     }
 
-    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> C) {
+    private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
-        compiler.convert(C.getConnectedGraph(), ImmutableList.of(C));
+        compiler.convert(B.getConnectedGraph(), ImmutableList.of(B));
 
         ComputableGraph computableGraph = compiler.build();
 
@@ -371,7 +462,7 @@ public class KeanuCompiledGraphTest {
 
         Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
 
-        assertEquals(C.getValue(), result.get(C.getReference()));
+        assertEquals(B.getValue(), result.get(B.getReference()));
     }
 
 }

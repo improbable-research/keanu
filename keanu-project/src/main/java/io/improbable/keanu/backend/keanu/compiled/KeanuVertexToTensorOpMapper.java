@@ -2,6 +2,7 @@ package io.improbable.keanu.backend.keanu.compiled;
 
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.VertexUnaryOp;
@@ -65,6 +66,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -218,6 +220,7 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(ConstantBooleanVertex.class, KeanuVertexToTensorOpMapper::constant);
 
         //Generics
+        opMappers.put(IfVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
         opMappers.put(GenericSliceVertex.class, KeanuVertexToTensorOpMapper::sliceGenericOp);
         opMappers.put(GenericTakeVertex.class, KeanuVertexToTensorOpMapper::takeGenericOp);
     }
@@ -574,6 +577,16 @@ public class KeanuVertexToTensorOpMapper {
         BooleanVertex els = ifVertex.getEls();
 
         return ifOp(predicate, thn, els, "booleanWhere", lookup);
+    }
+
+    private static String genericIfOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        IfVertex ifVertex = (IfVertex) vertex;
+
+        BooleanVertex predicate = ifVertex.getPredicate();
+        Vertex<? extends Tensor> thn = ifVertex.getThn();
+        Vertex<? extends Tensor> els = ifVertex.getEls();
+
+        return ifOp(predicate, thn, els, "where", lookup);
     }
 
     private static String ifOp(Vertex predicate,
