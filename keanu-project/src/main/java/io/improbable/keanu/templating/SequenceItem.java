@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.google.common.collect.ImmutableMap.copyOf;
+
 public class SequenceItem implements VertexDictionary {
 
     private static final String NAME_PREFIX = "Sequence_Item_";
@@ -54,6 +56,14 @@ public class SequenceItem implements VertexDictionary {
         contents.put(label, v);
         v.setLabel(label);
         return v;
+    }
+
+    /**
+     * @return Returns a map of vertex labels to vertices, which covers all of the vertices that have been explicitly
+     * added to this sequence item.
+     */
+    public Map<VertexLabel, Vertex<?>> getContents() {
+        return copyOf(this.contents);
     }
 
     private String getUniqueName() {

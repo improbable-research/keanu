@@ -29,7 +29,63 @@ A sequence is a group of vertices that is repeated multiple times in the network
 (optionally) depend on vertices in the previous group. They typically represent a concept larger than a vertex like 
 an agent in an ABM, a time series or some observations that are associated.
 
-## How do you build them?
+# Examples
+
+Here are some examples that will walk you through the process of developing with Sequences.
+
+## Writing time series
+
+This example shows you how you can write a simple time series model using Sequences
+
+```java
+DoubleVertex two = new ConstantDoubleVertex(2);
+
+// Define the labels of vertices we will use in our Sequence
+VertexLabel x1Label = new VertexLabel("x1");
+VertexLabel x2Label = new VertexLabel("x2");
+
+// Define labels for the Proxy Vertices which stand in for a Vertex from the previous SequenceItem.
+// They will be automatically wired up when you construct the Sequence.
+// i.e. these are the 'inputs' to our SequenceItem
+VertexLabel x1InputLabel = SequenceBuilder.proxyFor(x1Label);
+VertexLabel x2InputLabel = SequenceBuilder.proxyFor(x2Label);
+
+// Define a factory method that creates proxy vertices using the proxy vertex labels and then uses these
+// to define the computation graph of the Sequence.
+// Note we have labeled the output vertices of this SequenceItem
+Consumer<SequenceItem> factory = sequenceItem -> {
+    DoubleProxyVertex x1Input = new DoubleProxyVertex(x1InputLabel);
+    DoubleProxyVertex x2Input = new DoubleProxyVertex(x2InputLabel);
+
+    DoubleVertex x1Output = x1Input.multiply(two).setLabel(x1Label);
+    DoubleVertex x2Output = x2Input.plus(x1Output).setLabel(x2Label);
+
+    sequenceItem.addAll(x1Input, x2Input, x1Output, x2Output);
+};
+
+// Create the starting values of our sequence
+DoubleVertex x1Start = new ConstantDoubleVertex(4).setLabel(x1Label);
+DoubleVertex x2Start = new ConstantDoubleVertex(4).setLabel(x2Label);
+VertexDictionary dictionary = SimpleVertexDictionary.of(x1Start, x2Start);
+
+Sequence sequence = new SequenceBuilder<Integer>()
+    .withInitialState(dictionary)
+    .count(5)
+    .withFactory(factory)
+    .build();
+
+```
+
+Note: by using the `.withFactories` method on the builder, rather than the `.withFactory`, it is possible
+to have factories which use proxy input vertices which are defined in other factories.
+i.e. your vertices can cross factories.
+
+## Observing many associated data points
+
+This example shows you how you can repeat logic over many observed data points which are associated by having a 
+dependency on a common global value. 
+Here they are the intercept and weights of a linear regression model. 
+
 
 Let's say you have a class `MyData` that looks like this:
 ```java
