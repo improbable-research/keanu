@@ -4,6 +4,7 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.backend.ComputableGraphBuilder;
 import io.improbable.keanu.backend.StringVariableReference;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -12,6 +13,7 @@ import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.generic.GenericTensorVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.joor.Reflect;
@@ -146,6 +148,8 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
             return IntegerTensor.class.getCanonicalName();
         } else if (v instanceof BooleanVertex) {
             return BooleanTensor.class.getCanonicalName();
+        } else if (v instanceof GenericTensorVertex) {
+            return Tensor.class.getCanonicalName();
         } else {
             throw new IllegalArgumentException("Compiling of " + v.getClass().getCanonicalName() + " not supported yet.");
         }

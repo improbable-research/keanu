@@ -252,6 +252,11 @@ public class GenericTensor<T> implements Tensor<T> {
         return new GenericTensor(tadded.toArray(), taddedShape);
     }
 
+    @Override
+    public Tensor<T> take(long... index) {
+        return scalar(getValue(index));
+    }
+
     private void assertIsNumber() {
         if (data.length > 0 && !(data[0] instanceof Number)) {
             throw new IllegalStateException(data[0].getClass().getName() + " cannot be converted to number");

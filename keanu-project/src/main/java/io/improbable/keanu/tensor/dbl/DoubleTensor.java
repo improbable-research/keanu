@@ -270,6 +270,9 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     @Override
     DoubleTensor slice(int dimension, long index);
 
+    @Override
+    DoubleTensor take(long... index);
+
     List<DoubleTensor> split(int dimension, long... splitAtIndices);
 
     default List<DoubleTensor> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {

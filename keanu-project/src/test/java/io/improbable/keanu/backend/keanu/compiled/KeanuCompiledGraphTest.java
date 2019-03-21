@@ -12,6 +12,8 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
+import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
@@ -19,6 +21,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -323,6 +326,23 @@ public class KeanuCompiledGraphTest {
         BooleanVertex C = op.apply(A, B);
 
         assertCompiledIsSameAsVertexEvaluation(A, B, C);
+    }
+
+    private enum TestEnum {
+        A, B, C, D
+    }
+
+    @Test
+    public void canCompileGenericTake() {
+
+        Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, ConstantVertex.of(0.1, 0.5, 0.8, 0.2));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(0.9, 0.5, 0.2, 0.8));
+
+        CategoricalVertex<TestEnum> A = new CategoricalVertex<>(selectableValues);
+        GenericTakeVertex<TestEnum> C = A.take(1);
+
+        assertCompiledIsSameAsVertexEvaluation(A, C);
     }
 
     private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C) {

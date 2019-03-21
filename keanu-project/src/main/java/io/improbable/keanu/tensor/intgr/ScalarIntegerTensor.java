@@ -276,6 +276,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor take(long... index) {
+        return new ScalarIntegerTensor(getValue(index));
+    }
+
+    @Override
     public IntegerTensor minusInPlace(int that) {
         value = value - that;
         return this;

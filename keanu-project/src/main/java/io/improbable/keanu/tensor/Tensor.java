@@ -95,6 +95,8 @@ public interface Tensor<T> {
 
     Tensor<T> slice(int dimension, long index);
 
+    Tensor<T> take(long... index);
+
     double[] asFlatDoubleArray();
 
     int[] asFlatIntegerArray();

@@ -275,6 +275,11 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public BooleanTensor take(long... index) {
+        return scalar(getValue(index));
+    }
+
+    @Override
     public int getRank() {
         return shape.length;
     }

@@ -65,6 +65,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastToIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
@@ -214,6 +216,10 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(ConstantIntegerVertex.class, KeanuVertexToTensorOpMapper::constant);
         opMappers.put(ConstantDoubleVertex.class, KeanuVertexToTensorOpMapper::constant);
         opMappers.put(ConstantBooleanVertex.class, KeanuVertexToTensorOpMapper::constant);
+
+        //Generics
+        opMappers.put(GenericSliceVertex.class, KeanuVertexToTensorOpMapper::sliceGenericOp);
+        opMappers.put(GenericTakeVertex.class, KeanuVertexToTensorOpMapper::takeGenericOp);
     }
 
     interface OpMapper {
@@ -376,22 +382,27 @@ public class KeanuVertexToTensorOpMapper {
 
     private static String takeDoubleOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         TakeVertex takeVertex = (TakeVertex) vertex;
-        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup, "DoubleTensor");
+        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
     }
 
     private static String takeIntegerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         IntegerTakeVertex takeVertex = (IntegerTakeVertex) vertex;
-        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup, "IntegerTensor");
+        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
     }
 
     private static String takeBooleanOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         BooleanTakeVertex takeVertex = (BooleanTakeVertex) vertex;
-        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup, "BooleanTensor");
+        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
     }
 
-    private static String takeOp(long[] index, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup, String tensorType) {
+    private static String takeGenericOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        GenericTakeVertex takeVertex = (GenericTakeVertex) vertex;
+        return takeOp(takeVertex.getIndex(), takeVertex.getInputVertex(), lookup);
+    }
+
+    private static String takeOp(long[] index, Vertex inputVertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         String variableName = lookup.get(inputVertex.getId()).getName();
-        return tensorType + ".scalar(" + variableName + ".getValue(" + toJavaArrayCreation(index) + "))";
+        return variableName + ".take(" + toJavaArrayCreation(index) + ");";
     }
 
     private static String notOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
@@ -421,6 +432,11 @@ public class KeanuVertexToTensorOpMapper {
 
     private static String sliceBooleanOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
         BooleanSliceVertex sliceVertex = (BooleanSliceVertex) vertex;
+        return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
+    }
+
+    private static String sliceGenericOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        GenericSliceVertex sliceVertex = (GenericSliceVertex) vertex;
         return sliceOp(sliceVertex.getDimension(), sliceVertex.getIndex(), sliceVertex.getInputVertex(), lookup);
     }
 
