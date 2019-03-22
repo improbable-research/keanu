@@ -420,6 +420,15 @@ public class KeanuCompiledGraphTest {
         assertCompiledIsSameAsVertexEvaluation(A, B, predicate, D);
     }
 
+    @Test
+    public void canCompilePrint() {
+
+        DoubleVertex A = new GaussianVertex(0, 1);
+        A.print("\"hello'\' \\world\t\b\f\r\n", false);
+
+        assertCompiledIsSameAsVertexEvaluation(A, A.getChildren().iterator().next());
+    }
+
     private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C, Vertex<?> D) {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         compiler.convert(D.getConnectedGraph(), ImmutableList.of(D));

@@ -151,7 +151,7 @@ public class KeanuCompiledGraphBuilder implements ComputableGraphBuilder<Computa
         } else if (v instanceof GenericTensorVertex) {
             return Tensor.class.getCanonicalName();
         } else {
-            throw new IllegalArgumentException("Compiling of " + v.getClass().getCanonicalName() + " not supported yet.");
+            return Object.class.getCanonicalName();
         }
     }
 

@@ -67,6 +67,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -223,6 +224,9 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(IfVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
         opMappers.put(GenericSliceVertex.class, KeanuVertexToTensorOpMapper::sliceGenericOp);
         opMappers.put(GenericTakeVertex.class, KeanuVertexToTensorOpMapper::takeGenericOp);
+
+        //Debug ops
+        opMappers.put(PrintVertex.class, KeanuVertexToTensorOpMapper::printOp);
     }
 
     interface OpMapper {
@@ -628,5 +632,24 @@ public class KeanuVertexToTensorOpMapper {
         String epsilonName = lookup.get(epsilon.getId()).getName();
 
         return aName + ".toDouble().minus(" + bName + ".toDouble()).absInPlace().lessThanOrEqual(" + epsilonName + ".toDouble())";
+    }
+
+    private static String printOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        PrintVertex printVertex = (PrintVertex) vertex;
+        KeanuCompiledVariable parentVariable = lookup.get(printVertex.getParent().getId());
+
+        return PrintVertex.class.getCanonicalName() + ".print(" + parentVariable.getName() + ",\"" + escapeChars(printVertex.getMessage()) + "\"," + printVertex.getPrintData() + ")";
+    }
+
+    private static String escapeChars(String s) {
+        return s
+            .replace("\\", "\\\\")
+            .replace("\t", "\\t")
+            .replace("\b", "\\b")
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+            .replace("\f", "\\f")
+            .replace("\'", "\\'")
+            .replace("\"", "\\\"");
     }
 }
