@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * SequenceBuilder allows sequences to be constructed in steps
  *
  * @param <T> The data type provided to user-provided sequence
- *            factory function, if building from data
+ *            factory functions, if building from data
  */
 public class SequenceBuilder<T> {
 
@@ -118,8 +118,20 @@ public class SequenceBuilder<T> {
          * @param factory a sequence factory
          * @return A builder with count and sequence factory set
          */
-        public FromCountFactory withFactory(Consumer<SequenceItem> factory) {
-            return new FromCountFactory(factory, this, initialState, transitionMapping);
+        public FromCountFactories withFactory(Consumer<SequenceItem> factory) {
+            return withFactories(Collections.singleton(factory));
+        }
+
+        /**
+         * Set the SequenceItem factory method, taking no additional data
+         *
+         * @param factories the sequence factories.
+         *                  Each can use a vertex as an input (proxy) if the vertex is added to the sequence by any
+         *                  other factory.
+         * @return A builder with count and sequence factories set
+         */
+        public FromCountFactories withFactories(Collection<Consumer<SequenceItem>> factories) {
+            return new FromCountFactories(factories, this, initialState, transitionMapping);
         }
     }
 
@@ -147,22 +159,34 @@ public class SequenceBuilder<T> {
          * @param factory a sequence factory
          * @return A builder with data and sequence factory set
          */
-        public FromDataFactory withFactory(BiConsumer<SequenceItem, T> factory) {
-            return new FromDataFactory(factory, this, size, initialState);
+        public FromDataFactories withFactory(BiConsumer<SequenceItem, T> factory) {
+            return withFactories(Collections.singleton(factory));
+        }
+
+        /**
+         * Set the SequenceItem factory method, taking additional data
+         *
+         * @param factories the sequence factories.
+         *                  Each can use a vertex as an input (proxy) if the vertex is added to the sequence by any
+         *                  other factory.
+         * @return A builder with data and sequence factory set
+         */
+        public FromDataFactories withFactories(Collection<BiConsumer<SequenceItem, T>> factories) {
+            return new FromDataFactories(factories, this, size, initialState);
         }
     }
 
     /**
      * Build Sequence from some provided Data
      */
-    public class FromDataFactory implements SequenceFactory {
-        private BiConsumer<SequenceItem, T> factory;
+    public class FromDataFactories implements SequenceFactory {
+        private Collection<BiConsumer<SequenceItem, T>> factories;
         private SequenceData<T> data;
         private int size;
         private final VertexDictionary initialState;
 
-        private FromDataFactory(BiConsumer<SequenceItem, T> factory, SequenceData<T> data, int size, VertexDictionary initialState) {
-            this.factory = factory;
+        private FromDataFactories(Collection<BiConsumer<SequenceItem, T>> factories, SequenceData<T> data, int size, VertexDictionary initialState) {
+            this.factories = factories;
             this.data = data;
             this.size = size;
             this.initialState = initialState;
@@ -174,7 +198,7 @@ public class SequenceBuilder<T> {
             VertexDictionary previousVertices = initialState;
             while (iter.hasNext()) {
                 SequenceItem item = new SequenceItem();
-                factory.accept(item, iter.next());
+                factories.forEach(factory -> factory.accept(item, iter.next()));
                 connectTransitionVariables(previousVertices, item, transitionMapping);
                 sequence.add(item);
                 previousVertices = item;
@@ -219,12 +243,12 @@ public class SequenceBuilder<T> {
     /**
      * Build some number of sequence items
      */
-    public class FromCountFactory implements SequenceFactory {
-        private Consumer<SequenceItem> factory;
+    public class FromCountFactories implements SequenceFactory {
+        private Collection<Consumer<SequenceItem>> factories;
         private ItemCount count;
 
-        private FromCountFactory(Consumer<SequenceItem> factory, ItemCount count, VertexDictionary initialState, Map<VertexLabel, VertexLabel> transitionMapping) {
-            this.factory = factory;
+        private FromCountFactories(Collection<Consumer<SequenceItem>> factories, ItemCount count, VertexDictionary initialState, Map<VertexLabel, VertexLabel> transitionMapping) {
+            this.factories = factories;
             this.count = count;
         }
 
@@ -234,7 +258,7 @@ public class SequenceBuilder<T> {
             VertexDictionary previousItem = initialState;
             for (int i = 0; i < count.getCount(); i++) {
                 SequenceItem item = new SequenceItem();
-                factory.accept(item);
+                factories.forEach(factory -> factory.accept(item));
                 connectTransitionVariables(previousItem, item, transitionMapping);
                 sequence.add(item);
                 previousItem = item;
