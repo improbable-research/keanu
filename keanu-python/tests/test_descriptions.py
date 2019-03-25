@@ -1,3 +1,4 @@
+from keanu.description_creator import DescriptionCreator
 from keanu.vertex import Const, OrBinary, AndBinary, DoubleIf
 
 
@@ -10,7 +11,7 @@ def test_simple_descriptions_created_correctly() -> None:
     four.set_label("Four")
 
     result = (two * three) - four
-    assert result.create_description() == "This Vertex = (Const(2.0) * Three) - Four"
+    assert DescriptionCreator.create_description(result) == "This Vertex = (Const(2.0) * Three) - Four"
 
 
 def test_integer_addition_and_multiplication_descriptions_created_correctly() -> None:
@@ -22,7 +23,7 @@ def test_integer_addition_and_multiplication_descriptions_created_correctly() ->
     four.set_label("Four")
 
     result = (two * three) + four
-    assert result.create_description() == "This Vertex = (Const(2) * Three) + Four"
+    assert DescriptionCreator.create_description(result) == "This Vertex = (Const(2) * Three) + Four"
 
 
 def test_if_vertex_description_created_correctly() -> None:
@@ -34,7 +35,7 @@ def test_if_vertex_description_created_correctly() -> None:
     four.set_label("Four")
 
     result = DoubleIf(predicate, three, four)
-    assert result.create_description() == "This Vertex = Const(false) ? Three : Four"
+    assert DescriptionCreator.create_description(result) == "This Vertex = Const(false) ? Three : Four"
 
 
 def test_boolean_unary_ops_descriptions_created_correctly() -> None:
@@ -52,9 +53,9 @@ def test_boolean_unary_ops_descriptions_created_correctly() -> None:
     pred5 = OrBinary(false, false)
     pred6 = AndBinary(false, false)
 
-    assert pred1.create_description() == "This Vertex = Const(2.0) >= Three"
-    assert pred2.create_description() == "This Vertex = Const(2.0) > Three"
-    assert pred3.create_description() == "This Vertex = Const(2.0) <= Three"
-    assert pred4.create_description() == "This Vertex = Const(2.0) < Three"
-    assert pred5.create_description() == "This Vertex = Const(false) || Const(false)"
-    assert pred6.create_description() == "This Vertex = Const(false) && Const(false)"
+    assert DescriptionCreator.create_description(pred1) == "This Vertex = Const(2.0) >= Three"
+    assert DescriptionCreator.create_description(pred2) == "This Vertex = Const(2.0) > Three"
+    assert DescriptionCreator.create_description(pred3) == "This Vertex = Const(2.0) <= Three"
+    assert DescriptionCreator.create_description(pred4) == "This Vertex = Const(2.0) < Three"
+    assert DescriptionCreator.create_description(pred5) == "This Vertex = Const(false) || Const(false)"
+    assert DescriptionCreator.create_description(pred6) == "This Vertex = Const(false) && Const(false)"

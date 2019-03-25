@@ -57,10 +57,4 @@ public class AdditionVertex extends DoubleBinaryOpVertex implements Differentiab
         partials.put(right, toRight);
         return partials;
     }
-
-    @Override
-    protected CharSequence getDescriptionDelimiter() {
-        return " + ";
-    }
-
 }

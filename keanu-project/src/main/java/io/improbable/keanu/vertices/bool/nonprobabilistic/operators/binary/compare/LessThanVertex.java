@@ -18,8 +18,4 @@ public class LessThanVertex<A extends NumberTensor, B extends NumberTensor> exte
     protected BooleanTensor op(A l, B r) {
         return l.lessThan(r);
     }
-
-    protected String getInfixSymbol() {
-        return "<";
-    }
 }

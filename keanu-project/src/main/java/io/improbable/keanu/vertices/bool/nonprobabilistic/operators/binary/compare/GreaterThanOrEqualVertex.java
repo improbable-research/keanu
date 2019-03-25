@@ -18,8 +18,4 @@ public class GreaterThanOrEqualVertex<A extends NumberTensor, B extends NumberTe
     protected BooleanTensor op(A l, B r) {
         return l.greaterThanOrEqual(r);
     }
-
-    protected String getInfixSymbol() {
-        return ">=";
-    }
 }

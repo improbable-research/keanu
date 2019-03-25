@@ -18,8 +18,4 @@ public class NotEqualsVertex<A extends Tensor, B extends Tensor> extends Boolean
     protected BooleanTensor op(A l, B r) {
         return l.elementwiseEquals(r).not();
     }
-
-    protected String getInfixSymbol() {
-        return "!=";
-    }
 }

@@ -3,6 +3,8 @@ package io.improbable.keanu.util;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 
+import static io.improbable.keanu.util.DescriptionCreator.createDescriptionAllowingLabels;
+
 public class DescriptionUtils {
 
     public static String createIfStringDescription(BooleanVertex predicate, Vertex thn, Vertex els, boolean includeBrackets) {
@@ -11,11 +13,11 @@ public class DescriptionUtils {
         if (includeBrackets) {
             builder.append("(");
         }
-        builder.append(predicate.createDescriptionAllowingLabels());
+        builder.append(createDescriptionAllowingLabels(predicate));
         builder.append(" ? ");
-        builder.append(thn.createDescriptionAllowingLabels());
+        builder.append(createDescriptionAllowingLabels(thn));
         builder.append(" : ");
-        builder.append(els.createDescriptionAllowingLabels());
+        builder.append(createDescriptionAllowingLabels(els));
         if (includeBrackets) {
             builder.append(")");
         }
@@ -30,11 +32,11 @@ public class DescriptionUtils {
             builder.append("(");
         }
 
-        builder.append(a.createDescriptionAllowingLabels());
+        builder.append(createDescriptionAllowingLabels(a));
         builder.append(" ");
         builder.append(operation);
         builder.append(" ");
-        builder.append(b.createDescriptionAllowingLabels());
+        builder.append(createDescriptionAllowingLabels(b));
 
         if (includeBrackets) {
             builder.append(")");

@@ -4,7 +4,6 @@ import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.DescriptionUtils;
 import io.improbable.keanu.vertices.LoadVertexParam;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.SaveVertexParam;
@@ -89,10 +88,4 @@ public class DoubleIfVertex extends DoubleVertex implements Differentiable, NonP
             .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask()));
         return partials;
     }
-
-    @Override
-    public String recursiveDescriptionStep(boolean includeBrackets) {
-        return DescriptionUtils.createIfStringDescription(this.predicate, this.thn, this.els, includeBrackets);
-    }
-
 }
