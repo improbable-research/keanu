@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
@@ -21,6 +22,8 @@ import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVe
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
+import io.improbable.keanu.vertices.utility.AssertVertex;
+import io.improbable.keanu.vertices.utility.GraphAssertionException;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -427,6 +430,27 @@ public class KeanuCompiledGraphTest {
         A.print("\"hello'\' \\world\t\b\f\r\n", false);
 
         assertCompiledIsSameAsVertexEvaluation(A, A.getChildren().iterator().next());
+    }
+
+    @Test(expected = GraphAssertionException.class)
+    public void canCompileAssertVertex() {
+        DoubleVertex A = new HalfGaussianVertex(new long[]{2, 2}, 1);
+        AssertVertex assertVertex = A.lessThan(ConstantVertex.of(0.0)).assertTrue();
+        assertCompiledIsSameAsVertexEvaluation(A, assertVertex);
+    }
+
+    @Test(expected = GraphAssertionException.class)
+    public void canCompileAssertVertexWithMessage() {
+        DoubleVertex A = new HalfGaussianVertex(new long[]{2, 2}, 1);
+        AssertVertex assertVertex = A.lessThan(ConstantVertex.of(0.0)).assertTrue("test error message\n");
+        assertCompiledIsSameAsVertexEvaluation(A, assertVertex);
+    }
+
+    @Test(expected = GraphAssertionException.class)
+    public void canCompileAssertVertexWithLabel() {
+        DoubleVertex A = new HalfGaussianVertex(new long[]{2, 2}, 1);
+        AssertVertex assertVertex = A.lessThan(ConstantVertex.of(0.0)).assertTrue().setLabel("test label\n");
+        assertCompiledIsSameAsVertexEvaluation(A, assertVertex);
     }
 
     private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C, Vertex<?> D) {

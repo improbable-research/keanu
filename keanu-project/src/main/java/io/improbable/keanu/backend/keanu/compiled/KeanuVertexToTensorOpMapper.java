@@ -89,6 +89,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
+import io.improbable.keanu.vertices.utility.AssertVertex;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -227,6 +228,7 @@ public class KeanuVertexToTensorOpMapper {
 
         //Debug ops
         opMappers.put(PrintVertex.class, KeanuVertexToTensorOpMapper::printOp);
+        opMappers.put(AssertVertex.class, KeanuVertexToTensorOpMapper::assertOp);
     }
 
     interface OpMapper {
@@ -632,6 +634,17 @@ public class KeanuVertexToTensorOpMapper {
         String epsilonName = lookup.get(epsilon.getId()).getName();
 
         return aName + ".toDouble().minus(" + bName + ".toDouble()).absInPlace().lessThanOrEqual(" + epsilonName + ".toDouble())";
+    }
+
+    private static String assertOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        AssertVertex assertVertex = (AssertVertex) vertex;
+
+        KeanuCompiledVariable predicateVariable = lookup.get(assertVertex.getPredicate().getId());
+
+        return AssertVertex.class.getCanonicalName() + ".assertion(" +
+            predicateVariable.getName() + ",\"" +
+            escapeChars(assertVertex.getErrorMessage()) + "\"," +
+            (assertVertex.getLabel() != null ? "\"" + escapeChars(assertVertex.getLabel().getQualifiedName()) + "\"" : "null") + ")";
     }
 
     private static String printOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
