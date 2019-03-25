@@ -3,6 +3,7 @@ package io.improbable.keanu.backend.keanu.compiled;
 import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -16,6 +17,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.HalfGaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.MultiplexerVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
@@ -451,6 +453,18 @@ public class KeanuCompiledGraphTest {
         DoubleVertex A = new HalfGaussianVertex(new long[]{2, 2}, 1);
         AssertVertex assertVertex = A.lessThan(ConstantVertex.of(0.0)).assertTrue().setLabel("test label\n");
         assertCompiledIsSameAsVertexEvaluation(A, assertVertex);
+    }
+
+    @Test
+    public void conCompiledMultiplexer() {
+        IntegerVertex select = new UniformIntVertex(0, 2);
+
+        DoubleVertex A = new GaussianVertex(0, 1);
+        DoubleVertex B = new GaussianVertex(0, 1);
+
+        MultiplexerVertex<DoubleTensor> mux = new MultiplexerVertex<>(select, A, B);
+
+        assertCompiledIsSameAsVertexEvaluation(A, B, select, mux);
     }
 
     private void assertCompiledIsSameAsVertexEvaluation(Vertex<?> A, Vertex<?> B, Vertex<?> C, Vertex<?> D) {

@@ -67,6 +67,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.MultiplexerVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.PrintVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericSliceVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
@@ -221,10 +222,11 @@ public class KeanuVertexToTensorOpMapper {
         opMappers.put(ConstantDoubleVertex.class, KeanuVertexToTensorOpMapper::constant);
         opMappers.put(ConstantBooleanVertex.class, KeanuVertexToTensorOpMapper::constant);
 
-        //Generics
+        //Generic ops
         opMappers.put(IfVertex.class, KeanuVertexToTensorOpMapper::genericIfOp);
         opMappers.put(GenericSliceVertex.class, KeanuVertexToTensorOpMapper::sliceGenericOp);
         opMappers.put(GenericTakeVertex.class, KeanuVertexToTensorOpMapper::takeGenericOp);
+        opMappers.put(MultiplexerVertex.class, KeanuVertexToTensorOpMapper::multiplexerOp);
 
         //Debug ops
         opMappers.put(PrintVertex.class, KeanuVertexToTensorOpMapper::printOp);
@@ -664,5 +666,18 @@ public class KeanuVertexToTensorOpMapper {
             .replace("\f", "\\f")
             .replace("\'", "\\'")
             .replace("\"", "\\\"");
+    }
+
+    private static String multiplexerOp(Vertex<?> vertex, Map<VariableReference, KeanuCompiledVariable> lookup) {
+        MultiplexerVertex muxVertex = (MultiplexerVertex) vertex;
+
+        KeanuCompiledVariable select = lookup.get(muxVertex.getSelectorControlVertex().getId());
+
+        String outputs = Arrays
+            .stream(muxVertex.getSelectVertices())
+            .map(v -> lookup.get(v.getId()).getName())
+            .collect(Collectors.joining(","));
+
+        return MultiplexerVertex.class.getCanonicalName() + ".mux(" + select.getName() + "," + outputs + ")";
     }
 }
