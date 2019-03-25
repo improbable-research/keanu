@@ -30,13 +30,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static io.improbable.keanu.util.DescriptionUtils.createBinomialDescription;
+import static io.improbable.keanu.util.DescriptionUtils.createBooleanBinaryOpDescription;
+import static io.improbable.keanu.util.DescriptionUtils.createIfStringDescription;
+
 public class DescriptionCreator {
 
     private static Map<Class, String> delimiters = new HashMap<>();
-    private static Map<Class, String> infixes = new HashMap<>();
+    private static Map<Class, String> booleanBinaryOperators = new HashMap<>();
 
     static {
-        //TODO: put in delimiters for class
         delimiters.put(AdditionVertex.class, " + ");
         delimiters.put(IntegerAdditionVertex.class, " + ");
         delimiters.put(DifferenceVertex.class, " - ");
@@ -44,14 +47,14 @@ public class DescriptionCreator {
         delimiters.put(MultiplicationVertex.class, " * ");
         delimiters.put(IntegerMultiplicationVertex.class, " * ");
         delimiters.put(DivisionVertex.class, " / ");
-        infixes.put(AndBinaryVertex.class, "&&");
-        infixes.put(OrBinaryVertex.class, "||");
-        infixes.put(EqualsVertex.class, "==");
-        infixes.put(GreaterThanOrEqualVertex.class, ">=");
-        infixes.put(GreaterThanVertex.class, ">");
-        infixes.put(LessThanOrEqualVertex.class, "<=");
-        infixes.put(LessThanVertex.class, "<");
-        infixes.put(NotEqualsVertex.class, "!=");
+        booleanBinaryOperators.put(AndBinaryVertex.class, " && ");
+        booleanBinaryOperators.put(EqualsVertex.class, " == ");
+        booleanBinaryOperators.put(GreaterThanOrEqualVertex.class, " >= ");
+        booleanBinaryOperators.put(GreaterThanVertex.class, " > ");
+        booleanBinaryOperators.put(LessThanOrEqualVertex.class, " <= ");
+        booleanBinaryOperators.put(LessThanVertex.class, " < ");
+        booleanBinaryOperators.put(NotEqualsVertex.class, " != ");
+        booleanBinaryOperators.put(OrBinaryVertex.class, " || ");
     }
 
     private static <T extends Tensor> String getBaseDescription(Vertex<T> vertex) {
@@ -85,42 +88,9 @@ public class DescriptionCreator {
     }
 
     private static <T extends Tensor> String recursiveDescriptionStep(Vertex<T> vertex, boolean includeBrackets) {
-        if (vertex instanceof BinomialVertex) {
-            String pString = createDescriptionAllowingLabels(((BinomialVertex) vertex).getP());
-            String nString = createDescriptionAllowingLabels(((BinomialVertex) vertex).getN());
-
-            return new StringBuilder(includeBrackets ? "(" : "")
-                .append("Binomial(p=")
-                .append(pString)
-                .append(", n=")
-                .append(nString)
-                .append(")")
-                .append(includeBrackets ? ")" : "")
-                .toString();
-        } else if (vertex instanceof BooleanIfVertex) {
-            return DescriptionUtils.createIfStringDescription(
-                ((BooleanIfVertex) vertex).getPredicate(),
-                ((BooleanIfVertex) vertex).getThn(),
-                ((BooleanIfVertex) vertex).getEls(),
-                includeBrackets);
-        } else if (vertex instanceof BooleanBinaryOpVertex) {
-            return DescriptionUtils.createBooleanUnaryOpDescription(
-                ((BooleanBinaryOpVertex) vertex).getA(),
-                ((BooleanBinaryOpVertex) vertex).getB(),
-                getInfixSymbol(vertex),
-                includeBrackets);
-        } else if (vertex instanceof DoubleIfVertex) {
-            return DescriptionUtils.createIfStringDescription(
-                ((DoubleIfVertex) vertex).getPredicate(),
-                ((DoubleIfVertex) vertex).getThn(),
-                ((DoubleIfVertex) vertex).getEls(),
-                includeBrackets);
-        } else if (vertex instanceof IntegerIfVertex) {
-            return DescriptionUtils.createIfStringDescription(
-                ((IntegerIfVertex) vertex).getPredicate(),
-                ((IntegerIfVertex) vertex).getThn(),
-                ((IntegerIfVertex) vertex).getEls(),
-                includeBrackets);
+        String irregularDescription = checkForIrregularExpressions(vertex, includeBrackets);
+        if (irregularDescription != null) {
+            return irregularDescription;
         }
 
         Stream<String> parentStream = vertex
@@ -176,7 +146,33 @@ public class DescriptionCreator {
         return delimiters.getOrDefault(vertex.getClass(), ", ");
     }
 
-    private static <T extends Tensor> String getInfixSymbol(Vertex<T> vertex) {
-        return infixes.getOrDefault(vertex.getClass(), ", ");
+    private static <T extends Tensor> String checkForIrregularExpressions(Vertex<T> vertex, boolean includeBrackets) {
+        if (vertex instanceof BinomialVertex) {
+            createBinomialDescription((BinomialVertex) vertex, includeBrackets);
+        } else if (vertex instanceof BooleanIfVertex) {
+            return createIfStringDescription(
+                ((BooleanIfVertex) vertex).getPredicate(),
+                ((BooleanIfVertex) vertex).getThn(),
+                ((BooleanIfVertex) vertex).getEls(),
+                includeBrackets);
+        } else if (vertex instanceof DoubleIfVertex) {
+            return createIfStringDescription(
+                ((DoubleIfVertex) vertex).getPredicate(),
+                ((DoubleIfVertex) vertex).getThn(),
+                ((DoubleIfVertex) vertex).getEls(),
+                includeBrackets);
+        } else if (vertex instanceof IntegerIfVertex) {
+            return createIfStringDescription(
+                ((IntegerIfVertex) vertex).getPredicate(),
+                ((IntegerIfVertex) vertex).getThn(),
+                ((IntegerIfVertex) vertex).getEls(),
+                includeBrackets);
+        } else if (vertex instanceof BooleanBinaryOpVertex) {
+            return createBooleanBinaryOpDescription(
+                (BooleanBinaryOpVertex) vertex,
+                booleanBinaryOperators.getOrDefault(vertex.getClass(), ", "),
+                includeBrackets);
+        }
+        return null;
     }
 }

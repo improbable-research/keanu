@@ -1,13 +1,16 @@
 package io.improbable.keanu.util;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 
 import static io.improbable.keanu.util.DescriptionCreator.createDescriptionAllowingLabels;
 
-public class DescriptionUtils {
+class DescriptionUtils {
 
-    public static String createIfStringDescription(BooleanVertex predicate, Vertex thn, Vertex els, boolean includeBrackets) {
+    static String createIfStringDescription(BooleanVertex predicate, Vertex thn, Vertex els, boolean includeBrackets) {
         StringBuilder builder = new StringBuilder();
 
         if (includeBrackets) {
@@ -25,18 +28,30 @@ public class DescriptionUtils {
         return builder.toString();
     }
 
-    public static String createBooleanUnaryOpDescription(Vertex a, Vertex b, String operation, boolean includeBrackets) {
+    static String createBinomialDescription(BinomialVertex binomialVertex, boolean includeBrackets) {
+        String pString = createDescriptionAllowingLabels(binomialVertex.getP());
+        String nString = createDescriptionAllowingLabels(binomialVertex.getN());
+
+        return new StringBuilder(includeBrackets ? "(" : "")
+            .append("Binomial(p=")
+            .append(pString)
+            .append(", n=")
+            .append(nString)
+            .append(")")
+            .append(includeBrackets ? ")" : "")
+            .toString();
+    }
+
+    static <X extends Tensor, Y extends Tensor> String createBooleanBinaryOpDescription(BooleanBinaryOpVertex<X, Y> opVertex, String operation, boolean includeBrackets) {
         StringBuilder builder = new StringBuilder();
 
         if (includeBrackets) {
             builder.append("(");
         }
 
-        builder.append(createDescriptionAllowingLabels(a));
-        builder.append(" ");
+        builder.append(createDescriptionAllowingLabels(opVertex.getA()));
         builder.append(operation);
-        builder.append(" ");
-        builder.append(createDescriptionAllowingLabels(b));
+        builder.append(createDescriptionAllowingLabels(opVertex.getB()));
 
         if (includeBrackets) {
             builder.append(")");
