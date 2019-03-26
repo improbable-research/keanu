@@ -45,7 +45,7 @@ public class KeanuCompiledGraphTest {
         KeanuCompiledGraphBuilder compiler = new KeanuCompiledGraphBuilder();
         ComputableGraph computableGraph = compiler.build();
 
-        Map<VariableReference, ?> result = computableGraph.compute(Collections.emptyMap(), Collections.emptyList());
+        Map<VariableReference, ?> result = computableGraph.compute(Collections.emptyMap());
 
         assertTrue(result.isEmpty());
     }
@@ -122,7 +122,7 @@ public class KeanuCompiledGraphTest {
         inputs.put(A.getReference(), A.getValue());
         inputs.put(B.getReference(), B.getValue());
 
-        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+        Map<VariableReference, ?> result = computableGraph.compute(inputs);
 
         assertEquals(C.getValue(), result.get(C.getReference()));
         assertEquals(C.getValue().plus(A.getValue()), result.get(summation));
@@ -478,7 +478,7 @@ public class KeanuCompiledGraphTest {
         inputs.put(B.getReference(), B.getValue());
         inputs.put(C.getReference(), C.getValue());
 
-        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+        Map<VariableReference, ?> result = computableGraph.compute(inputs);
 
         assertEquals(D.getValue(), result.get(D.getReference()));
     }
@@ -493,7 +493,7 @@ public class KeanuCompiledGraphTest {
         inputs.put(A.getReference(), A.getValue());
         inputs.put(B.getReference(), B.getValue());
 
-        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+        Map<VariableReference, ?> result = computableGraph.compute(inputs);
 
         assertEquals(C.getValue(), result.get(C.getReference()));
     }
@@ -507,7 +507,7 @@ public class KeanuCompiledGraphTest {
         Map<VariableReference, Object> inputs = new HashMap<>();
         inputs.put(A.getReference(), A.getValue());
 
-        Map<VariableReference, ?> result = computableGraph.compute(inputs, Collections.emptyList());
+        Map<VariableReference, ?> result = computableGraph.compute(inputs);
 
         assertEquals(B.getValue(), result.get(B.getReference()));
     }

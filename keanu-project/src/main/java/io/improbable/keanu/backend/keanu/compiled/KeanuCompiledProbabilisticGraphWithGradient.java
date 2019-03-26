@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.improbable.keanu.backend.ProbabilisticGraphConverter.convertLogProbObservation;
@@ -104,7 +105,10 @@ public class KeanuCompiledProbabilisticGraphWithGradient extends KeanuCompiledPr
     private Map<VariableReference, DoubleTensor> calculateGradients(Map<VariableReference, ?> inputs,
                                                                     Map<VariableReference, VariableReference> gradientLookup) {
 
-        Map<VariableReference, ?> results = computableGraph.compute(inputs, gradientLookup.keySet());
+        Set<VariableReference> gradientReferences = gradientLookup.keySet();
+        Map<VariableReference, ?> results = computableGraph.compute(inputs).entrySet().stream()
+            .filter(e -> gradientReferences.contains(e.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         Map<VariableReference, DoubleTensor> gradientsByInputName = new HashMap<>();
         for (Map.Entry<VariableReference, ?> result : results.entrySet()) {

@@ -71,7 +71,7 @@ public class KeanuCompiledProbabilisticGraph implements ProbabilisticModel {
 
     @Override
     public double logProb(Map<VariableReference, ?> inputs) {
-        DoubleTensor logProb = computableGraph.compute(inputs, logProbOp);
+        DoubleTensor logProb = (DoubleTensor) computableGraph.compute(inputs).get(logProbOp);
         return logProb.scalar();
     }
 
@@ -82,7 +82,7 @@ public class KeanuCompiledProbabilisticGraph implements ProbabilisticModel {
             throw new IllegalStateException("Likelihood is undefined");
         }
 
-        DoubleTensor logLikelihood = computableGraph.compute(inputs, logLikelihoodOp);
+        DoubleTensor logLikelihood = (DoubleTensor) computableGraph.compute(inputs).get(logLikelihoodOp);
         return logLikelihood.scalar();
     }
 

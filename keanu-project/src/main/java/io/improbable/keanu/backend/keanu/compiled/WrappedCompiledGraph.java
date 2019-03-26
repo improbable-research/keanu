@@ -31,7 +31,7 @@ class WrappedCompiledGraph implements ComputableGraph {
     }
 
     @Override
-    public Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs, Collection<VariableReference> outputs) {
+    public Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs) {
 
         cachedInputs.putAll(inputs);
 

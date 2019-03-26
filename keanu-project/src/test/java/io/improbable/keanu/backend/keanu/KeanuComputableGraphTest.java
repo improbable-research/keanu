@@ -1,6 +1,8 @@
 package io.improbable.keanu.backend.keanu;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -29,12 +31,12 @@ public class KeanuComputableGraphTest {
         DoubleVertex C = A.plus(B);
         C.setLabel(cLabel);
 
-        KeanuComputableGraph computableGraph = new KeanuComputableGraph(C.getConnectedGraph());
+        KeanuComputableGraph computableGraph = new KeanuComputableGraph(ImmutableList.of(A, B), ImmutableSet.of(C));
 
-        DoubleTensor evaluatedC = computableGraph.compute(ImmutableMap.of(
+        DoubleTensor evaluatedC = (DoubleTensor) computableGraph.compute(ImmutableMap.of(
             A.getReference(), DoubleTensor.scalar(2),
             B.getReference(), DoubleTensor.scalar(3)
-        ), C.getReference());
+        )).get(C.getReference());
 
         assertEquals(DoubleTensor.scalar(5), evaluatedC);
     }

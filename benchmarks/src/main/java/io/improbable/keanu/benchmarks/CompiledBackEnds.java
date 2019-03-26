@@ -104,7 +104,7 @@ public class CompiledBackEnds {
         DoubleTensor result = null;
 
         for (int i = 0; i < 10000; i++) {
-            result = computableGraph.compute(inputs, output);
+            result = (DoubleTensor) computableGraph.compute(inputs).get(output);
             incrementInputs();
         }
 

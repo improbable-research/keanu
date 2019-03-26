@@ -4,7 +4,6 @@ import io.improbable.keanu.algorithms.VariableReference;
 import io.improbable.keanu.backend.ComputableGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -25,7 +24,7 @@ public class PreCompiledKeanuGraph implements ComputableGraph {
     }
 
     @Override
-    public Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs, Collection<VariableReference> outputs) {
+    public Map<VariableReference, ?> compute(Map<VariableReference, ?> inputs) {
 
         Map<String, Object> inputsByString = inputs.entrySet().stream()
             .collect(toMap(e -> toSourceVariableName(e.getKey()), Map.Entry::getValue));
