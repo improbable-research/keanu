@@ -1,3 +1,13 @@
+## Version 0.0.24
+
+## Version 0.0.23
+
+### Common
+
+* You can now build a `Sequence` using more than one factory, whose vertices may be dependent on another.
+  * In Java: you can call `SequenceBuilder#withFactories` instead of `SequenceBuilder#withFactory`
+  * In Python: the parameter has been renamed from `factory` to `factories` (BREAKING CHANGE). You can pass in one or a list of multiple factories. 
+
 ## Version 0.0.22
 
 ### Common
