@@ -17,7 +17,7 @@ public class UnaryDoubleOperations {
     public UnaryOperation operation;
 
     @Param({"10"})
-    public int N;
+    public int dimLength;
 
     @Param({"JVM", "ND4J"})
     public DoubleTensorImpl impl;
@@ -28,7 +28,7 @@ public class UnaryDoubleOperations {
     public void setup() {
         DoubleTensor.setFactory(impl.getFactory());
         KeanuRandom random = new KeanuRandom(1);
-        DoubleTensor A = random.nextDouble(new long[]{N, N});
+        DoubleTensor A = random.nextDouble(new long[]{dimLength, dimLength});
         tensor = A.matrixMultiply(A.transpose()).times(0.5);
     }
 
