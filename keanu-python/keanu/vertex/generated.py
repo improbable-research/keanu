@@ -4,6 +4,7 @@ from typing import Collection, Optional
 from py4j.java_gateway import java_import
 from keanu.context import KeanuContext
 from .base import Vertex, Double, Integer, Boolean, vertex_constructor_param_types
+from keanu.vertex.label import _VertexLabel
 from keanu.vartypes import (
     tensor_arg_types,
     shape_types
@@ -254,7 +255,7 @@ def DoubleIf(predicate: vertex_constructor_param_types, thn: vertex_constructor_
 
 
 def DoubleProxy(shape: Collection[int], label: str) -> Vertex:
-    return Double(context.jvm_view().DoubleProxyVertex, label, cast_to_long_array(shape), label)
+    return Double(context.jvm_view().DoubleProxyVertex, label, cast_to_long_array(shape), _VertexLabel(label).unwrap())
 
 
 def Addition(left: vertex_constructor_param_types, right: vertex_constructor_param_types, label: Optional[str]=None) -> Vertex:

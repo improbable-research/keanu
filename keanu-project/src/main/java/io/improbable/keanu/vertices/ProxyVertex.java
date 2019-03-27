@@ -10,4 +10,6 @@ public interface ProxyVertex<T extends Vertex<?>> {
 
     boolean hasParent();
 
+    void addScopeToLabel(String scope);
+
 }

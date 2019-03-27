@@ -54,7 +54,11 @@ public class SequenceItem implements VertexDictionary {
             throw new IllegalArgumentException("Key " + label + " already exists");
         }
         contents.put(label, v);
-        v.setLabel(label);
+        if (v instanceof ProxyVertex) {
+            ((ProxyVertex) v).addScopeToLabel(getUniqueName());
+        } else {
+            v.setLabel(label);
+        }
         return v;
     }
 

@@ -33,7 +33,7 @@ class Vertex(JavaObjectWrapper, SupportsRound['Vertex']):
             val = typing_cast(JavaObject, val_or_ctor)
 
         super(Vertex, self).__init__(val)
-        if label is not None:
+        if label is not None and self.get_label() is None:
             self.set_label(label)
 
     def cast(self, v: tensor_arg_types) -> tensor_arg_types:
