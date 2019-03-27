@@ -175,10 +175,7 @@ public class INDArrayShim {
                 rightBroadcasted = addi(Nd4j.valueArrayOf(resultShape, 0), right);
             }
 
-            INDArray result = operation.apply(leftBroadcasted, rightBroadcasted);
-
-            return result;
-
+            return operation.apply(leftBroadcasted, rightBroadcasted);
         } else {
             return operation.apply(left, right);
         }
