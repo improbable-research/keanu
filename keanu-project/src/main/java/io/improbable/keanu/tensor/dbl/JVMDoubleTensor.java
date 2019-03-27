@@ -50,7 +50,7 @@ public class JVMDoubleTensor extends DoubleTensor {
     private long[] stride;
     private double[] buffer;
 
-    public JVMDoubleTensor(double value) {
+    private JVMDoubleTensor(double value) {
         this.shape = new long[0];
         this.stride = new long[0];
         this.buffer = new double[]{value};
