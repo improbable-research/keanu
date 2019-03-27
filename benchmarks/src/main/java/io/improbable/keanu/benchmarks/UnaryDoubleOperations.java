@@ -29,6 +29,10 @@ public class UnaryDoubleOperations {
         DoubleTensor.setFactory(impl.getFactory());
         KeanuRandom random = new KeanuRandom(1);
         DoubleTensor A = random.nextDouble(new long[]{dimLength, dimLength});
+
+        /*
+         * Generate a matrix that is symmetric with values in a range suitable for all the operations above
+         */
         tensor = A.matrixMultiply(A.transpose()).times(0.5);
     }
 
