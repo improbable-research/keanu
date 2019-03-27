@@ -182,7 +182,7 @@ public class TensorShape {
     public static int[] slideDimension(int from, int to, int rank) {
         int[] dimensionRange = dimensionRange(0, rank);
         List<Integer> shapeList = new ArrayList<>(Ints.asList(dimensionRange));
-        int dimLength = shapeList.remove(from);
+        Integer dimLength = shapeList.remove(from);
         shapeList.add(to, dimLength);
         return Ints.toArray(shapeList);
     }
